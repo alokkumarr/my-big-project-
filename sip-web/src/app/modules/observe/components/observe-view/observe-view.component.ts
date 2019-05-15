@@ -6,16 +6,15 @@ import {
   ElementRef
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
-import * as html2pdf from 'html2pdf.js';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import * as Bowser from 'bowser';
 
-import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
+import { ObserveDownloadService } from '../../services/observe-download.service';
 import { FirstDashboardGuard } from '../../guards';
 import {
   JwtService,
@@ -23,20 +22,12 @@ import {
   ToastService
 } from '../../../../common/services';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
-import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
 import { map, catchError, flatMap } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
-import * as lodashMap from 'lodash/map';
-import * as forEach from 'lodash/forEach';
-
-function downloadDataUrlFromJavascript(filename, dataUrl) {
-  const blob = dataURItoBlob(dataUrl);
-  saveAs(blob, filename);
-}
 
 const browser = get(
   Bowser.getParser(window.navigator.userAgent).getBrowser(),
@@ -71,6 +62,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private _downloadService: ObserveDownloadService,
     private guard: FirstDashboardGuard,
     private dashboardService: DashboardService,
     private router: Router,
@@ -239,55 +231,11 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       });
   }
 
-  imageUrl2DataUrl(imageUrl) {
-    return fetch(imageUrl)
-      .then(response => response.blob())
-      .then(
-        blob =>
-          new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          })
-      );
-  }
-
-  changeMapCanvasesToImage() {
-    const mapBoxComponents = Array.from(
-      this.downloadContainer.nativeElement.getElementsByTagName('map-box')
-    );
-
-    const backupImgCanvasPairs = [];
-    const onImgLoadPromises = lodashMap(mapBoxComponents, comp => {
-      const imageUrl = comp.dataset['imageUrl'];
-      const canvasContainer = comp.querySelector('.mapboxgl-canvas-container');
-      const canvas = canvasContainer.querySelector('canvas');
-      const { height, width } = canvas.style;
-      const imageElem = document.createElement('img');
-
-      return this.imageUrl2DataUrl(imageUrl).then((dataUrl: string) => {
-        imageElem.src = dataUrl;
-        imageElem.crossOrigin = 'anonymous';
-        imageElem.height = parseInt(height, 10);
-        imageElem.width = parseInt(width, 10);
-        backupImgCanvasPairs.push({ canvas, imageElem });
-        canvas.replaceWith(imageElem);
-      });
-    });
-
-    if (isEmpty(onImgLoadPromises)) {
-      return Promise.resolve([]);
-    } else {
-      return Promise.all(onImgLoadPromises).then(() => {
-        return backupImgCanvasPairs;
-      });
-    }
-  }
-
   downloadDashboard() {
+    const nativeElement = this.downloadContainer.nativeElement;
+    const fileName = this.dashboard.name;
     const mapBoxComponents = Array.from(
-      this.downloadContainer.nativeElement.getElementsByTagName('map-box')
+      nativeElement.getElementsByTagName('map-box')
     );
 
     if (browser !== 'Chrome' && !isEmpty(mapBoxComponents)) {
@@ -298,64 +246,9 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.changeMapCanvasesToImage().then(backupImgCanvasPairs => {
-      this.turnHtml2pdf().then(() => {
-        forEach(backupImgCanvasPairs, ({ canvas, imageElem }) => {
-          imageElem.replaceWith(canvas);
-        });
-      });
-    });
-  }
+    const elemToDownload = nativeElement.getElementsByTagName('gridster')[0];
 
-  turnHtml2pdf() {
-    const FILE_NAME = this.dashboard.name;
-    const elem = this.downloadContainer.nativeElement.getElementsByTagName(
-      'gridster'
-    )[0];
-
-    /* Set overflow to visible manually to fix safari's bug. Without this,
-     * safari downloads a blank image */
-    const overflow = elem.style.overflow;
-    elem.style.overflow = 'visible';
-
-    return (
-      html2pdf()
-        .from(elem)
-        .set({
-          margin: 1,
-          filename: `${FILE_NAME}.pdf`,
-          image: { type: 'jpeg', quality: 1 },
-          html2canvas: {
-            backgroundColor: '#f4f5f4',
-            scale: 2,
-            width: elem.scrollWidth,
-            height: elem.scrollHeight,
-            windowWidth: elem.scrollWidth,
-            windowHeight: elem.scrollHeight,
-            onclone: cloned => {
-              // need this for html2pdf download to wirk with gridster library
-              // https://github.com/niklasvh/html2canvas/issues/1720
-              const gridsterItems = Array.from(
-                cloned.querySelectorAll('gridster-item')
-              );
-              forEach(gridsterItems, item => {
-                item.style.transition = 'unset';
-              });
-            }
-          },
-          jsPDF: {
-            unit: 'px',
-            orientation: 'landscape',
-            format: [elem.scrollHeight + 50, elem.scrollWidth]
-          }
-        })
-        // .save(); // comment this and uncomment following lines if png is needed instead of pdf
-        .outputImg('datauristring')
-        .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
-        .then(() => {
-          elem.style.overflow = overflow;
-        })
-    );
+    this._downloadService.downloadDashboard(elemToDownload, fileName);
   }
 
   editDashboard(): void {

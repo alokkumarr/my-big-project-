@@ -25,6 +25,7 @@ import {
   SideNavService
 } from '../../common/services';
 import { ObserveService } from './services/observe.service';
+import { ObserveDownloadService } from './services/observe-download.service';
 
 import { UChartModule } from '../../common/components/charts';
 
@@ -104,6 +105,7 @@ const GUARDS = [FirstDashboardGuard];
   providers: [
     DashboardService,
     ObserveService,
+    ObserveDownloadService,
     JwtService,
     UserService,
     AnalyzeService,
