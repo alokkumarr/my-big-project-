@@ -77,7 +77,7 @@ public class StorageProxyUtil {
   public static List<DataSecurityKeyDef> getDsks(List<TicketDSKDetails> dskList) {
     DataSecurityKeyDef dataSecurityKeyDef;
     List<DataSecurityKeyDef> dskDefList = new ArrayList<>();
-    if (dskDefList != null && !dskList.isEmpty()) {
+    if (dskList != null && !dskList.isEmpty()) {
       for (TicketDSKDetails dsk : dskList) {
         dataSecurityKeyDef = new DataSecurityKeyDef();
         dataSecurityKeyDef.setName(dsk.getName());
@@ -85,71 +85,74 @@ public class StorageProxyUtil {
         dskDefList.add(dataSecurityKeyDef);
       }
     }
-    return (dskDefList);
+    return dskDefList;
   }
 
   /**
    * This will fetch the SIP query from metadata and provide.
    *
-   * @param semanticId
+   * @param sipQuery
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      String semanticId, String metaDataServiceExport, HttpServletRequest request) {
+      SipQuery sipQuery, String metaDataServiceExport, HttpServletRequest request) {
+    String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
             + metaDataServiceExport
             + "/internal/semantic/workbench/"
             + semanticId);
     SipQuery semanticSipQuery = new SipQuery();
-    try {
-      RestTemplate restTemplate = new RestTemplate();
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
+    if (semanticId != null) {
+      try {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-      String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
-      logger.debug("SIP query url for analysis fetch : " + url);
-      HttpHeaders requestHeaders = new HttpHeaders();
-      requestHeaders.set("Host", request.getHeader("Host"));
-      requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-      requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
-      requestHeaders.set("Authorization", request.getHeader("Authorization"));
+        String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
+        logger.debug("SIP query url for analysis fetch : " + url);
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.set("Host", request.getHeader("Host"));
+        requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
+        requestHeaders.set("Authorization", request.getHeader("Authorization"));
 
-      HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
 
-      ResponseEntity<SemanticNode> analysisResponse =
-          restTemplate.exchange(url, HttpMethod.GET, requestEntity, SemanticNode.class);
+        ResponseEntity<SemanticNode> analysisResponse =
+            restTemplate.exchange(url, HttpMethod.GET, requestEntity, SemanticNode.class);
 
-      List<Object> artifactList = analysisResponse.getBody().getArtifacts();
+        List<Object> artifactList = analysisResponse.getBody().getArtifacts();
 
-      List<Artifact> artifacts = new ArrayList<>();
-      List<Field> fields = new ArrayList<>();
+        List<Artifact> artifacts = new ArrayList<>();
+        List<Field> fields = new ArrayList<>();
 
-      for (Object artifact : artifactList) {
-        Artifact dslArtifact = new Artifact();
-        Gson gson = new Gson();
-        logger.info("Gson String " + gson.toJson(artifact));
-        JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
-        dslArtifact.setArtifactsName(artifactObj.get("artifactName").getAsString());
-        JsonArray columns = artifactObj.getAsJsonArray("columns");
-        for (JsonElement columnElement : columns) {
-          JsonObject column = columnElement.getAsJsonObject();
-          Field field = new Field();
-          // Only columnName will be sufficient for applying DSK. If you are using this method to
-          // extract complete sipQuery Obj, you can set the other variables of sipQuery based on
-          // the needs and this doesn't affect DSK functionality.
-          field.setColumnName(column.get("columnName").getAsString());
-          field.setDisplayName(column.get("displayName").getAsString());
-          fields.add(field);
+        for (Object artifact : artifactList) {
+          Artifact dslArtifact = new Artifact();
+          Gson gson = new Gson();
+          logger.info("Gson String " + gson.toJson(artifact));
+          JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
+          dslArtifact.setArtifactsName(artifactObj.get("artifactName").getAsString());
+          JsonArray columns = artifactObj.getAsJsonArray("columns");
+          for (JsonElement columnElement : columns) {
+            JsonObject column = columnElement.getAsJsonObject();
+            Field field = new Field();
+            // Only columnName will be sufficient for applying DSK. If you are using this method to
+            // extract complete sipQuery Obj, you can set the other variables of sipQuery based on
+            // the needs and this doesn't affect DSK functionality.
+            field.setColumnName(column.get("columnName").getAsString());
+            field.setDisplayName(column.get("displayName").getAsString());
+            fields.add(field);
+          }
+          dslArtifact.setFields(fields);
+          artifacts.add(dslArtifact);
         }
-        dslArtifact.setFields(fields);
-        artifacts.add(dslArtifact);
-      }
-      semanticSipQuery.setArtifacts(artifacts);
+        semanticSipQuery.setArtifacts(artifacts);
 
-      logger.debug("Fetched SIP query for analysis : " + semanticSipQuery.toString());
-    } catch (Exception ex) {
-      logger.error("Sip query not fetched from semantic");
+        logger.debug("Fetched SIP query for analysis : " + semanticSipQuery.toString());
+      } catch (Exception ex) {
+        logger.error("Sip query not fetched from semantic");
+      }
     }
     return semanticSipQuery;
   }

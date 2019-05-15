@@ -285,8 +285,10 @@ public class StorageProxyController {
     if (sipQuery == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    Ticket authTicket = getTicket(request);
-    if (authTicket == null && !executionType.equals(ExecutionType.scheduled)) {
+
+    boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
+    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
+    if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
@@ -294,15 +296,14 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
-    SipQuery savedQuery = getSipQuery(sipQuery.getSemanticId(), metaDataServiceExport, request);
+    SipQuery savedQuery = getSipQuery(sipQuery, metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-    String executedBy = authTicket.getMasterLoginId();
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery.getArtifacts(), dataSecurityKey);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
 
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
@@ -323,7 +324,7 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
-        executionResult.setExecutedBy(executedBy);
+        executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "system");
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {
