@@ -28,13 +28,13 @@ import java.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import executor.ReportExecutorQueue
-
+import org.apache.commons.httpclient.HttpClient
+import org.apache.http.client
 import org.json4s
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.engine.Fields
 import sncr.saw.common.config.SAWServiceConfig
 import org.json4s.native.Serialization.writePretty
-
 import sncr.service.InternalServiceClient
 import sncr.service.model.SemanticNodeObject
 
@@ -481,6 +481,7 @@ class Analysis extends BaseController {
   def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): (json4s.JValue, String) = {
     var json: String = "";
     var typeInfo: String = "";
+    val  client: org.apache.http.client.HttpClient = new InternalServiceClient().getHttpClient();
     var analysisJSON: JObject = null;
     m_log.trace("dataSecurityKeyStr dataset: {}", dataSecurityKeyStr);
     m_log.trace("json dataset: {}", reqJSON);
@@ -533,11 +534,12 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr != null) {
         m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(client).getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr, timeOut), json, timeOut,
+          client);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(client).getSearchSourceBuilder(EntityType.PIVOT, json, timeOut), json, timeOut, client);
 
       }
 
@@ -620,11 +622,13 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr != null) {
         m_log.trace("dataSecurityKeyStr dataset inside esReport block: {}", dataSecurityKeyStr)
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(rowLimit, client).getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr, timeOut), json, timeOut,
+          client);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(rowLimit, client).getSearchSourceBuilder(EntityType.ESREPORT, json, timeOut), json, timeOut,
+          client);
       }
 
       val finishedTS = System.currentTimeMillis;
@@ -704,11 +708,11 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr != null) {
         m_log.trace("dataSecurityKeyStr dataset inside chart block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(client).getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr, timeOut), json, timeOut,client);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, timeOut), json, timeOut);
+          new SAWElasticSearchQueryBuilder(client).getSearchSourceBuilder(EntityType.CHART, json, timeOut), json, timeOut, client);
       }
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);

@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +41,11 @@ public class InternalServiceClient {
         this.url = url;
     }
 
+    /**
+     * Default Constructor
+     */
+    public InternalServiceClient(){}
+
     private static CloseableHttpClient client;
     /**
      * This method will be used to access the semantic service to get the
@@ -49,11 +53,11 @@ public class InternalServiceClient {
      * @param object
      * @return Object
      */
-    public String retrieveObject(Object object) throws IOException {
+    public String retrieveObject(Object object) throws Exception {
         logger.trace("request from retrieveObject :"+ object);
         Object node = null;
         ObjectMapper mapper = new ObjectMapper();
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = getHttpClient();
         HttpGet request = new HttpGet(url);
         HttpResponse response = client.execute(request);
         BufferedReader rd = new BufferedReader(
@@ -88,7 +92,7 @@ public class InternalServiceClient {
                     getSsLContext(trustStore, trustStorePassword, keyStore, keyStorePassword);
             SSLConnectionSocketFactory factory =
                     new SSLConnectionSocketFactory(sslcontext, new NoopHostnameVerifier());
-            client = HttpClients.custom().setConnectionManager(cm).setSSLSocketFactory(factory).build();
+            client = HttpClients.custom().setSSLSocketFactory(factory).build();
         } else {
             client = HttpClients.custom().setConnectionManager(cm).build();
         }

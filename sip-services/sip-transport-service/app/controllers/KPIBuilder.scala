@@ -49,7 +49,7 @@ class KPIBuilder extends BaseController {
           executionObject = new KPIDataQueryBuilder(jsonString,dskStr).buildQuery()
         else
           executionObject = new KPIDataQueryBuilder(jsonString).buildQuery()
-        val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut)
+        val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut, new InternalServiceClient().getHttpClient())
         val responseJson = parse(data)
         responseJson
       }

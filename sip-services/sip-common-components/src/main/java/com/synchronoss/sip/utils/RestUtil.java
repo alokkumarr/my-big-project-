@@ -164,7 +164,7 @@ public class RestUtil {
           getSsLContext(keyStore, keyStorePassword, trustStore, trustStorePassword);
       SSLConnectionSocketFactory factory =
           new SSLConnectionSocketFactory(sslcontext, new NoopHostnameVerifier());
-      client = HttpClients.custom().setConnectionManager(cm).setSSLSocketFactory(factory).build();
+      client = HttpClients.custom().setSSLSocketFactory(factory).build();
     } else {
       client = HttpClients.custom().setConnectionManager(cm).build();
     }

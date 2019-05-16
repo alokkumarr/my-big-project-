@@ -126,12 +126,12 @@ public class GatewayController {
         HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
       RestTemplate restTemplate = restUtil.restTemplate();
         String url = apiGatewayOtherProperties+"/auth/customer/details";
-        logger.debug("security server URL {}", url);
+        logger.trace("security server URL {}", url);
         try {
         ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
             requestEntity, UserCustomerMetaData.class);
-        logger.debug(securityResponse.getStatusCode().getReasonPhrase());
-        logger.debug(securityResponse.toString());
+        logger.trace(securityResponse.getStatusCode().getReasonPhrase());
+        logger.trace(securityResponse.toString());
         UserCustomerMetaData userMetadata =(UserCustomerMetaData) securityResponse.getBody();
          if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
           if (!ServletFileUpload.isMultipartContent(request)) {
@@ -204,7 +204,7 @@ public class GatewayController {
         }
         responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
-    logger.debug("Response {}", responseEntity.getStatusCode());
+    logger.trace("Response {}", responseEntity.getStatusCode());
     return responseEntity;
   }
 

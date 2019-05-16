@@ -8,6 +8,7 @@ import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
 import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.report.*;
+import org.apache.http.client.HttpClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -28,18 +29,21 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     String dataSecurityString;
     Integer timeOut = 3;
     SearchSourceBuilder searchSourceBuilder;
+    HttpClient client;
 
-    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut) {
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut, HttpClient client) {
         super();
         this.jsonString = jsonString;
         this.timeOut = timeOut;
+        this.client = client;
     }
 
-    public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut) {
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut, HttpClient client) {
         super();
         this.dataSecurityString = dataSecurityKey;
         this.jsonString = jsonString;
         this.timeOut = timeOut;
+        this.client = client;
     }
 
     public String getDataSecurityString() {
@@ -197,7 +201,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse",timeOut);
+                    "system","analyse",timeOut, client);
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);
