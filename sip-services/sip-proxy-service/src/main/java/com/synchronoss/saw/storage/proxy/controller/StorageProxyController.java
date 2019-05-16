@@ -324,7 +324,7 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
-        executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "sawadmin@synchronoss.com");
+        executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {
