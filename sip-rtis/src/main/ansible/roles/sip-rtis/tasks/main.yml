@@ -15,7 +15,7 @@
     - restart sip-rtis
 - name: Create symbolink link to current Spark version
   file:
-    src: /opt/mapr/spark/spark-2.2.1
+    src: /opt/mapr/spark/spark-2.3.2
     dest: /opt/mapr/spark/spark-current
     state: link
 - name: Enable RTIS

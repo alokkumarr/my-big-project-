@@ -3,7 +3,7 @@ Description=SIP Transport
 
 [Service]
 Type=notify
-ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj
+ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxjnetty
 SyslogIdentifier=saw-transport
 User=mapr
 Restart=on-failure

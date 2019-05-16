@@ -29,6 +29,12 @@ declare DRYRUN=''
 declare FG_EXECJ=
 # Option: --fxj
 
+
+# Use foreground 'exec' to run java process, variable will be used for play framework
+# based netty library to load at run time
+declare FG_EXECJN=
+# Option: --fxjnetty
+
 ###  ------------------------------- ###
 ###  Helper methods for BASH scripts ###
 ###  ------------------------------- ###
@@ -40,6 +46,7 @@ function usage () {
   -v          verbose output
   -d          print java command without running it
   --fxj       use Foreground eXec to start Java
+  --fxjnetty  use run the services with compatible netty version
   <saw_service_port> optional, SAW_SERVICE port number, if not provided
               using SAW_SERVICE_PORT from /etc/saw/service.env
 Environment vars:
@@ -62,6 +69,7 @@ function process_args ()
     -v) VERBOSE=1     ;;
     -d) DRYRUN=1      ;;
     --fxj) FG_EXECJ=1    ;;
+    --fxjnetty) FG_EXECJN=1 ;;
     -*) usage; exit 1 ;;
      *) SAW_SERVICE_PORT="$1"
         break ;;
@@ -132,7 +140,16 @@ declare lib_classpath=$(
     $lib_dir
   )
 
-for j in `ls /opt/mapr/spark/spark-2.2.1/jars/*.jar`; do
+# Workaround : Load the netty library at runtime for saw-transport-service
+# required play version. Added as part of spark 2.3.2 version upgrade , since
+# latest spark netty lib are not compatible with used play framework.
+if [[ $FG_EXECJN ]] ; then
+ for j in `ls ${saw_service_home}/netty-lib/*.jar`; do
+ lib_classpath=${lib_classpath}:"${j}"
+ done
+fi
+
+for j in `ls /opt/mapr/spark/spark-2.3.2/jars/*.jar`; do
  lib_classpath=${lib_classpath}:"${j}"
 done
 lib_classpath=${lib_classpath}:$(mapr classpath):$(hadoop classpath):$(hbase classpath)
@@ -181,7 +198,7 @@ export SAW_EXECUTOR_HOME=${saw_service_home}
 
 elog=/dev/null
 #
-if [[ $FG_EXECJ ]] ; then
+if [[ $FG_EXECJ ]] || [[ $FG_EXECJN ]] ; then
   $exec_cmd
   echo never gets here
 fi

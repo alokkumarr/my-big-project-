@@ -20,6 +20,12 @@
 		  <outputDirectory>lib</outputDirectory>
 		  <fileMode>644</fileMode>
 	  </fileSet>
+    <fileSet>
+      <directoryMode>755</directoryMode>
+      <directory>${project.basedir}/../sip-transport-service/target/sip-transport-service-${project.version}-package/sip-transport-service-${project.version}/netty-lib</directory>
+      <outputDirectory>netty-lib</outputDirectory>
+      <fileMode>644</fileMode>
+    </fileSet>
 	  <fileSet>
 		  <directoryMode>755</directoryMode>
 		  <directory>${project.basedir}/../sip-data-access/target</directory>
@@ -36,8 +42,18 @@
 		<outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
 		<scope>runtime</scope>
 		<excludes>
+      <!--exclude the io.netty from main lib path, it will included at runtime -->
+      <exclude>io.netty</exclude>
 			<exclude>*-maven-*</exclude>
 		</excludes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>netty-lib</outputDirectory>
+      <includes>
+        <include>
+          io.netty
+        </include>
+      </includes>
     </dependencySet>
   </dependencySets>
 </assembly>
