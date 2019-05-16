@@ -114,7 +114,11 @@ export class DesignerPageComponent implements OnInit {
             isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
           ]);
         } else {
-          this.locationService.back();
+          if (isDSLAnalysis(analysis)) {
+            this.router.navigateByUrl(`/analyze/analysis/${analysis.id}/executed?isDSL=${isDSLAnalysis(analysis)}`);
+          } else {
+            this.locationService.back();
+          }
         }
       }
     }
