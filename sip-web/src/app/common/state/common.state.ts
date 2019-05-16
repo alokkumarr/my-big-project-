@@ -20,7 +20,8 @@ import * as values from 'lodash/values';
     analyzeMenu: null,
     observeMenu: null,
     adminMenu: null,
-    metrics: {}
+    metrics: {},
+    jobs: {}
   }
 })
 export class CommonState {
@@ -97,11 +98,8 @@ export class CommonState {
     { patchState, getState },
     { cronJobs }
   ) {
-    const jobs = getState().jobs;
-    console.log(cronJobs);
-    console.log(jobs);
     return patchState({
-      jobs: {...jobs}
+      jobs: { ...cronJobs}
     });
   }
 }

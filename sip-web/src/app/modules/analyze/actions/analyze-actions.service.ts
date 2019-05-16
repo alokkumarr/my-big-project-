@@ -258,6 +258,8 @@ export class AnalyzeActionsService {
   removeAnalysis(analysis) {
     // Delete schedule if exists
     console.log(analysis);
+    console.log(analysis.id);
+
     return;
     if (analysis.schedule) {
       const deleteScheduleBody = {

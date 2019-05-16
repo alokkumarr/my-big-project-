@@ -15,4 +15,5 @@ export interface CommonStateModel {
   observeMenu: Menu;
   adminMenu: Menu;
   metrics: { [id: string]: any };
+  jobs: {};
 }
