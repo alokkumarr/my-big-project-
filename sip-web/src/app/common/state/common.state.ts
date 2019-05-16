@@ -3,7 +3,8 @@ import {
   CommonStateUpdateMenu,
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
-  CommonLoadMetricById
+  CommonLoadMetricById,
+  UpdateScheduleJobs
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
 import { tap } from 'rxjs/operators';
@@ -88,5 +89,19 @@ export class CommonState {
         patchState({ metrics: { ...metrics, [metric.id]: metric } });
       })
     );
+  }
+
+
+  @Action(UpdateScheduleJobs)
+  updateSchedule(
+    { patchState, getState },
+    { cronJobs }
+  ) {
+    const jobs = getState().jobs;
+    console.log(cronJobs);
+    console.log(jobs);
+    return patchState({
+      jobs: {...jobs}
+    });
   }
 }

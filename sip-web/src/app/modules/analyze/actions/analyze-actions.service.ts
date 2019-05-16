@@ -257,6 +257,8 @@ export class AnalyzeActionsService {
 
   removeAnalysis(analysis) {
     // Delete schedule if exists
+    console.log(analysis);
+    return;
     if (analysis.schedule) {
       const deleteScheduleBody = {
         scheduleState: 'delete',

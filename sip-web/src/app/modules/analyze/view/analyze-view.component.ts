@@ -15,7 +15,7 @@ import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 import { isDSLAnalysis } from '../designer/types';
-import { CommonLoadAllMetrics } from 'src/app/common/actions/menu.actions';
+import { CommonLoadAllMetrics, UpdateScheduleJobs } from 'src/app/common/actions/menu.actions';
 import { first, map } from 'rxjs/operators';
 
 const VIEW_KEY = 'analyseReportView';
@@ -260,6 +260,7 @@ export class AnalyzeViewComponent implements OnInit {
             },
             {}
           );
+          this.store.dispatch(new UpdateScheduleJobs(this.cronJobs));
         } else {
           this.cronJobs = {};
         }

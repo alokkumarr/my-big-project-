@@ -20,3 +20,9 @@ export class AdminExportLoadMenu {
 
   constructor(public moduleName: string) {}
 }
+
+export class UpdateScheduleJobs {
+  /* Use for only new DSL analyses. This is for filters in charts,  */
+  static readonly type = 'Update schedule Jobs for a particular category';
+  constructor(public cronJobs) {}
+}
