@@ -39,6 +39,9 @@ public class MigrateAnalysisService {
 
   @Autowired private HBaseUtil hBaseUtil;
 
+  @Autowired
+  private QueryDefinitionConverter queryDefinitionConverter;
+
   @PostConstruct
   private void init() throws Exception {
     // convertBinaryStoreToDslJsonStore();
@@ -202,12 +205,18 @@ public class MigrateAnalysisService {
       String executionFinishTs = content.get("execution_finish_ts").toString();
       LOGGER.info("executionFinishTs :" + executionFinishTs);
 
-      String queryBuilder = content.get("queryBuilder").toString();
-      LOGGER.info("queryBuilder :" + content.get("queryBuilder").getAsJsonObject());
+      JsonObject queryBuilder = new JsonObject();
+      queryBuilder.add("queryBuilder", content.get("queryBuilder"));
+      LOGGER.info("queryBuilder from the binary store :" + queryBuilder);
 
       String executedBy = content.get("executedBy").toString();
       LOGGER.info("executedBy :" + executedBy);
 
+      String executionDataAsString = new String(result.getValue("_objects".getBytes(), "data".getBytes()));
+      LOGGER.info(
+          "ExecutionData from Binary Store as executionDataAsString :" + executionDataAsString);
+
+/*
       JsonArray executionData =
           parser
               .parse(new String(result.getValue("_objects".getBytes(), "data".getBytes())))
@@ -215,6 +224,11 @@ public class MigrateAnalysisService {
 
       JsonObject object = executionData.getAsJsonObject();
       LOGGER.info("ExecutionData from Binary Store :" + object.toString());
+*/
+
+      LOGGER.info("SipQuery building start here");
+      SipQuery sipQuery = queryDefinitionConverter.convert(queryBuilder);
+      LOGGER.info("SipQuery from the binary store :" + sipQuery.getArtifacts().size());
 
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());

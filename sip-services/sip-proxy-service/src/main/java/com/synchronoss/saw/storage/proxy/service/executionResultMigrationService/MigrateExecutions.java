@@ -73,7 +73,7 @@ public class MigrateExecutions {
    */
   private SipQuery convertOldAnalysisObjtoSipDsl(JsonObject queryBuilderObject) {
 
-    FieldsSipDslConverter converter = new ExecutionResultConverter();
+    FieldsSipDslConverter converter = new QueryDefinitionConverter();
 
     SipQuery sipQuery = converter.convert(queryBuilderObject);
 

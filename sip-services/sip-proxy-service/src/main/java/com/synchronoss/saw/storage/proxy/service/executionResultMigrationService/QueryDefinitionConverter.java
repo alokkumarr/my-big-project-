@@ -17,11 +17,15 @@ import com.synchronoss.saw.model.Right;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.geomap.GeoRegion;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExecutionResultConverter implements FieldsSipDslConverter {
+@Component
+public class QueryDefinitionConverter implements FieldsSipDslConverter {
+
   @Override
   public SipQuery convert(JsonObject queryBuilderObject) {
     SipQuery sipQuery;
