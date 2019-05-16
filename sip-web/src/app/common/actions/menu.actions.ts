@@ -22,7 +22,7 @@ export class AdminExportLoadMenu {
 }
 
 export class UpdateScheduleJobs {
-  /* Use for only new DSL analyses. This is for filters in charts,  */
+  /* Use for only new DSL analyses. This is for fetching jobs for that category,  */
   static readonly type = 'Update schedule Jobs for a particular category';
   constructor(public cronJobs) {}
 }
