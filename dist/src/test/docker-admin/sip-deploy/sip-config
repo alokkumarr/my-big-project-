@@ -154,10 +154,6 @@ sip-app2
 
 [saw-security:vars]
 saw_security_email_host=sip-admin
-sip_secure=True
-## generate random encryption keys using the openssl rand command. For example, to create a random 256-bit (32-byte) encryption key, you would run the following command:openssl rand -hex 32
-#Note: Dont share this key 
-#This key file will be encypted using openssl enc command
 
 
 [saw-security-arbitrator]
