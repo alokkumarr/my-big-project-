@@ -404,22 +404,21 @@ public class QueryBuilderUtil {
    * This method will validate whether Data security keys will be applicable for the * analysis and
    * return the list of Key which all are applicable.
    *
-   * @param artifactList
+   * @param sipQuery
    * @param dataSecurityKey
    * @return
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
-      List<Artifact> artifactList, DataSecurityKey dataSecurityKey) {
+      SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
     List<DataSecurityKeyDef> dataSecurityKeyDefList =
         dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
     List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
-    String artifactName = null;
-    List<Field> fieldList;
+    List<Artifact> artifactList = sipQuery != null ? sipQuery.getArtifacts() : null;
     if ((artifactList != null && !artifactList.isEmpty())
         && (dataSecurityKeyDefList != null && !dataSecurityKeyDefList.isEmpty())) {
       for (Artifact artifact : artifactList) {
-        artifactName = artifact.getArtifactsName();
-        fieldList = artifact.getFields();
+        String artifactName = artifact.getArtifactsName();
+        List<Field> fieldList = artifact.getFields();
         for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
           if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
             dataSecurityKeyDefs.add(dataSecurityKeyDef);
