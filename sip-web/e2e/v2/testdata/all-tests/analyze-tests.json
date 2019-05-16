@@ -2,7 +2,7 @@
   "ANALYZE": {
     "listView": {
       "ANALY001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "description": "check if all analysis options are displayed in list view by user",
         "verification": {
@@ -19,7 +19,7 @@
         }
       },
       "ANALY002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "check if all analysis options are displayed in list view by amdin",
         "verification": {

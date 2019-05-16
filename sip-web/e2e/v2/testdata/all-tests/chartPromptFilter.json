@@ -2,7 +2,7 @@
   "CHART_PROMPT_FILTER": {
     "positiveTests": {
       "CPROM001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -12,7 +12,7 @@
         "description": "Admin should be able to add Date prompt filter and execute for chart:combo"
       },
       "CPROM002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -22,7 +22,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:combo"
       },
       "CPROM003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -33,7 +33,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:combo"
       },
       "CPROM004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -44,7 +44,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:combo"
       },
       "CPROM005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -55,7 +55,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:combo"
       },
       "CPROM006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -66,7 +66,7 @@
         "description": "User should be able to add String prompt filter and execute chart:combo"
       },
       "CPROM007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -76,7 +76,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:column"
       },
       "CPROM008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -86,7 +86,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:column"
       },
       "CPROM009": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -97,7 +97,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:column"
       },
       "CPROM010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -108,7 +108,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:column"
       },
       "CPROM011": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -119,7 +119,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:column"
       },
       "CPROM012": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -130,7 +130,7 @@
         "description": "User should be able to add String prompt filter and execute chart:column"
       },
       "CPROM013": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -140,7 +140,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:bar"
       },
       "CPROM014": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -150,7 +150,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:bar"
       },
       "CPROM015": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -161,7 +161,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:bar"
       },
       "CPROM016": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -172,7 +172,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:bar"
       },
       "CPROM017": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -183,7 +183,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:bar"
       },
       "CPROM018": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -194,7 +194,7 @@
         "description": "User should be able to add String prompt filter and execute chart:bar"
       },
       "CPROM019": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -204,7 +204,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:stack"
       },
       "CPROM020": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -214,7 +214,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:stack"
       },
       "CPROM021": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -225,7 +225,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:stack"
       },
       "CPROM022": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -236,7 +236,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:stack"
       },
       "CPROM023": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -247,7 +247,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:stack"
       },
       "CPROM024": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -258,7 +258,7 @@
         "description": "User should be able to add String prompt filter and execute chart:stack"
       },
       "CPROM025": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -268,7 +268,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:line"
       },
       "CPROM026": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -278,7 +278,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:line"
       },
       "CPROM027": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -289,7 +289,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:line"
       },
       "CPROM028": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -300,7 +300,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:line"
       },
       "CPROM029": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -311,7 +311,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:line"
       },
       "CPROM030": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -322,7 +322,7 @@
         "description": "User should be able to add String prompt filter and execute chart:line"
       },
       "CPROM031": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -332,7 +332,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:area"
       },
       "CPROM032": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -342,7 +342,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:area"
       },
       "CPROM033": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -353,7 +353,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:area"
       },
       "CPROM034": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -364,7 +364,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:area"
       },
       "CPROM035": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -375,7 +375,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:area"
       },
       "CPROM036": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -386,7 +386,7 @@
         "description": "User should be able to add String prompt filter and execute chart:area"
       },
       "CPROM037": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -396,7 +396,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:scatter"
       },
       "CPROM038": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -406,7 +406,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:scatter"
       },
       "CPROM039": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -417,7 +417,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:scatter"
       },
       "CPROM040": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -428,7 +428,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:scatter"
       },
       "CPROM041": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -439,7 +439,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:scatter"
       },
       "CPROM042": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -450,7 +450,7 @@
         "description": "User should be able to add String prompt filter and execute chart:scatter"
       },
       "CPROM043": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -460,7 +460,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:tsspline"
       },
       "CPROM044": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -470,7 +470,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:tsspline"
       },
       "CPROM045": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -481,7 +481,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:tsspline"
       },
       "CPROM046": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -492,7 +492,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:tsspline"
       },
       "CPROM047": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -503,7 +503,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:tsspline"
       },
       "CPROM048": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -514,7 +514,7 @@
         "description": "User should be able to add String prompt filter and execute chart:tsspline"
       },
       "CPROM049": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -524,7 +524,7 @@
         "description": "Admin should be able to add Date prompt filter and execute chart:tsspline"
       },
       "CPROM050": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -534,7 +534,7 @@
         "description": "User should be able to add Date prompt filter and execute chart:tsPane"
       },
       "CPROM051": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
@@ -545,7 +545,7 @@
         "description": "Admin should be able to add Number prompt filter and execute chart:tsPane"
       },
       "CPROM052": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
@@ -556,7 +556,7 @@
         "description": "User should be able to add Number prompt filter and execute chart:tsPane"
       },
       "CPROM053": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -567,7 +567,7 @@
         "description": "Admin should be able to add String prompt filter and execute chart:tsPane"
       },
       "CPROM054": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
