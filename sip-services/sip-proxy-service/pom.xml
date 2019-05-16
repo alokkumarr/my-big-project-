@@ -35,7 +35,7 @@
       <groupId>com.synchronoss</groupId>
       <artifactId>sip-query-dsl</artifactId>
       <version>${revision}</version>
-      <scope>provided</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch</groupId>

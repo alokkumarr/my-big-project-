@@ -1,7 +1,6 @@
 package com.synchronoss.saw.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,7 +12,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"artifacts", "columnName", "type", "order"})
+@JsonPropertyOrder({"artifacts", "columnName", "type", "order", "aggregate"})
 public class Sort {
 
   @JsonProperty("artifacts")
@@ -27,6 +26,9 @@ public class Sort {
 
   @JsonProperty("order")
   private Order order;
+
+  @JsonProperty("aggregate")
+  private Aggregate aggregate;
 
   @JsonProperty("artifacts")
   public String getArtifacts() {
@@ -68,6 +70,16 @@ public class Sort {
     this.order = order;
   }
 
+  @JsonProperty("aggregate")
+  public Aggregate getAggregate() {
+    return aggregate;
+  }
+
+  @JsonProperty("aggregate")
+  public void setAggregate(Aggregate aggregate) {
+    this.aggregate = aggregate;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -75,6 +87,7 @@ public class Sort {
         .append("columnName", columnName)
         .append("type", type)
         .append("order", order)
+        .append("aggregate", aggregate)
         .toString();
   }
 
@@ -85,6 +98,7 @@ public class Sort {
         .append(columnName)
         .append(type)
         .append(artifacts)
+        .append(aggregate)
         .toHashCode();
   }
 
@@ -102,6 +116,7 @@ public class Sort {
         .append(columnName, rhs.columnName)
         .append(type, rhs.type)
         .append(artifacts, rhs.artifacts)
+        .append(aggregate, rhs.aggregate)
         .isEquals();
   }
 
@@ -183,6 +198,51 @@ public class Sort {
     @JsonValue
     public String value() {
       return this.value;
+    }
+  }
+
+  public enum Aggregate {
+    AVG("avg"),
+    SUM("sum"),
+    MIN("min"),
+    MAX("max"),
+    COUNT("count"),
+    PERCENTAGE("percentage"),
+    PERCENTAGE_BY_ROW("percentagebyrow"),
+    DISTINCTCOUNT("distinctcount");
+
+    private static final Map<String, Sort.Aggregate> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Sort.Aggregate c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private final String value;
+
+    private Aggregate(String value) {
+      this.value = value;
+    }
+
+    @JsonCreator
+    public static Sort.Aggregate fromValue(String value) {
+      Sort.Aggregate constant = CONSTANTS.get(value.toLowerCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return this.value.toLowerCase();
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value.toLowerCase();
     }
   }
 }
