@@ -1,0 +1,490 @@
+<div class="schedule-container" fxLayout="column">
+  <mat-tab-group
+    fxFlex="1 1 260px"
+    (selectedTabChange)="openSchedule($event)"
+    [selectedIndex]="selectedTab"
+  >
+    <mat-tab label="Immediate">
+      <mat-radio-group [(ngModel)]="immediate.immediatetype">
+        <mat-radio-button
+          value="currenttime"
+          (click)="generateImmediateSchedule(immediate.immediatetype)"
+          [attr.e2e]="scheduleType + '-schedule'"
+          >Schedule Immediately
+        </mat-radio-button>
+      </mat-radio-group>
+    </mat-tab>
+
+    <mat-tab label="Hourly">
+      <div
+        fxFlex
+        fxLayout="row"
+        fxLayoutGap="10px"
+        fxLayoutAlign="start center"
+      >
+        <span class="mat-h4 text-content">Every</span>
+        <mat-form-field appearance="outline" class="form-select">
+          <mat-select
+            placeholder="Hour"
+            [(ngModel)]="hourly.hours"
+            (selectionChange)="regenerateCron('')"
+            [attr.e2e]="scheduleType + '-schedule-hourly-hours'"
+          >
+            <mat-option *ngFor="let hour of hours" [value]="hour">
+              {{ hour }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <span class="mat-h4 text-content">Hour(s) on minute</span>
+        <mat-form-field appearance="outline" class="form-select">
+          <mat-select
+            placeholder="Minute"
+            [(ngModel)]="hourly.minutes"
+            (selectionChange)="regenerateCron('')"
+            [attr.e2e]="scheduleType + '-schedule-hourly-minutes'"
+          >
+            <mat-option *ngFor="let minute of minutes" [value]="minute">
+              {{ minute }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Daily">
+      <mat-radio-group
+        [(ngModel)]="daily.dailyType"
+        fxFill
+        fxLayout="column"
+        fxLayoutGap="30px"
+        fxLayoutAlign="start start"
+      >
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
+          <mat-radio-button
+            class="everyDay"
+            value="everyDay"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyday'"
+          >
+          </mat-radio-button>
+          <span class="mat-h4 text-content">Every</span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Days"
+              [(ngModel)]="daily.days"
+              (selectionChange)="regenerateCron(dailyTypeDay)"
+              [disabled]="daily.dailyType !== 'everyDay'"
+              [attr.e2e]="scheduleType + '-schedule-daily-days'"
+            >
+              <mat-option *ngFor="let day of days" [value]="day">
+                {{ day }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">day(s) at</span>
+          <cron-date-picker
+            [model]="dailyTypeDay"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="daily.dailyType !== 'everyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-everyday'"
+          ></cron-date-picker>
+        </div>
+
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
+          <mat-radio-button
+            class="everyWeek"
+            value="everyWeek"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweekday'"
+          ></mat-radio-button
+          ><br />
+          <span class="mat-h4 text-content"
+            >Every weekday (Monday through Friday) at
+          </span>
+          <cron-date-picker
+            [model]="dailyTypeWeek"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="daily.dailyType !== 'everyWeek'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-everyweekday'"
+          ></cron-date-picker>
+        </div>
+      </mat-radio-group>
+    </mat-tab>
+
+    <mat-tab label="Weekly">
+      <div
+        fxFlex
+        fxLayout="column"
+        fxLayoutGap="25px"
+        fxLayoutAlign="space-evenly start"
+      >
+        <span class="mat-h4 text-content"
+          >Specific day of week (choose one or many)
+        </span>
+        <div
+          fxFlex="1 1 50px"
+          fxFlex.lt-md="1 1 60px"
+          fxLayout="row wrap"
+          fxLayoutGap="15px"
+        >
+          <mat-checkbox
+            *ngFor="let day of dayStrings"
+            [(ngModel)]="weekly[day]"
+            (change)="regenerateCron(weeklybasisDate)"
+            [attr.e2e]="scheduleType + '-schedule-' + day"
+            >{{ day | i18nPlural: DayMapping }}</mat-checkbox
+          >
+        </div>
+
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
+          <span class="mat-h4 text-content">Start Time </span>
+          <cron-date-picker
+            style="height: 40px;"
+            [model]="weeklybasisDate"
+            (onDateChange)="onDateChange($event)"
+            [attr.e2e]="scheduleType + '-cron-date-picker-week-basis-date'"
+          ></cron-date-picker>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Monthly">
+      <mat-radio-group
+        [(ngModel)]="monthly.monthlyType"
+        fxFill
+        fxLayout="column"
+        fxLayoutGap="36px"
+        fxLayoutAlign="start start"
+      >
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="5px">
+          <mat-radio-button
+            class="everyDay"
+            value="monthlyDay"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyday'"
+          ></mat-radio-button>
+          <span class="mat-h4 text-content">On the </span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Day"
+              [(ngModel)]="monthly.specificDay"
+              (selectionChange)="regenerateCron(specificDayMonth)"
+              [disabled]="monthly.monthlyType !== 'monthlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-day'"
+            >
+              <mat-option *ngFor="let day of days" [value]="day">
+                {{ day | i18nPlural: NumberMapping }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">day of every</span>
+
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Month"
+              [(ngModel)]="monthly.specificMonth"
+              (selectionChange)="regenerateCron(specificDayMonth)"
+              [disabled]="monthly.monthlyType !== 'monthlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-month'"
+            >
+              <mat-option *ngFor="let month of months" [value]="month">
+                {{ month }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">month(s) at</span>
+          <cron-date-picker
+            [model]="specificDayMonth"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="monthly.monthlyType !== 'monthlyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-day-month'"
+          ></cron-date-picker>
+        </div>
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="3px">
+          <mat-radio-button
+            class="everyWeek"
+            value="monthlyWeek"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweek'"
+          ></mat-radio-button>
+          <span class="mat-h4 text-content">On the</span>
+          <mat-form-field
+            appearance="outline"
+            class="form-select align-select monthly-select"
+          >
+            <mat-select
+              placeholder="Weeks"
+              [(ngModel)]="monthly.specificWeekDayMonth"
+              (selectionChange)="regenerateCron(specificWeekDayMonth)"
+              [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-week-day-month'"
+            >
+              <mat-option *ngFor="let week of weeks" [value]="week.value">
+                {{ week.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field
+            appearance="outline"
+            class="form-select align-select monthly-select"
+          >
+            <mat-select
+              placeholder="Day"
+              [(ngModel)]="monthly.specificWeekDayDay"
+              (selectionChange)="regenerateCron(specificWeekDayMonth)"
+              [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="scheduleType + '-schedule-monthly-week-day-day'"
+            >
+              <mat-option
+                *ngFor="let dayString of dayStrings"
+                [value]="dayString"
+              >
+                {{ dayString }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">of every</span>
+
+          <mat-form-field
+            appearance="outline"
+            class="form-select align-select monthly-select"
+          >
+            <mat-select
+              placeholder="Month"
+              [(ngModel)]="monthly.specificWeekDayMonthWeek"
+              (selectionChange)="regenerateCron(specificWeekDayMonth)"
+              [disabled]="monthly.monthlyType !== 'monthlyWeek'"
+              [attr.e2e]="
+                scheduleType + '-schedule-monthly-week-day-month-week'
+              "
+            >
+              <mat-option *ngFor="let month of months" [value]="month">
+                {{ month }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">month(s) at</span>
+          <cron-date-picker
+            [model]="specificWeekDayMonth"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="monthly.monthlyType !== 'monthlyWeek'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-week-day-month'"
+          ></cron-date-picker>
+        </div>
+      </mat-radio-group>
+    </mat-tab>
+
+    <mat-tab label="Yearly">
+      <mat-radio-group
+        [(ngModel)]="yearly.yearlyType"
+        fxFill
+        fxLayout="column"
+        fxLayoutGap="36px"
+        fxLayoutAlign="start start"
+      >
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
+          <mat-radio-button
+            class="everyDay"
+            value="yearlyMonth"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-cron-schedule-everyday'"
+          >
+          </mat-radio-button>
+          <span class="mat-h4 text-content">Every </span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Month"
+              [(ngModel)]="yearly.specificMonthDayMonth"
+              (selectionChange)="regenerateCron(specificMonthDayYear)"
+              [disabled]="yearly.yearlyType !== 'yearlyMonth'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-day-month'"
+            >
+              <mat-option
+                *ngFor="let monthString of monthStrings"
+                [value]="monthString.value"
+              >
+                {{ monthString.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content"> on the</span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Days"
+              [(ngModel)]="yearly.specificMonthDayDay"
+              (selectionChange)="regenerateCron(specificMonthDayYear)"
+              [disabled]="yearly.yearlyType !== 'yearlyMonth'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-day-day'"
+            >
+              <mat-option *ngFor="let day of days" [value]="day">
+                {{ day | i18nPlural: NumberMapping }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content"> day at</span>
+          <cron-date-picker
+            [model]="specificMonthDayYear"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="yearly.yearlyType !== 'yearlyMonth'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-month-day-year'"
+          ></cron-date-picker>
+        </div>
+
+        <div fxFlex="1 1 40px" fxLayout="row" fxLayoutGap="10px">
+          <mat-radio-button
+            class="everyWeek"
+            value="yearlyDay"
+            (click)="resetData()"
+            [attr.e2e]="scheduleType + '-schedule-everyweek'"
+          ></mat-radio-button>
+          <span class="mat-h4 text-content">On the </span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Weeks"
+              [(ngModel)]="yearly.specificMonthWeekMonthWeek"
+              (selectionChange)="regenerateCron(specificMonthWeekYear)"
+              [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="
+                scheduleType + '-schedule-yearly-month-week-month-week'
+              "
+            >
+              <mat-option *ngFor="let week of weeks" [value]="week.value">
+                {{ week.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Day"
+              [(ngModel)]="yearly.specificMonthWeekDay"
+              (selectionChange)="regenerateCron(specificMonthWeekYear)"
+              [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-week-day'"
+            >
+              <mat-option
+                *ngFor="let dayString of dayStrings"
+                [value]="dayString"
+              >
+                {{ dayString }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content"> of </span>
+          <mat-form-field appearance="outline" class="form-select align-select">
+            <mat-select
+              placeholder="Month"
+              [(ngModel)]="yearly.specificMonthWeekMonth"
+              (selectionChange)="regenerateCron(specificMonthWeekYear)"
+              [disabled]="yearly.yearlyType !== 'yearlyDay'"
+              [attr.e2e]="scheduleType + '-schedule-yearly-month-week-month'"
+            >
+              <mat-option
+                *ngFor="let monthString of monthStrings"
+                [value]="monthString.value"
+              >
+                {{ monthString.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="mat-h4 text-content">at </span>
+          <cron-date-picker
+            [model]="specificMonthWeekYear"
+            (onDateChange)="onDateChange($event)"
+            [class.no-click]="yearly.yearlyType !== 'yearlyDay'"
+            [attr.e2e]="scheduleType + '-cron-date-picker-month-week-year'"
+          ></cron-date-picker>
+        </div>
+      </mat-radio-group>
+    </mat-tab>
+  </mat-tab-group>
+  <div
+    fxFlex="1 1 40px"
+    fxLayout="row"
+    fxLayoutGap="30px"
+    fxLayoutAlign="start start"
+    class="date-group"
+    *ngIf="scheduleType !== 'immediate'"
+  >
+    <div
+      fxFlex="40"
+      fxLayout="row"
+      fxLayoutGap="10px"
+      fxLayoutAlign="start center"
+    >
+      <span class="text-content">Start Date: </span>
+      <input
+        [owlDateTimeTrigger]="dt12"
+        [owlDateTime]="dt12"
+        class="date-input"
+        [(ngModel)]="selectedMoments"
+        [selectMode]="'rangeFrom'"
+        [min]="today"
+        [max]="selectedMoments[1]"
+        #startDateInput
+        (ngModelChange)="cronChange()"
+        [attr.e2e]="'schedule-start-date-time'"
+      />
+      <owl-date-time
+        #dt12
+        (afterPickerClosed)="afterPickerClosed(startDateInput)"
+      ></owl-date-time>
+    </div>
+    <div
+      fxFlex="40"
+      fxLayout="row"
+      fxLayoutGap="10px"
+      fxLayoutAlign="start center"
+    >
+      <span class="text-content">End Date: </span>
+      <input
+        [owlDateTimeTrigger]="dt13"
+        [owlDateTime]="dt13"
+        [min]="selectedMoments[0]"
+        class="date-input"
+        [(ngModel)]="selectedMoments"
+        [selectMode]="'rangeTo'"
+        #endDateInput
+        (ngModelChange)="cronChange()"
+        [attr.e2e]="'schedule-end-date-time'"
+      />
+      <owl-date-time
+        #dt13
+        (afterPickerClosed)="afterPickerClosed(endDateInput)"
+      ></owl-date-time>
+    </div>
+    <div fxFlex="20">
+      <button
+        mat-button
+        color="warn"
+        (click)="selectedMoments = []"
+        [attr.e2e]="'clear-date-time'"
+      >
+        Clear
+      </button>
+    </div>
+  </div>
+  <div
+    fxFlex="1 1 40px"
+    fxLayout="row"
+    fxLayoutGap="10px"
+    fxLayoutAlign="start baseline"
+    class="timezone-field-container"
+    *ngIf="scheduleType !== 'immediate'"
+  >
+    <span class="text-content">Timezone: </span>
+    <mat-form-field fxFlex="50" appearance="outline" class="form-select">
+      <mat-select
+        placeholder="Timezone"
+        [(ngModel)]="timezone"
+        [(value)]="timezone"
+        [disabled]="true"
+        (selectionChange)="cronChange()"
+        [attr.e2e]="'schedule-time-zone'"
+      >
+        <mat-option *ngFor="let zone of timezones" [value]="zone.name">
+          {{ zone.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>

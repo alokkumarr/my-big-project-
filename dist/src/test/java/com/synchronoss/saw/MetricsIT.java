@@ -24,7 +24,8 @@ public class MetricsIT extends BaseIT {
         .body("status", equalTo("success"))
         .body("data.result.metric.job",
               hasItems(
-                  "sip-batch-ingestion", "sip-export",
+                  "sip-batch-ingestion",
+                  "sip-export",
                   "sip-scheduler", "sip-security", "sip-metadata",
                   "sip-storage-proxy", "sip-workbench"));
   }

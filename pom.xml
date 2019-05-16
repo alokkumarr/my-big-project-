@@ -135,17 +135,14 @@
       </activation>
       <modules>
         <module>bda-meta</module>
-        <module>xdf-nextgen</module>
-        <!--
-        This has been commented due to issue SIP-7037
-        and it will reverted back once it is fixed.
-        <module>a2</module> -->
+        <module>sip-xdf</module>
+        <module>a2</module>
         <module>a2sipr/inst/json</module>
-        <module>rtis</module>
-        <module>rtps</module>
-        <module>saw-security</module>
-        <module>saw-services</module>
-        <module>saw-web</module>
+        <module>sip-rtis</module>
+        <module>sip-rtps</module>
+        <module>sip-security</module>
+        <module>sip-services</module>
+        <module>sip-web</module>
         <module>dist</module>
       </modules>
     </profile>
