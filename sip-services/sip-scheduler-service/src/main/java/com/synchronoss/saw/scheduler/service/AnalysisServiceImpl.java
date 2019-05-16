@@ -219,22 +219,19 @@ public class AnalysisServiceImpl implements AnalysisService {
     return null;
   }
 
+  @Override
+  public void executeDslAnalysis(String analysisId) {
+    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+    logger.info("URL for SIP Query :" + dslUrl);
+    AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
-    @Override
-    public void executeDslAnalysis(String analysisId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        String dslUrl = metadataAnalysisUrl + "/" + analysisId;
-        logger.debug("URL for SIP Query :" + dslUrl);
-        AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
+    logger.info("Analysis body :" + analysisResponse.getAnalysis());
+    SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
+    logger.info("SIP Query :" + analysisResponse.getAnalysis());
 
-        logger.debug("Analysis body :" + analysisResponse.getAnalysis());
-        SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
-        logger.debug("SIP Query :" + analysisResponse.getAnalysis());
+    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
+    HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
 
-        String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType="+"scheduled";
-        HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery, headers);
-
-        restTemplate.postForObject(url, requestEntity, String.class);
-    }
+    restTemplate.postForObject(url, requestEntity, String.class);
+  }
 }
