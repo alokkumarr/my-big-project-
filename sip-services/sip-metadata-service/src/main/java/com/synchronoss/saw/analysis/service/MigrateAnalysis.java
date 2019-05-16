@@ -274,9 +274,7 @@ public class MigrateAnalysis {
 
     JsonElement parsedAnalysis =
         SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-    System.out.println(parsedAnalysis);
 
-    //System.out.println(gson.toJson(analysis, Analysis.class));
   }
 
   /**

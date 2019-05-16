@@ -50,7 +50,7 @@ public interface AnalysisSipDslConverter {
     }
     if (oldAnalysisDefinition.has(FieldNames.USER_ID)
         && !oldAnalysisDefinition.get(FieldNames.USER_ID).isJsonNull()) {
-      //analysis.setUserId(oldAnalysisDefinition.get(FieldNames.USER_ID).getAsLong());
+      analysis.setUserId(oldAnalysisDefinition.get(FieldNames.USER_ID).getAsLong());
     }
 
     if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION)
