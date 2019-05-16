@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.0.2.RELEASE</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
@@ -31,23 +31,23 @@
 	</properties>
 
 	<dependencies>
-    <dependency>
-      <groupId>com.synchronoss</groupId>
-      <artifactId>sip-query-dsl</artifactId>
-      <version>${revision}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${es.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.threeten</groupId>
-      <artifactId>threeten-extra</artifactId>
-      <version>1.2</version>
-    </dependency>
+		<dependency>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>sip-query-dsl</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>${es.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.threeten</groupId>
+			<artifactId>threeten-extra</artifactId>
+			<version>1.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -74,10 +74,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-    <dependency>
-	    <groupId>io.micrometer</groupId>
-	    <artifactId>micrometer-registry-prometheus</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
@@ -124,16 +124,16 @@
 		</dependency>
 
 		<dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.8.0</version>
-        </dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.8.0</version>
+		</dependency>
 		<dependency>
-            <!-- springfox.documentation.* -->
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.8.0</version>
-        </dependency>
+			<!-- springfox.documentation.* -->
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.8.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -161,13 +161,13 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.jayway.jsonpath</groupId>
-		    <artifactId>json-path</artifactId>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
 		</dependency>
 
 		<dependency>
-		    <groupId>com.jayway.jsonpath</groupId>
-		    <artifactId>json-path-assert</artifactId>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path-assert</artifactId>
 		</dependency>
 
 		<!-- APACHE COMMONS LANG -->
@@ -195,28 +195,78 @@
 			<scope>provided</scope>
 		</dependency>
 
-    <dependency>
-      <groupId>com.synchronoss.bda.sip</groupId>
-      <artifactId>sip-common-components</artifactId>
-      <version>${revision}</version>
-    </dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda.sip</groupId>
+			<artifactId>sip-common-components</artifactId>
+			<version>${revision}</version>
+		</dependency>
 
-    <dependency>
-      <groupId>com.mapr.ojai</groupId>
-      <artifactId>mapr-ojai-driver</artifactId>
-      <version>6.0.1-mapr</version>
-    </dependency>
+		<dependency>
+			<groupId>com.mapr.ojai</groupId>
+			<artifactId>mapr-ojai-driver</artifactId>
+			<version>6.0.1-mapr</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
+			<version>1.1.8-mapr-1710-m7-6.0.1</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-all</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-common -->
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-common</artifactId>
+			<version>1.1.8-mapr-1710-m7-6.0.1</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-all</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase -->
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>2.7.0-mapr-1803</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-all</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 	<build>
-	<pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.surefire</groupId>
-				<artifactId>surefire-api</artifactId>
-				<version>${surefire-api}</version>
-			</plugin>
-		</plugins>
-	</pluginManagement>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.surefire</groupId>
+					<artifactId>surefire-api</artifactId>
+					<version>${surefire-api}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -254,14 +304,16 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues
-						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
-						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
+                        with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
+                        so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
 					<!--
-					    The spring-boot-start-test dependency adds JUnit in the
-					    compile scope so exclude JUnit explicitly from packaging
-					-->
-					<excludeGroupIds>com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang</excludeGroupIds>
+                        The spring-boot-start-test dependency adds JUnit in the
+                        compile scope so exclude JUnit explicitly from packaging
+                    -->
+					<excludeGroupIds>
+						com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.spark,org.apache.zookeeper,junit,org.ojai,org.scala-lang
+					</excludeGroupIds>
 					<layout>ZIP</layout>
 				</configuration>
 			</plugin>
@@ -302,10 +354,10 @@
 								</entry>
 							</entries>
 							<afterInstallation>
-							  <script>systemctl daemon-reload</script>
+								<script>systemctl daemon-reload</script>
 							</afterInstallation>
 							<afterRemoval>
-							  <script>systemctl daemon-reload</script>
+								<script>systemctl daemon-reload</script>
 							</afterRemoval>
 							<signature>
 								<skip>true</skip>

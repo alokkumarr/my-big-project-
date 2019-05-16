@@ -1,0 +1,2208 @@
+{
+  "data": {"row_level_1": {
+    "doc_count_error_upper_bound": 0,
+    "sum_other_doc_count": 0,
+    "buckets": [
+      {
+        "key": 1546214400000,
+        "key_as_string": "2018-12-31",
+        "doc_count": 1304,
+        "AVAILABLE_ITEMS": {"value": 4854578},
+        "AVAILABLE_MB": {"value": 4726970.010142326}
+      },
+      {
+        "key": 1529107200000,
+        "key_as_string": "2018-06-16",
+        "doc_count": 361,
+        "AVAILABLE_ITEMS": {"value": 1526188},
+        "AVAILABLE_MB": {"value": 1508498.8795995712}
+      },
+      {
+        "key": 1529020800000,
+        "key_as_string": "2018-06-15",
+        "doc_count": 1615,
+        "AVAILABLE_ITEMS": {"value": 7150415},
+        "AVAILABLE_MB": {"value": 5577556.375310898}
+      },
+      {
+        "key": 1528934400000,
+        "key_as_string": "2018-06-14",
+        "doc_count": 1305,
+        "AVAILABLE_ITEMS": {"value": 5868561},
+        "AVAILABLE_MB": {"value": 4907922.049409866}
+      },
+      {
+        "key": 1528848000000,
+        "key_as_string": "2018-06-13",
+        "doc_count": 1336,
+        "AVAILABLE_ITEMS": {"value": 6394001},
+        "AVAILABLE_MB": {"value": 5300095.597748756}
+      },
+      {
+        "key": 1528761600000,
+        "key_as_string": "2018-06-12",
+        "doc_count": 1292,
+        "AVAILABLE_ITEMS": {"value": 5848398},
+        "AVAILABLE_MB": {"value": 4559203.322005272}
+      },
+      {
+        "key": 1528675200000,
+        "key_as_string": "2018-06-11",
+        "doc_count": 1091,
+        "AVAILABLE_ITEMS": {"value": 3869893},
+        "AVAILABLE_MB": {"value": 3566463.910636902}
+      },
+      {
+        "key": 1528588800000,
+        "key_as_string": "2018-06-10",
+        "doc_count": 1235,
+        "AVAILABLE_ITEMS": {"value": 5023132},
+        "AVAILABLE_MB": {"value": 4570529.13468647}
+      },
+      {
+        "key": 1528502400000,
+        "key_as_string": "2018-06-09",
+        "doc_count": 1465,
+        "AVAILABLE_ITEMS": {"value": 6526105},
+        "AVAILABLE_MB": {"value": 5050685.4926157}
+      },
+      {
+        "key": 1528416000000,
+        "key_as_string": "2018-06-08",
+        "doc_count": 1324,
+        "AVAILABLE_ITEMS": {"value": 5074634},
+        "AVAILABLE_MB": {"value": 4299998.138872147}
+      },
+      {
+        "key": 1528329600000,
+        "key_as_string": "2018-06-07",
+        "doc_count": 1191,
+        "AVAILABLE_ITEMS": {"value": 5513719},
+        "AVAILABLE_MB": {"value": 4243697.558163643}
+      },
+      {
+        "key": 1528243200000,
+        "key_as_string": "2018-06-06",
+        "doc_count": 1155,
+        "AVAILABLE_ITEMS": {"value": 4551386},
+        "AVAILABLE_MB": {"value": 3892961.5536909103}
+      },
+      {
+        "key": 1528156800000,
+        "key_as_string": "2018-06-05",
+        "doc_count": 1309,
+        "AVAILABLE_ITEMS": {"value": 5750911},
+        "AVAILABLE_MB": {"value": 4633001.648796082}
+      },
+      {
+        "key": 1528070400000,
+        "key_as_string": "2018-06-04",
+        "doc_count": 1058,
+        "AVAILABLE_ITEMS": {"value": 3664080},
+        "AVAILABLE_MB": {"value": 3482740.578130722}
+      },
+      {
+        "key": 1527984000000,
+        "key_as_string": "2018-06-03",
+        "doc_count": 1237,
+        "AVAILABLE_ITEMS": {"value": 4751084},
+        "AVAILABLE_MB": {"value": 4815301.832306862}
+      },
+      {
+        "key": 1527897600000,
+        "key_as_string": "2018-06-02",
+        "doc_count": 1568,
+        "AVAILABLE_ITEMS": {"value": 5638629},
+        "AVAILABLE_MB": {"value": 5370193.08795166}
+      },
+      {
+        "key": 1527811200000,
+        "key_as_string": "2018-06-01",
+        "doc_count": 1499,
+        "AVAILABLE_ITEMS": {"value": 6060089},
+        "AVAILABLE_MB": {"value": 4450999.052840233}
+      },
+      {
+        "key": 1527724800000,
+        "key_as_string": "2018-05-31",
+        "doc_count": 1289,
+        "AVAILABLE_ITEMS": {"value": 5746636},
+        "AVAILABLE_MB": {"value": 3853783.1498680115}
+      },
+      {
+        "key": 1527638400000,
+        "key_as_string": "2018-05-30",
+        "doc_count": 1074,
+        "AVAILABLE_ITEMS": {"value": 4572324},
+        "AVAILABLE_MB": {"value": 3851430.9230833054}
+      },
+      {
+        "key": 1527552000000,
+        "key_as_string": "2018-05-29",
+        "doc_count": 902,
+        "AVAILABLE_ITEMS": {"value": 3863586},
+        "AVAILABLE_MB": {"value": 3536666.095000267}
+      },
+      {
+        "key": 1527465600000,
+        "key_as_string": "2018-05-28",
+        "doc_count": 917,
+        "AVAILABLE_ITEMS": {"value": 2940034},
+        "AVAILABLE_MB": {"value": 3100819.8105573654}
+      },
+      {
+        "key": 1527379200000,
+        "key_as_string": "2018-05-27",
+        "doc_count": 946,
+        "AVAILABLE_ITEMS": {"value": 3963350},
+        "AVAILABLE_MB": {"value": 3656845.635266304}
+      },
+      {
+        "key": 1527292800000,
+        "key_as_string": "2018-05-26",
+        "doc_count": 1317,
+        "AVAILABLE_ITEMS": {"value": 5619864},
+        "AVAILABLE_MB": {"value": 5665146.710791588}
+      },
+      {
+        "key": 1527206400000,
+        "key_as_string": "2018-05-25",
+        "doc_count": 907,
+        "AVAILABLE_ITEMS": {"value": 4127721},
+        "AVAILABLE_MB": {"value": 3917151.706059456}
+      },
+      {
+        "key": 1527120000000,
+        "key_as_string": "2018-05-24",
+        "doc_count": 1047,
+        "AVAILABLE_ITEMS": {"value": 3836447},
+        "AVAILABLE_MB": {"value": 3509039.3280439377}
+      },
+      {
+        "key": 1527033600000,
+        "key_as_string": "2018-05-23",
+        "doc_count": 1092,
+        "AVAILABLE_ITEMS": {"value": 4011175},
+        "AVAILABLE_MB": {"value": 3835492.960612297}
+      },
+      {
+        "key": 1526947200000,
+        "key_as_string": "2018-05-22",
+        "doc_count": 950,
+        "AVAILABLE_ITEMS": {"value": 4587442},
+        "AVAILABLE_MB": {"value": 4481884.026770592}
+      },
+      {
+        "key": 1526860800000,
+        "key_as_string": "2018-05-21",
+        "doc_count": 1060,
+        "AVAILABLE_ITEMS": {"value": 4630611},
+        "AVAILABLE_MB": {"value": 3705606.7317237854}
+      },
+      {
+        "key": 1526774400000,
+        "key_as_string": "2018-05-20",
+        "doc_count": 1133,
+        "AVAILABLE_ITEMS": {"value": 5097912},
+        "AVAILABLE_MB": {"value": 4995540.789142609}
+      },
+      {
+        "key": 1526688000000,
+        "key_as_string": "2018-05-19",
+        "doc_count": 1294,
+        "AVAILABLE_ITEMS": {"value": 5121274},
+        "AVAILABLE_MB": {"value": 4798421.04308033}
+      },
+      {
+        "key": 1526601600000,
+        "key_as_string": "2018-05-18",
+        "doc_count": 1196,
+        "AVAILABLE_ITEMS": {"value": 5243831},
+        "AVAILABLE_MB": {"value": 3527819.562064171}
+      },
+      {
+        "key": 1526515200000,
+        "key_as_string": "2018-05-17",
+        "doc_count": 977,
+        "AVAILABLE_ITEMS": {"value": 4086084},
+        "AVAILABLE_MB": {"value": 3681565.9105205536}
+      },
+      {
+        "key": 1526428800000,
+        "key_as_string": "2018-05-16",
+        "doc_count": 1104,
+        "AVAILABLE_ITEMS": {"value": 4985731},
+        "AVAILABLE_MB": {"value": 3986529.3160972595}
+      },
+      {
+        "key": 1526342400000,
+        "key_as_string": "2018-05-15",
+        "doc_count": 1150,
+        "AVAILABLE_ITEMS": {"value": 4317344},
+        "AVAILABLE_MB": {"value": 3590423.8570661545}
+      },
+      {
+        "key": 1526256000000,
+        "key_as_string": "2018-05-14",
+        "doc_count": 1194,
+        "AVAILABLE_ITEMS": {"value": 4760667},
+        "AVAILABLE_MB": {"value": 4512225.527807236}
+      },
+      {
+        "key": 1526169600000,
+        "key_as_string": "2018-05-13",
+        "doc_count": 1179,
+        "AVAILABLE_ITEMS": {"value": 4562593},
+        "AVAILABLE_MB": {"value": 5394545.388528824}
+      },
+      {
+        "key": 1526083200000,
+        "key_as_string": "2018-05-12",
+        "doc_count": 1485,
+        "AVAILABLE_ITEMS": {"value": 6197241},
+        "AVAILABLE_MB": {"value": 5755134.989161491}
+      },
+      {
+        "key": 1525996800000,
+        "key_as_string": "2018-05-11",
+        "doc_count": 1247,
+        "AVAILABLE_ITEMS": {"value": 4651178},
+        "AVAILABLE_MB": {"value": 4521263.263520241}
+      },
+      {
+        "key": 1525910400000,
+        "key_as_string": "2018-05-10",
+        "doc_count": 1058,
+        "AVAILABLE_ITEMS": {"value": 4430094},
+        "AVAILABLE_MB": {"value": 3738815.578016281}
+      },
+      {
+        "key": 1525824000000,
+        "key_as_string": "2018-05-09",
+        "doc_count": 1142,
+        "AVAILABLE_ITEMS": {"value": 5305792},
+        "AVAILABLE_MB": {"value": 4147012.6472024918}
+      },
+      {
+        "key": 1525737600000,
+        "key_as_string": "2018-05-08",
+        "doc_count": 1017,
+        "AVAILABLE_ITEMS": {"value": 4289284},
+        "AVAILABLE_MB": {"value": 3200522.8545799255}
+      },
+      {
+        "key": 1525651200000,
+        "key_as_string": "2018-05-07",
+        "doc_count": 1002,
+        "AVAILABLE_ITEMS": {"value": 4343592},
+        "AVAILABLE_MB": {"value": 3291626.0493659973}
+      },
+      {
+        "key": 1525564800000,
+        "key_as_string": "2018-05-06",
+        "doc_count": 1177,
+        "AVAILABLE_ITEMS": {"value": 4667397},
+        "AVAILABLE_MB": {"value": 5041647.236530304}
+      },
+      {
+        "key": 1525478400000,
+        "key_as_string": "2018-05-05",
+        "doc_count": 1327,
+        "AVAILABLE_ITEMS": {"value": 5371729},
+        "AVAILABLE_MB": {"value": 4096845.320344925}
+      },
+      {
+        "key": 1525392000000,
+        "key_as_string": "2018-05-04",
+        "doc_count": 1325,
+        "AVAILABLE_ITEMS": {"value": 4944921},
+        "AVAILABLE_MB": {"value": 3925522.2476768494}
+      },
+      {
+        "key": 1525305600000,
+        "key_as_string": "2018-05-03",
+        "doc_count": 1128,
+        "AVAILABLE_ITEMS": {"value": 4448211},
+        "AVAILABLE_MB": {"value": 3215778.036171913}
+      },
+      {
+        "key": 1525219200000,
+        "key_as_string": "2018-05-02",
+        "doc_count": 1149,
+        "AVAILABLE_ITEMS": {"value": 4735812},
+        "AVAILABLE_MB": {"value": 3892199.5599536896}
+      },
+      {
+        "key": 1525132800000,
+        "key_as_string": "2018-05-01",
+        "doc_count": 1174,
+        "AVAILABLE_ITEMS": {"value": 4375733},
+        "AVAILABLE_MB": {"value": 3917861.5749778748}
+      },
+      {
+        "key": 1525046400000,
+        "key_as_string": "2018-04-30",
+        "doc_count": 915,
+        "AVAILABLE_ITEMS": {"value": 3522449},
+        "AVAILABLE_MB": {"value": 3063543.8767290115}
+      },
+      {
+        "key": 1524960000000,
+        "key_as_string": "2018-04-29",
+        "doc_count": 1088,
+        "AVAILABLE_ITEMS": {"value": 5315038},
+        "AVAILABLE_MB": {"value": 4358861.885513306}
+      },
+      {
+        "key": 1524873600000,
+        "key_as_string": "2018-04-28",
+        "doc_count": 1205,
+        "AVAILABLE_ITEMS": {"value": 5523958},
+        "AVAILABLE_MB": {"value": 4308558.333065987}
+      },
+      {
+        "key": 1524787200000,
+        "key_as_string": "2018-04-27",
+        "doc_count": 1193,
+        "AVAILABLE_ITEMS": {"value": 4921459},
+        "AVAILABLE_MB": {"value": 3995377.1547145844}
+      },
+      {
+        "key": 1524700800000,
+        "key_as_string": "2018-04-26",
+        "doc_count": 1069,
+        "AVAILABLE_ITEMS": {"value": 3884556},
+        "AVAILABLE_MB": {"value": 3599185.6985588074}
+      },
+      {
+        "key": 1524614400000,
+        "key_as_string": "2018-04-25",
+        "doc_count": 1117,
+        "AVAILABLE_ITEMS": {"value": 4538621},
+        "AVAILABLE_MB": {"value": 4956397.806092262}
+      },
+      {
+        "key": 1524528000000,
+        "key_as_string": "2018-04-24",
+        "doc_count": 1090,
+        "AVAILABLE_ITEMS": {"value": 4820154},
+        "AVAILABLE_MB": {"value": 4081792.6328525543}
+      },
+      {
+        "key": 1524441600000,
+        "key_as_string": "2018-04-23",
+        "doc_count": 1083,
+        "AVAILABLE_ITEMS": {"value": 5029599},
+        "AVAILABLE_MB": {"value": 3921593.9403915405}
+      },
+      {
+        "key": 1524355200000,
+        "key_as_string": "2018-04-22",
+        "doc_count": 1253,
+        "AVAILABLE_ITEMS": {"value": 5184889},
+        "AVAILABLE_MB": {"value": 4511208.112240791}
+      },
+      {
+        "key": 1524268800000,
+        "key_as_string": "2018-04-21",
+        "doc_count": 1685,
+        "AVAILABLE_ITEMS": {"value": 6797266},
+        "AVAILABLE_MB": {"value": 5888331.404395103}
+      },
+      {
+        "key": 1524182400000,
+        "key_as_string": "2018-04-20",
+        "doc_count": 1374,
+        "AVAILABLE_ITEMS": {"value": 5762259},
+        "AVAILABLE_MB": {"value": 5066563.542668343}
+      },
+      {
+        "key": 1524096000000,
+        "key_as_string": "2018-04-19",
+        "doc_count": 1282,
+        "AVAILABLE_ITEMS": {"value": 5302440},
+        "AVAILABLE_MB": {"value": 4693920.954717636}
+      },
+      {
+        "key": 1524009600000,
+        "key_as_string": "2018-04-18",
+        "doc_count": 1157,
+        "AVAILABLE_ITEMS": {"value": 4326372},
+        "AVAILABLE_MB": {"value": 3837842.5618104935}
+      },
+      {
+        "key": 1523923200000,
+        "key_as_string": "2018-04-17",
+        "doc_count": 1092,
+        "AVAILABLE_ITEMS": {"value": 4645478},
+        "AVAILABLE_MB": {"value": 3738819.9797592163}
+      },
+      {
+        "key": 1523836800000,
+        "key_as_string": "2018-04-16",
+        "doc_count": 1162,
+        "AVAILABLE_ITEMS": {"value": 4321379},
+        "AVAILABLE_MB": {"value": 3725198.7298021317}
+      },
+      {
+        "key": 1523750400000,
+        "key_as_string": "2018-04-15",
+        "doc_count": 1266,
+        "AVAILABLE_ITEMS": {"value": 5424305},
+        "AVAILABLE_MB": {"value": 5422896.945616722}
+      },
+      {
+        "key": 1523664000000,
+        "key_as_string": "2018-04-14",
+        "doc_count": 1543,
+        "AVAILABLE_ITEMS": {"value": 6351656},
+        "AVAILABLE_MB": {"value": 5914317.658382416}
+      },
+      {
+        "key": 1523577600000,
+        "key_as_string": "2018-04-13",
+        "doc_count": 1109,
+        "AVAILABLE_ITEMS": {"value": 4794892},
+        "AVAILABLE_MB": {"value": 3665120.8339824677}
+      },
+      {
+        "key": 1523491200000,
+        "key_as_string": "2018-04-12",
+        "doc_count": 851,
+        "AVAILABLE_ITEMS": {"value": 4541401},
+        "AVAILABLE_MB": {"value": 3207097.271361351}
+      },
+      {
+        "key": 1523404800000,
+        "key_as_string": "2018-04-11",
+        "doc_count": 368,
+        "AVAILABLE_ITEMS": {"value": 1713843},
+        "AVAILABLE_MB": {"value": 1400142.918893814}
+      },
+      {
+        "key": 1523318400000,
+        "key_as_string": "2018-04-10",
+        "doc_count": 3,
+        "AVAILABLE_ITEMS": {"value": 2754},
+        "AVAILABLE_MB": {"value": 380.35588550567627}
+      },
+      {
+        "key": 1523232000000,
+        "key_as_string": "2018-04-09",
+        "doc_count": 31,
+        "AVAILABLE_ITEMS": {"value": 33237},
+        "AVAILABLE_MB": {"value": 44148.63971042633}
+      },
+      {
+        "key": 1522972800000,
+        "key_as_string": "2018-04-06",
+        "doc_count": 346,
+        "AVAILABLE_ITEMS": {"value": 1650367},
+        "AVAILABLE_MB": {"value": 1171585.1260385513}
+      },
+      {
+        "key": 1522886400000,
+        "key_as_string": "2018-04-05",
+        "doc_count": 1493,
+        "AVAILABLE_ITEMS": {"value": 5315568},
+        "AVAILABLE_MB": {"value": 3710528.1717863083}
+      },
+      {
+        "key": 1522800000000,
+        "key_as_string": "2018-04-04",
+        "doc_count": 1402,
+        "AVAILABLE_ITEMS": {"value": 6058885},
+        "AVAILABLE_MB": {"value": 4069157.9838056564}
+      },
+      {
+        "key": 1522713600000,
+        "key_as_string": "2018-04-03",
+        "doc_count": 1512,
+        "AVAILABLE_ITEMS": {"value": 6367082},
+        "AVAILABLE_MB": {"value": 4494517.844655037}
+      },
+      {
+        "key": 1522627200000,
+        "key_as_string": "2018-04-02",
+        "doc_count": 1245,
+        "AVAILABLE_ITEMS": {"value": 4815601},
+        "AVAILABLE_MB": {"value": 2879673.2153663635}
+      },
+      {
+        "key": 1522540800000,
+        "key_as_string": "2018-04-01",
+        "doc_count": 1144,
+        "AVAILABLE_ITEMS": {"value": 4324319},
+        "AVAILABLE_MB": {"value": 4223779.419407845}
+      },
+      {
+        "key": 1522454400000,
+        "key_as_string": "2018-03-31",
+        "doc_count": 1931,
+        "AVAILABLE_ITEMS": {"value": 7408436},
+        "AVAILABLE_MB": {"value": 5864772.855463028}
+      },
+      {
+        "key": 1522368000000,
+        "key_as_string": "2018-03-30",
+        "doc_count": 1874,
+        "AVAILABLE_ITEMS": {"value": 7247010},
+        "AVAILABLE_MB": {"value": 5747766.032522202}
+      },
+      {
+        "key": 1522281600000,
+        "key_as_string": "2018-03-29",
+        "doc_count": 1510,
+        "AVAILABLE_ITEMS": {"value": 5863459},
+        "AVAILABLE_MB": {"value": 4560386.999420166}
+      },
+      {
+        "key": 1522195200000,
+        "key_as_string": "2018-03-28",
+        "doc_count": 1415,
+        "AVAILABLE_ITEMS": {"value": 5616325},
+        "AVAILABLE_MB": {"value": 4612929.453736305}
+      },
+      {
+        "key": 1522108800000,
+        "key_as_string": "2018-03-27",
+        "doc_count": 1469,
+        "AVAILABLE_ITEMS": {"value": 5643174},
+        "AVAILABLE_MB": {"value": 4216915.779767036}
+      },
+      {
+        "key": 1522022400000,
+        "key_as_string": "2018-03-26",
+        "doc_count": 1432,
+        "AVAILABLE_ITEMS": {"value": 4974807},
+        "AVAILABLE_MB": {"value": 5418631.413511276}
+      },
+      {
+        "key": 1521936000000,
+        "key_as_string": "2018-03-25",
+        "doc_count": 1669,
+        "AVAILABLE_ITEMS": {"value": 6883342},
+        "AVAILABLE_MB": {"value": 5290898.614553452}
+      },
+      {
+        "key": 1521849600000,
+        "key_as_string": "2018-03-24",
+        "doc_count": 1875,
+        "AVAILABLE_ITEMS": {"value": 8565253},
+        "AVAILABLE_MB": {"value": 5054365.959658623}
+      },
+      {
+        "key": 1521763200000,
+        "key_as_string": "2018-03-23",
+        "doc_count": 1497,
+        "AVAILABLE_ITEMS": {"value": 6293117},
+        "AVAILABLE_MB": {"value": 4352428.3377285}
+      },
+      {
+        "key": 1521676800000,
+        "key_as_string": "2018-03-22",
+        "doc_count": 1477,
+        "AVAILABLE_ITEMS": {"value": 5965543},
+        "AVAILABLE_MB": {"value": 4264332.448295593}
+      },
+      {
+        "key": 1521590400000,
+        "key_as_string": "2018-03-21",
+        "doc_count": 1439,
+        "AVAILABLE_ITEMS": {"value": 5640711},
+        "AVAILABLE_MB": {"value": 4657985.786915779}
+      },
+      {
+        "key": 1521504000000,
+        "key_as_string": "2018-03-20",
+        "doc_count": 1433,
+        "AVAILABLE_ITEMS": {"value": 5653590},
+        "AVAILABLE_MB": {"value": 5095822.991827965}
+      },
+      {
+        "key": 1521417600000,
+        "key_as_string": "2018-03-19",
+        "doc_count": 1338,
+        "AVAILABLE_ITEMS": {"value": 6003907},
+        "AVAILABLE_MB": {"value": 4760564.307474136}
+      },
+      {
+        "key": 1521331200000,
+        "key_as_string": "2018-03-18",
+        "doc_count": 1576,
+        "AVAILABLE_ITEMS": {"value": 7035913},
+        "AVAILABLE_MB": {"value": 5520866.921193123}
+      },
+      {
+        "key": 1521244800000,
+        "key_as_string": "2018-03-17",
+        "doc_count": 1997,
+        "AVAILABLE_ITEMS": {"value": 8938698},
+        "AVAILABLE_MB": {"value": 6488944.5002269745}
+      },
+      {
+        "key": 1521158400000,
+        "key_as_string": "2018-03-16",
+        "doc_count": 1720,
+        "AVAILABLE_ITEMS": {"value": 6926994},
+        "AVAILABLE_MB": {"value": 5094110.375746727}
+      },
+      {
+        "key": 1521072000000,
+        "key_as_string": "2018-03-15",
+        "doc_count": 1399,
+        "AVAILABLE_ITEMS": {"value": 7542666},
+        "AVAILABLE_MB": {"value": 4286498.407741547}
+      },
+      {
+        "key": 1520985600000,
+        "key_as_string": "2018-03-14",
+        "doc_count": 1585,
+        "AVAILABLE_ITEMS": {"value": 7110876},
+        "AVAILABLE_MB": {"value": 4873257.097661972}
+      },
+      {
+        "key": 1520899200000,
+        "key_as_string": "2018-03-13",
+        "doc_count": 1331,
+        "AVAILABLE_ITEMS": {"value": 6199349},
+        "AVAILABLE_MB": {"value": 3855069.3625030518}
+      },
+      {
+        "key": 1520812800000,
+        "key_as_string": "2018-03-12",
+        "doc_count": 1273,
+        "AVAILABLE_ITEMS": {"value": 5745701},
+        "AVAILABLE_MB": {"value": 3943764.249613762}
+      },
+      {
+        "key": 1520726400000,
+        "key_as_string": "2018-03-11",
+        "doc_count": 1547,
+        "AVAILABLE_ITEMS": {"value": 6238407},
+        "AVAILABLE_MB": {"value": 4133924.0582113266}
+      },
+      {
+        "key": 1520640000000,
+        "key_as_string": "2018-03-10",
+        "doc_count": 1760,
+        "AVAILABLE_ITEMS": {"value": 7536689},
+        "AVAILABLE_MB": {"value": 4577600.529740334}
+      },
+      {
+        "key": 1520553600000,
+        "key_as_string": "2018-03-09",
+        "doc_count": 1440,
+        "AVAILABLE_ITEMS": {"value": 6275780},
+        "AVAILABLE_MB": {"value": 3407661.1689710617}
+      },
+      {
+        "key": 1520467200000,
+        "key_as_string": "2018-03-08",
+        "doc_count": 1443,
+        "AVAILABLE_ITEMS": {"value": 6117443},
+        "AVAILABLE_MB": {"value": 4337117.530628204}
+      },
+      {
+        "key": 1520380800000,
+        "key_as_string": "2018-03-07",
+        "doc_count": 1389,
+        "AVAILABLE_ITEMS": {"value": 6080506},
+        "AVAILABLE_MB": {"value": 3876408.5121040344}
+      },
+      {
+        "key": 1520294400000,
+        "key_as_string": "2018-03-06",
+        "doc_count": 1371,
+        "AVAILABLE_ITEMS": {"value": 5590258},
+        "AVAILABLE_MB": {"value": 3951877.9265642166}
+      },
+      {
+        "key": 1520208000000,
+        "key_as_string": "2018-03-05",
+        "doc_count": 1197,
+        "AVAILABLE_ITEMS": {"value": 5276193},
+        "AVAILABLE_MB": {"value": 3674995.5836162567}
+      },
+      {
+        "key": 1520121600000,
+        "key_as_string": "2018-03-04",
+        "doc_count": 1561,
+        "AVAILABLE_ITEMS": {"value": 7235023},
+        "AVAILABLE_MB": {"value": 4347929.701321602}
+      },
+      {
+        "key": 1520035200000,
+        "key_as_string": "2018-03-03",
+        "doc_count": 2045,
+        "AVAILABLE_ITEMS": {"value": 8303821},
+        "AVAILABLE_MB": {"value": 5692772.970524788}
+      },
+      {
+        "key": 1519948800000,
+        "key_as_string": "2018-03-02",
+        "doc_count": 1652,
+        "AVAILABLE_ITEMS": {"value": 6774305},
+        "AVAILABLE_MB": {"value": 4552403.970705986}
+      },
+      {
+        "key": 1519862400000,
+        "key_as_string": "2018-03-01",
+        "doc_count": 1657,
+        "AVAILABLE_ITEMS": {"value": 7234755},
+        "AVAILABLE_MB": {"value": 4504547.572408676}
+      },
+      {
+        "key": 1519776000000,
+        "key_as_string": "2018-02-28",
+        "doc_count": 1306,
+        "AVAILABLE_ITEMS": {"value": 5565826},
+        "AVAILABLE_MB": {"value": 3758854.491170883}
+      },
+      {
+        "key": 1519689600000,
+        "key_as_string": "2018-02-27",
+        "doc_count": 1706,
+        "AVAILABLE_ITEMS": {"value": 6674500},
+        "AVAILABLE_MB": {"value": 5289152.723286629}
+      },
+      {
+        "key": 1519603200000,
+        "key_as_string": "2018-02-26",
+        "doc_count": 1478,
+        "AVAILABLE_ITEMS": {"value": 5698105},
+        "AVAILABLE_MB": {"value": 4037338.305454254}
+      },
+      {
+        "key": 1519516800000,
+        "key_as_string": "2018-02-25",
+        "doc_count": 1790,
+        "AVAILABLE_ITEMS": {"value": 7683805},
+        "AVAILABLE_MB": {"value": 5561489.920542717}
+      },
+      {
+        "key": 1519430400000,
+        "key_as_string": "2018-02-24",
+        "doc_count": 2102,
+        "AVAILABLE_ITEMS": {"value": 9688262},
+        "AVAILABLE_MB": {"value": 6032401.43074131}
+      },
+      {
+        "key": 1519344000000,
+        "key_as_string": "2018-02-23",
+        "doc_count": 2007,
+        "AVAILABLE_ITEMS": {"value": 7601671},
+        "AVAILABLE_MB": {"value": 5217305.925648689}
+      },
+      {
+        "key": 1519257600000,
+        "key_as_string": "2018-02-22",
+        "doc_count": 1576,
+        "AVAILABLE_ITEMS": {"value": 5431802},
+        "AVAILABLE_MB": {"value": 3319331.4656791687}
+      },
+      {
+        "key": 1519171200000,
+        "key_as_string": "2018-02-21",
+        "doc_count": 1326,
+        "AVAILABLE_ITEMS": {"value": 4761040},
+        "AVAILABLE_MB": {"value": 4491643.7614889145}
+      },
+      {
+        "key": 1519084800000,
+        "key_as_string": "2018-02-20",
+        "doc_count": 1225,
+        "AVAILABLE_ITEMS": {"value": 4844169},
+        "AVAILABLE_MB": {"value": 3684210.36695385}
+      },
+      {
+        "key": 1518998400000,
+        "key_as_string": "2018-02-19",
+        "doc_count": 1216,
+        "AVAILABLE_ITEMS": {"value": 4489842},
+        "AVAILABLE_MB": {"value": 3623031.26994133}
+      },
+      {
+        "key": 1518912000000,
+        "key_as_string": "2018-02-18",
+        "doc_count": 1423,
+        "AVAILABLE_ITEMS": {"value": 5180392},
+        "AVAILABLE_MB": {"value": 4197104.091112137}
+      },
+      {
+        "key": 1518825600000,
+        "key_as_string": "2018-02-17",
+        "doc_count": 1683,
+        "AVAILABLE_ITEMS": {"value": 6557958},
+        "AVAILABLE_MB": {"value": 4168767.207178116}
+      },
+      {
+        "key": 1518739200000,
+        "key_as_string": "2018-02-16",
+        "doc_count": 1380,
+        "AVAILABLE_ITEMS": {"value": 5243951},
+        "AVAILABLE_MB": {"value": 3775211.322962761}
+      },
+      {
+        "key": 1518652800000,
+        "key_as_string": "2018-02-15",
+        "doc_count": 1310,
+        "AVAILABLE_ITEMS": {"value": 5314122},
+        "AVAILABLE_MB": {"value": 3471439.340695381}
+      },
+      {
+        "key": 1518566400000,
+        "key_as_string": "2018-02-14",
+        "doc_count": 1194,
+        "AVAILABLE_ITEMS": {"value": 4737641},
+        "AVAILABLE_MB": {"value": 2964787.400223732}
+      },
+      {
+        "key": 1518480000000,
+        "key_as_string": "2018-02-13",
+        "doc_count": 1177,
+        "AVAILABLE_ITEMS": {"value": 4395689},
+        "AVAILABLE_MB": {"value": 3427952.250058174}
+      },
+      {
+        "key": 1518393600000,
+        "key_as_string": "2018-02-12",
+        "doc_count": 1172,
+        "AVAILABLE_ITEMS": {"value": 4556207},
+        "AVAILABLE_MB": {"value": 4131001.0313539505}
+      },
+      {
+        "key": 1518307200000,
+        "key_as_string": "2018-02-11",
+        "doc_count": 1640,
+        "AVAILABLE_ITEMS": {"value": 4981595},
+        "AVAILABLE_MB": {"value": 5496653.513522148}
+      },
+      {
+        "key": 1518220800000,
+        "key_as_string": "2018-02-10",
+        "doc_count": 1911,
+        "AVAILABLE_ITEMS": {"value": 6973619},
+        "AVAILABLE_MB": {"value": 5672769.975131035}
+      },
+      {
+        "key": 1518134400000,
+        "key_as_string": "2018-02-09",
+        "doc_count": 1400,
+        "AVAILABLE_ITEMS": {"value": 6004145},
+        "AVAILABLE_MB": {"value": 4297846.888990402}
+      },
+      {
+        "key": 1518048000000,
+        "key_as_string": "2018-02-08",
+        "doc_count": 1262,
+        "AVAILABLE_ITEMS": {"value": 5162478},
+        "AVAILABLE_MB": {"value": 3544157.2781629562}
+      },
+      {
+        "key": 1517961600000,
+        "key_as_string": "2018-02-07",
+        "doc_count": 1307,
+        "AVAILABLE_ITEMS": {"value": 4904576},
+        "AVAILABLE_MB": {"value": 3465782.6477279663}
+      },
+      {
+        "key": 1517875200000,
+        "key_as_string": "2018-02-06",
+        "doc_count": 1251,
+        "AVAILABLE_ITEMS": {"value": 4802960},
+        "AVAILABLE_MB": {"value": 4193707.0721769333}
+      },
+      {
+        "key": 1517788800000,
+        "key_as_string": "2018-02-05",
+        "doc_count": 1151,
+        "AVAILABLE_ITEMS": {"value": 4391467},
+        "AVAILABLE_MB": {"value": 3603192.978020668}
+      },
+      {
+        "key": 1517702400000,
+        "key_as_string": "2018-02-04",
+        "doc_count": 1364,
+        "AVAILABLE_ITEMS": {"value": 5060623},
+        "AVAILABLE_MB": {"value": 4377971.2971487045}
+      },
+      {
+        "key": 1517616000000,
+        "key_as_string": "2018-02-03",
+        "doc_count": 1575,
+        "AVAILABLE_ITEMS": {"value": 6977753},
+        "AVAILABLE_MB": {"value": 4400113.100032806}
+      },
+      {
+        "key": 1517529600000,
+        "key_as_string": "2018-02-02",
+        "doc_count": 1470,
+        "AVAILABLE_ITEMS": {"value": 5655510},
+        "AVAILABLE_MB": {"value": 3604059.549413681}
+      },
+      {
+        "key": 1517443200000,
+        "key_as_string": "2018-02-01",
+        "doc_count": 1188,
+        "AVAILABLE_ITEMS": {"value": 4365979},
+        "AVAILABLE_MB": {"value": 3629772.768842697}
+      },
+      {
+        "key": 1517356800000,
+        "key_as_string": "2018-01-31",
+        "doc_count": 1028,
+        "AVAILABLE_ITEMS": {"value": 4222544},
+        "AVAILABLE_MB": {"value": 2953633.644628525}
+      },
+      {
+        "key": 1517270400000,
+        "key_as_string": "2018-01-30",
+        "doc_count": 1088,
+        "AVAILABLE_ITEMS": {"value": 4418248},
+        "AVAILABLE_MB": {"value": 3596481.4159374237}
+      },
+      {
+        "key": 1517184000000,
+        "key_as_string": "2018-01-29",
+        "doc_count": 971,
+        "AVAILABLE_ITEMS": {"value": 4471577},
+        "AVAILABLE_MB": {"value": 3048717.8921203613}
+      },
+      {
+        "key": 1517097600000,
+        "key_as_string": "2018-01-28",
+        "doc_count": 1273,
+        "AVAILABLE_ITEMS": {"value": 5230032},
+        "AVAILABLE_MB": {"value": 4011583.377892494}
+      },
+      {
+        "key": 1517011200000,
+        "key_as_string": "2018-01-27",
+        "doc_count": 1530,
+        "AVAILABLE_ITEMS": {"value": 6202754},
+        "AVAILABLE_MB": {"value": 4221667.111298561}
+      },
+      {
+        "key": 1516924800000,
+        "key_as_string": "2018-01-26",
+        "doc_count": 1256,
+        "AVAILABLE_ITEMS": {"value": 4755506},
+        "AVAILABLE_MB": {"value": 3522144.0600156784}
+      },
+      {
+        "key": 1516838400000,
+        "key_as_string": "2018-01-25",
+        "doc_count": 1092,
+        "AVAILABLE_ITEMS": {"value": 4997812},
+        "AVAILABLE_MB": {"value": 3330734.0621185303}
+      },
+      {
+        "key": 1516752000000,
+        "key_as_string": "2018-01-24",
+        "doc_count": 1056,
+        "AVAILABLE_ITEMS": {"value": 4787298},
+        "AVAILABLE_MB": {"value": 3464785.461576462}
+      },
+      {
+        "key": 1516665600000,
+        "key_as_string": "2018-01-23",
+        "doc_count": 1095,
+        "AVAILABLE_ITEMS": {"value": 5252112},
+        "AVAILABLE_MB": {"value": 3333629.7155981064}
+      },
+      {
+        "key": 1516579200000,
+        "key_as_string": "2018-01-22",
+        "doc_count": 1064,
+        "AVAILABLE_ITEMS": {"value": 3952188},
+        "AVAILABLE_MB": {"value": 3433604.905046463}
+      },
+      {
+        "key": 1516492800000,
+        "key_as_string": "2018-01-21",
+        "doc_count": 1154,
+        "AVAILABLE_ITEMS": {"value": 4450510},
+        "AVAILABLE_MB": {"value": 3813043.1315279007}
+      },
+      {
+        "key": 1516406400000,
+        "key_as_string": "2018-01-20",
+        "doc_count": 1365,
+        "AVAILABLE_ITEMS": {"value": 5207145},
+        "AVAILABLE_MB": {"value": 3888283.60861969}
+      },
+      {
+        "key": 1516320000000,
+        "key_as_string": "2018-01-19",
+        "doc_count": 1161,
+        "AVAILABLE_ITEMS": {"value": 5066434},
+        "AVAILABLE_MB": {"value": 3278282.002679825}
+      },
+      {
+        "key": 1516233600000,
+        "key_as_string": "2018-01-18",
+        "doc_count": 971,
+        "AVAILABLE_ITEMS": {"value": 3943016},
+        "AVAILABLE_MB": {"value": 2634343.4010953903}
+      },
+      {
+        "key": 1516147200000,
+        "key_as_string": "2018-01-17",
+        "doc_count": 892,
+        "AVAILABLE_ITEMS": {"value": 3837048},
+        "AVAILABLE_MB": {"value": 3204166.814468384}
+      },
+      {
+        "key": 1516060800000,
+        "key_as_string": "2018-01-16",
+        "doc_count": 933,
+        "AVAILABLE_ITEMS": {"value": 3587639},
+        "AVAILABLE_MB": {"value": 2530089.2101125717}
+      },
+      {
+        "key": 1515974400000,
+        "key_as_string": "2018-01-15",
+        "doc_count": 1008,
+        "AVAILABLE_ITEMS": {"value": 4231594},
+        "AVAILABLE_MB": {"value": 3400705.5876512527}
+      },
+      {
+        "key": 1515888000000,
+        "key_as_string": "2018-01-14",
+        "doc_count": 1138,
+        "AVAILABLE_ITEMS": {"value": 4546794},
+        "AVAILABLE_MB": {"value": 3750737.2521123886}
+      },
+      {
+        "key": 1515801600000,
+        "key_as_string": "2018-01-13",
+        "doc_count": 1302,
+        "AVAILABLE_ITEMS": {"value": 5568190},
+        "AVAILABLE_MB": {"value": 4166798.0003881454}
+      },
+      {
+        "key": 1515715200000,
+        "key_as_string": "2018-01-12",
+        "doc_count": 1094,
+        "AVAILABLE_ITEMS": {"value": 4467178},
+        "AVAILABLE_MB": {"value": 3417214.3402280807}
+      },
+      {
+        "key": 1515628800000,
+        "key_as_string": "2018-01-11",
+        "doc_count": 1096,
+        "AVAILABLE_ITEMS": {"value": 4605481},
+        "AVAILABLE_MB": {"value": 3341142.2852420807}
+      },
+      {
+        "key": 1515542400000,
+        "key_as_string": "2018-01-10",
+        "doc_count": 1003,
+        "AVAILABLE_ITEMS": {"value": 3907090},
+        "AVAILABLE_MB": {"value": 2513950.5965738297}
+      },
+      {
+        "key": 1515456000000,
+        "key_as_string": "2018-01-09",
+        "doc_count": 1023,
+        "AVAILABLE_ITEMS": {"value": 4200691},
+        "AVAILABLE_MB": {"value": 3058035.203933716}
+      },
+      {
+        "key": 1515369600000,
+        "key_as_string": "2018-01-08",
+        "doc_count": 1068,
+        "AVAILABLE_ITEMS": {"value": 4487003},
+        "AVAILABLE_MB": {"value": 3925334.4979629517}
+      },
+      {
+        "key": 1515283200000,
+        "key_as_string": "2018-01-07",
+        "doc_count": 1218,
+        "AVAILABLE_ITEMS": {"value": 5094338},
+        "AVAILABLE_MB": {"value": 3772144.5100317}
+      },
+      {
+        "key": 1515196800000,
+        "key_as_string": "2018-01-06",
+        "doc_count": 1571,
+        "AVAILABLE_ITEMS": {"value": 6839669},
+        "AVAILABLE_MB": {"value": 4422566.337503433}
+      },
+      {
+        "key": 1515110400000,
+        "key_as_string": "2018-01-05",
+        "doc_count": 1247,
+        "AVAILABLE_ITEMS": {"value": 5775425},
+        "AVAILABLE_MB": {"value": 3356461.7344646454}
+      },
+      {
+        "key": 1515024000000,
+        "key_as_string": "2018-01-04",
+        "doc_count": 1176,
+        "AVAILABLE_ITEMS": {"value": 4622638},
+        "AVAILABLE_MB": {"value": 3662694.733010292}
+      },
+      {
+        "key": 1514937600000,
+        "key_as_string": "2018-01-03",
+        "doc_count": 1391,
+        "AVAILABLE_ITEMS": {"value": 6181120},
+        "AVAILABLE_MB": {"value": 4867419.121152878}
+      },
+      {
+        "key": 1514851200000,
+        "key_as_string": "2018-01-02",
+        "doc_count": 1138,
+        "AVAILABLE_ITEMS": {"value": 4409597},
+        "AVAILABLE_MB": {"value": 4037717.862739563}
+      },
+      {
+        "key": 1514764800000,
+        "key_as_string": "2018-01-01",
+        "doc_count": 1038,
+        "AVAILABLE_ITEMS": {"value": 5183290},
+        "AVAILABLE_MB": {"value": 3574465.86924839}
+      },
+      {
+        "key": 1514592000000,
+        "key_as_string": "2017-12-30",
+        "doc_count": 2011,
+        "AVAILABLE_ITEMS": {"value": 8545790},
+        "AVAILABLE_MB": {"value": 6593299.4883880615}
+      },
+      {
+        "key": 1514505600000,
+        "key_as_string": "2017-12-29",
+        "doc_count": 1901,
+        "AVAILABLE_ITEMS": {"value": 6773005},
+        "AVAILABLE_MB": {"value": 4987554.274066925}
+      },
+      {
+        "key": 1514419200000,
+        "key_as_string": "2017-12-28",
+        "doc_count": 1499,
+        "AVAILABLE_ITEMS": {"value": 5389484},
+        "AVAILABLE_MB": {"value": 4441406.744215965}
+      },
+      {
+        "key": 1514332800000,
+        "key_as_string": "2017-12-27",
+        "doc_count": 1848,
+        "AVAILABLE_ITEMS": {"value": 6208424},
+        "AVAILABLE_MB": {"value": 5495379.970246315}
+      },
+      {
+        "key": 1514246400000,
+        "key_as_string": "2017-12-26",
+        "doc_count": 1756,
+        "AVAILABLE_ITEMS": {"value": 6546602},
+        "AVAILABLE_MB": {"value": 4857466.622866631}
+      },
+      {
+        "key": 1514160000000,
+        "key_as_string": "2017-12-25",
+        "doc_count": 1897,
+        "AVAILABLE_ITEMS": {"value": 7090541},
+        "AVAILABLE_MB": {"value": 5123996.743625641}
+      },
+      {
+        "key": 1514073600000,
+        "key_as_string": "2017-12-24",
+        "doc_count": 1566,
+        "AVAILABLE_ITEMS": {"value": 5373262},
+        "AVAILABLE_MB": {"value": 4611052.595170975}
+      },
+      {
+        "key": 1513987200000,
+        "key_as_string": "2017-12-23",
+        "doc_count": 2035,
+        "AVAILABLE_ITEMS": {"value": 8718229},
+        "AVAILABLE_MB": {"value": 6608394.330610275}
+      },
+      {
+        "key": 1513900800000,
+        "key_as_string": "2017-12-22",
+        "doc_count": 1737,
+        "AVAILABLE_ITEMS": {"value": 6989379},
+        "AVAILABLE_MB": {"value": 6280541.956478119}
+      },
+      {
+        "key": 1513814400000,
+        "key_as_string": "2017-12-21",
+        "doc_count": 1400,
+        "AVAILABLE_ITEMS": {"value": 5228980},
+        "AVAILABLE_MB": {"value": 4205965.24251461}
+      },
+      {
+        "key": 1513728000000,
+        "key_as_string": "2017-12-20",
+        "doc_count": 1266,
+        "AVAILABLE_ITEMS": {"value": 6162488},
+        "AVAILABLE_MB": {"value": 5028997.0583639145}
+      },
+      {
+        "key": 1513641600000,
+        "key_as_string": "2017-12-19",
+        "doc_count": 1487,
+        "AVAILABLE_ITEMS": {"value": 6452722},
+        "AVAILABLE_MB": {"value": 4792770.971756935}
+      },
+      {
+        "key": 1513555200000,
+        "key_as_string": "2017-12-18",
+        "doc_count": 1279,
+        "AVAILABLE_ITEMS": {"value": 4838453},
+        "AVAILABLE_MB": {"value": 4206059.794406891}
+      },
+      {
+        "key": 1513468800000,
+        "key_as_string": "2017-12-17",
+        "doc_count": 1499,
+        "AVAILABLE_ITEMS": {"value": 6282876},
+        "AVAILABLE_MB": {"value": 5285053.983000755}
+      },
+      {
+        "key": 1513382400000,
+        "key_as_string": "2017-12-16",
+        "doc_count": 1816,
+        "AVAILABLE_ITEMS": {"value": 8443360},
+        "AVAILABLE_MB": {"value": 5711548.178774834}
+      },
+      {
+        "key": 1513296000000,
+        "key_as_string": "2017-12-15",
+        "doc_count": 1419,
+        "AVAILABLE_ITEMS": {"value": 5306048},
+        "AVAILABLE_MB": {"value": 4872933.467704773}
+      },
+      {
+        "key": 1513209600000,
+        "key_as_string": "2017-12-14",
+        "doc_count": 1308,
+        "AVAILABLE_ITEMS": {"value": 5488894},
+        "AVAILABLE_MB": {"value": 4209558.965294838}
+      },
+      {
+        "key": 1513123200000,
+        "key_as_string": "2017-12-13",
+        "doc_count": 1173,
+        "AVAILABLE_ITEMS": {"value": 6561467},
+        "AVAILABLE_MB": {"value": 3724890.3377552032}
+      },
+      {
+        "key": 1513036800000,
+        "key_as_string": "2017-12-12",
+        "doc_count": 1125,
+        "AVAILABLE_ITEMS": {"value": 4686332},
+        "AVAILABLE_MB": {"value": 3346310.7214746475}
+      },
+      {
+        "key": 1512950400000,
+        "key_as_string": "2017-12-11",
+        "doc_count": 1129,
+        "AVAILABLE_ITEMS": {"value": 4713543},
+        "AVAILABLE_MB": {"value": 3635168.3449602127}
+      },
+      {
+        "key": 1512864000000,
+        "key_as_string": "2017-12-10",
+        "doc_count": 1337,
+        "AVAILABLE_ITEMS": {"value": 6083996},
+        "AVAILABLE_MB": {"value": 4767647.213436127}
+      },
+      {
+        "key": 1512777600000,
+        "key_as_string": "2017-12-09",
+        "doc_count": 1440,
+        "AVAILABLE_ITEMS": {"value": 6643030},
+        "AVAILABLE_MB": {"value": 4266930.362926483}
+      },
+      {
+        "key": 1512691200000,
+        "key_as_string": "2017-12-08",
+        "doc_count": 1309,
+        "AVAILABLE_ITEMS": {"value": 5621725},
+        "AVAILABLE_MB": {"value": 3748365.848713875}
+      },
+      {
+        "key": 1512604800000,
+        "key_as_string": "2017-12-07",
+        "doc_count": 1228,
+        "AVAILABLE_ITEMS": {"value": 6444768},
+        "AVAILABLE_MB": {"value": 3937893.7997665405}
+      },
+      {
+        "key": 1512518400000,
+        "key_as_string": "2017-12-06",
+        "doc_count": 1205,
+        "AVAILABLE_ITEMS": {"value": 4654079},
+        "AVAILABLE_MB": {"value": 4013496.834569931}
+      },
+      {
+        "key": 1512432000000,
+        "key_as_string": "2017-12-05",
+        "doc_count": 1258,
+        "AVAILABLE_ITEMS": {"value": 5628024},
+        "AVAILABLE_MB": {"value": 3830074.719722748}
+      },
+      {
+        "key": 1512345600000,
+        "key_as_string": "2017-12-04",
+        "doc_count": 1223,
+        "AVAILABLE_ITEMS": {"value": 5265979},
+        "AVAILABLE_MB": {"value": 4541569.753044128}
+      },
+      {
+        "key": 1512259200000,
+        "key_as_string": "2017-12-03",
+        "doc_count": 1464,
+        "AVAILABLE_ITEMS": {"value": 6156905},
+        "AVAILABLE_MB": {"value": 4980270.343463898}
+      },
+      {
+        "key": 1512172800000,
+        "key_as_string": "2017-12-02",
+        "doc_count": 1715,
+        "AVAILABLE_ITEMS": {"value": 7321266},
+        "AVAILABLE_MB": {"value": 5338753.369007111}
+      },
+      {
+        "key": 1512086400000,
+        "key_as_string": "2017-12-01",
+        "doc_count": 1505,
+        "AVAILABLE_ITEMS": {"value": 5688349},
+        "AVAILABLE_MB": {"value": 4798549.673134804}
+      },
+      {
+        "key": 1512000000000,
+        "key_as_string": "2017-11-30",
+        "doc_count": 1264,
+        "AVAILABLE_ITEMS": {"value": 5153687},
+        "AVAILABLE_MB": {"value": 4969097.335770607}
+      },
+      {
+        "key": 1511913600000,
+        "key_as_string": "2017-11-29",
+        "doc_count": 1243,
+        "AVAILABLE_ITEMS": {"value": 5996981},
+        "AVAILABLE_MB": {"value": 4585045.405780792}
+      },
+      {
+        "key": 1511827200000,
+        "key_as_string": "2017-11-28",
+        "doc_count": 1541,
+        "AVAILABLE_ITEMS": {"value": 6887328},
+        "AVAILABLE_MB": {"value": 6012050.276885033}
+      },
+      {
+        "key": 1511740800000,
+        "key_as_string": "2017-11-27",
+        "doc_count": 1462,
+        "AVAILABLE_ITEMS": {"value": 6398737},
+        "AVAILABLE_MB": {"value": 5636609.81426239}
+      },
+      {
+        "key": 1511654400000,
+        "key_as_string": "2017-11-26",
+        "doc_count": 2499,
+        "AVAILABLE_ITEMS": {"value": 8611606},
+        "AVAILABLE_MB": {"value": 1.1477280443205833E7}
+      },
+      {
+        "key": 1511568000000,
+        "key_as_string": "2017-11-25",
+        "doc_count": 3645,
+        "AVAILABLE_ITEMS": {"value": 1.3212E7},
+        "AVAILABLE_MB": {"value": 1.6422985098247528E7}
+      },
+      {
+        "key": 1511481600000,
+        "key_as_string": "2017-11-24",
+        "doc_count": 3059,
+        "AVAILABLE_ITEMS": {"value": 8862252},
+        "AVAILABLE_MB": {"value": 1.0652022542053223E7}
+      },
+      {
+        "key": 1511395200000,
+        "key_as_string": "2017-11-23",
+        "doc_count": 927,
+        "AVAILABLE_ITEMS": {"value": 4474019},
+        "AVAILABLE_MB": {"value": 3619493.4103450775}
+      },
+      {
+        "key": 1511308800000,
+        "key_as_string": "2017-11-22",
+        "doc_count": 1247,
+        "AVAILABLE_ITEMS": {"value": 5628694},
+        "AVAILABLE_MB": {"value": 3881117.3793144226}
+      },
+      {
+        "key": 1511222400000,
+        "key_as_string": "2017-11-21",
+        "doc_count": 775,
+        "AVAILABLE_ITEMS": {"value": 3800155},
+        "AVAILABLE_MB": {"value": 2781611.6160087585}
+      },
+      {
+        "key": 1511136000000,
+        "key_as_string": "2017-11-20",
+        "doc_count": 1084,
+        "AVAILABLE_ITEMS": {"value": 5202506},
+        "AVAILABLE_MB": {"value": 3800765.490134239}
+      },
+      {
+        "key": 1511049600000,
+        "key_as_string": "2017-11-19",
+        "doc_count": 1108,
+        "AVAILABLE_ITEMS": {"value": 5212676},
+        "AVAILABLE_MB": {"value": 3325425.0387506485}
+      },
+      {
+        "key": 1510963200000,
+        "key_as_string": "2017-11-18",
+        "doc_count": 1281,
+        "AVAILABLE_ITEMS": {"value": 4655551},
+        "AVAILABLE_MB": {"value": 3621356.7778778076}
+      },
+      {
+        "key": 1510876800000,
+        "key_as_string": "2017-11-17",
+        "doc_count": 1092,
+        "AVAILABLE_ITEMS": {"value": 4401836},
+        "AVAILABLE_MB": {"value": 3673020.9058532715}
+      },
+      {
+        "key": 1510790400000,
+        "key_as_string": "2017-11-16",
+        "doc_count": 965,
+        "AVAILABLE_ITEMS": {"value": 3863160},
+        "AVAILABLE_MB": {"value": 2787198.2661237717}
+      },
+      {
+        "key": 1510704000000,
+        "key_as_string": "2017-11-15",
+        "doc_count": 947,
+        "AVAILABLE_ITEMS": {"value": 4204100},
+        "AVAILABLE_MB": {"value": 3118714.369828224}
+      },
+      {
+        "key": 1510617600000,
+        "key_as_string": "2017-11-14",
+        "doc_count": 951,
+        "AVAILABLE_ITEMS": {"value": 4084540},
+        "AVAILABLE_MB": {"value": 3452194.8551445007}
+      },
+      {
+        "key": 1510531200000,
+        "key_as_string": "2017-11-13",
+        "doc_count": 894,
+        "AVAILABLE_ITEMS": {"value": 3811149},
+        "AVAILABLE_MB": {"value": 2725684.2262735367}
+      },
+      {
+        "key": 1510444800000,
+        "key_as_string": "2017-11-12",
+        "doc_count": 1010,
+        "AVAILABLE_ITEMS": {"value": 4122757},
+        "AVAILABLE_MB": {"value": 4098267.720840454}
+      },
+      {
+        "key": 1510358400000,
+        "key_as_string": "2017-11-11",
+        "doc_count": 1179,
+        "AVAILABLE_ITEMS": {"value": 4670408},
+        "AVAILABLE_MB": {"value": 4015440.3937005997}
+      },
+      {
+        "key": 1510272000000,
+        "key_as_string": "2017-11-10",
+        "doc_count": 1137,
+        "AVAILABLE_ITEMS": {"value": 4820049},
+        "AVAILABLE_MB": {"value": 3580202.410396576}
+      },
+      {
+        "key": 1510185600000,
+        "key_as_string": "2017-11-09",
+        "doc_count": 909,
+        "AVAILABLE_ITEMS": {"value": 3206049},
+        "AVAILABLE_MB": {"value": 3291700.2635383606}
+      },
+      {
+        "key": 1510099200000,
+        "key_as_string": "2017-11-08",
+        "doc_count": 919,
+        "AVAILABLE_ITEMS": {"value": 4286227},
+        "AVAILABLE_MB": {"value": 3281662.7733917236}
+      },
+      {
+        "key": 1510012800000,
+        "key_as_string": "2017-11-07",
+        "doc_count": 894,
+        "AVAILABLE_ITEMS": {"value": 3697777},
+        "AVAILABLE_MB": {"value": 3186583.910741806}
+      },
+      {
+        "key": 1509926400000,
+        "key_as_string": "2017-11-06",
+        "doc_count": 983,
+        "AVAILABLE_ITEMS": {"value": 3872969},
+        "AVAILABLE_MB": {"value": 3647139.7687091827}
+      },
+      {
+        "key": 1509840000000,
+        "key_as_string": "2017-11-05",
+        "doc_count": 1083,
+        "AVAILABLE_ITEMS": {"value": 3935040},
+        "AVAILABLE_MB": {"value": 4449682.030134201}
+      },
+      {
+        "key": 1509753600000,
+        "key_as_string": "2017-11-04",
+        "doc_count": 1439,
+        "AVAILABLE_ITEMS": {"value": 5775001},
+        "AVAILABLE_MB": {"value": 5480610.412174225}
+      },
+      {
+        "key": 1509667200000,
+        "key_as_string": "2017-11-03",
+        "doc_count": 1284,
+        "AVAILABLE_ITEMS": {"value": 5603800},
+        "AVAILABLE_MB": {"value": 4182695.2513666153}
+      },
+      {
+        "key": 1509580800000,
+        "key_as_string": "2017-11-02",
+        "doc_count": 1042,
+        "AVAILABLE_ITEMS": {"value": 5213760},
+        "AVAILABLE_MB": {"value": 3788730.9561080933}
+      },
+      {
+        "key": 1509494400000,
+        "key_as_string": "2017-11-01",
+        "doc_count": 899,
+        "AVAILABLE_ITEMS": {"value": 3701449},
+        "AVAILABLE_MB": {"value": 2926630.4603300095}
+      },
+      {
+        "key": 1509408000000,
+        "key_as_string": "2017-10-31",
+        "doc_count": 809,
+        "AVAILABLE_ITEMS": {"value": 3068861},
+        "AVAILABLE_MB": {"value": 2788494.6385364532}
+      },
+      {
+        "key": 1509321600000,
+        "key_as_string": "2017-10-30",
+        "doc_count": 831,
+        "AVAILABLE_ITEMS": {"value": 3140642},
+        "AVAILABLE_MB": {"value": 2909922.0222301483}
+      },
+      {
+        "key": 1509235200000,
+        "key_as_string": "2017-10-29",
+        "doc_count": 945,
+        "AVAILABLE_ITEMS": {"value": 3799815},
+        "AVAILABLE_MB": {"value": 3402390.800635338}
+      },
+      {
+        "key": 1509148800000,
+        "key_as_string": "2017-10-28",
+        "doc_count": 1068,
+        "AVAILABLE_ITEMS": {"value": 4677894},
+        "AVAILABLE_MB": {"value": 3336744.184785843}
+      },
+      {
+        "key": 1509062400000,
+        "key_as_string": "2017-10-27",
+        "doc_count": 987,
+        "AVAILABLE_ITEMS": {"value": 3835792},
+        "AVAILABLE_MB": {"value": 2629480.5823755264}
+      },
+      {
+        "key": 1508976000000,
+        "key_as_string": "2017-10-26",
+        "doc_count": 799,
+        "AVAILABLE_ITEMS": {"value": 3101771},
+        "AVAILABLE_MB": {"value": 2043907.098856926}
+      },
+      {
+        "key": 1508889600000,
+        "key_as_string": "2017-10-25",
+        "doc_count": 758,
+        "AVAILABLE_ITEMS": {"value": 2954234},
+        "AVAILABLE_MB": {"value": 2379210.003177643}
+      },
+      {
+        "key": 1508803200000,
+        "key_as_string": "2017-10-24",
+        "doc_count": 914,
+        "AVAILABLE_ITEMS": {"value": 2676196},
+        "AVAILABLE_MB": {"value": 2316816.291294098}
+      },
+      {
+        "key": 1508716800000,
+        "key_as_string": "2017-10-23",
+        "doc_count": 809,
+        "AVAILABLE_ITEMS": {"value": 2627768},
+        "AVAILABLE_MB": {"value": 2306219.8409633636}
+      },
+      {
+        "key": 1508630400000,
+        "key_as_string": "2017-10-22",
+        "doc_count": 961,
+        "AVAILABLE_ITEMS": {"value": 3111257},
+        "AVAILABLE_MB": {"value": 1921252.9276685715}
+      },
+      {
+        "key": 1508544000000,
+        "key_as_string": "2017-10-21",
+        "doc_count": 1057,
+        "AVAILABLE_ITEMS": {"value": 3420909},
+        "AVAILABLE_MB": {"value": 2431992.5543432236}
+      },
+      {
+        "key": 1508457600000,
+        "key_as_string": "2017-10-20",
+        "doc_count": 948,
+        "AVAILABLE_ITEMS": {"value": 3026788},
+        "AVAILABLE_MB": {"value": 2371026.3894023895}
+      },
+      {
+        "key": 1508371200000,
+        "key_as_string": "2017-10-19",
+        "doc_count": 858,
+        "AVAILABLE_ITEMS": {"value": 3283877},
+        "AVAILABLE_MB": {"value": 1942713.5221385956}
+      },
+      {
+        "key": 1508284800000,
+        "key_as_string": "2017-10-18",
+        "doc_count": 813,
+        "AVAILABLE_ITEMS": {"value": 2406660},
+        "AVAILABLE_MB": {"value": 1829616.695736885}
+      },
+      {
+        "key": 1508198400000,
+        "key_as_string": "2017-10-17",
+        "doc_count": 812,
+        "AVAILABLE_ITEMS": {"value": 2150780},
+        "AVAILABLE_MB": {"value": 1702990.2143125534}
+      },
+      {
+        "key": 1508112000000,
+        "key_as_string": "2017-10-16",
+        "doc_count": 863,
+        "AVAILABLE_ITEMS": {"value": 2595901},
+        "AVAILABLE_MB": {"value": 2178857.959028244}
+      },
+      {
+        "key": 1508025600000,
+        "key_as_string": "2017-10-15",
+        "doc_count": 904,
+        "AVAILABLE_ITEMS": {"value": 3141828},
+        "AVAILABLE_MB": {"value": 2324866.78205204}
+      },
+      {
+        "key": 1507939200000,
+        "key_as_string": "2017-10-14",
+        "doc_count": 1179,
+        "AVAILABLE_ITEMS": {"value": 3568641},
+        "AVAILABLE_MB": {"value": 2220222.3399944305}
+      },
+      {
+        "key": 1507852800000,
+        "key_as_string": "2017-10-13",
+        "doc_count": 911,
+        "AVAILABLE_ITEMS": {"value": 2210230},
+        "AVAILABLE_MB": {"value": 2208841.9342164993}
+      },
+      {
+        "key": 1507766400000,
+        "key_as_string": "2017-10-12",
+        "doc_count": 907,
+        "AVAILABLE_ITEMS": {"value": 3282412},
+        "AVAILABLE_MB": {"value": 2496167.64421463}
+      },
+      {
+        "key": 1507680000000,
+        "key_as_string": "2017-10-11",
+        "doc_count": 877,
+        "AVAILABLE_ITEMS": {"value": 2828595},
+        "AVAILABLE_MB": {"value": 2354385.8206739426}
+      },
+      {
+        "key": 1507593600000,
+        "key_as_string": "2017-10-10",
+        "doc_count": 861,
+        "AVAILABLE_ITEMS": {"value": 1688424},
+        "AVAILABLE_MB": {"value": 1859856.8624887466}
+      },
+      {
+        "key": 1507507200000,
+        "key_as_string": "2017-10-09",
+        "doc_count": 837,
+        "AVAILABLE_ITEMS": {"value": 1912053},
+        "AVAILABLE_MB": {"value": 1850839.5729045868}
+      },
+      {
+        "key": 1507420800000,
+        "key_as_string": "2017-10-08",
+        "doc_count": 869,
+        "AVAILABLE_ITEMS": {"value": 2111749},
+        "AVAILABLE_MB": {"value": 2014210.4073553085}
+      },
+      {
+        "key": 1507334400000,
+        "key_as_string": "2017-10-07",
+        "doc_count": 1194,
+        "AVAILABLE_ITEMS": {"value": 3985244},
+        "AVAILABLE_MB": {"value": 2675940.825263977}
+      },
+      {
+        "key": 1507248000000,
+        "key_as_string": "2017-10-06",
+        "doc_count": 961,
+        "AVAILABLE_ITEMS": {"value": 2460386},
+        "AVAILABLE_MB": {"value": 2509112.6021003723}
+      },
+      {
+        "key": 1507161600000,
+        "key_as_string": "2017-10-05",
+        "doc_count": 832,
+        "AVAILABLE_ITEMS": {"value": 2659820},
+        "AVAILABLE_MB": {"value": 2356874.18501091}
+      },
+      {
+        "key": 1507075200000,
+        "key_as_string": "2017-10-04",
+        "doc_count": 782,
+        "AVAILABLE_ITEMS": {"value": 2127481},
+        "AVAILABLE_MB": {"value": 1575259.7156095505}
+      },
+      {
+        "key": 1506988800000,
+        "key_as_string": "2017-10-03",
+        "doc_count": 767,
+        "AVAILABLE_ITEMS": {"value": 1859440},
+        "AVAILABLE_MB": {"value": 1476068.0409469604}
+      },
+      {
+        "key": 1506902400000,
+        "key_as_string": "2017-10-02",
+        "doc_count": 804,
+        "AVAILABLE_ITEMS": {"value": 1960312},
+        "AVAILABLE_MB": {"value": 1991654.5918798447}
+      },
+      {
+        "key": 1506816000000,
+        "key_as_string": "2017-10-01",
+        "doc_count": 816,
+        "AVAILABLE_ITEMS": {"value": 2042173},
+        "AVAILABLE_MB": {"value": 1907079.8624629974}
+      },
+      {
+        "key": 1506729600000,
+        "key_as_string": "2017-09-30",
+        "doc_count": 1105,
+        "AVAILABLE_ITEMS": {"value": 3206063},
+        "AVAILABLE_MB": {"value": 2255450.3205709457}
+      },
+      {
+        "key": 1506643200000,
+        "key_as_string": "2017-09-29",
+        "doc_count": 879,
+        "AVAILABLE_ITEMS": {"value": 1970280},
+        "AVAILABLE_MB": {"value": 1452311.0971240997}
+      },
+      {
+        "key": 1506556800000,
+        "key_as_string": "2017-09-28",
+        "doc_count": 703,
+        "AVAILABLE_ITEMS": {"value": 1319579},
+        "AVAILABLE_MB": {"value": 1214227.7149381638}
+      },
+      {
+        "key": 1506470400000,
+        "key_as_string": "2017-09-27",
+        "doc_count": 453,
+        "AVAILABLE_ITEMS": {"value": 876305},
+        "AVAILABLE_MB": {"value": 648553.4352197647}
+      },
+      {
+        "key": 1506384000000,
+        "key_as_string": "2017-09-26",
+        "doc_count": 435,
+        "AVAILABLE_ITEMS": {"value": 729706},
+        "AVAILABLE_MB": {"value": 663336.0249462128}
+      },
+      {
+        "key": 1506297600000,
+        "key_as_string": "2017-09-25",
+        "doc_count": 451,
+        "AVAILABLE_ITEMS": {"value": 710698},
+        "AVAILABLE_MB": {"value": 697320.7916812897}
+      },
+      {
+        "key": 1506211200000,
+        "key_as_string": "2017-09-24",
+        "doc_count": 657,
+        "AVAILABLE_ITEMS": {"value": 1305469},
+        "AVAILABLE_MB": {"value": 1196858.9314069748}
+      },
+      {
+        "key": 1506124800000,
+        "key_as_string": "2017-09-23",
+        "doc_count": 1252,
+        "AVAILABLE_ITEMS": {"value": 4100398},
+        "AVAILABLE_MB": {"value": 3601858.2406864166}
+      },
+      {
+        "key": 1506038400000,
+        "key_as_string": "2017-09-22",
+        "doc_count": 772,
+        "AVAILABLE_ITEMS": {"value": 2669558},
+        "AVAILABLE_MB": {"value": 1934679.1949996948}
+      },
+      {
+        "key": 1505952000000,
+        "key_as_string": "2017-09-21",
+        "doc_count": 824,
+        "AVAILABLE_ITEMS": {"value": 3375173},
+        "AVAILABLE_MB": {"value": 2382647.6850471497}
+      },
+      {
+        "key": 1505865600000,
+        "key_as_string": "2017-09-20",
+        "doc_count": 836,
+        "AVAILABLE_ITEMS": {"value": 4070854},
+        "AVAILABLE_MB": {"value": 2500981.0099344254}
+      },
+      {
+        "key": 1505779200000,
+        "key_as_string": "2017-09-19",
+        "doc_count": 796,
+        "AVAILABLE_ITEMS": {"value": 3721701},
+        "AVAILABLE_MB": {"value": 2630367.71228981}
+      },
+      {
+        "key": 1505692800000,
+        "key_as_string": "2017-09-18",
+        "doc_count": 843,
+        "AVAILABLE_ITEMS": {"value": 4068920},
+        "AVAILABLE_MB": {"value": 3012552.148571968}
+      },
+      {
+        "key": 1505606400000,
+        "key_as_string": "2017-09-17",
+        "doc_count": 796,
+        "AVAILABLE_ITEMS": {"value": 3275870},
+        "AVAILABLE_MB": {"value": 2074158.0924386978}
+      },
+      {
+        "key": 1505520000000,
+        "key_as_string": "2017-09-16",
+        "doc_count": 1158,
+        "AVAILABLE_ITEMS": {"value": 5821934},
+        "AVAILABLE_MB": {"value": 3811330.7665338516}
+      },
+      {
+        "key": 1505433600000,
+        "key_as_string": "2017-09-15",
+        "doc_count": 997,
+        "AVAILABLE_ITEMS": {"value": 5160933},
+        "AVAILABLE_MB": {"value": 3278562.4476976395}
+      },
+      {
+        "key": 1505347200000,
+        "key_as_string": "2017-09-14",
+        "doc_count": 806,
+        "AVAILABLE_ITEMS": {"value": 3750197},
+        "AVAILABLE_MB": {"value": 2637907.8070220947}
+      },
+      {
+        "key": 1505260800000,
+        "key_as_string": "2017-09-13",
+        "doc_count": 805,
+        "AVAILABLE_ITEMS": {"value": 3636525},
+        "AVAILABLE_MB": {"value": 2886852.0331487656}
+      },
+      {
+        "key": 1505174400000,
+        "key_as_string": "2017-09-12",
+        "doc_count": 744,
+        "AVAILABLE_ITEMS": {"value": 3392386},
+        "AVAILABLE_MB": {"value": 2576721.905503273}
+      },
+      {
+        "key": 1505088000000,
+        "key_as_string": "2017-09-11",
+        "doc_count": 641,
+        "AVAILABLE_ITEMS": {"value": 3031739},
+        "AVAILABLE_MB": {"value": 2409213.487589836}
+      },
+      {
+        "key": 1505001600000,
+        "key_as_string": "2017-09-10",
+        "doc_count": 709,
+        "AVAILABLE_ITEMS": {"value": 3359346},
+        "AVAILABLE_MB": {"value": 2551903.657684326}
+      },
+      {
+        "key": 1504915200000,
+        "key_as_string": "2017-09-09",
+        "doc_count": 1018,
+        "AVAILABLE_ITEMS": {"value": 5556082},
+        "AVAILABLE_MB": {"value": 3214311.5993680954}
+      },
+      {
+        "key": 1504828800000,
+        "key_as_string": "2017-09-08",
+        "doc_count": 938,
+        "AVAILABLE_ITEMS": {"value": 4053653},
+        "AVAILABLE_MB": {"value": 2775629.9403295517}
+      },
+      {
+        "key": 1504742400000,
+        "key_as_string": "2017-09-07",
+        "doc_count": 743,
+        "AVAILABLE_ITEMS": {"value": 3777100},
+        "AVAILABLE_MB": {"value": 2804679.566432953}
+      },
+      {
+        "key": 1504656000000,
+        "key_as_string": "2017-09-06",
+        "doc_count": 832,
+        "AVAILABLE_ITEMS": {"value": 4336601},
+        "AVAILABLE_MB": {"value": 2954547.3504781723}
+      },
+      {
+        "key": 1504569600000,
+        "key_as_string": "2017-09-05",
+        "doc_count": 730,
+        "AVAILABLE_ITEMS": {"value": 3429027},
+        "AVAILABLE_MB": {"value": 2887226.3643541336}
+      },
+      {
+        "key": 1504483200000,
+        "key_as_string": "2017-09-04",
+        "doc_count": 702,
+        "AVAILABLE_ITEMS": {"value": 4048046},
+        "AVAILABLE_MB": {"value": 1900327.6921930313}
+      },
+      {
+        "key": 1504396800000,
+        "key_as_string": "2017-09-03",
+        "doc_count": 836,
+        "AVAILABLE_ITEMS": {"value": 3219167},
+        "AVAILABLE_MB": {"value": 2017711.8427362442}
+      },
+      {
+        "key": 1504310400000,
+        "key_as_string": "2017-09-02",
+        "doc_count": 1164,
+        "AVAILABLE_ITEMS": {"value": 4683858},
+        "AVAILABLE_MB": {"value": 3053742.508298874}
+      },
+      {
+        "key": 1504224000000,
+        "key_as_string": "2017-09-01",
+        "doc_count": 972,
+        "AVAILABLE_ITEMS": {"value": 3532726},
+        "AVAILABLE_MB": {"value": 2803319.926006317}
+      },
+      {
+        "key": 1504137600000,
+        "key_as_string": "2017-08-31",
+        "doc_count": 869,
+        "AVAILABLE_ITEMS": {"value": 3337880},
+        "AVAILABLE_MB": {"value": 2480013.80301857}
+      },
+      {
+        "key": 1504051200000,
+        "key_as_string": "2017-08-30",
+        "doc_count": 809,
+        "AVAILABLE_ITEMS": {"value": 4182847},
+        "AVAILABLE_MB": {"value": 2323577.1452884674}
+      },
+      {
+        "key": 1503964800000,
+        "key_as_string": "2017-08-29",
+        "doc_count": 779,
+        "AVAILABLE_ITEMS": {"value": 3825602},
+        "AVAILABLE_MB": {"value": 2298036.0835590363}
+      },
+      {
+        "key": 1503878400000,
+        "key_as_string": "2017-08-28",
+        "doc_count": 847,
+        "AVAILABLE_ITEMS": {"value": 3228013},
+        "AVAILABLE_MB": {"value": 2969219.493988037}
+      },
+      {
+        "key": 1503792000000,
+        "key_as_string": "2017-08-27",
+        "doc_count": 977,
+        "AVAILABLE_ITEMS": {"value": 3338725},
+        "AVAILABLE_MB": {"value": 3030741.1552143097}
+      },
+      {
+        "key": 1503705600000,
+        "key_as_string": "2017-08-26",
+        "doc_count": 1176,
+        "AVAILABLE_ITEMS": {"value": 4541279},
+        "AVAILABLE_MB": {"value": 3442519.128148079}
+      },
+      {
+        "key": 1503619200000,
+        "key_as_string": "2017-08-25",
+        "doc_count": 1018,
+        "AVAILABLE_ITEMS": {"value": 4269737},
+        "AVAILABLE_MB": {"value": 2979491.2108659744}
+      },
+      {
+        "key": 1503532800000,
+        "key_as_string": "2017-08-24",
+        "doc_count": 868,
+        "AVAILABLE_ITEMS": {"value": 3895921},
+        "AVAILABLE_MB": {"value": 2382010.016612053}
+      },
+      {
+        "key": 1503446400000,
+        "key_as_string": "2017-08-23",
+        "doc_count": 837,
+        "AVAILABLE_ITEMS": {"value": 3481350},
+        "AVAILABLE_MB": {"value": 2351685.2768335342}
+      },
+      {
+        "key": 1503360000000,
+        "key_as_string": "2017-08-22",
+        "doc_count": 809,
+        "AVAILABLE_ITEMS": {"value": 3264224},
+        "AVAILABLE_MB": {"value": 2480194.266889572}
+      },
+      {
+        "key": 1503273600000,
+        "key_as_string": "2017-08-21",
+        "doc_count": 901,
+        "AVAILABLE_ITEMS": {"value": 3595511},
+        "AVAILABLE_MB": {"value": 2750714.440273285}
+      },
+      {
+        "key": 1503187200000,
+        "key_as_string": "2017-08-20",
+        "doc_count": 871,
+        "AVAILABLE_ITEMS": {"value": 3514803},
+        "AVAILABLE_MB": {"value": 2563205.2741918564}
+      },
+      {
+        "key": 1503100800000,
+        "key_as_string": "2017-08-19",
+        "doc_count": 1061,
+        "AVAILABLE_ITEMS": {"value": 4419438},
+        "AVAILABLE_MB": {"value": 2800911.4036273956}
+      },
+      {
+        "key": 1503014400000,
+        "key_as_string": "2017-08-18",
+        "doc_count": 999,
+        "AVAILABLE_ITEMS": {"value": 5208820},
+        "AVAILABLE_MB": {"value": 2934195.4011068344}
+      },
+      {
+        "key": 1502928000000,
+        "key_as_string": "2017-08-17",
+        "doc_count": 842,
+        "AVAILABLE_ITEMS": {"value": 3249578},
+        "AVAILABLE_MB": {"value": 2462161.1134490967}
+      },
+      {
+        "key": 1502841600000,
+        "key_as_string": "2017-08-16",
+        "doc_count": 902,
+        "AVAILABLE_ITEMS": {"value": 4060210},
+        "AVAILABLE_MB": {"value": 2852374.467628479}
+      },
+      {
+        "key": 1502755200000,
+        "key_as_string": "2017-08-15",
+        "doc_count": 993,
+        "AVAILABLE_ITEMS": {"value": 3699467},
+        "AVAILABLE_MB": {"value": 3100850.163471222}
+      },
+      {
+        "key": 1502668800000,
+        "key_as_string": "2017-08-14",
+        "doc_count": 799,
+        "AVAILABLE_ITEMS": {"value": 2813861},
+        "AVAILABLE_MB": {"value": 2151235.859295845}
+      },
+      {
+        "key": 1502582400000,
+        "key_as_string": "2017-08-13",
+        "doc_count": 1248,
+        "AVAILABLE_ITEMS": {"value": 3958317},
+        "AVAILABLE_MB": {"value": 3977461.5294275284}
+      },
+      {
+        "key": 1502496000000,
+        "key_as_string": "2017-08-12",
+        "doc_count": 1563,
+        "AVAILABLE_ITEMS": {"value": 5453731},
+        "AVAILABLE_MB": {"value": 4980300.589864731}
+      },
+      {
+        "key": 1502409600000,
+        "key_as_string": "2017-08-11",
+        "doc_count": 767,
+        "AVAILABLE_ITEMS": {"value": 2169919},
+        "AVAILABLE_MB": {"value": 1712196.7233448029}
+      }
+    ]
+  }},
+  "queryBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [{
+      "type": "double",
+      "tableName": "mct_tgt_session",
+      "isOptional": false,
+      "columnName": "AVAILABLE_ITEMS",
+      "isRuntimeFilter": false,
+      "isGlobalFilter": true
+    }],
+    "sorts": [],
+    "rowFields": [{
+      "type": "date",
+      "columnName": "TRANSFER_DATE",
+      "area": "row",
+      "areaIndex": 0,
+      "aggregate": null,
+      "name": null,
+      "dateInterval": "day",
+      "dateFormat": "yyyy-MM-dd"
+    }],
+    "columnFields": [],
+    "dataFields": [
+      {
+        "type": "double",
+        "columnName": "AVAILABLE_MB",
+        "area": "data",
+        "areaIndex": 0,
+        "aggregate": "sum",
+        "name": "AVAILABLE_MB",
+        "dateInterval": null
+      },
+      {
+        "type": "double",
+        "columnName": "AVAILABLE_ITEMS",
+        "area": "data",
+        "areaIndex": 1,
+        "aggregate": "sum",
+        "name": "AVAILABLE_ITEMS",
+        "dateInterval": null
+      }
+    ]
+  },
+  "executedBy": "Scheduled"
+}
