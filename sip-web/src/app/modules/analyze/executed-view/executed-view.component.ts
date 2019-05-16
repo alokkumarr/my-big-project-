@@ -537,7 +537,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
           if (isDSLAnalysis(this.executedAnalysis)) {
-            this.executedAnalysis.sipQuery = queryBuilder;
+            this.executedAnalysis = {...this.executedAnalysis, sipQuery: queryBuilder};
           } else {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
