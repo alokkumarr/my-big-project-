@@ -17,6 +17,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.FieldNames;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class MigrateAnalysis {
   private String listAnalysisUrl;
   private String tableName;
   private String basePath;
+  private static ObjectMapper objectMapper = new ObjectMapper();
 
   public MigrateAnalysis() {}
 
@@ -129,7 +131,9 @@ public class MigrateAnalysis {
                 analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
                 Gson gson = new GsonBuilder().create();
-                JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
+                // JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
+                JsonElement parsedAnalysis =
+                    SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
                 analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
 
                 migrationStatusObject.addProperty("migrationStatus", true);
@@ -268,7 +272,9 @@ public class MigrateAnalysis {
 
     Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
 
-    System.out.println(gson.toJson(analysis, Analysis.class));
+    JsonElement parsedAnalysis =
+        SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
+
   }
 
   /**
