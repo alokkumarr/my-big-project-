@@ -57,7 +57,7 @@ public class MigrationStatusObject {
   /**
    * Set to true if Execution Results are migrated.
    *
-   * @param executionsMigrated
+   * @param executionsMigrated Flag to identify the executions migration happened or not.
    */
   public void setExecutionsMigrated(boolean executionsMigrated) {
     isExecutionsMigrated = executionsMigrated;

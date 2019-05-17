@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,10 +105,9 @@ public class MigrateAnalysis {
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
       MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
-
-      if (saveMigrationStatus(migrationStatus, migrationStatusTable, basePath)) {
-        logger.info("Successfully written the migration status to MaprDB..!!");
-      }
+      logger.info("Total number of Files for migration : ",migrationStatus.getTotalAnalysis());
+      logger.info("Number of Files Successfully Migrated : ",migrationStatus.getSuccessCount());
+      logger.info("Number of Files Successfully Migrated : ",migrationStatus.getFailureCount());
     }
   }
 
@@ -173,6 +171,11 @@ public class MigrateAnalysis {
                 failedMigration.incrementAndGet();
               }
 
+              if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
+                logger.info("Successfully written the migration status to MaprDB..!!");
+                logger.debug("Written Id = ",migrationStatusObject.getAnalysisId());
+              }
+
               analysisStatus.add(migrationStatusObject);
             });
 
@@ -231,10 +234,10 @@ public class MigrateAnalysis {
    * @return
    */
   private boolean saveMigrationStatus(
-      MigrationStatus migrationStatus, String migrationStatusTable, String basePath) {
+      MigrationStatusObject migrationStatus, String migrationStatusTable, String basePath) {
     boolean status = true;
 
-    String id = UUID.randomUUID().toString();
+    String id = migrationStatus.getAnalysisId();
     logger.info("Started Writing into MaprDB, id : ", id);
     try {
       analysisMetadataStore = new AnalysisMetadata(migrationStatusTable, basePath);
