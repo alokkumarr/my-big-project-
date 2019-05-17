@@ -52,7 +52,6 @@ public class FieldNames {
   public static final String UPDATED_TIMESTAMP = "updatedTimestamp";
   public static final String IS_GLOBAL_FILTER = "isGlobalFilter";
   public static final String IS_RUNTIME_FILTER = "isRuntimeFilter";
-
   public static final String ARTIFACTS = "artifacts";
   public static final String ARTIFACT_NAME = "artifactName";
   public static final String SQL_BUILDER = "sqlBuilder";
@@ -64,4 +63,6 @@ public class FieldNames {
   public static final String MAP_SETTINGS = "mapSettings";
   public static final String MAP_STYLE = "mapStyle";
   public static final String CHART_TYPE = "chartType";
+  public static final String USER_ID = "userId";
+
 }
