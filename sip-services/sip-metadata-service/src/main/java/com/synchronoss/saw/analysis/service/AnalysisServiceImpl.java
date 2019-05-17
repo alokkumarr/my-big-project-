@@ -38,6 +38,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.analysis}")
   private String tableName;
 
+  @Value("${metastore.migration}")
+  private String migrationStatusTable;
+
   @Value("${analysis.get-analysis-url}")
   @NotNull
   private String analysisUri;
@@ -60,7 +63,8 @@ public class AnalysisServiceImpl implements AnalysisService {
   private void init() throws Exception {
     if (migrationRequires) {
       logger.trace("Migration initiated.. " + migrationRequires);
-      new MigrateAnalysis().convertBinaryToJson(tableName, basePath, analysisUri);
+      new MigrateAnalysis()
+          .convertBinaryToJson(tableName, basePath, analysisUri, migrationStatusTable);
     }
     logger.trace("Migration ended..");
   }
