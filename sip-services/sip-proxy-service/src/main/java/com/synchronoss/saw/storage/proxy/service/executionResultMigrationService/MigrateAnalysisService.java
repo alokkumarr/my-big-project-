@@ -2,25 +2,21 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
-import com.synchronoss.saw.storage.proxy.service.ChartResultMigration;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 /**
@@ -30,47 +26,27 @@ import java.util.*;
 @Service
 public class MigrateAnalysisService {
   private static final Logger LOGGER = LoggerFactory.getLogger(MigrateAnalysisService.class);
-
   private final Set<String> executionIds = new HashSet<>();
 
-  private String tablePath = "/var/sip/services/metadata/analysis_results";
+  @Value("${metastore.binary-store-path}")
+  @NotNull
+  private String binaryTablePath;
+
+  @Value("${metadata.service.execution-migration-flag}")
+  @NotNull
+  private boolean executionMigrationFlag;
 
   @Autowired private StorageProxyService proxyService;
 
   @Autowired private HBaseUtil hBaseUtil;
 
-  @Autowired
-  private QueryDefinitionConverter queryDefinitionConverter;
+  @Autowired private MigrateExecutions migrateExecutions;
 
   @PostConstruct
   private void init() throws Exception {
-    // convertBinaryStoreToDslJsonStore();
-  }
-
-  public void convertBinaryStoreToDslJsonStore1() throws Exception {
-    String type = "Scheduled";
-    ObjectMapper mapper = new ObjectMapper();
-
-    File file = new ClassPathResource("old-pivot-execution-data.json").getFile();
-
-    JsonNode jsonNode = mapper.readValue(file, JsonNode.class);
-
-    String executedBy = jsonNode.get("executedBy").asText();
-
-    Object dslExecutionResult = convertOldExecutionToDSLExecution("pivot", jsonNode);
-
-    LOGGER.trace("DSL execution result : " + dslExecutionResult.toString());
-    file = new ClassPathResource("sample-dsl-query-data.json").getFile();
-
-    ObjectNode node = mapper.readValue(file, ObjectNode.class);
-    String dslQueryId = node.get("analysisId").asText();
-    Long startTime = new Date().getTime();
-    JsonNode sipNode = node.get("analysis").get("sipQuery");
-    // SipQuery sipQuery = mapper.convertValue(sipNode, SipQuery.class);
-
-    LOGGER.trace("DSL execution result store start here.");
-    // saveDSLJsonExecution(dslQueryId, type, executedBy, sipQuery, dslQueryId,
-    // startedTime,finishedTime, executionStatus, dslExecutionResult);
+    if (executionMigrationFlag) {
+      convertBinaryStoreToDslJsonStore();
+    }
   }
 
   /**
@@ -94,17 +70,23 @@ public class MigrateAnalysisService {
       Long finishedTime,
       String executionStatus,
       Object dslExecutionResult) {
-    ExecutionResult executionResult = new ExecutionResult();
-    executionResult.setExecutionId(executionId);
-    executionResult.setDslQueryId(dslQueryId);
-    executionResult.setSipQuery(sipQuery);
-    executionResult.setStartTime(finishedTime);
-    executionResult.setFinishedTime(finishedTime);
-    executionResult.setData(dslExecutionResult);
-    executionResult.setExecutionType(ExecutionType.fromValue(executionType));
-    executionResult.setStatus(executionStatus);
-    executionResult.setExecutedBy(executedBy);
-    proxyService.saveDslExecutionResult(executionResult);
+    try {
+      ExecutionResult executionResult = new ExecutionResult();
+      executionResult.setExecutionId(executionId);
+      executionResult.setDslQueryId(dslQueryId);
+      executionResult.setSipQuery(sipQuery);
+      executionResult.setStartTime(finishedTime);
+      executionResult.setFinishedTime(finishedTime);
+      executionResult.setData(dslExecutionResult);
+      executionResult.setExecutionType(ExecutionType.valueOf(executionType));
+      executionResult.setStatus(executionStatus);
+      executionResult.setExecutedBy(executedBy);
+      proxyService.saveDslExecutionResult(executionResult);
+      LOGGER.info("Execution Result Stored successfully in jason Store.");
+    } catch (Exception ex) {
+      LOGGER.error(
+          String.format("Error occurred during saving Execution Result : %s", ex.getMessage()));
+    }
   }
 
   /**
@@ -117,34 +99,38 @@ public class MigrateAnalysisService {
   public Object convertOldExecutionToDSLExecution(String type, JsonNode jsonNode) {
     List<Object> objectList = new ArrayList<>();
     Object dataConverter;
-    switch (type) {
-      case "chart":
-        dataConverter = new com.synchronoss.saw.storage.proxy.service.ChartResultMigration();
-        objectList = ((ChartResultMigration) dataConverter).parseData(jsonNode);
-        break;
-      case "pivot":
-        dataConverter = new PivotResultMigration();
-        objectList = ((PivotResultMigration) dataConverter).parseData(jsonNode);
-        break;
-      case "esReport":
-        throw new UnsupportedOperationException("ES Report migration not supported yet");
-      case "report":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
-      case "map":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
-      default:
-        LOGGER.error("Unknown report type");
-        break;
+    try {
+      switch (type) {
+        case "chart":
+          dataConverter = new com.synchronoss.saw.storage.proxy.service.ChartResultMigration();
+          objectList = ((ChartResultMigration) dataConverter).parseData(jsonNode);
+          break;
+        case "pivot":
+          dataConverter = new PivotResultMigration();
+          objectList = ((PivotResultMigration) dataConverter).parseData(jsonNode);
+          break;
+        case "esReport":
+          throw new UnsupportedOperationException("ES Report migration not supported yet");
+        case "report":
+          throw new UnsupportedOperationException("DL Report migration not supported yet");
+        case "map":
+          throw new UnsupportedOperationException("DL Report migration not supported yet");
+        default:
+          LOGGER.error("Unknown report type");
+          break;
+      }
+    } catch (UnsupportedOperationException e) {
+      LOGGER.error(e.getMessage());
     }
     return objectList;
   }
 
+  /** Conversion from binary store to jason store */
   public void convertBinaryStoreToDslJsonStore() {
     LOGGER.info("Fetch all start execution Id.!");
     fetchExecutionIdFromBinaryStore();
 
     LOGGER.info("Total count of execution Ids : " + executionIds.size());
-    LOGGER.info("Continue with execution result for execution Ids.");
     if (!executionIds.isEmpty()) {
       for (String executionId : executionIds) {
         if (executionId != null) {
@@ -160,7 +146,7 @@ public class MigrateAnalysisService {
     LOGGER.info("Fetch analysis start here");
     try {
       Connection connection = hBaseUtil.getConnection();
-      Table table = hBaseUtil.getTable(connection, tablePath);
+      Table table = hBaseUtil.getTable(connection, binaryTablePath);
       ResultScanner results = hBaseUtil.getResultScanner(table);
       if (results != null) {
         for (Result result : results) {
@@ -174,11 +160,16 @@ public class MigrateAnalysisService {
     }
   }
 
+  /**
+   * Read all execution result
+   *
+   * @param executionId
+   */
   public void readExecutionResultFromBinaryStore(String executionId) {
-    LOGGER.info("Fetch execution start here");
+    LOGGER.info("Fetch execution start here with this table :" + binaryTablePath);
     try {
       Connection connection = hBaseUtil.getConnection();
-      Table table = hBaseUtil.getTable(connection, tablePath);
+      Table table = hBaseUtil.getTable(connection, binaryTablePath);
       Get get = new Get(Bytes.toBytes(executionId));
       Result result = table.get(get);
       JsonParser parser = new JsonParser();
@@ -187,62 +178,60 @@ public class MigrateAnalysisService {
           parser
               .parse(new String(result.getValue("_source".getBytes(), "content".getBytes())))
               .getAsJsonObject();
+      LOGGER.debug("Contents from Binary Store :" + content.toString());
 
-      LOGGER.info("Contents Id from Binary Store :" + content.toString());
-
-      String executionResult = content.get("execution_result").toString();
-      LOGGER.info("executionResult :" + executionResult);
-
-      String type = content.get("type").toString();
-      LOGGER.info("type :" + type);
-
-      String executionType = content.get("executionType").toString();
-      LOGGER.info("executionType :" + executionType);
-
-      String analysisId = content.get("id").toString();
-      LOGGER.info("analysisId :" + analysisId);
-
-      String executionFinishTs = content.get("execution_finish_ts").toString();
-      LOGGER.info("executionFinishTs :" + executionFinishTs);
+      String type = content.get("type").getAsString();
+      String analysisId = content.get("id").getAsString();
+      String executedBy = content.get("executedBy").getAsString();
+      String executionType = content.get("executionType").getAsString();
+      String executionStatus = content.get("execution_result").getAsString();
+      Long executionFinishTs = Long.valueOf(content.get("execution_finish_ts").getAsString());
 
       JsonObject queryBuilder = new JsonObject();
       queryBuilder.add("queryBuilder", content.get("queryBuilder"));
-      LOGGER.info("queryBuilder from the binary store :" + queryBuilder);
+      SipQuery sipQuery = migrateExecutions.migrate(queryBuilder);
 
-      String executedBy = content.get("executedBy").toString();
-      LOGGER.info("executedBy :" + executedBy);
+      LOGGER.info("executionType :" + executionType.trim());
+      LOGGER.info("type :" + type);
 
-      String executionDataAsString = new String(result.getValue("_objects".getBytes(), "data".getBytes()));
-      LOGGER.info(
-          "ExecutionData from Binary Store as executionDataAsString :" + executionDataAsString);
+      Object dslExecutionResult = null;
+      if (type != null && type.matches("pivot|chart")) {
+        JsonObject executionData =
+            parser
+                .parse(new String(result.getValue("_objects".getBytes(), "data".getBytes())))
+                .getAsJsonObject();
+        LOGGER.info("ExecutionData :" + executionData.toString());
 
-/*
-      JsonArray executionData =
-          parser
-              .parse(new String(result.getValue("_objects".getBytes(), "data".getBytes())))
-              .getAsJsonArray();
+        JsonObject dataBuilderObject = new JsonObject();
+        dataBuilderObject.add("data", executionData);
+        dataBuilderObject.add("queryBuilder", content.get("queryBuilder"));
 
-      JsonObject object = executionData.getAsJsonObject();
-      LOGGER.info("ExecutionData from Binary Store :" + object.toString());
-*/
+        LOGGER.info("DataBuilder Object from the binary store :" + dataBuilderObject);
 
-      LOGGER.info("SipQuery building start here");
-      SipQuery sipQuery = queryDefinitionConverter.convert(queryBuilder);
-      LOGGER.info("SipQuery from the binary store :" + sipQuery.getArtifacts().size());
+        // Parse a JSON string into a JsonNode
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(dataBuilderObject.getAsString());
+        LOGGER.info(
+            "Complete Json Node which need to parsed for pivot/chart :" + dataBuilderObject);
 
+        dslExecutionResult = convertOldExecutionToDSLExecution(type, jsonNode);
+      }
+
+      LOGGER.info("dslExecutionResult :" + dslExecutionResult);
+      // store the execution result in json store
+      saveDSLJsonExecution(
+          executionId,
+          executionType,
+          executedBy,
+          sipQuery,
+          analysisId,
+          executionFinishTs,
+          executionStatus,
+          dslExecutionResult);
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());
     } finally {
       hBaseUtil.closeConnection();
     }
   }
-
-  /* public static void main(String[] args) throws Exception{
-    Configuration config = HBaseConfiguration.create();
-    HBaseAdmin admin = new HBaseAdmin(config);
-
-    // verifying the exist of the table
-    boolean bool = admin.tableExists("analysis_results");
-    System.out.println("analysis_results table exists: " + bool);
-  } */
 }

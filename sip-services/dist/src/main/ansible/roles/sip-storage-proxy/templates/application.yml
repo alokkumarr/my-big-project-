@@ -39,7 +39,9 @@ elastic-xpack :
 
 metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
+    binary-store-path:  /var/sip/services/metadata/analysis_results
 
 metadata:
   service:
     host: http://localhost:9501
+    execution-migration-flag: false

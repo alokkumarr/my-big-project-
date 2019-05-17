@@ -11,7 +11,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MigrateExecutions {
   private static final Logger logger = LoggerFactory.getLogger(MigrateExecutions.class);
 
@@ -90,11 +92,11 @@ public class MigrateExecutions {
     SipQuery sipQuery;
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     JsonObject queryBuilderObject = jsonObject.getAsJsonObject(FieldNames.QUERY_BUILDER);
-    logger.info("QueryBuilder obj to be Migrated = " + gson.toJson(queryBuilderObject));
+    logger.debug("QueryBuilder obj to be Migrated = " + gson.toJson(queryBuilderObject));
     MigrateExecutions ma = new MigrateExecutions();
 
     sipQuery = ma.convertOldAnalysisObjtoSipDsl(queryBuilderObject);
-    logger.info("Migrated SipQuery = " + gson.toJson(sipQuery, SipQuery.class));
+    logger.debug("Migrated SipQuery = " + gson.toJson(sipQuery, SipQuery.class));
 
     return sipQuery;
   }

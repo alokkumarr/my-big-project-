@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Component
 public class QueryDefinitionConverter implements FieldsSipDslConverter {
 
   @Override
