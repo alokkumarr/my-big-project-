@@ -309,14 +309,9 @@ public class RetryExecutorService {
    */
   private void updateAndDeleteCorruptFiles(BisFileLog log, String fileStatus,
       String procesStatus) {
-    int rowId = 0;
-    rowId = sipLogService.updateStatusFailed(fileStatus, procesStatus,
+    sipLogService.updateStatusFailed(fileStatus, procesStatus,
         log.getPid());
     logger.info("rowId updateAndDeleteCorruptFiles: " + log.getPid());
-    if (rowId <= 0) {
-      throw new PersistenceException(
-          "Exception occured while updating the bis log table to handle inconsistency");
-    }
     // The below code fix which will be part of
     // TODO : SIP-6148
     // This is known issue with this feature branch

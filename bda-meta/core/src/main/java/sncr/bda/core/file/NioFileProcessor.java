@@ -59,12 +59,8 @@ public class NioFileProcessor implements FileProcessor{
   public boolean deleteFile(String filePath, String defaultLoc, String user) throws IOException {
     File fileDelete =new File(filePath);
     boolean isFileDeleted = fileDelete.delete();
+    boolean isFolderDeleted = fileDelete.getParentFile().delete();
     
-    File[] files = fileDelete.getParentFile().listFiles();
-    boolean isFolderDeleted = false;
-    if (files != null && files.length == 0) {
-      isFolderDeleted = fileDelete.delete();
-    } 
    return  isFileDeleted && isFolderDeleted;
   }
 
