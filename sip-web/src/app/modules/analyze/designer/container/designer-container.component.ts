@@ -81,7 +81,7 @@ import {
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
-  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState
@@ -181,8 +181,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.analysis
       );
 
-      this._analyzeService.getSemanticObect(this.analysis.semanticId).toPromise().then(semanticObj => {
-        this._store.dispatch(new DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns(semanticObj.artifacts[0].columns));
+      this._analyzeService.getSemanticObject(this.analysis.semanticId).toPromise().then(semanticObj => {
+        this._store.dispatch(new DesignerMergeMetricColumns(semanticObj.artifacts[0].columns));
         this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
       });
 

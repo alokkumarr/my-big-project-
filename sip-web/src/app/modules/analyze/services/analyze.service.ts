@@ -30,6 +30,8 @@ import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
+const ANALYZE_MODULE_NAME = 'ANALYZE';
+const PROJECT_CODE = 'workbench';
 
 interface ExecutionRequestOptions {
   take?: number;
@@ -618,7 +620,7 @@ export class AnalyzeService {
   }
 
   getSemanticLayerData() {
-    const userProject = 'workbench';
+    const userProject = PROJECT_CODE;
     return this.getRequest(`internal/semantic/md?projectId=${userProject}`)
       .toPromise()
       .then(fpGet(`contents.[0].${MODULE_NAME}`));
@@ -628,7 +630,7 @@ export class AnalyzeService {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
-  getSemanticObect(semanticId: string): Observable<any> {
+  getSemanticObject(semanticId: string): Observable<any> {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
@@ -661,7 +663,7 @@ export class AnalyzeService {
   }
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
-    return this.getSemanticObect(model.semanticId).pipe(
+    return this.getSemanticObject(model.semanticId).pipe(
       switchMap(semanticData => {
         /* Set the store details from semantic data */
         const repo = semanticData.esRepository;
@@ -688,9 +690,9 @@ export class AnalyzeService {
       name: 'Untitled Analysis',
       description: '',
       createdBy: this._jwtService.getLoginId(),
-      customerCode: 'SYNCHRONOSS',
-      projectCode: 'workbench',
-      module: 'ANALYZE',
+      customerCode: this._jwtService.customerCode,
+      projectCode: PROJECT_CODE,
+      module: ANALYZE_MODULE_NAME,
       sipQuery: {
         artifacts: [],
         booleanCriteria: 'AND',
