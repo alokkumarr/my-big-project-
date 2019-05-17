@@ -53,10 +53,6 @@ public class MigrateAnalysisService {
   @NotNull
   private String basePath;
 
-  @Value("${metadata.service.execution-migration-flag}")
-  @NotNull
-  private boolean executionMigrationFlag;
-
   @Value("${metastore.migration}")
   @NotNull
   private String migrationStatusTable;
@@ -67,19 +63,15 @@ public class MigrateAnalysisService {
 
   @Autowired private MigrateExecutions migrateExecutions;
 
-  private Map<String,Boolean> migratedAnalysis;
+  private Map<String, Boolean> migratedAnalysis;
 
   private AnalysisMetadata analysisMetadataStore = null;
 
-    MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
-
-    Gson gson = new Gson();
+  MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
 
   @PostConstruct
   private void init() throws Exception {
-    if (executionMigrationFlag) {
-      convertBinaryStoreToDslJsonStore();
-    }
+    convertBinaryStoreToDslJsonStore();
   }
 
   /**
@@ -104,13 +96,16 @@ public class MigrateAnalysisService {
       String executionStatus,
       Object dslExecutionResult) {
     try {
+      List<Object> objectList = new ArrayList<>();
+      objectList.add(dslExecutionResult);
+
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
       executionResult.setDslQueryId(dslQueryId);
       executionResult.setSipQuery(sipQuery);
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
-      executionResult.setData(dslExecutionResult);
+      executionResult.setData(objectList);
       executionResult.setExecutionType(ExecutionType.valueOf(executionType));
       executionResult.setStatus(executionStatus);
       executionResult.setExecutedBy(executedBy);
@@ -217,7 +212,6 @@ public class MigrateAnalysisService {
     for (MigrationStatusObject mso : migrationStatusList) {
       migratedAnalysis.put(mso.getAnalysisId(), mso.isAnalysisMigrated());
     }
-
     return migratedAnalysis;
   }
 
@@ -266,7 +260,12 @@ public class MigrateAnalysisService {
           for (Map.Entry<String, Boolean> entry : analysisIdList.entrySet()) {
             String analysisId = entry.getKey();
             Boolean flag = entry.getValue();
-            if (!flag && executionId.contains(analysisId)) {
+            boolean validMigrationCheck =
+                !flag
+                    && executionId != null
+                    && analysisId != null
+                    && executionId.contains(analysisId);
+            if (validMigrationCheck) {
               executionIds.add(executionId);
             }
           }
@@ -350,11 +349,11 @@ public class MigrateAnalysisService {
           dslExecutionResult);
       migrationStatusObject.setExecutionsMigrated(true);
       migrationStatusObject.setMessage("Success");
-      saveMigrationStatus(migrationStatusObject,migrationStatusTable,basePath);
+      saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());
-        migrationStatusObject.setExecutionsMigrated(false);
-        migrationStatusObject.setMessage("Failed : "+ex.getMessage());
+      migrationStatusObject.setExecutionsMigrated(false);
+      migrationStatusObject.setMessage("Failed : " + ex.getMessage());
 
     } finally {
       hBaseUtil.closeConnection();
