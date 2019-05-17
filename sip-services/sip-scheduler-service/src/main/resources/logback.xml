@@ -12,7 +12,9 @@
     <logger name="org.springframework" level="info">
     </logger>
 
-    <logger name="com.synchronoss.saw.scheduler" level='info'>
+    <logger name="com.synchronoss.saw.scheduler" level="info"/>
+     <logger name="com.synchronoss.sip.utils" level="info">
+    
     </logger>
     <logger name="org.hibernate.SQL" level="DEBUG" />
     <logger name="org.hibernate.type" level="TRACE" />

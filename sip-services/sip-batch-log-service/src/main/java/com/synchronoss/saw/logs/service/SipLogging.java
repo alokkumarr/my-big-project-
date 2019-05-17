@@ -114,16 +114,9 @@ public class SipLogging {
   public void upsertInProgressStatus(String pid, 
       String recdFilePath, Date startTime)
       throws SipNestedRuntimeException {
-    BisFileLog bisLog = null;
-    if (bisFileLogsRepository.existsById(pid)) {
-      logger.trace("updating logs when process Id is found :" + pid);
-      bisLog = bisFileLogsRepository.findByPid(pid);
-      bisLog.setRecdFileName(recdFilePath);
-      bisLog.setTransferStartTime(startTime);
       
-      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.INPROGRESS.value(),
+    updateLogStatus(BisProcessState.INPROGRESS.value(),
           BisComponentState.DATA_INPROGRESS.value(), pid);
-    }
   }
   
   /**
@@ -132,14 +125,9 @@ public class SipLogging {
   @Transactional(TxType.REQUIRED)
   public void upsertInProgressStatus(String pid)
       throws SipNestedRuntimeException {
-    BisFileLog bisLog = null;
-    if (bisFileLogsRepository.existsById(pid)) {
-      logger.trace("updating logs when process Id is found :" + pid);
-      bisLog = bisFileLogsRepository.findByPid(pid);
       
-      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.INPROGRESS.value(),
+    updateLogStatus(BisProcessState.INPROGRESS.value(),
           BisComponentState.DATA_INPROGRESS.value(), pid);
-    }
   }
     
   /**
@@ -147,14 +135,8 @@ public class SipLogging {
    */
   @Transactional(TxType.REQUIRED)
   public void upsertFailedStatus(String pid) throws SipNestedRuntimeException {
-    BisFileLog bisLog = null;
-    if (bisFileLogsRepository.existsById(pid)) {
-      logger.trace("updating logs when process Id is found :" + pid);
-      bisLog = bisFileLogsRepository.findByPid(pid);
-     
-      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.FAILED.value(),
+    updateLogStatus(BisProcessState.FAILED.value(),
             BisComponentState.FAILED.value(), pid);
-    }
     
     
   }
@@ -165,16 +147,8 @@ public class SipLogging {
   @Transactional(TxType.REQUIRED)
   public void upsertSuccessStatus(String pid, BisDataMetaInfo metaInfo) 
       throws SipNestedRuntimeException {
-    BisFileLog bisLog = null;
-    if (bisFileLogsRepository.existsById(pid)) {
-      logger.trace("updating logs when process Id is found :" + pid);
-      bisLog = bisFileLogsRepository.findByPid(pid);
-      bisLog.setTransferEndTime(metaInfo.getFileTransferEndTime());
-      bisLog.setTransferDuration(metaInfo.getFileTransferDuration());
-     
-      this.bisFileLogsRepository.updateBislogsStatus(BisProcessState.SUCCESS.value(),
+    updateLogStatus(BisProcessState.SUCCESS.value(),
             BisComponentState.DATA_RECEIVED.value(), pid);
-    }
   }
 
   @Retryable(value = {RuntimeException.class},
@@ -305,9 +279,31 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public Integer updateStatusFailed(String fileStatus, String processStatus, String pid) {
-    Integer countOfRows = bisFileLogsRepository.updateBislogsStatus(fileStatus, processStatus, pid);
-    return countOfRows;
+  public void updateStatusFailed(String fileStatus, String processStatus, String pid) {
+    updateLogStatus(fileStatus, processStatus, pid);
+  }
+  
+  /**
+   * update log status.
+   * 
+   * @param fileStatus file Status
+   * @param processStatus process status
+   * @param pid process id
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  public void updateLogStatus(String fileStatus, String processStatus, String pid) {
+    Optional<BisFileLog> bisFileLog = this.bisFileLogsRepository.findById(pid);
+    if (bisFileLog.isPresent()) {
+      BisFileLog log = bisFileLog.get();
+      log.setMflFileStatus(fileStatus);
+      log.setBisProcessState(processStatus);
+      log.setModifiedDate(new Date());
+      bisFileLogsRepository.saveAndFlush(log);
+    }
+    
   }
 
   @Retryable(value = {RuntimeException.class},

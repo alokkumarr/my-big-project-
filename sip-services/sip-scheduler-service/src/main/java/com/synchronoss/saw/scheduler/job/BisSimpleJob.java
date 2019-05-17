@@ -52,6 +52,7 @@ public class BisSimpleJob extends QuartzJobBean implements InterruptableJob {
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
     
     try {
+      restTemplate = new RestTemplate();
       restTemplate.postForLocation(bisTransferUrl, jobDetails);
     } catch (Exception exception) {
       logger.error("Error during file transfer for the schedule. "

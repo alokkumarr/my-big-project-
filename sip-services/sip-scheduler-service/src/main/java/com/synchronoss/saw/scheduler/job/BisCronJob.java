@@ -18,7 +18,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.web.client.RestTemplate;
 
 
-
 public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
   private static final Logger logger = LoggerFactory.getLogger(CronJob.class);
@@ -37,16 +36,10 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
 
   
   RestTemplate restTemplate = null;
-  
-  /**
-   * Initialization logic.
-   * 
-   * @throws Exception exception
-   */
+
   @PostConstruct
   public void init() throws Exception {
-    restTemplate = new RestTemplate();
-    //restUtil.restTemplate();
+    restTemplate = restUtil.restTemplate();
         
   }
 
@@ -57,18 +50,23 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
       throws JobExecutionException {
     JobDetail jobDetail = jobExecutionContext.getJobDetail();
     JobKey key = jobDetail.getKey();
-    logger.info("bis transfr url::" + bisTransferUrl);
-    logger.info("Cron Job started with key :" + key.getName() + ", Group :" + key.getGroup()
+    logger.info("Cron Job started with key after :" + key.getName() + ", Group :" + key.getGroup()
         + " , Thread Name :" + Thread.currentThread().getName() + " ,Time now :" + new Date());
-   
     BisSchedulerJobDetails jobRequest =
         (BisSchedulerJobDetails) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
-    logger.info("job request :: " + jobRequest);
-    restTemplate = new RestTemplate();
-    logger.info("rest templatec ::" + restTemplate);
+
+    try {
+      restTemplate =  new RestTemplate();
+      restTemplate.postForLocation(bisTransferUrl, jobRequest);
+    } catch (Exception exception) {
+      /**
+       * As BIS is async process for larger files async timesout. 
+       * This can be ignored.
+       */
+      logger.info("Async BIS transfer still running"
+          + exception.getMessage());
+    }
     
-    restTemplate.postForLocation(bisTransferUrl, jobRequest);
-      
     logger.info("Thread: " + Thread.currentThread().getName() + " stopped.");
   }
 
