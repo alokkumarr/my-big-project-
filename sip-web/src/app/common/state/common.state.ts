@@ -4,7 +4,7 @@ import {
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
   CommonLoadMetricById,
-  UpdateScheduleJobs
+  CommonStateScheuleJobs
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
 import { tap } from 'rxjs/operators';
@@ -21,7 +21,7 @@ import * as values from 'lodash/values';
     observeMenu: null,
     adminMenu: null,
     metrics: {},
-    jobs: {}
+    jobs: null
   }
 })
 export class CommonState {
@@ -93,7 +93,7 @@ export class CommonState {
   }
 
 
-  @Action(UpdateScheduleJobs)
+  @Action(CommonStateScheuleJobs)
   updateSchedule(
     { patchState, getState },
     { cronJobs }

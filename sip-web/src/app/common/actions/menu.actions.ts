@@ -21,8 +21,8 @@ export class AdminExportLoadMenu {
   constructor(public moduleName: string) {}
 }
 
-export class UpdateScheduleJobs {
+export class CommonStateScheuleJobs {
   /* Use for only new DSL analyses. This is for fetching jobs for that category,  */
-  static readonly type = 'Update schedule Jobs for a particular category';
+  static readonly type = '[Common State] Update schedule Jobs for a particular category';
   constructor(public cronJobs) {}
 }
