@@ -4,7 +4,8 @@ package com.synchronoss.saw.analysis.service.migrationservice;
 public class MigrationStatusObject {
   String analysisId;
   String type;
-  boolean migrationStatus;
+  boolean isAnalysisMigrated;
+  boolean isExecutionsMigrated;
   String message;
 
   public String getAnalysisId() {
@@ -23,19 +24,42 @@ public class MigrationStatusObject {
     this.type = type;
   }
 
-  public boolean isMigrationStatus() {
-    return migrationStatus;
-  }
-
-  public void setMigrationStatus(boolean migrationStatus) {
-    this.migrationStatus = migrationStatus;
-  }
-
   public String getMessage() {
     return message;
   }
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  /**
+   * Flag to indicate Analysis definition migration.
+   *
+   * @return
+   */
+  public boolean isAnalysisMigrated() {
+    return isAnalysisMigrated;
+  }
+
+  public void setAnalysisMigrated(boolean analysisMigrated) {
+    isAnalysisMigrated = analysisMigrated;
+  }
+
+  /**
+   * Flag to indicate Executions results migration.
+   *
+   * @return boolean value
+   */
+  public boolean isExecutionsMigrated() {
+    return isExecutionsMigrated;
+  }
+
+  /**
+   * Set to true if Execution Results are migrated.
+   *
+   * @param executionsMigrated
+   */
+  public void setExecutionsMigrated(boolean executionsMigrated) {
+    isExecutionsMigrated = executionsMigrated;
   }
 }

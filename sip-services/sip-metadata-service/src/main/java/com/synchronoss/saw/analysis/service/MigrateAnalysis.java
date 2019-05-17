@@ -148,14 +148,17 @@ public class MigrateAnalysis {
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
                 analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
 
-                migrationStatusObject.setMigrationStatus(true);
+                migrationStatusObject.setAnalysisMigrated(true);
                 migrationStatusObject.setMessage("Success");
+                migrationStatusObject.setExecutionsMigrated(false);
+                // Migration of Executions is done via proxy-service
                 successfulMigration.incrementAndGet();
               } catch (JsonProcessingException exception) {
                 logger.error("Unable to convert analysis to json");
 
-                migrationStatusObject.setMigrationStatus(false);
+                migrationStatusObject.setAnalysisMigrated(false);
                 migrationStatusObject.setMessage(exception.getMessage());
+                migrationStatusObject.setExecutionsMigrated(false);
                 failedMigration.incrementAndGet();
               } catch (Exception exception) {
                 if (analysis != null) {
@@ -164,8 +167,9 @@ public class MigrateAnalysis {
                   logger.error("Unable to process analysis");
                 }
 
-                migrationStatusObject.setMigrationStatus(false);
+                migrationStatusObject.setAnalysisMigrated(false);
                 migrationStatusObject.setMessage(exception.getMessage());
+                migrationStatusObject.setExecutionsMigrated(false);
                 failedMigration.incrementAndGet();
               }
 
