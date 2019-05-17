@@ -25,20 +25,21 @@ public abstract class ResultMigration {
 
   private JsonNode queryBuilder;
 
-  public abstract List<Object> parseData(JsonNode jsonNode);
+  public abstract List<Object> parseData(JsonNode dataNode, JsonNode queryNode);
 
   /**
    * Parsed chart data to flatten structure
    *
-   * @param jsonNode
+   * @param dataNode
+   * @param queryNode
    * @return
    */
-  public List<Object> parseData(JsonNode jsonNode, String levelField, String columnField) {
-    queryBuilder = jsonNode.get(QUERY_BUILDER);
+  public List<Object> parseData(JsonNode dataNode, JsonNode queryNode, String levelField, String columnField) {
+    queryBuilder = queryNode;
     Map<String, String> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure =
-        jsonNodeParser(jsonNode.get(DATA), dataObj, flatStructure, 1, levelField, columnField);
+        jsonNodeParser(dataNode, dataObj, flatStructure, 1, levelField, columnField);
     return flatStructure;
   }
 
