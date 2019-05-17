@@ -124,21 +124,23 @@ public class MigrateAnalysisService {
    * This method to convert old execution result to new DSL execution results.
    *
    * @param type
-   * @param jsonNode
+   * @param dataNode
+   * @param queryNode
    * @return @{@link Object}
    */
-  public Object convertOldExecutionToDSLExecution(String type, JsonNode jsonNode) {
+  public Object convertOldExecutionToDSLExecution(
+      String type, JsonNode dataNode, JsonNode queryNode) {
     List<Object> objectList = new ArrayList<>();
     Object dataConverter;
     try {
       switch (type) {
         case "chart":
-          dataConverter = new com.synchronoss.saw.storage.proxy.service.ChartResultMigration();
-          objectList = ((ChartResultMigration) dataConverter).parseData(jsonNode);
+          dataConverter = new ChartResultMigration();
+          objectList = ((ChartResultMigration) dataConverter).parseData(dataNode, queryNode);
           break;
         case "pivot":
           dataConverter = new PivotResultMigration();
-          objectList = ((PivotResultMigration) dataConverter).parseData(jsonNode);
+          objectList = ((PivotResultMigration) dataConverter).parseData(dataNode, queryNode);
           break;
         case "esReport":
           throw new UnsupportedOperationException("ES Report migration not supported yet");
@@ -302,25 +304,20 @@ public class MigrateAnalysisService {
 
       Object dslExecutionResult = null;
       if (type != null && type.matches("pivot|chart")) {
-        JsonObject executionData =
-            parser
-                .parse(new String(result.getValue("_objects".getBytes(), "data".getBytes())))
-                .getAsJsonObject();
-        LOGGER.info("ExecutionData :" + executionData.toString());
 
-        JsonObject dataBuilderObject = new JsonObject();
-        dataBuilderObject.add("data", executionData);
-        dataBuilderObject.add("queryBuilder", content.get("queryBuilder"));
-
-        LOGGER.info("DataBuilder Object from the binary store :" + dataBuilderObject);
-
-        // Parse a JSON string into a JsonNode
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(dataBuilderObject.getAsString());
-        LOGGER.info(
-            "Complete Json Node which need to parsed for pivot/chart :" + dataBuilderObject);
+        JsonNode dataNode =
+            objectMapper.readTree(
+                new String(result.getValue("_objects".getBytes(), "data".getBytes())));
+        LOGGER.info("Data Json Node which need to parsed for pivot/chart :" + dataNode);
 
-        dslExecutionResult = convertOldExecutionToDSLExecution(type, jsonNode);
+        JsonNode queryNode =
+            objectMapper
+                .readTree(new String(result.getValue("_source".getBytes(), "content".getBytes())))
+                .get("queryBuilder");
+        LOGGER.info("Query Node which need to parsed for pivot/chart :" + queryNode);
+
+        dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
       }
 
       LOGGER.info("dslExecutionResult :" + dslExecutionResult);

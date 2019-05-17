@@ -28,14 +28,21 @@ public class PivotResultMigrationTest {
   @Test
   public void testParseData() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    File file =
+    File dataFile =
         new File(
             classLoader
-                .getResource("com/synchronoss/saw/storage/proxy/sample_pivot_result.json")
+                .getResource("com/synchronoss/saw/storage/proxy/sample-pivot-data.json")
+                .getPath());
+    File queryFile =
+        new File(
+            classLoader
+                .getResource("com/synchronoss/saw/storage/proxy/sample-pivot-query.json")
                 .getPath());
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(file);
-    List<Object> flatten = migration.parseData(jsonNode);
+    JsonNode dataNode = objectMapper.readTree(dataFile);
+    JsonNode queryNode = objectMapper.readTree(queryFile);
+    List<Object> flatten = migration.parseData(dataNode,queryNode);
+    //System.out.println(flatten);
     Assert.assertTrue(flatten.size() > 0);
   }
 }

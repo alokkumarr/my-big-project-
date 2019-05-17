@@ -29,7 +29,7 @@ public class ChartController {
   public Object retrieveFlattenChartData(@Valid @RequestBody JsonNode jsonNode) {
     LOGGER.debug("Start Chart Controller");
     ChartResultMigration migration = new ChartResultMigration();
-    Object obj = migration.parseData(jsonNode);
+    Object obj = migration.parseData(jsonNode,jsonNode);
     LOGGER.debug("Start Chart Controller");
     return obj;
   }

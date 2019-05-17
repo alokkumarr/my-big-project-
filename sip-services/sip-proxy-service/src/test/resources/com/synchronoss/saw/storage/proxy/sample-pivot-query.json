@@ -1,0 +1,43 @@
+{
+  "booleanCriteria": "AND",
+  "filters": [{
+    "type": "double",
+    "tableName": "mct_tgt_session",
+    "isOptional": false,
+    "columnName": "AVAILABLE_ITEMS",
+    "isRuntimeFilter": false,
+    "isGlobalFilter": true
+  }],
+  "sorts": [],
+  "rowFields": [{
+    "type": "date",
+    "columnName": "TRANSFER_DATE",
+    "area": "row",
+    "areaIndex": 0,
+    "aggregate": null,
+    "name": null,
+    "dateInterval": "day",
+    "dateFormat": "yyyy-MM-dd"
+  }],
+  "columnFields": [],
+  "dataFields": [
+    {
+      "type": "double",
+      "columnName": "AVAILABLE_MB",
+      "area": "data",
+      "areaIndex": 0,
+      "aggregate": "sum",
+      "name": "AVAILABLE_MB",
+      "dateInterval": null
+    },
+    {
+      "type": "double",
+      "columnName": "AVAILABLE_ITEMS",
+      "area": "data",
+      "areaIndex": 1,
+      "aggregate": "sum",
+      "name": "AVAILABLE_ITEMS",
+      "dateInterval": null
+    }
+  ]
+}

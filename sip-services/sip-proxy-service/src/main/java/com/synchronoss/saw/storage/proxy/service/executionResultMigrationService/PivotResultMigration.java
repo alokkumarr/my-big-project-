@@ -18,8 +18,8 @@ public class PivotResultMigration extends ResultMigration{
 	private static final String ROW_FIELDS = "rowFields";
 
 	@Override
-	public List<Object> parseData(JsonNode jsonNode) {
+	public List<Object> parseData(JsonNode dataNode, JsonNode queryNode) {
 		LOGGER.info("Starting parse data. ");
-		return parseData(jsonNode, ROW_FIELD_LEVEL, ROW_FIELDS);
+		return parseData(dataNode, queryNode, ROW_FIELD_LEVEL, ROW_FIELDS);
 	}
 }
