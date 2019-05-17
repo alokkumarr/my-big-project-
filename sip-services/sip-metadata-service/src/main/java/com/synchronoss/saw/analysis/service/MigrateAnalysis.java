@@ -15,6 +15,8 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
+import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
@@ -22,6 +24,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -101,7 +105,7 @@ public class MigrateAnalysis {
       JsonArray analysisList =
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
-      JsonObject migrationStatus = convertAllAnalysis(analysisList);
+      MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
 
       if (saveMigrationStatus(migrationStatus, migrationStatusTable, basePath)) {
         logger.info("Successfully written the migration status to MaprDB..!!");
@@ -115,11 +119,11 @@ public class MigrateAnalysis {
    * @param analysisList List of old analysis definitions
    * @return
    */
-  private JsonObject convertAllAnalysis(JsonArray analysisList) {
-    JsonObject migrationStatus = new JsonObject();
-    JsonArray analysisStatus = new JsonArray();
+  private MigrationStatus convertAllAnalysis(JsonArray analysisList) {
+    MigrationStatus migrationStatus = new MigrationStatus();
+    List<MigrationStatusObject> analysisStatus = new ArrayList<>();
 
-    migrationStatus.addProperty("totalAnalysis", analysisList.size());
+    migrationStatus.setTotalAnalysis(analysisList.size());
 
     AtomicInteger successfulMigration = new AtomicInteger();
     AtomicInteger failedMigration = new AtomicInteger();
@@ -127,12 +131,12 @@ public class MigrateAnalysis {
     (analysisList)
         .forEach(
             analysisElement -> {
-              JsonObject migrationStatusObject = new JsonObject();
+              MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
               JsonObject analysisObject = analysisElement.getAsJsonObject();
               String analysisId = analysisObject.get(FieldNames.ID).getAsString();
 
-              migrationStatusObject.addProperty("analysisId", analysisId);
-              migrationStatusObject.add("type", analysisObject.get("type"));
+              migrationStatusObject.setAnalysisId(analysisId);
+              migrationStatusObject.setType(analysisObject.get("type").getAsString());
               Analysis analysis = null;
 
               try {
@@ -144,14 +148,14 @@ public class MigrateAnalysis {
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
                 analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
 
-                migrationStatusObject.addProperty("migrationStatus", true);
-                migrationStatusObject.addProperty("message", "Success");
+                migrationStatusObject.setMigrationStatus(true);
+                migrationStatusObject.setMessage("Success");
                 successfulMigration.incrementAndGet();
               } catch (JsonProcessingException exception) {
                 logger.error("Unable to convert analysis to json");
 
-                migrationStatusObject.addProperty("migrationStatus", false);
-                migrationStatusObject.addProperty("message", exception.getMessage());
+                migrationStatusObject.setMigrationStatus(false);
+                migrationStatusObject.setMessage(exception.getMessage());
                 failedMigration.incrementAndGet();
               } catch (Exception exception) {
                 if (analysis != null) {
@@ -160,18 +164,18 @@ public class MigrateAnalysis {
                   logger.error("Unable to process analysis");
                 }
 
-                migrationStatusObject.addProperty("migrationStatus", false);
-                migrationStatusObject.addProperty("message", exception.getMessage());
+                migrationStatusObject.setMigrationStatus(false);
+                migrationStatusObject.setMessage(exception.getMessage());
                 failedMigration.incrementAndGet();
               }
 
               analysisStatus.add(migrationStatusObject);
             });
 
-    migrationStatus.addProperty("success", successfulMigration.get());
-    migrationStatus.addProperty("failed", failedMigration.get());
+    migrationStatus.setSuccessCount(successfulMigration.get());
+    migrationStatus.setFailureCount(failedMigration.get());
 
-    migrationStatus.add("analysisStatus", analysisStatus);
+    migrationStatus.setMigrationStatus(analysisStatus);
     return migrationStatus;
   }
 
@@ -223,7 +227,7 @@ public class MigrateAnalysis {
    * @return
    */
   private boolean saveMigrationStatus(
-      JsonObject migrationStatus, String migrationStatusTable, String basePath) {
+      MigrationStatus migrationStatus, String migrationStatusTable, String basePath) {
     boolean status = true;
 
     String id = UUID.randomUUID().toString();
@@ -232,7 +236,9 @@ public class MigrateAnalysis {
       analysisMetadataStore = new AnalysisMetadata(migrationStatusTable, basePath);
       logger.debug("Connection established with MaprDB..!!");
       logger.info("Started Writing the status into MaprDB, id : ", id);
-      analysisMetadataStore.create(id, migrationStatus);
+      JsonElement parsedMigrationStatus =
+          SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(migrationStatus));
+      analysisMetadataStore.create(id, parsedMigrationStatus);
     } catch (Exception e) {
       logger.error(
           "Error occurred while writing the status to location: " + migrationStatus,
@@ -280,7 +286,6 @@ public class MigrateAnalysis {
 
     JsonElement parsedAnalysis =
         SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-
   }
 
   /**
@@ -303,7 +308,7 @@ public class MigrateAnalysis {
 
     MigrateAnalysis ma = new MigrateAnalysis();
 
-    JsonObject migrationStatus = ma.convertAllAnalysis(analysisList);
+    MigrationStatus migrationStatus = ma.convertAllAnalysis(analysisList);
     String migrationStatusPath = ma.migrationDirectory + "/" + ma.migrationStatusFile;
     PrintWriter out = new PrintWriter(migrationStatusPath);
     out.println(gson.toJson(migrationStatus));
