@@ -274,16 +274,7 @@
         </executions>
         <configuration>
           <!-- Package for old SIP version to test upgrading from -->
-          <!-- Workaround: The SIP 3.0 package fails to deploy on
-               multinode configurations, due to a race condition in
-               the Transport Service MapR-DB table initialization
-               which has been later fixed.  The old version to upgrade
-               from should preferably be a previous release.  However,
-               due to the aforementioned issue, use an intermediate
-               build instead.  When SIP 3.1 is release, use that
-               instead. -->
-          <!--<url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-882/artifact/shared/SIP-Package/saw-3.0.0.tgz</url>-->
-          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-1084/artifact/shared/SIP-Package/saw-3.0.0-1721-g2f766e3fa.tgz</url>
+          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-1303/artifact/shared/SIP-Package/saw-3.2.3.tgz</url>
           <outputDirectory>${project.build.directory}/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
           <skip>${sip.upgrade.skip}</skip>
         </configuration>
@@ -471,6 +462,10 @@
                 </network>
                 <ports>
                   <port>+saw.docker.ip:saw.docker.port:80</port>
+                  <!-- Allow browsers to connect to "https://" URLs
+                       using the default HTTPS port 443, when SIP has
+                       been deployed with sip_secure=True -->
+                  <port>+saw.docker.ip:443:443</port>
                   <port>+saw.docker.ip:saw.squid.port:3128</port>
                 </ports>
                 <privileged>true</privileged>

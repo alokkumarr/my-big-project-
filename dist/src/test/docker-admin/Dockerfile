@@ -45,16 +45,16 @@ RUN chmod a+x /root/sip-deploy
 
 RUN chmod a+x /root
 # Add SAW Analyze test data
-COPY saw-analyze-samples /root/saw-analyze-samples/
-COPY saw-analyze-samples/sample-spark/sip-analyze-spark-samples.service /etc/systemd/system/
-COPY saw-analyze-samples/sample-elasticsearch/sip-analyze-elasticsearch-samples.service /etc/systemd/system/
+COPY sip-analyze-samples /root/saw-analyze-samples/
+COPY sip-analyze-samples/sample-spark/sip-analyze-spark-samples.service /etc/systemd/system/
+COPY sip-analyze-samples/sample-elasticsearch/sip-analyze-elasticsearch-samples.service /etc/systemd/system/
 # workaround: Set recursive execute bit for Windows (cygwin rsync) users
 RUN chmod -R 0755 /root/saw-analyze-samples
 RUN systemctl enable sip-analyze-spark-samples
 RUN systemctl enable sip-analyze-elasticsearch-samples
 # Add SAW Workbench test data
-COPY saw-workbench-samples /root/saw-workbench-samples/
-COPY saw-workbench-samples/sip-workbench-samples.service /etc/systemd/system/
+COPY sip-workbench-samples /root/saw-workbench-samples/
+COPY sip-workbench-samples/sip-workbench-samples.service /etc/systemd/system/
 # workaround: Set recursive execute bit for Windows (cygwin rsync) users
 RUN chmod -R 0755 /root/saw-workbench-samples
 RUN systemctl enable sip-workbench-samples
@@ -62,7 +62,7 @@ RUN systemctl enable sip-workbench-samples
 RUN chmod a+x /root/saw-*/sample-*/load*
 
 # Add SAW Batch sample test data
-COPY saw-batch-samples /root/saw-batch-samples/
+COPY sip-batch-samples /root/saw-batch-samples/
 RUN chmod -R 0755 /root/saw-batch-samples/
 
 # Workaround: The Batch Ingestion Service uses a large number of
