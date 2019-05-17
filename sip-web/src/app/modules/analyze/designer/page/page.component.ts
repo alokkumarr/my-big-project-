@@ -114,6 +114,8 @@ export class DesignerPageComponent implements OnInit {
             isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
           ]);
         } else {
+          // For DSL analysis, if on view analysis page we have loaded a previous execution and enter edit mode and save and close,
+          // we need to always navigate to the latest execution and not to the previously selected execution result.
           if (isDSLAnalysis(analysis)) {
             this.router.navigateByUrl(`/analyze/analysis/${analysis.id}/executed?isDSL=${isDSLAnalysis(analysis)}`);
           } else {
