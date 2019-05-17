@@ -1,23 +1,40 @@
 package com.synchronoss.saw.storage.proxy.service.executionResultMigrationService;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
+import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
-import org.apache.hadoop.hbase.client.*;
+import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
+import com.synchronoss.saw.util.SipMetadataUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-import java.util.*;
 
 /**
  * @author Alok.KumarR
@@ -32,15 +49,29 @@ public class MigrateAnalysisService {
   @NotNull
   private String binaryTablePath;
 
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
   @Value("${metadata.service.execution-migration-flag}")
   @NotNull
   private boolean executionMigrationFlag;
+
+  @Value("${metastore.migration}")
+  @NotNull
+  private String migrationStatusTable;
 
   @Autowired private StorageProxyService proxyService;
 
   @Autowired private HBaseUtil hBaseUtil;
 
   @Autowired private MigrateExecutions migrateExecutions;
+
+  private Map<String,Boolean> migratedAnalysis;
+
+  private AnalysisMetadata analysisMetadataStore = null;
+
+    Gson gson = new Gson();
 
   @PostConstruct
   private void init() throws Exception {
@@ -141,6 +172,81 @@ public class MigrateAnalysisService {
         }
       }
     }
+  }
+
+  /**
+   * Returns the list of Migrated Analysis results.
+   *
+   * @return
+   */
+  public List<MigrationStatusObject> getMigratedAnalysis() {
+    LOGGER.debug("Inside getMigratedAnalysis() !!");
+    List<Document> docs = null;
+    ProductModuleMetaStore productModuleMetaStore = null;
+    List<MigrationStatusObject> analysisList = new ArrayList<>();
+    try {
+      productModuleMetaStore = new ProductModuleMetaStore(migrationStatusTable, basePath);
+      docs = productModuleMetaStore.searchAll();
+      if (docs.isEmpty()) {
+        LOGGER.info("No Analysis present for migration!!");
+        return null;
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      for (Document d : docs) {
+        analysisList.add(mapper.readValue(d.asJsonString(), MigrationStatusObject.class));
+      }
+    } catch (Exception e) {
+      LOGGER.error("Exception occurred while reading the MaprDB table : ", migrationStatusTable);
+    }
+
+    LOGGER.debug("Return Analysis list : ", analysisList);
+    return analysisList;
+  }
+
+  /**
+   * Returns Map of Analysis id and definition migration status flag.
+   *
+   * @param migrationStatusList
+   * @return
+   */
+  public Map<String, Boolean> extractAnalysisId(List<MigrationStatusObject> migrationStatusList) {
+    migratedAnalysis = new HashMap<>();
+    for (MigrationStatusObject mso : migrationStatusList) {
+      migratedAnalysis.put(mso.getAnalysisId(), mso.isAnalysisMigrated());
+    }
+
+    return migratedAnalysis;
+  }
+
+  /**
+   * Saves migration status to a file.
+   *
+   * @param msObj
+   * @param migrationStatusTable
+   * @param basePath
+   * @return
+   */
+  private boolean saveMigrationStatus(
+      MigrationStatusObject msObj, String migrationStatusTable, String basePath) {
+    boolean status = true;
+
+    LOGGER.info("Started Writing into MaprDB, id : ", msObj.getAnalysisId());
+    try {
+      analysisMetadataStore = new AnalysisMetadata(migrationStatusTable, basePath);
+      LOGGER.debug("Connection established with MaprDB..!!");
+      LOGGER.info("Started Writing the status into MaprDB, id : ", msObj.getAnalysisId());
+      ObjectMapper mapper = new ObjectMapper();
+      JsonElement parsedMigrationStatus =
+          SipMetadataUtils.toJsonElement(mapper.writeValueAsString(msObj));
+      analysisMetadataStore.update(msObj.getAnalysisId(), parsedMigrationStatus);
+    } catch (Exception e) {
+      LOGGER.error("Error occurred while writing the status to location: " + msObj, e.getMessage());
+
+      status = false;
+    }
+
+    return status;
   }
 
   /** Retrieve all execution Id from binary store */

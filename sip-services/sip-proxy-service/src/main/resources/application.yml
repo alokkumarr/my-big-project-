@@ -32,6 +32,7 @@ elastic-xpack :
 metastore:
     base:  hdfs:///main/
     binary-store-path:  /var/sip/services/metadata/analysis_results
+    migration: analysisMigration
 
 metadata:
   service:
