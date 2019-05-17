@@ -71,6 +71,8 @@ public class MigrateAnalysisService {
 
   private AnalysisMetadata analysisMetadataStore = null;
 
+    MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
+
     Gson gson = new Gson();
 
   @PostConstruct
@@ -258,7 +260,16 @@ public class MigrateAnalysisService {
       ResultScanner results = hBaseUtil.getResultScanner(table);
       if (results != null) {
         for (Result result : results) {
-          executionIds.add(new String(result.getValue("_search".getBytes(), "id".getBytes())));
+          String executionId = new String(result.getValue("_search".getBytes(), "id".getBytes()));
+          List<MigrationStatusObject> mgObj = getMigratedAnalysis();
+          Map<String, Boolean> analysisIdList = extractAnalysisId(mgObj);
+          for (Map.Entry<String, Boolean> entry : analysisIdList.entrySet()) {
+            String analysisId = entry.getKey();
+            Boolean flag = entry.getValue();
+            if (!flag && executionId.contains(analysisId)) {
+              executionIds.add(executionId);
+            }
+          }
         }
       }
     } catch (Exception ex) {
@@ -279,7 +290,9 @@ public class MigrateAnalysisService {
       Connection connection = hBaseUtil.getConnection();
       Table table = hBaseUtil.getTable(connection, binaryTablePath);
       Get get = new Get(Bytes.toBytes(executionId));
+
       Result result = table.get(get);
+
       JsonParser parser = new JsonParser();
 
       JsonObject content =
@@ -301,6 +314,10 @@ public class MigrateAnalysisService {
 
       LOGGER.info("executionType :" + executionType.trim());
       LOGGER.info("type :" + type);
+
+      migrationStatusObject.setAnalysisId(analysisId);
+      migrationStatusObject.setAnalysisMigrated(true);
+      migrationStatusObject.setType(type);
 
       Object dslExecutionResult = null;
       if (type != null && type.matches("pivot|chart")) {
@@ -331,8 +348,14 @@ public class MigrateAnalysisService {
           executionFinishTs,
           executionStatus,
           dslExecutionResult);
+      migrationStatusObject.setExecutionsMigrated(true);
+      migrationStatusObject.setMessage("Success");
+      saveMigrationStatus(migrationStatusObject,migrationStatusTable,basePath);
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());
+        migrationStatusObject.setExecutionsMigrated(false);
+        migrationStatusObject.setMessage("Failed : "+ex.getMessage());
+
     } finally {
       hBaseUtil.closeConnection();
     }
