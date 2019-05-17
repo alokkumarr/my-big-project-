@@ -40,6 +40,7 @@ elastic-xpack :
 metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
     binary-store-path:  /var/sip/services/metadata/analysis_results
+    migration: analysisMigration
 
 metadata:
   service:

@@ -2,13 +2,16 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.*;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
+import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +35,25 @@ public class MigrateAnalysisService {
   @NotNull
   private String binaryTablePath;
 
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
   @Value("${metadata.service.execution-migration-flag}")
   @NotNull
   private boolean executionMigrationFlag;
 
-  @Autowired private StorageProxyService proxyService;
+  @Value("${metastore.migration}")
+  @NotNull
+  private String migrationStatusTable;
+
+    @Autowired private StorageProxyService proxyService;
 
   @Autowired private HBaseUtil hBaseUtil;
 
   @Autowired private MigrateExecutions migrateExecutions;
+
+    Gson gson = new Gson();
 
   @PostConstruct
   private void init() throws Exception {
@@ -139,6 +152,26 @@ public class MigrateAnalysisService {
         }
       }
     }
+  }
+
+  public void getAnalysisForMigration() {
+      List<Document> docs = null;
+      ProductModuleMetaStore productModuleMetaStore = null;
+      try {
+          productModuleMetaStore = new ProductModuleMetaStore(migrationStatusTable,basePath);
+          docs = productModuleMetaStore.searchAll();
+          if (docs.isEmpty()) {
+              //TODO : Error Log
+          }
+          ObjectMapper mapper = new ObjectMapper();
+          List<ObjectNode> objDocs = new ArrayList<>();
+          for (Document d : docs) {
+              objDocs.add((ObjectNode) mapper.readTree(gson.toJson(d)));
+          }
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+
   }
 
   /** Retrieve all execution Id from binary store */
