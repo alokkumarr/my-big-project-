@@ -84,10 +84,10 @@ public class MigrateAnalysis {
       String tableName, String basePath, String listAnalysisUri, String migrationStatusTable)
       throws Exception {
     logger.trace("Migration process will begin here");
-    HttpHeaders requestHeaders = new HttpHeaders();
     this.migrationStatusTable = migrationStatusTable;
     this.basePath = basePath;
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+    HttpHeaders requestHeaders = new HttpHeaders();
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
