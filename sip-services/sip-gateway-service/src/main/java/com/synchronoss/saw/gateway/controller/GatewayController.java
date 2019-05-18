@@ -172,8 +172,7 @@ public class GatewayController {
             headers.set("Authorization", request.getHeader("Authorization"));
             headers.set("directoryPath", filePath);
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
-            RestTemplate uploadrestTemplate = new RestTemplate();
-            uploadResponseEntity = uploadrestTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
+            uploadResponseEntity = restTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
             logger.debug("uploadResponseEntity {} ", uploadResponseEntity.toString());
             } catch (Exception e) {
             logger.error("Exception thrown during file upload ", e);

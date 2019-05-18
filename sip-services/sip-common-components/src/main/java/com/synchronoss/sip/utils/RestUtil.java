@@ -188,4 +188,45 @@ public class RestUtil {
     return sslContext;
   }
 
+  /**
+   * getTrustStore.
+   */
+  public String getTrustStore() {
+    return trustStore;
+  }
+
+  /**
+   * getTrustStorePassword.
+   */
+
+  public String getTrustStorePassword() {
+    return trustStorePassword;
+  }
+
+  /**
+   * getKeyStore.
+   */
+
+  public String getKeyStore() {
+    return keyStore;
+  }
+
+  /**
+   * getKeyStorePassword.
+   */
+
+  public String getKeyStorePassword() {
+    return keyStorePassword;
+  }
+
+  /**
+   * getTrustStore.
+   */
+
+  public Boolean getSipSslEnable() {
+    return sipSslEnable;
+  }
+  
+  
+
 }
