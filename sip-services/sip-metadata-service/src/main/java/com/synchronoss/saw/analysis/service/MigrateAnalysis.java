@@ -85,6 +85,8 @@ public class MigrateAnalysis {
       throws Exception {
     logger.trace("Migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
+    this.migrationStatusTable = migrationStatusTable;
+    this.basePath = basePath;
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -105,9 +107,9 @@ public class MigrateAnalysis {
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
       MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
-      logger.info("Total number of Files for migration : ",migrationStatus.getTotalAnalysis());
-      logger.info("Number of Files Successfully Migrated : ",migrationStatus.getSuccessCount());
-      logger.info("Number of Files Successfully Migrated : ",migrationStatus.getFailureCount());
+      logger.info("Total number of Files for migration : ", migrationStatus.getTotalAnalysis());
+      logger.info("Number of Files Successfully Migrated : ", migrationStatus.getSuccessCount());
+      logger.info("Number of Files Successfully Migrated : ", migrationStatus.getFailureCount());
     }
   }
 
@@ -146,6 +148,10 @@ public class MigrateAnalysis {
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
                 analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
 
+                migrationStatusObject.setAnalysisId(analysis.getId());
+                logger.info(
+                    "Analysis Id in inner block : " + migrationStatusObject.getAnalysisId());
+                migrationStatusObject.setType(analysis.getType());
                 migrationStatusObject.setAnalysisMigrated(true);
                 migrationStatusObject.setMessage("Success");
                 migrationStatusObject.setExecutionsMigrated(false);
@@ -173,9 +179,8 @@ public class MigrateAnalysis {
 
               if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
                 logger.info("Successfully written the migration status to MaprDB..!!");
-                logger.debug("Written Id = ",migrationStatusObject.getAnalysisId());
+                logger.debug("Written Id = " + migrationStatusObject.getAnalysisId());
               }
-
               analysisStatus.add(migrationStatusObject);
             });
 
@@ -238,15 +243,21 @@ public class MigrateAnalysis {
     boolean status = true;
 
     String id = migrationStatus.getAnalysisId();
-    logger.info("Started Writing into MaprDB, id : ", id);
+    logger.debug("Started Writing into MaprDB, id : " + id);
+    logger.debug("Object body to be written : " + new Gson().toJson(migrationStatus));
+    logger.debug(
+        "Details coming to saveMigration : \n migrationStatusTable = "
+            + migrationStatusTable
+            + "basePath = "
+            + basePath);
     try {
-      analysisMetadataStore = new AnalysisMetadata(migrationStatusTable, basePath);
+      AnalysisMetadata analysisMetadataStore1 =
+          new AnalysisMetadata(migrationStatusTable, basePath);
       logger.debug("Connection established with MaprDB..!!");
-      logger.info("Started Writing the status into MaprDB, id : ", id);
-      JsonElement parsedMigrationStatus =
-          SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(migrationStatus));
-      analysisMetadataStore.create(id, parsedMigrationStatus);
+      logger.info("Started Writing the status into MaprDB, id : " + id);
+      analysisMetadataStore1.create(id, new Gson().toJson(migrationStatus));
     } catch (Exception e) {
+      logger.error(e.getMessage());
       logger.error(
           "Error occurred while writing the status to location: " + migrationStatus,
           e.getMessage());

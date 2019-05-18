@@ -68,15 +68,43 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8081
     -->
-    <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-			   maxHttpHeaderSize="32768" 
-               useSendfile="false"
-               compression="on"
-               compressionMinSize="2048"
-               noCompressionUserAgents="gozilla, traviata"
-               compressableMimeType="application/json,application/xml,text/html,text/xml,text/plain,text/javascript,image/x-icon,application/javascript,application/x-javascript,application/xml,application/xhtml+xml,application/x-font-truetype,font/opentype,font/otf,text/css"
-               redirectPort="8443"/>
+     {% if sip_secure %}
+
+     <Connector port="8080" protocol="org.apache.coyote.http11.Http11Protocol"
+                SSLEnabled="true"
+                scheme="https"
+                secure="true"
+                clientAuth="false"
+                sslProtocol="TLS"
+                redirectPort="8443"
+                keyAlias="sip"
+                keystoreFile="{{ store_path }}/{{ ansible_host }}/keystore.jks"
+                keystorePass="{{ sip_keystore_password }}"
+                connectionTimeout="20000"
+                maxHttpHeaderSize="32768"
+                useSendfile="false"
+                compression="on"
+                compressionMinSize="2048"
+                noCompressionUserAgents="gozilla, traviata"
+                compressableMimeType="application/json,application/xml,text/html,text/xml,text/plain,text/javascript,image/x-icon,application/javascript,application/x-javascript,application/xml,application/xhtml+xml,application/x-font-truetype,font/opentype,font/otf,text/css"
+                />
+
+      {% else %}
+
+      <Connector port="8080" protocol="HTTP/1.1"
+                 connectionTimeout="20000"
+  			         maxHttpHeaderSize="32768"
+                 useSendfile="false"
+                 compression="on"
+                 compressionMinSize="2048"
+                 noCompressionUserAgents="gozilla, traviata"
+                 compressableMimeType="application/json,application/xml,text/html,text/xml,text/plain,text/javascript,image/x-icon,application/javascript,application/x-javascript,application/xml,application/xhtml+xml,application/x-font-truetype,font/opentype,font/otf,text/css"
+                 redirectPort="8443"/>
+
+
+
+
+      {% endif %}
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"

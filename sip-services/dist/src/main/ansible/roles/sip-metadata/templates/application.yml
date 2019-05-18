@@ -10,14 +10,28 @@ spring:
 logging:
   level:
     com.synchronoss.saw: INFO
+    org.springframework: INFO
 server:
   address: localhost
   port: 9501
   context-path: ''
-  maxHttpHeaderSize: 65536
+  maxHttpHeaderSize:  65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+
+  {% if sip_secure %}
+
+  ssl:
+   key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
+   key-alias: sip
+   key-store-password: "{{ sip_keystore_password }}"
+   trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
+   trust-store-password: "{{ sip_keystore_password }}"
+
+  {% endif %}
+
+
 management:
   endpoint:
     health:
@@ -26,20 +40,55 @@ management:
     web:
       exposure:
         include: info, health, prometheus
+
 application:
   async:
     core-pool-size: 10
     max-pool-size: 50
     queue-capacity: 10000
+
+sip:
+  service:
+    index: {{ groups['saw-services'].index(inventory_hostname) }}
+
+   {% if sip_secure %}
+
+  ssl:
+    enable : true
+
+  trust:
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
+  key:
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+    {% else %}
+
+  ssl:
+    enable : false
+
+   {% endif %}
+
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
+
+connector : http
+
+{% endif %}
+
 metastore:
   base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
   analysis: analysisMetadata
   migration: analysisMigration
 semantic:
-  workbench-url:  http://localhost:9700
-  transport-metadata-url:  http://localhost:9200
+  workbench-url:  ${connector}://localhost:9700
+  transport-metadata-url:  ${connector}://localhost:9200
   binary-migration-requires: true
   migration-metadata-home: {{  sip_var_path | default('/var/sip/') }}
+
 analysis:
   get-analysis-url:  http://localhost:9200
   binary-migration-required: true

@@ -3,10 +3,11 @@ info:
 spring:
   application:
     name: sip-metadata-service
-  http:
+  servlet:
     multipart:
       max-request-size: 25MB
       max-file-size: 25MB
+      file-size-threshold: 2KB
 logging:
   level:
     com.synchronoss.saw: INFO
@@ -14,9 +15,16 @@ logging:
     sncr.bda: INFO
 server:
   address: localhost
-  port: 9502
-  context-path: ''
-  maxHttpHeaderSize: 65536
+  port: 9501
+  servlet:
+    context-path: ''
+  max-http-header-size:  65536
+  ssl:
+    key-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    key-alias: sipcert
+    key-store-password: sip@123
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    trust-store-password: sip@123
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
@@ -27,15 +35,27 @@ application:
     queue-capacity: 10000
 
 metastore:
-  base:  hdfs:///user/pman0003/
+  base:  hdfs:///main/
   analysis: analysisMetadata
   migration: analysisMigration
 
+connector: https
 semantic:
-  workbench-url:  http://localhost:9700
-  transport-metadata-url:  http://localhost:9200
+  workbench-url:  ${connector}://localhost:9700
+  transport-metadata-url:  ${connector}://localhost:9642
   binary-migration-requires: false
   migration-metadata-home: /var/sip/
+
+sip:
+   ssl:
+     enable : true
+   trust:
+       store: /Users/spau0004/Desktop/keystore/truststore.jks
+       password: sip@123
+   key:
+      store: /Users/spau0004/Desktop/keystore/keystore.jks
+      password: sip@123
+
 
 analysis:
   get-analysis-url:  http://localhost:9200
