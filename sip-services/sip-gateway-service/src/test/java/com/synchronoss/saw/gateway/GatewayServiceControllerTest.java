@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.synchronoss.saw.gateway.controller.GatewayController;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(GatewayController.class)
+@WebMvcTest
 @TestPropertySource(locations = "application-test.properties")
 @WebAppConfiguration
 public class GatewayServiceControllerTest {
