@@ -50,7 +50,8 @@ provided in the environment:
 
 . Install and configure MapR client on the SIP target host.
 
-. Configure SIP server to use UTC timezone in all places where date and timezones are involved.
+. Configure SIP server to use UTC timezone in all places where date
+and timezones are involved.
 
 . On all saw nodes, volumes i.e. MapRFS using NFS gateway service
   has to be mounted. This is required by ingestion service.
@@ -177,30 +178,32 @@ this parameter can be set lower value.
 
      saw_export_chunk_size=10000
 
-
 ==== Running SIP on YARN
 
-Support for running SIP-executors on YARN (Hadoop NextGen) was added to SIP
-in version v2.6.0.
-To configure and run the saw-executor in yarn mode default configuration properties
-are provided in `sip-config` copy those properties change as per enviroment.
+Support for running SIP-executors on YARN (Hadoop NextGen) was added
+to SIP in version v2.6.0.  To configure and run the saw-executor in
+yarn mode default configuration properties are provided in
+`sip-config` copy those properties change as per enviroment.
 
-To configuring additional properties for spark and yarn,set configuration as java
-option since SparkConf loads defaults from system properties(start with spark.*)
-and the classpath.'
+To configuring additional properties for spark and yarn,set
+configuration as java option since SparkConf loads defaults from
+system properties(start with spark.*) and the classpath.'
 
   Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
 
 ===== SIP executors reserved ports
-SIP executors uses random ports for flexibility to increase the number of
-sip executors in future if required, but in case any SIP enviroment has limited port
-accessibility and other ports are blocked for security reasons. SIP executors required
-to be allocated with reserved series of port to SIP Executors to work properly.
-sip_executors_reserved_port properties can be set in `sip-config` file for starting port
-number and SIP will auto calculate the number of required port based on number of SIP-Nodes,
-like Number of open series ports required as (Number of SIP-node * 4 port).
-For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 4)
-, so 9801 to 9808 port will be used by spark executors.
+
+SIP executors uses random ports for flexibility to increase the number
+of sip executors in future if required, but in case any SIP enviroment
+has limited port accessibility and other ports are blocked for
+security reasons. SIP executors required to be allocated with reserved
+series of port to SIP Executors to work properly.
+sip_executors_reserved_port properties can be set in `sip-config` file
+for starting port number and SIP will auto calculate the number of
+required port based on number of SIP-Nodes, like Number of open series
+ports required as (Number of SIP-node * 4 port).  For example: if we
+have assigned 9801 is starting port and number of sip-node is 2 then
+(2* 4) , so 9801 to 9808 port will be used by spark executors.
 
 ==== Upgrading to SIP 3.0
 
@@ -238,13 +241,15 @@ config file to support larger files upload (more than 1MB)
 === XDF-NG
 
 ==== Prerequisites
+
 XDF-NG requires `jq` to be installed in the host cluster
 (all nodes of the cluster, because jobs can be submitted on any node).
 jq can be installed using the below command:
 
     yum install jq
 
-Once the installtion is complete, use the below command to validate the installation:
+Once the installtion is complete, use the below command to validate
+the installation:
 
     $ jq --version
     jq-1.5
@@ -255,14 +260,15 @@ Execute the following steps to install XDF-NG:
 
 . Get the XDF release package (named `bda-xdf-nextgen-*.rpm`)
 
-. Create and prepare a xdf-ng vars configuration file in /etc/bda/xdf-nextgen.vars
-  location, as described below
+. Create and prepare a xdf-ng vars configuration file in
+  /etc/bda/xdf-nextgen.vars location, as described below
 
       dl.root:   hdfs:///data/bda
       http.port: 15020
       seeds:     2784
 
-.  execute the RPM package installation command as below to install the XDF-NG package
+. Execute the RPM package installation command as below to install the
+  XDF-NG package
 
         rpm -ivh bda-xdf-nextgen-*.rpm
 
@@ -816,24 +822,25 @@ configuration.
 
 == Batch Ingestion : High Availability
 
-The below parameters in Batch Ingestion Service gives the control the configurations
-related to resiliency & avoid inconsistency across bis instances. To control what
-should be the time difference to declare a data in the system is corrupted, & needs
-to be downloaded again (default is 5 mins). While configuring this parameter we need
-account for all customers using the BIS & routes is being configured.
+The below parameters in Batch Ingestion Service gives the control the
+configurations related to resiliency & avoid inconsistency across bis
+instances. To control what should be the time difference to declare a
+data in the system is corrupted, & needs to be downloaded again
+(default is 5 mins). While configuring this parameter we need account
+for all customers using the BIS & routes is being configured.
 
-Specifically a use case which needs to be taken into account as follows:
-Let's say, we have a daily schedule at `5:00` PM for all `*.txt` files and as clean
-up job customers have a scheduled job on the customer data location to archive those
-files daily at `10:00 PM`. then if there is a failure or network glitches or may be
-due to some other reasons data source is not available until `10:00 PM` and we just
-marked status as failed there might be chances of data loss as `*.txt` file which
-has been archived before next schedule. The reason to mention this scenario so that we can
-configure the `sip_bis_retry_diffs_in_minutes` accordingly.
+Specifically a use case which needs to be taken into account as
+follows: Let's say, we have a daily schedule at `5:00` PM for all
+`*.txt` files and as clean up job customers have a scheduled job on
+the customer data location to archive those files daily at `10:00
+PM`. then if there is a failure or network glitches or may be due to
+some other reasons data source is not available until `10:00 PM` and
+we just marked status as failed there might be chances of data loss as
+`*.txt` file which has been archived before next schedule. The reason
+to mention this scenario so that we can configure the
+`sip_bis_retry_diffs_in_minutes` accordingly.
 
     sip_bis_retry_diffs_in_minutes=5
-
-
 
 The below parameter will switch on or off to activate secure or non-secure
 communication in sip platform
@@ -869,7 +876,8 @@ NOTE: Paths to files in the data lake must not contain spaces.
 
 == Onboarding customer
 
-We can utilise customer_onboard.sh script in order to execute the command with current environment setup.
+We can utilise customer_onboard.sh script in order to execute the
+command with current environment setup.
 
     cd /opt/bda/saw-security/bin/
     bash customer_onboard.sh
@@ -933,9 +941,12 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     		User Last Name
     		[Mandatory]
 
-Run the "onboard-customer" command with all required parameters stated above and it will start the process of creating customer and related products/components in the system.
+Run the "onboard-customer" command with all required parameters stated
+above and it will start the process of creating customer and related
+products/components in the system.
 
-The below is one such example to call onboard-customer with its required parameters.
+The below is one such example to call onboard-customer with its
+required parameters.
 
 
     shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
@@ -951,13 +962,18 @@ Note : A parameter containing a space in between can be enclosed in either singl
 
 ==  SIP SSO Authentication
 
-SIP supports external systems to authenticate users (single sign-on).The shared secret key is read from the SIP environment configuration, as a base64 encoded string (while ensuring Synchronoss Global Information Security standards for storing secret keys are adhered to).
-Recommended key size is 256 bits.
+SIP supports external systems to authenticate users (single
+sign-on).The shared secret key is read from the SIP environment
+configuration, as a base64 encoded string (while ensuring Synchronoss
+Global Information Security standards for storing secret keys are
+adhered to).  Recommended key size is 256 bits.
 
    Command to generate key : openssl rand 32 -base64
    Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=
 
-After generating the key, add it to the SIP environment configuration ({{sip-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
+After generating the key, add it to the SIP environment configuration
+({{sip-config}}) in the {{saw_security_sso_secret}} parameter and
+redeploy.
 
 == Export Configuration
 
@@ -969,8 +985,8 @@ SIP supports *exporting* reports and pivots:
 . to email
 . to ftp/sftp servers
 
-In sip-config, we can configure how many number of rows we want to extract for all the
-reports / pivots:
+In sip-config, we can configure how many number of rows we want to
+extract for all the reports / pivots:
 
 .sip-config
 [source, yaml]
@@ -980,8 +996,9 @@ saw_email_export_size=50000
 saw_ftp_export_size=1000000
 ----
 
-Saw reports are exported chunks of rows, we can configure how many rows to take
-at a time for processign reports, can be configured using following config parameter:
+SIP reports are exported chunks of rows, we can configure how many
+rows to take at a time for processign reports, can be configured using
+following config parameter:
 
 
 .sip-config
@@ -1003,13 +1020,7 @@ An example configuration has been included in config file.
 .sip-config
 ----
 # FTP JSON config
-# ##########################################
-#
-#
-# DO NOT SPLIT THIS INTO MULTIPLE LINES
-#
-#
-# ##########################################
+# (Do not split this into multiple lines)
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
 ----
 
