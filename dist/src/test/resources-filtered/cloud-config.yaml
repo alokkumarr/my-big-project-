@@ -12,7 +12,7 @@ bootcmd:
   # Workaround: If epel-release is installed in same command in the
   # packages section below, the smem package will not be available
   # yet.  So install it earlier here.
-  - yum -q -y install epel-release
+  - yum -q -y install epel-release bind-utils
 packages:
   # Add AWS CLI tools for the sip-update-dns script
   - awscli
@@ -42,6 +42,7 @@ write_files:
       public_ip=$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)
       local_dns=$(curl -sS http://169.254.169.254/latest/meta-data/local-hostname).sncrbda.dev.cloud.synchronoss.net
       changes=$(cat <<EOF
+      {
         "ChangeBatch": {
           "Comment": "Update host entry in DNS and Deleting AWS private hostname entry in route53",
           "Changes": [
@@ -57,7 +58,20 @@ write_files:
                   }
                 ]
               }
-            },
+            }
+          ]
+        }
+      }
+      EOF
+      )
+      aws route53 change-resource-record-sets \
+        --hosted-zone-id "$hosted_zone_id" --cli-input-json "$changes"
+      
+      delete_dns=$(cat <<EOF
+      {
+        "ChangeBatch": {
+          "Comment": "Deleting AWS private hostname entry in route53",
+          "Changes": [
             {
               "Action": "DELETE",
               "ResourceRecordSet": {
@@ -76,5 +90,9 @@ write_files:
       }
       EOF
       )
-      aws route53 change-resource-record-sets \
-        --hosted-zone-id "$hosted_zone_id" --cli-input-json "$changes"
+      if nslookup "$local_dns" >>/dev/null 2>&1 ; then
+        aws route53 change-resource-record-sets \
+         --hosted-zone-id "$hosted_zone_id" --cli-input-json "$delete_dns"
+      else
+           echo "$local_dns" is not exists
+      fi
