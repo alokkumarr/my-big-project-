@@ -834,6 +834,7 @@ public class BatchIngestionIT extends BaseIT {
    * file status to return as SUCCESS & Process status as DATA_RECEIVED.
    */
   @Test
+  @Ignore
   public void transferDataWithDuplicateAllowed() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode routeMetadata =
