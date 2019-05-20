@@ -8,7 +8,7 @@ const logger = require('../../conf/logger')(__filename);
 class APICommonHelpers {
   static getApiUrl(baseUrl) {
     const q = urlParser.parse(baseUrl, true);
-    let url = 'http://' + q.host; // API base url
+    let url = Constants.HTTP_PROTOCOL + '://' + q.host; // API base url
     logger.debug('api base url: ' + url);
     return url;
   }
