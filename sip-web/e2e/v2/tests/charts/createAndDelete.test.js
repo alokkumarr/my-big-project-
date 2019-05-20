@@ -22,6 +22,8 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
   const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
+  const yAxisName2 = 'Long';
+
   beforeAll(() => {
     logger.info('Starting charts/createAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
