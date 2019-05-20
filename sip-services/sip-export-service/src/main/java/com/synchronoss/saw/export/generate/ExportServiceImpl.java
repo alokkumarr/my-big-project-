@@ -253,7 +253,13 @@ public class ExportServiceImpl implements ExportService {
         s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
 
       if (((LinkedHashMap) dispatchBean).get("zip") != null)
-        zip = (boolean) ((LinkedHashMap) dispatchBean).get("zip");
+        zip = (Boolean) ((LinkedHashMap) dispatchBean).get("zip");
+
+      if (((LinkedHashMap) dispatchBean).get("zip") != null) {
+        logger.info("Zip inside reportToBeDispatchedAsync() : "+zip);
+      } else {
+          logger.info("Zip inside reportToBeDispatchedAsync() is NULL ");
+      }
 
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
     }
