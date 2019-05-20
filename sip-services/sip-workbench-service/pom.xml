@@ -197,6 +197,11 @@
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
+        <!--Exclude the xdf-esloader lib to resolve conflict with hadoop-es lib.-->
+        <exclusion>
+          <groupId>com.synchronoss.bda</groupId>
+          <artifactId>xdf-esloader</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

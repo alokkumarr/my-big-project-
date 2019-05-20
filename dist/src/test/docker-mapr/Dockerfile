@@ -58,11 +58,6 @@ RUN if $yarn_enabled; then \
 # again as part of configuring.
 RUN systemctl disable mapr-warden mapr-zookeeper
 
-# Configure MapR using configure script
-COPY sip-mapr-configure /root/
-COPY sip-mapr-configure.service /etc/systemd/system/
-RUN systemctl enable sip-mapr-configure
-
 # Note: Installing Apache Spark in standalone mode is disabled by
 # default for now, while there are developers still deploying using
 # local Docker with memory constraints.  Instead local Spark contexts
@@ -75,7 +70,7 @@ RUN systemctl enable sip-mapr-configure
 #COPY mapr-spark-worker.service /etc/systemd/system/
 #RUN systemctl enable mapr-spark-worker
 #
-#ENV spark_home=/opt/mapr/spark/spark-2.3.1
+#ENV spark_home=/opt/mapr/spark/spark-2.3.2
 #RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo "export SPARK_MASTER_IP=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo 'export SPARK_DIST_CLASSPATH=$MAPR_SPARK_CLASSPATH:$(hadoop classpath)' >> $spark_home/conf/spark-env.sh
@@ -96,6 +91,11 @@ RUN systemctl enable sip-mapr-configure
 # Workaround: The MapR "yarn classpath" command gives an error about
 # the "which" not being found, so install it here
 RUN yum -y -q install which
+
+# Configure MapR using configure script
+COPY sip-mapr-configure /root/
+COPY sip-mapr-configure.service /etc/systemd/system/
+RUN systemctl enable sip-mapr-configure
 
 # Workaround: MapR does not log into the systemd journal.  So install
 # MapR log forwrding as a workaround, so that all logs are aggregated
