@@ -242,10 +242,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       .getArtifactsForDataSet(semanticId)
       .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
-    console.log(newAnalysis$);
     return Promise.all([artifacts$, newAnalysis$]).then(
       ([metric, newAnalysis]) => {
-        console.log(metric.metricName);
         this._store.dispatch(
           new DesignerLoadMetric({
             metricName: metric.metricName,
@@ -762,6 +760,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
               this._designerService.generateReportPayload(cloneDeep(result.analysis)) :
               result.analysis
           });
+
           if (!shouldClose) {
             this.requestDataIfPossible();
           }
@@ -785,6 +784,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           .openQueryConfirmationDialog()
           .afterClosed()
           .subscribe(result => {
+            console.log(result);
             if (result) {
               this.changeToQueryModePermanently();
               resolve(this.openSaveDialog());
@@ -797,6 +797,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   openSaveDialog(): Promise<any> {
+    console.log("dave diaolog close");
     if (
       isDSLAnalysis(this.analysis) &&
       ['new', 'fork'].includes(this.designerMode)

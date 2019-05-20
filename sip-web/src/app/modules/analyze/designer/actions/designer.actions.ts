@@ -181,3 +181,4 @@ export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
   constructor() {}
 }
+
