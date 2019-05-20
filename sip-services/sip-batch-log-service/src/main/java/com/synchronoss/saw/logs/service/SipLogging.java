@@ -114,9 +114,16 @@ public class SipLogging {
   public void upsertInProgressStatus(String pid, 
       String recdFilePath, Date startTime)
       throws SipNestedRuntimeException {
-      
-    updateLogStatus(BisProcessState.INPROGRESS.value(),
-          BisComponentState.DATA_INPROGRESS.value(), pid);
+    BisFileLog bisLog = null;
+    if (bisFileLogsRepository.existsById(pid)) {
+      logger.trace("updating logs when process Id is found :" + pid);
+      bisLog = bisFileLogsRepository.findByPid(pid);
+      bisLog.setRecdFileName(recdFilePath);
+      bisLog.setTransferStartTime(startTime);
+      bisLog.setBisProcessState(BisComponentState.DATA_INPROGRESS.value());
+      bisLog.setMflFileStatus(BisProcessState.INPROGRESS.value());
+      this.bisFileLogsRepository.saveAndFlush(bisLog);
+    }
   }
   
   /**
@@ -144,11 +151,24 @@ public class SipLogging {
   /**
    * To make an entry to a log table.
    */
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
   public void upsertSuccessStatus(String pid, BisDataMetaInfo metaInfo) 
       throws SipNestedRuntimeException {
-    updateLogStatus(BisProcessState.SUCCESS.value(),
-            BisComponentState.DATA_RECEIVED.value(), pid);
+    Optional<BisFileLog> bisFileLog = this.bisFileLogsRepository.findById(pid);
+    if (bisFileLog.isPresent()) {
+      BisFileLog log = bisFileLog.get();
+      log.setMflFileStatus(BisProcessState.SUCCESS.value());
+      log.setBisProcessState(BisComponentState.DATA_RECEIVED.value());
+      log.setModifiedDate(new Date());
+      log.setTransferStartTime(metaInfo.getFileTransferStartTime());
+      log.setTransferEndTime(metaInfo.getFileTransferEndTime());
+      log.setTransferDuration(metaInfo.getFileTransferDuration());
+      log.setRecdFileName(metaInfo.getReceivedDataName());
+      bisFileLogsRepository.saveAndFlush(log);
+    }
   }
 
   @Retryable(value = {RuntimeException.class},
@@ -338,7 +358,7 @@ public class SipLogging {
   }
 
   /**
-  * check if any long running process exists.
+  * check if any long running process exists
   * and update if any.
   * @param minutesToCheck maxInProgress minutes
   * @return number of updated records
@@ -371,6 +391,29 @@ public class SipLogging {
       updatedRecords = inProgLogs.size();
     }
     return updatedRecords;
+  }
+  
+  
+  /**
+   * check if any long running process exists
+   * and update if any.
+   * @param minutesToCheck maxInProgress minutes
+   */
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+   public void updateLongRunningJobs(Integer minutesToCheck) {
+    int longCount = bisFileLogsRepository
+         .countOfLongRunningJobs(minutesToCheck);
+    logger.info("Long running process count: " +    longCount);
+    if (longCount > 0) {
+      logger.info("Updating long running transfers to failed");
+      bisFileLogsRepository
+           .updateBisJob("FAILED", minutesToCheck);
+      logger.info("long running jobs update completed");
+       
+    }
   }
   
   /**
@@ -565,14 +608,22 @@ public class SipLogging {
 
   }
   
-  
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {
+      RuntimeException.class }, maxAttemptsExpression = 
+          "#{${sip.service.max.attempts}}", backoff = 
+          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   private boolean isJobFailed(long jobId, Long total) {
     return bisFileLogsRepository
         .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
             "FAILED", jobId) == total;
   }
 
-
+  @Transactional(TxType.REQUIRED)
+  @Retryable(value = {
+      RuntimeException.class }, maxAttemptsExpression = 
+          "#{${sip.service.max.attempts}}", backoff = 
+          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   private boolean isJobPartiallyCompleted(Long jobId, Long total) {
     Long failedCnt = bisFileLogsRepository
         .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
@@ -582,7 +633,7 @@ public class SipLogging {
         "SUCCESS", jobId);
     
     
-    return total == failedCnt + successCnt; 
+    return (successCnt > 0) && (total == failedCnt + successCnt); 
   }
   
   /**
@@ -615,6 +666,7 @@ public class SipLogging {
    * Returns Job entity by Id.
    * 
    */
+  @Transactional(TxType.REQUIRED)
   public void saveJob(BisJobEntity jobEntity) {
     sipJobDataRepository.saveAndFlush(jobEntity);
     
@@ -624,6 +676,7 @@ public class SipLogging {
    * Returns Job entity by Id.
    * 
    */
+  @Transactional(TxType.REQUIRED)
   public BisFileLog retreiveOpenLogs() {
     List<BisFileLog> logs = bisFileLogsRepository.findFirstOpenLog();
     BisFileLog log = null;

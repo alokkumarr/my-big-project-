@@ -101,6 +101,11 @@ public class RetryExecutorService {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
+  
+  
+  @Value("${sip.service.max.inprogress.job.mins}")
+  @NotNull
+  private Integer maxInprogressJobMins;
 
   private static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
@@ -132,6 +137,7 @@ public class RetryExecutorService {
 
     // Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
+    sipLogService.updateLongRunningJobs(maxInprogressJobMins);
 
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);

@@ -77,6 +77,7 @@ sip:
     retry.diff.mins: 5
     retry.page.size: 20
     max.inprogress.mins: 45
+    max.inprogress.job.mins: 60
     worker.delay: 5000
   transfer:
     core-pool-size: 10

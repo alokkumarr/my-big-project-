@@ -79,12 +79,23 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
   Integer countOfLongRunningTransfers(@Param("minutesForLongProc") Integer minutesForLongProc);
   
+  @Query("SELECT COUNT(jobId) from BisJobEntity job  where job.jobStatus = 'INPROGRESS' " 
+      + "and ( (TIMEDIFF(NOW(), job.updatedDate)/60)> :minutesForLongJob )")
+  Integer countOfLongRunningJobs(@Param("minutesForLongJob") Integer minutesForLongJob);
+  
   @Modifying
   @Query("SELECT  Logs from BisFileLog Logs  where (Logs.mflFileStatus = 'INPROGRESS' " 
       + "and Logs.bisProcessState = 'DATA_INPROGRESS') and "
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
   List<BisFileLog> selectLongRunningTranfers(@Param("minutesForLongProc") 
       Integer minutesForLongProc);
+  
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE BisJobEntity job SET job.jobStatus = :jobStatus, "
+      + "job.updatedDate = NOW() WHERE  job.jobStatus = 'INPROGRESS' and "
+      + "(TIMEDIFF(NOW(), job.updatedDate)/60)> :minutesForLongJob")
+  Integer updateBisJob(@Param("jobStatus") String jobStatus, 
+      @Param("minutesForLongJob") Integer minutesForLongJob);
   
   @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
         + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "

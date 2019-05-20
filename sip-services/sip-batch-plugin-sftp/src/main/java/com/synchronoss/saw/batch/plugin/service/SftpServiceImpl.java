@@ -1333,7 +1333,8 @@ public class SftpServiceImpl extends SipPluginContract {
                       + fileTransEndTime);
                   logger.trace("closing the stream for the file " + fileName);
                   bisDataMetaInfo.setProcessId(logId);
-
+                  bisDataMetaInfo.setFileTransferStartTime(Date.from(
+                      fileTransStartTime.toInstant()));
                   bisDataMetaInfo.setFileTransferEndTime(
                       Date.from(fileTransEndTime.toInstant()));
                   bisDataMetaInfo.setFileTransferDuration(
