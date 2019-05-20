@@ -24,7 +24,7 @@ public class HBaseUtil {
       connection = ConnectionFactory.createConnection();
     } catch (IOException ex) {
       LOGGER.error(ex.getMessage());
-      LOGGER.info("Error occurred during hbase Connection connection");
+      LOGGER.info("Error occurred during hbase connection");
     }
     return connection;
   }

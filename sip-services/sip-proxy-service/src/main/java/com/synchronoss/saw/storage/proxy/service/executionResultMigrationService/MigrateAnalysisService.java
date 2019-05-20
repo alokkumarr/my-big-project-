@@ -283,16 +283,13 @@ public class MigrateAnalysisService {
    * @param executionId
    */
   public void readExecutionResultFromBinaryStore(String executionId) {
-    LOGGER.info("Fetch execution start here with this table :" + binaryTablePath);
+    LOGGER.debug("Fetch execution start here with this table :" + binaryTablePath);
     try {
       Connection connection = hBaseUtil.getConnection();
       Table table = hBaseUtil.getTable(connection, binaryTablePath);
       Get get = new Get(Bytes.toBytes(executionId));
-
       Result result = table.get(get);
-
       JsonParser parser = new JsonParser();
-
       JsonObject content =
           parser
               .parse(new String(result.getValue("_source".getBytes(), "content".getBytes())))
@@ -300,60 +297,56 @@ public class MigrateAnalysisService {
       LOGGER.debug("Contents from Binary Store :" + content.toString());
 
       String type = content.get("type").getAsString();
-      String analysisId = content.get("id").getAsString();
-      String executedBy = content.get("executedBy").getAsString();
-      String executionType = content.get("executionType").getAsString();
-      String executionStatus = content.get("execution_result").getAsString();
-      Long executionFinishTs = Long.valueOf(content.get("execution_finish_ts").getAsString());
+      LOGGER.debug("type :" + type);
 
-      JsonObject queryBuilder = new JsonObject();
-      queryBuilder.add("queryBuilder", content.get("queryBuilder"));
-      SipQuery sipQuery = migrateExecutions.migrate(queryBuilder);
-
-      LOGGER.info("executionType :" + executionType.trim());
-      LOGGER.info("type :" + type);
-
-      migrationStatusObject.setAnalysisId(analysisId);
-      migrationStatusObject.setAnalysisMigrated(true);
-      migrationStatusObject.setType(type);
-
-      Object dslExecutionResult = null;
       if (type != null && type.matches("pivot|chart")) {
+        String analysisId = content.get("id").getAsString();
+        String executedBy = content.get("executedBy").getAsString();
+        String executionType = content.get("executionType").getAsString();
+        String executionStatus = content.get("execution_result").getAsString();
+        Long executionFinishTs = Long.valueOf(content.get("execution_finish_ts").getAsString());
+
+        JsonObject queryBuilder = new JsonObject();
+        queryBuilder.add("queryBuilder", content.get("queryBuilder"));
+        SipQuery sipQuery = migrateExecutions.migrate(queryBuilder);
+
+        LOGGER.debug("executionType :" + executionType.trim());
+        migrationStatusObject.setAnalysisId(analysisId);
+        migrationStatusObject.setAnalysisMigrated(true);
+        migrationStatusObject.setType(type);
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode dataNode =
             objectMapper.readTree(
                 new String(result.getValue("_objects".getBytes(), "data".getBytes())));
-        LOGGER.info("Data Json Node which need to parsed for pivot/chart :" + dataNode);
+        LOGGER.debug("Data Json Node which need to parsed for pivot/chart :" + dataNode);
 
         JsonNode queryNode =
             objectMapper
                 .readTree(new String(result.getValue("_source".getBytes(), "content".getBytes())))
                 .get("queryBuilder");
-        LOGGER.info("Query Node which need to parsed for pivot/chart :" + queryNode);
+        LOGGER.debug("Query Node which need to parsed for pivot/chart :" + queryNode);
 
-        dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
+        Object dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
+        LOGGER.debug("dslExecutionResult :" + dslExecutionResult);
+        // store the execution result in json store
+        saveDSLJsonExecution(
+            executionId,
+            executionType,
+            executedBy,
+            sipQuery,
+            analysisId,
+            executionFinishTs,
+            executionStatus,
+            dslExecutionResult);
+        migrationStatusObject.setExecutionsMigrated(true);
+        migrationStatusObject.setMessage("Success");
+        saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
       }
-
-      LOGGER.info("dslExecutionResult :" + dslExecutionResult);
-      // store the execution result in json store
-      saveDSLJsonExecution(
-          executionId,
-          executionType,
-          executedBy,
-          sipQuery,
-          analysisId,
-          executionFinishTs,
-          executionStatus,
-          dslExecutionResult);
-      migrationStatusObject.setExecutionsMigrated(true);
-      migrationStatusObject.setMessage("Success");
-      saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());
       migrationStatusObject.setExecutionsMigrated(false);
       migrationStatusObject.setMessage("Failed : " + ex.getMessage());
-
     } finally {
       hBaseUtil.closeConnection();
     }
