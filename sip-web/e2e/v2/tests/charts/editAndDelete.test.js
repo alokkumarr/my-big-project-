@@ -17,7 +17,7 @@ const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
 
-describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
+describe('Executing create and delete chart tests from charts/editAndDelete.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
@@ -27,6 +27,8 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
   const yAxisName2 = 'Long';
   const groupName = 'Date';
   const sizeByName = 'Float';
+  const xAxisName = 'Date';
+
   let analysisId;
   let editedAnalysisId;
   let host;
