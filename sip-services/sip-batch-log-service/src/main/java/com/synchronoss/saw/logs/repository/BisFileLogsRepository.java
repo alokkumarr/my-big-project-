@@ -102,6 +102,11 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
         + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId )")
         Integer countOfInProgress(@Param("routeId") Long routeId);
   
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( "
+      + " Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = "
+      + "'DATA_RECEIVED' and Logs.job.jobId = :jobId )")
+      Long getSuccessCntForJob(@Param("jobId") Long jobId);
+  
   @Query("SELECT Logs FROM BisFileLog Logs  JOIN Logs.job BisJobEntity  "
       + "WHERE Logs.mflFileStatus = 'OPEN' and Logs.job.jobStatus = 'INPROGRESS'")
   List<BisFileLog> findFirstOpenLog();

@@ -1041,9 +1041,7 @@ public class SftpServiceImpl extends SipPluginContract {
                         bisDataMetaInfo.setComponentState(BisComponentState.DUPLICATE.value());
                         bisJobEntity = sipLogService.retriveJobById(jobId);
                         Long successCnt = bisJobEntity.getSuccessCount();
-                        logger.info("count before failed duplicate" + successCnt);
-                        sipLogService.updateSuccessCnt(jobId,
-                             successCnt + 1);
+                        sipLogService.updateSuccessCnt(jobId);
                         BisJobEntity entity = sipLogService.retriveJobById(jobId);
                         logger.info("count after failed duplicate" + entity.getSuccessCount());
                         // This check has been added as a part of optimization ticket
@@ -1346,19 +1344,8 @@ public class SftpServiceImpl extends SipPluginContract {
                       + bisDataMetaInfo.getFileTransferDuration());
                   // sipLogService.upsert(bisDataMetaInfo,
                   // logIdx);
-                  BisJobEntity bisJobEntity = sipLogService
-                      .retriveJobById(jobId);
-                  Long successCnt = bisJobEntity.getSuccessCount();
-                  logger.trace(
-                      "Before Success file log success cnt :: " + successCnt);
-                  sipLogService.updateSuccessCnt(jobId, 
-                      ++successCnt);
-                  BisJobEntity bisJobEntity2 = sipLogService
-                      .retriveJobById(jobId);
-                  Long successCnt2 = bisJobEntity2.getSuccessCount();
-                  logger.trace("After Success file log success cnt :: "
-                      + (successCnt2));
-
+                  // Long successCnt = bisJobEntity.getSuccessCount();
+                  sipLogService.updateSuccessCnt(jobId);
                   sipLogService.updateJobStatus(jobId);
                   // Adding to a list has been removed as a part of
                   // optimization
@@ -1383,10 +1370,9 @@ public class SftpServiceImpl extends SipPluginContract {
                     processor.deleteFile(fileTobeDeleted.getPath(),
                         defaultDestinationLocation, mapRfsUser);
                   }
-                } catch (Exception e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-                }
+                    } catch (Exception exception) {
+                      logger.error("Error while deleting file" + exception.getMessage());
+                    }
                 if (template.getSession() != null) {
                   template.getSession().close();
                 }

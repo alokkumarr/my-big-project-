@@ -547,15 +547,15 @@ public class SipLogging {
   /**
    * Adds entry to job log.
    * 
-   * @param successCnt number of files succssfully transferred
    */
   @Transactional(TxType.REQUIRED)
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public void  updateSuccessCnt(long jobId, long successCnt) {
+  public void  updateSuccessCnt(long jobId) {
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
+      Long successCnt = bisFileLogsRepository.getSuccessCntForJob(jobId);
       BisJobEntity jobEntity = sipJob.get();
       jobEntity.setSuccessCount(successCnt);
       jobEntity.setUpdatedDate(new Date());
@@ -628,10 +628,14 @@ public class SipLogging {
     Long failedCnt = bisFileLogsRepository
         .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
         "FAILED", jobId);
-    Long successCnt = bisFileLogsRepository
-        .countByMflFileStatusAndBisProcessStateAndJob_JobId("SUCCESS",
-        "SUCCESS", jobId);
+    logger.info("failed count" + failedCnt);
+    Long successCnt =  bisFileLogsRepository.getSuccessCntForJob(jobId);
+    logger.info("success count" + successCnt);
     
+    boolean totalProcessed = (total == (failedCnt + successCnt));
+   
+    boolean isPartial = (successCnt > 0) && totalProcessed;
+    logger.info("is partially complted?::" + isPartial);
     
     return (successCnt > 0) && (total == failedCnt + successCnt); 
   }
