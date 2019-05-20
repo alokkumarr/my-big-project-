@@ -1047,14 +1047,18 @@ export class ChartService {
           (point ? point.series.name : '{series.name}')}:</th>
         <td>${
           point
-            ? round(
-                options.aggregate === 'percentagebyrow'
-                  ? round(point.percentage, 2)
-                  : point.y
-                  ? point.y
-                  : point.value,
-                getPrecision(options.aggregate, options.dataType)
-              ).toLocaleString()
+            ? point.value === 0 || point.y === 0
+              ? point.value
+                ? point.value
+                : point.y
+              : round(
+                  options.aggregate === 'percentagebyrow'
+                    ? round(point.percentage, 2)
+                    : point.y
+                    ? point.y
+                    : point.value,
+                  getPrecision(options.aggregate, options.dataType)
+                ).toLocaleString()
             : '{point.y:,.2f}'
         }${
         point
