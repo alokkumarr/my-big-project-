@@ -30,8 +30,8 @@ import {
   NUMBER_TYPES,
   FLOAT_TYPES,
   DATE_INTERVALS_OBJ,
-  DATE_FORMATS_OBJ,
-  DEFAULT_DATE_FORMAT
+  PIVOT_DATE_FORMATS_OBJ,
+  DEFAULT_PIVOT_DATE_FORMAT
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
 
@@ -311,7 +311,7 @@ export class PivotGridComponent implements OnDestroy {
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
-      return moment.utc(value);
+      return moment.utc(value, formatToApply);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
       const formattedValue = moment.utc(value).format(formatToApply);
@@ -327,11 +327,11 @@ export class PivotGridComponent implements OnDestroy {
   }
 
   getMomentFormat(format: string) {
-    const formatObj = DATE_FORMATS_OBJ[format];
+    const formatObj = PIVOT_DATE_FORMATS_OBJ[format];
     return formatObj
       ? formatObj.momentValue
       : isEmpty(format)
-      ? DEFAULT_DATE_FORMAT.momentValue
+      ? DEFAULT_PIVOT_DATE_FORMAT.momentValue
       : format.replace(/d/g, 'D').replace(/y/g, 'Y');
   }
 
