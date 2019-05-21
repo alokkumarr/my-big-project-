@@ -12,8 +12,8 @@
             "METRICS",
             "SCHEDULED",
             "TYPE",
-            "CREATOR",
-            "CREATED"
+            "LAST MODIFIED BY",
+            "LAST MODIFIED ON"
           ],
           "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
         }
@@ -29,8 +29,8 @@
             "METRICS",
             "SCHEDULED",
             "TYPE",
-            "CREATOR",
-            "CREATED"
+            "LAST MODIFIED BY",
+            "LAST MODIFIED ON"
           ],
           "options": ["All", "Chart", "Report", "Pivot", "Scheduled"]
         }

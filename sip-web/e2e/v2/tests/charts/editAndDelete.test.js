@@ -22,8 +22,8 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   //updated fields
-  const metrics = 'Integer';
-  const dimension = 'String';
+  const yAxisName = 'Integer';
+  const xAxisName = 'String';
   const yAxisName2 = 'Long';
   const groupName = 'Date';
   const sizeByName = 'Float';
