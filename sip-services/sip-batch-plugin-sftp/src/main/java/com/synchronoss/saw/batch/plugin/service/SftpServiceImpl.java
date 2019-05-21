@@ -1075,6 +1075,7 @@ public class SftpServiceImpl extends SipPluginContract {
                     logger.trace("UPDATING:::::");
                     bisDataMetaInfo.setComponentState(BisComponentState.FAILED.value());
                     bisDataMetaInfo.setProcessState(BisProcessState.FAILED.value());
+                    bisDataMetaInfo.setReason(ex.getMessage());
                     sipLogService.upsert(bisDataMetaInfo, logId);
                     sipLogService.updateJobStatus(jobId);
                     //if (fileTobeDeleted != null
@@ -1364,7 +1365,7 @@ public class SftpServiceImpl extends SipPluginContract {
                 logger.error("Exception occurred while "
                     + "transferring the file from channel", ex);
 
-                sipLogService.upsertFailedStatus(logId);
+                sipLogService.upsertFailedStatus(logId, ex.getMessage());
                 sipLogService.updateJobStatus(jobId);
 
                 logger.trace(" files or directory to be "

@@ -109,6 +109,21 @@ public class BisFileLog implements Serializable {
   @ManyToOne
   @JoinColumn(name="JOB_ID")
   private BisJobEntity job;
+  
+   
+  @ApiModelProperty(value = "Indicates the status of the component process", dataType = "String",
+  allowEmptyValue = false, allowableValues = "DATA_RECEIVED, DATA_REMOVED, HOST_NOT_REACHABLE")
+  @Column(name = "STATE_REASON")
+  private String reason;
+
+
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(String reason) {
+    this.reason = reason;
+  }
 
   public BisJobEntity getJob() {
     return job;

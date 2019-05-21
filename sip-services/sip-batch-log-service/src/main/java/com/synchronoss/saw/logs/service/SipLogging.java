@@ -151,6 +151,27 @@ public class SipLogging {
   /**
    * To make an entry to a log table.
    */
+  @Transactional(TxType.REQUIRED)
+  public void upsertFailedStatus(String pid, String reason) throws SipNestedRuntimeException {
+    
+
+    Optional<BisFileLog> bisFileLog = this.bisFileLogsRepository.findById(pid);
+    if (bisFileLog.isPresent()) {
+      BisFileLog log = bisFileLog.get();
+      log.setMflFileStatus(BisProcessState.FAILED.value());
+      log.setBisProcessState(BisComponentState.FAILED.value());
+      log.setModifiedDate(new Date());
+      log.setReason(reason);
+      bisFileLogsRepository.saveAndFlush(log);
+    }
+    
+    
+  }
+  
+  
+  /**
+   * To make an entry to a log table.
+   */
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
@@ -320,6 +341,10 @@ public class SipLogging {
       BisFileLog log = bisFileLog.get();
       log.setMflFileStatus(fileStatus);
       log.setBisProcessState(processStatus);
+      if (processStatus.equals(
+          BisComponentState.HOST_NOT_REACHABLE.value())) {
+        log.setReason(BisComponentState.HOST_NOT_REACHABLE.value());
+      }
       log.setModifiedDate(new Date());
       bisFileLogsRepository.saveAndFlush(log);
     }
@@ -380,6 +405,7 @@ public class SipLogging {
       
       inProgLogs.stream().map(bisFileLog -> {
         bisFileLog.setMflFileStatus("FAILED");
+        bisFileLog.setReason("Long running inProgress transfer");
         bisFileLog.setBisProcessState("FAILED");
         return bisFileLog;
       }).forEach(bisFileLogsRepository::saveAndFlush);
