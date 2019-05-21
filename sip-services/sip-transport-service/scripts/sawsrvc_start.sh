@@ -133,20 +133,30 @@ vlog lib_dir: $lib_dir
 ( cd $lib_dir ) || exit
 
 # Create ':' separated list of all files in $lib_dir
-declare lib_classpath=$(
+declare lib_classpath=
+# Workaround : Load the netty library at runtime for saw-transport-service
+# required play version. Added as part of spark 2.3.2 version upgrade , since
+# latest spark netty lib are not compatible with used play framework.
+if [[ $FG_EXECJN ]] ; then
+ for j in `ls ${saw_service_home}/play-netty-lib/*.jar`; do
+ lib_classpath=${lib_classpath}:"${j}"
+ done
+fi
+
+if [[ $lib_classpath ]] ; then
+lib_classpath=${lib_classpath}:$(
   /usr/bin/perl -e 'use Cwd "realpath";
     # list all files in directory separated by colon(':')
     print join(":", map { realpath($_) } glob($ARGV[0] . "/*"))' \
     $lib_dir
   )
-
-# Workaround : Load the netty library at runtime for saw-transport-service
-# required play version. Added as part of spark 2.3.2 version upgrade , since
-# latest spark netty lib are not compatible with used play framework.
-if [[ $FG_EXECJN ]] ; then
- for j in `ls ${saw_service_home}/netty-lib/*.jar`; do
- lib_classpath=${lib_classpath}:"${j}"
- done
+ else
+lib_classpath=$(
+  /usr/bin/perl -e 'use Cwd "realpath";
+    # list all files in directory separated by colon(':')
+    print join(":", map { realpath($_) } glob($ARGV[0] . "/*"))' \
+    $lib_dir
+  )
 fi
 
 for j in `ls /opt/mapr/spark/spark-2.3.2/jars/*.jar`; do

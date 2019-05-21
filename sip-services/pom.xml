@@ -186,6 +186,7 @@
 		<module>sip-metadata-service</module>
     <module>saw-metadata-service</module>
 		<module>sip-data-access</module>
+    <module>play-netty</module>
 		<module>sip-transport-service</module>
 		<module>sip-es-querybuilder</module>
 		<module>sip-gateway-service</module>
