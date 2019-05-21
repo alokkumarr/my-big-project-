@@ -68,7 +68,7 @@ const testBaseDir = appRoot + '/e2e/src/';
  * Output path for the junit reports. Folder should be created in advance
  */
 const protractorPath = 'target/protractor-reports';
-
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 /**
  * Amount of attempts to retry doing action on element
  */
