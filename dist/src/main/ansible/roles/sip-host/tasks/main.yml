@@ -27,6 +27,25 @@
   file:
     path: /etc/bda
     state: directory
+# Creating env file to hold the connector streaming
+- name: Create the /etc/bda directory
+  file:
+    path: /etc/bda/secure.env
+    state: touch
+    mode: 0755
+
+- name: Copy the content of the file when it is secure
+  copy:
+    content: "SECURE=https:"
+    dest: "/etc/bda/secure.env"
+  when: sip_secure
+
+- name: Copy the content of the file when it is not secure
+  copy:
+    content: "SECURE=http:"
+    dest: "/etc/bda/secure.env"
+  when: not sip_secure
+
 - name: Add MapR classpath utility for services
   copy:
     dest: /usr/bin/sip-mapr-classpath
@@ -57,3 +76,34 @@
   command: systemctl stop saw-*.socket
 - name: Stop systemd units with old SAW prefix before upgrading
   command: systemctl stop saw-*
+- name: Ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - python
+    - python-setuptools
+
+- name: Installing pip on all saw-services hosts
+  easy_install:
+    name: pip
+    state: present
+
+- name: Installing libraries on all saw-services hosts using Ansible pip module
+  pip:
+    name: "{{ packages }}"
+    extra_args: --ignore-installed -U
+  vars:
+    packages:
+    - ipaddress
+    - enum34
+    - pyOpenSSL==19.0.0
+
+- name: Removing existing pyOpenSSL if exists
+  yum:
+    name: pyOpenSSL
+    autoremove: true
+ 
+ 
+ 

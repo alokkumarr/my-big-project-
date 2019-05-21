@@ -29,10 +29,14 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.synchronoss.bda.sip</groupId>
+			<artifactId>sip-common-components</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -120,12 +124,6 @@
 			<version>19.0</version>
 			<scope>test</scope>
 		</dependency>
-
-    <dependency>
-      <groupId>com.synchronoss.bda.sip</groupId>
-      <artifactId>sip-common-components</artifactId>
-      <version>${revision}</version>
-    </dependency>
 	</dependencies>
 
 	<build>
@@ -165,8 +163,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues 
-						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254), 
+					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues
+						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
 					<!--

@@ -171,19 +171,43 @@ declare -r app_classpath="$conf_dir:$lib_classpath"
 
 vlog app_classpath: $app_classpath
 
-declare -r java_args=$( echo \
-    $java_opts \
-    -Dhttp.port=$SAW_SERVICE_PORT \
-    -Dpidfile.path=$pidfile_path \
-    -Duser.dir=${user_dir} \
-    -Daggr.es.size=1000 \
-    -Durl=http://localhost:9800/ \
-    -Djava.library.path=/opt/mapr/lib \
-    -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
-    -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
-    -Dschema.report=/opt/saw/service/schema/report_querybuilder_schema.json \
-    -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0
-    )
+declare java_args=''
+
+if [ "$SIP_SECURE" = true ] ;
+then
+     java_args=$( echo \
+         $java_opts \
+         -Dhttps.port=$SAW_SERVICE_PORT \
+         -Dhttp.port=disabled \
+         -Dplay.server.https.keyStore.path=$KEY_STORE_PATH \
+         -Dplay.server.https.keyStore.password=$KEY_STORE_PASSWORD \
+         -Dpidfile.path=$pidfile_path \
+         -Duser.dir=${user_dir} \
+         -Daggr.es.size=1000 \
+         -Durl=https://localhost:9800/ \
+         -Djava.library.path=/opt/mapr/lib \
+         -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
+         -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
+         -Dschema.report=/opt/saw/service/schema/report_querybuilder_schema.json \
+         -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0
+         )
+else
+    java_args=$( echo \
+        $java_opts \
+        -Dhttp.port=$SAW_SERVICE_PORT \
+        -Dpidfile.path=$pidfile_path \
+        -Duser.dir=${user_dir} \
+        -Daggr.es.size=1000 \
+        -Durl=http://localhost:9800/ \
+        -Djava.library.path=/opt/mapr/lib \
+        -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
+        -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
+        -Dschema.report=/opt/saw/service/schema/report_querybuilder_schema.json \
+        -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0
+        )
+fi
+
+
 vlog java_args: $java_args
 
 vlog APP_MAINCLASS: $APP_MAINCLASS
