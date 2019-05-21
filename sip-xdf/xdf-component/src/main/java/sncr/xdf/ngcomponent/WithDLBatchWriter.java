@@ -28,6 +28,7 @@ public interface WithDLBatchWriter {
 
 
     default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
+
         WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
         return helper.writeDataset(DSMapKey.parameter, dataset, dataSetName, location, mode);
     }
@@ -52,7 +53,7 @@ public interface WithDLBatchWriter {
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
 
                 WithDLBatchWriterHelper.logger.warn(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
-                        moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
+                    moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
                 // TODO:: Fix BDA Meta
                 // Check if we have created data sample to move to final destination,
@@ -230,79 +231,83 @@ public interface WithDLBatchWriter {
 
         public int writeDataset(DSMapKey mapType, Dataset dataset, String dataSetName, String location, String mode) {
 
-        try{
+            try{
 
-            // Some components are using outputs (Transformer), other (SQL, Parser)  outputDataSets
-            // in any case we need some attributed from dataset descriptors.
+                // Some components are using outputs (Transformer), other (SQL, Parser)  outputDataSets
+                // in any case we need some attributed from dataset descriptors.
 
-            Map<String, Object> outputDS = null;
-            if (mapType == DSMapKey.dataset)
-                outputDS = ngctx.outputDataSets.get(dataSetName);
-            else
-                outputDS = ngctx.outputs.get(dataSetName);
+                Map<String, Object> outputDS = null;
+                if (mapType == DSMapKey.dataset)
+                    outputDS = ngctx.outputDataSets.get(dataSetName);
+                else
+                    outputDS = ngctx.outputs.get(dataSetName);
 
-            String name = (String) outputDS.get(DataSetProperties.Name.name());
+                String name = (String) outputDS.get(DataSetProperties.Name.name());
 
-            String loc = location + Path.SEPARATOR + name;
-            logger.info("Output write location : " + loc);
+                String loc = location + Path.SEPARATOR + name;
+                logger.info("Output write location : " + loc);
 
-            format = (String) outputDS.get(DataSetProperties.Format.name());
-            numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
-            keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
+                format = (String) outputDS.get(DataSetProperties.Format.name());
+                numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
+                keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
 
+                //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
+                //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
+                String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
+                boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
+                if ("true".equalsIgnoreCase(ngctx.runningPipeLine)) {
+                    if ("true".equalsIgnoreCase(ngctx.persistMode)) {
+                        baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                    }
+                }
+                else
+                {
+                    baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                }
 
-            //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
-            //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
-            String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
-            boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
+                // Whatever a component uses: outputs or outputDataSets --
+                // All final data should go to outputDataSets, to make a single source of
+                // dataset descriptors.
 
+                DateTime timeStamp = new DateTime();
+                long currentTime = timeStamp.getMillis() / 1000;
 
-            baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                if (mapType == DSMapKey.dataset) {
+                    outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                    logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
 
+                    //Add record count
+                    outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
-            // Whatever a component uses: outputs or outputDataSets --
-            // All final data should go to outputDataSets, to make a single source of
-            // dataset descriptors.
-
-            DateTime timeStamp = new DateTime();
-            long currentTime = timeStamp.getMillis() / 1000;
-
-            if (mapType == DSMapKey.dataset) {
-                outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
-
-                //Add record count
-                outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
-
-                //Add timestamp fields
+                    //Add timestamp fields
 //                outputDS.put(DataSetProperties.CreatedTime.name(), currentTime);
 //                outputDS.put(DataSetProperties.ModifiedTime.name(), currentTime);
-            }
-            else{
-                Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
-                outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
+                }
+                else{
+                    Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
+                    outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                    logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
 
-                //Add record count
-                outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
+                    //Add record count
+                    outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
-                //Add timestamp fields
+                    //Add timestamp fields
 //                outputDS2.put(DataSetProperties.CreatedTime.name(), currentTime);
 //                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
+                }
+
+
+
+                return 0;
+            } catch (Exception e) {
+                String error = ExceptionUtils.getFullStackTrace(e);
+                logger.error("Error at writing result: " + error);
+                return -1;
             }
 
 
-
-            return 0;
-        } catch (Exception e) {
-            String error = ExceptionUtils.getFullStackTrace(e);
-            logger.error("Error at writing result: " + error);
-            return -1;
         }
-
-
-    }
 
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
 
@@ -327,10 +332,10 @@ public interface WithDLBatchWriter {
                     //move data files with new name to output location
 
                     String destFileName =   dest + Path.SEPARATOR +
-                                            objectName + "." +
-                                            ngctx.batchID + "." + ngctx.startTs + "." +
-                                            String.format("%05d", ctx.globalFileCount ) +
-                                            "." + format;
+                        objectName + "." +
+                        ngctx.batchID + "." + ngctx.startTs + "." +
+                        String.format("%05d", ctx.globalFileCount ) +
+                        "." + format;
 
                     Path fdest = new Path(destFileName);
                     WithDLBatchWriterHelper.logger.warn(String.format("move from: %s to %s", srcFileName, fdest.toString()));

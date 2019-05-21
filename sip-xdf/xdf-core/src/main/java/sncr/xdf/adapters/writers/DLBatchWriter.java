@@ -98,6 +98,7 @@ public class DLBatchWriter {
 
         // This can be an empty collection in case FLAT partition
         // is requested or key definitions omited in configuration file
+
         scala.collection.immutable.Seq<String> partitionKeysList = null;
         if (keys != null)
             partitionKeysList = scala.collection.JavaConversions.asScalaBuffer(keys).toList();
@@ -162,9 +163,9 @@ public class DLBatchWriter {
 
     protected boolean isPathDir( Path p ) throws IOException {
         return  HFileOperations.fs.exists(p) &&
-                HFileOperations.fs.isDirectory(p) &&
-                HFileOperations.fs.listStatus(p) != null &&
-                HFileOperations.fs.listStatus(p).length > 0;
+            HFileOperations.fs.isDirectory(p) &&
+            HFileOperations.fs.listStatus(p) != null &&
+            HFileOperations.fs.listStatus(p).length > 0;
     }
 
     //TODO:: Fix BDA Meta

@@ -7,10 +7,10 @@ import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.ngcomponent.AsynchAbstractComponent;
-import sncr.xdf.parser.AsynchNGParser;
-import sncr.xdf.sql.ng.AsynchNGSQLComponent;
-import sncr.xdf.transformer.ng.AsynchNGTransformerComponent;
+import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.parser.NGParser;
+import sncr.xdf.sql.ng.NGSQLComponent;
+import sncr.xdf.transformer.ng.NGTransformerComponent;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
   private static final long serialVersionUID = 1L;
@@ -54,16 +54,16 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     }
     Logger log = LoggerFactory.getLogger(getClass().getName());
     log.info("Start execute job");
-    AsynchAbstractComponent aac = null;
+    AbstractComponent aac = null;
     switch (ngctx.componentName) {
       case "sql":
-        aac = new AsynchNGSQLComponent(ngctx);
+        aac = new NGSQLComponent(ngctx);
         break;
       case "parser":
-        aac = new AsynchNGParser(ngctx);
+        aac = new NGParser(ngctx);
         break;
       case "transformer":
-        aac = new AsynchNGTransformerComponent(ngctx);
+        aac = new NGTransformerComponent(ngctx);
         break;
       default:
         throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);

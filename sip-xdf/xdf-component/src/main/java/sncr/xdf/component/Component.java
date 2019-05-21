@@ -231,7 +231,7 @@ public abstract class Component {
   public final int collectCommandLineParameters(String[] args) throws Exception {
     CliHandler cli = new CliHandler();
     try {
-      HFileOperations.init();
+      HFileOperations.init(10);
 
       Map<String, Object> parameters = cli.parse(args);
       String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());

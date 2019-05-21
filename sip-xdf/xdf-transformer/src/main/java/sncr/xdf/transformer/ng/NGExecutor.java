@@ -14,10 +14,11 @@ import scala.Tuple2;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.xdf.context.NGContext;
 
 import java.util.*;
 
-import static sncr.xdf.transformer.TransformerComponent.*;
+import static sncr.xdf.transformer.ng.NGTransformerComponent.*;
 
 public abstract class NGExecutor {
 
@@ -43,6 +44,7 @@ public abstract class NGExecutor {
 
 
     public NGExecutor(WithContext parent, String script, int threshold, String tLoc, StructType st){
+        logger.trace("Inside Executor");
         this.script = script;
         session_ctx = parent.getICtx().sparkSession;
         this.threshold = threshold;
@@ -75,6 +77,7 @@ public abstract class NGExecutor {
     }
 
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
+
         WithDLBatchWriter pres = (WithDLBatchWriter) parent;
         pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location, "replace");
     }
@@ -83,7 +86,6 @@ public abstract class NGExecutor {
 
 
     protected void prepareRefData(Map<String, Dataset> dsMap){
-
         if (refDataSets != null && refDataSets.size() > 0) {
             JavaSparkContext jsc = new JavaSparkContext(session_ctx.sparkContext());
             for (String refDataSetName: refDataSets) {
@@ -109,18 +111,47 @@ public abstract class NGExecutor {
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
         Column trRC = ds.col(RECORD_COUNTER);
         outputResult = ds.filter( trRes.geq(0))
-                .drop(trRes)
-                .drop(trMsg)
-                .drop(trRC);
+            .drop(trRes)
+            .drop(trMsg)
+            .drop(trRC);
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
-        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+        logger.debug("Final DS: " + successTransformationsCount.value());
+        logger.debug("Rejected DS: " + failedTransformationsCount.value());
 
         writeResults(outputResult, outDataSetName, tempLoc);
         writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
 
+    }
+
+    protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
+
+        ds.schema();
+        Column trRes = ds.col(TRANSFORMATION_RESULT);
+        Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
+        Column trRC = ds.col(RECORD_COUNTER);
+        outputResult = ds.filter( trRes.geq(0))
+            .drop(trRes)
+            .drop(trMsg)
+            .drop(trRC);
+
+        ds.toDF().show(4);
+        ds.toDF().printSchema();
+
+        ngctx.datafileDFmap.put(ngctx.dataSetName,outputResult);
+
+        outputResult.toDF().show(4);
+        outputResult.toDF().printSchema();
+
+        if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
+            rejectedRecords = ds.filter( trRes.lt(0));
+
+        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
+        //logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+
+        writeResults(outputResult, outDataSetName, tempLoc);
+        writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
     }
 
 }

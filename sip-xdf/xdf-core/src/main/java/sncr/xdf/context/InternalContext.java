@@ -43,17 +43,17 @@ public class InternalContext {
     private Map<String, Dataset<Row>> datasetRegistry = new HashMap<>();
 
 
-    protected void finalize() {
-        if (!extSparkCtx) {
-            try {
-                fs.close();
-                sparkSession.close();
-
-            } catch (IOException e) {
-                logger.error("Could not close file system: ", e);
-            }
-            if (sparkSession != null) sparkSession.stop();
-        }
-    }
+//    protected void finalize() {
+//        if (!extSparkCtx) {
+//            try {
+//                fs.close();
+//                sparkSession.close();
+//
+//            } catch (IOException e) {
+//                logger.error("Could not close file system: ", e);
+//            }
+//            if (sparkSession != null) sparkSession.stop();
+//        }
+//    }
 
 }

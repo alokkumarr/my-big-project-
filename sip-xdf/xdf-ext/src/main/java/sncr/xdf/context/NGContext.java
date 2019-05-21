@@ -50,6 +50,12 @@ public class NGContext extends ContextMetadata {
     public Map<String, Map<String, Object>> inputs = new HashMap<>();
     public Map<String, Map<String, Object>> outputs = new HashMap<>();
 
+    public Map<String,Dataset> datafileDFmap = new HashMap<>();
+
+    public String dataSetName;
+    public String runningPipeLine;
+    public String persistMode;
+
     @Override
     public String toString(){
 
@@ -69,22 +75,22 @@ public class NGContext extends ContextMetadata {
         componentConfiguration.getInputs().forEach(p ->
         {
             if (p != null) s
-                    .append(" Object: ").append(p.getDataSet())
-                    .append(" Name: ").append(p.getName())
-                    .append(" Format: ").append(p.getFormat())
-                    .append(" File mask: ").append(p.getFileMask())
-                    .append(" Project: ").append(p.getProject())
-                    .append("\n");
+                .append(" Object: ").append(p.getDataSet())
+                .append(" Name: ").append(p.getName())
+                .append(" Format: ").append(p.getFormat())
+                .append(" File mask: ").append(p.getFileMask())
+                .append(" Project: ").append(p.getProject())
+                .append("\n");
         });
         s.append("Output: \n");
         componentConfiguration.getOutputs().forEach(p ->
         {
             if (p != null) s
-                    .append(" Object: ").append(p.getDataSet())
-                    .append(" Name: ").append(p.getName())
-                    .append(" Format: ").append(p.getFormat())
-                    .append(" Mode: ").append(p.getMode())
-                    .append("\n");
+                .append(" Object: ").append(p.getDataSet())
+                .append(" Name: ").append(p.getName())
+                .append(" Format: ").append(p.getFormat())
+                .append(" Mode: ").append(p.getMode())
+                .append("\n");
         });
 
         s.append("Services:");

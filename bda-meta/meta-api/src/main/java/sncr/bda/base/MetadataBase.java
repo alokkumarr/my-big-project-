@@ -47,7 +47,7 @@ public abstract class MetadataBase {
 
 
     public MetadataBase(String fsr) throws Exception {
-        HFileOperations.init();
+        HFileOperations.init(10);
         setXDFDataRoot(fsr);
         this.fs = HFileOperations.fs;
     }
