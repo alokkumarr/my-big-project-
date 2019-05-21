@@ -13,9 +13,12 @@ import com.synchronoss.saw.model.Sort;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface FieldsSipDslConverter {
   SipQuery convert(JsonObject queryBuilderObject);
+    static final Logger LOGGER = LoggerFactory.getLogger(FieldsSipDslConverter.class);
 
   /**
    * Prepare Filters as new DSL structure.
@@ -133,13 +136,14 @@ public interface FieldsSipDslConverter {
       JsonArray obj = modelObject.get(FieldNames.MODEL_VALUE).getAsJsonArray();
       List<Object> modelValues = new ArrayList<>();
       for (JsonElement arr : obj) {
-        modelValues.add(arr.getAsJsonPrimitive());
+          modelValues.add(arr.getAsString());
       }
       model.setModelValues(modelValues);
     }
 
     return model;
   }
+
 
   /**
    * Generates a list of sort objects.

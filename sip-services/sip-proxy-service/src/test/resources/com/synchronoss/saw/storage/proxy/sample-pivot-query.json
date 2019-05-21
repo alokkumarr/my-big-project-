@@ -1,43 +1,133 @@
 {
   "booleanCriteria": "AND",
-  "filters": [{
-    "type": "double",
-    "tableName": "mct_tgt_session",
-    "isOptional": false,
-    "columnName": "AVAILABLE_ITEMS",
-    "isRuntimeFilter": false,
-    "isGlobalFilter": true
-  }],
+  "filters": [
+    {
+      "type": "date",
+      "tableName": "sample",
+      "isOptional": false,
+      "columnName": "date",
+      "isRuntimeFilter": false,
+      "isGlobalFilter": false,
+      "model": {
+        "preset": "NA",
+        "lte": "2017-12-31",
+        "gte": "2017-01-01"
+      }
+    },
+    {
+      "type": "string",
+      "tableName": "sample",
+      "isOptional": false,
+      "columnName": "string.keyword",
+      "isRuntimeFilter": false,
+      "isGlobalFilter": false,
+      "model": {
+        "modelValues": [
+          "65"
+        ],
+        "operator": "EW"
+      }
+    },
+    {
+      "type": "integer",
+      "tableName": "sample",
+      "isOptional": false,
+      "columnName": "integer",
+      "isRuntimeFilter": false,
+      "isGlobalFilter": false,
+      "model": {
+        "operator": "BTW",
+        "otherValue": 100,
+        "value": 300
+      }
+    }
+  ],
   "sorts": [],
-  "rowFields": [{
-    "type": "date",
-    "columnName": "TRANSFER_DATE",
-    "area": "row",
-    "areaIndex": 0,
-    "aggregate": null,
-    "name": null,
-    "dateInterval": "day",
-    "dateFormat": "yyyy-MM-dd"
-  }],
-  "columnFields": [],
+  "rowFields": [
+    {
+      "type": "date",
+      "columnName": "date",
+      "area": "row",
+      "areaIndex": 0,
+      "aggregate": null,
+      "name": null,
+      "dateInterval": "day",
+      "dateFormat": "yyyy-MM-dd"
+    }
+  ],
+  "columnFields": [
+    {
+      "type": "string",
+      "columnName": "string.keyword",
+      "area": "column",
+      "areaIndex": 0,
+      "aggregate": null,
+      "name": null,
+      "dateInterval": null
+    }
+  ],
   "dataFields": [
     {
       "type": "double",
-      "columnName": "AVAILABLE_MB",
+      "columnName": "double",
       "area": "data",
       "areaIndex": 0,
-      "aggregate": "sum",
-      "name": "AVAILABLE_MB",
-      "dateInterval": null
+      "aggregate": "max",
+      "name": "double",
+      "dateInterval": null,
+      "format": {
+        "precision": 5,
+        "comma": true,
+        "currency": "USD",
+        "currencySymbol": "$",
+        "percentage": false
+      }
     },
     {
-      "type": "double",
-      "columnName": "AVAILABLE_ITEMS",
+      "type": "float",
+      "columnName": "float",
       "area": "data",
       "areaIndex": 1,
+      "aggregate": "avg",
+      "name": "float",
+      "dateInterval": null,
+      "format": {
+        "precision": 5,
+        "comma": true,
+        "currency": "INR",
+        "currencySymbol": "₹",
+        "percentage": false
+      }
+    },
+    {
+      "type": "integer",
+      "columnName": "integer",
+      "area": "data",
+      "areaIndex": 2,
+      "aggregate": "min",
+      "name": "integer",
+      "dateInterval": null,
+      "format": {
+        "comma": true,
+        "currency": "USD",
+        "currencySymbol": "$",
+        "percentage": false
+      }
+    },
+    {
+      "type": "long",
+      "columnName": "long",
+      "area": "data",
+      "areaIndex": 3,
       "aggregate": "sum",
-      "name": "AVAILABLE_ITEMS",
-      "dateInterval": null
+      "name": "long",
+      "dateInterval": null,
+      "format": {
+        "comma": true,
+        "currency": "USD",
+        "currencySymbol": "$",
+        "percentage": false
+      }
     }
   ]
 }

@@ -16,12 +16,11 @@ public abstract class ResultMigration {
 
   private static final String KEY = "key";
   private static final String NAME = "name";
-  private static final String DATA = "data";
   private static final String VALUE = "value";
   private static final String BUCKETS = "buckets";
   private static final String COLUMN_NAME = "columnName";
   private static final String DATA_FIELDS = "dataFields";
-  private static final String QUERY_BUILDER = "queryBuilder";
+  private static final String KEY_AS_STRING = "key_as_string";
 
   private JsonNode queryBuilder;
 
@@ -34,12 +33,12 @@ public abstract class ResultMigration {
    * @param queryNode
    * @return
    */
-  public List<Object> parseData(JsonNode dataNode, JsonNode queryNode, String levelField, String columnField) {
+  public List<Object> parseData(
+      JsonNode dataNode, JsonNode queryNode, String levelField, String columnField) {
     queryBuilder = queryNode;
     Map<String, String> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
-    flatStructure =
-        jsonNodeParser(dataNode, dataObj, flatStructure, 1, levelField, columnField);
+    flatStructure = jsonNodeParser(dataNode, dataObj, flatStructure, 1, levelField, columnField);
     return flatStructure;
   }
 
@@ -64,7 +63,9 @@ public abstract class ResultMigration {
     JsonNode childNode = jsonNode;
     if (childNode.get(KEY) != null) {
       String columnName = getColumnNames(level, columnField);
-      if (childNode.get(KEY).isNumber()) {
+      if (childNode.get(KEY_AS_STRING) != null) {
+        dataObj.put(columnName, childNode.get(KEY_AS_STRING).textValue());
+      } else if (childNode.get(KEY).isNumber()) {
         switch (childNode.get(KEY).numberType()) {
           case LONG:
             dataObj.put(columnName, childNode.get(KEY).longValue());
@@ -109,7 +110,33 @@ public abstract class ResultMigration {
         JsonNode dataField = iterator.next();
         String columnName = dataField.get(NAME).asText();
         if (jsonNode.has(columnName)) {
-          records.put(columnName, String.valueOf(jsonNode.get(columnName).get(VALUE)));
+          JsonNode childJSNode = jsonNode.get(columnName).get(VALUE);
+          if (childJSNode.isNumber()) {
+            switch (childJSNode.numberType()) {
+              case LONG:
+                dataObj.put(columnName, childJSNode.longValue());
+                break;
+              case BIG_INTEGER:
+                dataObj.put(columnName, childJSNode.bigIntegerValue());
+                break;
+              case FLOAT:
+                dataObj.put(columnName, childJSNode.floatValue());
+                break;
+              case DOUBLE:
+                dataObj.put(columnName, childJSNode.doubleValue());
+                break;
+              case BIG_DECIMAL:
+                dataObj.put(columnName, childJSNode.decimalValue());
+                break;
+              case INT:
+                dataObj.put(columnName, childJSNode.intValue());
+                break;
+              default:
+                dataObj.put(columnName, childJSNode.toString());
+            }
+          } else {
+            dataObj.put(columnName, childJSNode.toString());
+          }
         }
       }
       flatStructure.add(records);
