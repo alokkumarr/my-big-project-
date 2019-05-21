@@ -281,6 +281,7 @@
     <module>xdf-parser</module>
     <module>xdf-esloader</module>
     <module>xdf</module>
+    <module>xdf-dataprocessor</module>
   </modules>
   <build>
     <defaultGoal>package</defaultGoal>
