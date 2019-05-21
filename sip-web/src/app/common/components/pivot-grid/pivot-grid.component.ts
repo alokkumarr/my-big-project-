@@ -20,19 +20,19 @@ import * as filter from 'lodash/filter';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
-import {Subject} from 'rxjs';
-import {DEFAULT_PRECISION} from '../data-format-dialog/data-format-dialog.component';
+import { Subject } from 'rxjs';
+import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import {ArtifactColumnPivot, Sort} from '../../../models';
+import { ArtifactColumnPivot, Sort } from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
   FLOAT_TYPES,
   DATE_INTERVALS_OBJ,
   PIVOT_DATE_FORMATS_OBJ,
-  PIVOT_DEFAULT_DATE_FORMAT
+  DEFAULT_PIVOT_DATE_FORMAT
 } from '../../../modules/analyze/consts';
-import {getFormatter} from '../../utils/numberFormatter';
+import { getFormatter } from '../../utils/numberFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
@@ -103,7 +103,7 @@ export class PivotGridComponent implements OnDestroy {
   allowSorting = false;
   allowFiltering = false;
   allowExpandAll = true;
-  fieldChooser = {enabled: false};
+  fieldChooser = { enabled: false };
   // field-panel
   visible = true;
   showColumnFields = false;
@@ -137,7 +137,7 @@ export class PivotGridComponent implements OnDestroy {
 
   onPivotContentReady() {
     const fields = this._gridInstance.getDataSource().fields();
-    this.onContentReady.emit({fields});
+    this.onContentReady.emit({ fields });
   }
 
   onExported(e) {
@@ -170,7 +170,7 @@ export class PivotGridComponent implements OnDestroy {
     const dataSource = this._gridInstance.getDataSource();
     const fields = dataSource.fields();
     this._preExportState = dataSource.state();
-    forEach(fields, ({dataField}) => dataSource.expandAll(dataField));
+    forEach(fields, ({ dataField }) => dataSource.expandAll(dataField));
     this._gridInstance.exportToExcel();
   }
 
@@ -262,7 +262,7 @@ export class PivotGridComponent implements OnDestroy {
             unset(cloned, 'format');
             break;
           case 'all':
-            momentFormat = PIVOT_DEFAULT_DATE_FORMAT.momentValue;
+            momentFormat = DEFAULT_PIVOT_DATE_FORMAT.momentValue;
             cloned.format = {
               formatter: this.getFormatter(momentFormat)
             };
@@ -296,7 +296,7 @@ export class PivotGridComponent implements OnDestroy {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const columnsToFormat = filter(this.artifactColumns, ({type}) =>
+    const columnsToFormat = filter(this.artifactColumns, ({ type }) =>
       DATE_TYPES.includes(type)
     );
     if (isEmpty(columnsToFormat)) {
@@ -305,7 +305,7 @@ export class PivotGridComponent implements OnDestroy {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({name, groupInterval, manualFormat}) => {
+      forEach(columnsToFormat, ({ name, groupInterval, manualFormat }) => {
         clonedDataPoint[name] = this.getFormattedDataValue(
           clonedDataPoint[name],
           groupInterval,
@@ -343,8 +343,8 @@ export class PivotGridComponent implements OnDestroy {
     return formatObj
       ? formatObj.momentValue
       : isEmpty(format)
-        ? PIVOT_DEFAULT_DATE_FORMAT.momentValue
-        : format.replace(/d/g, 'D').replace(/y/g, 'Y');
+      ? DEFAULT_PIVOT_DATE_FORMAT.momentValue
+      : format.replace(/d/g, 'D').replace(/y/g, 'Y');
   }
 
   artifactColumn2PivotField(): any {
@@ -368,9 +368,9 @@ export class PivotGridComponent implements OnDestroy {
           cloned.format = {
             formatter: getFormatter(
               artifactColumn.format ||
-              (FLOAT_TYPES.includes(cloned.type)
-                ? {precision: DEFAULT_PRECISION, percentage: percent}
-                : {precision: conditionalPrecision, percentage: percent})
+                (FLOAT_TYPES.includes(cloned.type)
+                  ? { precision: DEFAULT_PRECISION, percentage: percent }
+                  : { precision: conditionalPrecision, percentage: percent })
             )
           };
           /* We're aggregating values in backend. Aggregating it again using
