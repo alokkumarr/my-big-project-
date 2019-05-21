@@ -4,12 +4,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.*;
+import sncr.bda.CliHandler;
+import sncr.bda.ConfigLoader;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.context.ComponentServices;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
+import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.context.RequiredNamedParameters;
@@ -26,6 +32,8 @@ import java.util.*;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
+
+//TODO:: Refactor NGTransformerComponent and NGTransformerComponent: eliminate duplicate
 public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";
@@ -38,45 +46,39 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
     {
         componentName = "transformer";
     }
+    public NGTransformerComponent(NGContext ngctx) {  super(ngctx); }
 
-    public static void main(String[] args){
-        NGTransformerComponent component = new NGTransformerComponent();
-        try {
-           if (component.initWithCMDParameters(args) == 0) {
-                int r = component.run();
-                System.exit(r);
-           }
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+    public NGTransformerComponent(NGContext ngctx, String mode) {  super(ngctx); }
+
+    public NGTransformerComponent() {  super(); }
+
+    public NGTransformerComponent(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
 
     private String getScriptFullPath() {
         String sqlScript = ngctx.componentConfiguration.getTransformer().getScriptLocation() + Path.SEPARATOR +
-                           ngctx.componentConfiguration.getTransformer().getScript();
-        logger.debug(String.format("Get script %s in location: ", sqlScript));
+            ngctx.componentConfiguration.getTransformer().getScript();
+        logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
 
     @Override
     protected int execute(){
         try {
-             tempLocation = generateTempLocation(new DataSetHelper(ngctx, services.md),
-                                                 ngctx.batchID,
-                                                 ngctx.componentName,
-                                                  null, null);
+            tempLocation = generateTempLocation(new DataSetHelper(ngctx, services.md),
+                ngctx.batchID,
+                ngctx.componentName,
+                null, null);
 
 //1. Read expression/scripts, compile it??
             String script;
             if (ngctx.componentConfiguration.getTransformer().getScriptLocation().equalsIgnoreCase("inline")) {
-                logger.debug("Script is inline encoded");
+                logger.trace("Script is inline encoded");
                 script = new String (Base64.getDecoder().decode(ngctx.componentConfiguration.getTransformer().getScript()));
             }
             else {
                 String pathToSQLScript = getScriptFullPath();
-                logger.debug("Path to script: " + pathToSQLScript);
+                logger.trace("Path to script: " + pathToSQLScript);
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
@@ -89,13 +91,15 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 //2. Read input datasets
 
             Map<String, Dataset> dsMap = new HashMap();
-            for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
-                Map<String, Object> desc = entry.getValue();
-                String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
-                String format = (String) desc.get(DataSetProperties.Format.name());
-                Dataset ds = reader.readDataset(entry.getKey(), format, loc);
-                logger.debug("Added to DS map: " + entry.getKey());
-                dsMap.put(entry.getKey(), ds);
+            if (! "true".equalsIgnoreCase(ngctx.runningPipeLine)) {
+                for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
+                    Map<String, Object> desc = entry.getValue();
+                    String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
+                    String format = (String) desc.get(DataSetProperties.Format.name());
+                    Dataset ds = reader.readDataset(entry.getKey(), format, loc);
+                    logger.trace("Added to DS map: " + entry.getKey());
+                    dsMap.put(entry.getKey(), ds);
+                }
             }
             Transformer.ScriptEngine engine = ngctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ngctx.componentConfiguration.getTransformer().getOutputSchema();
@@ -106,17 +110,21 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     NGJexlExecutorWithSchema jexlExecutorWithSchema  =
-                            new NGJexlExecutorWithSchema(this,
-                                                         script,
-                                                         ngctx.componentConfiguration.getTransformer().getThreshold(),
-                                                         tempLocation,
-                                                         st   );
-                    jexlExecutorWithSchema.execute(dsMap);
+                        new NGJexlExecutorWithSchema(this,
+                            script,
+                            ngctx.componentConfiguration.getTransformer().getThreshold(),
+                            tempLocation,
+                            st   );
+                    if ("true".equalsIgnoreCase(ngctx.runningPipeLine))
+                        //jexlExecutorWithSchema.executeSingleProcessor(ngctx.datafileDFmap,ngctx);
+                        jexlExecutorWithSchema.executeSingleProcessor(ngctx);
+                    else
+                        jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
                     String preamble = "";
                     if ( ngctx.componentConfiguration.getTransformer().getScriptPreamble() != null &&
-                         ! ngctx.componentConfiguration.getTransformer().getScriptPreamble().isEmpty())
+                        ! ngctx.componentConfiguration.getTransformer().getScriptPreamble().isEmpty())
                         preamble = HFileOperations.readFile(ngctx.componentConfiguration.getTransformer().getScriptPreamble());
 
 
@@ -126,16 +134,19 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     String[] odi = ngctx.componentConfiguration.getTransformer().getAdditionalImports().toArray(new String[0]);
                     String m = "Additional imports: ";
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
-                    logger.debug(m);
+                    logger.trace(m);
 
-                     NGJaninoExecutor janinoExecutor =
-                         new NGJaninoExecutor(this,
-                                 script,
-                                 ngctx.componentConfiguration.getTransformer().getThreshold(),
-                                 tempLocation,
-                                 st,
-                                 odi);
-                    janinoExecutor.execute(dsMap);
+                    NGJaninoExecutor janinoExecutor =
+                        new NGJaninoExecutor(this,
+                            script,
+                            ngctx.componentConfiguration.getTransformer().getThreshold(),
+                            tempLocation,
+                            st,
+                            odi);
+                    if ("true".equalsIgnoreCase(ngctx.runningPipeLine))
+                        janinoExecutor.executeSingleProcessor(ngctx);
+                    else
+                        janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -146,10 +157,10 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     NGJexlExecutor jexlExecutor =
-                            new NGJexlExecutor(this,
-                                    script,
-                                    ngctx.componentConfiguration.getTransformer().getThreshold(),
-                                    tempLocation);
+                        new NGJexlExecutor(this,
+                            script,
+                            ngctx.componentConfiguration.getTransformer().getThreshold(),
+                            tempLocation);
                     jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
@@ -179,14 +190,14 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         StructField[] sf = new StructField[outputSchema.size()+3];
         OutputSchema[] osa = outputSchema.toArray(new OutputSchema[0]);
         for (int i = 0; i < osa.length; i++) {
-            logger.debug(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
-           sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType()), true, Metadata.empty());
-           st = st.add(sf[i]);
+            logger.trace(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
+            sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType()), true, Metadata.empty());
+            st = st.add(sf[i]);
         }
         st = st.add( new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty()));
         st = st.add( new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty()));
         st = st.add( new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty()));
-        logger.debug("Output schema: " + st.prettyJson() );
+        logger.trace("Output schema: " + st.prettyJson() );
         return st;
     }
 
@@ -233,53 +244,82 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
             MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format, kl);
             ctx.resultDataDesc .add(desc);
-            logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
+            logger.trace(String.format("DataSet %s will be moved to %s", name, dest));
         }
         return super.move();
     }
 
-    protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return NGTransformerComponent.analyzeAndValidate(config);
-    }
+    public static void main(String[] args) {
 
-    public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
+        NGContextServices ngCtxSvc;
+        CliHandler cli = new CliHandler();
+        try {
 
-        ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(cfgAsStr);
-        Transformer transformerCfg = compConf.getTransformer();
-        if (transformerCfg == null)
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "transformer");
+            long start_time = System.currentTimeMillis();
 
-        if (transformerCfg.getScript() == null || transformerCfg.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script name.");
-        }
-        if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script location.");
-        }
+            HFileOperations.init(10);
 
-        boolean valid = false;
-        for( Input inpK: compConf.getInputs()){
-            if (inpK.getName() != null && inpK.getName().equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
-                valid = true; break;
+            Map<String, Object> parameters = cli.parse(args);
+            String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+            String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
             }
-        }
 
-        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
-
-        valid = false;
-        boolean rvalid = false;
-        for( Output outK: compConf.getOutputs()) {
-            if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
-                valid = true;
-            } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
-                rvalid = true;
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
             }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices[] scs =
+                {
+                    ComponentServices.InputDSMetadata,
+                    ComponentServices.OutputDSMetadata,
+                    ComponentServices.Project,
+                    ComponentServices.TransformationMetadata,
+                    ComponentServices.Spark
+                };
+            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
+            ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
+                "transformer", batchId);
+
+            ngCtxSvc.initContext();
+            ngCtxSvc.registerOutputDataSet();
+
+            logger.trace("Output datasets:");
+
+            ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.trace(id)
+            );
+            NGTransformerComponent component = new NGTransformerComponent(ngCtxSvc.getNgctx());
+            if (!component.initComponent(null))
+                System.exit(-1);
+            int rc = component.run();
+
+            long end_time = System.currentTimeMillis();
+            long difference = end_time-start_time;
+            logger.info("Transformer total time " + difference );
+
+            System.exit(rc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
-        if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
-
-        return compConf;
     }
-
 
 }
+
+
+
 
 
