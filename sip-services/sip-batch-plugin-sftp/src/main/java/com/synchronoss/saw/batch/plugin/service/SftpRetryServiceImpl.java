@@ -109,7 +109,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                         template, sourceLocation, metaInfo.getFilePattern(),
                         destinationLocation, channelId, routeId, 
                         fileExclusions, isDisable, SourceType.RETRY.name(),
-                        lastModifiedHoursLmt, jobId));
+                        lastModifiedHoursLmt, jobId, true));
                 BisJobEntity job = sipLogService.retriveJobById(jobId);
                 job.setJobStatus("INPROGRESS");
                 sipLogService.saveJob(job);

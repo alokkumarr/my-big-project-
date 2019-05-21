@@ -758,11 +758,12 @@ public class SftpServiceImpl extends SipPluginContract {
               transferDataFromChannel(template, sourceLocation, filePattern,
                          destinationLocation, channelId, routeId, 
                          fileExclusions, isDisable, source,lastModifiedHoursLmt,
-                         jobEntity.getJobId());
+                         jobEntity.getJobId(), false);
              
               BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
               job.setJobStatus("INPROGRESS");
               sipLogService.saveJob(job);
+              sipLogService.updateSuccessCnt(jobEntity.getJobId());
               sipLogService.updateJobStatus(job.getJobId());
               ZonedDateTime fileTransEndTime = ZonedDateTime.now();
               ZonedDateTime fileTransStartTime = ZonedDateTime.now();
@@ -811,11 +812,12 @@ public class SftpServiceImpl extends SipPluginContract {
 
   /**
    * Transfer files from given directory, recursing into each subdirectory.
+   * @param isHostNotReachable TODO
    */
   public List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId, String exclusions, boolean isDisableDuplicate, 
-      String source, int filesModifiedInLast, Long jobId)
+      String source, int filesModifiedInLast, Long jobId, boolean isHostNotReachable)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -828,7 +830,7 @@ public class SftpServiceImpl extends SipPluginContract {
     // SIP-6386
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
         destinationLocation, channelId, routeId, exclusions, 
-        getBatchId(), isDisableDuplicate, source, jobId);
+        getBatchId(), isDisableDuplicate, source, jobId, isHostNotReachable);
     
     ZonedDateTime fileTransEndTime = ZonedDateTime.now();
     long durationInMillis = Duration.between(fileTransStartTime,
@@ -883,7 +885,7 @@ public class SftpServiceImpl extends SipPluginContract {
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
           destinationLocation, channelId, routeId, exclusions, 
-          isDisableDuplicate, source, filesModifiedInLast, jobId);
+          isDisableDuplicate, source, filesModifiedInLast, jobId, isHostNotReachable);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
         + " and routeId " + routeId);
@@ -896,7 +898,7 @@ public class SftpServiceImpl extends SipPluginContract {
   private List<BisDataMetaInfo> transferDataFromChannelDirectory(SftpRemoteFileTemplate template,
       String sourcelocation, String pattern, String destinationLocation, Long channelId,
       Long routeId, String exclusions, String batchId, boolean isDisableDuplicate,
-      String source, long jobId)
+      String source, long jobId, boolean isHostNotReachable)
       throws IOException, ParseException {
     
     logger.info("Inside from channel Directory :: " 
@@ -942,11 +944,15 @@ public class SftpServiceImpl extends SipPluginContract {
           List<LsEntry> filesArray = Arrays.asList(filteredFiles);
           logger.trace("number of files on this pull :" + filesArray.size());
           BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
-          Long toatalCount = bisJobEntity.getTotalCount();
-          long total = toatalCount + filesArray.size();
-          logger.trace("Files count ::" +  total);
-          sipLogService.updateJobLog(jobId,"OPEN", bisJobEntity
-              .getSuccessCount(), total);
+          
+          if (source.equals(SourceType.REGULAR.toString()) || isHostNotReachable) {
+            Long toatalCount = bisJobEntity.getTotalCount();
+            long total = toatalCount + filesArray.size();
+            logger.trace("Files count ::" +  total);
+            sipLogService.updateJobLog(jobId,"OPEN", bisJobEntity
+                .getSuccessCount(), total);
+          }
+          
           
           List<List<LsEntry>> result = IntStream.range(0, partitionSize)
               .mapToObj(i -> filesArray.subList(iterationOfBatches * i,

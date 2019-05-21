@@ -556,6 +556,7 @@ public class SipLogging {
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
       Long successCnt = bisFileLogsRepository.getSuccessCntForJob(jobId);
+      logger.info("SUCCESS COUNT FROM LOGS TABLE ::" + successCnt);
       BisJobEntity jobEntity = sipJob.get();
       jobEntity.setSuccessCount(successCnt);
       jobEntity.setUpdatedDate(new Date());
