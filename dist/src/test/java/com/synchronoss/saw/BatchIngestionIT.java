@@ -739,10 +739,10 @@ public class BatchIngestionIT extends BaseIT {
     transferNode.put("routeId", routeId);
     this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     // Second call explicit transfer call
-   // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-   //     .statusCode(200);
+    // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    //     .statusCode(200);
     try {
-      Thread.sleep(1* 60 * 1000);
+      Thread.sleep(1 * 60 * 1000);
     } catch (InterruptedException e) {
       log.debug("Interrupted");
     }
