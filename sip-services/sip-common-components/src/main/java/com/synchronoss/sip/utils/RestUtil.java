@@ -11,7 +11,6 @@ import javax.net.ssl.SSLContext;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -48,12 +47,12 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
-  private CloseableHttpClient client;
-
+  
   /**
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
+    HttpClient client = null;
     logger.trace("restTemplate trustStore: " + trustStore);
     logger.trace("restTemplate keyStore: " + keyStore);
     logger.trace("restTemplate keyStorePassword: " + keyStorePassword);
@@ -69,7 +68,7 @@ public class RestUtil {
       } catch (Exception e) {
         logger.error("Exception :" + e);
       }
-      HttpClient client = HttpClients.custom().setSSLContext(sslContext)
+      client = HttpClients.custom().setSSLContext(sslContext)
           .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
       HttpComponentsClientHttpRequestFactory factory =
           new HttpComponentsClientHttpRequestFactory(client);
@@ -89,6 +88,7 @@ public class RestUtil {
     logger.trace("restTemplate with parameter keyStore: " + keyStore);
     logger.trace("restTemplate with parameter keyStorePassword: " + keyPassword);
     logger.trace("restTemplate with parameter trustStorePassword: " + trustPassword);
+    HttpClient client = null;
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -100,7 +100,7 @@ public class RestUtil {
       } catch (Exception e) {
         logger.error("Exception :" + e);
       }
-      HttpClient client = HttpClients.custom().setSSLContext(sslContext)
+      client = HttpClients.custom().setSSLContext(sslContext)
           .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
       HttpComponentsClientHttpRequestFactory factory =
           new HttpComponentsClientHttpRequestFactory(client);
@@ -154,10 +154,7 @@ public class RestUtil {
     logger.trace("getHttpClient keyStore: " + keyStore);
     logger.trace("getHttpClient keyStorePassword: " + keyStorePassword);
     logger.trace("getHttpClient trustStorePassword: " + trustStore);
-
-    if (client != null) {
-      return client;
-    }
+    HttpClient client = null;
     PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     if (sipSslEnable) {
       SSLContext sslcontext =

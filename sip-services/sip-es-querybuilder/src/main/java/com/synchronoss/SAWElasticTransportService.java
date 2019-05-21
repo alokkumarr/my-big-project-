@@ -107,6 +107,7 @@ public class SAWElasticTransportService {
       return esResponse.get("aggregationData").toString();
   }
 
+  
   /**
    *
    * @param query
@@ -200,7 +201,6 @@ public class SAWElasticTransportService {
         logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
         
         HttpPost httpPost = new HttpPost(url + endpoint);
-        httpPost.setConfig(setRequestConfig(timeOut));
         httpPost.setConfig(setRequestConfig(timeOut));
         StringEntity entity = new StringEntity(mapper.writeValueAsString(esProxy));
         httpPost.setEntity(entity);
@@ -302,9 +302,9 @@ public class SAWElasticTransportService {
     
     private static RequestConfig setRequestConfig(int timeOut) {
       RequestConfig config = RequestConfig.custom().
-          setConnectTimeout(timeOut * 1000).
-          setConnectionRequestTimeout(timeOut * 1000).
-          setSocketTimeout(timeOut * 1000).build();  
+          setConnectTimeout(timeOut * 10000).build();
+          //setConnectionRequestTimeout(timeOut * 10000).build();
+          //setSocketTimeout(timeOut * 1000).build();  
       return config;
     }
 }

@@ -30,6 +30,11 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     Integer timeOut = 3;
     SearchSourceBuilder searchSourceBuilder;
     HttpClient client;
+    private String trustStore;
+    private String trustPassWord;
+    private String keyStore;
+    private String keyPassword;
+    private boolean sslEnabled;
 
     public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut, HttpClient client) {
         super();
@@ -46,6 +51,33 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         this.client = client;
     }
 
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut, 
+        String trustStore, String trustPassWord, String keyStore, String keyPassword,
+        boolean sslEnabled) {
+      super();
+      this.jsonString = jsonString;
+      this.timeOut = timeOut;
+      this.keyPassword = keyPassword;
+      this.keyStore = keyStore;
+      this.trustPassWord = trustPassWord;
+      this.trustStore = trustStore;
+      this.sslEnabled = sslEnabled;
+  }
+
+  public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut, 
+      String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+      super();
+      this.dataSecurityString = dataSecurityKey;
+      this.jsonString = jsonString;
+      this.timeOut = timeOut;
+      this.keyPassword = keyPassword;
+      this.keyStore = keyStore;
+      this.trustPassWord = trustPassWord;
+      this.trustStore = trustStore;
+      this.sslEnabled = sslEnabled;
+  }
+    
     public String getDataSecurityString() {
         return dataSecurityString;
     }
@@ -53,7 +85,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     public String getJsonString() {
         return jsonString;
     }
-
+ 
     /**
      *  This method will return the data required to display for data.
      * @return
@@ -64,6 +96,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     public String buildDataQuery(Integer size) throws IOException, ProcessingException {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        HttpEsUtils client = new HttpEsUtils();
         searchSourceBuilder.from(0);
         if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
              changeOldEsReportStructureintoNewStructure(sqlBuilderNode);
@@ -201,7 +234,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse",timeOut, client);
+                    "system","analyse",timeOut, client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);

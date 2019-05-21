@@ -35,6 +35,11 @@ class SAWChartTypeElasticSearchQueryBuilder {
   String dataSecurityString;
   Integer timeOut = 3;
   HttpClient client;
+  private String trustStore;
+  private String trustPassWord;
+  private String keyStore;
+  private String keyPassword;
+  private boolean sslEnabled;
 
   SearchSourceBuilder searchSourceBuilder;
 
@@ -57,6 +62,34 @@ class SAWChartTypeElasticSearchQueryBuilder {
 	    this.client = client;
   }
 
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut,
+      String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+    super();
+    this.jsonString = jsonString;
+    this.timeOut = timeOut;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+  
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,
+      Integer timeOut, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+        super();
+        this.dataSecurityString = dataSecurityKey;
+        this.jsonString = jsonString;
+        this.timeOut=timeOut;
+        this.keyPassword = keyPassword;
+        this.keyStore = keyStore;
+        this.trustPassWord = trustPassWord;
+        this.trustStore = trustStore;
+        this.sslEnabled = sslEnabled;
+  }
+  
+  
   public String getDataSecurityString() {
 	return dataSecurityString;
   }
@@ -64,6 +97,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
   public String getJsonString() {
     return jsonString;
   }
+  
 
   /**
    * This method is used to generate the query to build elastic search query for<br/>
@@ -75,11 +109,13 @@ class SAWChartTypeElasticSearchQueryBuilder {
    * @throws ProcessingException
    */
   public String buildQuery() throws JsonProcessingException, IOException, ProcessingException {
-
+    
     String query = null;
     com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode =
         BuilderUtil.getNodeTreeChart(getJsonString(), "sqlBuilder");
     int size = 0;
+    HttpEsUtils client = new HttpEsUtils();
+    
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
 
@@ -214,7 +250,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields,preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse", timeOut, client);
+                    "system","analyse", timeOut, client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);

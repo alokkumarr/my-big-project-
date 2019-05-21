@@ -19,6 +19,12 @@ public class SAWElasticSearchQueryBuilder {
    */
   Integer size =10000;
   HttpClient client;
+  String trustStore;
+  String trustPassWord;
+  String keyStore;
+  String keyPassword;
+  boolean sslEnabled;
+
   public SAWElasticSearchQueryBuilder(Integer size, HttpClient client)
   {
     this.size=size;
@@ -33,7 +39,30 @@ public class SAWElasticSearchQueryBuilder {
     this.client = client;
   }
 
-  
+  public SAWElasticSearchQueryBuilder(Integer size, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.size=size;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
+  /**
+   *
+   */
+  public SAWElasticSearchQueryBuilder(String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
