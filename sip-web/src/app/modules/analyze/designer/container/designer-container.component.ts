@@ -1053,7 +1053,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.artifacts = [...this.artifacts];
         if (this.analysis.type === 'chart' || this.analysis.type === 'pivot') {
-          this.refreshDataObject();
+          this.requestDataIfPossible();
         }
         break;
       case 'sort':
