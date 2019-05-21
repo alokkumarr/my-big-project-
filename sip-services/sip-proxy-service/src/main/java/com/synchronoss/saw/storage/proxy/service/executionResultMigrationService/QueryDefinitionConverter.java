@@ -17,8 +17,6 @@ import com.synchronoss.saw.model.Right;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.geomap.GeoRegion;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -146,7 +144,7 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     if (fieldObject.has(FieldNames.CHECKED)) {
       String checkedVal = fieldObject.get(FieldNames.CHECKED).getAsString();
 
-      field.setArea(checkedVal + FieldNames.AXIS);
+      field.setArea(checkedVal);
     }
 
     if (fieldObject.has(FieldNames.REGION)) {

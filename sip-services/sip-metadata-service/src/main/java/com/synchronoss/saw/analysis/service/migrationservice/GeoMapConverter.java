@@ -83,7 +83,7 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
     if (fieldObject.has(FieldNames.CHECKED)) {
       String checkedVal = fieldObject.get(FieldNames.CHECKED).getAsString();
 
-      field.setArea(checkedVal + FieldNames.AXIS);
+      field.setArea(checkedVal);
     }
 
     if (fieldObject.has(FieldNames.REGION)) {
