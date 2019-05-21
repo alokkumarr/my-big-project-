@@ -9,7 +9,7 @@ database "Message Queue" {
 
 interface HTTP
 
-HTTP .> [SAW Workbench Service]
-[SAW Workbench Service] --> [Executor Queue]
-[SAW Workbench Executor] --> [Executor Queue]
-[SAW Workbench Executor] --> [Spark cluster]
+HTTP .> [SIP Workbench Service]
+[SIP Workbench Service] --> [Executor Queue]
+[SIP Workbench Executor] --> [Executor Queue]
+[SIP Workbench Executor] --> [Spark cluster]

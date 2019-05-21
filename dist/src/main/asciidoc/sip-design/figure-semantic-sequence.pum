@@ -1,15 +1,15 @@
 == Authentication ==
 
-Client -> "SAW Security Service": Authentication request
-"SAW Security Service" --> Client: Authentication response
+Client -> "SIP Security Service": Authentication request
+"SIP Security Service" --> Client: Authentication response
 
 == Execution ==
 
-Client -> "SAW Gateway Service": Execution request
-"SAW Gateway Service" -> "SAW Semantic Service": Execution request
+Client -> "SIP Gateway Service": Execution request
+"SIP Gateway Service" -> "SIP Semantic Service": Execution request
 
-"SAW Semantic Service" -> "JSON Schema Validation": Verify JSON Schema
+"SIP Semantic Service" -> "JSON Schema Validation": Verify JSON Schema
 "JSON Schema Validation" -> "MetaData Store": Execute MetaData API Query
-"MetaData Store" --> "SAW Semantic Service" : Semantic Data Response
-"SAW Semantic Service" --> "SAW Gateway Service" : Execution response
-"SAW Gateway Service" --> Client: Execution response
+"MetaData Store" --> "SIP Semantic Service" : Semantic Data Response
+"SIP Semantic Service" --> "SIP Gateway Service" : Execution response
+"SIP Gateway Service" --> Client: Execution response

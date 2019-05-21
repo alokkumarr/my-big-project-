@@ -24,7 +24,7 @@ application for different roles:
 | Consuming the SIP REST API to develop third-party integrations
 | Developer, integrator
 
-| SAW User Guidefootnote:[See help link embedded in the Synchronoss
+| SIP User Guidefootnote:[See help link embedded in the Synchronoss
   Analytics Workbench web application]
 | Using the web application to design and execute analyses
 | User, analyst
