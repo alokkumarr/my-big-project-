@@ -8,7 +8,7 @@ public interface AlertCountResponse {
 
   String getDate();
 
-  String getCount();
+  Long getCount();
 
   String getAlertSeverity();
 }
