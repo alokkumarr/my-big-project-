@@ -68,7 +68,7 @@ const testBaseDir = appRoot + '/e2e/src/';
  * Output path for the junit reports. Folder should be created in advance
  */
 const protractorPath = 'target/protractor-reports';
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
 /**
  * Amount of attempts to retry doing action on element
  */
@@ -293,6 +293,7 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function() {
+    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
     //clean up any residual/leftover from a previous run. Ensure we have clean
     //files for both locking and merging.
     if (fs.existsSync('jasmine-results.json.lock')) {
@@ -345,6 +346,7 @@ exports.config = {
     }
   },
   afterLaunch: function() {
+    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     if (!run.localRun) {
       if (fs.existsSync('target/e2e/e2eId.json')) {
         // delete and create new always
