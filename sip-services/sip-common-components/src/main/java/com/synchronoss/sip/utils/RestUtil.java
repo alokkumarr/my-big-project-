@@ -54,14 +54,14 @@ public class RestUtil {
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
-    logger.info("ssl enable?" + sipSslEnable);
-    logger.info("restTemplate trustStore: " + trustStore);
-    logger.info("restTemplate keyStore: " + keyStore);
-    logger.info("restTemplate keyStorePassword: " + keyStorePassword);
-    logger.info("restTemplate trustStorePassword: " + trustStore);
+    logger.trace("ssl enable?" + sipSslEnable);
+    logger.trace("restTemplate trustStore: " + trustStore);
+    logger.trace("restTemplate keyStore: " + keyStore);
+    logger.trace("restTemplate keyStorePassword: " + keyStorePassword);
+    logger.trace("restTemplate trustStorePassword: " + trustStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
-      logger.info("RestUtil if block");
+      logger.trace("RestUtil if block");
       SSLContext sslContext = null;
       try {
         sslContext = SSLContextBuilder.create()

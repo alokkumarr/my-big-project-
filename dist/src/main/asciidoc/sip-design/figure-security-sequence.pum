@@ -1,4 +1,4 @@
-"Client" -> "SAW Security Service": Authentication request
-"SAW Security Service" -> "SAW Security database": Lookup client
-"SAW Security database" --> "SAW Security Service": Credentials and privileges
-"SAW Security Service" --> Client: Authentication response
+"Client" -> "SIP Security Service": Authentication request
+"SIP Security Service" -> "SIP Security database": Lookup client
+"SIP Security database" --> "SIP Security Service": Credentials and privileges
+"SIP Security Service" --> Client: Authentication response
