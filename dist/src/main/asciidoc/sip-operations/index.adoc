@@ -48,32 +48,33 @@ provided in the environment:
   (from other than SIP nodes themselves) on all ports, except for port
   80 on the SIP proxy hosts
 
-. Install and configure MapR client on the SAW target host.
+. Install and configure MapR client on the SIP target host.
 
-. Configure SAW server to use UTC timezone in all places where date and timezones are involved.
+. Configure SIP server to use UTC timezone in all places where date
+and timezones are involved.
 
 . On all saw nodes, volumes i.e. MapRFS using NFS gateway service
   has to be mounted. This is required by ingestion service.
 
 Please note that the target hosts must be allocated exclusively for
-SAW use.  The underlying infrastructure up to the operating system
-level are expected to be managed externally, while SAW fully manages
+SIP use.  The underlying infrastructure up to the operating system
+level are expected to be managed externally, while SIP fully manages
 packages and configuration on the target hosts.
 
-Currently SAW only supports deploying to a single target host.
+Currently SIP only supports deploying to a single target host.
 
-=== SAW
+=== SIP
 
 ==== Configuring
 
-Each SAW environment requires its own SAW environment configuration
-file.  A sample configuration is provided inside the SAW release
-package in the `sip-config` file, which defaults to installing SAW on
+Each SIP environment requires its own SIP environment configuration
+file.  A sample configuration is provided inside the SIP release
+package in the `sip-config` file, which defaults to installing SIP on
 `localhost`.  At a minimum, copy this sample file and change the
-`localhost` entries to the SAW target host.
+`localhost` entries to the SIP target host.
 
 The sample configuration defaults to installing all available modules:
-SAW Web, SAW Services and SAW Security.  To install only a subset of
+SIP Web, SIP Services and SIP Security.  To install only a subset of
 these modules, edit the environment configuration to only mention the
 desired modules.
 
@@ -84,11 +85,11 @@ location.
 
 ==== Installing
 
-Execute the following steps to install SAW:
+Execute the following steps to install SIP:
 
-. Get the SAW release package (named `sip-*.tgz`)
+. Get the SIP release package (named `sip-*.tgz`)
 
-. Prepare a SAW environment configuration file, as described in the
+. Prepare a SIP environment configuration file, as described in the
   previous section
 
 . Extract the package and execute the deploy command, giving it the
@@ -98,7 +99,7 @@ Execute the following steps to install SAW:
         cd saw
         ./sip-deploy <config>
 
-TIP: Configure passwordless SSH access to the SAW target host for a
+TIP: Configure passwordless SSH access to the SIP target host for a
 smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
@@ -129,10 +130,10 @@ To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
 
-NOTE: Downgrading to an older SAW version is not supported.  If
+NOTE: Downgrading to an older SIP version is not supported.  If
 needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
-older SAW versions.
+older SIP versions.
 
 ==== Upgrading to SIP 3.1
 
@@ -148,18 +149,18 @@ file before deploying a newer SIP version.  The roles can however be
 left empty (no hosts listed under them), if RTIS and RTPS are not to
 be installed.
 
-==== Upgrading to SAW 2.5
+==== Upgrading to SIP 2.5
 
 Before upgrading, install and configure Apache Livy from the MapR
 Ecosystem Pack as described in the updated <<Prerequisites>>.  Also
-add the `saw_workbench_livy_uri` parameter to the SAW environment
+add the `saw_workbench_livy_uri` parameter to the SIP environment
 configuration (`sip-config`).
 
-==== Upgrading to SAW 2.6
+==== Upgrading to SIP 2.6
 
-Before upgrading, If SAW require to run saw-executor in YARN mode
-configure as described in the updated <<Running SAW on YARN>>. Update
-to the below SAW environment configuration (`sip-config`).
+Before upgrading, If SIP require to run saw-executor in YARN mode
+configure as described in the updated <<Running SIP on YARN>>. Update
+to the below SIP environment configuration (`sip-config`).
 
     saw_spark_master_url=yarn
     saw_spark_yarn_queue_regular=saw-regular
@@ -177,30 +178,32 @@ this parameter can be set lower value.
 
      saw_export_chunk_size=10000
 
+==== Running SIP on YARN
 
-==== Running SAW on YARN
+Support for running SIP-executors on YARN (Hadoop NextGen) was added
+to SIP in version v2.6.0.  To configure and run the saw-executor in
+yarn mode default configuration properties are provided in
+`sip-config` copy those properties change as per enviroment.
 
-Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
-in version v2.6.0.
-To configure and run the saw-executor in yarn mode default configuration properties
-are provided in `sip-config` copy those properties change as per enviroment.
-
-To configuring additional properties for spark and yarn,set configuration as java
-option since SparkConf loads defaults from system properties(start with spark.*)
-and the classpath.'
+To configuring additional properties for spark and yarn,set
+configuration as java option since SparkConf loads defaults from
+system properties(start with spark.*) and the classpath.'
 
   Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
 
 ===== SIP executors reserved ports
-SIP executors uses random ports for flexibility to increase the number of
-sip executors in future if required, but in case any SIP enviroment has limited port
-accessibility and other ports are blocked for security reasons. SIP executors required
-to be allocated with reserved series of port to SIP Executors to work properly.
-sip_executors_reserved_port properties can be set in `sip-config` file for starting port
-number and SIP will auto calculate the number of required port based on number of SIP-Nodes,
-like Number of open series ports required as (Number of SIP-node * 4 port).
-For example: if we have assigned 9801 is starting port and number of sip-node is 2 then (2* 4)
-, so 9801 to 9808 port will be used by spark executors.
+
+SIP executors uses random ports for flexibility to increase the number
+of sip executors in future if required, but in case any SIP enviroment
+has limited port accessibility and other ports are blocked for
+security reasons. SIP executors required to be allocated with reserved
+series of port to SIP Executors to work properly.
+sip_executors_reserved_port properties can be set in `sip-config` file
+for starting port number and SIP will auto calculate the number of
+required port based on number of SIP-Nodes, like Number of open series
+ports required as (Number of SIP-node * 4 port).  For example: if we
+have assigned 9801 is starting port and number of sip-node is 2 then
+(2* 4) , so 9801 to 9808 port will be used by spark executors.
 
 ==== Upgrading to SIP 3.0
 
@@ -215,11 +218,11 @@ volume snapshot which does not require any additional setup steps.
 
 ==== Interfaces
 
-The SAW Web module and supporting services are exposed on port 80 of
-the SAW target host, i.e. `http://<saw-target-host>/`.  The SAW Web
-application will automatically discover the endpoints for SAW Security
-and SAW Services based on the URL it is being served from.  Nothing
-else in the SAW deployment, except for port 80 on the SAW target host,
+The SIP Web module and supporting services are exposed on port 80 of
+the SIP target host, i.e. `http://<sip-target-host>/`.  The SIP Web
+application will automatically discover the endpoints for SIP Security
+and SIP Services based on the URL it is being served from.  Nothing
+else in the SIP deployment, except for port 80 on the SIP target host,
 is accessed by external parties.
 
 Large header settings: Include the below properties in NGINX server
@@ -238,13 +241,15 @@ config file to support larger files upload (more than 1MB)
 === XDF-NG
 
 ==== Prerequisites
+
 XDF-NG requires `jq` to be installed in the host cluster
 (all nodes of the cluster, because jobs can be submitted on any node).
 jq can be installed using the below command:
 
     yum install jq
 
-Once the installtion is complete, use the below command to validate the installation:
+Once the installtion is complete, use the below command to validate
+the installation:
 
     $ jq --version
     jq-1.5
@@ -255,14 +260,15 @@ Execute the following steps to install XDF-NG:
 
 . Get the XDF release package (named `bda-xdf-nextgen-*.rpm`)
 
-. Create and prepare a xdf-ng vars configuration file in /etc/bda/xdf-nextgen.vars
-  location, as described below
+. Create and prepare a xdf-ng vars configuration file in
+  /etc/bda/xdf-nextgen.vars location, as described below
 
       dl.root:   hdfs:///data/bda
       http.port: 15020
       seeds:     2784
 
-.  execute the RPM package installation command as below to install the XDF-NG package
+. Execute the RPM package installation command as below to install the
+  XDF-NG package
 
         rpm -ivh bda-xdf-nextgen-*.rpm
 
@@ -568,14 +574,14 @@ configuration.
 SIP can be deployed with multiple hosts in the `saw-proxy` role, which
 will ensures redundancy for every host in the SIP environment.
 However, this requires clients of the SIP Services to be aware of each
-host in the `saw-proxy` role.  Additionally, the SAW Web module
+host in the `saw-proxy` role.  Additionally, the SIP Web module
 currently is only able to use a single endpoint, making it susceptible
 to being unavailable of that single endpoint becomes unavailable.
 
 Due to the above, SIP is currently recommended to be deployed with a
 load balancer in front of the hosts in the `saw-proxy` role, that
 exposes all of the hosts as a single endpoint reachable with a single
-IP address.  This will allow clients and the SAW Web module to
+IP address.  This will allow clients and the SIP Web module to
 continue working even if one of the hosts in the `saw-proxy` role
 become unavailable.
 
@@ -646,7 +652,7 @@ to start the cluster manually.
 
 === Accessing application logs
 
-The SAW systemd services system logs can be accessed using the `sudo
+The SIP systemd services system logs can be accessed using the `sudo
 journalctl` command.  To view the logs of individual services, use the
 `-u` option:
 
@@ -654,7 +660,7 @@ journalctl` command.  To view the logs of individual services, use the
 
 === Listing services and their statuses
 
-To list services and check the status of all SAW systemd units,
+To list services and check the status of all SIP systemd units,
 execute the following commands:
 
         $ sudo systemctl list-units sip-\*
@@ -669,14 +675,14 @@ socket-activated services and does not indicate a problem.
 === Starting, stopping and restarting services
 
 Under normal circumstances there should be no need to start, stop or
-restart SAW services manually.  However, if needed it can be done
+restart SIP services manually.  However, if needed it can be done
 using the following commands:
 
         $ sudo systemctl start <sip-service>
         $ sudo systemctl stop <sip-service>
         $ sudo systemctl restart <sip-service>
 
-Where `<sip-service>` is one of the SAW systemd services (for example
+Where `<sip-service>` is one of the SIP systemd services (for example
 `sip-gateway`), which can be listed using the `sudo systemctl
 list-units sip-\*` command shown in the previous section.
 
@@ -765,7 +771,7 @@ the MariaDB Galera Cluster documentation.
 
 === Clearing the Transport Service Executor queues
 
-If the SAW report execution queue has filled up, for example due to
+If the SIP report execution queue has filled up, for example due to
 many long-running queries being executed, the queues can be cleared
 using the following commands:
 
@@ -816,24 +822,25 @@ configuration.
 
 == Batch Ingestion : High Availability
 
-The below parameters in Batch Ingestion Service gives the control the configurations
-related to resiliency & avoid inconsistency across bis instances. To control what
-should be the time difference to declare a data in the system is corrupted, & needs
-to be downloaded again (default is 5 mins). While configuring this parameter we need
-account for all customers using the BIS & routes is being configured.
+The below parameters in Batch Ingestion Service gives the control the
+configurations related to resiliency & avoid inconsistency across bis
+instances. To control what should be the time difference to declare a
+data in the system is corrupted, & needs to be downloaded again
+(default is 5 mins). While configuring this parameter we need account
+for all customers using the BIS & routes is being configured.
 
-Specifically a use case which needs to be taken into account as follows:
-Let's say, we have a daily schedule at `5:00` PM for all `*.txt` files and as clean
-up job customers have a scheduled job on the customer data location to archive those
-files daily at `10:00 PM`. then if there is a failure or network glitches or may be
-due to some other reasons data source is not available until `10:00 PM` and we just
-marked status as failed there might be chances of data loss as `*.txt` file which
-has been archived before next schedule. The reason to mention this scenario so that we can
-configure the `sip_bis_retry_diffs_in_minutes` accordingly.
+Specifically a use case which needs to be taken into account as
+follows: Let's say, we have a daily schedule at `5:00` PM for all
+`*.txt` files and as clean up job customers have a scheduled job on
+the customer data location to archive those files daily at `10:00
+PM`. then if there is a failure or network glitches or may be due to
+some other reasons data source is not available until `10:00 PM` and
+we just marked status as failed there might be chances of data loss as
+`*.txt` file which has been archived before next schedule. The reason
+to mention this scenario so that we can configure the
+`sip_bis_retry_diffs_in_minutes` accordingly.
 
     sip_bis_retry_diffs_in_minutes=5
-
-
 
 The below parameter will switch on or off to activate secure or non-secure
 communication in sip platform
@@ -845,7 +852,7 @@ Note: This is mandatory field it has to be either 'False' or 'True'. Please obse
 
 == Loading semantic metadata
 
-To enable creating analyses in SAW, load semantic metadata as follows:
+To enable creating analyses in SIP, load semantic metadata as follows:
 
         $ ssh <sip-services-host>
         $ sudo -u mapr /opt/saw/service/bin/mdcli.sh -i \
@@ -869,7 +876,8 @@ NOTE: Paths to files in the data lake must not contain spaces.
 
 == Onboarding customer
 
-We can utilise customer_onboard.sh script in order to execute the command with current environment setup.
+We can utilise customer_onboard.sh script in order to execute the
+command with current environment setup.
 
     cd /opt/bda/saw-security/bin/
     bash customer_onboard.sh
@@ -933,12 +941,15 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     		User Last Name
     		[Mandatory]
 
-Run the "onboard-customer" command with all required parameters stated above and it will start the process of creating customer and related products/components in the system.
+Run the "onboard-customer" command with all required parameters stated
+above and it will start the process of creating customer and related
+products/components in the system.
 
-The below is one such example to call onboard-customer with its required parameters.
+The below is one such example to call onboard-customer with its
+required parameters.
 
 
-    shell:>onboard-customer --C SNCR0001 --P SAWDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
+    shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
     1
     2019-02-19 08:04:41.326  INFO 17665 --- [           main] c.s.saw.security.app.admin.OnBoardShell  : Connection successful !!
     2019-02-19 08:04:41.357  INFO 17665 --- [           main] s.a.r.i.OnBoardCustomerRepositoryDaoImpl : res
@@ -947,30 +958,35 @@ The below is one such example to call onboard-customer with its required paramet
 
 Note : A parameter containing a space in between can be enclosed in either single quotes('') or double quotes("").
 
-        Ex : onboard-customer --C SNCR0001 --P SAWDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
+        Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
 
-==  SAW SSO Authentication
+==  SIP SSO Authentication
 
-SAW supports external systems to authenticate users (single sign-on).The shared secret key is read from the SAW environment configuration, as a base64 encoded string (while ensuring Synchronoss Global Information Security standards for storing secret keys are adhered to).
-Recommended key size is 256 bits.
+SIP supports external systems to authenticate users (single
+sign-on).The shared secret key is read from the SIP environment
+configuration, as a base64 encoded string (while ensuring Synchronoss
+Global Information Security standards for storing secret keys are
+adhered to).  Recommended key size is 256 bits.
 
    Command to generate key : openssl rand 32 -base64
    Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=
 
-After generating the key, add it to the SAW environment configuration ({{sip-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
+After generating the key, add it to the SIP environment configuration
+({{sip-config}}) in the {{saw_security_sso_secret}} parameter and
+redeploy.
 
 == Export Configuration
 
 === email and ftp extract size configuration
 
-SAW supports *exporting* reports and pivots:
+SIP supports *exporting* reports and pivots:
 
 . from UI
 . to email
 . to ftp/sftp servers
 
-In sip-config, we can configure how many number of rows we want to extract for all the
-reports / pivots:
+In sip-config, we can configure how many number of rows we want to
+extract for all the reports / pivots:
 
 .sip-config
 [source, yaml]
@@ -980,8 +996,9 @@ saw_email_export_size=50000
 saw_ftp_export_size=1000000
 ----
 
-Saw reports are exported chunks of rows, we can configure how many rows to take
-at a time for processign reports, can be configured using following config parameter:
+SIP reports are exported chunks of rows, we can configure how many
+rows to take at a time for processign reports, can be configured using
+following config parameter:
 
 
 .sip-config
@@ -993,7 +1010,7 @@ saw_export_chunk_size=10000
 
 === FTP server configuration
 
-SAW supports exporting of pivots and reports to ftp/sftp servers.
+SIP supports exporting of pivots and reports to ftp/sftp servers.
 By default an empty configuration is installed in
 `/opt/bda/saw-export-service/conf/ftp-details.json` file on saw nodes.
 
@@ -1003,13 +1020,7 @@ An example configuration has been included in config file.
 .sip-config
 ----
 # FTP JSON config
-# ##########################################
-#
-#
-# DO NOT SPLIT THIS INTO MULTIPLE LINES
-#
-#
-# ##########################################
+# (Do not split this into multiple lines)
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
 ----
 
