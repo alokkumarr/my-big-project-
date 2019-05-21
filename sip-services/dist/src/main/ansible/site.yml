@@ -1,0 +1,19 @@
+- name: SAW Services
+  hosts: saw-services
+  become: true
+  roles:
+    # This role to be executed when sip environment
+    # tend to have secured communication across.
+    - { role: sip-secure, when: sip_secure }
+    - sip-transport
+    - sip-workbench
+    - sip-export
+    - sip-metadata
+    - sip-scheduler
+    - sip-storage-proxy
+    - sip-batch-ingestion
+    # Keep Gateway Service last to avoid starting socket-activated
+    # services from the health check until all Ansible handlers have
+    # been run (which might otherwise cause unnecessary restarts of
+    # services and slow down deployment)
+    - sip-gateway

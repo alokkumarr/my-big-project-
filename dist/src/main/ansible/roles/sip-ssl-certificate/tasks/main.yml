@@ -1,33 +1,4 @@
 # Creating store & certificate to every node for all service to be used by server & client
-- name: Ensure a list of packages installed
-  yum:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-    - python
-    - python-setuptools
-
-- name: Installing pip on all saw-services hosts
-  easy_install:
-    name: pip
-    state: present
-
-- name: Installing libraries on all saw-services hosts using Ansible pip module
-  pip:
-    name: "{{ packages }}"
-    extra_args: --ignore-installed -U
-  vars:
-    packages:
-    - ipaddress
-    - enum34
-    - pyOpenSSL==19.0.0
-
-- name: Removing existing pyOpenSSL if exists
-  yum:
-    name: pyOpenSSL
-    autoremove: true
-
 - name: Ensure directory exists for local self-signed TLS certs.
   file:
     path: "{{ inventory_dir }}/certificate"
@@ -44,14 +15,15 @@
 
 - name: Generate an OpenSSL CSR.
   openssl_csr:
-    path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    path: "{{ inventory_dir }}/certificate/sip-authority.csr"
     privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
     organization_name: "SNCR"
     organizational_unit_name : "DXP"
+    common_name: "localhost"
 
 - name: Generate a Self Signed OpenSSL certificate
   openssl_certificate:
     path: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
     privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
-    csr_path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    csr_path: "{{ inventory_dir }}/certificate/sip-authority.csr"
     provider: selfsigned

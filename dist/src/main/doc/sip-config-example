@@ -18,7 +18,12 @@ sip_openweathermap_api_token = 1d60893d260345b7c4a62ec0842ed731
 # Elasticsearch port number for Prometheus monitoring, if the below value is not set the default port will be taken as 8200
 #sip_elastic_port=8200
 #Depending on the below parameter, the connectors can be changed from http or https
-#sip_secure=true/false
+#sip_secure=True/False. This is mandatory field it has to be either 'False' or 'True'. Please observe the case of `T & F`
+# of `True` & `False` Note: true or false will result into an error
+
+# Enable encryption of data in flight and data at rest in SIP
+# environment
+#sip_secure=True
 
 [sip-admin]
 #sip-host

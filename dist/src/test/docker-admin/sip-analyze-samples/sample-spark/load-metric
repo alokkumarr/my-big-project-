@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Load sample Spark metric (for report)
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Load common metrics functions
+. $dir/../lib/common.sh $SECURE
+
+datalake=$datalake_home/sample-spark
+
+init_datalake() {
+    $sudo_mapr hadoop fs -mkdir -p $datalake
+}
+
+load_data() {
+    echo "Loading sample Spark data"
+    $sudo_mapr $hadoop_put $dir/data-sales.ndjson $datalake
+    $sudo_mapr $hadoop_put $dir/data-product.ndjson $datalake
+}
+
+wait_maprfs
+init_datalake
+load_data
+wait_semantic_service
+insert_json_store_sample $sample_location/sample-spark/sample-data-spark.json
