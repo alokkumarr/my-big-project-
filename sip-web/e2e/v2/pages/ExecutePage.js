@@ -105,6 +105,7 @@ class ExecutePage extends ConfirmationModel {
   verifyAppliedFilter(filters) {
     filters.forEach(filter => {
       const value = `${filter.field}: ${filter.displayedValue}`;
+      commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
     });
   }

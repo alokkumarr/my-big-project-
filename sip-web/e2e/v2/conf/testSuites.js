@@ -9,11 +9,7 @@ const SMOKE = [
 
 const SANITY = [
   ...SMOKE,
-  TEST_BASE_DIR + 'createReport.test.js',
-  TEST_BASE_DIR + 'charts/createAndDeleteCharts.test.js',
   TEST_BASE_DIR + 'ForgotPassword/preResetPwd.test.js',
-  TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js',
-  TEST_BASE_DIR + 'analyze/analyze.test.js'
 ];
 // ALL the test with minimal data set so that all the functionality is touched
 const CRITICAL = [
@@ -27,7 +23,6 @@ const CRITICAL = [
   TEST_BASE_DIR + 'charts/forkEditAndDelete.test.js',
   TEST_BASE_DIR + 'promptFilter/chartPromptFilters.test.js',
   TEST_BASE_DIR + 'promptFilter/esReportPromptFilters.test.js',
-  TEST_BASE_DIR + 'promptFilter/pivotPromptFilters.test.js',
   TEST_BASE_DIR + 'promptFilter/reportPromptFilters.test.js',
   TEST_BASE_DIR + 'pivots/pivotFilters.test.js',
   TEST_BASE_DIR + 'observe/createAndDeleteDashboardWithCharts.test.js',
@@ -42,13 +37,13 @@ const CRITICAL = [
   TEST_BASE_DIR + 'prompt-filter/chartPromptFilters.test.js',
   TEST_BASE_DIR + 'prompt-filter/esReportPromptFilters.test.js',
   TEST_BASE_DIR + 'prompt-filter/reportPromptFilters.test.js',
-  TEST_BASE_DIR + 'prompt-filter/pivotPromptFilters.test.js',
+  TEST_BASE_DIR + 'prompt-filter/pivotPrompt.test.js'
   TEST_BASE_DIR + 'bis/createAndDeleteChannel.test.js',
   TEST_BASE_DIR + 'bis/updateAndDeleteChannel.test.js',
   TEST_BASE_DIR + 'bis/activateDeActivateChannel.test.js',
   TEST_BASE_DIR + 'bis/createAndDeleteRoute.test.js',
   TEST_BASE_DIR + 'bis/activateAndDeActivateRoute.test.js',
-  TEST_BASE_DIR + 'bis/scheduleRoute.test.js',
+  TEST_BASE_DIR + 'bis/scheduleRoute.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [

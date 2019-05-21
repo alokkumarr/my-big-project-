@@ -20,7 +20,7 @@ const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 
-describe('Executing pivotPromptFilters tests from pivotPromptFilters.test.js', () => {
+describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
   const savedCategory = 'My Analysis';
@@ -31,7 +31,7 @@ describe('Executing pivotPromptFilters tests from pivotPromptFilters.test.js', (
   let token;
   let editedAnalysisId;
   beforeAll(() => {
-    logger.info('Starting pivotPromptFilters tests...');
+    logger.info('Starting pivotPrompt.test.js tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
