@@ -1005,6 +1005,29 @@ export class ChartService {
         : 0;
     };
 
+    const handleNaNIssue = (point, options) => {
+      /**
+       * In some cases point.value or point.y is received as 0. Which was causing the round()
+       * to return NaN . So making sure that if value received is 0 then
+       * it should return as it is.
+       *
+       */
+      point
+        ? point.value === 0 || point.y === 0
+          ? point.value
+            ? point.value
+            : point.y
+          : round(
+              options.aggregate === 'percentagebyrow'
+                ? round(point.percentage, 2)
+                : point.y
+                ? point.y
+                : point.value,
+              getPrecision(options.aggregate, options.dataType)
+            ).toLocaleString()
+        : '{point.y:,.2f}';
+    };
+
     /**
      * If point is provided as paramter, this function returns the formatted tooltip.
      * If point is not provided, it replaces the point values with appropriate format strings.
@@ -1045,22 +1068,7 @@ export class ChartService {
         <th>${fields.y.alias ||
           get(opts, 'labels.y', '') ||
           (point ? point.series.name : '{series.name}')}:</th>
-        <td>${
-          point
-            ? point.value === 0 || point.y === 0
-              ? point.value
-                ? point.value
-                : point.y
-              : round(
-                  options.aggregate === 'percentagebyrow'
-                    ? round(point.percentage, 2)
-                    : point.y
-                    ? point.y
-                    : point.value,
-                  getPrecision(options.aggregate, options.dataType)
-                ).toLocaleString()
-            : '{point.y:,.2f}'
-        }${
+        <td>${handleNaNIssue(point, options)}${
         point
           ? point.series.userOptions.aggrSymbol
           : '{point.series.userOptions.aggrSymbol}'
