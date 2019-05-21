@@ -1009,14 +1009,17 @@ export class ChartService {
       /**
        * In some cases point.value or point.y is received as 0. Which was causing the round()
        * to return NaN . So making sure that if value received is 0 then
-       * it should return as it is.
+       * it should return as it is. Also checking if option datatype
+       * is float or double return the value with correct decimal precision.
        *
        */
       return point
         ? point.value === 0 || point.y === 0
           ? point.value
-            ? point.value
-            : point.y
+            ? point.value.toFixed(
+                getPrecision(options.aggregate, options.dataType)
+              )
+            : point.y.toFixed(getPrecision(options.aggregate, options.dataType))
           : round(
               options.aggregate === 'percentagebyrow'
                 ? round(point.percentage, 2)
