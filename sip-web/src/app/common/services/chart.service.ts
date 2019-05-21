@@ -1012,7 +1012,7 @@ export class ChartService {
        * it should return as it is.
        *
        */
-      point
+      return point
         ? point.value === 0 || point.y === 0
           ? point.value
             ? point.value
