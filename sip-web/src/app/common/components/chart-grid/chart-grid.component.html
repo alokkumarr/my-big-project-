@@ -84,7 +84,7 @@
 <map-box
   *ngIf="!toggleToGrid && analysis.chartType == 'map'"
   [data]="data"
-  [sqlBuilder]="analysis.sipQuery"
+  [sipQuery]="analysis.sipQuery"
   [mapSettings]="analysis.mapOptions"
   [attr.e2e]="'map-type-' + analysis.chartType"
 ></map-box>
