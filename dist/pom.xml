@@ -36,6 +36,7 @@
     <saw.yarn.enabled>false</saw.yarn.enabled>
     <!-- SAW e2e test suite configutration supported values are smoke/sanity/regression/development-->
     <saw.e2e.suite>smoke</saw.e2e.suite>
+    <sip.cloud.secure>True</sip.cloud.secure>
     <!-- Test upgrading from old SIP version to new version by
          disabling the upgrade skip.  The build works the same, except
          the old SIP version is installed before installing the new
@@ -654,7 +655,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite}</arguments>
+              <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite} --isHttps=${sip.cloud.secure}</arguments>
             </configuration>
           </execution>
            <execution>
