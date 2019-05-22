@@ -80,9 +80,9 @@
   "
 >
 </chart>
-
+{{ analysis.mapOptions.mapType }}
 <map-box
-  *ngIf="!toggleToGrid && analysis.chartType == 'map'"
+  *ngIf="!toggleToGrid && analysis.mapOptions.mapType == 'map'"
   [data]="data"
   [sipQuery]="analysis.sipQuery"
   [mapSettings]="analysis.mapOptions"
@@ -90,8 +90,8 @@
 ></map-box>
 
 <map-chart-viewer
-  *ngIf="!toggleToGrid && analysis.chartType == 'chart_scale'"
-  [chartType]="analysis.chartType"
+  *ngIf="!toggleToGrid && analysis.mapOptions.mapType == 'chart_scale'"
+  [chartType]="analysis.mapOptions.chartType"
   [data]="data"
   [analysis]="analysis"
   [updater]="updater"
