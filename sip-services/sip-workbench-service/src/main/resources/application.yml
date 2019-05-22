@@ -10,7 +10,7 @@ spring:
       file-size-threshold: 2KB
 logging:
   level:
-    com.synchronoss.saw.workbench: INFO
+    com.synchronoss.saw.workbench: DEBUG
     sncr.bda: INFO
 server:
   address: localhost
