@@ -59,7 +59,6 @@ public abstract class ResultMigration {
       String levelField,
       String columnField) {
 
-    LOGGER.trace("jsonNodeParser starts here :" + jsonNode);
     JsonNode childNode = jsonNode;
     if (childNode.get(KEY) != null) {
       String columnName = getColumnNames(level, columnField);
@@ -140,8 +139,6 @@ public abstract class ResultMigration {
         }
       }
       flatStructure.add(records);
-      LOGGER.trace("jsonNodeParser ends here :" + jsonNode);
-      LOGGER.trace("Flat Structure Build :" + flatStructure);
     }
     return flatStructure;
   }
