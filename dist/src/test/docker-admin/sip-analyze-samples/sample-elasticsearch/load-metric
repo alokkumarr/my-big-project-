@@ -21,10 +21,19 @@ load_data() {
     echo "Creating alias for the index"
     curl_json POST "$alias_url" $dir/aliases.json
     data=$dir/es-data.ndjson
-        curl_json POST "$index_url/sample/_bulk" $data > /dev/null
+    curl_json POST "$index_url/sample/_bulk" $data > /dev/null
+    local index_url="http://sip-elastic:8200/sample-geo-data"
+    local alias_url="http://sip-elastic:8200/_aliases"
+    echo "Loading sample Elasticsearch data"
+    curl_json PUT "$index_url" $dir/index-geo.json
+    echo "Creating alias for the index"
+    curl_json POST "$alias_url" $dir/aliases.json
+    data=$dir/es-data-geo.ndjson
+    curl_json POST "$index_url/sample/_bulk" $data > /dev/null
 }
 
 wait_maprfs
 load_data
 wait_semantic_service
 insert_json_store_sample $sample_location/sample-elasticsearch/sample-data-elastic.json
+insert_json_store_sample $sample_location/sample-elasticsearch/sample-data-elastic-geo.json

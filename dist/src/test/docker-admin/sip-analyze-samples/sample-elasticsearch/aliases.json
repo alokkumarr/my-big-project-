@@ -1,5 +1,6 @@
 {
-    "actions" : [
-        { "add" : { "index" : "sample", "alias" : "sampleAlias" } }
-    ]
+  "actions": [
+    { "add": { "index": "sample", "alias": "sampleAlias" } },
+    { "add": { "index": "sample-geo-data", "alias": "sampleAlias-geo-data" } }
+  ]
 }
