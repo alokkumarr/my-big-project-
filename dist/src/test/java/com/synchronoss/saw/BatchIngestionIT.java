@@ -3,6 +3,7 @@ package com.synchronoss.saw;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -790,8 +790,8 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-      .statusCode(200);
+   // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    //  .statusCode(200);
     waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
@@ -807,6 +807,7 @@ public class BatchIngestionIT extends BaseIT {
         .readTree(response.extract().body().jsonPath().getString("routeMetadata"));
     final String exclusion = routeData.get("fileExclusions").asText();
     String basePath = FilenameUtils.getFullPath(fileName1);
+    assertNotEquals("", basePath);
     log.debug("basePath :" + basePath);
     String extension = "*." + exclusion;
     log.debug("extension :" + extension);
