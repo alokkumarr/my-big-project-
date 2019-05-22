@@ -84,7 +84,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             logger.error("Error reading s3 List: "+ e.getMessage());
             s3List = "";
         }
-
+        Boolean isZipRequired=analysis.getZip();
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
@@ -99,7 +99,8 @@ public class AnalysisServiceImpl implements AnalysisService {
             .userFullName(analysis.getUserFullName())
             .metricName(analysis.getMetricName())
             .jobGroup(analysis.getJobGroup())
-            .publishedTime(formatted);
+            .publishedTime(formatted)
+            .zip(isZipRequired);
 
         if (!recipients.equals("")) {
             executionBuilder
