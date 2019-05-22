@@ -641,9 +641,9 @@ export class AnalyzeService {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
-          type === 'chart'
-            ? this.newAnalysisChartModel(metricId, type)
-            : this.newAnalysisPivotModel(metricId, type)
+          type === 'pivot'
+            ? this.newAnalysisPivotModel(metricId, type)
+            : this.newAnalysisChartModel(metricId, type)
         ).toPromise()
       : this.createAnalysisNonDSL(metricId, type);
   }
