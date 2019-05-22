@@ -2,7 +2,7 @@ package com.synchronoss.saw.storage.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.storage.proxy.service.ChartResultMigration;
+import com.synchronoss.saw.storage.proxy.service.executionResultMigrationService.ChartResultMigration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +24,20 @@ public class ChartResultMigrationTest {
   @Test
   public void testParseData() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    File file =
+    File dataFile =
         new File(
             classLoader
-                .getResource("com/synchronoss/saw/storage/proxy/sample_chart_result.json")
+                .getResource("com/synchronoss/saw/storage/proxy/sample_chart_data.json")
+                .getPath());
+    File queryFile =
+        new File(
+            classLoader
+                .getResource("com/synchronoss/saw/storage/proxy/sample-chart-query.json")
                 .getPath());
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(file);
-    List<Object> flatten = migration.parseData(jsonNode);
+    JsonNode dataNode = objectMapper.readTree(dataFile);
+    JsonNode queryNode = objectMapper.readTree(queryFile);
+    List<Object> flatten = migration.parseData(dataNode, queryNode);
     Assert.assertTrue(flatten.size() > 0);
   }
 }

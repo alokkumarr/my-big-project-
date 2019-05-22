@@ -50,7 +50,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
-      this.artifactColumns = this.analysis.artifacts[0].columns;
+      this.artifactColumns = get(this.analysis, 'sipQuery.artifacts[0].fields');
       break;
     case 'report':
     case 'esReport':

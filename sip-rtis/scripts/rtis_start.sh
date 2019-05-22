@@ -152,13 +152,31 @@ declare -r lib_classpath=$(
 declare -r app_classpath="$conf_dir:$lib_classpath"
 vlog app_classpath: $app_classpath
 
-declare -r java_args=$( echo \
-    $java_opts \
-    -Dhttp.port=$RTIS_PORT \
-    -Dpidfile.path=$pidfile_path \
-    -Dlog.dir=${log_dir} \
-    -Duser.dir=${user_dir}
-    )
+declare java_args=''
+
+if [ "$SIP_SECURE" = true ] ;
+then
+    java_args=$( echo \
+        $java_opts \
+        -Dhttps.port=$RTIS_PORT \
+        -Dhttp.port=disabled \
+        -Dplay.server.https.keyStore.path=$KEY_STORE_PATH \
+        -Dplay.server.https.keyStore.password=$KEY_STORE_PASSWORD \
+        -Dpidfile.path=$pidfile_path \
+        -Dlog.dir=${log_dir} \
+        -Duser.dir=${user_dir}
+        )
+
+else
+    java_args=$( echo \
+        $java_opts \
+        -Dhttp.port=$RTIS_PORT \
+        -Dpidfile.path=$pidfile_path \
+        -Dlog.dir=${log_dir} \
+        -Duser.dir=${user_dir}
+        )
+fi
+
 vlog java_args: $java_args
 
 vlog APP_MAINCLASS: $APP_MAINCLASS
