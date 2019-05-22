@@ -15,7 +15,7 @@
     <logger name="com.synchronoss.saw" level="INFO">
     </logger>
     
-    <logger name="com.synchronoss.sip.utils" level="TRACE">
+    <logger name="com.synchronoss.sip.utils" level="INFO">
     </logger>
 
 </configuration>

@@ -1,11 +1,11 @@
 @startuml
 
-node "saw-batch-ingestion-ui" {
+node "sip-batch-ingestion-ui" {
   [sip-portal] - HTTP
 }
 
-node "saw-services" {
-  [sip-portal] --> [saw-gateway]
+node "sip-services" {
+  [sip-portal] --> [sip-gateway]
   [sip-batch-ingeston-service]
   [sip-scheduler-service]
 }

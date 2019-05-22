@@ -31,7 +31,6 @@ import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 
 
 @RunWith(SpringRunner.class)
-@Ignore
 public class BisCronJobTest {
 
   private static final Logger logger = LoggerFactory.getLogger(BisCronJobTest.class);

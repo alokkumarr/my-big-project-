@@ -97,9 +97,10 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   Integer updateBisJob(@Param("jobStatus") String jobStatus, 
       @Param("minutesForLongJob") Integer minutesForLongJob);
   
-  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
-        + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
-        + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId )")
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where  Logs.source = 'REGULAR' "
+        + "and ((Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_INPROGRESS') "
+        + " or (Logs.mflFileStatus = 'OPEN' and Logs.bisProcessState = 'OPEN'))"
+        + " and Logs.routeSysId = :routeId ")
         Integer countOfInProgress(@Param("routeId") Long routeId);
   
   @Query("SELECT COUNT(pid) from BisFileLog Logs where ( "
