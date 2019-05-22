@@ -156,14 +156,13 @@ public class MigrateAnalysisService {
 
   /** Conversion from binary store to jason store */
   public void convertBinaryStoreToDslJsonStore() {
-    LOGGER.info("Fetch all start execution Id.!");
+    LOGGER.debug("Fetch all start execution Id.!");
     fetchExecutionIdFromBinaryStore();
 
-    LOGGER.info("Total count of execution Ids : " + executionIds.size());
+    LOGGER.debug("Total count of execution Ids : " + executionIds.size());
     if (!executionIds.isEmpty()) {
       for (String executionId : executionIds) {
         if (executionId != null) {
-          LOGGER.info("Process execution result start here for one executionId : " + executionId);
           readExecutionResultFromBinaryStore(executionId);
         }
       }
@@ -297,8 +296,6 @@ public class MigrateAnalysisService {
       LOGGER.debug("Contents from Binary Store :" + content.toString());
 
       String type = content.get("type").getAsString();
-      LOGGER.debug("type :" + type);
-
       if (type != null && type.matches("pivot|chart")) {
         String analysisId = content.get("id").getAsString();
         String executedBy = content.get("executedBy").getAsString();
@@ -310,7 +307,6 @@ public class MigrateAnalysisService {
         queryBuilder.add("queryBuilder", content.get("queryBuilder"));
         SipQuery sipQuery = migrateExecutions.migrate(queryBuilder);
 
-        LOGGER.debug("executionType :" + executionType.trim());
         migrationStatusObject.setAnalysisId(analysisId);
         migrationStatusObject.setAnalysisMigrated(true);
         migrationStatusObject.setType(type);
