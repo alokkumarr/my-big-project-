@@ -41,7 +41,7 @@ public class SipJobsLogController {
    */
   @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
       response = SipJobDetails.class, responseContainer = "List")
-  @RequestMapping(value = "/logs/jobs/{jobType}", method = RequestMethod.GET)
+  @RequestMapping(value = "/logs/jobs/jobType/{jobType}", method = RequestMethod.GET)
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
