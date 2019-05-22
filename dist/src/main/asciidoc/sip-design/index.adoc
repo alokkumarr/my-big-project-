@@ -36,7 +36,7 @@ inspecting its signature and the secret key.
 .Authentication using JSON Web Tokens
 plantuml::sip-design/figure-authentication.pum[]
 
-For more details see the <<SAW Gateway Service>> and <<SAW Security>>
+For more details see the <<SIP Gateway Service>> and <<SIP Security>>
 sections.
 
 === Authorization
@@ -48,23 +48,23 @@ permissions to view folders, access SIP modules and so on.
 
 = Services
 
-== SAW Web
+== SIP Web
 
-The SAW Web module provides a user interface for creating and
+The SIP Web module provides a user interface for creating and
 executing analyses.  It is implemented it AngularJS and makes calls to
-the SAW Services REST API over HTTP.  It additionally calls SAW
+the SIP Services REST API over HTTP.  It additionally calls SIP
 Security to authenticate users and manage privileges.
 
-The SAW Web user interface is organized into two modules: analyze and
+The SIP Web user interface is organized into two modules: analyze and
 observe.  Additionally it provides a user interface for managing users
-and privileges in SAW Security.
+and privileges in SIP Security.
 
-== SAW Services
+== SIP Services
 
-SAW Services are a collection of microservices exposed over HTTP REST
+SIP Services are a collection of microservices exposed over HTTP REST
 APIs.  They enable creating and executing analyses.  They are
 implemented in Java and the Spring Framework.  As an exception, the
-SAW Transport Service is implemented in Scala and the Play framework.
+SIP Transport Service is implemented in Scala and the Play framework.
 
 .Figure: SIP system overview
 plantuml::sip-design/figure-system.pum[]
@@ -72,13 +72,13 @@ plantuml::sip-design/figure-system.pum[]
 .Figure: SIP Services and their dependencies
 plantuml::sip-design/figure-services.pum[]
 
-SAW Services use MapR-DB for persistence, using the OJAI interface.
-As an exception, the SAW Transport Service uses the MapR-DB binary
-tables.  Additionally SAW Services access files on the MapR-FS.
+SIP Services use MapR-DB for persistence, using the OJAI interface.
+As an exception, the SIP Transport Service uses the MapR-DB binary
+tables.  Additionally SIP Services access files on the MapR-FS.
 
-=== SAW Gateway Service
+=== SIP Gateway Service
 
-The SAW Gateway Service acts as single entry point for all upstream
+The SIP Gateway Service acts as single entry point for all upstream
 micro services.  It is a Spring Boot based microservice. It upholds
 the concerns regarding security.  It acts as edge service and
 authenticates every request that passes by it and makes sure that it
@@ -109,7 +109,7 @@ It comes with the following benefits:
 . Translates from a "standard" public web-friendly API protocol to
   whatever protocols are used internally
 
-The SAW gateway pattern has some drawbacks:
+The SIP gateway pattern has some drawbacks:
 
 . Increased complexity - the API gateway is yet another moving part
   that must be developed, deployed and managed.
@@ -118,19 +118,19 @@ The SAW gateway pattern has some drawbacks:
   the API gateway - however, for most applications the cost of an
   extra roundtrip is insignificant.
 
-=== SAW Dataset Service
+=== SIP Dataset Service
 
-The SAW Dataset Service provides starting points for creating
+The SIP Dataset Service provides starting points for creating
 analyses.  Administrators load information about datasets (including
-so called semantic metadata) into SAW, which is used to create
+so called semantic metadata) into SIP, which is used to create
 analyses.  The information about datasets includes the location of the
 data, its schema in the form of columns, data types of columns and
 so on.  Clients can enumerate datasets and retrieve descriptions of
 them for use when creating analyses.
 
-=== SAW Analysis Service
+=== SIP Analysis Service
 
-The SAW Analysis Services allows creating, reading, updating and
+The SIP Analysis Services allows creating, reading, updating and
 deleting analyses.  Analyses are used to execute queries on data.  An
 analysis is created based on information about a dataset, also known
 as semantic metadata.  An analysis can contain one or more artifacts,
@@ -139,30 +139,30 @@ has a number of properties, for example if it is selected, or joined
 with another column.  These properties affect how the analysis is
 translated into a query that is exected.
 
-=== SAW Execution Service
+=== SIP Execution Service
 
-The SAW Execution Service enables executing analyses.  It takes an
+The SIP Execution Service enables executing analyses.  It takes an
 analysis to execute as input, translates it into a query and executes
 the query and finally provides the results back to the client.
 
-.Figure: Executing an analysis using the SAW Execution Service
+.Figure: Executing an analysis using the SIP Execution Service
 plantuml::sip-design/figure-execution-sequence.pum[]
 
-The SAW Execution Service supports two types of storage: Apache Spark
+The SIP Execution Service supports two types of storage: Apache Spark
 and Elasticsearch.  Analyses of type report are executed on Apache
 Spark clusters, while analyses of type pivot and chart are executed on
 Elasticsearch clusters.
 
-=== SAW Workbench Service
+=== SIP Workbench Service
 
-The SAW Workbench Service enables executing Workbench related operation.  It takes an
+The SIP Workbench Service enables executing Workbench related operation.  It takes an
 project definition to execute as input, translates it into a Datalake operation and records
 the operation's activity in MaprDB and finally provides the results back to the client.
 
-.Figure: Executing an analysis using the SAW Workbench Service
+.Figure: Executing an analysis using the SIP Workbench Service
 plantuml::sip-design/figure-workbench-sequence.pum[]
 
-The SAW Workbench Service supports three types of storage: Apache Spark,
+The SIP Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.
 
@@ -187,17 +187,19 @@ Datasets are internally stored as JSON documents in MapR-DB. The
 entries are created by XDF components as part of execution and
 accessed using the BDA Metadata library.
 
-=== SAW Storage Proxy Service
+=== SIP Storage Proxy Service
 
-SAW Proxy Service will act as proxy for our storage i.e to make consumables application agnostic to any specific store.
-The intention of this services to provide access behind our gateway for our polyglot persistence
-layer *(ElasticSearch, Datalake, RDMS & MapRDB).*
+SIP Proxy Service will act as proxy for our storage i.e to make
+consumables application agnostic to any specific store.  The intention
+of this services to provide access behind our gateway for our polyglot
+persistence layer (Elasticsearch, Datalake, RDMS & MapR-DB).
 
-[%hardbreaks]
-One of the reason to access this service to perform transformation at backend service and API consumer
-just needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+One of the reason to access this service to perform transformation at
+backend service and API consumer just needs to deal with two common
+formats i.e JSON or Tabular (flat structure CSV) irrespective of
+storage layer.
 
-.Figure: Executing an data query using the SAW Proxy Service via SIP Gateway Service
+.Figure: Executing an data query using the SIP Proxy Service via SIP Gateway Service
 plantuml::sip-design/figure-proxy-sequence.pum[]
 
 The request (link:sip-developer/index.html[SIP Developer Guide]) body shall provide the query,
@@ -205,26 +207,32 @@ storage type & other details. The below are salient feature for the service whic
 
 [[proxy-goals]]
 [role="incremental"]
-* It will return either in JSON or Tabular Format.
-   ES returns in JSON format in terms of search, it should be converted into Tabular format if in
-   the request body tabular format is requested.
+* It will return either in JSON or Tabular Format.  ES returns in JSON
+   format in terms of search, it should be converted into Tabular
+   format if in the request body tabular format is requested.
 * Input JSON Schema Validation.
 * support create, search, update, delete & aggregate operations.
 * It should support to flatten our in house build pivot format.
-* Search results will provided in paginated format either in JSON or Tabular format.
+* Search results will provided in paginated format either in JSON or
+  Tabular format.
 * Implicit ES Query validation.
-* Every incoming request to this story proxy service will be validated in gateway service layer.
-* It provides CRUD REST API on top of MapRDB store. The user of the API can store any form of JSON data adhering to certain structure i.e request & response specification.
+* Every incoming request to this story proxy service will be validated
+  in gateway service layer.
+* It provides CRUD REST API on top of MapRDB store. The user of the
+  API can store any form of JSON data adhering to certain structure
+  i.e request & response specification.
 
-=== SAW Batch Ingestion Service
+=== SIP Batch Ingestion Service
 
-SAW Batch Ingestion Service allows to pull batch of data at uniform interval (can be defined by user) of time.
-It will facilitates to pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
+SIP Batch Ingestion Service allows to pull batch of data at uniform
+interval (can be defined by user) of time.  It will facilitates to
+pull data from remote source like *(SFTP, SCP, S3, JDBC etc).*
 Currently with it supports only SCP/SFTP.
 
-[%hardbreaks]
-The REST API of this service is HATEOS Complaint API. To get an overview of the self descriptive API, it can
-accessed using URL (http://hostname/saw/services/batch, http://hostname/saw/services/batch/profiles)
+The REST API of this service is HATEOS Complaint API. To get an
+overview of the self descriptive API, it can accessed using URL
+(http://hostname/saw/services/batch,
+http://hostname/saw/services/batch/profiles)
 
 .Figure: Saw Batch ingestion request & response flow
 plantuml::sip-design/figure-batch-sequence.pum[]
@@ -243,39 +251,49 @@ Below are the salient feature which are as follows:
 
 High level Entity Relationship diagram
 
-.Figure: SAW Batch Ingestion ER Diagram
+.Figure: SIP Batch Ingestion ER Diagram
 plantuml::sip-design/figure-batch-er-diagram.pum[format=svg]
 
 
-The above entities are used to hold the base of Batch Ingestion module.
-Entity BIS_ROUTE is used to hold the details of route i.e it holds the details of destination, frequency etc etc.
-Entity BIS_CHANNEL is used to hold the details of channel i.e it holds the details of data channel.
-Entity BIS_FILE_LOGS is used to log details related to the files or data retrieved from the custom.
+The above entities are used to hold the base of Batch Ingestion
+module.  Entity BIS_ROUTE is used to hold the details of route i.e it
+holds the details of destination, frequency etc etc.  Entity
+BIS_CHANNEL is used to hold the details of channel i.e it holds the
+details of data channel.  Entity BIS_FILE_LOGS is used to log details
+related to the files or data retrieved from the custom.
 
-.Figure: SAW Batch Ingestion Component Diagram
+.Figure: SIP Batch Ingestion Component Diagram
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
 
 High Availability & Resiliency
 
-SAW Batch Ingestion Services provides HA providing multiple instances of services up & running if one goes down
-& other available services will serves the request. BIS also monitors it's dependent services such as scheduler services etc.
-BIS API's provides resiliency to failure providing configurable retry techniques using circuit breaker pattern which triggers on the occasion
-of network glitches. If transferring gets interrupted due to network glitches. It automatically heals inconsistent state,
-reinitiate the transfer again & make sure data has been received. It also takes care of partial data or corrupted data on destination host to be removed.
+SIP Batch Ingestion Services provides HA providing multiple instances
+of services up & running if one goes down & other available services
+will serves the request. BIS also monitors it's dependent services
+such as scheduler services etc.  BIS API's provides resiliency to
+failure providing configurable retry techniques using circuit breaker
+pattern which triggers on the occasion of network glitches. If
+transferring gets interrupted due to network glitches. It
+automatically heals inconsistent state, reinitiate the transfer again
+& make sure data has been received. It also takes care of partial data
+or corrupted data on destination host to be removed.
 
-=== SAW Semantic Service
+=== SIP Semantic Service
 
-The SAW Semantic Service enables the consumer to store the semantic metadata of SIP. The intention of this services
-to provide CRUD operations to deal with semantic metadata
+The SIP Semantic Service enables the consumer to store the semantic
+metadata of SIP. The intention of this services to provide CRUD
+operations to deal with semantic metadata
 
-.Figure: Executing an data query using the SAW Proxy Service
+.Figure: Executing an data query using the SIP Proxy Service
 plantuml::sip-design/figure-semantic-sequence.pum[]
 
-1. Create Integrated Semantic Node JSON structure for both elastic search as well as data lake data pods.
-2. The structure is consistent with that used by SAW Analyze module and Observe modules in the store.
+1. Create Integrated Semantic Node JSON structure for both elastic
+search as well as data lake data pods.
+2. The structure is consistent with that used by SIP Analyze module
+and Observe modules in the store.
 3. This service should be consumable by
-  . SAW Analyze Module
-  . SAW Workbench Module
+  . SIP Analyze Module
+  . SIP Workbench Module
 
 === SIP Alert service
 
@@ -293,7 +311,7 @@ cluster.  The queried data is stored as Parquet files in the data
 lake.  The report execution functionality is provided by two
 components: the Transport Service and the Transport Service Executor.
 
-The Transport Service provides an internal REST API for SAW Web to
+The Transport Service provides an internal REST API for SIP Web to
 use, including operations to execute a report.  When a report is
 executed, the Transport Service writes a message requesting execution
 to a message queue.  The message queue is implemented using MapR
@@ -312,7 +330,7 @@ blocking the more time-sensitive preview and onetime executions.
 The queue approach with executors in separate processes is used due to
 the limitation of having one Spark context per Java virtual machine.
 The number of executors of each type is configured statically in the
-SAW environment configuration and used during deployment.  The report
+SIP environment configuration and used during deployment.  The report
 execution concurrency limit follows from the number of executors
 configured for each type.
 
@@ -331,49 +349,48 @@ into memory at the same time which might lead to out of memory errors.
 
 The Elasticsearch executor supports analyses of types pivot and chart.
 
-=== SAW Export Service
+=== SIP Export Service
 
-The SAW Export Service enables exporting analysis executions to file
-formats such as Microsoft Excel.  It calls the SAW Execution Service
+The SIP Export Service enables exporting analysis executions to file
+formats such as Microsoft Excel.  It calls the SIP Execution Service
 to retrieve the execution result, generates the desired output file
 format and finally provides it to the client over email and/or on
 FTP/SFTP configured locations.
 
-=== SAW Scheduler Service
+=== SIP Scheduler Service
 
-The SAW Scheduler Service triggers execution of analyses
-based on their configured schedule.  The SchedulerService is a Spring
-Boot based micro-service, which provides Api to create, manage and trigger schedules.
-It also triggers dispatch request to saw-export service, if analysis execution result
-needs to be dispatched.
+The SIP Scheduler Service triggers execution of analyses based on
+their configured schedule.  The SchedulerService is a Spring Boot
+based micro-service, which provides Api to create, manage and trigger
+schedules.  It also triggers dispatch request to saw-export service,
+if analysis execution result needs to be dispatched.
 
-Internally it uses the Quartz scheduler framework for create, manage and trigger
-analysis schedules with mariaDB as job store. The Scheduler Service
-does not monitor the actual execution or its results, but only
-triggers the start of execution.
+Internally it uses the Quartz scheduler framework for create, manage
+and trigger analysis schedules with mariaDB as job store. The
+Scheduler Service does not monitor the actual execution or its
+results, but only triggers the start of execution.
 
+=== SIP Observe Service
 
-=== SAW Observe Service
-
-The SAW Observe Service enables creating, reading, updating and
+The SIP Observe Service enables creating, reading, updating and
 deleting dashboards.
 
-== SAW Security
+== SIP Security
 
-The SAW Security module provides authentication and privilege services
+The SIP Security module provides authentication and privilege services
 to other modules.  It is implemented as a microservice in Java and the
 Spring Framework and uses a MariaDB database to persist authentication
 and privilege information.
 
-.Figure: The SAW Security Service and dependencies
+.Figure: The SIP Security Service and dependencies
 plantuml::sip-design/figure-security.pum[]
 
-A client authenticated to the SAW Security Service by sending a to the
-REST API.  The credentials and privileges are checked against the SAW
+A client authenticated to the SIP Security Service by sending a to the
+REST API.  The credentials and privileges are checked against the SIP
 Security database, after which a token is issued and returned in the
 response to the client.
 
-.Figure: Authenticating a client using the SAW Security Service
+.Figure: Authenticating a client using the SIP Security Service
 plantuml::sip-design/figure-security-sequence.pum[]
 
 == SIP DSL
@@ -385,6 +402,36 @@ structure to visualize the data into platform.
 
 .Figure: SIP-DSL sequence Diagram with platform integration
 plantuml::sip-design/figure-SIP-DSL-sequence.pum[]
+
+= Security
+
+By default SIP sends data over the network and store data in
+persistent storage in an unencrypted form.  SIP also optionally
+supports encryption of data in flight and at rest.
+
+== Data in flight
+
+Data in flight between SIP services are secured using HTTPS.  Data in
+flight between SIP services and MariaDB, MapR and Elasticsearch are
+also secured using SSL.  Data in flight internally inside MariaDB
+Galera clusters, MapR clusters and Elasticsearch clusters are secured
+using the respective vendor's default intracluster encryption
+solution.
+
+== Data at rest
+
+Data at rest is encrypted using each data storage's respective default
+encryption solution.  See the documentation of MariaDB, MapR and
+Elasticsearch respectively.
+
+Connections between SIP services use certificates signed by an
+internal certificate authority (CA).  The CA is located on the SIP
+node with the `sip-admin` role.
+
+NOTE: The `sip_secure` configuration parameter must be set before the
+first installation of SIP and not changed thereafter.  Changing the
+value after the initial installation for an existing environment is
+not supported.
 
 = Monitoring
 

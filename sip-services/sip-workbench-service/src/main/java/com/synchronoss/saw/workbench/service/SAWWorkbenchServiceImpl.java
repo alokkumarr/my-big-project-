@@ -28,11 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -51,6 +49,7 @@ import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
 import com.synchronoss.saw.workbench.model.StorageProxy;
 import com.synchronoss.saw.workbench.model.StorageProxy.Storage;
+import com.synchronoss.sip.utils.RestUtil;
 import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
@@ -96,7 +95,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @Value("${workbench.storage-uri}")
   @NotNull
   private String storageURL;
-
+  
   private String tmpDir = null;
   private DLMetadata mdt = null;
   private DataSetStore mdtStore =null;
@@ -106,6 +105,10 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @Autowired
   private WorkbenchExecutionService workbenchExecutionService;
 
+  @Autowired
+  private RestUtil restUtil;
+
+  
   @PostConstruct
   private void init() throws Exception {
     if (defaultProjectRoot.startsWith(prefix)) {
@@ -372,12 +375,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
    * This method generates the structure aligned to meta data store structure
    * @param project
    * @return List<DataSet>
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws JsonProcessingException
-   * @throws IOException
+   * @throws Exception 
    */
-  public List<DataSet> listOfDataSetAvailableInESStore (Project project) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException{
+  public List<DataSet> listOfDataSetAvailableInESStore (Project project) throws Exception{
     logger.trace("listOfDataSetFromESStore  starts here : ", project);
     List <DataSet>  dataSets = new ArrayList<>();
     String storageEndpoints = "/internal/proxy/storage";
@@ -403,7 +403,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     HttpHeaders  requestHeaders = new HttpHeaders();
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(jsonInString,requestHeaders);
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     logger.debug("storageURL server URL {}", url);
     ResponseEntity<StorageProxy> aliasResponse = restTemplate.exchange(url, HttpMethod.POST,
         requestEntity, StorageProxy.class);

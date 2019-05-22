@@ -164,22 +164,44 @@ appl_start() {
     confdir=$optdir/conf
     ( cd $confdir ) || dry_exit
 
-    ( <$confdir/application.properties ) || dry_exit
+    if [ "$SECURE" = true ] ;
+    then
+      ( <$confdir/application-secure.properties ) || dry_exit
+    else
+      ( <$confdir/application.properties ) || dry_exit
+    fi
 
     war_fnm=( $libdir/*saw-security*.war )
     # use first file only
     war_file=${war_fnm[0]}
     ( <${war_file} ) || dry_exit
 
-    java_args=(
-        -Xms32M -Xmx2048M
-        -Djava.net.preferIPv4Stack=true
-        -Dspring.config.location=$confdir/application.properties
-        -Dlogging.config=$confdir/logback.xml
-        -Dquartz.properties.location=$confdir
-        -jar $war_file
-        -name saw-security
+declare java_args=''
+
+if [ "$SECURE" = true ] ;
+then
+      java_args=(
+          -Xms32M -Xmx2048M
+          -Djava.net.preferIPv4Stack=true
+          -Dspring.config.location=$confdir/application-secure.properties
+          -Dlogging.config=$confdir/logback.xml
+          -Dquartz.properties.location=$confdir
+          -jar $war_file
+          -name saw-security
         )
+else
+     java_args=(
+         -Xms32M -Xmx2048M
+         -Djava.net.preferIPv4Stack=true
+         -Dspring.config.location=$confdir/application.properties
+         -Dlogging.config=$confdir/logback.xml
+         -Dquartz.properties.location=$confdir
+         -jar $war_file
+         -name saw-security
+       )
+fi
+
+
     exec_cmd="java ${java_args[@]}"
     [[ $DRYRUN ]] && {
         log CMD: "$exec_cmd"
@@ -194,7 +216,7 @@ appl_start() {
         vlog 'run in foreground'
         exec $exec_cmd
         echo never gets here
-    fi 
+    fi
     # Start service in daemon mode
     ( eval $exec_cmd </dev/null & )
     vlog $(dts) 'started in background'
@@ -257,7 +279,7 @@ appl_stop() {
 appl_status() {
     rc=0
     if appIsUp ; then
-        log "status: running: '$APPL_NAME', PID: $APPL_PID" 
+        log "status: running: '$APPL_NAME', PID: $APPL_PID"
     else
         rc=1
         log "status: down: '$APPL_NAME'"

@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 ###
 # This script executes post-install step(s):
 # - get 'db.init.password' parameter value from
@@ -91,7 +91,7 @@ ds_cpass_val=
 }
 
 # Generate conf files from template
-for tfn in $APPL_HOME/conf/templates/* ; do
+for tfn in $APPL_HOME/conf/templates/application.properties ; do
     bfn=$(basename $tfn)
     echo "# generate $APPL_NAME conf file: $bfn"
     conf_tmpl=$tfn

@@ -15,11 +15,11 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
-import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.saw.batch.model.BisSchedulerRequest;
 import com.synchronoss.saw.batch.service.BisRouteService;
 import com.synchronoss.saw.batch.service.ChannelTypeService;
+import com.synchronoss.sip.utils.RestUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 
+
 @RestController
 @Api(value = "The controller provides operations related Route Entity "
     + "synchronoss analytics platform ")
@@ -77,13 +78,12 @@ public class SawBisRouteController {
   private String bisSchedulerUrl;
   private String scheduleUri = "/scheduler/bisscheduler";
 
-
   private String insertUrl = "/schedule";
   private String updateUrl = "/update";
   private String deleteUrl = "/delete";
   private static final Long STATUS_ACTIVE = 1L;
   private static final Long STATUS_DEACTIVE = 0L;
-  
+
 
   @Value("${bis.default-data-drop-location}")
   private String dropLocation;
@@ -93,12 +93,21 @@ public class SawBisRouteController {
 
   @Autowired
   private BisRouteService bisRouteService;
-  
+
   @Autowired
   ChannelTypeService channelTypeService;
 
 
-  RestTemplate restTemplate = new RestTemplate();
+  @Autowired
+  private RestUtil restUtil;
+
+
+  private RestTemplate restTemplate = null;
+
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
 
   /**
    * This API provides an ability to add a source.
@@ -189,7 +198,6 @@ public class SawBisRouteController {
           // Date in sent in User's locale time along with the timezone.
           // E.g.: 2019-02-07T00:00:26+05:30
           // This will be converted to machine time
-          
 
           try {
             if (startDateStr != null) {
@@ -216,7 +224,6 @@ public class SawBisRouteController {
           }
         }
         // }
-        RestTemplate restTemplate = new RestTemplate();
         logger.info("posting scheduler inserting uri starts here: " + bisSchedulerUrl + scheduleUri
             + insertUrl);
         restTemplate.postForLocation(bisSchedulerUrl + scheduleUri + insertUrl, schedulerRequest);
@@ -391,7 +398,6 @@ public class SawBisRouteController {
           routeEntity.setStatus(STATUS_ACTIVE);
         }
         routeEntity = bisRouteDataRestRepository.save(routeEntity);
-        RestTemplate restTemplate = new RestTemplate();
         logger.info(
             "scheduler uri to update starts here : " + bisSchedulerUrl + scheduleUri + updateUrl);
         try {
@@ -473,7 +479,7 @@ public class SawBisRouteController {
    * @param routeId id of the route
    * @return true or false
    */
-  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method 
+  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/deactivate", method
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public Map<String,Boolean> deactivateRoute(
@@ -491,14 +497,14 @@ public class SawBisRouteController {
     responseMap.put("isDeactivated",Boolean.TRUE);
     return responseMap;
   }
-  
+
   /**
    * checks is there a route with given route name.
    * @param channelId channe identifier
    * @param routeId id of the route
    * @return true or false
    */
-  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method 
+  @RequestMapping(value = "/channels/{channelId}/routes/{routeId}/activate", method
       = RequestMethod.PUT, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public Map<String,Boolean> activateRoute(
@@ -516,22 +522,22 @@ public class SawBisRouteController {
     responseMap.put("isActivated", Boolean.TRUE);
     return responseMap;
   }
-  
-  
+
+
   /**
    * checks is there a route with given route name.
    * @param channelId channe identifier
    * @param routeName name of the route
    * @return true or false
    */
-  @RequestMapping(value = "/channels/{channelId}/duplicate-route", method 
+  @RequestMapping(value = "/channels/{channelId}/duplicate-route", method
       = RequestMethod.GET, produces = org.springframework.http.MediaType
       .APPLICATION_JSON_UTF8_VALUE)
   public Map<String,Boolean> isDuplicateRoute(
       @PathVariable("channelId")  Long channelId,
       @RequestParam("routeName") String routeName) {
     Map<String,Boolean> responseMap = new HashMap<String,Boolean>();
-    logger.trace("Checking for duplicate route namewith channelId: " + channelId 
+    logger.trace("Checking for duplicate route namewith channelId: " + channelId
         + " and routeName: " + routeName);
     Boolean result =  bisRouteService
         .isRouteNameExists(channelId,routeName);
