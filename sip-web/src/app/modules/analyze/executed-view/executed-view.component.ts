@@ -357,7 +357,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     ).finished;
     this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
     if (isUndefined(this.executedAt)) {
-      this.executedAt = moment(this.analysis.modifiedTime).local().format('YYYY/MM/DD h:mm A');
+      this.executedAt = moment(this.analysis.modifiedTime)
+        .local()
+        .format('YYYY/MM/DD h:mm A');
     }
   }
 
@@ -389,7 +391,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         //   .then(data => {
         //     console.log(data);
         //   });
-        this.executedAnalysis = { ...this.analysis };
         /* Get metrics to get full artifacts. Needed to show filters for fields
         that aren't selected for data */
         return this._analyzeService
@@ -398,7 +399,19 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       })
       .then(metric => {
         this.metric = metric;
-        return this.analysis;
+        if (isDSLAnalysis(this.analysis) && this.analysis.type === 'map') {
+          this.executedAnalysis = {
+            ...this.analysis,
+            sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+              get(this.metric, 'artifacts.0.columns', []),
+              this.analysis.sipQuery
+            )
+          };
+          return this.analysis;
+        } else {
+          this.executedAnalysis = { ...this.analysis };
+          return this.analysis;
+        }
       });
   }
 
@@ -422,8 +435,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           ...this.analysis,
           ...(isDSLAnalysis(this.executedAnalysis)
             ? {
-                sipQuery:
+                sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                  get(this.metric, 'artifacts.0.columns', []),
                   executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                )
               }
             : {
                 sqlBuilder:
@@ -475,8 +490,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           ...this.analysis,
           ...(isDSLAnalysis(this.executedAnalysis)
             ? {
-                sipQuery:
+                sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                  get(this.metric, 'artifacts.0.columns', []),
                   executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                )
               }
             : {
                 sqlBuilder:
@@ -504,7 +521,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isUndefined(utcTime)) {
       return;
     }
-    return moment(utcTime).local().format('YYYY/MM/DD h:mm A');
+    return moment(utcTime)
+      .local()
+      .format('YYYY/MM/DD h:mm A');
   }
 
   flattenData(data, analysis) {
@@ -537,7 +556,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
           if (isDSLAnalysis(this.executedAnalysis)) {
-            this.executedAnalysis = {...this.executedAnalysis, sipQuery: queryBuilder};
+            this.executedAnalysis = {
+              ...this.executedAnalysis,
+              sipQuery: queryBuilder
+            };
           } else {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
