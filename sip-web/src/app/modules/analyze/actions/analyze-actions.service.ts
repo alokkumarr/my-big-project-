@@ -143,6 +143,9 @@ export class AnalyzeActionsService {
       })
       .then(
         parentAnalysis => {
+          if (!parentAnalysis) {
+            return publish();
+          }
           /* The destination category is different from parent analysis's category. Publish it normally */
           const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
             ? parentAnalysis.category
