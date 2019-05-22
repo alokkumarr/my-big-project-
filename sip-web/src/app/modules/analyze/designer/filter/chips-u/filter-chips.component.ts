@@ -1,5 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as reduce from 'lodash/reduce';
+import * as uniq from 'lodash/uniq';
+import * as map from 'lodash/map';
 import { Filter, Artifact, ArtifactColumn } from '../../types';
 import {
   NUMBER_TYPES,
@@ -65,17 +67,31 @@ export class FilterChipsComponent {
     this.nameMap = reduce(
       artifacts,
       (acc, artifact: Artifact | ArtifactDSL) => {
-        acc[
+        // This is a fail safe. Metric's table names differ between columns, tables etc.
+        // This is a data error from backend. We create maps for all the uniq table names
+        // found in metric to accomodate everything.
+        const allArtifactNames = uniq([
           (<Artifact>artifact).artifactName ||
-            (<ArtifactDSL>artifact).artifactsName
-        ] = reduce(
-          (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
-          (accum, col: ArtifactColumn) => {
-            accum[col.columnName] = col.displayName;
-            return accum;
-          },
-          {}
-        );
+            (<ArtifactDSL>artifact).artifactsName,
+          ...map(
+            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
+            field =>
+              field.table ||
+              field.tableName ||
+              field.artifactName ||
+              field.artifactsName
+          )
+        ]);
+        allArtifactNames.forEach(artifactName => {
+          acc[artifactName] = reduce(
+            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
+            (accum, col: ArtifactColumn) => {
+              accum[col.columnName] = col.displayName;
+              return accum;
+            },
+            {}
+          );
+        });
         return acc;
       },
       {}
