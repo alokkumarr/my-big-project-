@@ -4,8 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Field.LimitType;
 import com.synchronoss.saw.model.Store;
 import java.util.LinkedHashMap;
@@ -81,6 +83,31 @@ public class ChartConverter implements AnalysisSipDslConverter {
       String checkedVal = fieldObject.get("checked").getAsString();
 
       field.setArea(checkedVal);
+    }
+
+    if (field.getType() != null) {
+      if (field.getType() == Field.Type.DATE) {
+        String dateFormat = field.getDateFormat();
+        String interval =
+            QueryBuilderUtil.dateFormats.get(
+                dateFormat.replaceAll(QueryBuilderUtil.SPACE_REGX, QueryBuilderUtil.EMPTY_STRING));
+        switch (interval) {
+          case "month":
+            field.setGroupInterval(GroupInterval.MONTH);
+            break;
+          case "year":
+            field.setGroupInterval(GroupInterval.YEAR);
+            break;
+          case "day":
+            field.setGroupInterval(GroupInterval.DAY);
+            break;
+          case "hour":
+            field.setGroupInterval(GroupInterval.HOUR);
+            break;
+          default:
+            // throw new IllegalArgumentException(interval + " not present");
+        }
+      }
     }
 
     // Set limit fields

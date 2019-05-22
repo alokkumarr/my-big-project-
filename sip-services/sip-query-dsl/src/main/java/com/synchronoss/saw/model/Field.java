@@ -74,6 +74,9 @@ public class Field {
   @JsonProperty("min_doc_count")
   private Integer minDocCount;
 
+  @JsonProperty("areaIndex")
+  private Integer areaIndex;
+
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonProperty("dataField")
@@ -231,7 +234,22 @@ public class Field {
     this.minDocCount = minDocCount;
   }
 
-  @JsonAnyGetter
+  /**
+   * Used in UI to rearrange field positions.
+   *
+   * @return index number
+   */
+  @JsonProperty("areaIndex")
+  public Integer getAreaIndex() {
+    return areaIndex;
+  }
+
+  @JsonProperty("areaIndex")
+  public void setAreaIndex(Integer areaIndex) {
+    this.areaIndex = areaIndex;
+  }
+
+    @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
   }

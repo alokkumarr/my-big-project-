@@ -5,20 +5,22 @@ import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
+import com.synchronoss.sip.utils.RestUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
@@ -37,14 +39,17 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${saw-dispatch-service-url}")
   private String dispatchUrl;
 
+  @Autowired private RestUtil restUtil;
+
   private RestTemplate restTemplate;
 
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-  @Autowired
-  public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
-    restTemplate = restTemplateBuilder.build();
-  }
+
+    @PostConstruct
+    public void init() throws Exception {
+      restTemplate = restUtil.restTemplate();
+    }
 
   public void executeAnalysis(String analysisId) {
     AnalysisExecution execution = ImmutableAnalysisExecution.builder().type("scheduled").build();

@@ -37,7 +37,7 @@ import {
   GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   DEFAULT_DATE_INTERVAL,
-  DEFAULT_DATE_FORMAT,
+  DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
 
@@ -607,7 +607,7 @@ export class DesignerService {
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
-                artifactColumn.format || DEFAULT_DATE_FORMAT.value
+                artifactColumn.format || DEFAULT_PIVOT_DATE_FORMAT.value
             } : {format: artifactColumn.format})
           };
         })

@@ -1,0 +1,126 @@
+{
+  "queryBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "type": "date",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "date",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "preset": "LY"
+        }
+      },
+      {
+        "type": "float",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "float",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "operator": "GTE",
+          "value": 1
+        }
+      },
+      {
+        "type": "string",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "string.keyword",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "modelValues": [
+            "str"
+          ],
+          "operator": "CONTAINS"
+        }
+      }
+    ],
+    "sorts": [
+      {
+        "tableName": "sample",
+        "columnName": "string.keyword",
+        "type": "string",
+        "order": "desc"
+      },
+      {
+        "tableName": "sample",
+        "columnName": "date",
+        "type": "date",
+        "order": "desc"
+      },
+      {
+        "tableName": "sample",
+        "aggregate": "sum",
+        "columnName": "double",
+        "type": "double",
+        "order": "asc"
+      }
+    ],
+    "rowFields": [
+      {
+        "type": "date",
+        "columnName": "date",
+        "area": "row",
+        "areaIndex": 0,
+        "aggregate": null,
+        "name": null,
+        "dateInterval": "day",
+        "dateFormat": "yyyy-MM-dd"
+      }
+    ],
+    "columnFields": [
+      {
+        "type": "string",
+        "columnName": "string.keyword",
+        "area": "column",
+        "areaIndex": 0,
+        "aggregate": null,
+        "name": null,
+        "dateInterval": null
+      },
+      {
+        "type": "long",
+        "columnName": "long",
+        "area": "column",
+        "areaIndex": 1,
+        "aggregate": null,
+        "name": null,
+        "dateInterval": null
+      }
+    ],
+    "dataFields": [
+      {
+        "type": "double",
+        "columnName": "double",
+        "area": "data",
+        "areaIndex": 0,
+        "aggregate": "sum",
+        "name": "double",
+        "dateInterval": null
+      },
+      {
+        "type": "float",
+        "columnName": "float",
+        "area": "data",
+        "areaIndex": 1,
+        "aggregate": "sum",
+        "name": "float",
+        "dateInterval": null
+      },
+      {
+        "type": "integer",
+        "columnName": "integer",
+        "area": "data",
+        "areaIndex": 2,
+        "aggregate": "sum",
+        "name": "integer",
+        "dateInterval": null
+      }
+    ]
+  }
+}

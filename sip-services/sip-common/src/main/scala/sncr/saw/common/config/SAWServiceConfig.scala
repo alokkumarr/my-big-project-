@@ -27,6 +27,8 @@ object SAWServiceConfig {
 
   lazy val es_conf: Config = conf.getConfig("es")
   lazy val semanticService: Config = conf.getConfig("semantic")
+  lazy val sipSsl: Config = conf.getConfig("sip.ssl")
+  lazy val sslConfig: Config = conf.getConfig("ssl-config")
   lazy val dl_conf: Config = conf.getConfig("dl")
   lazy val metadataConfig : Config = conf.getConfig("metadata")
   lazy val executorConfig :Config = conf.getConfig("report.executor")

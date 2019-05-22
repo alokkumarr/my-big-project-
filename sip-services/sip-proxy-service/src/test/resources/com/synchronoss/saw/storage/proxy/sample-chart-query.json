@@ -1,0 +1,58 @@
+{
+  "booleanCriteria": "AND",
+  "filters": [{
+    "type": "float",
+    "tableName": "sample",
+    "isOptional": false,
+    "columnName": "float",
+    "isRuntimeFilter": false,
+    "isGlobalFilter": true
+  }],
+  "sorts": [
+    {
+      "order": "asc",
+      "columnName": "date",
+      "type": "date"
+    },
+    {
+      "order": "asc",
+      "columnName": "string.keyword",
+      "type": "string"
+    }
+  ],
+  "dataFields": [{
+    "aggregate": "sum",
+    "alias": "",
+    "checked": "y",
+    "columnName": "double",
+    "name": "double",
+    "comboType": "column",
+    "displayName": "Double",
+    "table": "sales",
+    "tableName": "sales",
+    "type": "double"
+  }],
+  "nodeFields": [
+    {
+      "alias": "",
+      "checked": "x",
+      "columnName": "date",
+      "name": "date",
+      "displayName": "Date",
+      "table": "sample",
+      "tableName": "sample",
+      "type": "date",
+      "dateFormat": "MMM d YYYY"
+    },
+    {
+      "alias": "",
+      "checked": "g",
+      "columnName": "string.keyword",
+      "name": "string.keyword",
+      "displayName": "String",
+      "table": "sample",
+      "tableName": "sample",
+      "type": "string"
+    }
+  ]
+}
