@@ -658,7 +658,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite}</arguments>
+              <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite} --isHttps=${sip.cloud.secure}</arguments>
             </configuration>
           </execution>
            <execution>

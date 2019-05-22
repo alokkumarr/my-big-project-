@@ -7,6 +7,7 @@ var argv = require('yargs').argv;
 const webpackHelper = require('./webpack.helper');
 const logger = require('./v2/conf/logger')(__filename);
 const SuiteSetup = require('./v2/helpers/SuiteSetup');
+const Constants = require('./v2/helpers/Constants');
 /**
  * Note about intervals:
  * Defined to be dependent on environment where tests are executed. Running against distribution package in CI requires
@@ -285,6 +286,10 @@ exports.config = {
     });
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
+    browser.baseUrl = JSON.parse(
+      fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', 'utf8')
+    ).baseUrl;
+
     browser.get(browser.baseUrl);
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
