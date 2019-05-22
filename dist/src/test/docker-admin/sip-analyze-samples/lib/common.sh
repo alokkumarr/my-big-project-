@@ -1,11 +1,12 @@
 #
 # Functions shared across sample SAW metric load scripts
 #
+secure=$1
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 mdcli="sshpass -p root ssh sip-app1 $sudo_mapr /opt/saw/service/bin/mdcli.sh"
 datalake_home=/var/sip/services/saw-analyze-samples
-semantic_service=http://sip-app1:9500
+semantic_service=$secure//sip-app1:9500
 sample_location=/root/saw-analyze-samples
 
 wait_maprfs() {
@@ -24,14 +25,14 @@ wait_semantic_service(){
 RETRIES=10
 while :
 do
-STATUS=$(curl -s -o /dev/null -w '%{http_code}' "$semantic_service/actuator/health")
+STATUS=$(curl -k -s -o /dev/null -w '%{http_code}' "$semantic_service/actuator/health")
 if [ $STATUS -eq 200 ];
 then
  while :
  do
       set -o pipefail
       local semantic_status=$(curl -H "Content-Type:application/json" -XGET "$semantic_service/actuator/health" | jq -r .status)
-      STATUS=$(curl -s -o /dev/null -w '%{http_code}' "$semantic_service""/actuator/health")
+      STATUS=$(curl -k -s -o /dev/null -w '%{http_code}' "$semantic_service""/actuator/health")
       echo "HTTP STATUS: $STATUS"
       if [ $semantic_status != "UP" ]
       then
@@ -62,7 +63,7 @@ insert_json_store_sample(){
  echo "Inserting the sample data starts here."
  local data_location=$1
  echo "data to be inserted $data_location"
- inserted_sample=$(curl -H "Content-type:application/json" -XPOST $semantic_service"/internal/semantic/workbench/create" -d "@$data_location" | jq '.')
+ inserted_sample=$(curl -k -H "Content-type:application/json" -XPOST $semantic_service"/internal/semantic/workbench/create" -d "@$data_location" | jq '.')
  echo "output after inserting into store $inserted_sample"
  echo "Inserting the sample data ends here."
 }

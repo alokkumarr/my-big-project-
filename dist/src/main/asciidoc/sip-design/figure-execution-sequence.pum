@@ -1,16 +1,16 @@
 == Authentication ==
 
-Client -> "SAW Security Service": Authentication request
-"SAW Security Service" --> Client: Authentication response
+Client -> "SIP Security Service": Authentication request
+"SIP Security Service" --> Client: Authentication response
 
 == Workbench ==
 
-Client -> "SAW Gateway Service": Workbench request
-"SAW Gateway Service" -> "SAW Workbench Service": Workbench request
+Client -> "SIP Gateway Service": Workbench request
+"SIP Gateway Service" -> "SIP Workbench Service": Workbench request
 
-"SAW Workbench Service" -> "XDF nextgen API": Access MapRDB
+"SIP Workbench Service" -> "XDF nextgen API": Access MapRDB
 "Execute MapRDB API" -> "MapR-FS": Write results
-"MapR-FS" --> "SAW Workbench Service": Read results
+"MapR-FS" --> "SIP Workbench Service": Read results
 
-"SAW Execution Service" --> "SAW Gateway Service": Execution response
-"SAW Gateway Service" --> Client: Execution response
+"SIP Execution Service" --> "SIP Gateway Service": Execution response
+"SIP Gateway Service" --> Client: Execution response

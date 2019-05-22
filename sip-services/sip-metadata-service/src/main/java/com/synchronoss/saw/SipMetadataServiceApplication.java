@@ -1,12 +1,14 @@
 package com.synchronoss.saw;
 
+import com.synchronoss.saw.semantic.service.MigrationService;
 import info.faljse.SDNotify.SDNotify;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,7 +20,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
-@ComponentScan("com.synchronoss.saw")
+@ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
 @EnableAsync
 public class SipMetadataServiceApplication {
 
@@ -64,9 +66,20 @@ public class SipMetadataServiceApplication {
     return tomcat;
   }
 
+  @Autowired
+  private  MigrationService migrationService;
+
+  /**
+   * method.
+   * @param event ready event.
+   * @throws Exception exception.
+   */
   @EventListener
-  public void onApplicationEvent(ApplicationReadyEvent event) {
+  public void onApplicationEvent(ApplicationStartedEvent event) throws Exception {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
+    migrationService.init();
   }
+
+
 }

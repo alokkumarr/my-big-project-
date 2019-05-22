@@ -20,6 +20,10 @@ rtis_env=${app_home}/conf/rtis.env
     echo "RTIS_PORT=9950"
     echo "declare -r RTIS_USER=rtis-user"
     echo "declare -r RTIS_CURRENT_HOME=${app_home}"
+    echo "# BEGIN SECURE"
+    echo "# END SECURE"
+    echo "# BEGIN ANSIBLE MANAGED BLOCK"
+    echo "# END ANSIBLE MANAGED BLOCK"
 } >$rtis_env
 
 chown rtis-user:rtis-user $rtis_env
@@ -48,7 +52,7 @@ cd ${app_home}/conf &&
     rc=
     echo "*** ERROR in mk_conf.sh, see log file: $mk_conf_log"
     echo "    fix the problem and create valid /opt/bda/rtis/conf/application.conf"
-} 
+}
 [[ $ok_rc ]] && {
     chown rtis-user:rtis-user $app_conf_fnm
     chmod 640 $app_conf_fnm

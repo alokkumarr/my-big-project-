@@ -6,6 +6,6 @@ After=sip-deploy.service
 Type=oneshot
 ExecStart=/root/saw-analyze-samples/sample-elasticsearch/load-metric
 SyslogIdentifier=sip-analyze-elasticsearch-samples
-
+EnvironmentFile=/etc/bda/secure.env
 [Install]
 WantedBy=sip-deploy.service

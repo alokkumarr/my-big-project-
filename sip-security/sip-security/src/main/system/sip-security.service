@@ -5,6 +5,6 @@ Description=SIP Security
 ExecStart=/opt/bda/saw-security/bin/saw-security.sh start --fg
 SyslogIdentifier=sip-security
 Restart=on-failure
-
+EnvironmentFile=/etc/bda/security.env
 [Install]
 WantedBy=default.target

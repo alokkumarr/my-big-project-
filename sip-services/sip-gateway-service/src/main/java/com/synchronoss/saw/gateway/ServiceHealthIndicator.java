@@ -1,18 +1,18 @@
 package com.synchronoss.saw.gateway;
 
+import com.synchronoss.sip.utils.RestUtil;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.net.URL;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 public class ServiceHealthIndicator implements HealthIndicator {
@@ -21,30 +21,30 @@ public class ServiceHealthIndicator implements HealthIndicator {
   @Autowired
   private ApiGatewayProperties apiGatewayProperties;
 
+  @Autowired
+  private RestUtil restUtil;
+
+  private RestTemplate restTemplate;
+
   @Override
   public Health health() {
     Set<String> checked = new HashSet<>();
     List<String> errors = new ArrayList<>();
-    boolean healthy = true;
     log.debug("Checking health");
     String uri = null;
-    for (ApiGatewayProperties.Endpoint endpoint
-             : apiGatewayProperties.getEndpoints()) {
-    		uri	= endpoint.getLocation() +"/actuator/health";
-    	
+    for (ApiGatewayProperties.Endpoint endpoint : apiGatewayProperties.getEndpoints()) {
+      uri = endpoint.getLocation() + "/actuator/health";
       if (checked.contains(uri)) {
         /* Skip endpoints that already have been checked */
         continue;
       }
       checked.add(uri);
-      HttpURLConnection connection = null;
       try {
         log.debug("Checking health: {}", uri);
-        URL url = new URL(uri);
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-        int code = connection.getResponseCode();
+        restTemplate = restUtil.restTemplate();
+        ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+        int code = result.getStatusCodeValue();
+
         log.debug("Health check respose code: {}", code);
         if (code != 200) {
           errors.add(uri + ": respose code: " + code);
@@ -52,13 +52,6 @@ public class ServiceHealthIndicator implements HealthIndicator {
       } catch (Exception e) {
         log.debug("Health check error: {}", e.getMessage());
         errors.add(uri + ": health check error: " + e.getMessage());
-      } finally {
-        if (connection != null) {
-          /* Disconnect explicitly to avoid keeping too many
-           * connections open which might exhaust socket resources on
-           * the host */
-          connection.disconnect();
-        }
       }
     }
     if (!errors.isEmpty()) {
@@ -67,3 +60,4 @@ public class ServiceHealthIndicator implements HealthIndicator {
     return Health.up().build();
   }
 }
+

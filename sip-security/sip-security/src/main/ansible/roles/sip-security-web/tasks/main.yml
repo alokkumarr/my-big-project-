@@ -20,6 +20,26 @@
   user: name=saw group=saw
 - name: Create BDA directory
   file: path=/etc/bda state=directory
+
+ # Creating env file to hold the connector streaming
+- name: Create the /etc/bda directory
+  file:
+    path: /etc/bda/security.env
+    state: touch
+    mode: 0755
+
+- name: Copy the content of the file when it is secure
+  copy:
+    content: "SECURE=true"
+    dest: "/etc/bda/security.env"
+  when: sip_secure
+
+- name: Copy the content of the file when it is not secure
+  copy:
+    content: "SECURE=false"
+    dest: "/etc/bda/security.env"
+  when: not sip_secure
+
 - name: Create SAW Security variables file
   template: src=saw-security.vars dest=/etc/bda/saw-security.vars
 - name: Copy SAW Security package
@@ -29,8 +49,14 @@
   yum: name=/tmp/saw-security.rpm state=present
   notify:
     - restart saw-security
-- name: Run SAW Security configuration initialization
+- name: Run SAW Security configuration initialization when environment is not secure
   command: /opt/bda/saw-security/bin/conf_init
+  when: not sip_secure
+
+- name: Run SAW Security configuration initialization when environment is secure
+  command: /opt/bda/saw-security/bin/conf_init_secure
+  when: sip_secure
+
 - name: Run SAW Security initial database setup
   command: /opt/bda/saw-security/db/setup/init
   # Note: Run database initialization only on one of the nodes
