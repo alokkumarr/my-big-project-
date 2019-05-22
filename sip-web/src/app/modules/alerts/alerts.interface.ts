@@ -49,3 +49,32 @@ export interface AlertIds {
   alertRulesSysId: number;
   alertTriggerSysId: number;
 }
+
+export interface AlertDateCount {
+  date: string;
+  count: string;
+}
+export interface AlertDateSeverity {
+  count: string;
+  alertSeverity: string;
+}
+
+export interface AlertChartData {
+  y: number[];
+  x: string[];
+}
+
+export interface AlertFilterModel {
+  preset: string;
+  endTime?: string;
+  startTime?: string;
+  groupBy: string;
+}
+
+export interface AlertsStateModel {
+  alertFilter: AlertFilterModel;
+  allAlertsCountChartData: AlertChartData;
+  allAlertsSeverityChartData: AlertChartData;
+  selectedAlertCountChartData: AlertChartData;
+  selectedAlertRuleDetails: AlertConfig;
+}

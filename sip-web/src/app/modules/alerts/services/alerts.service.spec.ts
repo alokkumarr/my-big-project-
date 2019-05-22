@@ -39,4 +39,31 @@ describe('AlertsService', () => {
       service.getRequest('alerts/states') instanceof Observable
     ).toBeTruthy();
   });
+
+  it('should return observable for calling getAllAlertsCount', () => {
+    expect(
+      service.getAllAlertsCount({
+        preset: 'TW',
+        groupBy: 'StartTime'
+      }) instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should return observable for calling getAllAlertsSeverity', () => {
+    expect(
+      service.getAllAlertsSeverity({
+        preset: 'TW',
+        groupBy: 'StartTime'
+      }) instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('should return observable for calling getAlertCountById', () => {
+    expect(
+      service.getAlertCountById(1, {
+        preset: 'TW',
+        groupBy: 'StartTime'
+      }) instanceof Observable
+    ).toBeTruthy();
+  });
 });

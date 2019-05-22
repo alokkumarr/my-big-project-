@@ -54,6 +54,7 @@
     &__body {
       height: calc(100% - 45px);
       padding: 0 7px;
+      background-color: $background-color;
 
       &__grid {
         border-radius: 3px;

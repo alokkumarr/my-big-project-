@@ -8,7 +8,9 @@ if (environment.production) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost
-  apiUrl = 'https://saw01-rd-sip-vaste.sncrcorp.net';
+  // apiUrl = 'http://sip-bmum0001.sncrbda.dev.cloud.synchronoss.net';
+  apiUrl = 'http://52.91.244.221';
+  // apiUrl = 'https://saw01-rd-sip-vaste.sncrcorp.net';
 }
 /* eslint-enable */
 apiUrl += '/sip';

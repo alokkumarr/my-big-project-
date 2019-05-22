@@ -1,39 +1,66 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { AlertConfig, AlertIds } from '../../../alerts.interface';
-import { AlertsService } from '../../../services/alerts.service';
-import { SubscriptionLike } from 'rxjs';
+import { Component, Input, OnInit } from '@angular/core';
+import { Select, Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+
+import {
+  AlertConfig,
+  AlertIds,
+  AlertChartData
+} from '../../../alerts.interface';
+import {
+  LoadSelectedAlertRuleDetails,
+  LoadSelectedAlertCount
+} from '../../../state/alerts.actions';
+import { AlertsState } from '../../../state/alerts.state';
 
 @Component({
   selector: 'alert-detail',
   templateUrl: './alert-detail.component.html',
   styleUrls: ['./alert-detail.component.scss']
 })
-export class AlertDetailComponent implements OnInit, OnDestroy {
-  alertRuleDetails: AlertConfig;
-  subscriptions: SubscriptionLike[] = [];
+export class AlertDetailComponent implements OnInit {
+  constructor(private _store: Store) {}
+  public alertRuleDetails: AlertConfig;
 
-  constructor(public _alertService: AlertsService) {}
+  @Select(AlertsState.getAlertFilterString) filterString$: Observable<string>;
+
+  @Select(AlertsState.getSelectedAlertRuleDetails)
+  alertRuleDetails$: Observable<AlertConfig>;
+
+  @Select(AlertsState.getSelectedAlertCountChartData)
+  selectedAlertCountChartData$: Observable<AlertChartData>;
 
   @Input('alertIds')
-  set alertIds(alertIds: AlertIds) {
+  set setAlertIds(alertIds: AlertIds) {
+    this.alertIds = alertIds;
     if (alertIds) {
-      this.getalertRuleDetails(alertIds.alertRulesSysId);
+      this._store.dispatch(
+        new LoadSelectedAlertRuleDetails(alertIds.alertRulesSysId)
+      );
+      this._store.dispatch(
+        new LoadSelectedAlertCount(alertIds.alertRulesSysId)
+      );
     }
   }
 
-  ngOnInit() {}
+  public alertIds;
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
+  public additionalCountChartOptions = {
+    chart: {
+      type: 'area'
+    }
+  };
 
-  getalertRuleDetails(id) {
-    const ruleDetailsSub = this._alertService
-      .getAlertRuleDetails(id)
-      .subscribe((data: any) => {
-        this.alertRuleDetails = data;
-      });
-
-    this.subscriptions.push(ruleDetailsSub);
+  ngOnInit() {
+    this.filterString$.subscribe(() => {
+      if (this.alertIds) {
+        this._store.dispatch(
+          new LoadSelectedAlertCount(this.alertIds.alertRulesSysId)
+        );
+      }
+    });
+    this.alertRuleDetails$.subscribe(alertRuleDetails => {
+      this.alertRuleDetails = alertRuleDetails;
+    });
   }
 }

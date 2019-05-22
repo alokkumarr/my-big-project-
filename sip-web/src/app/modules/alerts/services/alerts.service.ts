@@ -3,13 +3,37 @@ import { HttpClient } from '@angular/common/http';
 
 import * as floor from 'lodash/floor';
 import * as get from 'lodash/get';
-import * as fpGet from 'lodash/fp/get';
 import { map } from 'rxjs/operators';
 
-import { GridPagingOptions } from '../alerts.interface';
+import { GridPagingOptions, AlertFilterModel } from '../alerts.interface';
 import AppConfig from '../../../../../appConfig';
+import { CUSTOM_DATE_PRESET_VALUE } from '../consts';
+import {
+  AlertDateCount,
+  AlertDateSeverity,
+  AlertConfig
+} from '../alerts.interface';
 
 const apiUrl = AppConfig.api.url;
+
+const getAlertCountPayload = (
+  dateFilter: AlertFilterModel,
+  groupBy: string
+) => {
+  const { preset, startTime, endTime } = dateFilter;
+  if (dateFilter.preset === CUSTOM_DATE_PRESET_VALUE) {
+    return {
+      preset,
+      startTime,
+      endTime,
+      groupBy
+    };
+  }
+  return {
+    preset,
+    groupBy: groupBy
+  };
+};
 @Injectable({
   providedIn: 'root'
 })
@@ -39,7 +63,30 @@ export class AlertsService {
   }
 
   getAlertRuleDetails(id: number) {
-    const url = `alerts/${id}`;
-    return this.getRequest(url).pipe(map(fpGet('alert')));
+    const url = `${apiUrl}/alerts/${id}`;
+    return this._http
+      .get<{ alert: AlertConfig; message: string }>(url)
+      .pipe(map(({ alert }) => alert));
+  }
+
+  getAllAlertsCount(dateFilter: AlertFilterModel) {
+    const url = `${apiUrl}/alerts/count`;
+    const payload = getAlertCountPayload(dateFilter, 'StartTime');
+
+    return this._http.post<AlertDateCount[]>(url, payload);
+  }
+
+  getAllAlertsSeverity(dateFilter: AlertFilterModel) {
+    const url = `${apiUrl}/alerts/count`;
+    const payload = getAlertCountPayload(dateFilter, 'Severity');
+
+    return this._http.post<AlertDateSeverity[]>(url, payload);
+  }
+
+  getAlertCountById(id, dateFilter: AlertFilterModel) {
+    const url = `${apiUrl}/alerts/count?alertRuleId=${id}`;
+    const payload = getAlertCountPayload(dateFilter, 'StartTime');
+
+    return this._http.post<AlertDateCount[]>(url, payload);
   }
 }

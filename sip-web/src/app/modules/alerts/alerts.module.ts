@@ -18,16 +18,18 @@ import {
 } from './components/configure/index';
 import {
   AlertsViewComponent,
+  AlertChartComponent,
   AlertsGridComponent,
   AlertDetailComponent,
   AlertsFilterComponent
 } from './components/alerts-view/index';
-import { AlertsFilterState } from './components/alerts-view/state/alerts.state';
+import { AlertsState } from './state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
 
 const components = [
   AlertsPageComponent,
   AlertsViewComponent,
+  AlertChartComponent,
   AlertsConfigurationComponent,
   AddAlertComponent,
   ConfirmActionDialogComponent,
@@ -48,7 +50,7 @@ const components = [
     DxTemplateModule,
     DxDataGridModule,
     DxSelectBoxModule,
-    NgxsModule.forFeature([AlertsFilterState])
+    NgxsModule.forFeature([AlertsState])
   ],
   entryComponents: components,
   providers: [IsAdminGuard],

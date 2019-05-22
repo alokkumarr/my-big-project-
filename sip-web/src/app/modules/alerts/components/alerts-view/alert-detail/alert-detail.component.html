@@ -63,6 +63,12 @@
   </div>
 
   <div fxFlex="50" fxLayoutAlign="center center">
-    <strong>Frequency Count Chart Here...</strong>
+    <alert-chart
+      style="height: 200px; width: 100%"
+      title="Frequency"
+      [dateFilter]="filterString$ | async"
+      [additionalOptions]="additionalCountChartOptions"
+      [chartData]="selectedAlertCountChartData$ | async"
+    ></alert-chart>
   </div>
 </div>

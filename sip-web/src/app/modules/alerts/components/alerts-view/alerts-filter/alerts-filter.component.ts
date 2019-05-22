@@ -1,16 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import { requireIf } from '../../../../../common/validators/index';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { ApplyAlertFilters } from '../state/alerts.actions';
+import {
+  ApplyAlertFilters,
+  ResetAlertFilters
+} from '../../../state/alerts.actions';
 
 import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS
 } from '../../../consts';
+import { AlertFilterModel } from '../../../alerts.interface';
 
 @Component({
   selector: 'alerts-filter',
@@ -23,11 +27,18 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
   datePresetSubscription: Subscription;
   showDateFields = false;
 
+  @Input('dateFilter') set setDateFilter(dateFilter: AlertFilterModel) {
+    const { preset, startTime, endTime } = dateFilter;
+    const isCustomDate = preset === CUSTOM_DATE_PRESET_VALUE;
+    this.alertFilterForm.setValue({
+      datePreset: dateFilter.preset,
+      gte: isCustomDate ? moment(startTime) : null,
+      lte: isCustomDate ? moment(endTime) : null
+    });
+  }
+
   constructor(private fb: FormBuilder, private store: Store) {
     this.createForm();
-    setTimeout(() => {
-      this.applyFilters();
-    });
   }
 
   ngOnInit() {}
@@ -62,29 +73,34 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
   }
 
   prepareDateFilterModel() {
-    const model = {
-      preset: this.alertFilterForm.get('datePreset').value,
-      groupBy: 'StartTime'
-    };
+    const preset = this.alertFilterForm.get('datePreset').value;
+    const groupBy = 'StartTime';
 
-    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) {
-      return model;
+    if (preset !== CUSTOM_DATE_PRESET_VALUE) {
+      return {
+        preset,
+        groupBy
+      };
     }
 
     return {
-      preset: 'BTW',
+      preset,
       endTime:
         this.alertFilterForm.get('lte').value.format(DATE_FORMAT.YYYY_MM_DD) +
         ' 23:59:59',
       startTime:
         this.alertFilterForm.get('gte').value.format(DATE_FORMAT.YYYY_MM_DD) +
         ' 00:00:00',
-      groupBy: 'StartTime'
+      groupBy
     };
   }
 
   applyFilters() {
     const filters = this.prepareDateFilterModel();
     this.store.dispatch(new ApplyAlertFilters(filters));
+  }
+
+  resetFilters() {
+    this.store.dispatch(new ResetAlertFilters());
   }
 }

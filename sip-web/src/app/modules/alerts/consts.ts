@@ -1,3 +1,7 @@
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMapValues from 'lodash/fp/mapValues';
+
 export const ALERT_SEVERITY = [
   { value: 'CRITICAL' },
   { value: 'MEDIUM' },
@@ -84,6 +88,11 @@ export const DATE_PRESETS = [
     label: 'Custom'
   }
 ];
+
+export const DATE_PRESETS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_PRESETS);
 
 export const DATE_FORMAT = {
   YYYY_MM_DD: 'YYYY-MM-DD',

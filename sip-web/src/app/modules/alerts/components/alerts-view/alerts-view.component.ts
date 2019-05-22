@@ -1,9 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertsService } from '../../services/alerts.service';
-import { GridData } from '../../alerts.interface';
-import { Select } from '@ngxs/store';
-import { AlertsFilterState } from './state/alerts.state';
+import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+
+import {
+  LoadAllAlertCount,
+  LoadAllAlertSeverity
+} from '../../state/alerts.actions';
+import { AlertsService } from '../../services/alerts.service';
+import {
+  GridData,
+  AlertChartData,
+  AlertFilterModel
+} from '../../alerts.interface';
+import { AlertsState } from '../../state/alerts.state';
 
 @Component({
   selector: 'alerts-view',
@@ -12,13 +21,59 @@ import { Observable } from 'rxjs';
 })
 export class AlertsViewComponent implements OnInit {
   public alertsDataLoader: (options: {}) => Promise<GridData>;
-  @Select(AlertsFilterState.getAlertFilters) filters$: Observable<any>;
+  @Select(AlertsState.getAlertFilterString) filterString$: Observable<string>;
+  @Select(AlertsState.getAlertFilter) filter$: Observable<AlertFilterModel>;
+  @Select(AlertsState.getAllAlertsCountChartData)
+  allAlertCountChartData$: Observable<AlertChartData>;
+  @Select(AlertsState.getAllAlertsSeverityChartData)
+  allAlertSeverityChartData$: Observable<AlertChartData>;
 
-  constructor(public _alertService: AlertsService) {
+  public additionalCountChartOptions = {
+    chart: {
+      type: 'areaspline'
+    }
+  };
+
+  public additionalSeverityChartOptions = {
+    chart: {
+      type: 'bar'
+    },
+    colors: ['#e4524c', '#ffbe00', '#24b18c', '#a5b7ce'],
+    plotOptions: {
+      series: {
+        colorByPoint: true
+      },
+      bar: {
+        dataLabels: {
+          enabled: true
+        }
+      }
+    },
+    xAxis: {
+      lineWidth: 0,
+      tickWidth: 0,
+      gridLineWidth: 0
+    },
+    yAxis: {
+      gridLineWidth: 0,
+      min: 0,
+      labels: {
+        enabled: false
+      },
+      visible: false
+    }
+  };
+
+  constructor(private _alertService: AlertsService, private _store: Store) {
     this.setAlertLoaderForGrid();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.filterString$.subscribe(() => {
+      this._store.dispatch(new LoadAllAlertCount());
+      this._store.dispatch(new LoadAllAlertSeverity());
+    });
+  }
 
   fetchLateshAlerts() {
     this.setAlertLoaderForGrid();

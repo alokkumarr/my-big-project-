@@ -24,7 +24,7 @@
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>
-      <alerts-filter fxFlex></alerts-filter>
+      <alerts-filter [dateFilter]="filter$ | async" fxFlex></alerts-filter>
     </div>
   </mat-sidenav>
   <mat-sidenav-content fxFlex fxLayout="column" class="view-container-content">
@@ -67,11 +67,32 @@
       class="view-container-content__body"
     >
       <div
-        fxFlex="100"
-        class="view-container-content__body__grid mat-elevation-z3"
+        fxLayout="row"
+        fxLayoutAlign="space-around"
+        style="width: 100%; height: 250px;"
       >
-        <alerts-grid [alertsDataLoader]="alertsDataLoader"></alerts-grid>
+        <alert-chart
+          class="mat-elevation-z3"
+          style="width: calc(60% - 30px); height: 170px; padding: 10px 10px 0 10px; margin-right: 10px;"
+          title="All Alerts"
+          [dateFilter]="filterString$ | async"
+          [additionalOptions]="additionalCountChartOptions"
+          [chartData]="allAlertCountChartData$ | async"
+        ></alert-chart>
+
+        <alert-chart
+          class="mat-elevation-z3"
+          style="width: calc(40% - 30px); height: 170px; padding: 10px 10px 0 10px;"
+          title="Severity"
+          [dateFilter]="filterString$ | async"
+          [additionalOptions]="additionalSeverityChartOptions"
+          [chartData]="allAlertSeverityChartData$ | async"
+        ></alert-chart>
       </div>
+      <alerts-grid
+        [alertsDataLoader]="alertsDataLoader"
+        class="view-container-content__body__grid mat-elevation-z3"
+      ></alerts-grid>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

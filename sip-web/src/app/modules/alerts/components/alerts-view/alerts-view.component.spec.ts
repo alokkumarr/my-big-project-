@@ -2,9 +2,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgxsModule } from '@ngxs/store';
 
 import { MaterialModule } from '../../../../material.module';
-
+import { AlertsState } from '../../state/alerts.state';
 import { AlertsViewComponent } from './alerts-view.component';
 
 describe('AlertsViewComponent', () => {
@@ -13,7 +14,12 @@ describe('AlertsViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, MaterialModule, HttpClientTestingModule],
+      imports: [
+        NoopAnimationsModule,
+        MaterialModule,
+        HttpClientTestingModule,
+        NgxsModule.forRoot([AlertsState])
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [AlertsViewComponent]
     }).compileComponents();
