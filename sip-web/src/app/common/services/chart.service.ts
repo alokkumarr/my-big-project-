@@ -752,45 +752,43 @@ export class ChartService {
       value: 'percentage'
     });
 
-    if (!isEmpty(gridData)) {
-      const { series, categories } = this.splitToSeriesAndCategories(
-        gridData,
-        fields,
-        opts,
-        type
-      );
-      const { chartSeries } = this.customizeSeriesForChartType(
-        series,
-        type,
-        categories,
-        fields
-      );
+    const { series, categories } = this.splitToSeriesAndCategories(
+      gridData,
+      fields,
+      opts,
+      type
+    );
+    const { chartSeries } = this.customizeSeriesForChartType(
+      series,
+      type,
+      categories,
+      fields
+    );
 
-      forEach(chartSeries, seriesData => {
-        seriesData.name = yLabel;
-        seriesData.dataLabels = seriesData.dataLabels || {};
-        seriesData.dataLabels.enabled = labelOptions.enabled;
+    forEach(chartSeries, seriesData => {
+      seriesData.name = yLabel;
+      seriesData.dataLabels = seriesData.dataLabels || {};
+      seriesData.dataLabels.enabled = labelOptions.enabled;
 
-        /* eslint-disable */
-        seriesData.dataLabels.formatter = function() {
-          if (this.percentage <= 5) {
-            return null;
-          }
-          const data =
-            labelOptions.value === 'percentage' ? this.percentage : this.y;
-          const isPercent = labelOptions.value === 'percentage';
-          return `${this.point.name}: ${addCommas(round(data, 2))}${
-            isPercent ? '%' : ''
-          }`;
-        };
-        /* eslint-enable */
-      });
+      /* eslint-disable */
+      seriesData.dataLabels.formatter = function() {
+        if (this.percentage <= 5) {
+          return null;
+        }
+        const data =
+          labelOptions.value === 'percentage' ? this.percentage : this.y;
+        const isPercent = labelOptions.value === 'percentage';
+        return `${this.point.name}: ${addCommas(round(data, 2))}${
+          isPercent ? '%' : ''
+        }`;
+      };
+      /* eslint-enable */
+    });
 
-      changes.push({
-        path: 'series',
-        data: chartSeries
-      });
-    }
+    changes.push({
+      path: 'series',
+      data: chartSeries
+    });
 
     return changes;
   }
