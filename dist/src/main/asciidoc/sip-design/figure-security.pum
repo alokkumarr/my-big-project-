@@ -1,7 +1,7 @@
-[SAW Security Service]
+[SIP Security Service]
 
 database "MariaDB" {
-    ["SAW Security database"]
+    ["SIP Security database"]
 }
 
-[SAW Security Service] .> ["SAW Security database"]
+[SIP Security Service] .> ["SIP Security database"]

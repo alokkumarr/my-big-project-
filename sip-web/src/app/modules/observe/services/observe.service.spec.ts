@@ -9,6 +9,7 @@ import {
   MenuService,
   CommonSemanticService
 } from '../../../common/services';
+import { AnalyzeService } from '../../analyze/services/analyze.service';
 import { Observable } from 'rxjs';
 
 const mockService = {};
@@ -24,6 +25,7 @@ describe('Observe Service', () => {
         { provide: MenuService, useValue: mockService },
         { provide: Router, useValue: mockService },
         { provide: ActivatedRoute, useValue: mockService },
+        { provide: AnalyzeService, useValue: mockService },
         {
           provide: CommonSemanticService,
           useValue: new CommonSemanticServiceStub()

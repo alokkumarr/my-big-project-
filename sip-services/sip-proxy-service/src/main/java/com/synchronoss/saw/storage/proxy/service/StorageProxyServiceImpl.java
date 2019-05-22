@@ -480,6 +480,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     } catch (Exception e) {
 
       logger.error("Error occurred while storing the execution result data");
+      logger.error(e.getMessage());
     }
     return false;
   }

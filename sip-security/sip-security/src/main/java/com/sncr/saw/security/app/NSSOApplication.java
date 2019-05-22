@@ -1,14 +1,13 @@
-/**
- * 
- */
 package com.sncr.saw.security.app;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.Http11NioProtocol;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -27,13 +26,12 @@ import com.sncr.saw.security.common.util.JwtFilter;
  */
 
 @SpringBootApplication
-//@EnableDiscoveryClient
 public class NSSOApplication extends SpringBootServletInitializer {
 	
 	private static String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 	private static final String pidPath = "/var/bda/saw-security/run/saw-security.pid";
 
-    /**
+	/**
      * TomcatServletWebServerFactory has been overridden.
      */
 
@@ -48,26 +46,21 @@ public class NSSOApplication extends SpringBootServletInitializer {
         return tomcat;
     }
 
-
-	@Override
+ 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(NSSOApplication.class);
 	}
 
-	@Bean
-	public FilterRegistrationBean jwtFilter() {
-		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-		registrationBean.setFilter(new JwtFilter());
-		registrationBean.addUrlPatterns("/auth/*");
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Bean
+    public FilterRegistrationBean<?> jwtFilter() {
+      final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+      registrationBean.setFilter(new JwtFilter());
+      registrationBean.addUrlPatterns("/auth/*");
+  
+      return registrationBean;
+    }
 
-		return registrationBean;
-	}
-
-	/*
-	 * @Override protected SpringApplicationBuilder configure(
-	 * SpringApplicationBuilder builder) { // TODO Auto-generated method stub
-	 * return builder.sources(NSSOApplication.class); }
-	 */
 	public static void main(String[] args) {
 		try {        	
 			Files.write(Paths.get(pidPath), pid.getBytes());

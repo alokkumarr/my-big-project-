@@ -1,45 +1,44 @@
-package com.synchronoss.saw.storage.proxy.service;
+package com.synchronoss.saw.storage.proxy.service.executionResultMigrationService;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * @author Alok.KumarR
  * @since 3.3.0
  */
-public class ChartResultMigration {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ChartResultMigration.class);
+public abstract class ResultMigration {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResultMigration.class);
 
   private static final String KEY = "key";
   private static final String NAME = "name";
-  private static final String DATA = "data";
   private static final String VALUE = "value";
   private static final String BUCKETS = "buckets";
-  private static final String NODE_FIELD = "node_field_";
   private static final String COLUMN_NAME = "columnName";
   private static final String DATA_FIELDS = "dataFields";
-  private static final String NODE_FIELDS = "nodeFields";
-  private static final String QUERY_BUILDER = "queryBuilder";
+  private static final String KEY_AS_STRING = "key_as_string";
 
   private JsonNode queryBuilder;
+
+  public abstract List<Object> parseData(JsonNode dataNode, JsonNode queryNode);
 
   /**
    * Parsed chart data to flatten structure
    *
-   * @param jsonNode
+   * @param dataNode
+   * @param queryNode
    * @return
    */
-  public List<Object> parseData(JsonNode jsonNode) {
-    queryBuilder = jsonNode.get(QUERY_BUILDER);
+  public List<Object> parseData(
+      JsonNode dataNode, JsonNode queryNode, String levelField, String columnField) {
+    queryBuilder = queryNode;
     Map<String, String> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
-    flatStructure = jsonNodeParser(jsonNode.get(DATA), dataObj, flatStructure, 1);
+    flatStructure = jsonNodeParser(dataNode, dataObj, flatStructure, 1, levelField, columnField);
     return flatStructure;
   }
 
@@ -53,13 +52,20 @@ public class ChartResultMigration {
    * @return flatten response
    */
   public List<Object> jsonNodeParser(
-      JsonNode jsonNode, Map dataObj, List<Object> flatStructure, int level) {
+      JsonNode jsonNode,
+      Map dataObj,
+      List<Object> flatStructure,
+      int level,
+      String levelField,
+      String columnField) {
 
     LOGGER.trace("jsonNodeParser starts here :" + jsonNode);
     JsonNode childNode = jsonNode;
     if (childNode.get(KEY) != null) {
-      String columnName = getColumnNames(level);
-      if (childNode.get(KEY).isNumber()) {
+      String columnName = getColumnNames(level, columnField);
+      if (childNode.get(KEY_AS_STRING) != null) {
+        dataObj.put(columnName, childNode.get(KEY_AS_STRING).textValue());
+      } else if (childNode.get(KEY).isNumber()) {
         switch (childNode.get(KEY).numberType()) {
           case LONG:
             dataObj.put(columnName, childNode.get(KEY).longValue());
@@ -87,13 +93,13 @@ public class ChartResultMigration {
       }
     }
 
-    JsonNode childNodeLevel = jsonNode.get(NODE_FIELD + level);
+    JsonNode childNodeLevel = jsonNode.get(levelField + level);
     if (childNodeLevel != null) {
       JsonNode nodeBucket = childNodeLevel.get(BUCKETS);
       Iterator<JsonNode> iterator = nodeBucket.iterator();
       while (iterator.hasNext()) {
         JsonNode nextNode = iterator.next();
-        jsonNodeParser(nextNode, dataObj, flatStructure, level + 1);
+        jsonNodeParser(nextNode, dataObj, flatStructure, level + 1, levelField, columnField);
       }
     } else {
       Map<String, String> records = new LinkedHashMap<>();
@@ -104,7 +110,33 @@ public class ChartResultMigration {
         JsonNode dataField = iterator.next();
         String columnName = dataField.get(NAME).asText();
         if (jsonNode.has(columnName)) {
-          records.put(columnName, String.valueOf(jsonNode.get(columnName).get(VALUE)));
+          JsonNode childJSNode = jsonNode.get(columnName).get(VALUE);
+          if (childJSNode.isNumber()) {
+            switch (childJSNode.numberType()) {
+              case LONG:
+                dataObj.put(columnName, childJSNode.longValue());
+                break;
+              case BIG_INTEGER:
+                dataObj.put(columnName, childJSNode.bigIntegerValue());
+                break;
+              case FLOAT:
+                dataObj.put(columnName, childJSNode.floatValue());
+                break;
+              case DOUBLE:
+                dataObj.put(columnName, childJSNode.doubleValue());
+                break;
+              case BIG_DECIMAL:
+                dataObj.put(columnName, childJSNode.decimalValue());
+                break;
+              case INT:
+                dataObj.put(columnName, childJSNode.intValue());
+                break;
+              default:
+                dataObj.put(columnName, childJSNode.toString());
+            }
+          } else {
+            dataObj.put(columnName, childJSNode.toString());
+          }
         }
       }
       flatStructure.add(records);
@@ -120,8 +152,8 @@ public class ChartResultMigration {
    * @param level
    * @return column name
    */
-  private String getColumnNames(int level) {
-    JsonNode nodeFields = queryBuilder.get(NODE_FIELDS);
+  private String getColumnNames(int level, String columnField) {
+    JsonNode nodeFields = queryBuilder.get(columnField);
     String columnName = nodeFields.get(level - 2).get(COLUMN_NAME).asText();
     String[] split = columnName != null ? columnName.split("\\.") : null;
     if (split != null && split.length >= 2) return split[0];

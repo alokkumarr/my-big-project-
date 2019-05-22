@@ -34,7 +34,7 @@ public class BisSimpleJobTest {
   @InjectMocks
   @Spy
   BisSimpleJob simpleJob;
-
+  
   @Test
   public void testExecuteInternal()
       throws RestClientException, URISyntaxException, JobExecutionException {

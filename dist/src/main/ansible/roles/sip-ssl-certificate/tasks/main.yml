@@ -1,0 +1,24 @@
+# Creating store & certificate to every node for all service to be used by server & client
+- name: Ensure directory exists for local self-signed TLS certs.
+  file:
+    path: "{{ inventory_dir }}/certificate"
+    state: directory
+    mode: 0755
+
+- name: Generate an OpenSSL private key.
+  openssl_privatekey:
+    path: "{{ inventory_dir }}/certificate/main-private.pem"
+
+- name: Generate an OpenSSL CSR.
+  openssl_csr:
+    path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
+    organization_name: "SNCR"
+    organizational_unit_name : "DXP"
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
+    privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
+    csr_path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    provider: selfsigned
