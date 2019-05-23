@@ -18,6 +18,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
@@ -142,8 +143,6 @@ public class MigrateAnalysis {
               try {
                 analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
-                Gson gson = new GsonBuilder().create();
-                // JsonElement parsedAnalysis = gson.toJsonTree(analysis, Analysis.class);
                 JsonElement parsedAnalysis =
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
                 analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
@@ -157,8 +156,8 @@ public class MigrateAnalysis {
                 migrationStatusObject.setExecutionsMigrated(false);
                 // Migration of Executions is done via proxy-service
                 successfulMigration.incrementAndGet();
-              } catch (JsonProcessingException exception) {
-                logger.error("Unable to convert analysis to json");
+              } catch (JsonProcessingException | MissingFieldException exception) {
+                logger.error("Unable to convert analysis to json ", exception);
 
                 migrationStatusObject.setAnalysisMigrated(false);
                 migrationStatusObject.setMessage(exception.getMessage());
@@ -197,7 +196,7 @@ public class MigrateAnalysis {
    * @param analysisObject Single analysis object in old definition
    * @return
    */
-  private Analysis convertOldAnalysisObjtoSipDsl(JsonObject analysisObject) {
+  private Analysis convertOldAnalysisObjtoSipDsl(JsonObject analysisObject) throws Exception {
     Analysis analysis = null;
 
     String analysisType = analysisObject.get("type").getAsString();
@@ -219,14 +218,14 @@ public class MigrateAnalysis {
         converter = new GeoMapConverter();
         break;
       default:
-        logger.error("Unknown report type");
+        logger.error("Unknown analysis type");
         break;
     }
 
     if (converter != null) {
       analysis = converter.convert(analysisObject);
     } else {
-      logger.error("Unknown report type");
+      logger.error("Unknown analysis type");
     }
 
     return analysis;
@@ -287,7 +286,7 @@ public class MigrateAnalysis {
    * @param args - command line args
    * @throws IOException - In case of file errors
    */
-  public static void main1(String[] args) throws IOException {
+  public static void main1(String[] args) throws Exception {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
 
@@ -302,8 +301,7 @@ public class MigrateAnalysis {
 
     Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
 
-    JsonElement parsedAnalysis =
-        SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
+    System.out.println(gson.toJson(analysis));
   }
 
   /**
@@ -327,9 +325,6 @@ public class MigrateAnalysis {
     MigrateAnalysis ma = new MigrateAnalysis();
 
     MigrationStatus migrationStatus = ma.convertAllAnalysis(analysisList);
-    String migrationStatusPath = ma.migrationDirectory + "/" + ma.migrationStatusFile;
-    PrintWriter out = new PrintWriter(migrationStatusPath);
-    out.println(gson.toJson(migrationStatus));
-    out.close();
+    System.out.println(gson.toJson(migrationStatus));
   }
 }
