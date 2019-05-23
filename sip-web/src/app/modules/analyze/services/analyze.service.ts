@@ -28,7 +28,7 @@ import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
-import { isArray } from 'util';
+import * as isArray from 'lodash/isArray';
 
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
