@@ -888,13 +888,16 @@
         <filtering>true</filtering>
       </testResource>
       <testResource>
-        <directory>src/test/docker-admin/sip-deploy</directory>
+        <directory>${basedir}/src/test/docker-admin/sip-deploy/resources</directory>
         <includes>
             <include>sip-config</include>
         </includes>
         <filtering>true</filtering>
+        <targetPath>${basedir}/src/test/docker-admin/sip-deploy</targetPath>
       </testResource>
     </testResources>
+
+
   </build>
   <repositories>
     <repository>
