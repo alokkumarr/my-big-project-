@@ -56,7 +56,6 @@ public class PivotResultMigration {
   public List<Object> jsonNodeParser(
       JsonNode jsonNode, Map dataObj, List<Object> flatStructure, int level) {
 
-    LOGGER.trace("jsonNodeParser starts here :" + jsonNode);
     JsonNode childNode = jsonNode;
     if (childNode.get(KEY) != null) {
       String columnName = getColumnNames(level);
@@ -140,8 +139,6 @@ public class PivotResultMigration {
         }
       }
       flatStructure.add(records);
-      LOGGER.trace("jsonNodeParser ends here :" + jsonNode);
-      LOGGER.trace("Flat Structure Build :" + flatStructure);
     }
     return flatStructure;
   }
