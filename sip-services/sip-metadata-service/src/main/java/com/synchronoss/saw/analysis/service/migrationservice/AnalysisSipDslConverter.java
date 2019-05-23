@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface AnalysisSipDslConverter {
-  Analysis convert(JsonObject oldAnalysisDefinition) throws Exception;
+  Analysis convert(JsonObject oldAnalysisDefinition) throws MissingFieldException;
 
   /**
    * Set all the common parameters across all types of analysis.
@@ -29,7 +29,7 @@ public interface AnalysisSipDslConverter {
    * @return Analysis Object
    */
   default Analysis setCommonParams(Analysis analysis, JsonObject oldAnalysisDefinition)
-      throws Exception {
+      throws MissingFieldException {
     if (analysis == null) {
       return null;
     }

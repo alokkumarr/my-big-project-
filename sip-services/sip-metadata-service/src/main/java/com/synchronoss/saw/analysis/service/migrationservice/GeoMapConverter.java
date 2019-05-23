@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.MigrateAnalysis;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Store;
 import com.synchronoss.saw.model.geomap.GeoRegion;
@@ -20,7 +21,7 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
 
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) throws Exception {
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws MissingFieldException {
     logger.trace("Geo - map converter called.");
     logger.info("old analysis definition : " + oldAnalysisDefinition.toString());
     Analysis analysis = new Analysis();

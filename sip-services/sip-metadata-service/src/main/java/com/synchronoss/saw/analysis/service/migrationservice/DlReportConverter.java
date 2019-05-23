@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.Field;
@@ -21,7 +22,7 @@ import java.util.List;
 public class DlReportConverter implements AnalysisSipDslConverter {
 
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) throws Exception {
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws MissingFieldException {
     Analysis analysis = new Analysis();
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);
