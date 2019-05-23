@@ -673,6 +673,7 @@ public class BatchIngestionIT extends BaseIT {
   @Test
   public void transferData() throws JsonProcessingException {
     ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/small");
+    routeMetadata.put("disableDuplicate", true);
     Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
         .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
         .getLong("bisChannelSysId");
