@@ -90,6 +90,12 @@
 
 		</dependency>
 		<dependency>
+			<groupId>com.synchronoss.bda.sip</groupId>
+			<artifactId>sip-common-components</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
 		</dependency>
