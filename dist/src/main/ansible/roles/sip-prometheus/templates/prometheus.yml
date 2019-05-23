@@ -9,9 +9,15 @@ scrape_configs:
           - '{{ host }}:8100'
 {% endfor %}
   - job_name: 'sip-export'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -19,9 +25,15 @@ scrape_configs:
           - '{{ host }}:9400'
 {% endfor %}
   - job_name: 'sip-metadata'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -29,9 +41,15 @@ scrape_configs:
           - '{{ host }}:9500'
 {% endfor %}
   - job_name: 'sip-scheduler'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -39,9 +57,15 @@ scrape_configs:
           - '{{ host }}:9600'
 {% endfor %}
   - job_name: 'sip-workbench'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -49,9 +73,15 @@ scrape_configs:
           - '{{ host }}:9700'
 {% endfor %}
   - job_name: 'sip-storage-proxy'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -59,9 +89,15 @@ scrape_configs:
           - '{{ host }}:9800'
 {% endfor %}
   - job_name: 'sip-batch-ingestion'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
@@ -69,9 +105,15 @@ scrape_configs:
           - '{{ host }}:9903'
 {% endfor %}
   - job_name: 'sip-security'
+
+{% if sip_secure %}
+
     scheme: https
     tls_config:
       insecure_skip_verify: true
+
+{% endif %}
+
     metrics_path: '/saw-security/actuator/prometheus'
     static_configs:
       - targets:
