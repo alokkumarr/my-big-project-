@@ -1,9 +1,17 @@
-import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  OnInit,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import {
   ExecuteService,
   EXECUTION_STATES
@@ -18,6 +26,7 @@ import { JwtService } from '../../../../common/services';
   styleUrls: ['./analyze-list-view.component.scss']
 })
 export class AnalyzeListViewComponent implements OnInit {
+  @ViewChild('analysesGrid') analysesGrid: DxDataGridComponent;
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input('analyses')
   set setAnalyses(analyses: Array<Analysis | AnalysisDSL>) {
@@ -33,8 +42,15 @@ export class AnalyzeListViewComponent implements OnInit {
   }
   @Input() analysisType: string;
   @Input() searchTerm: string;
-  @Input() cronJobs: any;
+  @Input('cronJobs') set _cronJobs(value) {
+    this.cronJobs = value;
+    if (this.analysesGrid && this.analysesGrid.instance && this.analyses) {
+      this.analyses = [...this.analyses];
+      this.analysesGrid.instance.refresh();
+    }
+  }
 
+  cronJobs: any;
   public config: any;
   public canUserFork = false;
   public analyses: (Analysis | AnalysisDSL)[];
