@@ -173,6 +173,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       );
       break;
     case 'edit':
+      this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
       isDSLAnalysis(this.analysis) &&
         this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
       this.initExistingAnalysis();
@@ -192,6 +193,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
+        this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
@@ -234,6 +236,21 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       return 'single';
     }
+  }
+
+  mapTableWithFields(analysis) {
+    let tableName = '';
+    forEach(analysis.sipQuery.artifacts, table => {
+      tableName = table.artifactsName;
+      table.fields = map(table.fields, field => {
+        if (field.table) {
+          return field;
+        }
+        field.table = tableName;
+        return field;
+      });
+    });
+    return analysis;
   }
 
   initNewAnalysis() {
