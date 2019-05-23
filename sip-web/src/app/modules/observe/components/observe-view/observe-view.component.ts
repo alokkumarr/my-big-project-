@@ -24,7 +24,6 @@ import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
 import { map, catchError, flatMap } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
-import * as isEmpty from 'lodash/isEmpty';
 
 function downloadDataUrlFromJavascript(filename, dataUrl) {
   const blob = dataURItoBlob(dataUrl);
@@ -297,12 +296,9 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       this.sidenav.close();
       return;
     }
-    if (!isEmpty(data.analysisFilters)) {
-      this.filters.onApplyFilter.next(data.analysisFilters);
-    }
-    if (!isEmpty(data.kpiFilters)) {
-      this.filters.onApplyKPIFilter.next(data.kpiFilters);
-    }
+
+    this.filters.onApplyFilter.next(data.analysisFilters);
+    this.filters.onApplyKPIFilter.next(data.kpiFilters);
     this.sidenav.close();
   }
 
