@@ -5,6 +5,7 @@ const PIVOT = 'pivot';
 const REPORT = 'report'; // DL
 const CHART = 'chart';
 const NUMBER_TYPES = ['long', 'integer', 'double', 'float'];
+const HTTP_PROTOCOL = 'https';
 
 const API_ROUTES = {
   AUTH: '/sip/security/doAuthenticate',
@@ -44,5 +45,6 @@ module.exports = {
   LOG_LEVELS,
   E2E_OUTPUT_BASE_DIR,
   NUMBER_TYPES,
-  SFTP_DETAILS
+  SFTP_DETAILS,
+  HTTP_PROTOCOL
 };
