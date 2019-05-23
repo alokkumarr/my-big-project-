@@ -671,7 +671,7 @@ export class ChartService {
       }
     }
 
-    const { aggregate, aggrSymbol, dataType } = get(series, '0');
+    const { aggregate, aggrSymbol, dataType } = get(series, '0', {});
 
     const chartSeries = [
       {
