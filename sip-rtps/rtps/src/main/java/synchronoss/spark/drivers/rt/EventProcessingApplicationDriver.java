@@ -191,8 +191,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         kafkaParams.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         kafkaParams.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
-        //TODO: Check on this
-//        kafkaParams.put(ConsumerConfig.STREAMS_ZEROOFFSET_RECORD_ON_EOF_CONFIG, false);
         kafkaParams.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaParams.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, 65536);
         

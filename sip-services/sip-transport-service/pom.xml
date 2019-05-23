@@ -32,9 +32,7 @@
         <threeten.extra>1.2</threeten.extra>
         <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
         <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
-
-      <!--TODO: Check this version-->
-        <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
+        <hbase.version>1.1.8-mapr-1901</hbase.version>
     </properties>
     <dependencies>
       <dependency>
