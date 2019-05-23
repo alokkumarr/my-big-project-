@@ -790,7 +790,7 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-   // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
     //  .statusCode(200);
     waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
