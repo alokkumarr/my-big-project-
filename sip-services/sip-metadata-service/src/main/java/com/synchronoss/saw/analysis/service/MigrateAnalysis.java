@@ -18,6 +18,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
@@ -155,8 +156,8 @@ public class MigrateAnalysis {
                 migrationStatusObject.setExecutionsMigrated(false);
                 // Migration of Executions is done via proxy-service
                 successfulMigration.incrementAndGet();
-              } catch (JsonProcessingException exception) {
-                logger.error("Unable to convert analysis to json");
+              } catch (JsonProcessingException | MissingFieldException exception) {
+                logger.error("Unable to convert analysis to json ", exception);
 
                 migrationStatusObject.setAnalysisMigrated(false);
                 migrationStatusObject.setMessage(exception.getMessage());

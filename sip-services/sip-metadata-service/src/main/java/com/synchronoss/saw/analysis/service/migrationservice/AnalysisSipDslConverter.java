@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -37,19 +38,35 @@ public interface AnalysisSipDslConverter {
         && !oldAnalysisDefinition.get(FieldNames.ID).isJsonNull()) {
       analysis.setId(oldAnalysisDefinition.get(FieldNames.ID).getAsString());
     } else {
-      throw new Exception("Analysis ID is missing");
+      throw new MissingFieldException(FieldNames.ID);
     }
 
     if (oldAnalysisDefinition.has(FieldNames.NAME)
         && !oldAnalysisDefinition.get(FieldNames.NAME).isJsonNull()) {
       analysis.setName(oldAnalysisDefinition.get(FieldNames.NAME).getAsString());
     } else {
-      throw new Exception("Analysis name is missing");
+      throw new MissingFieldException(FieldNames.NAME);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.CUSTOMER_CODE)
+        && !oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).isJsonNull()) {
+      analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.CUSTOMER_CODE);
     }
 
     if (oldAnalysisDefinition.has(FieldNames.TYPE)
         && !oldAnalysisDefinition.get(FieldNames.TYPE).isJsonNull()) {
       analysis.setType(oldAnalysisDefinition.get(FieldNames.TYPE).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.TYPE);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.SEMANTIC_ID)
+        && !oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).isJsonNull()) {
+      analysis.setSemanticId(oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.SEMANTIC_ID);
     }
 
     if (oldAnalysisDefinition.has(FieldNames.MODULE)
@@ -67,19 +84,9 @@ public interface AnalysisSipDslConverter {
       analysis.setMetricName(oldAnalysisDefinition.get(FieldNames.METRIC_NAME).getAsString());
     }
 
-    if (oldAnalysisDefinition.has(FieldNames.SEMANTIC_ID)
-        && !oldAnalysisDefinition.get(FieldNames.METRIC_NAME).isJsonNull()) {
-      analysis.setSemanticId(oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).getAsString());
-    }
-
     if (oldAnalysisDefinition.has(FieldNames.PROJECT_CODE)
         && !oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).isJsonNull()) {
       analysis.setProjectCode(oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).getAsString());
-    }
-
-    if (oldAnalysisDefinition.has(FieldNames.CUSTOMER_CODE)
-        && !oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).isJsonNull()) {
-      analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
     }
 
     if (oldAnalysisDefinition.has(FieldNames.CREATED_TIMESTAMP)
