@@ -11,7 +11,7 @@ import java.util.List;
 
 public class EsReportConverter implements AnalysisSipDslConverter {
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) {
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws Exception {
     Analysis analysis = new Analysis();
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);

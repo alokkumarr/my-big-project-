@@ -20,8 +20,8 @@ public class GeoMapConverter implements AnalysisSipDslConverter {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
 
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) {
-    logger.trace("Geo - mao converter called.");
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws Exception {
+    logger.trace("Geo - map converter called.");
     logger.info("old analysis definition : " + oldAnalysisDefinition.toString());
     Analysis analysis = new Analysis();
 

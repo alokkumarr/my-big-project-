@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
+import com.synchronoss.saw.model.Axis;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.GroupInterval;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class ChartConverter implements AnalysisSipDslConverter {
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) {
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws Exception {
     Analysis analysis = new Analysis();
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);
@@ -184,13 +185,15 @@ public class ChartConverter implements AnalysisSipDslConverter {
   private ChartOptions createChartOptions(JsonObject oldAnalysisDefinition) {
     Boolean isInverted = null;
     JsonObject legendObject = null;
+    Map<Object, Object> legend = new LinkedHashMap<Object, Object>();
     String chartType = null;
     String chartTitle = null;
     JsonObject labelOptions = null;
     Map<String, String> label = new LinkedHashMap<String, String>();
-    Map<Object, Object> legend = new LinkedHashMap<Object, Object>();
-    String xaxis = null;
-    String yaxis = null;
+
+    Axis xaxis = null;
+
+    Axis yaxis = null;
 
     if (oldAnalysisDefinition.has("isInverted")) {
       isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
@@ -223,11 +226,22 @@ public class ChartConverter implements AnalysisSipDslConverter {
     }
 
     if (oldAnalysisDefinition.has("xAxis")) {
-      xaxis = oldAnalysisDefinition.get("xAxis").getAsString();
+
+      JsonObject xaxisObject = oldAnalysisDefinition.getAsJsonObject("xAxis");
+
+      if (xaxisObject.has("title") && !xaxisObject.get("title").isJsonNull()) {
+        xaxis = new Axis();
+        xaxis.setTitle(xaxisObject.get("title").getAsString());
+      }
     }
 
     if (oldAnalysisDefinition.has("yAxis")) {
-      yaxis = oldAnalysisDefinition.get("yAxis").getAsString();
+      JsonObject yaxisObject = oldAnalysisDefinition.getAsJsonObject("yAxis");
+
+      if (yaxisObject.has("title") && !yaxisObject.get("title").isJsonNull()) {
+        yaxis = new Axis();
+        yaxis.setTitle(yaxisObject.get("title").getAsString());
+      }
     }
     ChartOptions chartOptions = new ChartOptions();
 
