@@ -150,7 +150,7 @@ export class ChartGridComponent implements OnInit {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
     forEach(columns, column => {
-      if (axisName === column.name) {
+      if (axisName === column.name || axisName === column.columnName.split('.keyword')[0]) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
         alias = column.alias || column.displayName;
