@@ -24,7 +24,8 @@
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
 		<jwt.version>0.7.0</jwt.version>
-    <amazon-s3-version>1.11.534</amazon-s3-version>
+    	<amazon-s3-version>1.11.534</amazon-s3-version>
+		<poi.version>4.1.0</poi.version>
 	</properties>
 
 	<dependencies>
@@ -143,17 +144,17 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml-schemas</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>info.faljse</groupId>

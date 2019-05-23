@@ -226,29 +226,39 @@ public class ElasticSearchAggeragationParser {
 
       Field.Type[] columnDataType = new Field.Type[fields.size()];
       int count = 0;
-      for (Field rowField : fields) {
-        dataType.add(getColumnName(rowField.getColumnName()));
-        switch (rowField.getType()) {
-          case DATE:
+      for (Field field : fields) {
+        if (field != null && field.getArea() != null && field.getArea().matches("column|row")) {
+          if (field.getType().equals(Field.Type.STRING)) {
+            columnDataType[count++] = Field.Type.STRING;
+            dataType.add(getColumnName(field.getColumnName()));
+          } else if (field.getType().equals(Field.Type.DATE)) {
             columnDataType[count++] = Field.Type.DATE;
-            break;
+            dataType.add(getColumnName(field.getColumnName()));
+          }
+        }
+      }
+
+      for (Field rowField : fields) {
+        switch (rowField.getType()) {
           case TIMESTAMP:
             columnDataType[count++] = Field.Type.TIMESTAMP;
+            dataType.add(getColumnName(rowField.getColumnName()));
             break;
           case LONG:
             columnDataType[count++] = Field.Type.LONG;
+            dataType.add(getColumnName(rowField.getColumnName()));
             break;
           case DOUBLE:
             columnDataType[count++] = Field.Type.DOUBLE;
+            dataType.add(getColumnName(rowField.getColumnName()));
             break;
           case INTEGER:
             columnDataType[count++] = Field.Type.INTEGER;
+            dataType.add(getColumnName(rowField.getColumnName()));
             break;
           case FLOAT:
             columnDataType[count++] = Field.Type.FLOAT;
-            break;
-          case STRING:
-            columnDataType[count++] = Field.Type.STRING;
+            dataType.add(getColumnName(rowField.getColumnName()));
             break;
         }
       }

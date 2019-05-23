@@ -17,7 +17,7 @@ public class ChartResultMigration extends ResultMigration {
 
   @Override
   public List<Object> parseData(JsonNode dataNode, JsonNode queryNode) {
-    LOGGER.info("Starting parse data. ");
+    LOGGER.debug("Starting Chart result migration data. ");
     return parseData(dataNode, queryNode, NODE_FIELD, NODE_FIELDS);
   }
 }
