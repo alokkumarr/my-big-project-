@@ -38,7 +38,6 @@ public class ESResponseParser {
    */
   private List<Object> jsonNodeParser(
       JsonNode jsonNode, Map dataObj, List<Object> flatStructure, int level) {
-    logger.trace("jsonNodeParser starts here :" + jsonNode);
     JsonNode childNode = jsonNode;
     if (childNode.get(KEY) != null) {
       String columnName = getColumnNames(groupByFields, level);
@@ -103,7 +102,7 @@ public class ESResponseParser {
             }
             flatStructure.add(flatValues);
         }
-        logger.trace("jsonNodeParser ends flatStructure here :" + flatStructure );
+        logger.debug("jsonNodeParser ends flatStructure here :" + flatStructure );
         return flatStructure;
     }
 
@@ -114,12 +113,10 @@ public class ESResponseParser {
    * @return
    */
   public List<Object> parseData(JsonNode jsonNode) {
-    logger.trace(this.getClass().getName() + " parseData starts here");
     prepareGroupByFields(dataFields);
     Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);
-    logger.trace(this.getClass().getName() + " parseData ends here");
     return flatStructure;
   }
 
@@ -159,7 +156,7 @@ public class ESResponseParser {
     for (Field dataField : dataFields) {
       if (dataField.getAggregate() == null) groupByFields[fieldCount++] = dataField.getColumnName();
     }
-    logger.trace("groupByFields :" + groupByFields);
-    logger.trace(this.getClass().getName() + " prepareGroupByFields ends");
+    logger.debug("groupByFields :" + groupByFields);
+    logger.debug(this.getClass().getName() + " prepareGroupByFields ends");
   }
 }

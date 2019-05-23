@@ -190,7 +190,7 @@ public class AnalysisController {
       @PathVariable(name = "id") String id) {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    Ticket authTicket = getTicket(request);
+    Ticket authTicket = null; //getTicket(request);
     /**
      * if (authTicket == null) { response.setStatus(401); analysisResponse.setMessage("Invalid
      * authentication token"); }
