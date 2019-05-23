@@ -259,7 +259,8 @@ export class AnalyzeActionsService {
 
   removeAnalysis(analysis) {
     // Delete schedule if exists
-    if (this._store.selectSnapshot(state => state.common.jobs)[analysis.id]) {
+    const cronJobs = this._store.selectSnapshot(state => state.common.jobs);
+    if (cronJobs && cronJobs[analysis.id]) {
       const deleteScheduleBody = {
         scheduleState: 'delete',
         jobName: analysis.id,
