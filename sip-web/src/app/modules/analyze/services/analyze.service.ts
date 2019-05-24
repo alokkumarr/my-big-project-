@@ -7,6 +7,7 @@ import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
+import * as reduce from 'lodash/reduce';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isUndefined from 'lodash/isUndefined';
@@ -17,7 +18,8 @@ import {
   Analysis,
   AnalysisDSL,
   AnalysisType,
-  AnalysisPivotDSL
+  AnalysisPivotDSL,
+  QueryDSL
 } from '../../../models';
 
 import { JwtService } from '../../../common/services';
@@ -642,9 +644,9 @@ export class AnalyzeService {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
-          type === 'chart'
-            ? this.newAnalysisChartModel(metricId, type)
-            : this.newAnalysisPivotModel(metricId, type)
+          type === 'pivot'
+            ? this.newAnalysisPivotModel(metricId, type)
+            : this.newAnalysisChartModel(metricId, type)
         ).toPromise()
       : this.createAnalysisNonDSL(metricId, type);
   }
@@ -759,5 +761,38 @@ export class AnalyzeService {
       })
     };
     return this._http.post(`${apiUrl}/${path}`, params, httpOptions);
+  }
+
+  /**
+   * Copies geoType from metric columns to analysis' artifacts columns.
+   * Required for displaying maps
+   *
+   * @param {any[]} artifactColumns
+   * @param {QueryDSL} sipQuery
+   * @returns {QueryDSL}
+   * @memberof AnalyzeService
+   */
+  copyGeoTypeFromMetric(artifactColumns: any[], sipQuery: QueryDSL): QueryDSL {
+    const artifacts = sipQuery.artifacts;
+
+    const metricArtifactMap = reduce(
+      artifactColumns,
+      (accumulator, column) => {
+        accumulator[column.columnName] = column;
+        return accumulator;
+      },
+      {}
+    );
+
+    forEach(artifacts, artifact => {
+      forEach(artifact.fields, column => {
+        const metricColumn = metricArtifactMap[column.columnName];
+        if (metricColumn.geoType) {
+          column.geoType = metricColumn.geoType;
+        }
+      });
+    });
+
+    return sipQuery;
   }
 }

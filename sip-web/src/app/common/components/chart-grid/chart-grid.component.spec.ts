@@ -60,7 +60,8 @@ describe('Chart Grid Component', () => {
         component.analysis = {
           chartOptions: { chartType: 'map' },
           chartType: 'map',
-          type: 'chart'
+          type: 'chart',
+          mapOptions: {mapType: 'map'}
         };
         component.updater = new BehaviorSubject<Object[]>([]);
         fixture.detectChanges();

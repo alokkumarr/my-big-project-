@@ -4,7 +4,6 @@ import * as get from 'lodash/get';
 import * as unset from 'lodash/unset';
 import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
-import * as reduce from 'lodash/reduce';
 import * as set from 'lodash/set';
 import * as remove from 'lodash/remove';
 import * as isEmpty from 'lodash/isEmpty';
@@ -53,6 +52,7 @@ import {
   DesignerResetState
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
+import { AnalyzeService } from '../../services/analyze.service';
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
@@ -93,7 +93,10 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   defaults: <DesignerStateModel>cloneDeep(defaultDesignerState)
 })
 export class DesignerState {
-  constructor(private _designerService: DesignerService) {}
+  constructor(
+    private _designerService: DesignerService,
+    private _analyzeService: AnalyzeService
+  ) {}
 
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
@@ -120,29 +123,13 @@ export class DesignerState {
     { metricArtifactColumns }: DesignerMergeMetricColumns
   ) {
     const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    const artifacts = sipQuery.artifacts;
-
-    const metricArtifactMap = reduce(
+    const sipQuery = this._analyzeService.copyGeoTypeFromMetric(
       metricArtifactColumns,
-      (accumulator, column) => {
-        accumulator[column.columnName] = column;
-        return accumulator;
-      },
-      {}
+      analysis.sipQuery
     );
 
-    forEach(artifacts, artifact => {
-      forEach(artifact.fields, column => {
-        const metricColumn = metricArtifactMap[column.columnName];
-        if (metricColumn.geoType) {
-          column.geoType = metricColumn.geoType;
-        }
-      });
-    });
-
     return patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
 

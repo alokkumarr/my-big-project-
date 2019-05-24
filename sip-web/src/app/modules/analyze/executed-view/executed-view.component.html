@@ -208,27 +208,12 @@
 
           <div *ngSwitchCase="'map'">
             <executed-map-view
-              *ngIf="
-                analysis.type
-                  | isAnalysisType: 'map':analysis?.mapOptions?.mapType
-              "
+              *ngIf="analysis?.mapOptions?.mapType === 'map' || analysis?.mapOptions?.mapType === 'chart_scale'"
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"
             >
             </executed-map-view>
-
-            <executed-map-chart-view
-              *ngIf="
-                analysis.type
-                  | isAnalysisType: 'mapChart':analysis?.mapOptions?.mapType
-              "
-              [analysis]="executedAnalysis"
-              [data]="data"
-              [updater]="chartUpdater$"
-              [actionBus]="chartActionBus$"
-            >
-            </executed-map-chart-view>
           </div>
         </div>
       </mat-card>
