@@ -102,7 +102,6 @@ public class ESResponseParser {
             }
             flatStructure.add(flatValues);
         }
-        logger.debug("jsonNodeParser ends flatStructure here :" + flatStructure );
         return flatStructure;
     }
 
