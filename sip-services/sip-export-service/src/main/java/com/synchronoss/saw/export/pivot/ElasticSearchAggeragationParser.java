@@ -227,39 +227,81 @@ public class ElasticSearchAggeragationParser {
       Field.Type[] columnDataType = new Field.Type[fields.size()];
       int count = 0;
       for (Field field : fields) {
-        if (field != null && field.getArea() != null && field.getArea().matches("column|row")) {
-          if (field.getType().equals(Field.Type.STRING)) {
-            columnDataType[count++] = Field.Type.STRING;
-            dataType.add(getColumnName(field.getColumnName()));
-          } else if (field.getType().equals(Field.Type.DATE)) {
-            columnDataType[count++] = Field.Type.DATE;
-            dataType.add(getColumnName(field.getColumnName()));
+        if (field != null && field.getArea() != null) {
+          // row field
+          if (field.getArea().matches("row")) {
+            switch (field.getType()) {
+              case DATE:
+                columnDataType[count++] = Field.Type.DATE;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case TIMESTAMP:
+                columnDataType[count++] = Field.Type.TIMESTAMP;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case LONG:
+                columnDataType[count++] = Field.Type.LONG;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case DOUBLE:
+                columnDataType[count++] = Field.Type.DOUBLE;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case INTEGER:
+                columnDataType[count++] = Field.Type.INTEGER;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case FLOAT:
+                columnDataType[count++] = Field.Type.FLOAT;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case STRING:
+                columnDataType[count++] = Field.Type.STRING;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+            }
+          }
+
+          // column field
+          if (field.getArea().matches("column")) {
+            switch (field.getType()) {
+              case DATE:
+                columnDataType[count++] = Field.Type.DATE;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case TIMESTAMP:
+                columnDataType[count++] = Field.Type.TIMESTAMP;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case LONG:
+                columnDataType[count++] = Field.Type.LONG;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case DOUBLE:
+                columnDataType[count++] = Field.Type.DOUBLE;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case INTEGER:
+                columnDataType[count++] = Field.Type.INTEGER;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case FLOAT:
+                columnDataType[count++] = Field.Type.FLOAT;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+              case STRING:
+                columnDataType[count++] = Field.Type.STRING;
+                dataType.add(getColumnName(field.getColumnName()));
+                break;
+            }
           }
         }
       }
 
-      for (Field rowField : fields) {
-        switch (rowField.getType()) {
-          case TIMESTAMP:
-            columnDataType[count++] = Field.Type.TIMESTAMP;
-            dataType.add(getColumnName(rowField.getColumnName()));
-            break;
-          case LONG:
-            columnDataType[count++] = Field.Type.LONG;
-            dataType.add(getColumnName(rowField.getColumnName()));
-            break;
-          case DOUBLE:
-            columnDataType[count++] = Field.Type.DOUBLE;
-            dataType.add(getColumnName(rowField.getColumnName()));
-            break;
-          case INTEGER:
-            columnDataType[count++] = Field.Type.INTEGER;
-            dataType.add(getColumnName(rowField.getColumnName()));
-            break;
-          case FLOAT:
-            columnDataType[count++] = Field.Type.FLOAT;
-            dataType.add(getColumnName(rowField.getColumnName()));
-            break;
+      // data field
+      for (Field dataField : fields) {
+        if (dataField != null && dataField.getArea().equalsIgnoreCase("data")) {
+          dataType.add(getColumnName(dataField.getColumnName()));
         }
       }
       exportBean.setColumnFieldDataType(columnDataType);
