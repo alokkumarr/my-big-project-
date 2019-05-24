@@ -3,6 +3,7 @@ package com.synchronoss.querybuilder;
 import java.io.IOException;
 import java.util.List;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
+import org.apache.http.client.HttpClient;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -17,18 +18,51 @@ public class SAWElasticSearchQueryBuilder {
    * Initialize elastic search query result size
    */
   Integer size =10000;
-  public SAWElasticSearchQueryBuilder(Integer size)
+  HttpClient client;
+  String trustStore;
+  String trustPassWord;
+  String keyStore;
+  String keyPassword;
+  boolean sslEnabled;
+
+  public SAWElasticSearchQueryBuilder(Integer size, HttpClient client)
   {
     this.size=size;
+    this.client = client;
   }
 
   /**
    *
    */
-  public SAWElasticSearchQueryBuilder()
+  public SAWElasticSearchQueryBuilder(HttpClient client)
   {
-
+    this.client = client;
   }
+
+  public SAWElasticSearchQueryBuilder(Integer size, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.size=size;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
+  /**
+   *
+   */
+  public SAWElasticSearchQueryBuilder(String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
@@ -45,11 +79,11 @@ public class SAWElasticSearchQueryBuilder {
       //assert (type.find(type) == null);
       //assert (jsonString == null || jsonString.equals(""));
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).buildDataQuery(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut,client).buildDataQuery(size);
       } else {
         query =
-                type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut)
-                        .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut).buildQuery();
+                type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut, client)
+                        .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut, client).buildQuery();
         }
       }catch(IllegalStateException | IOException | NullPointerException exception){
         throw new IllegalArgumentException(exception.getMessage());
@@ -72,11 +106,11 @@ public class SAWElasticSearchQueryBuilder {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).getSearchSourceBuilder(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut, client).getSearchSourceBuilder(size);
       } else {
       query =
-          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut)
-              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut)
+          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut,client)
+              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut, client)
               .getSearchSourceBuilder();
     }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
@@ -98,11 +132,11 @@ public class SAWElasticSearchQueryBuilder {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut).getSearchSourceBuilder(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut, client).getSearchSourceBuilder(size);
       } else {
       query =
-          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut)
-              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, dataSecurityKey, timeOut)
+          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut, client)
+              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, dataSecurityKey, timeOut, client)
               .getSearchSourceBuilder();
     }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());

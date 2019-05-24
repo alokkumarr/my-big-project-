@@ -11,7 +11,7 @@ database "Message Queue\n" {
 interface "Workbench Executor" as Workbench_Executor
 Workbench_Executor --> [Executor Queue]
 
-package "SAW Workbench Executor" {
+package "SIP Workbench Executor" {
     [Executor Queue Client] -> [Executor Queue]
     [Spark driver] --> [Spark master]
     [XDF Components]
