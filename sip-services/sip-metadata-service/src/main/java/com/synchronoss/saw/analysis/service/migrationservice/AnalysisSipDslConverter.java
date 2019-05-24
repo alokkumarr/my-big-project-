@@ -45,7 +45,7 @@ public interface AnalysisSipDslConverter {
         && !oldAnalysisDefinition.get(FieldNames.NAME).isJsonNull()) {
       analysis.setName(oldAnalysisDefinition.get(FieldNames.NAME).getAsString());
     } else {
-        analysis.setName("Untitled Analysis");
+      analysis.setName("Untitled Analysis");
     }
 
     if (oldAnalysisDefinition.has(FieldNames.CUSTOMER_CODE)
