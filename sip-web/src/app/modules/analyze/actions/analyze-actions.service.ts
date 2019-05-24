@@ -143,6 +143,9 @@ export class AnalyzeActionsService {
       })
       .then(
         parentAnalysis => {
+          if (!parentAnalysis) {
+            return publish();
+          }
           /* The destination category is different from parent analysis's category. Publish it normally */
           const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
             ? parentAnalysis.category
@@ -259,7 +262,8 @@ export class AnalyzeActionsService {
 
   removeAnalysis(analysis) {
     // Delete schedule if exists
-    if (this._store.selectSnapshot(state => state.common.jobs)[analysis.id]) {
+    const cronJobs = this._store.selectSnapshot(state => state.common.jobs);
+    if (cronJobs && cronJobs[analysis.id]) {
       const deleteScheduleBody = {
         scheduleState: 'delete',
         jobName: analysis.id,
