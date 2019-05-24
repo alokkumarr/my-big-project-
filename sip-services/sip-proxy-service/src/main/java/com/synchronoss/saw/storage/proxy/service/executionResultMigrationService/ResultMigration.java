@@ -104,6 +104,7 @@ public abstract class ResultMigration {
       }
     } else {
       Map<String, String> records = new LinkedHashMap<>();
+      records.putAll(dataObj);
       Iterator<JsonNode> iterator = queryBuilder.get(DATA_FIELDS).iterator();
 
       while (iterator.hasNext()) {
@@ -137,8 +138,8 @@ public abstract class ResultMigration {
           } else {
             dataObj.put(columnName, childJSNode.toString());
           }
+          records.putAll(dataObj);
         }
-        records.putAll(dataObj);
       }
       flatStructure.add(records);
     }
