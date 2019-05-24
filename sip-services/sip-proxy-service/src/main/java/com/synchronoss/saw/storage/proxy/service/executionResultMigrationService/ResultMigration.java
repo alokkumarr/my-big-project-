@@ -95,10 +95,12 @@ public abstract class ResultMigration {
     JsonNode childNodeLevel = jsonNode.get(levelField + level);
     if (childNodeLevel != null) {
       JsonNode nodeBucket = childNodeLevel.get(BUCKETS);
-      Iterator<JsonNode> iterator = nodeBucket.iterator();
-      while (iterator.hasNext()) {
-        JsonNode nextNode = iterator.next();
-        jsonNodeParser(nextNode, dataObj, flatStructure, level + 1, levelField, columnField);
+      if (nodeBucket != null && !nodeBucket.isNull()) {
+        Iterator<JsonNode> iterator = nodeBucket.iterator();
+        while (iterator.hasNext()) {
+          JsonNode nextNode = iterator.next();
+          jsonNodeParser(nextNode, dataObj, flatStructure, level + 1, levelField, columnField);
+        }
       }
     } else {
       Map<String, String> records = new LinkedHashMap<>();
@@ -136,6 +138,7 @@ public abstract class ResultMigration {
           } else {
             dataObj.put(columnName, childJSNode.toString());
           }
+          records.putAll(dataObj);
         }
       }
       flatStructure.add(records);
