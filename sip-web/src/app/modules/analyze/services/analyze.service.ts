@@ -24,12 +24,14 @@ import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
 import { zip, Observable } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
+const ANALYZE_MODULE_NAME = 'ANALYZE';
+const PROJECT_CODE = 'workbench';
 
 interface ExecutionRequestOptions {
   take?: number;
@@ -168,24 +170,24 @@ export class AnalyzeService {
       this.getAnalysesForNonDSL(subCategoryId),
       this.getAnalysesDSL(subCategoryId)
     )
-    .pipe(
-      // Merge list of analyses from both observables into one
-      map(([nonDSLAnalyses, dslAnalyses]) => {
-        return [].concat(nonDSLAnalyses).concat(dslAnalyses);
-      }),
+      .pipe(
+        // Merge list of analyses from both observables into one
+        map(([nonDSLAnalyses, dslAnalyses]) => {
+          return [].concat(nonDSLAnalyses).concat(dslAnalyses);
+        }),
 
-      // Sort all the analyses based on their create time in descending order (newest first).
-      // Uses correct time field based on if analysis is new dsl type or not
-      map(<FPSort<Analysis | AnalysisDSL>>(
-        fpSortBy([
-          analysis =>
-            isDSLAnalysis(analysis)
-              ? -(analysis.createdTime || 0)
-              : -(analysis.createdTimestamp || 0)
-        ])
-      ))
-    )
-    .toPromise();
+        // Sort all the analyses based on their create time in descending order (newest first).
+        // Uses correct time field based on if analysis is new dsl type or not
+        map(<FPSort<Analysis | AnalysisDSL>>(
+          fpSortBy([
+            analysis =>
+              isDSLAnalysis(analysis)
+                ? -(analysis.createdTime || 0)
+                : -(analysis.createdTimestamp || 0)
+          ])
+        ))
+      )
+      .toPromise();
   }
 
   getPublishedAnalysesByAnalysisId(id, isDSL) {
@@ -194,13 +196,13 @@ export class AnalyzeService {
       : `analysis/${id}/executions`;
     if (isDSL) {
       return <Promise<Analysis[]>>this.getRequest(path)
-      .toPromise()
-      .then(fpSortBy([obj => -obj.finishedTime]));
+        .toPromise()
+        .then(fpSortBy([obj => -obj.finishedTime]));
     } else {
       return <Promise<Analysis[]>>this.getRequest(path)
-      .toPromise()
-      .then(fpGet(`executions`))
-      .then(fpSortBy([obj => -obj.finished]));
+        .toPromise()
+        .then(fpGet(`executions`))
+        .then(fpSortBy([obj => -obj.finished]));
     }
   }
 
@@ -224,28 +226,28 @@ export class AnalyzeService {
       const path = `analysis/${analysisId}/executions/data`;
       const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
         options.analysisType
-        }`;
+      }`;
       url = `${path}?${queryParams}`;
     }
 
     return this.getRequest(url)
-    .toPromise()
-    .then(resp => {
-      const data = fpGet(`data`, resp) || [];
-      const queryBuilder = options.isDSL
-        ? fpGet(`sipQuery`, resp)
-        : fpGet(`queryBuilder`, resp);
-      const executedBy = fpGet(`executedBy`, resp);
-      const count = fpGet(`totalRows`, resp) || data.length;
-      return {
-        data: options.forcePaginate
-          ? this.forcePagination(data, options)
-          : data,
-        queryBuilder,
-        executedBy,
-        count
-      };
-    });
+      .toPromise()
+      .then(resp => {
+        const data = fpGet(`data`, resp) || [];
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
+        const executedBy = fpGet(`executedBy`, resp);
+        const count = fpGet(`totalRows`, resp) || data.length;
+        return {
+          data: options.forcePaginate
+            ? this.forcePagination(data, options)
+            : data,
+          queryBuilder,
+          executedBy,
+          count
+        };
+      });
   }
 
   getExecutionData(
@@ -269,27 +271,27 @@ export class AnalyzeService {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
       const queryParams = `?page=${page}&pageSize=${
         options.take
-        }&analysisType=${options.analysisType}${onetimeExecution}`;
+      }&analysisType=${options.analysisType}${onetimeExecution}`;
       url = `${path}${queryParams}`;
     }
     return this.getRequest(url)
-    .toPromise()
-    .then(resp => {
-      const data = fpGet(`data`, resp) || [];
-      const queryBuilder = options.isDSL
-        ? fpGet(`sipQuery`, resp)
-        : fpGet(`queryBuilder`, resp);
-      const executedBy = fpGet(`executedBy`, resp);
-      const count = fpGet(`totalRows`, resp) || data.length;
-      return {
-        data: options.forcePaginate
-          ? this.forcePagination(data, options)
-          : data,
-        queryBuilder,
-        executedBy,
-        count
-      };
-    });
+      .toPromise()
+      .then(resp => {
+        const data = fpGet(`data`, resp) || [];
+        const queryBuilder = options.isDSL
+          ? fpGet(`sipQuery`, resp)
+          : fpGet(`queryBuilder`, resp);
+        const executedBy = fpGet(`executedBy`, resp);
+        const count = fpGet(`totalRows`, resp) || data.length;
+        return {
+          data: options.forcePaginate
+            ? this.forcePagination(data, options)
+            : data,
+          queryBuilder,
+          executedBy,
+          count
+        };
+      });
   }
 
   readAnalysis(
@@ -312,8 +314,8 @@ export class AnalyzeService {
       payload,
       customHeaders
     )
-    .toPromise()
-    .then(fpGet(`contents.analyze.[0]`));
+      .toPromise()
+      .then(fpGet(`contents.analyze.[0]`));
   }
 
   readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
@@ -342,14 +344,14 @@ export class AnalyzeService {
         this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
         this.applyAnalysis(model, execType).then(
           ({
-             data,
-             executionId,
-             executedBy,
-             executedAt,
-             queryBuilder,
-             executionType,
-             count
-           }) => {
+            data,
+            executionId,
+            executedBy,
+            executedAt,
+            queryBuilder,
+            executionType,
+            count
+          }) => {
             this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
             resolve({
               data,
@@ -482,8 +484,8 @@ export class AnalyzeService {
       ['contents.analyze', [model]]
     ]);
     return <Promise<Analysis>>this.postRequest(`analysis`, payload)
-    .toPromise()
-    .then(fpGet(`contents.analyze.[0]`));
+      .toPromise()
+      .then(fpGet(`contents.analyze.[0]`));
   }
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
@@ -513,27 +515,27 @@ export class AnalyzeService {
     // This addition is a part of SIP-7145 as this is required for DSK implementation. This is a request from BE.
     model.sipQuery.semanticId = model.semanticId;
     return this._http
-    .post(
-      `${apiUrl}/internal/proxy/storage/execute?id=${
-        model.id
+      .post(
+        `${apiUrl}/internal/proxy/storage/execute?id=${
+          model.id
         }&ExecutionType=${mode}&executedBy=${this._jwtService.getLoginId()}`,
-      model.sipQuery
-    )
-    .pipe(
-      map((resp: any) => {
-        return {
-          data: resp,
-          executionId: resp.executionId || (model.sipQuery ? '123456' : null),
-          executionType: mode,
-          executedBy: this._jwtService.getLoginId(),
-          executedAt: Date.now(),
-          designerQuery: fpGet(`query`, resp),
-          queryBuilder: { ...model.sipQuery },
-          count: fpGet(`totalRows`, resp)
-        };
-      })
-    )
-    .toPromise();
+        model.sipQuery
+      )
+      .pipe(
+        map((resp: any) => {
+          return {
+            data: resp,
+            executionId: resp.executionId || (model.sipQuery ? '123456' : null),
+            executionType: mode,
+            executedBy: this._jwtService.getLoginId(),
+            executedAt: Date.now(),
+            designerQuery: fpGet(`query`, resp),
+            queryBuilder: { ...model.sipQuery },
+            count: fpGet(`totalRows`, resp)
+          };
+        })
+      )
+      .toPromise();
   }
 
   applyAnalysisNonDSL(
@@ -565,33 +567,33 @@ export class AnalyzeService {
       ['contents.analyze', [cloned]]
     ]);
     return this.postRequest(`analysis`, payload)
-    .toPromise()
-    .then(resp => {
-      return {
-        data: fpGet(`contents.analyze.[0].data`, resp),
-        executionId: fpGet(`contents.analyze.[0].executionId`, resp),
-        executionType: mode,
-        executedBy: this._jwtService.getLoginId(),
-        executedAt: Date.now(),
-        designerQuery: fpGet(`query`, resp),
-        queryBuilder: { ...model.sqlBuilder },
-        count: fpGet(`contents.analyze.[0].totalRows`, resp)
-      };
-    });
+      .toPromise()
+      .then(resp => {
+        return {
+          data: fpGet(`contents.analyze.[0].data`, resp),
+          executionId: fpGet(`contents.analyze.[0].executionId`, resp),
+          executionType: mode,
+          executedBy: this._jwtService.getLoginId(),
+          executedAt: Date.now(),
+          designerQuery: fpGet(`query`, resp),
+          queryBuilder: { ...model.sqlBuilder },
+          count: fpGet(`contents.analyze.[0].totalRows`, resp)
+        };
+      });
   }
 
   getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW, options = {}) {
     return this.applyAnalysis(analysis, mode, options).then(
       ({
-         data,
-         executionId,
-         executedBy,
-         executedAt,
-         queryBuilder,
-         executionType,
-         designerQuery,
-         count
-       }) => {
+        data,
+        executionId,
+        executedBy,
+        executedAt,
+        queryBuilder,
+        executionType,
+        designerQuery,
+        count
+      }) => {
         return {
           analysis,
           data,
@@ -618,20 +620,18 @@ export class AnalyzeService {
   }
 
   getSemanticLayerData() {
-    const userProject = 'workbench';
+    const userProject = PROJECT_CODE;
     return this.getRequest(`internal/semantic/md?projectId=${userProject}`)
-    .toPromise()
-    .then(fpGet(`contents.[0].${MODULE_NAME}`));
+      .toPromise()
+      .then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
   getArtifactsForDataSet(semanticId: string) {
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
-  getSemanticObect(semanticId: string) {
-    return this.getRequest(
-      `internal/semantic/workbench/${semanticId}`
-    ).toPromise();
+  getSemanticObject(semanticId: string): Observable<any> {
+    return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   createAnalysis(
@@ -641,10 +641,10 @@ export class AnalyzeService {
     // return this.createAnalysisNonDSL(metricId, type);
     return DSL_ANALYSIS_TYPES.includes(type)
       ? this.createAnalysisDSL(
-        type === 'chart'
-          ? this.newAnalysisChartModel(metricId, type)
-          : this.newAnalysisPivotModel(metricId, type)
-      ).toPromise()
+          type === 'chart'
+            ? this.newAnalysisChartModel(metricId, type)
+            : this.newAnalysisPivotModel(metricId, type)
+        ).toPromise()
       : this.createAnalysisNonDSL(metricId, type);
   }
 
@@ -658,17 +658,52 @@ export class AnalyzeService {
       ['contents.keys.[0].analysisType', type]
     ]);
     return <Promise<Analysis>>this.postRequest(`analysis`, params)
-    .toPromise()
-    .then(fpGet('contents.analyze.[0]'));
+      .toPromise()
+      .then(fpGet('contents.analyze.[0]'));
   }
 
   createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
-    return <Observable<AnalysisDSL>>(
-      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
-        first(),
-        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
-      )
+    return this.getSemanticObject(model.semanticId).pipe(
+      switchMap(semanticData => {
+        /* Set the store details from semantic data */
+        const repo = semanticData.esRepository;
+        model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
+        model.sipQuery.store.storageType = repo.storageType;
+
+        return <Observable<AnalysisDSL>>(
+          this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
+            first(),
+            map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+          )
+        );
+      })
     );
+  }
+
+  newAnalysisModel(
+    semanticId: string,
+    type: AnalysisType
+  ): Partial<AnalysisDSL> {
+    return {
+      type,
+      semanticId,
+      name: 'Untitled Analysis',
+      description: '',
+      createdBy: this._jwtService.getLoginId(),
+      customerCode: this._jwtService.customerCode,
+      projectCode: PROJECT_CODE,
+      module: ANALYZE_MODULE_NAME,
+      sipQuery: {
+        artifacts: [],
+        booleanCriteria: 'AND',
+        filters: [],
+        sorts: [],
+        store: {
+          dataStore: null, // This is filled up when creating analysis
+          storageType: null
+        }
+      }
+    };
   }
 
   newAnalysisChartModel(
@@ -677,7 +712,7 @@ export class AnalyzeService {
   ): Partial<AnalysisDSL> {
     const chartOptions = {
       chartType: 'column',
-      chartTitle: 'Untitled Analysis',
+      chartTitle: '',
       isInverted: false,
       legend: {
         align: 'right',
@@ -692,24 +727,7 @@ export class AnalyzeService {
     };
     const mapOptions = DEFAULT_MAP_SETTINGS;
     return {
-      type,
-      semanticId,
-      name: 'Untitled Analysis',
-      description: '',
-      createdBy: this._jwtService.getLoginId(),
-      customerCode: 'SYNCHRONOSS',
-      projectCode: 'workbench',
-      module: 'ANALYZE',
-      sipQuery: {
-        artifacts: [],
-        booleanCriteria: 'AND',
-        filters: [],
-        sorts: [],
-        store: {
-          dataStore: 'sampleAlias/sample', // make this dynamic
-          storageType: 'ES'
-        }
-      },
+      ...this.newAnalysisModel(semanticId, type),
       chartOptions: type === 'chart' ? chartOptions : null,
       mapOptions: type === 'map' ? mapOptions : null
     };
@@ -720,24 +738,7 @@ export class AnalyzeService {
     type: AnalysisType
   ): Partial<AnalysisPivotDSL> {
     return {
-      type,
-      semanticId,
-      name: 'Untitled Analysis',
-      description: '',
-      createdBy: this._jwtService.getLoginId(),
-      customerCode: 'SYNCHRONOSS',
-      projectCode: 'workbench',
-      module: 'ANALYZE',
-      sipQuery: {
-        artifacts: [],
-        booleanCriteria: 'AND',
-        filters: [],
-        sorts: [],
-        store: {
-          dataStore: 'sampleAlias/sample', // make this dynamic
-          storageType: 'ES'
-        }
-      }
+      ...this.newAnalysisModel(semanticId, type)
     };
   }
 

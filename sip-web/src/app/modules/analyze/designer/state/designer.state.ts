@@ -45,7 +45,7 @@ import {
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
-  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
@@ -114,12 +114,10 @@ export class DesignerState {
     });
   }
 
-  @Action(DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns)
+  @Action(DesignerMergeMetricColumns)
   mergeMetricArtifactColumnWithAnalysisArtifactColumns(
     { getState, patchState }: StateContext<DesignerStateModel>,
-    {
-      metricArtifactColumns
-    }: DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns
+    { metricArtifactColumns }: DesignerMergeMetricColumns
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;

@@ -109,19 +109,28 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   onCategorySelected(value) {
-    this.data.analysis.categoryId = value;
+    if (isDSLAnalysis(this.data.analysis)) {
+      this.data.analysis.category = value;
+    } else {
+      this.data.analysis.categoryId = value;
+    }
   }
 
   setDefaultCategory() {
     const analysis = this.data.analysis;
-    if (!analysis.categoryId) {
+    const categoryPresent = isDSLAnalysis(analysis)
+      ? !!analysis.category
+      : !!analysis.categoryId;
+    if (!categoryPresent) {
       const defaultCategory = find(
         this.categories,
         category => category.children.length > 0
       );
 
       if (defaultCategory) {
-        analysis.categoryId = first(defaultCategory.children).id;
+        analysis[isDSLAnalysis(analysis) ? 'category' : 'categoryId'] = first(
+          defaultCategory.children
+        ).id;
       }
     }
   }
@@ -134,7 +143,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     }
     const requestCron = {
       jobName: id,
-      categoryId: isDSLAnalysis(this.data.analysis) ? this.data.analysis.category : this.data.analysis.categoryId,
+      categoryId: isDSLAnalysis(this.data.analysis)
+        ? this.data.analysis.category
+        : this.data.analysis.categoryId,
       groupName: this.token.ticket.custCode
     };
     this._analyzeService.getCronDetails(requestCron).then(
@@ -219,7 +230,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     const analysis = this.data.analysis;
     this.scheduleState = 'delete';
     analysis.schedule = {
-      categoryId: analysis.categoryId,
+      categoryId: isDSLAnalysis(analysis)
+        ? +analysis.category
+        : analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
       scheduleState: this.scheduleState
@@ -259,7 +272,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         userFullName: analysis.userFullName || analysis.createdBy,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
-        categoryID: isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId,
+        categoryID: isDSLAnalysis(analysis)
+          ? analysis.category
+          : analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };
       this.triggerSchedule();

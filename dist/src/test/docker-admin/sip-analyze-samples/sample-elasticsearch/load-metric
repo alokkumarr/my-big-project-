@@ -7,10 +7,10 @@ set -eu
 dir=$(dirname $0)
 
 # Load common metrics functions
-. $dir/../lib/common.sh
+. $dir/../lib/common.sh $SECURE
 
 curl_json() {
-    curl -sS -X $1 -H "Content-Type: application/json" $2 --data-binary @$3
+    curl -k -sS -X $1 -H "Content-Type: application/json" $2 --data-binary @$3
 }
 
 load_data() {

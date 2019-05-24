@@ -30,7 +30,6 @@ import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 
-import { CUSTOM_HEADERS } from '../../../../common/consts';
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
@@ -40,11 +39,11 @@ import {
 } from '../../../../common/services/window.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 import { isDSLAnalysis } from 'src/app/modules/analyze/types';
+import { ObserveService } from '../../services/observe.service';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -87,7 +86,7 @@ export class DashboardGridComponent
   public initialised = false;
 
   constructor(
-    private analyze: AnalyzeService,
+    private observe: ObserveService,
     private filters: GlobalFilterService,
     private dashboardService: DashboardService,
     private windowService: WindowService,
@@ -172,12 +171,12 @@ export class DashboardGridComponent
       /* Wait for metrics to load before initialising dashboard.
       Metrics are needed to get full artifacts for filters */
       const listener = this.store
-      .select(state => state.common.metrics)
-      .pipe(
-        first(metrics => values(metrics).length > 0),
-        tap(() => this.initialiseDashboard())
-      )
-      .subscribe();
+        .select(state => state.common.metrics)
+        .pipe(
+          first(metrics => values(metrics).length > 0),
+          tap(() => this.initialiseDashboard())
+        )
+        .subscribe();
       this.listeners.push(listener);
     }, 100);
   }
@@ -416,11 +415,7 @@ export class DashboardGridComponent
         return;
       }
 
-      this.analyze
-      .readAnalysis(tile.id, tile.dslAnalysis, {
-        [CUSTOM_HEADERS.SKIP_TOAST]: '1'
-      })
-      .then(
+      this.observe.readAnalysis(tile.id).then(
         data => {
           tile.analysis = data;
           tile.success = true;
@@ -604,7 +599,6 @@ export class DashboardGridComponent
       updatedAt: get(model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: this.tileType(tile),
-        dslAnalysis: !!get(tile, 'analysis.sipQuery', null),
         id: get(tile, 'analysis.id', ''),
         x: tile.x,
         y: tile.y,

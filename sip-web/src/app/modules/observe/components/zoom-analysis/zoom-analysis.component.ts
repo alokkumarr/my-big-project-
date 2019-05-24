@@ -3,6 +3,7 @@ import {
   Inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ElementRef
 } from '@angular/core';
@@ -33,7 +34,7 @@ let initialChartHeight = 0;
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-export class ZoomAnalysisComponent implements OnInit, OnDestroy {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public nameMap;
@@ -78,21 +79,6 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const sub = this.displayNameBuilder$.subscribe();
     this.subscriptions.push(sub);
-    this.nameMap = reduce(
-      this.data.origAnalysis.artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
-          (accum, col: ArtifactColumn) => {
-            accum[col.columnName] = col.displayName;
-            return accum;
-          },
-          {}
-        );
-        return acc;
-      },
-      {}
-    );
 
     fpPipe(
       fpMap(val => {
@@ -164,7 +150,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   getDisplayName(filter: Filter) {
     return this.nameMap[filter.tableName || filter.artifactsName][
       filter.columnName
-      ];
+    ];
   }
 
   getFilterValue(filter: Filter) {

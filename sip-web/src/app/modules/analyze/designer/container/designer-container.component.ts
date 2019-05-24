@@ -81,7 +81,7 @@ import {
   DesignerUpdateSorts,
   DesignerUpdateFilters,
   DesignerUpdatebooleanCriteria,
-  DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns,
+  DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState
@@ -173,6 +173,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       );
       break;
     case 'edit':
+      this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
       isDSLAnalysis(this.analysis) &&
         this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
       this.initExistingAnalysis();
@@ -181,8 +182,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.analysis
       );
 
-      this._analyzeService.getSemanticObect(this.analysis.semanticId).then(semanticObj => {
-        this._store.dispatch(new DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns(semanticObj.artifacts[0].columns));
+      this._analyzeService.getSemanticObject(this.analysis.semanticId).toPromise().then(semanticObj => {
+        this._store.dispatch(new DesignerMergeMetricColumns(semanticObj.artifacts[0].columns));
         this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
       });
 
@@ -192,6 +193,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
+        this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
@@ -236,16 +238,29 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
+  mapTableWithFields(analysis) {
+    let tableName = '';
+    forEach(analysis.sipQuery.artifacts, table => {
+      tableName = table.artifactsName;
+      table.fields = map(table.fields, field => {
+        if (field.table) {
+          return field;
+        }
+        field.table = tableName;
+        return field;
+      });
+    });
+    return analysis;
+  }
+
   initNewAnalysis() {
     const { type, semanticId, chartType } = this.analysisStarter;
     const artifacts$ = this._analyzeService
       .getArtifactsForDataSet(semanticId)
       .toPromise();
     const newAnalysis$ = this._designerService.createAnalysis(semanticId, type);
-    console.log(newAnalysis$);
     return Promise.all([artifacts$, newAnalysis$]).then(
       ([metric, newAnalysis]) => {
-        console.log(metric.metricName);
         this._store.dispatch(
           new DesignerLoadMetric({
             metricName: metric.metricName,
@@ -762,6 +777,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
               this._designerService.generateReportPayload(cloneDeep(result.analysis)) :
               result.analysis
           });
+
           if (!shouldClose) {
             this.requestDataIfPossible();
           }
@@ -785,6 +801,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           .openQueryConfirmationDialog()
           .afterClosed()
           .subscribe(result => {
+            console.log(result);
             if (result) {
               this.changeToQueryModePermanently();
               resolve(this.openSaveDialog());
@@ -797,6 +814,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   openSaveDialog(): Promise<any> {
+    console.log("dave diaolog close");
     if (
       isDSLAnalysis(this.analysis) &&
       ['new', 'fork'].includes(this.designerMode)
@@ -1052,7 +1070,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.artifacts = [...this.artifacts];
         if (this.analysis.type === 'chart' || this.analysis.type === 'pivot') {
-          this.refreshDataObject();
+          this.requestDataIfPossible();
         }
         break;
       case 'sort':

@@ -4,16 +4,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.es.QueryBuilderUtil;
+import com.synchronoss.saw.exceptions.MissingFieldException;
+import com.synchronoss.saw.model.Axis;
 import com.synchronoss.saw.model.ChartOptions;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Field.LimitType;
 import com.synchronoss.saw.model.Store;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ChartConverter implements AnalysisSipDslConverter {
   @Override
-  public Analysis convert(JsonObject oldAnalysisDefinition) {
+  public Analysis convert(JsonObject oldAnalysisDefinition) throws MissingFieldException {
     Analysis analysis = new Analysis();
 
     analysis = setCommonParams(analysis, oldAnalysisDefinition);
@@ -79,6 +85,31 @@ public class ChartConverter implements AnalysisSipDslConverter {
       String checkedVal = fieldObject.get("checked").getAsString();
 
       field.setArea(checkedVal);
+    }
+
+    if (field.getType() != null) {
+      if (field.getType() == Field.Type.DATE) {
+        String dateFormat = field.getDateFormat();
+        String interval =
+            QueryBuilderUtil.dateFormats.get(
+                dateFormat.replaceAll(QueryBuilderUtil.SPACE_REGX, QueryBuilderUtil.EMPTY_STRING));
+        switch (interval) {
+          case "month":
+            field.setGroupInterval(GroupInterval.MONTH);
+            break;
+          case "year":
+            field.setGroupInterval(GroupInterval.YEAR);
+            break;
+          case "day":
+            field.setGroupInterval(GroupInterval.DAY);
+            break;
+          case "hour":
+            field.setGroupInterval(GroupInterval.HOUR);
+            break;
+          default:
+            // throw new IllegalArgumentException(interval + " not present");
+        }
+      }
     }
 
     // Set limit fields
@@ -155,11 +186,15 @@ public class ChartConverter implements AnalysisSipDslConverter {
   private ChartOptions createChartOptions(JsonObject oldAnalysisDefinition) {
     Boolean isInverted = null;
     JsonObject legendObject = null;
+    Map<Object, Object> legend = new LinkedHashMap<Object, Object>();
     String chartType = null;
     String chartTitle = null;
     JsonObject labelOptions = null;
-    JsonElement xaxis = null;
-    JsonElement yaxis = null;
+    Map<String, String> label = new LinkedHashMap<String, String>();
+
+    Axis xaxis = null;
+
+    Axis yaxis = null;
 
     if (oldAnalysisDefinition.has("isInverted")) {
       isInverted = oldAnalysisDefinition.get("isInverted").getAsBoolean();
@@ -167,6 +202,11 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
     if (oldAnalysisDefinition.has("legend")) {
       legendObject = oldAnalysisDefinition.getAsJsonObject("legend");
+      legendObject
+          .entrySet()
+          .forEach(
+              (Map.Entry<String, JsonElement> entry) ->
+                  legend.put(entry.getKey(), entry.getValue().getAsString()));
     }
 
     if (oldAnalysisDefinition.has("chartType")) {
@@ -178,23 +218,39 @@ public class ChartConverter implements AnalysisSipDslConverter {
     }
 
     if (oldAnalysisDefinition.has("labelOptions")) {
-      labelOptions = oldAnalysisDefinition.get("labelOptions").getAsJsonObject();
+      labelOptions = oldAnalysisDefinition.getAsJsonObject("labelOptions");
+      labelOptions
+          .entrySet()
+          .forEach(
+              (Map.Entry<String, JsonElement> entry) ->
+                  label.put(entry.getKey(), entry.getValue().getAsString()));
     }
 
     if (oldAnalysisDefinition.has("xAxis")) {
-      xaxis = oldAnalysisDefinition.get("xAxis");
+
+      JsonObject xaxisObject = oldAnalysisDefinition.getAsJsonObject("xAxis");
+
+      if (xaxisObject.has("title") && !xaxisObject.get("title").isJsonNull()) {
+        xaxis = new Axis();
+        xaxis.setTitle(xaxisObject.get("title").getAsString());
+      }
     }
 
     if (oldAnalysisDefinition.has("yAxis")) {
-      yaxis = oldAnalysisDefinition.get("yAxis");
+      JsonObject yaxisObject = oldAnalysisDefinition.getAsJsonObject("yAxis");
+
+      if (yaxisObject.has("title") && !yaxisObject.get("title").isJsonNull()) {
+        yaxis = new Axis();
+        yaxis.setTitle(yaxisObject.get("title").getAsString());
+      }
     }
     ChartOptions chartOptions = new ChartOptions();
 
     chartOptions.setInverted(isInverted);
-    chartOptions.setLegend(legendObject);
+    chartOptions.setLegend(legend);
     chartOptions.setChartTitle(chartTitle);
     chartOptions.setChartType(chartType);
-    chartOptions.setLabelOptions(labelOptions);
+    chartOptions.setLabelOptions(label);
     chartOptions.setxAxis(xaxis);
     chartOptions.setyAxis(yaxis);
     return chartOptions;

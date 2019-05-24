@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -18,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface AnalysisSipDslConverter {
-  Analysis convert(JsonObject oldAnalysisDefinition);
+  Analysis convert(JsonObject oldAnalysisDefinition) throws MissingFieldException;
 
   /**
    * Set all the common parameters across all types of analysis.
@@ -27,26 +28,80 @@ public interface AnalysisSipDslConverter {
    * @param oldAnalysisDefinition Old analysis definition
    * @return Analysis Object
    */
-  default Analysis setCommonParams(Analysis analysis, JsonObject oldAnalysisDefinition) {
+  default Analysis setCommonParams(Analysis analysis, JsonObject oldAnalysisDefinition)
+      throws MissingFieldException {
     if (analysis == null) {
       return null;
     }
 
-    analysis.setId(oldAnalysisDefinition.get(FieldNames.ID).getAsString());
-    analysis.setName(oldAnalysisDefinition.get(FieldNames.NAME).getAsString());
-    analysis.setType(oldAnalysisDefinition.get(FieldNames.TYPE).getAsString());
-    analysis.setModule(oldAnalysisDefinition.get(FieldNames.MODULE).getAsString());
-    analysis.setCreatedBy(oldAnalysisDefinition.get(FieldNames.USER_NAME).getAsString());
-    analysis.setMetricName(oldAnalysisDefinition.get(FieldNames.METRIC_NAME).getAsString());
-    analysis.setSemanticId(oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).getAsString());
-    analysis.setProjectCode(oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).getAsString());
-    analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
-    analysis.setCreatedTime(oldAnalysisDefinition.get(FieldNames.CREATED_TIMESTAMP).getAsLong());
+    if (oldAnalysisDefinition.has(FieldNames.ID)
+        && !oldAnalysisDefinition.get(FieldNames.ID).isJsonNull()) {
+      analysis.setId(oldAnalysisDefinition.get(FieldNames.ID).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.ID);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.NAME)
+        && !oldAnalysisDefinition.get(FieldNames.NAME).isJsonNull()) {
+      analysis.setName(oldAnalysisDefinition.get(FieldNames.NAME).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.NAME);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.CUSTOMER_CODE)
+        && !oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).isJsonNull()) {
+      analysis.setCustomerCode(oldAnalysisDefinition.get(FieldNames.CUSTOMER_CODE).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.CUSTOMER_CODE);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.TYPE)
+        && !oldAnalysisDefinition.get(FieldNames.TYPE).isJsonNull()) {
+      analysis.setType(oldAnalysisDefinition.get(FieldNames.TYPE).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.TYPE);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.SEMANTIC_ID)
+        && !oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).isJsonNull()) {
+      analysis.setSemanticId(oldAnalysisDefinition.get(FieldNames.SEMANTIC_ID).getAsString());
+    } else {
+      throw new MissingFieldException(FieldNames.SEMANTIC_ID);
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.MODULE)
+        && !oldAnalysisDefinition.get(FieldNames.MODULE).isJsonNull()) {
+      analysis.setModule(oldAnalysisDefinition.get(FieldNames.MODULE).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.USER_NAME)
+        && !oldAnalysisDefinition.get(FieldNames.USER_NAME).isJsonNull()) {
+      analysis.setCreatedBy(oldAnalysisDefinition.get(FieldNames.USER_NAME).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.METRIC_NAME)
+        && !oldAnalysisDefinition.get(FieldNames.METRIC_NAME).isJsonNull()) {
+      analysis.setMetricName(oldAnalysisDefinition.get(FieldNames.METRIC_NAME).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.PROJECT_CODE)
+        && !oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).isJsonNull()) {
+      analysis.setProjectCode(oldAnalysisDefinition.get(FieldNames.PROJECT_CODE).getAsString());
+    }
+
+    if (oldAnalysisDefinition.has(FieldNames.CREATED_TIMESTAMP)
+        && !oldAnalysisDefinition.get(FieldNames.CREATED_TIMESTAMP).isJsonNull()) {
+      analysis.setCreatedTime(oldAnalysisDefinition.get(FieldNames.CREATED_TIMESTAMP).getAsLong());
+    }
 
     if (oldAnalysisDefinition.has(FieldNames.EDIT)
         && !oldAnalysisDefinition.get(FieldNames.EDIT).isJsonNull()) {
       Boolean designerEdit = oldAnalysisDefinition.get(FieldNames.EDIT).getAsBoolean();
       analysis.setDesignerEdit(designerEdit);
+    }
+    if (oldAnalysisDefinition.has(FieldNames.USER_ID)
+        && !oldAnalysisDefinition.get(FieldNames.USER_ID).isJsonNull()) {
+      analysis.setUserId(oldAnalysisDefinition.get(FieldNames.USER_ID).getAsLong());
     }
 
     if (oldAnalysisDefinition.has(FieldNames.DESCRIPTION)
@@ -270,7 +325,7 @@ public interface AnalysisSipDslConverter {
       JsonArray obj = modelObject.get(FieldNames.MODEL_VALUE).getAsJsonArray();
       List<Object> modelValues = new ArrayList<>();
       for (JsonElement arr : obj) {
-        modelValues.add(arr.getAsJsonPrimitive());
+        modelValues.add(arr.getAsString());
       }
       model.setModelValues(modelValues);
     }

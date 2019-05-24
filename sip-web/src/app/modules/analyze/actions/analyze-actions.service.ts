@@ -11,6 +11,7 @@ import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { CUSTOM_HEADERS } from '../../../common/consts';
+import { Store } from '@ngxs/store';
 
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
@@ -29,7 +30,8 @@ export class AnalyzeActionsService {
     public _publishService: PublishService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _toastMessage: ToastService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private _store: Store
   ) {}
 
   execute(analysis, mode = EXECUTION_MODES.LIVE) {
@@ -141,6 +143,9 @@ export class AnalyzeActionsService {
       })
       .then(
         parentAnalysis => {
+          if (!parentAnalysis) {
+            return publish();
+          }
           /* The destination category is different from parent analysis's category. Publish it normally */
           const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
             ? parentAnalysis.category
@@ -257,7 +262,8 @@ export class AnalyzeActionsService {
 
   removeAnalysis(analysis) {
     // Delete schedule if exists
-    if (analysis.schedule) {
+    const cronJobs = this._store.selectSnapshot(state => state.common.jobs);
+    if (cronJobs && cronJobs[analysis.id]) {
       const deleteScheduleBody = {
         scheduleState: 'delete',
         jobName: analysis.id,

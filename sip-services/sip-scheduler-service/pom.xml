@@ -40,6 +40,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+
     <dependency>
 	    <groupId>io.micrometer</groupId>
 	    <artifactId>micrometer-registry-prometheus</artifactId>
@@ -48,6 +49,9 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
+
+
+
 
 		<!-- flyway dependency to execute sql files automatically on server startup. -->
 		<dependency>
@@ -141,6 +145,10 @@
 			<artifactId>sip-metadata-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+    </dependency>
 	</dependencies>
 
 	<build>

@@ -24,10 +24,10 @@ public class ChartOptions {
   Object labelOptions;
 
   @JsonProperty("xAxis")
-  Object xAxis;
+  Axis xAxis;
 
   @JsonProperty("yAxis")
-  Object yAxis;
+  Axis yAxis;
 
   @JsonProperty("isInverted")
   public Boolean isInverted() {
@@ -80,22 +80,22 @@ public class ChartOptions {
   }
 
   @JsonProperty("xAxis")
-  public Object getxAxis() {
+  public Axis getxAxis() {
     return this.xAxis;
   }
 
   @JsonProperty("xAxis")
-  public void setxAxis(Object xAxis) {
+  public void setxAxis(Axis xAxis) {
     this.xAxis = xAxis;
   }
 
   @JsonProperty("yAxis")
-  public Object getyAxis() {
+  public Axis getyAxis() {
     return this.yAxis;
   }
 
   @JsonProperty("yAxis")
-  public void setyAxis(Object yAxis) {
+  public void setyAxis(Axis yAxis) {
     this.yAxis = yAxis;
   }
 

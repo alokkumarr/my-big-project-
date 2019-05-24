@@ -31,7 +31,17 @@ object Service {
   private def isPortOpen(): Boolean = {
     try {
       val conf: Config = ConfigFactory.load
-      val port = conf.getInt("http.port")
+      var port = 0
+      lazy val sipSsl: Config = conf.getConfig("sip.ssl")
+      val sipSslEnable = sipSsl.getBoolean("enable")
+      if (sipSslEnable) {
+       log.info("secure communication is activated.")
+       port = conf.getInt("https.port")
+      }
+      else {
+        log.info("secure communication is deactivated.")
+        port = conf.getInt("http.port")
+      }
       val socket = new Socket("localhost", port)
       socket.close()
       return true

@@ -1,0 +1,36 @@
+{
+  "row_level_1": {
+    "doc_count_error_upper_bound": 0,
+    "sum_other_doc_count": 0,
+    "buckets": [
+      {
+        "key": 1507680000000,
+        "key_as_string": "2017-10-11",
+        "doc_count": 1,
+        "column_level_1": {
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 0,
+          "buckets": [
+            {
+              "key": "string 65",
+              "doc_count": 1,
+              "double": {
+                "value": 99995.65
+              },
+              "integer": {
+                "value": 164.0
+              },
+              "float": {
+                "value": 1000.6500244140625
+              },
+              "long": {
+                "value": 1064.0
+              }
+            }
+          ]
+        }
+      }
+
+    ]
+  }
+}

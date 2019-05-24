@@ -9,10 +9,10 @@
     <root level="error">
         <appender-ref ref="STDOUT" />
     </root>
-    <logger name="org.springframework" level="info">
+    <logger name="org.springframework" level="INFO">
     </logger>
 
-    <logger name="com.synchronoss.saw" level='info'>
+    <logger name="com.synchronoss.saw" level="INFO">
     </logger>
-    
+
 </configuration>

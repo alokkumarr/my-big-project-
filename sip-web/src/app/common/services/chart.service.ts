@@ -671,7 +671,7 @@ export class ChartService {
       }
     }
 
-    const { aggregate, aggrSymbol, dataType } = get(series, '0');
+    const { aggregate, aggrSymbol, dataType } = get(series, '0', {});
 
     const chartSeries = [
       {
@@ -752,45 +752,43 @@ export class ChartService {
       value: 'percentage'
     });
 
-    if (!isEmpty(gridData)) {
-      const { series, categories } = this.splitToSeriesAndCategories(
-        gridData,
-        fields,
-        opts,
-        type
-      );
-      const { chartSeries } = this.customizeSeriesForChartType(
-        series,
-        type,
-        categories,
-        fields
-      );
+    const { series, categories } = this.splitToSeriesAndCategories(
+      gridData,
+      fields,
+      opts,
+      type
+    );
+    const { chartSeries } = this.customizeSeriesForChartType(
+      series,
+      type,
+      categories,
+      fields
+    );
 
-      forEach(chartSeries, seriesData => {
-        seriesData.name = yLabel;
-        seriesData.dataLabels = seriesData.dataLabels || {};
-        seriesData.dataLabels.enabled = labelOptions.enabled;
+    forEach(chartSeries, seriesData => {
+      seriesData.name = yLabel;
+      seriesData.dataLabels = seriesData.dataLabels || {};
+      seriesData.dataLabels.enabled = labelOptions.enabled;
 
-        /* eslint-disable */
-        seriesData.dataLabels.formatter = function() {
-          if (this.percentage <= 5) {
-            return null;
-          }
-          const data =
-            labelOptions.value === 'percentage' ? this.percentage : this.y;
-          const isPercent = labelOptions.value === 'percentage';
-          return `${this.point.name}: ${addCommas(round(data, 2))}${
-            isPercent ? '%' : ''
-          }`;
-        };
-        /* eslint-enable */
-      });
+      /* eslint-disable */
+      seriesData.dataLabels.formatter = function() {
+        if (this.percentage <= 5) {
+          return null;
+        }
+        const data =
+          labelOptions.value === 'percentage' ? this.percentage : this.y;
+        const isPercent = labelOptions.value === 'percentage';
+        return `${this.point.name}: ${addCommas(round(data, 2))}${
+          isPercent ? '%' : ''
+        }`;
+      };
+      /* eslint-enable */
+    });
 
-      changes.push({
-        path: 'series',
-        data: chartSeries
-      });
-    }
+    changes.push({
+      path: 'series',
+      data: chartSeries
+    });
 
     return changes;
   }
@@ -1005,6 +1003,32 @@ export class ChartService {
         : 0;
     };
 
+    const handleNaNIssue = (point, options) => {
+      /**
+       * In some cases point.value or point.y is received as 0. Which was causing the round()
+       * to return NaN . So making sure that if value received is 0 then
+       * it should return as it is. Also checking if option datatype
+       * is float or double return the value with correct decimal precision.
+       *
+       */
+      return point
+        ? point.value === 0 || point.y === 0
+          ? point.value
+            ? point.value.toFixed(
+                getPrecision(options.aggregate, options.dataType)
+              )
+            : point.y.toFixed(getPrecision(options.aggregate, options.dataType))
+          : round(
+              options.aggregate === 'percentagebyrow'
+                ? round(point.percentage, 2)
+                : point.y
+                ? point.y
+                : point.value,
+              getPrecision(options.aggregate, options.dataType)
+            ).toLocaleString()
+        : '{point.y:,.2f}';
+    };
+
     /**
      * If point is provided as paramter, this function returns the formatted tooltip.
      * If point is not provided, it replaces the point values with appropriate format strings.
@@ -1045,18 +1069,7 @@ export class ChartService {
         <th>${fields.y.alias ||
           get(opts, 'labels.y', '') ||
           (point ? point.series.name : '{series.name}')}:</th>
-        <td>${
-          point
-            ? round(
-                options.aggregate === 'percentagebyrow'
-                  ? round(point.percentage, 2)
-                  : point.y
-                  ? point.y
-                  : point.value,
-                getPrecision(options.aggregate, options.dataType)
-              ).toLocaleString()
-            : '{point.y:,.2f}'
-        }${
+        <td>${handleNaNIssue(point, options)}${
         point
           ? point.series.userOptions.aggrSymbol
           : '{point.series.userOptions.aggrSymbol}'

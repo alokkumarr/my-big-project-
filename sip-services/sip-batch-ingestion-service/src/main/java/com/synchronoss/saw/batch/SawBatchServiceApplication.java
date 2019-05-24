@@ -34,7 +34,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableRetry
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"com.synchronoss.saw.batch", "com.synchronoss.saw.logs"})
+@ComponentScan(basePackages = {"com.synchronoss.saw.batch","com.synchronoss.sip.utils"})
 public class SawBatchServiceApplication {
   private static final Logger LOG = LoggerFactory.getLogger(SawBatchServiceApplication.class);
 
@@ -80,7 +80,7 @@ public class SawBatchServiceApplication {
 
   /**
    * Initializing Transaction Manager.
-   * 
+   *
    * @param entityManagerFactory entity manager.
    * @return {@link JpaTransactionManager}.
    */

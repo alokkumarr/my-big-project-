@@ -159,7 +159,14 @@ export class DesignerRemoveArtifactColumn {
   ) {}
 }
 
-export class DesignerMergeMetricArtifactColumnWithAnalysisArtifactColumns {
+/**
+ * Merges metric's artifacts columns to analysis artifacts fields.
+ * This fills out any missing data in both sides.
+ *
+ * @export
+ * @class DesignerMergeMetricColumns
+ */
+export class DesignerMergeMetricColumns {
   static readonly type =
     '[Designer] Merge metric artifactColumns with analysis artifactColumns';
   constructor(public metricArtifactColumns: ArtifactColumnDSL[]) {}
@@ -174,3 +181,4 @@ export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
   constructor() {}
 }
+
