@@ -3,7 +3,7 @@
   file:
     path: "{{ inventory_dir }}/certificate"
     state: directory
-    mode: 0755
+    mode: 0777
 
 - name: Generate an OpenSSL private key.
   openssl_privatekey:

@@ -1,8 +1,18 @@
 [mysqld]
+{% if sip_secure %}
+ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt
+ssl_key=/etc/bda/{{ansible_host}}-key.pem
+{% endif %}
 lower_case_table_names=1
 binlog_format=ROW
 default_storage_engine=InnoDB
 innodb_autoinc_lock_mode=2
+
+#[client]
+#ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt
+#ssl_key=/etc/bda/{{ansible_host}}-key.pem
+
+[galera]
 wsrep_on=ON
 wsrep_provider=/usr/lib64/galera/libgalera_smm.so
 wsrep_cluster_name=sip
@@ -10,6 +20,7 @@ wsrep_cluster_address=gcomm://
 {%- for host in groups['saw-security'] + groups['saw-security-arbitrator'] -%}
   {{ host }}{% if not loop.last %},{% endif %}
 {%- endfor %}
-{% if sip_secure %}
-wsrep_provider_options="socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem;socket.ssl_ca=/etc/bda/{{ansible_host}}-authority.ca;socket.ssl_password_file=/etc/bda/{{ansible_host}}-sip-keystore-password"
-{% endif %}
+
+#{% if sip_secure %}
+#wsrep_provider_options="socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem"
+#{% endif %}

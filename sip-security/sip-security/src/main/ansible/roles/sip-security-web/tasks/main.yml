@@ -26,7 +26,7 @@
   file:
     path: /etc/bda/security.env
     state: touch
-    mode: 0755
+    mode: 0777
 
 - name: Copy the content of the file when it is secure
   copy:
