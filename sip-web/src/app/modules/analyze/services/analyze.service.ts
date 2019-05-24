@@ -28,6 +28,7 @@ import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import { isDSLAnalysis } from '../designer/types';
+import * as isArray from 'lodash/isArray';
 
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
@@ -277,7 +278,7 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp) || [];
+        const data = isArray(resp.data[0]) ? fpGet(`data[0]`, resp) : fpGet(`data`, resp);
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
