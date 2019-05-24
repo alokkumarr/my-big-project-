@@ -97,32 +97,41 @@ export class DesignerPageComponent implements OnInit {
         ? 'home'
         : 'back';
     if (requestExecution) {
-      this._executeService.executeAnalysis(
-        analysis,
-        EXECUTION_MODES.PUBLISH,
-        navigateBackTo
-      );
-
-      const navigateToList = !filter(
-        f => f.isRuntimeFilter,
-        get(analysis, 'sqlBuilder.filters', [])
-      ).length;
-      if (navigateToList) {
-        if (navigateBackTo === 'home') {
-          this.router.navigate([
-            'analyze',
-            isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
-          ]);
-        } else {
-          // For DSL analysis, if on view analysis page we have loaded a previous execution and enter edit mode and save and close,
-          // we need to always navigate to the latest execution and not to the previously selected execution result.
-          if (isDSLAnalysis(analysis)) {
-            this.router.navigateByUrl(`/analyze/analysis/${analysis.id}/executed?isDSL=${isDSLAnalysis(analysis)}`);
-          } else {
-            this.locationService.back();
+      this._executeService
+        .executeAnalysis(analysis, EXECUTION_MODES.PUBLISH, navigateBackTo)
+        .then(executionSuccess => {
+          /* If all non-optional prompt filters aren't applied, don't let user
+             exit the designer */
+          if (!executionSuccess) {
+            return;
           }
-        }
-      }
+          const navigateToList = !filter(
+            f => f.isRuntimeFilter,
+            get(analysis, 'sqlBuilder.filters', [])
+          ).length;
+          if (navigateToList) {
+            if (navigateBackTo === 'home') {
+              this.router.navigate([
+                'analyze',
+                isDSLAnalysis(analysis)
+                  ? analysis.category
+                  : analysis.categoryId
+              ]);
+            } else {
+              // For DSL analysis, if on view analysis page we have loaded a previous execution and enter edit mode and save and close,
+              // we need to always navigate to the latest execution and not to the previously selected execution result.
+              if (isDSLAnalysis(analysis)) {
+                this.router.navigateByUrl(
+                  `/analyze/analysis/${
+                    analysis.id
+                  }/executed?isDSL=${isDSLAnalysis(analysis)}`
+                );
+              } else {
+                this.locationService.back();
+              }
+            }
+          }
+        });
     }
   }
 
