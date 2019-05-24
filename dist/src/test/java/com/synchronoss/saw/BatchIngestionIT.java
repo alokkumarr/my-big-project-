@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -671,6 +672,7 @@ public class BatchIngestionIT extends BaseIT {
    * This test-case is check the scenario to test the transfer data with filePattern : *.csv.
    */
   @Test
+  @Ignore
   public void transferData() throws JsonProcessingException {
     ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/small");
     routeMetadata.put("disableDuplicate", true);
