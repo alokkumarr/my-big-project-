@@ -1,19 +1,19 @@
 == Authentication ==
 
-Client -> "SAW Security Service": Authentication request
-"SAW Security Service" --> Client: Authentication response
+Client -> "SIP Security Service": Authentication request
+"SIP Security Service" --> Client: Authentication response
 
 == Execution ==
 
-Client -> "SAW Gateway Service": Execution request
-"SAW Gateway Service" -> "SAW Workbench Service": Execution request
+Client -> "SIP Gateway Service": Execution request
+"SIP Gateway Service" -> "SIP Workbench Service": Execution request
 
-"SAW Workbench Service" -> "Metadata Service": Register dataset
-"Metadata Service" --> "SAW Workbench Service": Return dataset ID
+"SIP Workbench Service" -> "Metadata Service": Register dataset
+"Metadata Service" --> "SIP Workbench Service": Return dataset ID
 
-"SAW Workbench Service" -> "Apache Spark": Execute Spark SQL
+"SIP Workbench Service" -> "Apache Spark": Execute Spark SQL
 "Apache Spark" -> "MapR-FS": Write results
-"MapR-FS" --> "SAW Execution Service": Read results
+"MapR-FS" --> "SIP Execution Service": Read results
 
-"SAW Workbench Service" --> "SAW Gateway Service": Execution response
-"SAW Gateway Service" --> Client: Execution response
+"SIP Workbench Service" --> "SIP Gateway Service": Execution response
+"SIP Gateway Service" --> Client: Execution response

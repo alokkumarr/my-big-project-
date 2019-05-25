@@ -1,15 +1,15 @@
 @startuml
 
-node "saw-batch-ingestion-ui" {
+node "sip-batch-ingestion-ui" {
   [sip-portal] - HTTP
 }
 
-node "saw-services" {
-  [sip-portal] --> [saw-gateway]
-  [saw-batch--ingeston-service]
-  [saw-scheduler-service]
-  [saw-batch-log-service-plugin]
-  [saw-batch-sftp-service-plugin]
+node "sip-services" {
+  [sip-portal] --> [sip-gateway]
+  [sip-batch--ingeston-service]
+  [sip-scheduler-service]
+  [sip-batch-log-service-plugin]
+  [sip-batch-sftp-service-plugin]
 
 }
 
@@ -17,24 +17,24 @@ package "com.synchronoss.saw.batch.plugins" {
  Contract - [extensions]
 }
 
-database "saw-storage" {
-  folder "saw_security" {
-  [saw_security_tables]
+database "sip-storage" {
+  folder "sip_security" {
+  [sip_security_tables]
   }
   folder "sip_batch_ingestion" {
 	[sip_batch_ingestion_tables]
   }
-  folder "saw_scheduler" {
-	[saw_scheduler_tables]
+  folder "sip_scheduler" {
+	[sip_scheduler_tables]
   }
   }
 
-[saw-gateway] --> [saw-batch-ingestion-service]
-[saw-batch-ingestion-service] <--> [saw-scheduler-service]
-[saw-batch-ingestion-service] <--> [saw-batch-log-service-plugin]
-[saw-batch-ingestion-service] <--> [saw-batch-sftp-service-plugin]
-[saw-batch-ingestion-service] --> [saw-batch-sftp-service-plugin]
-[saw-scheduler-service] --> [saw_scheduler_tables]
-[saw-batch-sftp-service-plugin] --> [extensions]
-[saw-batch-log-service-plugin] --> [extensions]
+[sip-gateway] --> [sip-batch-ingestion-service]
+[sip-batch-ingestion-service] <--> [sip-scheduler-service]
+[sip-batch-ingestion-service] <--> [sip-batch-log-service-plugin]
+[sip-batch-ingestion-service] <--> [sip-batch-sftp-service-plugin]
+[sip-batch-ingestion-service] --> [sip-batch-sftp-service-plugin]
+[sip-scheduler-service] --> [sip_scheduler_tables]
+[sip-batch-sftp-service-plugin] --> [extensions]
+[sip-batch-log-service-plugin] --> [extensions]
 @enduml

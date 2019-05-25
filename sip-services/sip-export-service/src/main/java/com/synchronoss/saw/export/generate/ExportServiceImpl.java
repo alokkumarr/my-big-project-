@@ -100,8 +100,11 @@ public class ExportServiceImpl implements ExportService {
   private String exportChunkSize;
 
   @Autowired private ApplicationContext appContext;
-  @Autowired private RestUtil restUtil;
+
   @Autowired private ServiceUtils serviceUtils;
+
+  @Autowired
+  private RestUtil restUtil;
 
   @Override
   public DataResponse dataToBeExportedSync(

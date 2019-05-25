@@ -35,6 +35,11 @@ class SAWChartTypeElasticSearchQueryBuilder {
   String dataSecurityString;
   Integer timeOut = 3;
   HttpClient client;
+  private String trustStore;
+  private String trustPassWord;
+  private String keyStore;
+  private String keyPassword;
+  private boolean sslEnabled;
 
   SearchSourceBuilder searchSourceBuilder;
 
@@ -48,7 +53,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
     this.timeOut = timeOut;
     this.client = client;
   }
-  
+
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut, HttpClient client) {
 	    super();
 	    this.dataSecurityString = dataSecurityKey;
@@ -56,6 +61,34 @@ class SAWChartTypeElasticSearchQueryBuilder {
 	    this.timeOut=timeOut;
 	    this.client = client;
   }
+
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut,
+      String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+    super();
+    this.jsonString = jsonString;
+    this.timeOut = timeOut;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,
+      Integer timeOut, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+        super();
+        this.dataSecurityString = dataSecurityKey;
+        this.jsonString = jsonString;
+        this.timeOut=timeOut;
+        this.keyPassword = keyPassword;
+        this.keyStore = keyStore;
+        this.trustPassWord = trustPassWord;
+        this.trustStore = trustStore;
+        this.sslEnabled = sslEnabled;
+  }
+
 
   public String getDataSecurityString() {
 	return dataSecurityString;
@@ -65,10 +98,11 @@ class SAWChartTypeElasticSearchQueryBuilder {
     return jsonString;
   }
 
+
   /**
    * This method is used to generate the query to build elastic search query for<br/>
    * chart data set
-   * 
+   *
    * @return query
    * @throws IOException
    * @throws JsonProcessingException
@@ -80,6 +114,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
     com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode =
         BuilderUtil.getNodeTreeChart(getJsonString(), "sqlBuilder");
     int size = 0;
+    HttpEsUtils client = new HttpEsUtils();
+
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
 
@@ -97,7 +133,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
     }
     DataSecurityKey dataSecurityKeyNode = null;
     ObjectMapper objectMapper = null;
-    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){		
+    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){
 	    objectMapper= new ObjectMapper();
 	    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 	    JsonNode objectNode = objectMapper.readTree(getDataSecurityString());
@@ -114,7 +150,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
         if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
                 && !item.getIsGloblFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())
-              || item.getType().value().equals(Type.TIMESTAMP.value())) 
+              || item.getType().value().equals(Type.TIMESTAMP.value()))
           {
             if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
             {
@@ -144,14 +180,14 @@ class SAWChartTypeElasticSearchQueryBuilder {
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
               || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
               || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
-            
+
             builder = QueryBuilderUtil.numericFilterChart(item, builder);
-            
+
           }
         }
         if (item.getIsRuntimeFilter().value() && item.getModel() != null) {
           if (item.getType().value().equals(Type.DATE.value())
-              || item.getType().value().equals(Type.TIMESTAMP.value())) 
+              || item.getType().value().equals(Type.TIMESTAMP.value()))
           {
             if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
             {
@@ -182,7 +218,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
               || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
               || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
-            
+
             builder = QueryBuilderUtil.numericFilterChart(item, builder);
           }
         }
@@ -214,7 +250,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields,preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse", timeOut, client);
+                    "system","analyse", timeOut, client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);
@@ -230,10 +266,10 @@ class SAWChartTypeElasticSearchQueryBuilder {
           (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
       else {
-        
+
           throw new IllegalArgumentException("nodeFields & dataFields cannot be empty");
       }
-    } 
+    }
     else {
         throw new IllegalArgumentException("Please select appropriate value for the axes & metrices");
     }

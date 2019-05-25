@@ -18,8 +18,11 @@
   group: name=saw
 - name: Create SAW Security user
   user: name=saw group=saw
+
 - name: Create BDA directory
-  file: path=/etc/bda state=directory
+  file: 
+    path: /etc/bda state=directory
+    mode: 0777
 
  # Creating env file to hold the connector streaming
 - name: Create the /etc/bda directory

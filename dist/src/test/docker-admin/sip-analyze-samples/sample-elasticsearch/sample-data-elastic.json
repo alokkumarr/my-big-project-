@@ -65,7 +65,7 @@
           "joinEligible":false,
           "kpiEligible":true,
           "name":"double",
-          "table":"sales",
+          "table":"sample",
           "type":"double"
         }
       ]

@@ -19,6 +19,12 @@ public class SAWElasticSearchQueryBuilder {
    */
   Integer size =10000;
   HttpClient client;
+  String trustStore;
+  String trustPassWord;
+  String keyStore;
+  String keyPassword;
+  boolean sslEnabled;
+
   public SAWElasticSearchQueryBuilder(Integer size, HttpClient client)
   {
     this.size=size;
@@ -34,15 +40,40 @@ public class SAWElasticSearchQueryBuilder {
   }
 
   
+
+  public SAWElasticSearchQueryBuilder(Integer size, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.size=size;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
+  /**
+   *
+   */
+  public SAWElasticSearchQueryBuilder(String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled)
+  {
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
+  }
+
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query
    * @throws AssertionError
-   * @throws ProcessingException 
+   * @throws ProcessingException
    */
   public String getQuery(EntityType type, String jsonString, Integer timeOut) throws IllegalArgumentException, ProcessingException {
     String query = null;
@@ -66,7 +97,7 @@ public class SAWElasticSearchQueryBuilder {
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query
@@ -92,7 +123,7 @@ public class SAWElasticSearchQueryBuilder {
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query
