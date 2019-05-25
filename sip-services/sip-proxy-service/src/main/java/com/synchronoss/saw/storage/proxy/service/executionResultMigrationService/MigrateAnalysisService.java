@@ -112,7 +112,7 @@ public class MigrateAnalysisService {
       LOGGER.info("Execution Result Stored successfully in jason Store.");
     } catch (Exception ex) {
       LOGGER.error(
-          String.format("Error occurred during saving Execution Result : %s", ex.getMessage()));
+          String.format("Error occurred during saving Execution Result : %s"+ ex.getMessage()));
     }
   }
 
@@ -159,7 +159,7 @@ public class MigrateAnalysisService {
     LOGGER.debug("Fetch all start execution Id.!");
     fetchExecutionIdFromBinaryStore();
 
-    LOGGER.debug("Total count of execution Ids : " + executionIds.size());
+    LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
     if (!executionIds.isEmpty()) {
       for (String executionId : executionIds) {
         if (executionId != null) {
@@ -192,10 +192,10 @@ public class MigrateAnalysisService {
         analysisList.add(mapper.readValue(d.asJsonString(), MigrationStatusObject.class));
       }
     } catch (Exception e) {
-      LOGGER.error("Exception occurred while reading the MaprDB table : ", migrationStatusTable);
+      LOGGER.error("Exception occurred while reading the MaprDB table : {}", migrationStatusTable);
     }
 
-    LOGGER.debug("Return Analysis list : ", analysisList);
+    LOGGER.debug("Return Analysis list : {}", analysisList);
     return analysisList;
   }
 
@@ -225,17 +225,18 @@ public class MigrateAnalysisService {
       MigrationStatusObject msObj, String migrationStatusTable, String basePath) {
     boolean status = true;
 
-    LOGGER.info("Started Writing into MaprDB, id : ", msObj.getAnalysisId());
+    LOGGER.info("Started Writing into MaprDB, id : {} ", msObj.getAnalysisId());
     try {
       analysisMetadataStore = new AnalysisMetadata(migrationStatusTable, basePath);
       LOGGER.debug("Connection established with MaprDB..!!");
-      LOGGER.info("Started Writing the status into MaprDB, id : ", msObj.getAnalysisId());
+      LOGGER.info("Started Writing the status into MaprDB, id : {} ", msObj.getAnalysisId());
       ObjectMapper mapper = new ObjectMapper();
       JsonElement parsedMigrationStatus =
           SipMetadataUtils.toJsonElement(mapper.writeValueAsString(msObj));
       analysisMetadataStore.update(msObj.getAnalysisId(), parsedMigrationStatus);
     } catch (Exception e) {
-      LOGGER.error("Error occurred while writing the status to location: " + msObj, e.getMessage());
+      LOGGER.error("Error occurred while writing the status to location: {}", msObj.toString());
+      LOGGER.error("stack trace : {}"+e.getMessage());
 
       status = false;
     }
@@ -248,7 +249,8 @@ public class MigrateAnalysisService {
     LOGGER.info("Fetch analysis start here");
     try {
       Connection connection = hBaseUtil.getConnection();
-      Table table = hBaseUtil.getTable(connection, binaryTablePath);
+      LOGGER.info(" Binary table Path = {}"+basePath + binaryTablePath);
+      Table table = hBaseUtil.getTable(connection, basePath + binaryTablePath);
       ResultScanner results = hBaseUtil.getResultScanner(table);
       if (results != null) {
         for (Result result : results) {
@@ -282,10 +284,10 @@ public class MigrateAnalysisService {
    * @param executionId
    */
   public void readExecutionResultFromBinaryStore(String executionId) {
-    LOGGER.debug("Fetch execution start here with this table :" + binaryTablePath);
+    LOGGER.debug("Fetch execution start here with this table :" + basePath + binaryTablePath);
     try {
       Connection connection = hBaseUtil.getConnection();
-      Table table = hBaseUtil.getTable(connection, binaryTablePath);
+      Table table = hBaseUtil.getTable(connection, basePath + binaryTablePath);
       Get get = new Get(Bytes.toBytes(executionId));
       Result result = table.get(get);
       JsonParser parser = new JsonParser();
@@ -315,16 +317,16 @@ public class MigrateAnalysisService {
         JsonNode dataNode =
             objectMapper.readTree(
                 new String(result.getValue("_objects".getBytes(), "data".getBytes())));
-        LOGGER.debug("Data Json Node which need to parsed for pivot/chart :" + dataNode);
+        LOGGER.debug("Data Json Node which need to parsed for pivot/chart : {}", dataNode);
 
         JsonNode queryNode =
             objectMapper
                 .readTree(new String(result.getValue("_source".getBytes(), "content".getBytes())))
                 .get("queryBuilder");
-        LOGGER.debug("Query Node which need to parsed for pivot/chart :" + queryNode);
+        LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
 
         Object dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
-        LOGGER.debug("dslExecutionResult :" + dslExecutionResult);
+        LOGGER.debug("dslExecutionResult : {}", dslExecutionResult);
         // store the execution result in json store
         saveDSLJsonExecution(
             executionId,
@@ -337,7 +339,11 @@ public class MigrateAnalysisService {
             dslExecutionResult);
         migrationStatusObject.setExecutionsMigrated(true);
         migrationStatusObject.setMessage("Success");
-        saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
+        if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
+            LOGGER.info("Migration result saved successfully !! : {}"+ migrationStatusObject.isExecutionsMigrated());
+        } else {
+            LOGGER.error("Unable to write update AnalysisMigration table!!");
+        }
       }
     } catch (Exception ex) {
       LOGGER.error(ex.getMessage());
