@@ -31,7 +31,7 @@ elastic-xpack :
           cluster-password: xuw3dUraHapret
 metastore:
     base:  hdfs:///main/
-    binary-store-path:  /var/sip/services/metadata/analysis_results
+    binary-store-path:  analysis_results
     migration: analysisMigration
 
 metadata:
