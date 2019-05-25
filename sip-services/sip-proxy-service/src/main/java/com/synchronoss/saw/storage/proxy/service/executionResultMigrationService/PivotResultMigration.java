@@ -82,10 +82,10 @@ public class PivotResultMigration {
             dataObj.put(columnName, childNode.get(KEY).intValue());
             break;
           default:
-            dataObj.put(columnName, childNode.get(KEY).toString());
+            dataObj.put(columnName, childNode.get(KEY).textValue());
         }
       } else {
-        dataObj.put(columnName, childNode.get(KEY).toString());
+        dataObj.put(columnName, childNode.get(KEY).textValue());
       }
     }
 
@@ -130,10 +130,10 @@ public class PivotResultMigration {
                 dataObj.put(columnName, childJSNode.intValue());
                 break;
               default:
-                dataObj.put(columnName, childJSNode.toString());
+                dataObj.put(columnName, childJSNode.textValue());
             }
           } else {
-            dataObj.put(columnName, childJSNode.toString());
+            dataObj.put(columnName, childJSNode.textValue());
           }
           records.putAll(dataObj);
         }
