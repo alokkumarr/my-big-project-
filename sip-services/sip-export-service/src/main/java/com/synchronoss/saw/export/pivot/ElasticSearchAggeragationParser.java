@@ -295,13 +295,13 @@ public class ElasticSearchAggeragationParser {
                 break;
             }
           }
-        }
-      }
 
-      // data field
-      for (Field dataField : fields) {
-        if (dataField != null && dataField.getArea().equalsIgnoreCase("data")) {
-          dataType.add(getColumnName(dataField.getColumnName()));
+          // data field
+          if (field != null && field.getArea().equalsIgnoreCase("data")) {
+            columnDataType[count++] = field.getType();
+            dataType.add(getColumnName(field.getColumnName()));
+          }
+
         }
       }
       exportBean.setColumnFieldDataType(columnDataType);
