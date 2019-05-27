@@ -186,7 +186,6 @@ export class ChartGridComponent implements OnInit {
   }
 
   trimKeyword(data) {
-    console.log(data);
     if (!data) {
       return;
     }
@@ -200,7 +199,6 @@ export class ChartGridComponent implements OnInit {
       }
       return obj;
     });
-    console.log(trimData);
     return trimData;
   }
 
@@ -237,7 +235,6 @@ export class ChartGridComponent implements OnInit {
   }
 
   getChartUpdates(data, analysis: AnalysisDSL) {
-    console.log(data);
     const sorts = analysis.sipQuery.sorts;
     const dateFormats = this.getDateFormats(analysis);
     const labels = {
@@ -246,8 +243,6 @@ export class ChartGridComponent implements OnInit {
     };
     let orderedData;
     if (!isEmpty(sorts)) {
-      console.log('inside sorts');
-      console.log(sorts);
       orderedData = orderBy(
         data,
         map(sorts, sort =>
