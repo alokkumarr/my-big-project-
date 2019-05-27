@@ -31,11 +31,7 @@ import { MapChartViewerComponent } from './map-chart-viewer';
 
 export const ChartsModule = 'components.charts';
 
-const COMPONENTS = [
-  ChartComponent,
-  MapChartComponent,
-  MapChartViewerComponent
-];
+const COMPONENTS = [ChartComponent, MapChartComponent, MapChartViewerComponent];
 @NgModule({
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,

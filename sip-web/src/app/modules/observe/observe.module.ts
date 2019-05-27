@@ -12,6 +12,7 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import { DxCircularGaugeModule } from 'devextreme-angular';
 import { DxRangeSliderModule } from 'devextreme-angular/ui/range-slider';
 import { DxNumberBoxModule } from 'devextreme-angular/ui/number-box';
 
@@ -96,7 +97,8 @@ const GUARDS = [FirstDashboardGuard];
     UChartModule,
     CountoModule,
     DxDataGridModule,
-    DxTemplateModule
+    DxTemplateModule,
+    DxCircularGaugeModule
   ],
   declarations: components,
   entryComponents: components,

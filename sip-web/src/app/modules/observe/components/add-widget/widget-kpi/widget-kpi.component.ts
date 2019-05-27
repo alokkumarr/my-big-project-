@@ -50,6 +50,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   aggregations = KPI_AGGREGATIONS;
   kpiBgColors = KPI_BG_COLORS;
 
+  chartTypes = ['bullet', 'gauge'];
+
   kpiForm: FormGroup;
   datePresetSubscription: Subscription;
   primaryAggregationSubscription: Subscription;
@@ -90,6 +92,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
       ],
       filter: [this.dateFilters[0].value, Validators.required],
+      kpiDisplay: [this.chartTypes[0]],
       primAggregate: [this.aggregations[0].value, Validators.required],
       secAggregates: this.fb.group(secAggregateControls),
       target: [0, [Validators.required, nonEmpty()]],
@@ -176,6 +179,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     }
 
     this._kpi = data;
+
+    if (data.kpiDisplay) {
+      this.kpiForm.get('kpiDisplay').setValue(data.kpiDisplay);
+    }
 
     data.name && this.kpiForm.get('name').setValue(data.name);
 
@@ -276,6 +283,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
         target: toNumber(this.kpiForm.get('target').value),
+        kpiDisplay: this.kpiForm.get('kpiDisplay').value,
         measure1: toNumber(this.kpiForm.get('measure1').value),
         measure2: toNumber(this.kpiForm.get('measure2').value),
         kpiBgColor: this.kpiBgColorValue,

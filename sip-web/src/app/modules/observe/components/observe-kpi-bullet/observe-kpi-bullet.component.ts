@@ -13,10 +13,12 @@ import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as toNumber from 'lodash/toNumber';
 import * as round from 'lodash/round';
+import * as find from 'lodash/find';
+import * as debounce from 'lodash/debounce';
 
 import * as defaults from 'lodash/defaults';
 
-import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
+import { DATE_PRESETS_OBJ, BULLET_CHART_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
@@ -35,9 +37,14 @@ export class ObserveKPIBulletComponent
   datePresetObj = DATE_PRESETS_OBJ;
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   kpiFilterSubscription: Subscription;
-  chartOptions = BULLET_CHART_OPTIONS;
   public chartUpdater = new BehaviorSubject([]);
   public requesterSubscription: Subscription;
+  public kpiHeight: number;
+  public kpiWidth: number;
+  public kpiValue: number;
+  public kpiColorPalette: string[] = [];
+  public kpiTitle = '';
+  public kpiSubTitle = '';
 
   @Input()
   set bulletKpi(data) {
@@ -57,7 +64,9 @@ export class ObserveKPIBulletComponent
   constructor(
     public observe: ObserveService,
     public globalFilterService: GlobalFilterService
-  ) {}
+  ) {
+    this.setKpiSize = debounce(this.setKpiSize, 10);
+  }
 
   ngOnInit() {
     this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
@@ -88,7 +97,26 @@ export class ObserveKPIBulletComponent
   }
 
   reloadChart(changes) {
+    const title = find(changes, change => change.path === 'title.text');
+    const subTitle = find(changes, change => change.path === 'subtitle.text');
+    if (title) {
+      this.kpiTitle = get(title, 'data');
+    }
+    if (subTitle) {
+      this.kpiSubTitle = get(subTitle, 'data');
+    }
+    const heightChange = find(
+      changes,
+      change => change.path === 'chart.height'
+    );
+    const widthChange = find(changes, change => change.path === 'chart.width');
+    this.setKpiSize(heightChange, widthChange);
     this.chartUpdater.next(changes);
+  }
+
+  setKpiSize(heightChange, widthChange) {
+    this.kpiHeight = get(heightChange, 'data');
+    this.kpiWidth = get(widthChange, 'data');
   }
 
   onFilterKPI(filterModel) {
@@ -139,6 +167,7 @@ export class ObserveKPIBulletComponent
 
   executeKPI(kpi, changes = []) {
     this._executedKPI = kpi;
+
     const dataFieldName = get(kpi, 'dataFields.0.name');
     const kpiTitle = get(kpi, 'name');
     const kpiFilter = this.filterLabel();
@@ -149,6 +178,11 @@ export class ObserveKPIBulletComponent
         res,
         `data.current.${dataFieldName}._${primaryAggregate}`
       );
+      this.kpiValue = round(toNumber(count), 2);
+      const { b1, b2, b3 } = find(BULLET_CHART_COLORS, {
+        value: this.item.bullet.bulletPalette
+      });
+      this.kpiColorPalette = [b1, b2, b3];
       const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
         this.item.bullet.bulletPalette,
         this.item.bullet.measure1,
@@ -156,6 +190,7 @@ export class ObserveKPIBulletComponent
         round(toNumber(count), 2),
         this.item.bullet.target
       );
+
       changes.push(
         {
           path: 'title.text',
@@ -178,6 +213,7 @@ export class ObserveKPIBulletComponent
           data: seriesData
         }
       );
+
       this.reloadChart(changes);
       this.item && this.onRefresh.emit(this.item);
     });
