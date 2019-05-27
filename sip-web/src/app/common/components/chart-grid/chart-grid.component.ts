@@ -260,7 +260,7 @@ export class ChartGridComponent implements OnInit {
       );
     }
     const chartData = orderedData || data;
-    this.chartToggleData = this.trimKeyword(chartData || data);
+    this.chartToggleData = this.trimKeyword(chartData);
 
     return [
       ...this._chartService.dataToChangeConfig(
