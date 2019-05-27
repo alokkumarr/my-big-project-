@@ -4,7 +4,7 @@
 - name: Install SAW Scheduler package
   yum: name=/tmp/saw-scheduler.rpm state=present
   notify:
-    - restart saw-scheduler
+    - restart sip-scheduler
 - name: Migrate Scheduler Service database password from old location
   fetch:
     src: /etc/bda/saw-scheduler-db-password
@@ -20,7 +20,7 @@
 - name: Install SAW scheduler Service configuration file
   template: src=application.yml dest=/opt/bda/saw-scheduler-service/conf
   notify:
-    - restart saw-scheduler
+    - restart sip-scheduler
 - name: Set the SAW Scheduler Service database password
   copy:
     content: "{{ saw_scheduler_db_password }}"
