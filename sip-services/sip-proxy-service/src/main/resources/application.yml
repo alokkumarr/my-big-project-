@@ -30,8 +30,8 @@ elastic-xpack :
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
 metastore:
-    base:  hdfs:///main/
-    binary-store-path:  analysis_results
+    base:  hdfs:///main
+    binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
 metadata:
