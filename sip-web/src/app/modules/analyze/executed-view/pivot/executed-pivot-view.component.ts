@@ -103,11 +103,14 @@ export class ExecutedPivotViewComponent {
           artifactColumn.artifactsName ||
           artifactName;
 
-        const displayName = get(
-          this.nameMap,
-          [`${tableName}`, `${artifactColumn.columnName}`],
-          artifactColumn.displayName
-        );
+        const alias = artifactColumn.alias || artifactColumn.aliasName;
+        const displayName =
+          alias ||
+          get(
+            this.nameMap,
+            [`${tableName}`, `${artifactColumn.columnName}`],
+            artifactColumn.displayName
+          );
         /* If column wasn't selected in any area, mark it unselected and return */
         if (!isRow && !isColumn && !isData) {
           return {
