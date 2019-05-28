@@ -410,7 +410,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           return this.analysis;
         } else {
           this.executedAnalysis = { ...this.analysis };
-          console.log(this.executedAnalysis);
           return this.analysis;
         }
       });
