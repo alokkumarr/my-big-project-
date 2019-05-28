@@ -27,13 +27,13 @@
   file:
     path: /etc/bda
     state: directory
-    mode: 0777
+    mode: 0755
 # Creating env file to hold the connector streaming
 - name: Create the /etc/bda directory
   file:
     path: /etc/bda/secure.env
     state: touch
-    mode: 0777
+    mode: 0755
 
 - name: Copy the content of the file when it is secure
   copy:
