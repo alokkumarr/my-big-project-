@@ -410,6 +410,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           return this.analysis;
         } else {
           this.executedAnalysis = { ...this.analysis };
+          console.log(this.executedAnalysis);
           return this.analysis;
         }
       });
@@ -558,13 +559,15 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           if (isDSLAnalysis(this.executedAnalysis)) {
             this.executedAnalysis = {
               ...this.executedAnalysis,
-              sipQuery: queryBuilder
+              sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                get(this.metric, 'artifacts.0.columns', []),
+                queryBuilder
+              )
             };
           } else {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
         }
-
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
           data = clone(flattenReportData(data, this.analysis));
