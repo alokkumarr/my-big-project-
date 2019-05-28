@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.SftpProcessorException;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
@@ -90,6 +92,10 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
+
+  @Autowired
+  private BisChannelDataRestRepository bisChannelDataRestRepository;
 
   @Autowired
   private SipLogging sipLogService;
@@ -501,7 +507,7 @@ public class SftpServiceImpl extends SipPluginContract {
   public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
     BisJobEntity jobEntity = this.executeSipJob(Long.valueOf(payload.getChannelId()),
-        Long.valueOf(payload.getRouteId()), payload.getFilePattern());
+        Long.valueOf(payload.getRouteId()), payload.getFilePattern(), null);
     Preconditions.checkNotNull(payload.getChannelId() != null,
         "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(payload.getRouteId() != null, "payload.getRouteId() cannot be null");
@@ -639,16 +645,18 @@ public class SftpServiceImpl extends SipPluginContract {
   private  Optional<BisRouteEntity>  findRouteById(Long routeId) {
     return bisRouteDataRestRepository.findById(routeId);
   }
-
+  
   @Override
-  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source, Optional<Long>  jobId) throws SipNestedRuntimeException {
+  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, 
+      Long routeId, String filePattern,
+      boolean isDisable, String source, Optional<Long>  jobId, 
+      String channelType) throws SipNestedRuntimeException {
     Preconditions.checkNotNull(channelId != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(routeId != null, "payload.getRouteId() cannot be null");
     
     BisJobEntity jobEntity = null;
     if (source.equals(SourceType.REGULAR.toString())) {
-      jobEntity = this.executeSipJob(channelId, routeId, filePattern);
+      jobEntity = this.executeSipJob(channelId, routeId, filePattern, null);
     } else {
       if (jobId.isPresent()) {
         jobEntity =  sipLogService.retriveJobById(jobId.get());
@@ -1196,9 +1204,10 @@ public class SftpServiceImpl extends SipPluginContract {
 
 
   
-  BisJobEntity executeSipJob(Long channelId, Long routeId, String filePattern) {
+  BisJobEntity executeSipJob(Long channelId, Long routeId, String filePattern, String channelType) {
     if (filePattern == null) {
       Optional<BisRouteEntity> routeInfo = this.findRouteById(routeId);
+      
       if (routeInfo.isPresent()) {
         BisRouteEntity route = routeInfo.get();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -1215,7 +1224,8 @@ public class SftpServiceImpl extends SipPluginContract {
       }
       
     }
-    return sipLogService.createJobLog(channelId, routeId, filePattern);
+    return sipLogService.createJobLog(channelId, routeId, 
+         filePattern, channelType);
     
   }
 

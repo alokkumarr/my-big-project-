@@ -8,5 +8,5 @@ public interface SipRetryContract {
       String pid, String status, Long jobId) throws NotFoundException;
 
   public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName,
-      boolean isDisable, String source, Long jobId);
+      boolean isDisable, String source, Long jobId, String channelType);
 }

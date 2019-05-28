@@ -4,6 +4,7 @@ import com.synchronoss.saw.logs.entities.BisJobEntity;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
@@ -11,6 +12,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SipJobDataRepository 
     extends JpaRepository<BisJobEntity, Long> {
-  List<BisJobEntity> findByjobType(String jobType);
+  List<BisJobEntity> findByChannelType(String jobType, Pageable pageable);
+  
+  List<BisJobEntity> findByBisChannelSysIdAndBisRouteSysId(Long channelSysId, 
+      Long routeSysId,  Pageable pageable);
 
 }

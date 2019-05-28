@@ -54,7 +54,7 @@ public class S3ServiceImpl extends SipPluginContract {
   
   @Override
   public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source, Optional<Long>  jobId) throws SipNestedRuntimeException {
+      boolean isDisable, String source, Optional<Long>  jobId, String channelType) throws SipNestedRuntimeException {
     
     return null;
   }

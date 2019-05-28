@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.synchronoss.saw.logs.entities.BisJobEntity;
@@ -20,7 +22,8 @@ public class BisJobLogsTest {
   
   @Test
   public void testFindByJobType() {
-    List<BisJobEntity> list = jobRepository.findByjobType("BIS");
+    List<BisJobEntity> list = jobRepository.findByChannelType("BIS",
+        PageRequest.of(0, 1, Sort.Direction.fromString("DESC"), "createdDate"));
     Assert.assertNotNull(list);
     Assert.assertTrue(list.size()>0);
   }

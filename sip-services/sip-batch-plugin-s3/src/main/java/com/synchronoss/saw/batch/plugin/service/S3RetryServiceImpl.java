@@ -18,7 +18,7 @@ public class S3RetryServiceImpl implements SipRetryContract{
 
 	@Override
 	public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName, boolean isDisable,
-			String source, Long jobId) {
+			String source, Long jobId, String channelType) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -132,9 +132,8 @@ public class SipLogging {
   @Transactional(TxType.REQUIRED)
   public void upsertInProgressStatus(String pid)
       throws SipNestedRuntimeException {
-      
     updateLogStatus(BisProcessState.INPROGRESS.value(),
-          BisComponentState.DATA_INPROGRESS.value(), pid);
+        BisComponentState.DATA_INPROGRESS.value(), pid);
   }
     
   /**
@@ -524,12 +523,15 @@ public class SipLogging {
   @Retryable(value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public BisJobEntity createJobLog(Long channelId, Long routeId, String filePattern) {
+  public BisJobEntity createJobLog(Long channelId, Long routeId, 
+      String filePattern, String channelType) {
     BisJobEntity sipJob = new BisJobEntity();
     sipJob.setFilePattern(filePattern);
     sipJob.setJobName(channelId + "-" +  routeId.toString());
     sipJob.setJobStatus("OPEN");
-    sipJob.setJobType("SFTP");
+    sipJob.setChannelType("SFTP");
+    sipJob.setBisChannelSysId(channelId);
+    sipJob.setBisRouteSysId(routeId);
     sipJob.setStartTime(new Date());
     sipJob.setTotalCount(0L);
     sipJob.setSuccessCount(0L);
@@ -537,6 +539,7 @@ public class SipLogging {
     sipJob.setUpdatedBy("system");
     sipJob.setCreatedDate(new Date());
     sipJob.setUpdatedDate(new Date());
+    sipJob.setChannelType(channelType);
     sipJobDataRepository.save(sipJob);
     return sipJob;
     

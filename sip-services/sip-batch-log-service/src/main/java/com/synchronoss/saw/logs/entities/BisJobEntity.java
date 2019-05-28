@@ -45,8 +45,8 @@ public class BisJobEntity implements Serializable {
   private long successCount;
   @Column(name = "FILE_PATTERN")
   private String filePattern;
-  @Column(name = "JOB_TYPE")
-  private String jobType;
+  @Column(name = "CHANNEL_TYPE")
+  private String channelType;
   @Column(name = "CREATED_DATE")
   private Date createdDate;
   @Column(name = "CREATED_BY")
@@ -56,6 +56,25 @@ public class BisJobEntity implements Serializable {
   @Column(name = "UPDATED_BY")
   private String updatedBy;
   
+  @Column(name = "BIS_CHANNEL_SYS_ID")
+  private Long bisChannelSysId;
+  
+  @Column(name = "BIS_ROUTE_SYS_ID")
+  private Long bisRouteSysId;
+  
+  
+  public Long getBisChannelSysId() {
+	return bisChannelSysId;
+  }
+  public void setBisChannelSysId(Long bisChannelSysId) {
+	this.bisChannelSysId = bisChannelSysId;
+  }
+  public Long getBisRouteSysId() {
+	return bisRouteSysId;
+  }
+  public void setBisRouteSysId(Long bisRouteSysId) {
+	this.bisRouteSysId = bisRouteSysId;
+  }
   public Long getJobId() {
     return jobId;
   }
@@ -104,11 +123,11 @@ public class BisJobEntity implements Serializable {
   public void setFilePattern(String filePattern) {
     this.filePattern = filePattern;
   }
-  public String getJobType() {
-    return jobType;
+  public String getChannelType() {
+    return channelType;
   }
-  public void setJobType(String jobType) {
-    this.jobType = jobType;
+  public void setChannelType(String jobType) {
+    this.channelType = jobType;
   }
   public Date getCreatedDate() {
     return createdDate;

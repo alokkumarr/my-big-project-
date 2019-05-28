@@ -181,7 +181,7 @@ public class SawBisPluginController {
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
         response = sipTransferService.scanFilesForPattern(Long.valueOf(requestBody.getChannelId()),
             Long.valueOf(requestBody.getRouteId()), null, false, 
-            SourceType.REGULAR.name(), Optional.empty());
+            SourceType.REGULAR.name(), Optional.empty(), requestBody.getChannelType().toString());
       } else {
         response = sipTransferService.immediateTransfer(requestBody);
       }
@@ -258,7 +258,7 @@ public class SawBisPluginController {
           .supplyAsync(() -> sipTransferService.scanFilesForPattern(
               Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
-              SourceType.REGULAR.name(), Optional.empty()),transactionPostExecutor)
+              SourceType.REGULAR.name(), Optional.empty(), channelType),transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

@@ -199,7 +199,7 @@ public class RetryExecutorService {
                         BisComponentState.DATA_REMOVED.value());
                     sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                         FilenameUtils.getName(log.getFileName()), isDisable,
-                        SourceType.RETRY.name(), log.getJob().getJobId());
+                        SourceType.RETRY.name(), log.getJob().getJobId(), channelType);
                     // transferData(channelId, routeId,
                     // FilenameUtils.getName(log.getFileName()),
                     // isDisable, SourceType.RETRY.name());
@@ -256,7 +256,7 @@ public class RetryExecutorService {
                           + log.getPid());
                   sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                       FilenameUtils.getName(log.getFileName()), isDisable,
-                      SourceType.RETRY.name(),log.getJob().getJobId());
+                      SourceType.RETRY.name(),log.getJob().getJobId(), null);
                   // transferData(channelId, routeId,
                   // FilenameUtils.getName(log.getFileName()),
                   // isDisable, SourceType.RETRY.name());

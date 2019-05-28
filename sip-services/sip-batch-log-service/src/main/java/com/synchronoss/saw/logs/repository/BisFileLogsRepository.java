@@ -118,6 +118,7 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       String name, String processState, Long jobId);
   
   Long countByJob_JobId(Long jobId);
-
+  
+  List<BisFileLog> findByJob_JobId(Long jobId, Pageable pageable);
 
 }
