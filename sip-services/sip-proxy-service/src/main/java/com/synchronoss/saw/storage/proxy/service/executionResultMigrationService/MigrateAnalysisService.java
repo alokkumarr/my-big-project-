@@ -52,6 +52,9 @@ public class MigrateAnalysisService {
   @NotNull
   private String basePath;
 
+  @Value("${metadata.service.execution-migration-flag}")
+  private boolean migrationFlag;
+
   @Value("${metastore.migration}")
   @NotNull
   private String migrationStatusTable;
@@ -70,7 +73,9 @@ public class MigrateAnalysisService {
 
   @PostConstruct
   private void init() throws Exception {
-    convertBinaryStoreToDslJsonStore();
+    if (migrationFlag) {
+      convertBinaryStoreToDslJsonStore();
+    }
   }
 
   /**
