@@ -4,10 +4,10 @@
 - name: Install SAW Storage Proxy Service package
   yum: name=/tmp/saw-storage-proxy.rpm state=present
   notify:
-    - restart saw-storage-proxy
+    - restart sip-storage-proxy
 - name: Install SAW Storage Proxy Service configuration file
   template: src=application.yml dest=/opt/bda/saw-storage-proxy-service/conf
   notify:
-    - restart saw-storage-proxy
+    - restart sip-storage-proxy
 - name: Enable SIP Storage Proxy Service
   systemd: name=sip-storage-proxy enabled=true
