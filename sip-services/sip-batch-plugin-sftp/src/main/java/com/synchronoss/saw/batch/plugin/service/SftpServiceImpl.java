@@ -656,7 +656,7 @@ public class SftpServiceImpl extends SipPluginContract {
     
     BisJobEntity jobEntity = null;
     if (source.equals(SourceType.REGULAR.toString())) {
-      jobEntity = this.executeSipJob(channelId, routeId, filePattern, null);
+      jobEntity = this.executeSipJob(channelId, routeId, filePattern, channelType);
     } else {
       if (jobId.isPresent()) {
         jobEntity =  sipLogService.retriveJobById(jobId.get());

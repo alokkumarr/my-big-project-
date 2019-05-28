@@ -46,15 +46,15 @@ public class SawBisFileLogsController {
   
   private String scheduleUri = "/scheduler/bisscheduler";
 
-  //@Autowired
-  //private RestUtil restUtil;
+  @Autowired
+  private RestUtil restUtil;
 
 
   private RestTemplate restTemplate = null;
 
   @PostConstruct
   public void init() {
-    restTemplate = new RestTemplate();
+    restTemplate = restUtil.restTemplate();
   }
  
   
