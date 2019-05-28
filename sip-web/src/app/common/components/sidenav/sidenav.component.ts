@@ -18,19 +18,7 @@ export class SidenavComponent implements OnInit {
   public _moduleName: string;
 
   ngOnInit() {
-    this._moduleName = '';
     this._sidenav.subscribe(({ menu, module }) => this.update(menu, module));
-  }
-
-  getMenuHeader() {
-    return (
-      {
-        analyze: 'Analysis',
-        observe: 'Dashboards',
-        admin: 'Manage',
-        workbench: 'WORKBENCH'
-      }[this._moduleName.toLowerCase()] || ''
-    );
   }
 
   update(data, moduleName = '') {
@@ -39,6 +27,9 @@ export class SidenavComponent implements OnInit {
   }
 
   toggleNav() {
-    this.sidenav.toggle();
+    // wait for menu to load its items
+    setTimeout(() => {
+      this.sidenav.toggle();
+    }, 100);
   }
 }
