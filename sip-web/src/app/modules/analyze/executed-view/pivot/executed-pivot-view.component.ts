@@ -2,8 +2,17 @@ import { Component, Input } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
-import { ArtifactColumn, Sort, isDSLAnalysis, AnalysisDSL } from '../../types';
+import { AnalyzeService } from '../../services/analyze.service';
+import {
+  ArtifactColumn,
+  Sort,
+  isDSLAnalysis,
+  AnalysisDSL,
+  Artifact
+} from '../../types';
 
+import * as get from 'lodash/get';
+import * as keys from 'lodash/keys';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
@@ -16,18 +25,30 @@ import * as forEach from 'lodash/forEach';
 export class ExecutedPivotViewComponent {
   @Input('analysis')
   set setAnalysis(analysis: AnalysisDSL) {
+    if (!analysis) {
+      return;
+    }
     this.analysis = analysis;
     this.artifactColumns = this.getArtifactColumns(analysis);
     this.sorts = analysis.sipQuery.sorts;
   }
+
+  @Input() set artifacts(value: Artifact[]) {
+    this.nameMap = this.analyzeService.calcNameMap(value);
+    if (this.analysis) {
+      this.artifactColumns = this.getArtifactColumns(this.analysis);
+    }
+  }
+
   @Input() data: any[];
   @Input() updater: Subject<IPivotGridUpdate>;
 
   analysis: AnalysisDSL;
   artifactColumns: ArtifactColumn[];
   sorts: Sort[];
+  nameMap;
 
-  constructor() {}
+  constructor(private analyzeService: AnalyzeService) {}
 
   /* Use sqlBuilder to update selected fields in artifacts */
   getArtifactColumns(analysis: AnalysisDSL) {
@@ -56,6 +77,9 @@ export class ExecutedPivotViewComponent {
     let rowId = 0,
       colId = 0,
       dataId = 0;
+    const artifactName =
+      get(<AnalysisDSL>analysis, 'sipQuery.artifacts[0].artifactsName') ||
+      keys(this.nameMap)[0];
     return map(
       (<AnalysisDSL>analysis).sipQuery.artifacts[0].fields,
       artifactColumn => {
@@ -72,11 +96,24 @@ export class ExecutedPivotViewComponent {
           data,
           c => c.columnName === artifactColumn.columnName
         );
+        const tableName =
+          artifactColumn.table ||
+          artifactColumn.tableName ||
+          artifactColumn.artifactName ||
+          artifactColumn.artifactsName ||
+          artifactName;
 
+        const displayName = get(
+          this.nameMap,
+          [`${tableName}`, `${artifactColumn.columnName}`],
+          artifactColumn.displayName
+        );
         /* If column wasn't selected in any area, mark it unselected and return */
         if (!isRow && !isColumn && !isData) {
           return {
             ...artifactColumn,
+            displayName,
+            caption: displayName,
             checked: false,
             area: null,
             areaIndex: null
@@ -87,6 +124,8 @@ export class ExecutedPivotViewComponent {
         if (isRow) {
           return {
             ...artifactColumn,
+            displayName,
+            caption: displayName,
             checked: true,
             area: 'row',
             areaIndex: isRow.areaIndex || rowId++
@@ -94,6 +133,8 @@ export class ExecutedPivotViewComponent {
         } else if (isColumn) {
           return {
             ...artifactColumn,
+            displayName,
+            caption: displayName,
             checked: true,
             area: 'column',
             areaIndex: isColumn.areaIndex || colId++
@@ -101,6 +142,8 @@ export class ExecutedPivotViewComponent {
         } else if (isData) {
           return {
             ...artifactColumn,
+            displayName,
+            caption: displayName,
             checked: true,
             area: 'data',
             areaIndex: isData.areaIndex || dataId++

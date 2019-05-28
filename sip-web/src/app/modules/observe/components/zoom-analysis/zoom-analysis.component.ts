@@ -12,8 +12,9 @@ import { Select } from '@ngxs/store';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 
-import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
+import { Filter } from './../../../analyze/types';
 import { isDSLAnalysis } from './../../../analyze/types';
+import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
   NUMBER_TYPES,
   DATE_TYPES,
@@ -22,7 +23,6 @@ import {
   STRING_FILTER_OPERATORS_OBJ,
   NUMBER_FILTER_OPERATORS_OBJ
 } from './../../../analyze/consts';
-import { reduce } from 'lodash';
 import * as forEach from 'lodash/forEach';
 import moment from 'moment';
 import { Observable, Subscription } from 'rxjs';
@@ -51,21 +51,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filters = isDSLAnalysis(this.data.analysis)
         ? this.generateDSLDateFilters(queryBuilder.filters)
         : queryBuilder.filters;
-      this.nameMap = reduce(
-        metric.artifacts,
-        (acc, artifact: Artifact) => {
-          acc[artifact.artifactName || artifact['artifactsName']] = reduce(
-            artifact.columns || artifact['fields'],
-            (accum, col: ArtifactColumn) => {
-              accum[col.columnName] = col.displayName;
-              return accum;
-            },
-            {}
-          );
-          return acc;
-        },
-        {}
-      );
+      this.nameMap = this.analyzeService.calcNameMap(metric.artifacts);
     })
   );
 
@@ -73,6 +59,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
+    private analyzeService: AnalyzeService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
