@@ -236,7 +236,7 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp) || [];
+        const data = isArray(resp.data[0]) ? fpGet(`data[0]`, resp) : fpGet(`data`, resp);
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
@@ -521,7 +521,7 @@ export class AnalyzeService {
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}&executedBy=${this._jwtService.getLoginId()}`,
+        }&ExecutionType=${mode}`,
         model.sipQuery
       )
       .pipe(
