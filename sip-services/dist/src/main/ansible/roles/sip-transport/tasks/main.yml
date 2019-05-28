@@ -13,15 +13,15 @@
 - name: Install SAW Transport Service package
   yum: name=/tmp/saw-transport.rpm state=present
   notify:
-    - restart saw-transport
-    - restart saw-transport-executor-regular
-    - restart saw-transport-executor-fast
+    - restart sip-transport
+    - restart sip-transport-executor-regular
+    - restart sip-transport-executor-fast
 - name: Install SAW Transport Service configuration file
   template: src=application.conf dest=/opt/saw/service/conf
   notify:
-    - restart saw-transport
-    - restart saw-transport-executor-regular
-    - restart saw-transport-executor-fast
+    - restart sip-transport
+    - restart sip-transport-executor-regular
+    - restart sip-transport-executor-fast
 
 - name: Updating a environment variable in /opt/saw/service/conf/service.env
   blockinfile:
@@ -30,9 +30,9 @@
     block: |
         SIP_SECURE=true
   notify:
-    - restart saw-transport
-    - restart saw-transport-executor-regular
-    - restart saw-transport-executor-fast
+    - restart sip-transport
+    - restart sip-transport-executor-regular
+    - restart sip-transport-executor-fast
   when: sip_secure
 
 - name: Updating a environment variable in /opt/saw/service/conf/service.env
@@ -42,9 +42,9 @@
     block: |
         SIP_SECURE=false
   notify:
-    - restart saw-transport
-    - restart saw-transport-executor-regular
-    - restart saw-transport-executor-fast
+    - restart sip-transport
+    - restart sip-transport-executor-regular
+    - restart sip-transport-executor-fast
   when: not sip_secure
 
 
@@ -57,9 +57,9 @@
         KEY_STORE_PASSWORD={{ sip_keystore_password }}
         HTTP_DISABLED=-Dhttp.port=disabled
   notify:
-    - restart saw-transport
-    - restart saw-transport-executor-regular
-    - restart saw-transport-executor-fast
+    - restart sip-transport
+    - restart sip-transport-executor-regular
+    - restart sip-transport-executor-fast
   when: sip_secure
 
 - name: Create Transport Service environment file

@@ -1,4 +1,4 @@
-- name: restart saw-batch-ingestion
+- name: restart sip-batch-ingestion
 # Stop service, to trigger restart by socket activation
   systemd: name=sip-batch-ingestion state=stopped daemon_reload=true
   # However, skip starting in development mode as tasks do not exist
