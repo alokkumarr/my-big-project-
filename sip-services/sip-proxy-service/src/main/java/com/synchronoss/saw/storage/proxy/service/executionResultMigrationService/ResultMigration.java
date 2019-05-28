@@ -133,10 +133,10 @@ public abstract class ResultMigration {
                 dataObj.put(columnName, childJSNode.intValue());
                 break;
               default:
-                dataObj.put(columnName, childJSNode.toString());
+                dataObj.put(columnName, childJSNode.textValue());
             }
           } else {
-            dataObj.put(columnName, childJSNode.toString());
+            dataObj.put(columnName, childJSNode.textValue());
           }
           records.putAll(dataObj);
         }
