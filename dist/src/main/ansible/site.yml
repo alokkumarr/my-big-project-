@@ -13,20 +13,29 @@
   roles:
     - { role: sip-ssl-certificate, when: sip_secure }
 
-- name: SAW Services
-  hosts: saw-services
+- name: SAW Secure Hosts
+  hosts: all
   become: true
   tasks:
     - name: copying the certificates to the saw-services nodes
       copy:
         src: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
         dest: /etc/bda/{{ ansible_host }}-certificate.crt
+        mode: 0777
       when: sip_secure
 
     - name: copying the private to the saw-services nodes
       copy:
         src: "{{ inventory_dir }}/certificate/main-private.pem"
         dest: /etc/bda/{{ ansible_host }}-key.pem
+        mode: 0777
+      when: sip_secure
+
+    - name: copying the ca file to the saw-services nodes
+      copy:
+        src: "{{ inventory_dir }}/certificate/sip-authority.csr"
+        dest: /etc/bda/{{ ansible_host }}-authority.ca
+        mode: 0777
       when: sip_secure
 
     - name: Look up for keystore password
@@ -35,6 +44,13 @@
           {{ lookup('password', inventory_dir
             + '/sip-keystore-password chars=ascii_letters,digits') }}
         when: sip_secure
+
+    - name: copying the password file to the saw-services nodes
+      copy:
+        src: "{{ inventory_dir }}/sip-keystore-password"
+        dest: /etc/bda/{{ ansible_host }}-sip-keystore-password
+        mode: 0777
+      when: sip_secure
 
     - name: Setting the keystore store path
       set_fact:

@@ -27,12 +27,13 @@
   file:
     path: /etc/bda
     state: directory
+    mode: 0777
 # Creating env file to hold the connector streaming
 - name: Create the /etc/bda directory
   file:
     path: /etc/bda/secure.env
     state: touch
-    mode: 0755
+    mode: 0777
 
 - name: Copy the content of the file when it is secure
   copy:
@@ -88,7 +89,12 @@
 - name: Installing pip on all saw-services hosts
   easy_install:
     name: pip
-    state: present
+    state: latest
+
+- name: Removing existing pyOpenSSL if exists
+  yum:
+    name: pyOpenSSL
+    autoremove: true
 
 - name: Installing libraries on all saw-services hosts using Ansible pip module
   pip:
@@ -99,11 +105,3 @@
     - ipaddress
     - enum34
     - pyOpenSSL==19.0.0
-
-- name: Removing existing pyOpenSSL if exists
-  yum:
-    name: pyOpenSSL
-    autoremove: true
- 
- 
- 
