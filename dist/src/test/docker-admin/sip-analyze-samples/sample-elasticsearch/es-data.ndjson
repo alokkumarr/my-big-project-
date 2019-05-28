@@ -1,6 +1,4 @@
 { "index" :{}}
-{"COORDINATES": "-76.52527778,45.46444444", "COUNTY": "MI","string": "geo string 1", "long": 1553, "float": 40001.01, "date": "2018-12-14 00:00:00", "integer": 4001, "double": 4000001.01}
-{ "index" :{}}
 {"COORDINATES": "-83.52527778,42.46444444", "COUNTY": "MI","string": "string 1", "long": 1000, "float": 1000.01, "date": "2017-12-14 00:00:00", "integer": 100, "double": 99995.01}
 { "index" :{}}
 {"COORDINATES": "-96.914506,32.844442", "COUNTY": "TX","string": "string 2", "long": 1001, "float": 1000.02, "date": "2017-12-13 00:00:00", "integer": 101, "double": 99995.02}

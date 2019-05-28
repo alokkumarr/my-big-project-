@@ -371,7 +371,7 @@ public class AnalyzeIT extends BaseIT {
         .body(json)
         .when().post("/saw/services/analysis")
         .then().assertThat().statusCode(200)
-        .body(buckets + ".find { it.key == 'geo string 1' }.doc_count", equalTo(1));
+        .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
   }
 
     private void executeDLAnalysis(String token, String analysisId)
@@ -455,7 +455,7 @@ public class AnalyzeIT extends BaseIT {
                         .extract().response();
     ObjectNode root = response.as(ObjectNode.class);
     JsonNode jsonNode= root.get("long");
-    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1553);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1552);
     Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 
