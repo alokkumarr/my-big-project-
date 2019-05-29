@@ -177,7 +177,8 @@ export class ChartGridComponent implements OnInit {
           (column.aggregate === 'percentage' || column.aggregate === 'avg')
         ) {
           value =
-            value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+            (parseFloat(value) || 0).toFixed(2) +
+            (column.aggregate === 'percentage' ? '%' : '');
         }
         value = value === 'Undefined' ? '' : value;
       }
