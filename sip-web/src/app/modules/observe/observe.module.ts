@@ -16,7 +16,11 @@ import { DxRangeSliderModule } from 'devextreme-angular/ui/range-slider';
 import { DxNumberBoxModule } from 'devextreme-angular/ui/number-box';
 
 import { MaterialModule } from '../../material.module';
-import { JwtService, UserService } from '../../common/services';
+import {
+  JwtService,
+  UserService,
+  HtmlDownloadService
+} from '../../common/services';
 import { AnalyzeService } from '../analyze/services/analyze.service';
 import { FilterService } from '../analyze/services/filter.service';
 import {
@@ -25,8 +29,6 @@ import {
   SideNavService
 } from '../../common/services';
 import { ObserveService } from './services/observe.service';
-import { ObserveDownloadService } from './services/observe-download.service';
-
 import { UChartModule } from '../../common/components/charts';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
@@ -105,7 +107,7 @@ const GUARDS = [FirstDashboardGuard];
   providers: [
     DashboardService,
     ObserveService,
-    ObserveDownloadService,
+    HtmlDownloadService,
     JwtService,
     UserService,
     AnalyzeService,

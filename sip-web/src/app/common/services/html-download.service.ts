@@ -5,7 +5,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { saveAs } from 'file-saver/FileSaver';
 
-import { dataURItoBlob } from '../../../common/utils/dataURItoBlob';
+import { dataURItoBlob } from '../utils/dataURItoBlob';
 
 function downloadDataUrlFromJavascript(filename, dataUrl) {
   const blob = dataURItoBlob(dataUrl);
@@ -13,7 +13,7 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
 }
 
 @Injectable()
-export class ObserveDownloadService {
+export class HtmlDownloadService {
   constructor() {}
 
   downloadDashboard(element, fileName) {
@@ -58,7 +58,7 @@ export class ObserveDownloadService {
     }
   }
 
-  private turnHtml2pdf(elem, fileName) {
+  turnHtml2pdf(elem, fileName) {
     /* Set overflow to visible manually to fix safari's bug. Without this,
      * safari downloads a blank image */
     const overflow = elem.style.overflow;
@@ -74,10 +74,9 @@ export class ObserveDownloadService {
           html2canvas: {
             backgroundColor: '#f4f5f4',
             scale: 2,
+            useCORS: true,
             width: elem.scrollWidth,
             height: elem.scrollHeight,
-            windowWidth: elem.scrollWidth,
-            windowHeight: elem.scrollHeight,
             onclone: cloned => {
               // need this for html2pdf download to wirk with gridster library
               // https://github.com/niklasvh/html2canvas/issues/1720

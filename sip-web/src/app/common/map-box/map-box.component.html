@@ -1,5 +1,6 @@
 <mgl-map
   *ngIf="geoJson"
+  [preserveDrawingBuffer]="true"
   [trackResize]="true"
   [style]="mapStyle"
   [zoom]="[zoom]"

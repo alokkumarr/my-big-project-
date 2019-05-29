@@ -14,12 +14,12 @@ import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
-import { ObserveDownloadService } from '../../services/observe-download.service';
 import { FirstDashboardGuard } from '../../guards';
 import {
   JwtService,
   ConfigService,
-  ToastService
+  ToastService,
+  HtmlDownloadService
 } from '../../../../common/services';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
 
@@ -62,7 +62,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
-    private _downloadService: ObserveDownloadService,
+    private _downloadService: HtmlDownloadService,
     private guard: FirstDashboardGuard,
     private dashboardService: DashboardService,
     private router: Router,
