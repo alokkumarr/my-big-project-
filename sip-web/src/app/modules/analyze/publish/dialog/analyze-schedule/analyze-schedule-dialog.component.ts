@@ -72,7 +72,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   errorFlagMsg = false;
   loadCron = false;
   emailValidateFlag = false;
-  isReport: boolean;
+  isEligibleToZip: boolean;
   fileType: string;
   startDateCorrectFlag = true;
   zipFormatFlag: boolean = false;
@@ -95,7 +95,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.fetchCronDetails();
     });
 
-    this.isReport = ['report', 'esReport'].includes(
+    this.isEligibleToZip = ['report', 'esReport', 'pivot'].includes(
       get(this.data.analysis, 'type')
     );
 
