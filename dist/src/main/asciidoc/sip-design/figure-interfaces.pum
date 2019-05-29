@@ -9,10 +9,10 @@ interface HTTP as HTTPWeb
 interface HTTP as HTTPServices
 interface HTTP as HTTPSecurity
 
-package "SAW" {
-    HTTPWeb - [SAW Web]
-    HTTPServices - [SAW Services]
-    HTTPSecurity - [SAW Security]
+package "SIP" {
+    HTTPWeb - [SIP Web]
+    HTTPServices - [SIP Services]
+    HTTPSecurity - [SIP Security]
 }
 
 Client .> HTTPWeb

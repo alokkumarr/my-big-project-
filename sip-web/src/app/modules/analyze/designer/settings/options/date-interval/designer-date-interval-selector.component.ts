@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ArtifactColumnPivot, DesignerChangeEvent } from '../../../types';
-import { DATE_INTERVALS, DEFAULT_DATE_FORMAT } from '../../../../consts';
+import { DATE_INTERVALS, DEFAULT_PIVOT_DATE_FORMAT } from '../../../../consts';
 
 @Component({
   selector: 'designer-date-interval-selector',
@@ -17,7 +17,7 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
   onDateIntervalChange(value) {
     this.artifactColumn.dateInterval = value;
     if (this.artifactColumn.dateInterval !== 'day') {
-      this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
+      this.artifactColumn.format = DEFAULT_PIVOT_DATE_FORMAT.value;
     }
     this.change.emit({ subject: 'dateInterval' });
   }

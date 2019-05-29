@@ -7,13 +7,11 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -26,6 +24,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import org.apache.http.ssl.SSLContextBuilder;
 import sncr.saw.common.config.SAWServiceConfig;
+import org.apache.http.client.config.RequestConfig;
 
 
 /**
@@ -42,18 +41,68 @@ public class InternalServiceClient {
         this.url = url;
     }
 
-    private static CloseableHttpClient client;
+    /**
+     * Default Constructor
+     */
+    public InternalServiceClient(){}
+
+    private String trustStore;
+    private String trustPassWord;
+    private String keyStore;
+    private String keyPassword;
+    private boolean sslEnabled;
+
+    public String getTrustStore() {
+        return trustStore;
+    }
+
+    public String getTrustPassWord() {
+        return trustPassWord;
+    }
+
+    public String getKeyStore() {
+        return keyStore;
+    }
+
+    public String getKeyPassword() {
+        return keyPassword;
+    }
+
+    public boolean isSslEnabled() {
+        return sslEnabled;
+    }
+
+    public void setTrustStore(String trustStore) {
+        this.trustStore = trustStore;
+    }
+
+    public void setTrustPassWord(String trustPassWord) {
+        this.trustPassWord = trustPassWord;
+    }
+
+    public void setKeyStore(String keyStore) {
+        this.keyStore = keyStore;
+    }
+
+    public void setKeyPassword(String keyPassword) {
+        this.keyPassword = keyPassword;
+    }
+
+    public void setSslEnabled(boolean sslEnabled) {
+        this.sslEnabled = sslEnabled;
+    }
+
     /**
      * This method will be used to access the semantic service to get the
      * details of semantic a particular semantic node
      * @param object
      * @return Object
      */
-    public String retrieveObject(Object object) throws IOException {
+    public String retrieveObject(Object object) throws Exception {
         logger.trace("request from retrieveObject :"+ object);
         Object node = null;
         ObjectMapper mapper = new ObjectMapper();
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = getHttpClient();
         HttpGet request = new HttpGet(url);
         HttpResponse response = client.execute(request);
         BufferedReader rd = new BufferedReader(
@@ -70,25 +119,30 @@ public class InternalServiceClient {
         return mapper.writeValueAsString(node);
     }
 
+    private static RequestConfig setRequestConfig(int timeOut) {
+        RequestConfig config = RequestConfig.custom().
+                setConnectTimeout(30 * 10000).build();
+        //setConnectionRequestTimeout(timeOut * 10000).build();
+        //setSocketTimeout(timeOut * 1000).build();
+        return config;
+    }
+
+
     /**
      * creating a https client.
      */
     public HttpClient getHttpClient() throws Exception {
-        if (client != null) {
-            return client;
-        }
+        HttpClient client;
         Boolean sipSslEnable = SAWServiceConfig.sipSsl().getBoolean("enable");
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        setSslEnabled(sipSslEnable);
         if (sipSslEnable) {
-            String trustStore = SAWServiceConfig.sipSsl().getString("trust.store");
-            String trustStorePassword = SAWServiceConfig.sipSsl().getString("trust.password");
-            String keyStore = SAWServiceConfig.sipSsl().getString("key.store");
-            String keyStorePassword = SAWServiceConfig.sipSsl().getString("key.password");
+            setParameters();
             SSLContext sslcontext =
-                    getSsLContext(trustStore, trustStorePassword, keyStore, keyStorePassword);
+                    getSsLContext(trustStore, trustPassWord, keyStore, keyPassword);
             SSLConnectionSocketFactory factory =
                     new SSLConnectionSocketFactory(sslcontext, new NoopHostnameVerifier());
-            client = HttpClients.custom().setConnectionManager(cm).setSSLSocketFactory(factory).build();
+            client = HttpClients.custom().setSSLSocketFactory(factory).build();
         } else {
             client = HttpClients.custom().setConnectionManager(cm).build();
         }
@@ -110,6 +164,19 @@ public class InternalServiceClient {
         return sslContext;
     }
 
-
+    public void setParameters() {
+        Boolean sipSslEnable = SAWServiceConfig.sipSsl().getBoolean("enable");
+        setSslEnabled(sipSslEnable);
+        if (sipSslEnable) {
+            String trustStore = SAWServiceConfig.sipSsl().getString("trust.store");
+            setTrustStore(trustStore);
+            String trustStorePassword = SAWServiceConfig.sipSsl().getString("trust.password");
+            setTrustPassWord(trustStorePassword);
+            String keyStore = SAWServiceConfig.sipSsl().getString("key.store");
+            setKeyStore(keyStore);
+            String keyStorePassword = SAWServiceConfig.sipSsl().getString("key.password");
+            setKeyPassword(keyStorePassword);
+        }
+    }
 
 }

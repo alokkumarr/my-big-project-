@@ -252,6 +252,7 @@ class SuiteSetup {
 
   static getSawWebUrl() {
     let url;
+    let isHttps;
 
     if (!fs.existsSync('target')) {
       fs.mkdirSync('target');
@@ -266,11 +267,19 @@ class SuiteSetup {
       ).baseUrl;
     } else {
       process.argv.forEach(function(val) {
+        if (val.includes('--isHttps')) {
+          isHttps = val.split('=')[1];
+          return;
+        }
+      });
+
+      process.argv.forEach(function(val) {
         if (val.includes('--baseUrl')) {
           url = val.split('=')[1];
           let urlObject = {
-            baseUrl: url
+            baseUrl: Utils.getUrl(url, isHttps)
           };
+          url = urlObject.baseUrl;
           fs.writeFileSync(
             Constants.E2E_OUTPUT_BASE_DIR + '/url.json',
             JSON.stringify(urlObject),
