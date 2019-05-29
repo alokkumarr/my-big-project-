@@ -69,35 +69,35 @@
 { "index" :{}}
 {"COORDINATES": "85.21831944,59.89848056", "COUNTY": "IN","string": "string 35", "long": 1034, "float": 1000.35, "date": "2017-11-10 00:00:00", "integer": 134, "double": 99995.35}
 { "index" :{}}
-{{"COORDINATES": "-76.07644444,39.63894444", "COUNTY": "MD","string": "string 36", "long": 1035, "float": 1000.36, "date": "2017-11-09 00:00:00", "integer": 135, "double": 99995.36}
+{"COORDINATES": "-76.07644444,39.63894444", "COUNTY": "MD","string": "string 36", "long": 1035, "float": 1000.36, "date": "2017-11-09 00:00:00", "integer": 135, "double": 99995.36}
 { "index" :{}}
-{{"COORDINATES": "-66.07644444,49.63894444", "COUNTY": "MD","string": "string 37", "long": 1036, "float": 1000.37, "date": "2017-11-08 00:00:00", "integer": 136, "double": 99995.37}
+{"COORDINATES": "-66.07644444,49.63894444", "COUNTY": "MD","string": "string 37", "long": 1036, "float": 1000.37, "date": "2017-11-08 00:00:00", "integer": 136, "double": 99995.37}
 { "index" :{}}
-{{"COORDINATES": "56.07644444,29.63894444", "COUNTY": "MD","string": "string 38", "long": 1037, "float": 1000.38, "date": "2017-11-07 00:00:00", "integer": 137, "double": 99995.38}
+{"COORDINATES": "56.07644444,29.63894444", "COUNTY": "MD","string": "string 38", "long": 1037, "float": 1000.38, "date": "2017-11-07 00:00:00", "integer": 137, "double": 99995.38}
 { "index" :{}}
-{{"COORDINATES": "46.07644444,59.63894444", "COUNTY": "MD","string": "string 39", "long": 1038, "float": 1000.39, "date": "2017-11-06 00:00:00", "integer": 138, "double": 99995.39}
+{"COORDINATES": "46.07644444,59.63894444", "COUNTY": "MD","string": "string 39", "long": 1038, "float": 1000.39, "date": "2017-11-06 00:00:00", "integer": 138, "double": 99995.39}
 { "index" :{}}
-{{"COORDINATES": "-79.07644444,09.63894444", "COUNTY": "MD","string": "string 40", "long": 1039, "float": 1000.40, "date": "2017-11-05 00:00:00", "integer": 139, "double": 99995.40}
+{"COORDINATES": "-79.07644444,09.63894444", "COUNTY": "MD","string": "string 40", "long": 1039, "float": 1000.40, "date": "2017-11-05 00:00:00", "integer": 139, "double": 99995.40}
 { "index" :{}}
-{{"COORDINATES": "-78.07644444,69.63894444", "COUNTY": "MD","string": "string 41", "long": 1040, "float": 1000.41, "date": "2017-11-04 00:00:00", "integer": 140, "double": 99995.41}
+{"COORDINATES": "-78.07644444,69.63894444", "COUNTY": "MD","string": "string 41", "long": 1040, "float": 1000.41, "date": "2017-11-04 00:00:00", "integer": 140, "double": 99995.41}
 { "index" :{}}
-{{"COORDINATES": "-65.07644444,29.63894444", "COUNTY": "MD","string": "string 42", "long": 1041, "float": 1000.42, "date": "2017-11-03 00:00:00", "integer": 141, "double": 99995.42}
+{"COORDINATES": "-65.07644444,29.63894444", "COUNTY": "MD","string": "string 42", "long": 1041, "float": 1000.42, "date": "2017-11-03 00:00:00", "integer": 141, "double": 99995.42}
 { "index" :{}}
-{{"COORDINATES": "-43.07644444,23.63894444", "COUNTY": "MD","string": "string 43", "long": 1042, "float": 1000.43, "date": "2017-11-02 00:00:00", "integer": 142, "double": 99995.43}
+{"COORDINATES": "-43.07644444,23.63894444", "COUNTY": "MD","string": "string 43", "long": 1042, "float": 1000.43, "date": "2017-11-02 00:00:00", "integer": 142, "double": 99995.43}
 { "index" :{}}
-{{"COORDINATES": "-23.07644444,26.63894444", "COUNTY": "MD","string": "string 44", "long": 1043, "float": 1000.44, "date": "2017-11-01 00:00:00", "integer": 143, "double": 99995.44}
+{"COORDINATES": "-23.07644444,26.63894444", "COUNTY": "MD","string": "string 44", "long": 1043, "float": 1000.44, "date": "2017-11-01 00:00:00", "integer": 143, "double": 99995.44}
 { "index" :{}}
-{{"COORDINATES": "-11.07644444,78.63894444", "COUNTY": "MD","string": "string 45", "long": 1044, "float": 1000.45, "date": "2017-10-31 00:00:00", "integer": 144, "double": 99995.45}
+{"COORDINATES": "-11.07644444,78.63894444", "COUNTY": "MD","string": "string 45", "long": 1044, "float": 1000.45, "date": "2017-10-31 00:00:00", "integer": 144, "double": 99995.45}
 { "index" :{}}
-{{"COORDINATES": "-20.07644444,88.63894444", "COUNTY": "MD","string": "string 46", "long": 1045, "float": 1000.46, "date": "2017-10-30 00:00:00", "integer": 145, "double": 99995.46}
+{"COORDINATES": "-20.07644444,88.63894444", "COUNTY": "MD","string": "string 46", "long": 1045, "float": 1000.46, "date": "2017-10-30 00:00:00", "integer": 145, "double": 99995.46}
 { "index" :{}}
-{{"COORDINATES": "-30.07644444,45.63894444", "COUNTY": "MD","string": "string 47", "long": 1046, "float": 1000.47, "date": "2017-10-29 00:00:00", "integer": 146, "double": 99995.47}
+{"COORDINATES": "-30.07644444,45.63894444", "COUNTY": "MD","string": "string 47", "long": 1046, "float": 1000.47, "date": "2017-10-29 00:00:00", "integer": 146, "double": 99995.47}
 { "index" :{}}
-{{"COORDINATES": "40.07644444,50.63894444", "COUNTY": "MD","string": "string 48", "long": 1047, "float": 1000.48, "date": "2017-10-28 00:00:00", "integer": 147, "double": 99995.48}
+{"COORDINATES": "40.07644444,50.63894444", "COUNTY": "MD","string": "string 48", "long": 1047, "float": 1000.48, "date": "2017-10-28 00:00:00", "integer": 147, "double": 99995.48}
 { "index" :{}}
-{{"COORDINATES": "55.07644444,30.63894444", "COUNTY": "MD","string": "string 49", "long": 1048, "float": 1000.49, "date": "2017-10-27 00:00:00", "integer": 148, "double": 99995.49}
+{"COORDINATES": "55.07644444,30.63894444", "COUNTY": "MD","string": "string 49", "long": 1048, "float": 1000.49, "date": "2017-10-27 00:00:00", "integer": 148, "double": 99995.49}
 { "index" :{}}
-{{"COORDINATES": "-76.07644444,89.63894444", "COUNTY": "MD","string": "string 50", "long": 1049, "float": 1000.50, "date": "2017-10-26 00:00:00", "integer": 149, "double": 99995.50}
+{"COORDINATES": "-76.07644444,89.63894444", "COUNTY": "MD","string": "string 50", "long": 1049, "float": 1000.50, "date": "2017-10-26 00:00:00", "integer": 149, "double": 99995.50}
 { "index" :{}}
 {"COORDINATES": "-96.914506,32.844442", "COUNTY": "TX","string": "string 51", "long": 1050, "float": 1000.51, "date": "2017-10-25 00:00:00", "integer": 150, "double": 99995.51}
 { "index" :{}}
