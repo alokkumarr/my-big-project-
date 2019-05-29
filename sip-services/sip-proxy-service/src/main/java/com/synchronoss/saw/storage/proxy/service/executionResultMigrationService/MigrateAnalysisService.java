@@ -56,10 +56,6 @@ public class MigrateAnalysisService {
   @NotNull
   private String binaryTablePath;
 
-  @Value("${metastore.analysis-binary-path}")
-  @NotNull
-  private String analysisBinaryPath;
-
   @Value("${metadata.service.transporthost}")
   private String proxyAnalysisUrl;
 
@@ -97,9 +93,9 @@ public class MigrateAnalysisService {
         Boolean flag = entry.getValue();
         String analysisId = entry.getKey();
         if (analysisId != null && !flag) {
-          LOGGER.debug("Fetch execution Ids for miration.!");
+          LOGGER.debug("Fetch execution Ids for migration.!");
           Set<String> executionIds = getExecutionIds(analysisId);
-          LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
+          LOGGER.debug("Total count of execution Ids : ", executionIds.size());
           if (!executionIds.isEmpty()) {
             readExecutionResultFromBinaryStore(executionIds, analysisId);
           }
@@ -130,15 +126,10 @@ public class MigrateAnalysisService {
             LOGGER.debug("Contents from Binary Store :" + content.toString());
 
             String type = null;
-            AnalysisDefMigration analysisDefMigration = null;
             if (content.has("type")
                 && content.get("type") != null
                 && !content.get("type").isJsonNull()) {
               type = content.get("type").getAsString();
-            } else {
-              // Read analysis definition
-              analysisDefMigration = readAnalysisDefinition(analysisId, connection);
-              type = analysisDefMigration.getType();
             }
 
             if (type != null && type.matches("pivot|chart")) {
@@ -196,9 +187,6 @@ public class MigrateAnalysisService {
                 queryNode =
                     jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
                 LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
-              } else {
-                queryNode = analysisDefMigration.getQueryBuilder();
-                LOGGER.debug("Query Node fetched from analysisDefMigration : ", queryNode);
               }
 
               Object dslExecutionResult = null;
@@ -226,6 +214,18 @@ public class MigrateAnalysisService {
               } else {
                 LOGGER.error("Unable to write update AnalysisMigration table!!");
               }
+            } else {
+              JsonElement queryBuilderElement = content.get("queryBuilder");
+              String format = "is missing";
+              if (type == null) {
+                format = "type " + format;
+              }
+              if (queryBuilderElement == null) {
+                format = "query builder " + format;
+              }
+              migrationStatusObject.setExecutionsMigrated(false);
+              migrationStatusObject.setMessage(format);
+              saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
             }
           }
         }
@@ -321,7 +321,7 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in jason Store.");
     } catch (Exception ex) {
-			LOGGER.error(" {Stack trace} : " + ex);
+      LOGGER.error(" {Stack trace} : " + ex);
       LOGGER.error("Error occurred during saving Execution Result :" + ex.getMessage());
     }
   }
@@ -422,43 +422,5 @@ public class MigrateAnalysisService {
       LOGGER.info("Number of execution for analysis Id : " + executionIds.size());
     }
     return executionIds;
-  }
-
-  /**
-   * Read the analysis body if queryBuilder missing in execution result.
-   *
-   * @param analysisId
-   * @return
-   */
-  public AnalysisDefMigration readAnalysisDefinition(String analysisId, Connection connection) {
-    AnalysisDefMigration analysisDefMigration = new AnalysisDefMigration();
-    try {
-      String tablePath = basePath + "/" + analysisBinaryPath;
-      LOGGER.trace("Hbase table path while reading analysis : " + tablePath);
-      Table table = hBaseUtil.getTable(connection, tablePath);
-      Get get = new Get(Bytes.toBytes(analysisId));
-      Result result = table.get(get);
-      JsonParser parser = new JsonParser();
-      JsonObject content =
-          parser
-              .parse(new String(result.getValue("_source".getBytes(), "content".getBytes())))
-              .getAsJsonObject();
-      LOGGER.debug("Contents from Binary Store :" + content.toString());
-
-      if (content.has("type")) {
-        analysisDefMigration.setType(content.get("type").getAsString());
-      }
-      if (content.has("sqlBuilder")) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readValue(content.get("sqlBuilder").toString(), JsonNode.class);
-        analysisDefMigration.setQueryBuilder(jsonNode);
-      }
-    } catch (Exception e) {
-      LOGGER.error("Error while getting analysis definition from HBase : {}", e);
-      migrationStatusObject.setExecutionsMigrated(false);
-      migrationStatusObject.setMessage("Failed : " + e.getMessage());
-      saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
-    }
-    return analysisDefMigration;
   }
 }
