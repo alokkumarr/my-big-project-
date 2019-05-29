@@ -120,5 +120,9 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
   Long countByJob_JobId(Long jobId);
   
   List<BisFileLog> findByJob_JobId(Long jobId, Pageable pageable);
+  
+  List<BisFileLog> findByChannelSysIdAndRouteSysId(Long channelId, Long routeId);
+
+  List<BisFileLog> findByChannelSysId(Long channelId);
 
 }

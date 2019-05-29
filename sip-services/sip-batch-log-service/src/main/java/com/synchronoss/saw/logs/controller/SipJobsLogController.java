@@ -1,7 +1,9 @@
 package com.synchronoss.saw.logs.controller;
 
+import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.models.SipJobDetails;
+import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
 
 import io.swagger.annotations.Api;
@@ -10,6 +12,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +23,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,10 @@ public class SipJobsLogController {
 
   @Autowired
   SipJobDataRepository jobRepository;
+  
+  @Autowired
+  BisFileLogsRepository logsRepository;
+  
   private static final Logger logger = LoggerFactory
       .getLogger(SipJobsLogController.class);
 
@@ -48,7 +54,7 @@ public class SipJobsLogController {
    */
   @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
       response = SipJobDetails.class, responseContainer = "List")
-  @RequestMapping(value = "/logs/jobs/channelType/{channelType}", method = RequestMethod.GET)
+  @RequestMapping(value = "/logs/jobs/channelTypes/{channelType}", method = RequestMethod.GET)
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -73,16 +79,7 @@ public class SipJobsLogController {
     List<BisJobEntity> jobLogs = this.jobRepository.findByChannelType(channelType,
         PageRequest.of(offset, size, Sort.Direction.fromString(sort), column));
     logger.info("job logs fetching done");
-    List<SipJobDetails> logs = jobLogs.stream().map(sipJobEntity -> {
-      SipJobDetails sipJobDto = new SipJobDetails();
-      try {
-        BeanUtils.copyProperties(sipJobEntity, sipJobDto);
-      } catch (Exception exception) {
-        logger.error("exception during copying " + "properties to DTO"
-            + exception.getMessage());
-      }
-      return sipJobDto;
-    }).collect(Collectors.toList());
+    List<SipJobDetails> logs = copyArrayPropertiesToDto(jobLogs);
     
     return  new ResponseEntity<List<SipJobDetails>>(logs,HttpStatus.OK);
 
@@ -136,9 +133,66 @@ public class SipJobsLogController {
    * 
    * @return logs
    */
-  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs", notes = "", 
+  @ApiOperation(value = "Retrive job logs", nickname = "retriveJobLogs",
+       notes = "", response = SipJobDetails.class, responseContainer = "List")
+  @RequestMapping(value = "/logs/jobs/{channelId}/{routeId}",
+      method = RequestMethod.GET)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200,
+           message = "Request has been succeeded without any error"),
+      @ApiResponse(code = 404,
+      message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500,
+       message = "Server is down. Contact System adminstrator"),
+      @ApiResponse(code = 400,
+      message = "Bad request"),
+      @ApiResponse(code = 201,
+       message = "Created"),
+      @ApiResponse(code = 401,
+       message = "Unauthorized"),
+      @ApiResponse(code = 415,
+       message = "Unsupported Type. "
+          + "Representation not supported for the resource") })
+  public ResponseEntity<List<SipJobDetails>> jobLogsByChanneIdAndRouteId(
+      @PathVariable("channelId") Long channelId,
+      @PathVariable("routeId") Long routeId,
+      @ApiParam(value = "offset number", required = false) 
+        @RequestParam(name = "offset", defaultValue = "0") int offset,
+      @ApiParam(value = "number of objects per page", required = false) 
+        @RequestParam(name = "size", defaultValue = "10") int size,
+      @ApiParam(value = "sort order", required = false) 
+        @RequestParam(name = "sort", defaultValue = "desc") String sort,
+      @ApiParam(value = "column name to be sorted", required = false) 
+        @RequestParam(name = "column", defaultValue = "createdDate") String column) {
+    logger.info("fetching job logs");
+    List<BisJobEntity> jobLogs = new  ArrayList<BisJobEntity>();
+    jobLogs = this.jobRepository
+        .findByBisChannelSysIdAndBisRouteSysId(channelId, routeId, PageRequest
+            .of(offset, size, Sort.Direction.fromString(sort), column));
+    if (jobLogs.isEmpty()) {
+      List<BisFileLog> fileLogs = logsRepository
+          .findByChannelSysIdAndRouteSysId(channelId, routeId);
+      if (!fileLogs.isEmpty() && fileLogs.get(0).getJob().getJobId() == -1) {
+        jobLogs.add(fileLogs.get(0).getJob());
+
+      }
+
+    }
+    List<SipJobDetails> logs = copyArrayPropertiesToDto(jobLogs);
+
+    return new ResponseEntity<List<SipJobDetails>>(logs, HttpStatus.OK);
+
+  }
+  
+  
+  /**
+   * Returns list of job logs by jobType type such as SFTP or S3..etc
+   * 
+   * @return logs
+   */
+  @ApiOperation(value = "Retrive job logs for channel", nickname = "retriveJobLogs", notes = "", 
       response = SipJobDetails.class, responseContainer = "List")
-  @RequestMapping(value = "/logs/jobs/{channelId}/{routeId}", method = RequestMethod.GET)
+  @RequestMapping(value = "/logs/jobs/channels/{channelId}", method = RequestMethod.GET)
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request has been succeeded without any error"),
       @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -148,9 +202,8 @@ public class SipJobsLogController {
       @ApiResponse(code = 401, message = "Unauthorized"),
       @ApiResponse(code = 415, message = "Unsupported Type. "
           + "Representation not supported for the resource") })
-  public ResponseEntity<List<SipJobDetails>> jobLogsByChanneIdAndRouteId(
+  public ResponseEntity<List<SipJobDetails>> jobLogsByChanneId(
       @PathVariable("channelId") Long channelId, 
-      @PathVariable("channelId") Long routeId,
       @ApiParam(value = "offset number", required = false) @RequestParam(name = "offset",
         defaultValue = "0") int offset,
       @ApiParam(value = "number of objects per page", required = false) @RequestParam(name = "size",
@@ -160,10 +213,31 @@ public class SipJobsLogController {
       @ApiParam(value = "column name to be sorted", required = false) @RequestParam(name = "column",
         defaultValue = "createdDate") String column) {
     logger.info("fetching job logs");
-    List<BisJobEntity> jobLogs = this.jobRepository
-        .findByBisChannelSysIdAndBisRouteSysId(channelId, routeId, 
-        PageRequest.of(offset, size, Sort.Direction.fromString(sort), column));
-    List<SipJobDetails> logs =  jobLogs.stream().map(sipJobEntity -> {
+    List<BisJobEntity> jobLogs = new  ArrayList<BisJobEntity>();
+    jobLogs = this.jobRepository
+        .findByBisChannelSysId(channelId,  PageRequest.of(offset,
+         size, Sort.Direction.fromString(sort), column));
+    if (jobLogs.isEmpty()) {
+      List<BisFileLog> fileLogs = logsRepository
+          .findByChannelSysId(channelId);
+      if (!fileLogs.isEmpty() && fileLogs.get(0).getJob().getJobId() == -1) {
+        jobLogs.add(fileLogs.get(0).getJob());
+
+      }
+
+    }
+    List<SipJobDetails> logs = copyArrayPropertiesToDto(jobLogs);
+    
+    
+    return new ResponseEntity<List<SipJobDetails>>(logs,HttpStatus.OK);
+    
+
+  }
+  
+  
+  private     List<SipJobDetails>  copyArrayPropertiesToDto(
+      List<BisJobEntity> jobLogs) {
+    return jobLogs.stream().map(sipJobEntity -> {
       SipJobDetails sipJobDto = new SipJobDetails();
       try {
         BeanUtils.copyProperties(sipJobEntity, sipJobDto);
@@ -174,10 +248,5 @@ public class SipJobsLogController {
       return sipJobDto;
     }).collect(Collectors.toList());
     
-    
-    return new ResponseEntity<List<SipJobDetails>>(logs,HttpStatus.OK);
-    
-
   }
-
 }
