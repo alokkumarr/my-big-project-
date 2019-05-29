@@ -693,8 +693,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
           if (this.analysis.type === 'report' && response.designerQuery) {
-            (this.analysis as AnalysisReport).queryManual =
-              response.designerQuery;
+            if (this.isInQueryMode) {
+              (this.analysis as AnalysisReport).queryManual =
+                response.designerQuery;
+            }
 
             (this.analysis as AnalysisReport).query = response.designerQuery;
           }
