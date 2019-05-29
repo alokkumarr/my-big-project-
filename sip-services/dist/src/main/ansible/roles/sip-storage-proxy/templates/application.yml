@@ -62,4 +62,4 @@ metadata:
   service:
     host: http://localhost:9501
     execution-migration-flag: false
-    transporthost: http://localhost:9200
+    transporthost: http://localhost:9200/analysis

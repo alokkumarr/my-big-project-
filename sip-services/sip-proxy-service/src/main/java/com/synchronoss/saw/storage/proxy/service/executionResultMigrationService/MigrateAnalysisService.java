@@ -320,8 +320,8 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in jason Store.");
     } catch (Exception ex) {
-      LOGGER.error(
-          String.format("Error occurred during saving Execution Result : %s" + ex.getMessage()));
+			LOGGER.error(" {Stack trace} : " + ex);
+      LOGGER.error("Error occurred during saving Execution Result :" + ex.getMessage());
     }
   }
 
@@ -410,6 +410,7 @@ public class MigrateAnalysisService {
     RestTemplate restTemplate = restUtil.restTemplate();
     Set<String> executionIds = new HashSet<>();
     String url = proxyAnalysisUrl + "/{analysisId}/executions";
+
     String executionResult = restTemplate.getForObject(url, String.class, analysisId);
     Gson gson = new Gson();
     JsonObject executions = gson.fromJson(executionResult, JsonObject.class);
@@ -433,7 +434,9 @@ public class MigrateAnalysisService {
   public AnalysisDefMigration readAnalysisDefinition(String analysisId, Connection connection) {
     AnalysisDefMigration analysisDefMigration = new AnalysisDefMigration();
     try {
-      Table table = hBaseUtil.getTable(connection, basePath + analysisBinaryPath);
+      String tablePath = basePath + "/" + analysisBinaryPath;
+      LOGGER.trace("Hbase table path while reading analysis : " + tablePath);
+      Table table = hBaseUtil.getTable(connection, tablePath);
       Get get = new Get(Bytes.toBytes(analysisId));
       Result result = table.get(get);
       JsonParser parser = new JsonParser();
