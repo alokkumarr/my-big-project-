@@ -19,7 +19,7 @@ import {
 } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
-
+import * as Bowser from 'bowser';
 import {
   AnalyzeService,
   EXECUTION_MODES,
@@ -43,6 +43,11 @@ import { AnalyzeActionsService } from '../actions';
 import { Analysis } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
 import { isUndefined } from 'util';
+
+const browser = get(
+  Bowser.getParser(window.navigator.userAgent).getBrowser(),
+  'name'
+);
 
 @Component({
   selector: 'executed-view',
@@ -560,6 +565,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       break;
     case 'map':
       if (get(this.analysis, 'chartType') === 'map') {
+        if (browser !== 'Chrome') {
+          const title = 'Browser not supported.';
+          const msg =
+            'Downloading map analysis only works with Chrome browser at the moment.';
+          this._toastMessage.warn(msg, title);
+          return;
+        }
         this._htmlService.turnHtml2pdf(this.mapView.nativeElement, this.analysis.name);
       } else {
         this.chartUpdater$.next({ export: true });
