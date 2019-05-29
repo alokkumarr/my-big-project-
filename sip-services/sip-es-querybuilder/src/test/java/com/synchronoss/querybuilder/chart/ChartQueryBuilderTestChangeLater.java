@@ -107,7 +107,7 @@ public class ChartQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -130,7 +130,7 @@ public class ChartQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -152,7 +152,7 @@ public class ChartQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -175,7 +175,7 @@ public class ChartQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);

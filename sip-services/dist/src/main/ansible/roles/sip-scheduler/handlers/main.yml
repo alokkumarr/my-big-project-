@@ -1,4 +1,4 @@
-- name: restart saw-scheduler
+- name: restart sip-scheduler
   # Note: Use state=restarted despite being socket-activated, to
   # ensure the service is up to execute scheduled tasks
   systemd: name=sip-scheduler state=restarted daemon_reload=true
