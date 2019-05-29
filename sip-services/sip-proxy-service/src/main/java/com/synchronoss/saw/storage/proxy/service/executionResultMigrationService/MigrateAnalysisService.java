@@ -52,6 +52,9 @@ public class MigrateAnalysisService {
   @NotNull
   private String basePath;
 
+  @Value("${metadata.service.execution-migration-flag}")
+  private boolean migrationFlag;
+
   @Value("${metastore.migration}")
   @NotNull
   private String migrationStatusTable;
@@ -70,7 +73,9 @@ public class MigrateAnalysisService {
 
   @PostConstruct
   private void init() throws Exception {
-    convertBinaryStoreToDslJsonStore();
+    if (migrationFlag) {
+      convertBinaryStoreToDslJsonStore();
+    }
   }
 
   /**
@@ -112,7 +117,7 @@ public class MigrateAnalysisService {
       LOGGER.info("Execution Result Stored successfully in jason Store.");
     } catch (Exception ex) {
       LOGGER.error(
-          String.format("Error occurred during saving Execution Result : %s"+ ex.getMessage()));
+          String.format("Error occurred during saving Execution Result : %s" + ex.getMessage()));
     }
   }
 
@@ -249,14 +254,14 @@ public class MigrateAnalysisService {
     LOGGER.info("Fetch analysis start here");
     try {
       Connection connection = hBaseUtil.getConnection();
-      LOGGER.info(" Binary table Path = {}"+basePath + binaryTablePath);
+      LOGGER.info(" Binary table Path = {}" + basePath + binaryTablePath);
       Table table = hBaseUtil.getTable(connection, basePath + binaryTablePath);
       ResultScanner results = hBaseUtil.getResultScanner(table);
       if (results != null) {
+        List<MigrationStatusObject> mgObj = getMigratedAnalysis();
+        Map<String, Boolean> analysisIdList = extractAnalysisId(mgObj);
         for (Result result : results) {
           String executionId = new String(result.getValue("_search".getBytes(), "id".getBytes()));
-          List<MigrationStatusObject> mgObj = getMigratedAnalysis();
-          Map<String, Boolean> analysisIdList = extractAnalysisId(mgObj);
           for (Map.Entry<String, Boolean> entry : analysisIdList.entrySet()) {
             String analysisId = entry.getKey();
             Boolean flag = entry.getValue();
@@ -272,7 +277,8 @@ public class MigrateAnalysisService {
         }
       }
     } catch (Exception ex) {
-      LOGGER.error(ex.getMessage());
+      LOGGER.error("{Stack Trace} :" + ex);
+      LOGGER.error("Error occurred while fetching execution Ids :" + ex.getMessage());
     } finally {
       hBaseUtil.closeConnection();
     }
@@ -340,9 +346,11 @@ public class MigrateAnalysisService {
         migrationStatusObject.setExecutionsMigrated(true);
         migrationStatusObject.setMessage("Success");
         if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
-            LOGGER.info("Migration result saved successfully !! : {}"+ migrationStatusObject.isExecutionsMigrated());
+          LOGGER.info(
+              "Migration result saved successfully !! : {}"
+                  + migrationStatusObject.isExecutionsMigrated());
         } else {
-            LOGGER.error("Unable to write update AnalysisMigration table!!");
+          LOGGER.error("Unable to write update AnalysisMigration table!!");
         }
       }
     } catch (Exception ex) {
