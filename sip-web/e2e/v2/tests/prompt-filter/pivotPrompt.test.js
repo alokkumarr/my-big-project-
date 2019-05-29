@@ -208,6 +208,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
+          browser.sleep(2000);// Added because of some issues on bamboo : SIP-7298
           //header.clickOnToastMessage();
           executePage.verifyAppliedFilter(filters);
         } catch (e) {
