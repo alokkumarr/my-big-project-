@@ -31,8 +31,8 @@ public class PivotConverter implements AnalysisSipDslConverter {
     JsonElement sqlQueryBuilderElement = oldAnalysisDefinition.get("sqlBuilder");
     if (sqlQueryBuilderElement != null) {
       JsonObject sqlQueryBuilderObject = sqlQueryBuilderElement.getAsJsonObject();
-      analysis.setSipQuery(generateSipQuery(artifactName, sqlQueryBuilderObject,
-          artifactsArray, store));
+      analysis.setSipQuery(
+          generateSipQuery(artifactName, sqlQueryBuilderObject, artifactsArray, store));
     }
 
     return analysis;
@@ -77,6 +77,18 @@ public class PivotConverter implements AnalysisSipDslConverter {
     // Set area
     if (fieldObject.has("area")) {
       field.setArea(fieldObject.get("area").getAsString());
+    } else {
+      String area = null;
+      String columnName = field.getColumnName();
+
+      for (JsonElement artifactElement : artifactsArray) {
+        area = getAreaFromArtifactObject(columnName, artifactElement.getAsJsonObject(), "area");
+
+        if (area != null) {
+          field.setArea(area);
+          break;
+        }
+      }
     }
 
     // Set groupInterval/dateInterval
@@ -85,6 +97,23 @@ public class PivotConverter implements AnalysisSipDslConverter {
 
       if (!dateInterval.isJsonNull() && dateInterval != null) {
         field.setGroupInterval(GroupInterval.fromValue(dateInterval.getAsString()));
+      }
+    }
+
+    if (fieldObject.has("areaIndex")) {
+      field.setAreaIndex(fieldObject.get("areaIndex").getAsInt());
+    } else {
+      String columnName = field.getColumnName();
+
+      for (JsonElement artifactElement : artifactsArray) {
+        String areaIndexAsString =
+            getAreaFromArtifactObject(columnName, artifactElement.getAsJsonObject(), "areaIndex");
+
+        if (areaIndexAsString != null) {
+          int areaIndex = Integer.parseInt(areaIndexAsString);
+          field.setAreaIndex(areaIndex);
+          break;
+        }
       }
     }
 

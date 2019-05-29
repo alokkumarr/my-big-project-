@@ -594,6 +594,39 @@ public interface AnalysisSipDslConverter {
   }
 
   /**
+   * Extracts area from artifacts object.
+   *
+   * @param columnName Name of the column
+   * @param artifactObject Artifact Object
+   * @param fieldName Field to be extracted from Artifact
+   * @return aliasName - on successful extraction null - on failure
+   */
+  default String getAreaFromArtifactObject(
+      String columnName, JsonObject artifactObject, String fieldName) {
+    String aliasName = null;
+
+    if (artifactObject.has("columns")) {
+      JsonArray columns = artifactObject.getAsJsonArray("columns");
+
+      for (JsonElement columnElement : columns) {
+        JsonObject column = columnElement.getAsJsonObject();
+
+        String artifactColumnName = column.get("columnName").getAsString();
+
+        if (columnName.equalsIgnoreCase(artifactColumnName)) {
+          if (column.has(fieldName)) {
+            aliasName = column.get(fieldName).getAsString();
+
+            break;
+          }
+        }
+      }
+    }
+
+    return aliasName;
+  }
+
+  /**
    * Extracts displayName from artifacts array.
    *
    * @param columnName Name of the column
