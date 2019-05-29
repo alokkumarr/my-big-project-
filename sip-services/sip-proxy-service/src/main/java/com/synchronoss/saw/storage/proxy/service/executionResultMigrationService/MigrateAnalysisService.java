@@ -78,7 +78,9 @@ public class MigrateAnalysisService {
   @PostConstruct
   private void init() {
     if (migrationFlag) {
+      LOGGER.info("Execution Result Migration set to true, Starting Migration !!");
       convertBinaryStoreToDslJsonStore();
+      LOGGER.info("Execution Migration completed !! ");
     }
   }
 
@@ -106,9 +108,6 @@ public class MigrateAnalysisService {
 
       } catch (Exception ex) {
         LOGGER.error("{ Stack Trace }" + ex);
-        migrationStatusObject.setExecutionsMigrated(false);
-        migrationStatusObject.setMessage("Failed : " + ex.getMessage());
-        saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
       } finally {
         // finally close connection after all execution
         hBaseUtil.closeConnection();
@@ -203,7 +202,7 @@ public class MigrateAnalysisService {
 
             Object dslExecutionResult = null;
             if (dataNode != null && queryNode != null) {
-              convertOldExecutionToDSLExecution(type, dataNode, queryNode);
+                dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
             }
             LOGGER.debug("dslExecutionResult : {}", dslExecutionResult);
 
@@ -233,7 +232,7 @@ public class MigrateAnalysisService {
               format = "type " + format;
             }
             if (queryBuilderElement == null) {
-              format = "query builder " + format;
+              format = ",query builder " + format;
             }
             migrationStatusObject.setExecutionsMigrated(false);
             migrationStatusObject.setMessage(format);
