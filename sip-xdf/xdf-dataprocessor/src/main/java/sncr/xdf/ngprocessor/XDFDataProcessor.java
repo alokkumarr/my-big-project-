@@ -77,11 +77,11 @@ public class XDFDataProcessor  extends AbstractComponent {
                     logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
                     processTransformer(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
                 }
-//                if ( pipeObj.get("component").equals("sql"))
-//                {
-//                    logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
-//                    processSQL(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
-//                }
+                if ( pipeObj.get("component").equals("sql"))
+                {
+                    logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
+                    processSQL(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
+                }
             }
 
         } catch (Exception e) {
@@ -189,9 +189,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Transformation completed: "  + " Size is : " + datafileDFmap.size() + "\n");
 
-            datafileDFmap.values().parallelStream().forEach( dFValue -> dFValue.printSchema());
-            datafileDFmap.values().parallelStream().forEach( dFValue -> dFValue.show());
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -265,9 +262,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Parser completed: "  + " Size is : " + datafileDFmap.size() + "\n");
 
-            datafileDFmap.values().parallelStream().forEach( dFValue -> dFValue.printSchema());
-            datafileDFmap.values().parallelStream().forEach( dFValue -> dFValue.show());
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -275,9 +269,9 @@ public class XDFDataProcessor  extends AbstractComponent {
     }
 
 
-    public void processSQL(Map<String, Object> parameters, String configPath,String persistFlag) {
+    public void processSQL(Map<String, Object> parameters, String configPath,String persistFlag)
+    {
         try {
-            String runningMode = "true";
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -300,49 +294,56 @@ public class XDFDataProcessor  extends AbstractComponent {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
             }
 
-            ComponentServices pcs[] = {
-                ComponentServices.InputDSMetadata,
-                ComponentServices.OutputDSMetadata,
-                ComponentServices.Project,
-                ComponentServices.TransformationMetadata,
-                ComponentServices.Spark
-            };
+            ComponentServices[] sqlcs =
+                {
+                    ComponentServices.OutputDSMetadata,
+                    ComponentServices.Project,
+                    ComponentServices.TransformationMetadata,
+                    ComponentServices.Spark
+                };
 
-            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
-            NGContextServices ngSqlCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId,
+            logger.debug("Starting SQL component :" + "\n" );
+
+            ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+
+            NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
                 "sql", batchId);
+            ngSQLCtxSvc.initContext(); // debug
+            ngSQLCtxSvc.registerOutputDataSet();
 
-            ngSqlCtxSvc.initContext();
-            ngSqlCtxSvc.registerOutputDataSet();
+            logger.trace("Output datasets:   ");
 
-            ngSqlCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
-            ngSqlCtxSvc.getNgctx().dataSetName = cfg.getOutputs().get(0).getDataSet().toString();
-
-            logger.debug("Output datasets:");
-
-            ngSqlCtxSvc.getNgctx().registeredOutputDSIds.forEach(id ->
-                logger.debug(id)
+            ngSQLCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.trace(id)
             );
 
-            NGSQLComponent component = new NGSQLComponent(ngSqlCtxSvc.getNgctx());
-            if (!component.initComponent(null))
+            logger.debug(" DataSetnAME IS  :" + config.getInputs().get(0).getDataSet().toString() +  "\n" );
+
+            ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
+            ngSQLCtxSvc.getNgctx().dataSetName = config.getInputs().get(0).getDataSet().toString();
+            ngSQLCtxSvc.getNgctx().datafileDFmap = datafileDFmap;
+
+            ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
+
+            NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
+
+            if (!sqlcomponent.initSQLComponent(null))
                 System.exit(-1);
 
-            component.run();
+            sqlcomponent.run();
 
-            datafileDFmap = ngSqlCtxSvc.getNgctx().datafileDFmap;
+            datafileDFmap = ngSQLCtxSvc.getNgctx().datafileDFmap;
 
-            logger.debug("SQL completed: " + " Size is : " + datafileDFmap.size() + "\n");
-
-            datafileDFmap.values().parallelStream().forEach(dFValue -> dFValue.printSchema());
-            datafileDFmap.values().parallelStream().forEach(dFValue -> dFValue.show());
+            logger.debug("SQL completed: "  + " Size is : " + datafileDFmap.size() + "\n");
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
-
     }
+
+
 
 }

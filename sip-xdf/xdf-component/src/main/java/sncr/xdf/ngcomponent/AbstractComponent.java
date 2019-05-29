@@ -114,7 +114,6 @@ public abstract class AbstractComponent implements WithContext{
             logger.error(error);
             return -1;
         }
-
         int ret = execute();
         if ("true".equalsIgnoreCase(ngctx.runningPipeLine)) {
             if ("true".equalsIgnoreCase(ngctx.persistMode)) {
@@ -502,6 +501,78 @@ public abstract class AbstractComponent implements WithContext{
         }
 
         //Initialization part-4: Initialize trasnsformation metadata.
+        if (services.transformationMD == null &&
+            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
+
+            try {
+                ngctx.transformationID =
+                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
+                ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
+            } catch (Exception e) {
+                String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
+                logger.error(error);
+                return false;
+            }
+        }
+
+        //Initialization part-5: Initialize spark if necessary
+        rc = initSpark(jsc);
+        if (rc != 0) {
+            error = "Could not initialize Spark.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-7: Initialize output datasets.
+        rc = initOutputDataSets();
+        if (rc != 0) {
+            error = "Could not initialize output datasets.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-8: Initialize writer.
+        initWriter();
+        initReader();
+
+        return true;
+    }
+
+
+    /**
+     * Initializes component: if jsc is null - creates SparkContext based on Project/Configuration settings
+     * If jsc is not null - uses the context.
+     * @param jsc
+     * @return
+     * @throws Exception
+     */
+    public final boolean initSQLComponent(JavaSparkContext jsc) throws Exception {
+
+        if (ngctx == null){
+            throw new Exception("Incorrect call, the method can be called only NGContext is initialized");
+        }
+
+        //Initialization part-1: Create context
+
+        try {
+            ctx = new InternalContext();
+            ctx.extSparkCtx = (jsc != null);
+            ctx.fs = HFileOperations.getFileSystem();
+            ctx.fc = HFileOperations.getFileContext();
+        } catch (Exception e) {
+            logger.error("Could not create internal context: ", e);
+            return false;
+        }
+
+        //Initialization part-3: Initialize services.
+        int rc = initServices();
+        if (rc != 0) {
+            error = "Could not initialize component services.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-4: Initialize SQL metadata.
         if (services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
 
