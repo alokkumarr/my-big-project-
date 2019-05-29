@@ -56,8 +56,10 @@ metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
+    analysis-binary-path: analysis_metadata
 
 metadata:
   service:
     host: http://localhost:9501
     execution-migration-flag: false
+    transporthost: http://localhost:9200

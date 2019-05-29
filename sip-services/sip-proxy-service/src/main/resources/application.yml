@@ -33,11 +33,10 @@ metastore:
     base:  hdfs:///main
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
+    analysis-binary-path: analysis_metadata
 
 metadata:
   service:
     host: http://localhost:9501
     execution-migration-flag: false
-
-
-         
+    transporthost: http://localhost:9200
