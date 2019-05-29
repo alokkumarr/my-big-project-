@@ -186,7 +186,7 @@ public class MigrateAnalysisService {
               JsonNode dataNode = null, queryNode = null;
               byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
               if (dataObject != null && dataObject.length > 0) {
-                dataNode = objectMapper.readTree(new String());
+                dataNode = objectMapper.readTree(new String(dataObject));
                 LOGGER.debug("Data Json Node which need to parsed for pivot/chart : {}", dataNode);
               }
 
@@ -198,6 +198,7 @@ public class MigrateAnalysisService {
                 LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
               } else {
                 queryNode = analysisDefMigration.getQueryBuilder();
+                LOGGER.debug("Query Node fetched from analysisDefMigration : ", queryNode);
               }
 
               Object dslExecutionResult = null;
@@ -350,8 +351,6 @@ public class MigrateAnalysisService {
     } catch (Exception e) {
       LOGGER.error("Exception occurred while reading the MaprDB table : {}", migrationStatusTable);
     }
-
-    LOGGER.debug("Return Analysis list : {}", analysisList);
     return analysisList;
   }
 
