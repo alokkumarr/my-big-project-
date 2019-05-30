@@ -1062,7 +1062,7 @@ export class ChartService {
         <th>${fields.x.alias ||
           get(opts, 'labels.x', '') ||
           fields.x.displayName}:</th>
-        <td>{${xStringValue}}</td>
+        <td>${xStringValue}</td>
       </tr>`;
 
       const yString = `<tr>
