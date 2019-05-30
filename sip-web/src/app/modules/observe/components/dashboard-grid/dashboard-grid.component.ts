@@ -44,6 +44,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
 import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 import { ObserveService } from '../../services/observe.service';
+import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -92,6 +93,7 @@ export class DashboardGridComponent
     private windowService: WindowService,
     private sidenav: SideNavService,
     private _dialog: MatDialog,
+    private _analyzeService: AnalyzeService,
     private store: Store
   ) {}
 
@@ -417,7 +419,7 @@ export class DashboardGridComponent
 
       this.observe.readAnalysis(tile.id).then(
         data => {
-          tile.analysis = data;
+          tile.analysis = data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
           tile.success = true;
           this.addAnalysisTile(tile);
           tileLoaded();
@@ -433,6 +435,18 @@ export class DashboardGridComponent
     });
 
     this.initialised = true;
+  }
+
+  fetchGeoAnalysis(analysis) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    const metric = metrics[analysis.semanticId];
+    return {
+      ...analysis,
+      sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+        get(metric, 'artifacts.0.columns', []),
+        analysis.sipQuery
+      )
+    };
   }
 
   addAnalysisTile(tile, executeTile = false) {
