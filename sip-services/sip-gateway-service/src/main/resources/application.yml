@@ -27,10 +27,10 @@ server:
   ssl:
     key-store: /Users/spau0004/Desktop/keystore/keystore.jks
     key-store-password: sip@123
-    trust-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
     trust-store-password: sip@123
 
-connector: http
+connector: https
 saw-security-port: 9000
 
 
@@ -154,7 +154,7 @@ api:
 
 sip:
    ssl:
-     enable : false
+     enable : true
    trust:
        store: /Users/spau0004/Desktop/keystore/truststore.jks
        password: sip@123
