@@ -7,7 +7,7 @@ import com.synchronoss.saw.logs.models.BisFileLogDetails;
 import com.synchronoss.saw.logs.models.BisRouteHistory;
 import com.synchronoss.saw.logs.models.ScheduleDetail;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
-
+import com.synchronoss.sip.utils.RestUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.management.OperationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,19 @@ public class SawBisFileLogsController {
   
   private String scheduleUri = "/scheduler/bisscheduler";
 
-  RestTemplate restTemplate = new RestTemplate();
+  @Autowired
+  private RestUtil restUtil;
+
+
+  private RestTemplate restTemplate = null;
+
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
+ 
+  
+  
   private static final Logger logger = LoggerFactory.getLogger(SawBisFileLogsController.class);
   @Autowired
   private BisFileLogsRepository bisLogsRepository;

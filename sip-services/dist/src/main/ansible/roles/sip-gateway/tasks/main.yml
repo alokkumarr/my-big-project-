@@ -4,10 +4,10 @@
 - name: Install SAW Gateway Service package
   yum: name=/tmp/saw-gateway.rpm state=present
   notify:
-    - restart saw-gateway
+    - restart sip-gateway
 - name: Install SAW Gateway Service configuration file
   template: src=application.yml dest=/opt/bda/saw-gateway-service/conf
   notify:
-    - restart saw-gateway
+    - restart sip-gateway
 - name: Enable SIP Gateway Service
   systemd: name=sip-gateway enabled=true

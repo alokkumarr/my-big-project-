@@ -14,6 +14,7 @@ spring:
 logging:
   level:
     com.synchronoss.saw.gateway: INFO
+    org.apache.http.client: INFO
 server:
   # Note: Bind to all available addresses (not just localhost) so that
   # a proxy which might be on another host can connect
@@ -208,6 +209,6 @@ sip:
 sip:
    ssl:
      enable : false
-     
+
 
   {% endif %}
