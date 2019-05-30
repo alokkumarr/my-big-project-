@@ -5,7 +5,9 @@ spring:
     name: saw-storage-proxy-service
 logging:
   level:
-    com.synchronoss.saw.storage.proxy: INFO
+    com.synchronoss: INFO
+    org.apache.http.client: INFO
+    org.elasticsearch: INFO
 server:
   port: 9800
   context-path: ''

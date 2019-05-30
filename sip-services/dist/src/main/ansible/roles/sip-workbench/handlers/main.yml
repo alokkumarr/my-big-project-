@@ -1,4 +1,4 @@
-- name: restart saw-workbench
+- name: restart sip-workbench
   # Stop service, to trigger restart by socket activation
   systemd: name=sip-workbench state=stopped daemon_reload=true
   # Workaround: Occasionally deployments will fail with "Job for
