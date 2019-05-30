@@ -134,7 +134,6 @@ public class MigrateAnalysisService {
         byte[] contentBinary = result.getValue("_source".getBytes(), "content".getBytes());
         if (contentBinary != null && contentBinary.length > 0) {
           JsonObject content = parser.parse(new String(contentBinary)).getAsJsonObject();
-          LOGGER.debug("Contents from Binary Store :" + content.toString());
 
           String type = null;
           if (content.has("type")
@@ -142,7 +141,7 @@ public class MigrateAnalysisService {
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
           }
-
+          LOGGER.debug("Contents from Binary Store : " + content.toString() +" and Type : " + type);
           if (type != null && type.matches("pivot|chart")) {
             analysisId = analysisId != null ? analysisId : content.get("id").getAsString();
             JsonElement executedByElement = content.get("executedBy");

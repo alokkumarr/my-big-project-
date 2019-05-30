@@ -145,7 +145,6 @@ public abstract class ResultMigration {
       }
       flatStructure.add(records);
     }
-    LOGGER.trace("flatStructure count" + flatStructure.size());
     return flatStructure;
   }
 
