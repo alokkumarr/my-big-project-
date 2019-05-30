@@ -62,3 +62,7 @@ metadata:
     host: http://localhost:9501
     execution-migration-flag: false
     transporthost: http://localhost:9200/analysis
+
+sip:
+  ssl:
+    enable : false
