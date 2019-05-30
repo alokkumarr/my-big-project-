@@ -141,7 +141,12 @@ public class MigrateAnalysisService {
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
           }
-          LOGGER.debug("Contents from Binary Store : " + content.toString() +" and Type : " + type);
+
+          migrationStatusObject.setAnalysisId(analysisId);
+          migrationStatusObject.setAnalysisMigrated(true);
+          migrationStatusObject.setType(type);
+          LOGGER.debug(
+              "Contents from Binary Store : " + content.toString() + " and Type : " + type);
           if (type != null && type.matches("pivot|chart")) {
             analysisId = analysisId != null ? analysisId : content.get("id").getAsString();
             JsonElement executedByElement = content.get("executedBy");
@@ -179,10 +184,6 @@ public class MigrateAnalysisService {
             SipQuery sipQuery =
                 queryBuilder != null ? migrateExecutions.migrate(queryBuilder) : null;
 
-            migrationStatusObject.setAnalysisId(analysisId);
-            migrationStatusObject.setAnalysisMigrated(true);
-            migrationStatusObject.setType(type);
-
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode dataNode = null, queryNode = null;
             byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
@@ -201,7 +202,7 @@ public class MigrateAnalysisService {
 
             Object dslExecutionResult = null;
             if (dataNode != null && queryNode != null) {
-                dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
+              dslExecutionResult = convertOldExecutionToDSLExecution(type, dataNode, queryNode);
             }
             LOGGER.debug("dslExecutionResult : {}", dslExecutionResult);
 
@@ -224,7 +225,7 @@ public class MigrateAnalysisService {
             } else {
               LOGGER.error("Unable to write update AnalysisMigration table!!");
             }
-          } else {
+          } else if (type == null) {
             JsonElement queryBuilderElement = content.get("queryBuilder");
             String format = "is missing";
             if (type == null) {
