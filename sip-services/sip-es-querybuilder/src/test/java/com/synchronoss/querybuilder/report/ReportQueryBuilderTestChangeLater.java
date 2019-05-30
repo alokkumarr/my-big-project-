@@ -108,7 +108,7 @@ public class ReportQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.ESREPORT, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -131,7 +131,7 @@ public class ReportQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.ESREPORT, jsonString,dataSecurityKey,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);

@@ -1,4 +1,4 @@
-- name: restart saw-storage-proxy
+- name: restart sip-storage-proxy
   systemd: name=sip-storage-proxy state=restarted daemon_reload=true
   # Workaround: Occasionally deployments will fail with "Job for
   # service canceled".  The root cause is not known, but retry as a
