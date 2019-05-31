@@ -357,10 +357,28 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     ).finished;
     this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
     if (isUndefined(this.executedAt)) {
-      this.executedAt = moment(this.analysis.modifiedTime)
+      this.executedAt = moment(
+        this.secondsToMillis(
+          (<Analysis>this.analysis).updatedTimestamp ||
+            this.analysis.modifiedTime
+        )
+      )
         .local()
         .format('YYYY/MM/DD h:mm A');
     }
+  }
+
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt(timestamp.toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
   }
 
   loadExecutedAnalyses(analysisId, isDSL) {
