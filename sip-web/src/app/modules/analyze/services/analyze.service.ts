@@ -4,9 +4,11 @@ import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
 import * as has from 'lodash/has';
 import * as fpSortBy from 'lodash/fp/sortBy';
+import * as fpMap from 'lodash/fp/map';
 import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
+import * as uniq from 'lodash/uniq';
 import * as reduce from 'lodash/reduce';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -19,7 +21,10 @@ import {
   AnalysisDSL,
   AnalysisType,
   AnalysisPivotDSL,
-  QueryDSL
+  QueryDSL,
+  Artifact,
+  ArtifactDSL,
+  ArtifactColumn
 } from '../../../models';
 
 import { JwtService } from '../../../common/services';
@@ -44,6 +49,13 @@ interface ExecutionRequestOptions {
   analysisType?: string;
   isDSL?: boolean;
 }
+
+interface ArtifactNameMap {
+  [tableName: string]: {
+    [columnName: string]: string;
+  };
+}
+
 export const EXECUTION_MODES = {
   PREVIEW: 'preview',
   LIVE: 'regularExecution',
@@ -236,7 +248,7 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = fpGet(`data`, resp) || [];
+        const data = isArray(resp.data[0]) ? fpGet(`data[0]`, resp) : fpGet(`data`, resp);
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
@@ -280,7 +292,9 @@ export class AnalyzeService {
     return this.getRequest(url)
       .toPromise()
       .then(resp => {
-        const data = isArray(resp.data[0]) ? fpGet(`data[0]`, resp) : fpGet(`data`, resp);
+        const data = isArray(resp.data[0])
+          ? fpGet(`data[0]`, resp)
+          : fpGet(`data`, resp);
         const queryBuilder = options.isDSL
           ? fpGet(`sipQuery`, resp)
           : fpGet(`queryBuilder`, resp);
@@ -521,7 +535,7 @@ export class AnalyzeService {
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}&executedBy=${this._jwtService.getLoginId()}`,
+        }&ExecutionType=${mode}`,
         model.sipQuery
       )
       .pipe(
@@ -794,5 +808,52 @@ export class AnalyzeService {
     });
 
     return sipQuery;
+  }
+
+  /**
+   * Creates a mapping of column name to display name for all
+   * columns in all artifacts given as argument.
+   *
+   * @param {(Artifact[] | ArtifactDSL[])} artifacts
+   * @returns {ArtifactNameMap}
+   * @memberof AnalyzeService
+   */
+  calcNameMap(artifacts: Artifact[] | ArtifactDSL[]): ArtifactNameMap {
+    return reduce(
+      artifacts,
+      (acc, artifact: Artifact | ArtifactDSL) => {
+        /* This is a fail safe. Metric's table names differ between columns, tables etc.
+           This is a data error from backend. We create maps for all the uniq table names
+           found in metric to accomodate everything. So if two columns in same artifact
+           have different table names, we create mappings for both table names containing both
+           columns.
+        */
+        const allArtifactNames = uniq([
+          (<Artifact>artifact).artifactName ||
+            (<ArtifactDSL>artifact).artifactsName,
+          ...fpMap(
+            field =>
+              field.table ||
+              field.tableName ||
+              field.artifactName ||
+              field.artifactsName,
+
+            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields
+          )
+        ]);
+        allArtifactNames.forEach(artifactName => {
+          acc[artifactName] = reduce(
+            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
+            (accum, col: ArtifactColumn) => {
+              accum[col.columnName] = col.displayName;
+              return accum;
+            },
+            {}
+          );
+        });
+        return acc;
+      },
+      {}
+    );
   }
 }

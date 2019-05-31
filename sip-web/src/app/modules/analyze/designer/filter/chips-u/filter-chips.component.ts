@@ -1,8 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import * as reduce from 'lodash/reduce';
-import * as uniq from 'lodash/uniq';
-import * as map from 'lodash/map';
-import { Filter, Artifact, ArtifactColumn } from '../../types';
+import { Filter, Artifact } from '../../types';
 import {
   NUMBER_TYPES,
   DATE_TYPES,
@@ -11,6 +8,7 @@ import {
   STRING_FILTER_OPERATORS_OBJ,
   NUMBER_FILTER_OPERATORS_OBJ
 } from '../../../consts';
+import { AnalyzeService } from '../../../services/analyze.service';
 
 import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
 import moment from 'moment';
@@ -41,10 +39,12 @@ export const getFilterValue = (filter: Filter) => {
     }
     return `: ${otherValue} ${operatoLabel} ${value}`;
   } else if (DATE_TYPES.includes(type)) {
-    if (preset === CUSTOM_DATE_PRESET_VALUE ) {
+    if (preset === CUSTOM_DATE_PRESET_VALUE) {
       return `: From ${gte} To ${lte}`;
     } else if (operator === 'BTW') {
-      return `: From ${moment(value).format('YYYY-MM-DD')} to ${moment(otherValue).format('YYYY-MM-DD')}`;
+      return `: From ${moment(value).format('YYYY-MM-DD')} to ${moment(
+        otherValue
+      ).format('YYYY-MM-DD')}`;
     }
     return `: ${preset}`;
   }
@@ -64,42 +64,13 @@ export class FilterChipsComponent {
     if (!artifacts) {
       return;
     }
-    this.nameMap = reduce(
-      artifacts,
-      (acc, artifact: Artifact | ArtifactDSL) => {
-        // This is a fail safe. Metric's table names differ between columns, tables etc.
-        // This is a data error from backend. We create maps for all the uniq table names
-        // found in metric to accomodate everything.
-        const allArtifactNames = uniq([
-          (<Artifact>artifact).artifactName ||
-            (<ArtifactDSL>artifact).artifactsName,
-          ...map(
-            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
-            field =>
-              field.table ||
-              field.tableName ||
-              field.artifactName ||
-              field.artifactsName
-          )
-        ]);
-        allArtifactNames.forEach(artifactName => {
-          acc[artifactName] = reduce(
-            (<Artifact>artifact).columns || (<ArtifactDSL>artifact).fields,
-            (accum, col: ArtifactColumn) => {
-              accum[col.columnName] = col.displayName;
-              return accum;
-            },
-            {}
-          );
-        });
-        return acc;
-      },
-      {}
-    );
+    this.nameMap = this.analyzeService.calcNameMap(artifacts);
   }
   @Input() readonly: boolean;
 
   public nameMap;
+
+  constructor(private analyzeService: AnalyzeService) {}
 
   getDisplayName(filter: Filter) {
     return this.nameMap[filter.tableName || filter.artifactsName][

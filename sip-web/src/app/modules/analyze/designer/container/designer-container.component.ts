@@ -693,8 +693,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
           if (this.analysis.type === 'report' && response.designerQuery) {
-            (this.analysis as AnalysisReport).queryManual =
-              response.designerQuery;
+            if (this.isInQueryMode) {
+              (this.analysis as AnalysisReport).queryManual =
+                response.designerQuery;
+            }
 
             (this.analysis as AnalysisReport).query = response.designerQuery;
           }
@@ -801,7 +803,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           .openQueryConfirmationDialog()
           .afterClosed()
           .subscribe(result => {
-            console.log(result);
             if (result) {
               this.changeToQueryModePermanently();
               resolve(this.openSaveDialog());
@@ -814,7 +815,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   openSaveDialog(): Promise<any> {
-    console.log("dave diaolog close");
     if (
       isDSLAnalysis(this.analysis) &&
       ['new', 'fork'].includes(this.designerMode)

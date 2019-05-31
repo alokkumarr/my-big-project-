@@ -20,11 +20,11 @@ import { DndPubsubService, DndEvent } from '../../../../../common/services';
 import { getArtifactColumnGeneralType } from '../../utils';
 import {
   IDEsignerSettingGroupAdapter,
-  Artifact,
   ArtifactColumn,
   Filter,
   DesignerChangeEvent
 } from '../../types';
+import { AnalyzeService } from '../../../services/analyze.service';
 import { DesignerState } from '../../state/designer.state';
 import {
   DesignerInitGroupAdapters,
@@ -64,7 +64,11 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }>();
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
-  constructor(private _dndPubsub: DndPubsubService, private _store: Store) {
+  constructor(
+    private _dndPubsub: DndPubsubService,
+    private _store: Store,
+    private analyzeService: AnalyzeService
+  ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
       SETTINGS_CHANGE_DEBOUNCE_TIME
@@ -94,21 +98,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       .select(state => state.designerState.metric)
       .pipe(
         tap(metric => {
-          this.nameMap = reduce(
-            metric.artifacts,
-            (acc, artifact: Artifact) => {
-              acc[artifact.artifactName] = reduce(
-                artifact.columns,
-                (accum, col: ArtifactColumn) => {
-                  accum[col.columnName] = col.displayName;
-                  return accum;
-                },
-                {}
-              );
-              return acc;
-            },
-            {}
-          );
+          this.nameMap = this.analyzeService.calcNameMap(metric.artifacts);
         })
       )
       .subscribe();

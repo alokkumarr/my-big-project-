@@ -133,10 +133,12 @@ public abstract class ResultMigration {
                 dataObj.put(columnName, childJSNode.intValue());
                 break;
               default:
-                dataObj.put(columnName, childJSNode.toString());
+                dataObj.put(columnName, childJSNode.textValue());
             }
+          } else if (childJSNode.textValue() == null) {
+            setDefaultValue(dataObj, columnName, childJSNode.textValue());
           } else {
-            dataObj.put(columnName, childJSNode.toString());
+            dataObj.put(columnName, childJSNode.textValue());
           }
           records.putAll(dataObj);
         }
@@ -144,6 +146,21 @@ public abstract class ResultMigration {
       flatStructure.add(records);
     }
     return flatStructure;
+  }
+
+  /**
+   * Set Default Value for Chart
+   *
+   * @param dataObj
+   * @param columnName
+   * @param value
+   */
+  private void setDefaultValue(Map dataObj, String columnName, String value) {
+    if (columnName != null && columnName.matches("integer|long|double|float")) {
+      dataObj.put(columnName, 0);
+    } else {
+      dataObj.put(columnName, value);
+    }
   }
 
   /**

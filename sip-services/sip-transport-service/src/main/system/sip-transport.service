@@ -4,7 +4,7 @@ Description=SIP Transport
 [Service]
 Type=notify
 ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj
-SyslogIdentifier=saw-transport
+SyslogIdentifier=sip-transport
 User=mapr
 Restart=on-failure
 # Allow service to exit on SIGTERM, if socket-activated

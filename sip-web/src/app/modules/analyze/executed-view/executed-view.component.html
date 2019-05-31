@@ -194,6 +194,7 @@
             *ngSwitchCase="'pivot'"
             [analysis]="executedAnalysis"
             [data]="data"
+            [artifacts]="metric && metric.artifacts"
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
@@ -208,7 +209,10 @@
 
           <div *ngSwitchCase="'map'">
             <executed-map-view
-              *ngIf="analysis?.mapOptions?.mapType === 'map' || analysis?.mapOptions?.mapType === 'chart_scale'"
+              *ngIf="
+                analysis?.mapOptions?.mapType === 'map' ||
+                analysis?.mapOptions?.mapType === 'chart_scale'
+              "
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"

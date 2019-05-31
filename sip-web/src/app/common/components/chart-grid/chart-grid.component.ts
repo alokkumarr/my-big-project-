@@ -177,7 +177,8 @@ export class ChartGridComponent implements OnInit {
           (column.aggregate === 'percentage' || column.aggregate === 'avg')
         ) {
           value =
-            value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+            (parseFloat(value) || 0).toFixed(2) +
+            (column.aggregate === 'percentage' ? '%' : '');
         }
         value = value === 'Undefined' ? '' : value;
       }
@@ -259,8 +260,8 @@ export class ChartGridComponent implements OnInit {
         map(sorts, 'order')
       );
     }
-
-    this.chartToggleData = this.trimKeyword(orderedData);
+    const chartData = orderedData || data;
+    this.chartToggleData = this.trimKeyword(chartData);
 
     return [
       ...this._chartService.dataToChangeConfig(
@@ -268,7 +269,7 @@ export class ChartGridComponent implements OnInit {
         ? (<AnalysisChartDSL>analysis).chartOptions.chartType
         : get((<AnalysisChartDSL>analysis), 'mapOptions.mapType'),
         analysis.sipQuery,
-        orderedData || data,
+        chartData,
         {
           labels,
           labelOptions: get(analysis, 'chartOptions.labelOptions'),

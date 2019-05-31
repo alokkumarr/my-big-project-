@@ -89,6 +89,8 @@ public class ChartConverter implements AnalysisSipDslConverter {
 
     if (field.getType() != null) {
       if (field.getType() == Field.Type.DATE) {
+
+        field.setMinDocCount(0);
         String dateFormat = field.getDateFormat();
         String interval =
             QueryBuilderUtil.dateFormats.get(

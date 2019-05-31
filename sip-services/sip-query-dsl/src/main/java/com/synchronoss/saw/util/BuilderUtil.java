@@ -80,12 +80,12 @@ public class BuilderUtil {
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
     switch (dynamic) {
-      case "YESTERDAY":
+      case "Yesterday":
         LocalDateTime yesterday = now.minusDays(1);
         dynamicConvertor.setLte(yesterday.format(dateTimeFormatter) + space + dateFormatLte);
         dynamicConvertor.setGte(yesterday.format(dateTimeFormatter) + space + dateFormatGte);
         break;
-      case "TODAY":
+      case "Today":
         {
           LocalDateTime today = now;
           dynamicConvertor.setLte(today.format(dateTimeFormatter) + space + dateFormatLte);
