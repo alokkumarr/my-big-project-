@@ -22,6 +22,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
@@ -51,6 +52,7 @@ public class MigrateAnalysis {
   public String migrationStatusFile = "migrationStatus.json";
 
   private AnalysisMetadata analysisMetadataStore = null;
+  private AnalysisMetadata semanticMedatadataStore = null;
   private String listAnalysisUrl;
   private String tableName;
   private String basePath;
@@ -180,9 +182,9 @@ public class MigrateAnalysis {
                 failedMigration.incrementAndGet();
               } catch (Exception exception) {
                 if (analysis != null) {
-                  logger.error("Unable to process analysis " + analysis.getId());
+                  logger.error("Unable to process analysis " + analysis.getId(), exception);
                 } else {
-                  logger.error("Unable to process analysis");
+                  logger.error("Unable to process analysis", exception);
                 }
 
                 migrationStatusObject.setAnalysisMigrated(false);
@@ -305,18 +307,32 @@ public class MigrateAnalysis {
    * @return
    */
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
+    logger.debug("Analysis definition = {}", analysis);
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
+    logger.debug("Analysis semantic id = {}", analysisSemanticId);
     if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
       for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
         if (analysisSemanticId.equalsIgnoreCase(entry.getValue())) {
           break;
         } else {
           String semanticArtifactName = entry.getKey();
-          String artifactName = analysis.getSipQuery().getArtifacts().get(0).getArtifactsName();
-          if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-            analysis.setSemanticId(entry.getKey());
-            break;
+          SipQuery sipQuery = analysis.getSipQuery();
+
+          if (sipQuery != null) {
+            List<Artifact> artifacts = sipQuery.getArtifacts();
+
+            if (artifacts != null && artifacts.size() == 0) {
+              String artifactName = artifacts.get(0).getArtifactsName();
+              if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
+                analysis.setSemanticId(entry.getKey());
+                break;
+              }
+            } else {
+              logger.warn("Artifacts is not present");
+            }
+          } else {
+            logger.warn("sipQuery not present");
           }
         }
       }
@@ -380,47 +396,46 @@ public class MigrateAnalysis {
 
     Map<String, String> semanticMap = new HashMap<>();
 
-    List<Document> doc = null;
+    List<Document> docs = null;
 
-    List<SemanticNode> objDocs = new ArrayList<>();
+    List<JsonObject> objDocs = new ArrayList<>();
 
     try {
 
-      analysisMetadataStore = new AnalysisMetadata(metadataTable, basePath);
+      semanticMedatadataStore = new AnalysisMetadata(metadataTable, basePath);
 
-      doc = analysisMetadataStore.searchAll();
+      docs = semanticMedatadataStore.searchAll();
 
-      if (doc == null) {
+      if (docs == null) {
 
         return null;
       }
 
-      for (Document d : doc) {
+      for (Document d : docs) {
 
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        objDocs.add(objectMapper.readValue(d.asJsonString(), SemanticNode.class));
+        objDocs.add(toJsonElement(d).getAsJsonObject());
       }
-
-      logger.info("docs:: " + objDocs);
 
     } catch (Exception e) {
 
       logger.error("Exception occurred while fetching Semantic definition", e);
     }
-    for (SemanticNode semanticData : objDocs) {
+    for (JsonObject semanticData : objDocs) {
 
-      logger.debug("SemantiMetadata = " + semanticData);
+      logger.debug("Semantic Metadata = " + semanticData);
 
-      String id = semanticData.getId();
+      String id = semanticData.get("_id").getAsString();
       logger.debug("Semantic ID = " + id);
 
       if (id != null) {
-        List<Object> artifacts = semanticData.getArtifacts();
+        JsonArray artifacts = semanticData.getAsJsonArray(FieldNames.ARTIFACTS);
         logger.debug("Artifacts = " + artifacts);
 
         if (artifacts != null) {
-          String artifactName = ((Artifact) artifacts.get(0)).getArtifactsName();
+          String artifactName =
+              artifacts.get(0).getAsJsonObject().get(FieldNames.ARTIFACT_NAME).getAsString();
 
           if (artifactName != null) {
 
@@ -431,5 +446,11 @@ public class MigrateAnalysis {
     }
 
     return semanticMap;
+  }
+
+  private JsonElement toJsonElement(Document doc) {
+    String json = doc.asJsonString();
+    com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
+    return jsonParser.parse(json);
   }
 }
