@@ -12,7 +12,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.modal.SemanticMetaData;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
@@ -117,7 +116,6 @@ public class MigrateAnalysis {
     ResponseEntity analysisBinaryData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
     if (analysisBinaryData.getBody() != null) {
-      logger.debug("Analysis data = " + analysisBinaryData.getBody());
       JsonNode jsonNode = (JsonNode) analysisBinaryData.getBody();
       JsonElement jelement = new com.google.gson.JsonParser().parse(jsonNode.toString());
       JsonObject analysisBinaryObject = jelement.getAsJsonObject();
@@ -307,6 +305,7 @@ public class MigrateAnalysis {
    * @return
    */
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
+    logger.debug("Semantic Map = {}", semanticMap);
     logger.debug("Analysis definition = {}", analysis);
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
@@ -322,9 +321,12 @@ public class MigrateAnalysis {
           if (sipQuery != null) {
             List<Artifact> artifacts = sipQuery.getArtifacts();
 
-            if (artifacts != null && artifacts.size() == 0) {
+            if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
+              logger.debug("Artifact name = {}", artifactName);
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
+                logger.info("Semantic id updated from {} to {}",
+                    analysis.getSemanticId(), entry.getValue());
                 analysis.setSemanticId(entry.getKey());
                 break;
               }
@@ -444,7 +446,6 @@ public class MigrateAnalysis {
         }
       }
     }
-
     return semanticMap;
   }
 
