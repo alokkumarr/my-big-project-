@@ -237,7 +237,7 @@ export class AnalyzeViewComponent implements OnInit {
     const metrics = this.store.selectSnapshot(state => state.common.metrics);
     return analyses.map(analysis => ({
       ...analysis,
-      metricName: metrics[analysis.semanticId].metricName
+      metricName: metrics[analysis.semanticId] ? metrics[analysis.semanticId].metricName : ''
     }));
   }
 
