@@ -355,12 +355,37 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         finished: null
       }
     ).finished;
-    this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
+    /* If a valid finish time is found, use that. If not, and if we don't have an
+      execution id, we're showing last execution. Use the time from last execution list
+    */
+    this.executedAt = finished
+      ? this.utcToLocal(finished)
+      : executionId
+      ? this.executedAt
+      : this.utcToLocal(get(this.analyses, '0.finished', this.executedAt));
     if (isUndefined(this.executedAt)) {
-      this.executedAt = moment(this.analysis.modifiedTime)
+      this.executedAt = moment(
+        this.secondsToMillis(
+          (<Analysis>this.analysis).updatedTimestamp ||
+            this.analysis.modifiedTime
+        )
+      )
         .local()
         .format('YYYY/MM/DD h:mm A');
     }
+  }
+
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt(timestamp.toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
   }
 
   loadExecutedAnalyses(analysisId, isDSL) {
