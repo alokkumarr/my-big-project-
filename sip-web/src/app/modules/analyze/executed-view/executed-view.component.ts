@@ -564,7 +564,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               )
             };
           } else {
-            this.executedAnalysis.sqlBuilder = queryBuilder;
+            this.executedAnalysis = {...this.executedAnalysis, sqlBuilder: queryBuilder};
           }
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
