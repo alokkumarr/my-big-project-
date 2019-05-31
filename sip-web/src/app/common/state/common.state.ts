@@ -3,7 +3,6 @@ import {
   CommonStateUpdateMenu,
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
-  CommonLoadMetricById,
   CommonStateScheuleJobs
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
