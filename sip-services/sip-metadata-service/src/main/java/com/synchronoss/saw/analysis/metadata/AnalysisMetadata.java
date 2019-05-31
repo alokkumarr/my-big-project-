@@ -35,11 +35,12 @@ public class AnalysisMetadata extends MetadataStore
     cond.build();
     return searchAsList(table, cond);
   }
+
   /**
    * Search All analysis.
    *
    * @return {@link List} of {@link Document}
-   * @throws java.io.IOException
+   * @throws java.io.IOException MaprDBexception
    */
   public List<Document> searchAll() throws Exception {
     QueryCondition cond = MapRDB.newCondition();
