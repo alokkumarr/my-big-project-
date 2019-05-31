@@ -19,6 +19,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.File;
@@ -26,8 +27,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -48,7 +52,9 @@ public class MigrateAnalysis {
   private String tableName;
   private String basePath;
   private String migrationStatusTable;
+  private String metadataTable;
   private static ObjectMapper objectMapper = new ObjectMapper();
+  private Map<String, String> semanticMap;
 
   public MigrateAnalysis() {}
 
@@ -82,12 +88,18 @@ public class MigrateAnalysis {
    * @param listAnalysisUri - API to get list of existing analysis
    */
   public void convertBinaryToJson(
-      String tableName, String basePath, String listAnalysisUri, String migrationStatusTable)
+      String tableName,
+      String basePath,
+      String listAnalysisUri,
+      String migrationStatusTable,
+      String metadataTable)
       throws Exception {
     logger.trace("Migration process will begin here");
     this.migrationStatusTable = migrationStatusTable;
     this.basePath = basePath;
+    this.metadataTable = metadataTable;
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+    semanticMap = getMetaData();
     HttpHeaders requestHeaders = new HttpHeaders();
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -224,6 +236,8 @@ public class MigrateAnalysis {
 
     if (converter != null) {
       analysis = converter.convert(analysisObject);
+      // Updating the semantic id
+      updatedSemanticId(analysis, semanticMap);
     } else {
       logger.error("Unknown analysis type");
     }
@@ -281,6 +295,32 @@ public class MigrateAnalysis {
   }
 
   /**
+   * Return the semantic id for the migration.
+   *
+   * @param analysis Analysis
+   * @param semanticMap semanticMap
+   * @return
+   */
+  private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
+    String analysisSemanticId =
+        analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
+    if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
+      for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
+        if (analysisSemanticId.equalsIgnoreCase(entry.getValue())) {
+          break;
+        } else {
+          String semanticArtifactName = entry.getKey();
+          String artifactName = analysis.getSipQuery().getArtifacts().get(0).getArtifactsName();
+          if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
+            analysis.setSemanticId(entry.getKey());
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Main function.
    *
    * @param args - command line args
@@ -326,5 +366,47 @@ public class MigrateAnalysis {
 
     MigrationStatus migrationStatus = ma.convertAllAnalysis(analysisList);
     System.out.println(gson.toJson(migrationStatus));
+  }
+
+  /**
+   * Return all the semantic details with key/value.
+   *
+   * @return
+   */
+  private Map<String, String> getMetaData() {
+    logger.info("Inside getMetadata method");
+    Map<String, String> semanticMap = new HashMap<>();
+    List<Document> docs = null;
+    List<JsonObject> objDocs = new ArrayList<>();
+    try {
+      analysisMetadataStore = new AnalysisMetadata(metadataTable, basePath);
+      docs = analysisMetadataStore.searchAll();
+      if (docs == null) {
+        return null;
+      }
+      for (Document d : docs) {
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objDocs.add(objectMapper.readValue(d.asJsonString(), JsonObject.class));
+      }
+      logger.info("docs:: " + docs);
+    } catch (Exception e) {
+      logger.error("Exception occurred while fetching analysis by category for userId", e);
+      throw new SipReadEntityException(
+          "Exception occurred while fetching analysis by category for userId", e);
+    }
+    for (JsonObject object : objDocs) {
+      String semanticId = object.get("_id").getAsString();
+      String artifactName =
+          object
+              .get("artifacts")
+              .getAsJsonArray()
+              .get(0)
+              .getAsJsonObject()
+              .get("artifactName")
+              .getAsString();
+      semanticMap.put(artifactName, semanticId);
+    }
+    logger.info("sematicMap:: " + semanticMap);
+    return semanticMap;
   }
 }

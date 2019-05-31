@@ -83,6 +83,8 @@ metastore:
   base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
   analysis: analysisMetadata
   migration: analysisMigration
+  metadataTable: semanticDataStore
+
 semantic:
   workbench-url:  ${connector}://localhost:9700
   transport-metadata-url:  ${connector}://localhost:9200

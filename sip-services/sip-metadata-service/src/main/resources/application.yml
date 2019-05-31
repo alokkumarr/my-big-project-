@@ -38,6 +38,7 @@ metastore:
   base:  hdfs:///main/
   analysis: analysisMetadata
   migration: analysisMigration
+  metadataTable: semanticDataStore
 
 connector: https
 semantic:

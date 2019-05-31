@@ -41,6 +41,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.migration}")
   private String migrationStatusTable;
 
+  @Value("${metastore.metadataTable}")
+  private String metadataTable;
+
   @Value("${analysis.get-analysis-url}")
   @NotNull
   private String analysisUri;
@@ -64,7 +67,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     if (migrationRequires) {
       logger.trace("Migration initiated.. " + migrationRequires);
       new MigrateAnalysis()
-          .convertBinaryToJson(tableName, basePath, analysisUri, migrationStatusTable);
+          .convertBinaryToJson(
+              tableName, basePath, analysisUri, migrationStatusTable, metadataTable);
     }
     logger.trace("Migration ended..");
   }
