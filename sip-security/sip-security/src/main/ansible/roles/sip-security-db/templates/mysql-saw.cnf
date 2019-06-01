@@ -21,6 +21,7 @@ wsrep_cluster_address=gcomm://
   {{ host }}{% if not loop.last %},{% endif %}
 {%- endfor %}
 
-#{% if sip_secure %}
-#wsrep_provider_options="socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem"
-#{% endif %}
+{% if sip_secure %}
+wsrep_provider_options=socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem
+wsrep_sst_auth=sstssl:sstssl
+{% endif %}
