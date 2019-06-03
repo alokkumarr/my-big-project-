@@ -39,6 +39,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
     showMode: 'always',
     position: 'top'
   };
+  private defaultsLoaded = false;
 
   constructor(
     public observe: ObserveService,
@@ -102,6 +103,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       /* Give time for changes to min/max to propagate properly. The
         range slider may use a settimeout to update changes in min/max.
       */
+      this.defaultsLoaded = true;
       setTimeout(() => {
         this.loadDefaults(useCache);
         this.cacheFilters();
@@ -155,6 +157,9 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalNumberFilterComponent
    */
   onSliderChange(data) {
+    if (!this.defaultsLoaded) {
+      return;
+    }
     this.value = data;
     const payload = {
       ...this._filter,

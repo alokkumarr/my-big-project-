@@ -59,7 +59,8 @@ export class GlobalFilterService {
   areFiltersEqual(f1, f2) {
     return (
       f1.semanticId === f2.semanticId &&
-      f1.tableName === f2.tableName &&
+      (f1.tableName || f1.artifactsName) ===
+        (f2.tableName || f2.artifactsName) &&
       f1.columnName === f2.columnName
     );
   }
@@ -110,7 +111,8 @@ export class GlobalFilterService {
       f =>
         f.semanticId === data.semanticId &&
         f.columnName === data.columnName &&
-        f.tableName === data.tableName
+        (f.tableName || f.artifactsName) ===
+          (data.tableName || data.artifactsName)
     );
 
     /* Push or replace existing filter */
