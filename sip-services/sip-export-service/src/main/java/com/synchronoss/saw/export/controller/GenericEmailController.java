@@ -56,10 +56,11 @@ public class GenericEmailController {
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<Map<String,String>> sendEmail(@RequestBody EmailDetails emailDetails) {
 
-    if (emailDetails.getSubject().isEmpty() 
-        ||  emailDetails.getRecipients().isEmpty()) {
+    if ((emailDetails.getSubject() == null || emailDetails.getSubject().isEmpty()) 
+        || (emailDetails.getRecipients() == null ||  emailDetails.
+        getRecipients().isEmpty())) {
       throw new JSONValidationSAWException("Recipient address "
-          + "are subject are required");
+          + "and subject are required");
     }
     
     if (emailDetails.getAttachmentFilePath() != null) {
