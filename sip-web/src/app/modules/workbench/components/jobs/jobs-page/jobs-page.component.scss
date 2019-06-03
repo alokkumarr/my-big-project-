@@ -1,0 +1,17 @@
+@import 'src/themes/base/colors';
+
+:host {
+  mat-form-field {
+    font-size: 12px;
+  }
+
+  mat-toolbar {
+    background-color: $primary-white;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .jobs-grid {
+    padding: 10px;
+  }
+}

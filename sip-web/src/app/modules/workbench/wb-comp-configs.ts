@@ -1,3 +1,5 @@
+import { ChannelType } from './models/workbench.interface';
+
 export const CSV_CONFIG = {
   file: '',
   lineSeparator: '\n',
@@ -68,7 +70,7 @@ export const TYPE_CONVERSION = {
   timestamp: 'date'
 };
 
-export const CHANNEL_TYPES: any[] = [
+export const CHANNEL_TYPES: ChannelType[] = [
   {
     name: 'SFTP',
     uid: 'sftp',
