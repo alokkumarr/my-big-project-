@@ -1053,10 +1053,10 @@ export class ChartService {
           ? round(point.x, 2)
           : point.x
         : xIsString
-        ? 'point.key'
+        ? '{point.key}'
         : xIsNumber
-        ? 'point.x:,.2f'
-        : 'point.x';
+        ? '{point.x:,.2f}'
+        : '{point.x}';
 
       const xString = `<tr>
         <th>${fields.x.alias ||
