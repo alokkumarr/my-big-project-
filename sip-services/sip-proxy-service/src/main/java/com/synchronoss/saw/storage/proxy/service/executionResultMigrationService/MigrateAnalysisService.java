@@ -183,6 +183,7 @@ public class MigrateAnalysisService {
             }
             SipQuery sipQuery =
                 queryBuilder != null ? migrateExecutions.migrate(queryBuilder) : null;
+            LOGGER.debug("SIP query for pivot/chart : {}", sipQuery);
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode dataNode = null, queryNode = null;
@@ -318,7 +319,7 @@ public class MigrateAnalysisService {
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
       executionResult.setData(objectList);
-      executionResult.setExecutionType(ExecutionType.valueOf(executionType));
+      executionResult.setExecutionType(executionType != null ? ExecutionType.valueOf(executionType) : null);
       executionResult.setStatus(executionStatus);
       executionResult.setExecutedBy(executedBy);
       proxyService.saveDslExecutionResult(executionResult);
