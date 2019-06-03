@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RetryScheduler {
+public class RetrySchedulerService {
   @Autowired
   private RetryExecutorService retryExecutor;
   

@@ -336,18 +336,6 @@ public class RetryExecutorService {
           logger.error("Error during delete of currupted file:" 
                 + ex.getMessage());
         }
-        /*File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
-          @Override
-          public boolean accept(File file) {
-            return !file.isHidden();
-          }
-        });
-        if (files != null && files.length > 1) {
-          fileDelete.delete();
-        } else {
-          logger.trace("Directory deleted :", fileDelete);
-          IntegrationUtils.removeDirectory(fileDelete.getParentFile());
-        }*/
       }
     } else {
       logger.trace("Corrupted file does not exist.");
