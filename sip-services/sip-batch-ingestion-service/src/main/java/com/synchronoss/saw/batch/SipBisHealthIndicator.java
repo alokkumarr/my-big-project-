@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
  * due to property loading issue. 
  * Now default health checker is active
  */
-//@Component
+@Component
 public class SipBisHealthIndicator implements HealthIndicator {
   private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -48,26 +48,24 @@ public class SipBisHealthIndicator implements HealthIndicator {
     
     String error = null;
     try {
-      log.info("From SipBisHealthIndicator starts here");
+      log.trace("From SipBisHealthIndicator starts here");
       restTemplate =
           restUtil.restTemplate(keyStore, keyStorePassword, trustStore, trustStorePassword);
-      log.debug("Checking health: {}", uri);
+      log.trace("Checking health: {}", uri);
       ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
       int code = result.getStatusCodeValue();
-      log.debug("Health check respose code: {}", code);
+      log.trace("Health check respose code: {}", code);
       if (code != 200) {
-        //error = uri + ": respose code: " + code;
-        error = null;
+        error = uri + ": respose code: " + code;
       }
     } catch (Exception e) {
-      log.debug("Health check error: {}", e);
-      // error = uri + ": health check error: " + e.getMessage();
-      error = null;
+      log.error("Health check error: {}", e);
+      error = uri + ": health check error: " + e.getMessage();
     }
-    // if (error != null) {
-    // return Health.down().withDetail("errors", error).build();
-    // }
-    log.info("From SipBisHealthIndicator ends here");
+    if (error != null) {
+      return Health.down().withDetail("errors", error).build();
+    }
+    log.trace("From SipBisHealthIndicator ends here");
     return Health.up().build();
   }
 }
