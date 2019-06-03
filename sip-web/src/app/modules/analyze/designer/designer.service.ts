@@ -251,7 +251,7 @@ export class DesignerService {
       title: metricTitle,
       type: 'map',
       marker: 'y',
-      maxAllowed: () => Infinity,
+      maxAllowed: () => (subType === 'map' ? Infinity : 1),
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,

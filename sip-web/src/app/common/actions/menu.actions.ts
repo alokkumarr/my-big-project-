@@ -23,6 +23,12 @@ export class AdminExportLoadMenu {
 
 export class CommonStateScheuleJobs {
   /* Use for only new DSL analyses. This is for fetching jobs for that category,  */
-  static readonly type = '[Common State] Update schedule Jobs for a particular category';
+  static readonly type =
+    '[Common State] Update schedule Jobs for a particular category';
   constructor(public cronJobs) {}
+}
+
+export class CommonResetStateOnLogout {
+  static readonly type = '[Common State] Reset common state on logout';
+  constructor() {}
 }
