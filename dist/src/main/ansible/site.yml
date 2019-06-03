@@ -38,13 +38,6 @@
         mode: 0755
       when: sip_secure
 
-    #- name: copying the ca file to the saw-services nodes
-    #  copy:
-    #    src: "{{ inventory_dir }}/certificate/sip-authority.csr"
-    #    dest: /etc/bda/{{ ansible_host }}-authority.ca
-    #    mode: 0755
-    #  when: sip_secure
-
     - name: Look up for keystore password
       set_fact:
         sip_keystore_password: >-
