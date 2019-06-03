@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Analysis, Artifact } from '../../types';
-
+import * as get from 'lodash/get';
 @Component({
   selector: 'executed-report-view',
   templateUrl: 'executed-report-view.component.html'
@@ -13,7 +13,7 @@ export class ExecutedReportViewComponent {
     // TODO use the columns from the query
     const isEsReport = analysis.type === 'esReport';
     const isInQueryMode = analysis.edit;
-    const dataFields = <any>analysis.sqlBuilder.dataFields;
+    const dataFields = get(analysis, 'sqlBuilder.dataFields');
 
     if (isInQueryMode) {
       this.artifacts = null;
