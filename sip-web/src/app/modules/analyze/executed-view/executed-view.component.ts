@@ -376,7 +376,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   secondsToMillis(timestamp: string | number): number | string {
-    const secondsOrMillis = parseInt(timestamp.toString(), 10);
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
     if (!secondsOrMillis) {
       // NaN condition
       return timestamp;
