@@ -50,58 +50,66 @@ public class NGSQLExecutor implements Serializable {
             case SELECT:
                 long st = System.currentTimeMillis();
                 descriptor.startTime =  st;
+                Dataset<Row> df = null;
+                if (!"true".equalsIgnoreCase(parent.getNgctx().runningPipeLine)) {
 
-                for ( String tn: allTables.keySet()){
+                    for (String tn : allTables.keySet()) {
 
-                    TableDescriptor tb = allTables.get(tn);
-                    if (tb.isTargetTable){
-                        logger.trace("Do not load data of target table: " + tn);
-                        continue;
-                    }
+                        TableDescriptor tb = allTables.get(tn);
+                        if (tb.isTargetTable) {
+                            logger.trace("Do not load data of target table: " + tn);
+                            continue;
+                        }
 
-                    if (!tb.asReference.contains(descriptor.index)){
-                        logger.trace("Do not load data not needed for this statement: " + tn);
-                        continue;
-                    }
+                        if (!tb.asReference.contains(descriptor.index)) {
+                            logger.trace("Do not load data not needed for this statement: " + tn);
+                            continue;
+                        }
 
-                    logger.debug ("Attempt to load data for table: " + tn);
-                    String location;
-                    if (allTables.get(tn) != null){
-                        location = allTables.get(tn).getLocation();
-                    }
-                    else
-                    {
-                        logger.error("Could not get data location from table descriptor, cancel processing");
-                        return -1L;
-                    }
+                        logger.debug("Attempt to load data for table: " + tn);
+                        String location;
+                        if (allTables.get(tn) != null) {
+                            location = allTables.get(tn).getLocation();
+                        } else {
+                            logger.error("Could not get data location from table descriptor, cancel processing");
+                            return -1L;
+                        }
 
-                    if (location == null || location.isEmpty())
-                    {
-                        logger.error("Data location is Empty, cancel processing");
-                        return -1L;
-                    }
+                        if (location == null || location.isEmpty()) {
+                            logger.error("Data location is Empty, cancel processing");
+                            return -1L;
+                        }
 
-                    if (jobDataFrames.get(tn) != null){
-                        continue;
-                    }
+                        if (jobDataFrames.get(tn) != null) {
+                            continue;
+                        }
 
-                    logger.debug("Load data from: " + location  + ", registered table name: " + tn );
+                        logger.debug("Load data from: " + location + ", registered table name: " + tn);
 
-                    //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
-                    Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                        //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                        Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
                             DLDataSetOperations.getPartitioningInfo(location);
 
-                    if (loc_desc == null)
-                        throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                        if (loc_desc == null)
+                            throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
 
-                    logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
-                    Dataset<Row> df = null;
-                    df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
-                    if (df == null){
-                        throw new Exception( "Could not load data neither in parquet nor in JSON, cancel processing");
+                        logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
+
+                        df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+                        if (df == null) {
+                            throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
+                        }
+                        jobDataFrames.put(tn, df);
+                        df.createOrReplaceTempView(tn);
                     }
-                    jobDataFrames.put(tn, df);
-                    df.createOrReplaceTempView(tn);
+
+                }
+                else
+                {
+
+                    Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
+                    df = dsMap.get(parent.getNgctx().dataSetName);
+                    df.createOrReplaceTempView(parent.getNgctx().dataSetName);
                 }
 
                 long lt = System.currentTimeMillis();
