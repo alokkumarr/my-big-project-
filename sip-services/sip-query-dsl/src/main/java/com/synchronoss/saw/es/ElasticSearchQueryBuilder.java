@@ -241,9 +241,8 @@ public class ElasticSearchQueryBuilder {
    */
   public List<QueryBuilder> buildFilters(List<Filter> filters, List<QueryBuilder> builder) {
     for (Filter item : filters) {
-      if (!item.getIsRuntimeFilter()
-          && item.getIsGlobalFilter() != null
-          && !item.getIsGlobalFilter()) {
+      if ((item.getIsRuntimeFilter() == null || !item.getIsRuntimeFilter())
+          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())) {
 
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
@@ -415,7 +414,9 @@ public class ElasticSearchQueryBuilder {
           builder = QueryBuilderUtil.numericFilter(item, builder);
         }
       }
-      if (item.getIsRuntimeFilter() && item.getModel() != null) {
+      if (item.getIsRuntimeFilter() != null
+          && item.getIsRuntimeFilter()
+          && item.getModel() != null) {
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
           if (item.getModel().getPreset() != null
