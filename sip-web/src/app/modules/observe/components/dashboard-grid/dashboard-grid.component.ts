@@ -109,8 +109,8 @@ export class DashboardGridComponent
       margin: MARGIN_BETWEEN_TILES,
       minRows: 4,
       maxRows: 10000,
-      minItemRows: 6,
-      minItemCols: 10,
+      minItemRows: 1,
+      minItemCols: 1,
       maxItemCols: 100,
       maxItemRows: 10000,
       maxItemArea: 1000000,
@@ -275,7 +275,8 @@ export class DashboardGridComponent
             get(this.model, 'filters') || [],
             dashFilt =>
               dashFilt.semanticId === analysis.semanticId &&
-              dashFilt.tableName === flt.tableName &&
+              (dashFilt.tableName || dashFilt.artifactsName) ===
+                (flt.tableName || flt.artifactsName) &&
               dashFilt.columnName === flt.columnName &&
               flt.isGlobalFilter
           );
@@ -349,7 +350,8 @@ export class DashboardGridComponent
 
         (tile.origAnalysis.sqlBuilder || tile.origAnalysis.sipQuery).filters,
         (gFilt, filt) =>
-          gFilt.tableName === filt.tableName &&
+          (gFilt.tableName || gFilt.artifactsName) ===
+            (filt.tableName || filt.artifactsName) &&
           gFilt.columnName === filt.columnName
       );
 
@@ -419,7 +421,8 @@ export class DashboardGridComponent
 
       this.observe.readAnalysis(tile.id).then(
         data => {
-          tile.analysis = data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
+          tile.analysis =
+            data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
           tile.success = true;
           this.addAnalysisTile(tile);
           tileLoaded();

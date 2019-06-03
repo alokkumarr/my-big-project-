@@ -138,13 +138,12 @@ export class ChartGridComponent implements OnInit {
     const chart = {
       height: 580
     };
-    const chartType = (<AnalysisChartDSL>analysis).chartOptions
-     ? (<AnalysisChartDSL>analysis).chartOptions.chartType
-      : get((<AnalysisChartDSL>analysis), 'mapOptions.mapType');
+    const chartType =
+      analysis.type === 'chart'
+        ? (<AnalysisChartDSL>analysis).chartOptions.chartType
+        : get(<AnalysisChartDSL>analysis, 'mapOptions.mapType');
     this.chartOptions = this._chartService.getChartConfigFor(
-      isDSLAnalysis(analysis)
-        ? chartType
-        : analysis.chartType,
+      isDSLAnalysis(analysis) ? chartType : analysis.chartType,
       { chart, legend }
     );
   }
@@ -265,9 +264,9 @@ export class ChartGridComponent implements OnInit {
 
     return [
       ...this._chartService.dataToChangeConfig(
-        (<AnalysisChartDSL>analysis).chartOptions
-        ? (<AnalysisChartDSL>analysis).chartOptions.chartType
-        : get((<AnalysisChartDSL>analysis), 'mapOptions.mapType'),
+        analysis.type === 'chart'
+          ? (<AnalysisChartDSL>analysis).chartOptions.chartType
+          : get(<AnalysisChartDSL>analysis, 'mapOptions.mapType'),
         analysis.sipQuery,
         chartData,
         {

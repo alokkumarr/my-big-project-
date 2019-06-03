@@ -3,12 +3,12 @@ import {
   CommonStateUpdateMenu,
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
-  CommonLoadMetricById,
   CommonStateScheuleJobs,
   CommonResetStateOnLogout
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
-import { tap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import { tap, switchMap } from 'rxjs/operators';
 
 import { MenuService, CommonSemanticService } from '../services';
 
@@ -68,29 +68,20 @@ export class CommonState {
     }
 
     return this.semantic.getMetricList$().pipe(
-      tap(resp => {
+      /* Load all metrics individually. The above request gets
+       the list of all metrics, but those don't have the artifacts.
+       Individual loading of all metrics is necessary for that */
+      switchMap(resp => {
         const resultMetrics = {};
-        resp.forEach(metric => {
-          resultMetrics[metric.id] = metric;
-        });
-
-        patchState({ metrics: resultMetrics });
-        return dispatch(
-          resp.map(metric => new CommonLoadMetricById(metric.id))
+        const metrics$ = resp.map(metric =>
+          this.semantic.getArtifactsForDataSet$(metric.id)
         );
-      })
-    );
-  }
-
-  @Action(CommonLoadMetricById)
-  loadArtifactsForMetric(
-    { patchState, getState, dispatch }: StateContext<CommonStateModel>,
-    { metricId }: CommonLoadMetricById
-  ) {
-    return this.semantic.getArtifactsForDataSet$(metricId).pipe(
-      tap((metric: any) => {
-        const metrics = getState().metrics;
-        patchState({ metrics: { ...metrics, [metric.id]: metric } });
+        return forkJoin(metrics$).pipe(
+          tap((ms: Array<any>) => {
+            ms.forEach(metric => (resultMetrics[metric.id] = metric));
+            patchState({ metrics: resultMetrics });
+          })
+        );
       })
     );
   }

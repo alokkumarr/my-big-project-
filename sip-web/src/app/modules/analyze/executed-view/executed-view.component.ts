@@ -376,7 +376,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   secondsToMillis(timestamp: string | number): number | string {
-    const secondsOrMillis = parseInt(timestamp.toString(), 10);
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
     if (!secondsOrMillis) {
       // NaN condition
       return timestamp;
@@ -589,7 +589,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               )
             };
           } else {
-            this.executedAnalysis.sqlBuilder = queryBuilder;
+            this.executedAnalysis = {...this.executedAnalysis, sqlBuilder: queryBuilder};
           }
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
