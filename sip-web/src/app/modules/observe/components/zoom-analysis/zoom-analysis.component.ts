@@ -38,19 +38,23 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public nameMap;
-  public filters: Filter[];
   @Select(state => state.common.metrics) metrics$: Observable<{
     [metricId: string]: any;
   }>;
-  displayNameBuilder$ = this.metrics$.pipe(
-    map(metrics => metrics[this.data.analysis.semanticId]),
-    tap(metric => {
+  filters$ = this.metrics$.pipe(
+    map(() => {
       const queryBuilder = isDSLAnalysis(this.data.analysis)
         ? this.data.analysis.sipQuery
         : this.data.analysis.sqlBuilder;
-      this.filters = isDSLAnalysis(this.data.analysis)
+      return isDSLAnalysis(this.data.analysis)
         ? this.generateDSLDateFilters(queryBuilder.filters)
         : queryBuilder.filters;
+    })
+  );
+  filterCount$ = this.filters$.pipe(map(filters => (filters || []).length));
+  displayNameBuilder$ = this.metrics$.pipe(
+    map(metrics => metrics[this.data.analysis.semanticId]),
+    tap(metric => {
       this.nameMap = this.analyzeService.calcNameMap(metric.artifacts);
     })
   );
@@ -115,7 +119,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
     forEach(filters, filtr => {
       if (
         !filtr.isRuntimeFilter &&
-        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+        (filtr.type === 'date' && filtr.model && filtr.model.operator === 'BTW')
       ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');

@@ -1,16 +1,20 @@
 <div class="dialog-container" #zoomAnalysisChartContainer>
   <div class="dialog__content" fxLayout="column">
-    <div fxLayout="row" fxLayoutAlign="start center" *ngIf="filters.length > 0">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      *ngIf="(filterCount$ | async) > 0"
+    >
       <div fxLayout="column">
         <span class="filter-counter" i18n
-        >{filters.length, plural, =1 {1 Filter} other
-          {{{filters.length}} Filters} } Applied</span
+          >{(filterCount$ | async), plural, =1 {1 Filter} other
+          {{{(filterCount$ | async)}} Filters} } Applied</span
         >
       </div>
 
       <mat-chip-list #chipList>
         <mat-chip
-          *ngFor="let filter of filters; let i = index"
+          *ngFor="let filter of filters$ | async; let i = index"
           style="padding-bottom: 1px;padding-top: 3px;"
         >
           {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
