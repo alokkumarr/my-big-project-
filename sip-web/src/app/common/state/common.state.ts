@@ -4,7 +4,8 @@ import {
   AdminExportLoadMenu,
   CommonLoadAllMetrics,
   CommonLoadMetricById,
-  CommonStateScheuleJobs
+  CommonStateScheuleJobs,
+  CommonResetStateOnLogout
 } from '../actions/menu.actions';
 import { CommonStateModel, Menu } from './common.state.model';
 import { tap } from 'rxjs/operators';
@@ -14,15 +15,17 @@ import { MenuService, CommonSemanticService } from '../services';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as values from 'lodash/values';
 
+const initialState = {
+  analyzeMenu: null,
+  observeMenu: null,
+  adminMenu: null,
+  metrics: {},
+  jobs: null
+};
+
 @State<CommonStateModel>({
   name: 'common',
-  defaults: {
-    analyzeMenu: null,
-    observeMenu: null,
-    adminMenu: null,
-    metrics: {},
-    jobs: null
-  }
+  defaults: cloneDeep(initialState)
 })
 export class CommonState {
   constructor(
@@ -92,14 +95,15 @@ export class CommonState {
     );
   }
 
-
   @Action(CommonStateScheuleJobs)
-  updateSchedule(
-    { patchState, getState },
-    { cronJobs }
-  ) {
+  updateSchedule({ patchState, getState }, { cronJobs }) {
     return patchState({
-      jobs: { ...cronJobs}
+      jobs: { ...cronJobs }
     });
+  }
+
+  @Action(CommonResetStateOnLogout)
+  resetState({ patchState }: StateContext<CommonStateModel>) {
+    return patchState(cloneDeep(initialState));
   }
 }
