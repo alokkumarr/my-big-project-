@@ -49,6 +49,13 @@ elastic-search:
            cluster-name: {{ saw_elasticsearch_cluster_name }}
            transport-hosts: {{ saw_elasticsearch_host }}
            transport-ports: {{ saw_elasticsearch_port | default('9200') }}
+           {% if saw_elasticsearch_protocol == https %}
+           sslEnabled: {{ true | default('false') }}
+           keyStorePath: {{ sip_elasticsearch_keyStorePath }}
+           storePassword: {{ sip_elasticsearch_keyStorePassword }}
+           {% else %}
+           sslEnabled: false
+           {% endif %}
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}

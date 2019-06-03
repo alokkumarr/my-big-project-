@@ -25,6 +25,9 @@ elastic-search:
            cluster-name: elasticsearch
            transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net,es-rd602.ana.dev.vaste.sncrcorp.net
            transport-ports: 9200,9200
+           sslEnabled: false
+           keyStorePath: /codebase/sip/server.keystore
+           storePassword: es123
 elastic-xpack :
           cluster-active: false
           cluster-username: elastic
