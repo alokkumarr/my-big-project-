@@ -13,51 +13,46 @@
         </mat-expansion-panel-header>
         <mat-divider></mat-divider>
 
-        <div class="detail-top">
-          <strong *ngIf="analysis.userFullName || analysis.createdBy"
-            >Created By:</strong
-          >
+        <div
+          class="detail-top"
+          *ngIf="analysis.userFullName || analysis.createdBy"
+        >
+          <strong>Created By:</strong>
           {{
             analysis.userFullName || analysis.createdBy | changeCase: 'title'
           }}
         </div>
-        <div>
-          <strong *ngIf="analysis.createdTimestamp || analysis.createdTime"
-            >Created Time:</strong
-          >
+        <div *ngIf="analysis.createdTimestamp || analysis.createdTime">
+          <strong>Created Time:</strong>
           {{
             utcToLocal(analysis.createdTimestamp) ||
               utcToLocal(analysis.createdTime)
           }}
         </div>
-        <div>
-          <strong *ngIf="analysis.updatedUserName || analysis.modifiedBy"
-            >Last Modified By:</strong
-          >
+        <div *ngIf="analysis.updatedUserName || analysis.modifiedBy">
+          <strong>Last Modified By:</strong>
           {{ analysis.updatedUserName || analysis.modifiedBy }}
         </div>
-        <div>
-          <strong *ngIf="analysis.updatedTimestamp || analysis.modifiedTime"
-            >Last Modified Time:</strong
-          >
+        <div *ngIf="analysis.updatedTimestamp || analysis.modifiedTime">
+          <strong>Last Modified Time:</strong>
           {{
             utcToLocal(analysis.updatedTimestamp) ||
               utcToLocal(analysis.modifiedTime)
           }}
         </div>
-        <div>
-          <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}
+        <div *ngIf="executedBy">
+          <strong>Executed By:</strong> {{ executedBy }}
         </div>
-        <div>
-          <strong *ngIf="executedAt">Execution Time:</strong>
+        <div *ngIf="executedAt">
+          <strong>Execution Time:</strong>
           {{ executedAt }}
         </div>
-        <div class="analysis-detail-description">
-          <strong *ngIf="analysis.description">Description</strong>
+        <div class="analysis-detail-description" *ngIf="analysis.description">
+          <strong>Description</strong>
           <p>{{ analysis.description }}</p>
         </div>
-        <div>
-          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+        <div *ngIf="analysis.scheduleHuman">
+          <strong>Schedule:</strong>
           {{ analysis.scheduleHuman }}
         </div>
       </mat-expansion-panel>
