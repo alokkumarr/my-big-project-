@@ -37,6 +37,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import com.synchronoss.saw.model.Field;
