@@ -3,12 +3,12 @@ package com.synchronoss.saw.batch;
 import com.synchronoss.sip.utils.RestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -16,8 +16,8 @@ import org.springframework.web.client.RestTemplate;
  * due to property loading issue. 
  * Now default health checker is active
  */
-@Component
-public class SipBisHealthIndicator implements HealthIndicator {
+//@Component
+public class SipBisHealthIndicator implements HealthIndicator, InitializingBean {
   private Logger log = LoggerFactory.getLogger(this.getClass());
 
   @Value("${bis.scheduler-url}")
@@ -48,7 +48,7 @@ public class SipBisHealthIndicator implements HealthIndicator {
     
     String error = null;
     try {
-      log.trace("From SipBisHealthIndicator starts here");
+      log.info("From SipBisHealthIndicator starts here");
       restTemplate =
           restUtil.restTemplate(keyStore, keyStorePassword, trustStore, trustStorePassword);
       log.trace("Checking health: {}", uri);
@@ -65,7 +65,15 @@ public class SipBisHealthIndicator implements HealthIndicator {
     if (error != null) {
       return Health.down().withDetail("errors", error).build();
     }
-    log.trace("From SipBisHealthIndicator ends here");
+    log.info("From SipBisHealthIndicator ends here");
     return Health.up().build();
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    log.info("trustStore: "+ trustStore);
+    log.info("trustStorePassword: "+ trustStorePassword);
+    log.info("keyStore: "+ keyStore);
+    log.info("keyStorePassword: "+ keyStorePassword);
   }
 }
