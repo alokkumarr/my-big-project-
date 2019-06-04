@@ -3,15 +3,19 @@
   file:
     path: "{{ inventory_dir }}/certificate"
     state: directory
-    mode: 0755
+    mode: 0777
 
 - name: Generate an OpenSSL private key.
   openssl_privatekey:
     path: "{{ inventory_dir }}/certificate/main-private.pem"
+- name: Generate the OpenSSL public key
+  openssl_publickey:
+    path: "{{ inventory_dir }}/certificate/main-public.pem"
+    privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
 
 - name: Generate an OpenSSL CSR.
   openssl_csr:
-    path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    path: "{{ inventory_dir }}/certificate/sip-authority.csr"
     privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
     organization_name: "SNCR"
     organizational_unit_name : "DXP"
@@ -21,5 +25,5 @@
   openssl_certificate:
     path: "{{ inventory_dir }}/certificate/self-signed-admin.crt"
     privatekey_path: "{{ inventory_dir }}/certificate/main-private.pem"
-    csr_path: "{{ inventory_dir }}/certificate/{{ inventory_hostname }}.csr"
+    csr_path: "{{ inventory_dir }}/certificate/sip-authority.csr"
     provider: selfsigned
