@@ -30,7 +30,7 @@
 		<mariadb>2.3.0</mariadb>
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
-                <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
+    <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
 	</properties>
 	<repositories>
 		<repository>

@@ -1,19 +1,15 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.cloudera.livy.Job;
-import com.cloudera.livy.JobHandle;
-import com.cloudera.livy.LivyClient;
-import com.cloudera.livy.LivyClientBuilder;
-
 import java.io.File;
 import java.net.URI;
-
+import org.apache.livy.Job;
+import org.apache.livy.JobHandle;
+import org.apache.livy.LivyClient;
+import org.apache.livy.LivyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Workbench client for submitting Livy jobs.
- */
+/** Workbench client for submitting Livy jobs. */
 public class WorkbenchClient {
   private static final String WORKBENCH_JAR =
       "/opt/bda/saw-workbench-service/saw-workbench-spark.jar";
@@ -22,6 +18,7 @@ public class WorkbenchClient {
 
   /**
    * This is parameterized constructor.
+   *
    * @param livyUri is of type String.
    * @throws Exception when this exceptional condition happens.
    */
@@ -32,16 +29,12 @@ public class WorkbenchClient {
     log.debug("Uploaded Workbench JAR");
   }
 
-  /**
-   * Submits given Workbench job to Livy.
-   */
+  /** Submits given Workbench job to Livy. */
   public void submit(Job job) throws Exception {
     submit(job, null);
   }
 
-  /**
-   * Submits given Workbench job to Livy with given failure handler.
-   */
+  /** Submits given Workbench job to Livy with given failure handler. */
   public void submit(Job job, FailureHandler failure) throws Exception {
     log.info("Submitting job");
     JobHandle<Integer> jobHandle = client.submit(job);

@@ -1,7 +1,8 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.cloudera.livy.Job;
-import com.cloudera.livy.JobContext;
+
+import org.apache.livy.Job;
+import org.apache.livy.JobContext;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
