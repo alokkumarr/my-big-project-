@@ -72,14 +72,10 @@
       [useNative]="false"
     ></dxo-scrolling>
     <dxi-column
-      caption="Job id"
-      dataField="jobId"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
       caption="Job name"
       dataField="jobName"
       alignment="left"
+      cellTemplate="linkCellTemplate"
     ></dxi-column>
     <dxi-column
       caption="Start time"
@@ -141,15 +137,11 @@
       alignment="left"
     ></dxi-column>
 
-    <!-- <div *dxTemplate="let data of 'nameTemplate'">
-              <div
-                class="details-title mat-subheading-2"
-                e2e="available-routes"
-                i18n
-              >
-                Available Routes
-              </div>
-            </div> -->
+    <div *dxTemplate="let cell of 'linkCellTemplate'">
+      <a routerLink="./{{ cell.data.jobId }}">
+        {{ cell.data.jobName }}
+      </a>
+    </div>
 
     <div *dxTemplate="let cell of 'dateTemplate'">
       {{ cell.text | date: 'short' }}

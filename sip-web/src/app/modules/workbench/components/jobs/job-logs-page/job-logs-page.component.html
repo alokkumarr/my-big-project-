@@ -1,0 +1,144 @@
+<mat-toolbar>
+  <mat-toolbar-row fxLayoutGap="5px">
+    <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center">
+      <span i18n>Job logs</span>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div *ngIf="job" fxLayout="row" class="mat-elevation-z3 job-logs__details">
+  <ng-container
+    *ngFor="let detailGroup of jobDetails; last as isLastDetailGroup"
+  >
+    <div fxLayout="column" fxFlex="16">
+      <div *ngFor="let detail of detailGroup; last as isLastDetail">
+        <div class="job-logs__details__cell">
+          <span i18n>{{ detail.label }}:</span>
+          <span *ngIf="detail.isDateField">{{
+            job[detail.prop] | date: 'short'
+          }}</span>
+          <span *ngIf="!detail.isDateField">{{ job[detail.prop] }}</span>
+        </div>
+        <mat-divider *ngIf="!isLastDetail"></mat-divider>
+      </div>
+    </div>
+    <mat-divider *ngIf="!isLastDetailGroup" [vertical]="true"></mat-divider>
+  </ng-container>
+</div>
+
+<dx-data-grid
+  class="mat-elevation-z3 job-logs__data-grid"
+  e2e="job-logs-container"
+  [allowColumnResizing]="true"
+  [columnMinWidth]="50"
+  [dataSource]="jobLogs$ | async"
+  [showBorders]="false"
+  [columnAutoWidth]="true"
+  [showRowLines]="false"
+  [showColumnLines]="false"
+  [rowAlternationEnabled]="true"
+  rowTemplate="logTableRowTemplate"
+  e2e="job-logs-container"
+>
+  <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+  <dxi-column
+    caption="File Pattern"
+    dataField="filePattern"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="File Name"
+    dataField="fileName"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Actual File Rec Date"
+    dataField="actualFileRecDate"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Rec File Name"
+    dataField="recdFileName"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Rec File Size"
+    dataField="recdFileSize"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="File Status"
+    dataField="mflFileStatus"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Process State"
+    dataField="bisProcessState"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Transfer Start"
+    dataField="transferStartTime"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Transfer End"
+    dataField="transferEndTime"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Transfer Duration (ms)"
+    dataField="transferDuration"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Modified at"
+    dataField="modifiedDate"
+    alignment="left"
+  ></dxi-column>
+  <dxi-column
+    caption="Created at"
+    dataField="createdDate"
+    alignment="left"
+  ></dxi-column>
+
+  <tbody
+    class="logRow dx-row"
+    e2e="job-log-row"
+    *dxTemplate="let logRow of 'logTableRowTemplate'"
+  >
+    <tr class="tr-row" e2e="job-log-row-tr">
+      <td e2e="job-log-filePattern">{{ logRow.data.filePattern }}</td>
+      <td e2e="job-log-fileName" [matTooltip]="logRow.data.fileName">
+        {{ logRow.data.fileName }}
+      </td>
+      <td e2e="job-log-actualFileRecDate">
+        {{ logRow.data.actualFileRecDate | date: 'short' }}
+      </td>
+      <td e2e="job-log-recdFileName" [matTooltip]="logRow.data.recdFileName">
+        {{ logRow.data.recdFileName }}
+      </td>
+      <td e2e="job-log-recdFileSize">{{ logRow.data.recdFileSize }}</td>
+      <td e2e="job-log-mflFileStatus">{{ logRow.data.mflFileStatus }}</td>
+      <td e2e="job-log-bisProcessState">
+        {{ logRow.data.bisProcessState }}
+      </td>
+      <td e2e="job-log-transferStartTime">
+        {{ logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
+      </td>
+      <td e2e="job-log-transferEndTime">
+        {{ logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
+      </td>
+
+      <td e2e="job-log-transferDuration">
+        {{ logRow.data.transferDuration }}
+      </td>
+      <td e2e="job-log-modifiedDate">
+        {{ logRow.data.modifiedDate | date: 'short' }}
+      </td>
+      <td e2e="job-log-createdDate">
+        {{ logRow.data.createdDate | date: 'short' }}
+      </td>
+    </tr>
+  </tbody>
+</dx-data-grid>

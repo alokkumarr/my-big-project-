@@ -24,6 +24,29 @@ export interface Job {
   updatedBy: string;
 }
 
+export interface JobLog {
+  pid: string /* don't show */;
+  routeSysId: number /* don't show */;
+  filePattern: string;
+  source: string;
+  fileName: string;
+  actualFileRecDate: string;
+  recdFileName: string;
+  recdFileSize: number;
+  mflFileStatus: string;
+  bisProcessState: string;
+  modifiedDate: string;
+  createdDate: string;
+  transferStartTime: string;
+  transferEndTime: string;
+  transferDuration: string;
+  checkpointDate: string;
+  reason: string;
+  bisChannelSysId: number;
+  bisChannelType: string;
+  job: any;
+}
+
 export interface ChannelForJobs {
   id: number;
   name: string;
@@ -49,4 +72,5 @@ export interface WorkbenchStateModel {
   routeList: RouteForJobs[];
   selectedRoute: RouteForJobs;
   jobs: Job[];
+  jobLogs: JobLog[];
 }

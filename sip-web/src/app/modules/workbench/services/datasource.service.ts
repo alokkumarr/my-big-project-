@@ -9,7 +9,8 @@ import * as lodashMap from 'lodash/map';
 import {
   Job,
   ChannelForJobs,
-  RouteForJobs
+  RouteForJobs,
+  JobLog
 } from '../models/workbench.interface';
 
 const userProject = 'workbench';
@@ -329,6 +330,11 @@ export class DatasourceService {
     };
   }
 
+  public getJobLogs(jobId) {
+    const url = `${this.api}/ingestion/batch/logs/job/${jobId}?offset=0`;
+    return this.http.get<JobLog[]>(url);
+  }
+
   public getJobsForChannelType(channelTypeId) {
     const path = `channelTypes/${channelTypeId}`;
     return this.getJobs(path);
@@ -344,53 +350,15 @@ export class DatasourceService {
     return this.getJobs(path);
   }
 
-  // getJobs(path) {
-  //   const url = `${
-  //     this.api
-  //   }/ingestion/batch/logs/jobs/${path}?offset=1`;
-  //   return this.http.get<Job[]>(url).toPromise();
-  // }
-
-  public getJobs(path: string) {
-    return of([
-      {
-        jobId: 2,
-        jobName: null,
-        startTime: '2019-05-29T15:01:53.000+0000',
-        endTime: '2019-05-29T15:01:53.000+0000',
-        jobStatus: 'OPEN',
-        totalCount: 1,
-        successCount: 0,
-        filePattern: '*.csv',
-        jobType: 'sftp',
-        createdDate: '2019-05-29T15:01:53.000+0000',
-        createdBy: 'SYSTEM',
-        updatedDate: '2019-05-29T15:01:53.000+0000',
-        updatedBy: 'SYSTEM'
-      },
-
-      {
-        jobId: 1,
-        jobName: null,
-        startTime: '2019-05-28T19:26:56.000+0000',
-        endTime: '2019-05-28T19:26:56.000+0000',
-        jobStatus: 'OPEN',
-        totalCount: 1,
-        successCount: 0,
-        filePattern: '*.csv',
-        jobType: 'sftp',
-        createdDate: '2019-05-28T19:26:56.000+0000',
-        createdBy: 'SYSTEM',
-        updatedDate: '2019-05-28T19:26:56.000+0000',
-        updatedBy: 'SYSTEM'
-      }
-    ]).toPromise();
+  getJobs(path) {
+    const url = `${this.api}/ingestion/batch/logs/jobs/${path}?offset=0`;
+    return this.http.get<Job[]>(url).toPromise();
   }
 
   public getJobsByChannelId(channelId) {
     const url = `${
       this.api
-    }/ingestion/batch/logs/jobs/channels/${channelId}?offset=1`;
+    }/ingestion/batch/logs/jobs/channels/${channelId}?offset=0`;
     return this.http.get<Job[]>(url);
   }
 

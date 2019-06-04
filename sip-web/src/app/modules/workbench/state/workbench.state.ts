@@ -2,6 +2,7 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
 import {
   LoadJobs,
+  LoadJobLogs,
   LoadChannelList,
   LoadRouteList,
   SelectChannelType,
@@ -21,7 +22,8 @@ const defaultWorkbenchState: WorkbenchStateModel = {
   selectedChannel: null,
   routeList: [],
   selectedRoute: null,
-  jobs: []
+  jobs: [],
+  jobLogs: []
 };
 
 @State<WorkbenchStateModel>({
@@ -96,7 +98,7 @@ export class WorkbenchState {
 
     if (selectedRoute && selectedChannel) {
       return this._datasourceService
-        .getJobsForRoute(selectedRoute.id, selectedChannel.id)
+        .getJobsForRoute(selectedChannel.id, selectedRoute.id)
         .then(jobs => patchState({ jobs }));
     }
     if (selectedChannel) {
@@ -109,6 +111,17 @@ export class WorkbenchState {
         .getJobsForChannelType(selectedChannelType.uid)
         .then(jobs => patchState({ jobs }));
     }
+  }
+
+  @Action(LoadJobLogs)
+  loadJobLogs(
+    { patchState }: StateContext<WorkbenchStateModel>,
+    { jobId }: LoadJobLogs
+  ) {
+    return this._datasourceService
+      .getJobLogs(jobId)
+      .toPromise()
+      .then(jobLogs => patchState({ jobLogs }));
   }
 
   @Action(LoadChannelList)
