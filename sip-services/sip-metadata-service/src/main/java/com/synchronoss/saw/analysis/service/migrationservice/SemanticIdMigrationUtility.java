@@ -10,6 +10,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.AnalysisServiceImpl;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.util.FieldNames;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 
-import com.synchronoss.saw.util.FieldNames;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
