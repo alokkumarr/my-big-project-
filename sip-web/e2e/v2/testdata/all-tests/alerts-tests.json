@@ -1,0 +1,393 @@
+{
+  "ALERTS": {
+    "dashboard": {
+      "ALERT001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-1",
+          "severityLevel": "Critical",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 10
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-2",
+          "severityLevel": "Medium",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than",
+          "alertThresholdValue": 20
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-3",
+          "severityLevel": "Low",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than and Equal To",
+          "alertThresholdValue": 30
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-4",
+          "severityLevel": "Warning",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than and Equal To",
+          "alertThresholdValue": 40
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-5",
+          "severityLevel": "Critical",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Equal To",
+          "alertThresholdValue": 50
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-6",
+          "severityLevel": "Medium",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Not Equal To",
+          "alertThresholdValue": 60
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-7",
+          "severityLevel": "Low",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Long",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Not Equal To",
+          "alertThresholdValue": 70
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-8",
+          "severityLevel": "Warning",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Float",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than",
+          "alertThresholdValue": 80
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+
+      "ALERT009": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-9",
+          "severityLevel": "Critical",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Float",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than and Equal To",
+          "alertThresholdValue": 90
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-10",
+          "severityLevel": "Medium",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Float",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 100
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT011": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-11",
+          "severityLevel": "Low",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Float",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 110
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT012": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-12",
+          "severityLevel": "Warning",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Float",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 120
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+
+      "ALERT013": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-13",
+          "severityLevel": "Critical",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 130
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT014": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-14",
+          "severityLevel": "Medium",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 140
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT015": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-15",
+          "severityLevel": "Low",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 150
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT016": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-16",
+          "severityLevel": "Warning",
+          "alertStatus": "Active",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 160
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT017": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-17",
+          "severityLevel": "Critical",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 170
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT018": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-18",
+          "severityLevel": "Medium",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 180
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT019": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-19",
+          "severityLevel": "Low",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Integer",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Greater Than",
+          "alertThresholdValue": 190
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT020": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-20",
+          "severityLevel": "Warning",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Double",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than",
+          "alertThresholdValue":200
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+
+      "ALERT021": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-21",
+          "severityLevel": "Critical",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Double",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than and Equal To",
+          "alertThresholdValue": 210
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT022": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-22",
+          "severityLevel": "Medium",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Double",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Not Equal To",
+          "alertThresholdValue": 220
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT023": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-23",
+          "severityLevel": "Low",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Double",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Equal To",
+          "alertThresholdValue": 230
+        },
+        "description": "Admin should be able to configure alerts."
+      },
+      "ALERT024": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "alertInfo": {
+          "alertName": "Alert-24",
+          "severityLevel": "Warning",
+          "alertStatus": "Inactive",
+          "alertDescription": "This alert is created by admin with Alert-1 name.",
+          "alertDataPod": "sample-elasticsearch",
+          "alertMetricName": "Double",
+          "alertAggregation": "Average",
+          "alertOperatorName": "Less Than",
+          "alertThresholdValue": 240
+        },
+        "description": "Admin should be able to configure alerts."
+      }
+    }
+  }
+}

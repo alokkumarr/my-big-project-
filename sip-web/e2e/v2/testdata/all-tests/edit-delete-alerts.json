@@ -1,0 +1,198 @@
+{
+  "EDITDELETEALERTS": {
+    "alerts": {
+      "ALERT001": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 1 ",
+          "alertDescription": "Alert-1 desription.",
+          "alertSeverity": "CRITICAL",
+          "activeInd": false,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "float",
+          "aggregation": "SUM",
+          "operator": "LT",
+          "thresholdValue": 9,
+          "product": "SAWD000001"
+        },
+        "description": "Admin should be able to create and add alerts."
+      },
+      "ALERT002": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 2",
+          "alertDescription": "Alert-2 desription.",
+          "alertSeverity": "MEDIUM",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "long",
+          "aggregation": "AVG",
+          "operator": "GTE",
+          "thresholdValue": 12,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts."
+      },
+      "ALERT003": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 3",
+          "alertDescription": "Alert-3 desription.",
+          "alertSeverity": "LOW",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "integer",
+          "aggregation": "MIN",
+          "operator": "LTE",
+          "thresholdValue": 15,
+          "product": "SAWD000001"
+        },
+        "description": "admin should be able to create and add alerts."
+      },
+      "ALERT004": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 4",
+          "alertDescription": "Alert-4 desription.",
+          "alertSeverity": "WARNING",
+          "activeInd": false,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "double",
+          "aggregation": "MAX",
+          "operator": "EQ",
+          "thresholdValue": 0,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts ."
+      },
+      "ALERT005": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 5",
+          "alertDescription": "Alert-5 desription.",
+          "alertSeverity": "MEDIUM",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "long",
+          "aggregation": "COUNT",
+          "operator": "NEQ",
+          "thresholdValue": 12,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts ."
+      },
+
+
+      "ALERT006": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 6 ",
+          "alertDescription": "Alert-6 desription.",
+          "alertSeverity": "CRITICAL",
+          "activeInd": false,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "float",
+          "aggregation": "MAX",
+          "operator": "GTE",
+          "thresholdValue": 9,
+          "product": "SAWD000001"
+        },
+        "description": "Admin should be able to create and add alerts."
+      },
+      "ALERT007": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 7",
+          "alertDescription": "Alert-7 desription.",
+          "alertSeverity": "MEDIUM",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "long",
+          "aggregation": "SUM",
+          "operator": "LTE",
+          "thresholdValue": 12,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts."
+      },
+      "ALERT008": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 8",
+          "alertDescription": "Alert-8 desription.",
+          "alertSeverity": "LOW",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "integer",
+          "aggregation": "MIN",
+          "operator": "GT",
+          "thresholdValue": 15,
+          "product": "SAWD000001"
+        },
+        "description": "admin should be able to create and add alerts."
+      },
+      "ALERT009": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 9",
+          "alertDescription": "Alert-9 desription.",
+          "alertSeverity": "WARNING",
+          "activeInd": false,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "double",
+          "aggregation": "COUNT",
+          "operator": "NEQ",
+          "thresholdValue": 0,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts ."
+      },
+      "ALERT010": {
+        "suites": ["smoke", "sanity", "critical", "regression"],
+        "user": "admin",
+        "editAlertInfo": {
+          "alertName": "name 10",
+          "alertDescription": "Alert-10 desription.",
+          "alertSeverity": "MEDIUM",
+          "activeInd": true,
+          "datapodId": "workbench::sample-elasticsearch",
+          "datapodName": "sample-elasticsearch",
+          "categoryId": "Default",
+          "monitoringEntity": "long",
+          "aggregation": "AVG",
+          "operator": "EQ",
+          "thresholdValue": 12,
+          "product": "SAWD000001"
+        },
+        "description": "User should be able to create and add alerts ."
+      }
+    }
+  }
+}

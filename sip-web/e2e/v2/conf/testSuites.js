@@ -49,6 +49,8 @@ const CRITICAL = [
   TEST_BASE_DIR + 'bis/createAndDeleteRoute.test.js',
   TEST_BASE_DIR + 'bis/activateAndDeActivateRoute.test.js',
   TEST_BASE_DIR + 'bis/scheduleRoute.test.js',
+  TEST_BASE_DIR + 'alert/addAlert.test.js',
+  TEST_BASE_DIR + 'alert/editDeleteAlerts.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [
