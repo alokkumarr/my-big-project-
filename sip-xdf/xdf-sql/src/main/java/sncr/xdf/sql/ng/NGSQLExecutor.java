@@ -1,6 +1,5 @@
 package sncr.xdf.sql.ng;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -42,7 +41,6 @@ public class NGSQLExecutor implements Serializable {
 
     public int run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
-        System.out.println("NGSQLExecutor:Long run() **********************************HFileOperations.exists " + descriptor.transactionalLocation + "\n");
 
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 

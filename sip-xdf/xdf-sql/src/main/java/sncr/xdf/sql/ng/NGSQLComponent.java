@@ -60,7 +60,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 ngctx.componentName,
                 null, null);
             logger.info("tempDir : " +tempDir);
-            executor.start(tempDir);
+            int rc = executor.start(tempDir);
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();
             logger.error(e.toString());
@@ -93,29 +93,39 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
             return 0;
         }
 
-        Map<String, SQLDescriptor> resultDataDesc = executor.getResultDataSets();
+        Map<String, SQLDescriptor> resultDataSets = executor.getResultDataSets();
 
-        logger.warn("Move descriptors " + resultDataDesc);
+        logger.warn("Move descriptors " + resultDataSets);
         logger.warn("Output datasets" + ngctx.outputDataSets);
 
 
         ngctx.outputDataSets.forEach(
             (on, obDesc) ->
             {
-                List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
-                String partKeys = on + ": ";
-                for (String s : kl)
-                    partKeys += s + " ";
+                logger.debug("SQL Descriptor for " + on + " = " + on);
 
-                MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
-                    resultDataDesc.get(on),        // SQLDescriptor
-                    (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
-                    kl);
-                ctx.resultDataDesc.add(desc);
+                logger.debug("SQL Descriptor for obDesc.keySet  " + obDesc.keySet());
 
-                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s\n",
-                    obDesc.get(DataSetProperties.Name.name()),
-                    obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+                SQLDescriptor descriptor = resultDataSets.get(on);
+                logger.debug("SQL Descriptor for " + on + " = " + descriptor);
+
+                if (descriptor != null) {
+                    logger.info("Generating MoveDataDescriptor for " + on + " description " + obDesc);
+                    List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
+                    String partKeys = on + ": ";
+
+                    for (String s : kl) partKeys += s + " ";
+
+                    MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
+                        resultDataSets.get(on),         // SQLDescriptor
+                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
+
+                    ctx.resultDataDesc.add(desc);
+
+                    logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
+                        obDesc.get(DataSetProperties.Name.name()),
+                        obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+                }
 
             }
         );
@@ -129,6 +139,8 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
         try {
+            long start_time = System.currentTimeMillis();
+
             HFileOperations.init(10);
 
             Map<String, Object> parameters = cli.parse(args);
@@ -177,6 +189,12 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
             if (!component.initComponent(null))
                 System.exit(-1);
             int rc = component.run();
+
+            long end_time = System.currentTimeMillis();
+            long difference = end_time-start_time;
+            logger.info("SQL total time " + difference );
+
+
             System.exit(rc);
         } catch (Exception e) {
             e.printStackTrace();

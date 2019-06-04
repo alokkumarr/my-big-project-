@@ -47,11 +47,9 @@ public interface WithDLBatchWriter {
                 return 0;
             }
 
-
             //TODO:: Open JIRA ticket to prepare rollback artifacts.
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
-
                 WithDLBatchWriterHelper.logger.warn(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
                     moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
@@ -232,7 +230,6 @@ public interface WithDLBatchWriter {
         public int writeDataset(DSMapKey mapType, Dataset dataset, String dataSetName, String location, String mode) {
 
             try{
-
                 // Some components are using outputs (Transformer), other (SQL, Parser)  outputDataSets
                 // in any case we need some attributed from dataset descriptors.
 
@@ -254,6 +251,7 @@ public interface WithDLBatchWriter {
                 //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
                 //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
                 String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
+
                 boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
                 if ("true".equalsIgnoreCase(ngctx.runningPipeLine)) {
@@ -297,16 +295,12 @@ public interface WithDLBatchWriter {
 //                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
                 }
 
-
-
                 return 0;
             } catch (Exception e) {
                 String error = ExceptionUtils.getFullStackTrace(e);
                 logger.error("Error at writing result: " + error);
                 return -1;
             }
-
-
         }
 
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
@@ -329,8 +323,8 @@ public interface WithDLBatchWriter {
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
-                    //move data files with new name to output location
 
+                    //move data files with new name to output location
                     String destFileName =   dest + Path.SEPARATOR +
                         objectName + "." +
                         ngctx.batchID + "." + ngctx.startTs + "." +
@@ -351,7 +345,6 @@ public interface WithDLBatchWriter {
             if (fs.exists(tmpDIR))
                 fs.delete(tmpDIR, true);
             logger.warn("Data Objects were successfully moved from " + source + " into " + dest);
-
         }
 
         public int createOrCleanUpDestDir(String dest, String objectName) {

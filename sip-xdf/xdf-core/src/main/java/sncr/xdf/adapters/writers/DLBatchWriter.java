@@ -2,8 +2,6 @@ package sncr.xdf.adapters.writers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +80,6 @@ public class DLBatchWriter {
     public void baseWrite( Dataset<Row> DS, String tempLocation, boolean replace, boolean produceSample) throws Exception {
 
         if (replace && HFileOperations.exists(tempLocation)) {
-            System.out.println(" baseWrite : replace && HFileOperations.exists(tempLocation) : " + tempLocation + "\n");
             logger.debug("Clean up temp location: " + tempLocation);
             HFileOperations.deleteEnt(tempLocation);
         }

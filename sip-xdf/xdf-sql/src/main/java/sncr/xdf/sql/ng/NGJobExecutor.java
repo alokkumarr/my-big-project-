@@ -113,7 +113,6 @@ public class NGJobExecutor {
 
                     } catch (Exception e) {
                         logger.error("************** Cannot execute SQL: " + descriptor.SQL + " reason: ", e);
-                        System.out.println("(((((((((((((((((Remove temporary directory and cancel batch processing.");
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
                         return -1;
@@ -166,7 +165,6 @@ public class NGJobExecutor {
                 }
                 else{
                     logger.debug("Add result table: " + sqlDescriptor.targetTableName );
-                    System.out.println("Add result table: " + sqlDescriptor + "\n");
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
                     Map<String, Object> ods = parent.getNgctx().outputDataSets.get(sqlDescriptor.targetTableName);
                     ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
