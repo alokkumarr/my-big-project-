@@ -37,6 +37,7 @@
             <mat-radio-button
               class="format-csv"
               value="csv"
+              *ngIf="data.analysis.type !== 'pivot'"
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
               >CSV</mat-radio-button
             >
