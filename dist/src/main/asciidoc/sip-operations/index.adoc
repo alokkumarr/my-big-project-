@@ -842,6 +842,8 @@ to mention this scenario so that we can configure the
 
     sip_bis_retry_diffs_in_minutes=5
 
+
+
 The below parameter will switch on or off to activate secure or non-secure
 communication in sip platform
 
