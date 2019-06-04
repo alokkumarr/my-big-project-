@@ -801,6 +801,20 @@
               </config>
             </configuration>
           </execution>
+           <execution>
+            <id>apidoc-export</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>convertSwagger2markup</goal>
+            </goals>
+            <configuration>
+              <swaggerInput>dist/target/apidoc-input/apidoc-export.json</swaggerInput>
+              <outputDir>target/generated-snippets/apidoc-export</outputDir>
+              <config>
+                <swagger2markup.anchorPrefix>apidoc_export_</swagger2markup.anchorPrefix>
+              </config>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

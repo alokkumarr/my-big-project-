@@ -41,7 +41,7 @@ public class ApiDocIT extends BaseIT {
     writeApiDoc("semantic", servicePath("internal/semantic"));
     writeApiDoc("workbench", servicePath("internal/workbench"));
     writeApiDoc("batch", servicePath("ingestion/batch"));
-    writeApiDoc("export", servicePath("exports"));
+    writeApiDoc("export", servicePath("export"));
   }
 
   /**
