@@ -1,5 +1,6 @@
 package sncr.xdf.sql.ng;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -39,8 +40,10 @@ public class NGSQLExecutor implements Serializable {
         return descriptor.SQL;
     }
 
-    public Long run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
+    public int run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
+        System.out.println("NGSQLExecutor:Long run() **********************************HFileOperations.exists " + descriptor.transactionalLocation + "\n");
+
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
         switch (descriptor.statementType) {
@@ -72,12 +75,12 @@ public class NGSQLExecutor implements Serializable {
                             location = allTables.get(tn).getLocation();
                         } else {
                             logger.error("Could not get data location from table descriptor, cancel processing");
-                            return -1L;
+                            return -1;
                         }
 
                         if (location == null || location.isEmpty()) {
                             logger.error("Data location is Empty, cancel processing");
-                            return -1L;
+                            return -1;
                         }
 
                         if (jobDataFrames.get(tn) != null) {
@@ -106,9 +109,8 @@ public class NGSQLExecutor implements Serializable {
                 }
                 else
                 {
-
-                    Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
-                    df = dsMap.get(parent.getNgctx().dataSetName);
+                    //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
+                    df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);
                     df.createOrReplaceTempView(parent.getNgctx().dataSetName);
                 }
 
@@ -127,21 +129,23 @@ public class NGSQLExecutor implements Serializable {
                 long exet  = System.currentTimeMillis();
                 descriptor.executionTime =  (int) ((exet-lt)/1000);
 
-                logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
+                logger.debug(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.transactionalLocation);
 
-                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation, "replace");
+                if(!descriptor.isTemporaryTable) {
+                    pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.transactionalLocation , "append");
 
-                long wt = System.currentTimeMillis();
-                descriptor.writeTime = (int) ((wt - exet) / 1000);
-                logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt-st)/1000, (lt-st)/1000, (exet -lt)/1000, (wt-exet)/1000));
-                return 0L;
+                    long wt = System.currentTimeMillis();
+                    descriptor.writeTime = (int) ((wt - exet) / 1000);
+                    logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt - st) / 1000, (lt - st) / 1000, (exet - lt) / 1000, (wt - exet) / 1000));
+                }
+                return 0;
             case DROP_TABLE:
                 HFileOperations.deleteEnt(descriptor.tableDescriptor.getLocation());
                 logger.error("Removed data set: " + descriptor.SQL);
-                return 0L;
+                return 0;
             default:
         }
-        return 0L;
+        return 0;
     }
 
 }
