@@ -530,9 +530,9 @@ public class ExportServiceImpl implements ExportService {
                     CreatePivotTable createPivotTable =
                         new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
                     createPivotTable.createPivot(workbook, file);
-                      if (finalRecipients != null && !finalRecipients.equals("")) {
-                            dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
-                      }
+                    if (finalRecipients != null && !finalRecipients.equals("")) {
+                      dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
+                    }
                   } catch (IOException e) {
                     logger.error(
                         "Exception occurred while dispatching pivot :"
@@ -567,6 +567,13 @@ public class ExportServiceImpl implements ExportService {
                       dispatchBean,
                       requestEntity,
                       finalJobGroup);
+                }
+                logger.debug("Deleting exported file11.");
+                deleteDispatchedFile(exportBean.getFileName());
+                if (isZip) {
+                  File cfile = new File(exportBean.getFileName());
+                  String zipFileName = cfile.getAbsolutePath().concat(".zip");
+                  deleteDispatchedFile(zipFileName);
                 }
               }
 
@@ -774,8 +781,6 @@ public class ExportServiceImpl implements ExportService {
         s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName), exportBean);
 
         logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-        deleteDispatchedFile(exportBean.getFileName());
-        deleteDispatchedFile(zipFileName);
         logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
 
       } catch (Exception e) {
@@ -784,7 +789,6 @@ public class ExportServiceImpl implements ExportService {
     } else {
       s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
       logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-      deleteDispatchedFile(exportBean.getFileName());
     }
   }
 
@@ -1413,19 +1417,6 @@ public class ExportServiceImpl implements ExportService {
             serviceUtils.prepareMailBody(exportBean, mailBody),
             zipFileName);
         logger.debug("Email sent successfully");
-        logger.debug("Deleting exported file.");
-        try {
-          logger.debug(
-              "ExportBean.getFileName() to delete -  mail : "
-                  + zipFileName
-                  + ", "
-                  + exportBean.getFileName());
-          serviceUtils.deleteFile(exportBean.getFileName(), true);
-          serviceUtils.deleteFile(zipFileName, true);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
       } else {
         MailSender.sendMail(
             recipients,
@@ -1433,13 +1424,6 @@ public class ExportServiceImpl implements ExportService {
             serviceUtils.prepareMailBody(exportBean, mailBody),
             exportBean.getFileName());
         logger.debug("Email sent successfully");
-        logger.debug("Deleting exported file.");
-        try {
-          logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
-          serviceUtils.deleteFile(exportBean.getFileName(), true);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
       }
 
     } catch (Exception e) {
