@@ -27,7 +27,6 @@ import java.util.Map;
  * Created by asor0002 on 9/11/2017.
  */
 
-//TODO:: Refactor NGSQLComponent and SQLComponent: eliminate duplicate
 public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = LoggerFactory.getLogger(NGSQLComponent.class);

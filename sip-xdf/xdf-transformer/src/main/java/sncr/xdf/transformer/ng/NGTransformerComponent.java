@@ -33,7 +33,6 @@ import java.util.*;
  * if you need to make such transformation.
  */
 
-//TODO:: Refactor NGTransformerComponent and NGTransformerComponent: eliminate duplicate
 public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";
