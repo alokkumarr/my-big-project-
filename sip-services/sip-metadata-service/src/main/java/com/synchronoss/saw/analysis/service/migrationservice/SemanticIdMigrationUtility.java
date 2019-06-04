@@ -11,21 +11,14 @@ import com.synchronoss.saw.analysis.service.AnalysisServiceImpl;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.FieldNames;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-@Service
 public class SemanticIdMigrationUtility {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SemanticIdMigrationUtility.class);
@@ -33,14 +26,11 @@ public class SemanticIdMigrationUtility {
 
   private AnalysisMetadata semanticMedatadataStore = null;
 
-  @Value("${metastore.metadataTable}")
-  private String metadataTable;
+  private static String metadataTable;
 
-  @Value("${metastore.base}")
-  @NotNull
-  private String basePath;
+  private static String basePath;
 
-  @Autowired private AnalysisServiceImpl analysisService;
+  private AnalysisServiceImpl analysisService;
 
   /**
    * Main method to be called from a script.
@@ -48,6 +38,8 @@ public class SemanticIdMigrationUtility {
    * @param args Require no args for this
    */
   public static void main(String[] args) {
+    basePath = args[0];
+    metadataTable = args[1];
     SemanticIdMigrationUtility uos = new SemanticIdMigrationUtility();
     uos.updateAnalysisWithSemanticInfo();
   }
@@ -58,6 +50,7 @@ public class SemanticIdMigrationUtility {
    * @return boolean value
    */
   public boolean updateAnalysisWithSemanticInfo() {
+    analysisService  = new AnalysisServiceImpl();
     List<Analysis> analyses = analysisService.getAllAnalyses();
     Map<String, String> semanticMap = getMetaData();
     if (analyses != null && analyses.size() > 0 && semanticMap != null && !semanticMap.isEmpty()) {
