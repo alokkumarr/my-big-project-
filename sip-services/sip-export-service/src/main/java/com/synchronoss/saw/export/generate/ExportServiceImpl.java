@@ -530,13 +530,9 @@ public class ExportServiceImpl implements ExportService {
                     CreatePivotTable createPivotTable =
                         new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
                     createPivotTable.createPivot(workbook, file);
-                    MailSender.sendMail(
-                        finalRecipients,
-                        exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-                        serviceUtils.prepareMailBody(exportBean, mailBody),
-                        exportBean.getFileName());
-                    logger.debug("Email sent successfully ");
-                    logger.debug("Removing the file from published location");
+                      if (finalRecipients != null && !finalRecipients.equals("")) {
+                            dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
+                      }
                   } catch (IOException e) {
                     logger.error(
                         "Exception occurred while dispatching pivot :"
@@ -925,7 +921,7 @@ public class ExportServiceImpl implements ExportService {
             recipients,
             exportBean.getReportName() + " | " + exportBean.getPublishDate(),
             serviceUtils.prepareMailBody(exportBean, mailBody),
-            exportBean.getFileName());
+            zipFileName);
         logger.debug("Email sent successfully");
 
         logger.debug("Deleting exported file.");
@@ -1378,6 +1374,76 @@ public class ExportServiceImpl implements ExportService {
       } catch (IOException e) {
         logger.error(e.getMessage());
       }
+    }
+  }
+
+  public void dispatchMailForPivot(
+      ExportBean bean, String recipients, ResponseEntity<JsonNode> entity, boolean isZip) {
+    ExportBean exportBean = bean;
+    MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+    try {
+      File cfile = new File(exportBean.getFileName());
+      if (isZip) {
+        logger.debug("Pivot - zip = true!!");
+        String zipFileName = cfile.getAbsolutePath().concat(".zip");
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+        zos.closeEntry();
+        zos.close();
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            zipFileName);
+        logger.debug("Email sent successfully");
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug(
+              "ExportBean.getFileName() to delete -  mail : "
+                  + zipFileName
+                  + ", "
+                  + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+          serviceUtils.deleteFile(zipFileName, true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+      } else {
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            exportBean.getFileName());
+        logger.debug("Email sent successfully");
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+
+    } catch (Exception e) {
+      logger.error("Error sending mail" + e.getMessage() + ":::" + e.getStackTrace());
     }
   }
 
