@@ -35,6 +35,13 @@ class KPIBuilder extends BaseController {
         responseJson
       }
       case "execute" => {
+        val client: InternalServiceClient = new InternalServiceClient()
+            client.setParameters()
+        val trustStore : String = client.getTrustStore()
+        val trustPswd : String = client.getTrustPassWord()
+        val keyStore : String = client.getKeyStore()
+        val keyPassword : String = client.getKeyPassword()
+        val sslEnabled : Boolean = client.isSslEnabled()
         val jsonString: String = compact(render(json));
         val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
           new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
@@ -49,7 +56,7 @@ class KPIBuilder extends BaseController {
           executionObject = new KPIDataQueryBuilder(jsonString,dskStr).buildQuery()
         else
           executionObject = new KPIDataQueryBuilder(jsonString).buildQuery()
-        val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut)
+        val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut, trustStore, trustPswd, keyStore, keyPassword, sslEnabled)
         val responseJson = parse(data)
         responseJson
       }
@@ -122,4 +129,3 @@ class KPIBuilder extends BaseController {
         name, expected, location))
   }
 }
-

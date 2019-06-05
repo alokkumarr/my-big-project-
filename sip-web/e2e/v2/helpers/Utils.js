@@ -1,4 +1,5 @@
 'use strict';
+const urlParser = require('url');
 const logger = require('../../v2/conf/logger')(__filename);
 class Utils {
   /* Returns object found in list by passed inputValue and inputKey.
@@ -57,6 +58,15 @@ class Utils {
     for (let i = 0; i < 10; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
+  }
+
+  static getUrl(baseUrl, isHttps) {
+    const q = urlParser.parse(baseUrl, true);
+    const protocol =
+      isHttps && isHttps.toLowerCase() == 'false' ? 'http' : 'https';
+    const url = protocol + '://' + q.host + '' + q.pathname;
+    logger.debug('app base url: ' + url);
+    return url;
   }
 }
 

@@ -4,10 +4,10 @@
 - name: Install SAW Workbench Service package
   yum: name=/tmp/saw-workbench.rpm state=present
   notify:
-    - restart saw-workbench
+    - restart sip-workbench
 - name: Install SAW Workbench Service configuration file
   template: src=application.yml dest=/opt/bda/saw-workbench-service/conf
   notify:
-    - restart saw-workbench
+    - restart sip-workbench
 - name: Enable SIP Workbench Service
   systemd: name=sip-workbench-proxy.socket enabled=true state=started

@@ -107,7 +107,7 @@ public class PivotQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -129,7 +129,7 @@ public class PivotQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
@@ -151,7 +151,7 @@ public class PivotQueryBuilderTestChangeLater {
     } catch (IOException e) {
       assertThat(e.getMessage(), is("IOException"));    
     }
-    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder(null);
     SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,dataSecurityKey,3);
     String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
     HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);

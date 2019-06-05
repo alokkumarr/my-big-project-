@@ -78,7 +78,7 @@ export class MapBoxComponent implements OnChanges {
 
     // set center if possible
     if (features.length > 0) {
-      const centerIndex = features.length / 2;
+      const centerIndex = Math.ceil(features.length / 2);
       this.center = features[centerIndex].geometry['coordinates'];
     }
   }
