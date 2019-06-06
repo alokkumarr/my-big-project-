@@ -47,6 +47,8 @@ public class SemanticIdMigrationUtility {
   public static void main(String[] args) {
     basePath = args[0];
     metadataTable = args[1];
+    System.out.println("basePath : --> " + basePath);
+    System.out.println("metadataTable : --> " + metadataTable);
     SemanticIdMigrationUtility uos = new SemanticIdMigrationUtility();
     uos.updateAnalysisWithSemanticInfo();
   }
@@ -58,6 +60,7 @@ public class SemanticIdMigrationUtility {
    */
   public boolean updateAnalysisWithSemanticInfo() {
     analysisService = new AnalysisServiceImpl();
+    System.out.println("Start semantic id migration");
     List<Analysis> analyses = getAllAnalyses();
     Map<String, String> semanticMap = getMetaData();
     if (analyses != null && analyses.size() > 0 && semanticMap != null && !semanticMap.isEmpty()) {
@@ -67,6 +70,7 @@ public class SemanticIdMigrationUtility {
         return returnedAnalysis != null ? true : false;
       }
     }
+    System.out.println("Ends semantic id migration");
     return false;
   }
 
@@ -77,10 +81,13 @@ public class SemanticIdMigrationUtility {
    * @param semanticMap Map of semantic id and artifact name
    */
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
+    System.out.println("Semantic Map = {}" + semanticMap);
+    System.out.println("SipQuery definition = {}" + analysis);
     LOGGER.debug("Semantic Map = {}", semanticMap);
     LOGGER.debug("SipQuery definition = {}", analysis);
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
+    System.out.println("Analysis semantic id = {}" + analysisSemanticId);
     LOGGER.debug("Analysis semantic id = {}", analysisSemanticId);
     if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
       for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
@@ -96,11 +103,18 @@ public class SemanticIdMigrationUtility {
             if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
               LOGGER.debug("Artifact name = {}", artifactName);
+              System.out.println("Artifact name = {}" + artifactName);
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
                 LOGGER.info(
                     "Semantic id updated from {} to {}",
                     analysis.getSemanticId(),
                     entry.getValue());
+
+                System.out.println(
+                    "Semantic id updated from {} to {}"
+                        + analysis.getSemanticId()
+                        + entry.getValue());
+
                 analysis.setSemanticId(entry.getKey());
                 if (updateAnalysisWithSemanticInfo()) {
                   LOGGER.debug(
@@ -132,11 +146,15 @@ public class SemanticIdMigrationUtility {
     Map<String, String> semanticMap = new HashMap<>();
     List<JsonObject> objDocs = new ArrayList<>();
     try {
+
       semanticMedatadataStore = new AnalysisMetadata(metadataTable, basePath);
       List<Document> docs = semanticMedatadataStore.searchAll();
+      System.out.println("Semantic Metadata Document : -- >>" + docs);
       if (docs != null && !docs.isEmpty() && docs.size() > 0) {
+        System.out.println("Inside Semantic Metadata Document.");
         for (Document d : docs) {
           MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+          System.out.println("toJsonElement(d).getAsJsonObject() --> : " + toJsonElement(d).getAsJsonObject());
           objDocs.add(toJsonElement(d).getAsJsonObject());
         }
       }
@@ -160,6 +178,7 @@ public class SemanticIdMigrationUtility {
         }
       }
     }
+    System.out.println("Semantcic map {} " + semanticMap.size());
     return semanticMap;
   }
 
@@ -208,6 +227,8 @@ public class SemanticIdMigrationUtility {
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.searchAll();
+      /*System.out.println("Document {} "
+          + doc);*/
       if (doc == null) {
         return null;
       }
@@ -220,6 +241,8 @@ public class SemanticIdMigrationUtility {
       throw new SipReadEntityException(
           "Exception occurred while fetching analysis by category for userId", e);
     }
+    System.out.println("Document objDocs size {} "
+        + objDocs.size());
     return objDocs;
   }
 
