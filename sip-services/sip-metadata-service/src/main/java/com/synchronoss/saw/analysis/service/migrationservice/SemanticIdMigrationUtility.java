@@ -154,7 +154,8 @@ public class SemanticIdMigrationUtility {
         System.out.println("Inside Semantic Metadata Document.");
         for (Document d : docs) {
           MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-          System.out.println("toJsonElement(d).getAsJsonObject() --> : " + toJsonElement(d).getAsJsonObject());
+          System.out.println(
+              "toJsonElement(d).getAsJsonObject() --> : " + toJsonElement(d).getAsJsonObject());
           objDocs.add(toJsonElement(d).getAsJsonObject());
         }
       }
@@ -228,7 +229,7 @@ public class SemanticIdMigrationUtility {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.searchAll();
       /*System.out.println("Document {} "
-          + doc);*/
+      + doc);*/
       if (doc == null) {
         return null;
       }
@@ -241,8 +242,7 @@ public class SemanticIdMigrationUtility {
       throw new SipReadEntityException(
           "Exception occurred while fetching analysis by category for userId", e);
     }
-    System.out.println("Document objDocs size {} "
-        + objDocs.size());
+    System.out.println("Document objDocs size {} " + objDocs.size());
     return objDocs;
   }
 
