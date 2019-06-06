@@ -71,9 +71,9 @@ public class SipBisHealthIndicator implements HealthIndicator, InitializingBean 
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    log.info("trustStore: "+ trustStore);
-    log.info("trustStorePassword: "+ trustStorePassword);
-    log.info("keyStore: "+ keyStore);
-    log.info("keyStorePassword: "+ keyStorePassword);
+    log.info("trustStore: " + trustStore);
+    log.info("trustStorePassword: " + trustStorePassword);
+    log.info("keyStore: " + keyStore);
+    log.info("keyStorePassword: " + keyStorePassword);
   }
 }
