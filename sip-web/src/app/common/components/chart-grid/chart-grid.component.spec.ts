@@ -10,6 +10,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ChartGridComponent } from './chart-grid.component';
 import { UChartModule } from '../../components/charts';
 import { ChartService } from '../../services';
+import { HeaderProgressService } from './../../../common/services';
 
 @Component({
   selector: 'dx-data-grid',
@@ -42,6 +43,10 @@ class ChartStubService {
   getChartConfigFor = () => ({});
 }
 
+class HeaderProgressStubService {
+  show = () => (true);
+}
+
 describe('Chart Grid Component', () => {
   let fixture: ComponentFixture<ChartGridComponent>;
   let component;
@@ -49,7 +54,8 @@ describe('Chart Grid Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [UChartModule],
-      providers: [{ provide: ChartService, useClass: ChartStubService }],
+      providers: [{ provide: ChartService, useClass: ChartStubService },
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService }],
       declarations: [ChartGridComponent, DxDataGridStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
