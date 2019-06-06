@@ -54,8 +54,8 @@ export class ChartGridComponent implements OnInit {
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
+      this.data = data;
     });
-    this.data = data;
   }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
