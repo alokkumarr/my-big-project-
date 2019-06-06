@@ -51,7 +51,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         this.client = client;
     }
 
-    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut, 
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut,
         String trustStore, String trustPassWord, String keyStore, String keyPassword,
         boolean sslEnabled) {
       super();
@@ -64,7 +64,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
       this.sslEnabled = sslEnabled;
   }
 
-  public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut, 
+  public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut,
       String trustStore, String trustPassWord, String keyStore, String keyPassword,
       boolean sslEnabled) {
       super();
@@ -77,7 +77,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
       this.trustStore = trustStore;
       this.sslEnabled = sslEnabled;
   }
-    
+
     public String getDataSecurityString() {
         return dataSecurityString;
     }
@@ -85,7 +85,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     public String getJsonString() {
         return jsonString;
     }
- 
+
     /**
      *  This method will return the data required to display for data.
      * @return

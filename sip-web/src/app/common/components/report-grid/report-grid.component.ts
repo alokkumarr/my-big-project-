@@ -27,6 +27,7 @@ import { getFormatter } from '../../utils/numberFormatter';
 import { Subscription, BehaviorSubject } from 'rxjs';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
+import * as isEqual from 'lodash/isEqual';
 
 import { AGGREGATE_TYPES, AGGREGATE_TYPES_OBJ } from '../../consts';
 
@@ -101,6 +102,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (!artifacts) {
       this.artifacts = null;
       this.columns = null;
+      return;
+    }
+    if (isEqual(this.artifacts, artifacts)) {
+      /* If artifacts are equal to what is currently set, don't proceeding.
+         If we proceed, the columns will be reset to new javascript object.
+         This will cause issues with things such as when we sort by clicking on column names.
+         This is because setting new columns will always call CustomStore.load again,
+         thereby clearing report column header sort user selects.
+      */
       return;
     }
     this.artifacts = artifacts;
