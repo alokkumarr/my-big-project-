@@ -8,6 +8,7 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as moment from 'moment';
+import { HeaderProgressService } from './../../../common/services';
 
 import { ChartService } from '../../services';
 import {
@@ -49,12 +50,14 @@ export class ChartGridComponent implements OnInit {
   }
   @Input('data')
   set setData(data: any[]) {
+    this._headerProgress.show();
     this.toggleToGrid = false;
     this.updates = this.getChartUpdates(data, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
       this.data = data;
+      this._headerProgress.hide();
     });
   }
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
@@ -66,7 +69,8 @@ export class ChartGridComponent implements OnInit {
   public updates: any;
   public data: any[];
 
-  constructor(private _chartService: ChartService) {
+  constructor(private _chartService: ChartService,
+    private _headerProgress: HeaderProgressService) {
     this.customizeColumns = this.customizeColumns.bind(this);
   }
 
