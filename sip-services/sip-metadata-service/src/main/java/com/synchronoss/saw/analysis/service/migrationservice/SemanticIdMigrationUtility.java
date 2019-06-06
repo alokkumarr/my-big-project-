@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.AnalysisServiceImpl;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
+import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.FieldNames;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,12 +29,15 @@ public class SemanticIdMigrationUtility {
   private static ObjectMapper MAPPER = new ObjectMapper();
 
   private AnalysisMetadata semanticMedatadataStore = null;
+  private AnalysisMetadata analysisMetadataStore = null;
 
   private static String metadataTable;
 
   private static String basePath;
 
   private AnalysisServiceImpl analysisService;
+
+  private String tableName = "analysisMetadata";
 
   /**
    * Main method to be called from a script.
@@ -50,13 +57,13 @@ public class SemanticIdMigrationUtility {
    * @return boolean value
    */
   public boolean updateAnalysisWithSemanticInfo() {
-    analysisService  = new AnalysisServiceImpl();
-    List<Analysis> analyses = analysisService.getAllAnalyses();
+    analysisService = new AnalysisServiceImpl();
+    List<Analysis> analyses = getAllAnalyses();
     Map<String, String> semanticMap = getMetaData();
     if (analyses != null && analyses.size() > 0 && semanticMap != null && !semanticMap.isEmpty()) {
       for (Analysis analysis : analyses) {
         updatedSemanticId(analysis, semanticMap);
-        Analysis returnedAnalysis = analysisService.updateAnalysis(analysis, null);
+        Analysis returnedAnalysis = updateAnalysis(analysis);
         return returnedAnalysis != null ? true : false;
       }
     }
@@ -166,5 +173,74 @@ public class SemanticIdMigrationUtility {
     String json = doc.asJsonString();
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     return jsonParser.parse(json);
+  }
+
+  /**
+   * Convert to JsonElement.
+   *
+   * @param jsonString Json String
+   * @return JsonElement
+   */
+  public static JsonElement toJsonElement(String jsonString) {
+    LOGGER.trace("toJsonElement Called: String = ", jsonString);
+    com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
+    JsonElement jsonElement;
+    try {
+      jsonElement = jsonParser.parse(jsonString);
+      LOGGER.info("json element parsed successfully");
+      LOGGER.trace("Parsed String = ", jsonElement);
+      return jsonElement;
+    } catch (JsonParseException jse) {
+      LOGGER.error("Can't parse String to Json, JsonParseException occurred!\n");
+      LOGGER.error(jse.getStackTrace().toString());
+      return null;
+    }
+  }
+
+  /**
+   * Retrieves all analyses from Mapr DB.
+   *
+   * @return List of Analysis
+   */
+  public List<Analysis> getAllAnalyses() {
+    List<Document> doc = null;
+    List<Analysis> objDocs = new ArrayList<>();
+    try {
+      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+      doc = analysisMetadataStore.searchAll();
+      if (doc == null) {
+        return null;
+      }
+      for (Document d : doc) {
+        MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objDocs.add(MAPPER.readValue(d.asJsonString(), Analysis.class));
+      }
+    } catch (Exception e) {
+      LOGGER.error("Exception occurred while fetching analysis by category for userId", e);
+      throw new SipReadEntityException(
+          "Exception occurred while fetching analysis by category for userId", e);
+    }
+    return objDocs;
+  }
+
+  /**
+   * Update Analysis def with matching semantic id.
+   *
+   * @param analysis Analysis
+   * @return Analysis obj
+   * @throws SipUpdateEntityException SipUpdateEntityException
+   */
+  public Analysis updateAnalysis(Analysis analysis) throws SipUpdateEntityException {
+
+    analysis.setModifiedTime(Instant.now().toEpochMilli());
+    try {
+      JsonElement parsedAnalysis = toJsonElement(MAPPER.writeValueAsString(analysis));
+      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
+      analysisMetadataStore.update(analysis.getId(), parsedAnalysis);
+    } catch (Exception e) {
+      LOGGER.error("Exception occurred while updating analysis", e);
+      throw new SipUpdateEntityException("Exception occurred while updating analysis");
+    }
+    return analysis;
   }
 }
