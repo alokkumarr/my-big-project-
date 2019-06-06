@@ -241,6 +241,7 @@ public class ExportServiceImpl implements ExportService {
     String ftp = null;
     String s3 = null;
     String jobGroup = null;
+    boolean zip = false;
 
     // Read Additional props
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -251,6 +252,15 @@ public class ExportServiceImpl implements ExportService {
 
       if (((LinkedHashMap) dispatchBean).get("s3") != null)
         s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
+
+      if (((LinkedHashMap) dispatchBean).get("zip") != null)
+        zip = (Boolean) ((LinkedHashMap) dispatchBean).get("zip");
+
+      if (((LinkedHashMap) dispatchBean).get("zip") != null) {
+        logger.info("Zip inside reportToBeDispatchedAsync() : "+zip);
+      } else {
+          logger.info("Zip inside reportToBeDispatchedAsync() is NULL ");
+      }
 
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
     }
@@ -269,6 +279,7 @@ public class ExportServiceImpl implements ExportService {
           requestEntity,
           s3,
           ftp,
+          zip,
           jobGroup,
           restTemplate);
     }
@@ -427,12 +438,15 @@ public class ExportServiceImpl implements ExportService {
     String s3 = null;
     String jobGroup = null;
     ExportBean exportBean = new ExportBean();
+    boolean isZiprequired=false;
 
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
       Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
       Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
+      if (((LinkedHashMap) dispatchBean).get("zip") != null)
+        isZiprequired = (Boolean) ((LinkedHashMap) dispatchBean).get("zip");
 
       if (recipientsObj != null) {
         recipients = String.valueOf(recipientsObj);
@@ -471,6 +485,7 @@ public class ExportServiceImpl implements ExportService {
         String finalRecipients = recipients;
         String finalFtp = ftp;
         String finalJobGroup = jobGroup;
+        boolean isZip=isZiprequired;
         responseStringFuture.addCallback(
             new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
               @Override
@@ -516,14 +531,9 @@ public class ExportServiceImpl implements ExportService {
                     CreatePivotTable createPivotTable =
                         new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
                     createPivotTable.createPivot(workbook, file);
-                    MailSender.sendMail(
-                        finalRecipients,
-                        exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-                        serviceUtils.prepareMailBody(exportBean, mailBody),
-                        exportBean.getFileName());
-                    logger.debug("Email sent successfully ");
-                    logger.debug("Removing the file from published location");
-                    serviceUtils.deleteFile(exportBean.getFileName(), true);
+                    if (finalRecipients != null && !finalRecipients.equals("")) {
+                      dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
+                    }
                   } catch (IOException e) {
                     logger.error(
                         "Exception occurred while dispatching pivot :"
@@ -542,7 +552,9 @@ public class ExportServiceImpl implements ExportService {
                       asyncRestTemplate,
                       dispatchBean,
                       requestEntity,
-                      finalJobGroup);
+                      finalJobGroup,
+                      exportBean,
+                      isZip);
                 }
 
                 logger.debug("ftp details = " + finalFtp);
@@ -556,6 +568,13 @@ public class ExportServiceImpl implements ExportService {
                       dispatchBean,
                       requestEntity,
                       finalJobGroup);
+                }
+                logger.debug("Deleting exported file11.");
+                deleteDispatchedFile(exportBean.getFileName());
+                if (isZip) {
+                  File cfile = new File(exportBean.getFileName());
+                  String zipFileName = cfile.getAbsolutePath().concat(".zip");
+                  deleteDispatchedFile(zipFileName);
                 }
               }
 
@@ -724,113 +743,54 @@ public class ExportServiceImpl implements ExportService {
       AsyncRestTemplate asyncRestTemplate,
       Object dispatchBean,
       HttpEntity<?> requestEntity,
-      String jobGroup) {
-    String url =
-        apiExportOtherProperties
-            + "/"
-            + analysisId
-            + "/executions/"
-            + executionId
-            + "/data?page=1&pageSize="
-            + s3ExportSize
-            + "&analysisType=pivot";
-    ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
-        asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, JsonNode.class);
+      String jobGroup,
+      ExportBean exportBean,
+      boolean isZip) {
 
-    logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
+    logger.info("Inside S3 dispatch Pivot");
     String finalS3 = s3;
     String finalJobGroup = jobGroup;
-    responseStringFuture.addCallback(
-        new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
-          @Override
-          public void onSuccess(ResponseEntity<JsonNode> entity) {
-            logger.debug("In S3 dispatcher: [Success] Response :" + entity.getStatusCode());
-            IFileExporter iFileExporter = new XlsxExporter();
-            ExportBean exportBean = new ExportBean();
-            String dir = UUID.randomUUID().toString();
+    File cfile = new File(exportBean.getFileName());
+    if (isZip) {
+      logger.debug("S3 - zip = true!!");
+      try {
+        String zipFileName = cfile.getAbsolutePath().concat(".zip");
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
 
-            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-            exportBean.setFileName(
-                publishedPath
-                    + File.separator
-                    + dir
-                    + File.separator
-                    + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
-                    + "."
-                    + exportBean.getFileType());
-            exportBean.setReportDesc(
-                String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-            exportBean.setPublishDate(
-                String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-            exportBean.setCreatedBy(
-                String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
 
-            File cfile = new File(exportBean.getFileName());
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
 
-            try {
-              File file = new File(exportBean.getFileName());
-              file.getParentFile().mkdir();
-              AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-              ElasticSearchAggeragationParser elasticSearchAggeragationParser =
-                  new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-              List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-              elasticSearchAggeragationParser.setColumnDataType(
-                  exportBean, analysisMetaData.getAnalyses().get(0));
-              Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-              CreatePivotTable createPivotTable =
-                  new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-              createPivotTable.createPivot(workbook, file);
-            } catch (FileNotFoundException e) {
-              logger.error("file error FileNotFound: " + e.getMessage());
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
-            logger.debug("s3 List: " + finalS3);
-
-            for (String aliastemp : finalS3.split(",")) {
-              ObjectMapper jsonMapper = new ObjectMapper();
-              try {
-                S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
-                for (S3Details alias : obj.getS3List()) {
-                  if (alias.getCustomerCode().equals(finalJobGroup)
-                      && aliastemp.equals(alias.getAlias())) {
-                    logger.debug("Final Obj to be dispatched for S3 : ");
-                    logger.debug("BucketName : " + alias.getBucketName());
-                    logger.debug("AccessKey : " + alias.getAccessKey());
-                    logger.debug("SecretKey : " + alias.getSecretKey());
-                    logger.debug("Region : " + alias.getRegion());
-                    logger.debug("getOutputLocation : " + alias.getOutputLocation());
-                    logger.debug("FileName : " + exportBean.getFileName());
-
-                    S3Config s3Config =
-                        new S3Config(
-                            alias.getBucketName(),
-                            alias.getAccessKey(),
-                            alias.getSecretKey(),
-                            alias.getRegion(),
-                            alias.getOutputLocation());
-
-                    AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
-                    s3Handler.uploadObject(cfile.getAbsoluteFile());
-
-                    logger.debug("Removing the file from published location");
-                    serviceUtils.deleteFile(exportBean.getFileName(), true);
-                  }
-                }
-              } catch (IOException e) {
-                logger.error(e.getMessage());
-              } catch (Exception e) {
-                logger.error(e.getMessage());
-              }
-            }
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
           }
 
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
+          logger.info("Written " + written + " bytes to " + zipFileName);
+
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+
+        zos.closeEntry();
+        zos.close();
+
+        s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName), exportBean);
+
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
+
+      } catch (Exception e) {
+        logger.error("Error writing to zip!!");
+      }
+    } else {
+      s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+      logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+    }
   }
 
   @Override
@@ -897,7 +857,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public boolean dispatchMail(
-      ExportBean bean, String recipients, ResponseEntity<DataResponse> entity) {
+      ExportBean bean, String recipients, ResponseEntity<DataResponse> entity, boolean zip) {
 
     ExportBean exportBean = new ExportBean();
     exportBean = bean;
@@ -934,19 +894,69 @@ public class ExportServiceImpl implements ExportService {
         streamToXlsxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
       }
 
-      MailSender.sendMail(
-          recipients,
-          exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-          serviceUtils.prepareMailBody(exportBean, mailBody),
-          exportBean.getFileName());
-      logger.debug("Email sent successfully");
+      File cfile = new File(exportBean.getFileName());
+      String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
-      logger.debug("Deleting exported file.");
-      try {
-        logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
-        serviceUtils.deleteFile(exportBean.getFileName(), true);
-      } catch (IOException e) {
-        e.printStackTrace();
+      if (zip) {
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+
+        zos.closeEntry();
+        zos.close();
+
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            zipFileName);
+        logger.debug("Email sent successfully");
+
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug(
+              "ExportBean.getFileName() to delete -  mail : "
+                  + zipFileName
+                  + ", "
+                  + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+          serviceUtils.deleteFile(zipFileName, true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+      } else {
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            exportBean.getFileName());
+        logger.debug("Email sent successfully");
+
+        logger.debug("Deleting exported file.");
+        try {
+          logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
+          serviceUtils.deleteFile(exportBean.getFileName(), true);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
 
     } catch (IOException e) {
@@ -964,6 +974,7 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean bean,
       String finalS3,
+      boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate,
@@ -995,11 +1006,50 @@ public class ExportServiceImpl implements ExportService {
         exportBean);
 
     File cfile = new File(exportBean.getFileName());
+    String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
-    s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+    if (zip) {
+      logger.debug("S3 - zip = true!!");
+      try {
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
 
-    logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-    deleteDispatchedFile(exportBean.getFileName());
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+
+        zos.closeEntry();
+        zos.close();
+
+        s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName), exportBean);
+
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+        deleteDispatchedFile(exportBean.getFileName());
+        deleteDispatchedFile(zipFileName);
+        logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
+
+      } catch (Exception e) {
+        logger.error("Error writing to zip!!");
+      }
+    } else {
+      s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+      logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+      deleteDispatchedFile(exportBean.getFileName());
+    }
   }
 
   public void s3DispatchExecutor(
@@ -1047,6 +1097,7 @@ public class ExportServiceImpl implements ExportService {
       HttpEntity<?> requestEntity,
       String s3,
       String ftp,
+      boolean zip,
       String jobGroup,
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
@@ -1069,7 +1120,7 @@ public class ExportServiceImpl implements ExportService {
           public void onSuccess(ResponseEntity<DataResponse> entity) {
 
             if (recipients != null && !recipients.equals("")) {
-              dispatchMail(exportBean, recipients, entity);
+              dispatchMail(exportBean, recipients, entity, zip);
             }
 
             if (s3 != null && s3 != "") {
@@ -1080,6 +1131,7 @@ public class ExportServiceImpl implements ExportService {
                   analysisType,
                   exportBean,
                   s3,
+                  zip,
                   jobGroup,
                   requestEntity,
                   restTemplate,
@@ -1094,6 +1146,7 @@ public class ExportServiceImpl implements ExportService {
                   analysisType,
                   exportBean,
                   ftp,
+                  zip,
                   jobGroup,
                   requestEntity,
                   restTemplate,
@@ -1205,6 +1258,7 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean bean,
       String finalFtp,
+      boolean zip,
       String finalJobGroup,
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate,
@@ -1325,6 +1379,56 @@ public class ExportServiceImpl implements ExportService {
       } catch (IOException e) {
         logger.error(e.getMessage());
       }
+    }
+  }
+
+  public void dispatchMailForPivot(
+      ExportBean bean, String recipients, ResponseEntity<JsonNode> entity, boolean isZip) {
+    ExportBean exportBean = bean;
+    MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+    try {
+      File cfile = new File(exportBean.getFileName());
+      if (isZip) {
+        logger.debug("Pivot - zip = true!!");
+        String zipFileName = cfile.getAbsolutePath().concat(".zip");
+        FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+        ZipOutputStream zos = new ZipOutputStream(fos_zip);
+        zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+        byte[] readBuffer = new byte[2048];
+        int amountRead;
+        int written = 0;
+
+        try (FileInputStream inputStream = new FileInputStream(exportBean.getFileName())) {
+
+          while ((amountRead = inputStream.read(readBuffer)) > 0) {
+            zos.write(readBuffer, 0, amountRead);
+            written += amountRead;
+          }
+
+          logger.info("Written " + written + " bytes to " + zipFileName);
+        } catch (Exception e) {
+          logger.error("Error while writing to zip: " + e.getMessage());
+        }
+        zos.closeEntry();
+        zos.close();
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            zipFileName);
+        logger.debug("Email sent successfully");
+      } else {
+        MailSender.sendMail(
+            recipients,
+            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
+            serviceUtils.prepareMailBody(exportBean, mailBody),
+            exportBean.getFileName());
+        logger.debug("Email sent successfully");
+      }
+
+    } catch (Exception e) {
+      logger.error("Error sending mail" + e.getMessage() + ":::" + e.getStackTrace());
     }
   }
 
