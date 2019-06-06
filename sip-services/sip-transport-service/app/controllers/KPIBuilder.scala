@@ -129,4 +129,3 @@ class KPIBuilder extends BaseController {
         name, expected, location))
   }
 }
-
