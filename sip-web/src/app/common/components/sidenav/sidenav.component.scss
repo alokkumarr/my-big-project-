@@ -7,7 +7,7 @@
 
 mat-sidenav-container {
   // Fix for Safari
-  position: inherit !important;
+  overflow: visible;
 }
 
 .menu-icon-btn {

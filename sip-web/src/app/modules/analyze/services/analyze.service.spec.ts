@@ -44,7 +44,9 @@ describe('Analyze Service', () => {
       asyncData({ contents: { analyze: [{}] } } as any)
     );
 
-    service.readAnalysis('abc').then((res: any) => expect(res).toEqual({}));
+    service
+      .readAnalysis('abc', false)
+      .then((res: any) => expect(res).toEqual({}));
 
     expect(spy.calls.count()).toEqual(1);
   });

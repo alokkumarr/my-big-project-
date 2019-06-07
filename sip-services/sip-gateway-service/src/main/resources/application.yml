@@ -14,7 +14,7 @@ spring:
 logging:
   level:
     com.synchronoss.saw.gateway: TRACE
-    
+
 server:
   max-http-header-size: 65536
   address: localhost
@@ -150,6 +150,8 @@ api:
             method: DELETE
             path: '[/]ingestion/batch.*'
 
+            
+
 sip:
    ssl:
      enable : false
@@ -159,5 +161,3 @@ sip:
    key:
       store: /Users/spau0004/Desktop/keystore/keystore.jks
       password: sip@123
-          
-                 

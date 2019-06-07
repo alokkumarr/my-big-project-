@@ -25,6 +25,6 @@ export interface Schedule {
   type?: string;
   userFullName?: string;
   jobScheduleTime?: string;
-  categoryID?: number;
+  categoryID?: any;
   jobGroup?: string;
 }

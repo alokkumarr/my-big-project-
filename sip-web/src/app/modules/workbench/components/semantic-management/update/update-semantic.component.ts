@@ -105,7 +105,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
     dsData.schema.fields = map(dsData.schema.fields, value => {
       const colName = value.isKeyword ? `${value.name}.keyword` : value.name;
       return {
-        aliasName: value.name,
+        alias: value.name,
         columnName: colName,
         displayName: value.name,
         filterEligible: true,

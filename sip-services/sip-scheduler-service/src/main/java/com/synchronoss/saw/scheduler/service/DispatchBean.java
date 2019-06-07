@@ -27,6 +27,7 @@ interface DispatchBean {
 
     String metricName();
 
+    @Nullable
     String userFullName();
 
     String publishedTime();

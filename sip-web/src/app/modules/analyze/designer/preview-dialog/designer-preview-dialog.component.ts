@@ -1,6 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Analysis, ArtifactColumns } from '../types';
+import { Store } from '@ngxs/store';
+import {
+  Analysis,
+  ArtifactColumns,
+  AnalysisDSL,
+  isDSLAnalysis
+} from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
@@ -13,6 +19,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'designer-preview-dialog',
@@ -22,24 +29,28 @@ import * as map from 'lodash/map';
 export class DesignerPreviewDialogComponent implements OnInit {
   public previewData = null;
   public artifactColumns: ArtifactColumns;
-  public analysis: Analysis;
+  public analysis: Analysis | AnalysisDSL;
   public chartType: string;
   public state = DesignerStates.SELECTION_WITH_DATA;
-  public dataLoader: (
-    options: {}
-  ) => Promise<{ data: any[]; totalCount: number }>;
+  public dataLoader: (options: {}) => Promise<{
+    data: any[];
+    totalCount: number;
+  }>;
 
   constructor(
     public _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
-    public _designerService: DesignerService
+    public _designerService: DesignerService,
+    private _store: Store
   ) {
     this.analysis = data.analysis;
-    this.chartType = this.analysis['chartType'];
+    this.chartType =
+      this.analysis['chartType'] ||
+      get(this.analysis, 'chartOptions.chartType');
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
-      this.artifactColumns = this.analysis.artifacts[0].columns;
+      this.artifactColumns = get(this.analysis, 'sipQuery.artifacts[0].fields');
       break;
     case 'report':
     case 'esReport':
@@ -49,7 +60,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
           return this._designerService.getDataForExecution(
             this.analysis.id,
             execId,
-            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
+            {...options, analysisType: this.analysis.type, executionType: 'onetime', isDSL: isDSLAnalysis(this.analysis)}
           )
             .then((result) => ({data: flattenReportData(result.data, this.analysis), totalCount: result.count}));
         } else {
@@ -63,6 +74,10 @@ export class DesignerPreviewDialogComponent implements OnInit {
       };
       break;
     }
+  }
+
+  get metricName(): Observable<string> {
+    return this._store.select(state => state.designerState.metric.metricName);
   }
 
   ngOnInit() {
@@ -80,11 +95,11 @@ export class DesignerPreviewDialogComponent implements OnInit {
     }
   }
 
-  flattenData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis | AnalysisDSL) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+    return flattenPivotData(data, (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
@@ -92,11 +107,11 @@ export class DesignerPreviewDialogComponent implements OnInit {
     case 'map':
       let chartData = flattenChartData(
         data,
-        analysis.sqlBuilder
+        (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder
       );
 
       /* Order chart data manually. Backend doesn't sort chart data. */
-      const sorts = get(this.analysis, 'sqlBuilder.sorts', []);
+      const sorts = get(this.analysis, 'sqlBuilder.sorts', get(this.analysis, 'sipQuery.sorts', []));
       if (!isEmpty(sorts)) {
         chartData = orderBy(
           chartData,

@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Store } from '@ngxs/store';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,11 +9,26 @@ import { JwtService } from '../../../../common/services';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
+import { Observable } from 'rxjs';
 
 class LocationStub {}
 class AnalysisStubService {
-  readAnalysis() {}
+  readAnalysis() {
+    return Promise.resolve({
+      id: '124',
+      category: '6',
+      categoryId: '6',
+      sipQuery: {}
+    });
+  }
+
+  getArtifactsForDataSet() {
+    return new Observable();
+  }
 }
+
+class StoreStub {}
+
 class ActivatedRouteStub {
   snapshot = { queryParams: {} };
 }
@@ -23,7 +39,11 @@ class ExecuteServiceStub {
   executeAnalysis() {}
 }
 
-class JwtServiceStub {}
+class JwtServiceStub {
+  get userAnalysisCategoryId() {
+    return 1;
+  }
+}
 
 class MatDialogStub {}
 
@@ -42,7 +62,8 @@ describe('DesignerPageComponent', () => {
         { provide: Router, useValue: new RouterStub() },
         { provide: ExecuteService, useValue: new ExecuteServiceStub() },
         { provide: JwtService, useValue: new JwtServiceStub() },
-        { provide: MatDialog, useValue: new MatDialogStub() }
+        { provide: MatDialog, useValue: new MatDialogStub() },
+        { provide: Store, useValue: new StoreStub() }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();

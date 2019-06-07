@@ -1,5 +1,13 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnDestroy
+} from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import { Select } from '@ngxs/store';
 import * as map from 'lodash/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
@@ -9,7 +17,8 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as startsWith from 'lodash/startsWith';
 import * as includes from 'lodash/includes';
 import * as some from 'lodash/some';
-// import * as startsWith from 'lodash/startsWith';
+import * as get from 'lodash/get';
+import { Observable, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 
 import { ANALYSIS_METHODS } from '../../consts';
@@ -23,10 +32,20 @@ const methodsMap = {
   templateUrl: 'analysis-sub-type-chooser.component.html',
   styleUrls: ['analysis-sub-type-chooser.component.scss']
 })
-export class AnalysisSubTypeChooserComponent implements OnInit {
+export class AnalysisSubTypeChooserComponent implements OnInit, OnDestroy {
+  @Select(state => {
+    const analysis = state.designerState.analysis;
+    const subTypePath =
+      analysis.type === 'chart'
+        ? 'chartOptions.chartType'
+        : 'mapOptions.mapType';
+    return get(analysis, subTypePath);
+  })
+  subType$: Observable<string>;
+  subType: string;
+  subscriptions: Array<Subscription> = [];
   @Output() change = new EventEmitter();
   @Input() category: 'map' | 'chart';
-  @Input() subType: string;
   @Input('supports') set setSupports(supports: string[]) {
     this.supports = fpPipe(
       fpFlatMap(support => support.children),
@@ -43,6 +62,11 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
 
   ngOnInit() {
     const methods = cloneDeep(methodsMap[this.category]) || [];
+    this.subscriptions.push(
+      this.subType$.subscribe(val => {
+        this.subType = val;
+      })
+    );
     this.subTypes = map(methods, chartType => {
       const [, type] = split(chartType.type, ':');
 
@@ -53,6 +77,10 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
       };
       return ret;
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   doesSupportType(type, category) {
@@ -78,7 +106,6 @@ export class AnalysisSubTypeChooserComponent implements OnInit {
     const newValue = event.value;
     const oldValue = this.subType;
     this.subType = null;
-
     setTimeout(() => {
       this.subType = oldValue;
     });

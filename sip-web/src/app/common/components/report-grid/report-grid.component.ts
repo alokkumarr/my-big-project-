@@ -27,6 +27,7 @@ import { getFormatter } from '../../utils/numberFormatter';
 import { Subscription, BehaviorSubject } from 'rxjs';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
+import * as isEqual from 'lodash/isEqual';
 
 import { AGGREGATE_TYPES, AGGREGATE_TYPES_OBJ } from '../../consts';
 
@@ -103,6 +104,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       this.columns = null;
       return;
     }
+    if (isEqual(this.artifacts, artifacts)) {
+      /* If artifacts are equal to what is currently set, don't proceeding.
+         If we proceed, the columns will be reset to new javascript object.
+         This will cause issues with things such as when we sort by clicking on column names.
+         This is because setting new columns will always call CustomStore.load again,
+         thereby clearing report column header sort user selects.
+      */
+      return;
+    }
     this.artifacts = artifacts;
     this.columns = this.artifacts2Columns(this.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
@@ -157,9 +167,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Input() isEditable = false;
   @Input() columnHeaders;
 
-  public dataLoader: (
-    options: {}
-  ) => Promise<{ data: any[]; totalCount: number }>;
+  public dataLoader: (options: {}) => Promise<{
+    data: any[];
+    totalCount: number;
+  }>;
 
   public sorts: {};
   public artifacts: Artifact[];
@@ -314,7 +325,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       this.aggregates = this.isAggregateEligible();
     } else {
       this.aggregates = filter(AGGREGATE_TYPES, t => {
-        return t.value === 'count' || t.value === 'distinctCount';
+        return t.value === 'count' || t.value.toLowerCase() === 'distinctcount';
       });
     }
   }
@@ -328,7 +339,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   aggregateColumn(payload, value) {
-    payload.aggregate = value;
+    payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     if (value === 'clear') {
       delete payload.aggregate;
     }
@@ -349,10 +360,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   renameColumn({ payload, changeColumnProp }: ReportGridField) {
     this.getNewDataThroughDialog(
       AliasRenameDialogComponent,
-      { alias: payload.aliasName || '' },
+      { alias: payload.alias || '' },
       alias => {
-        changeColumnProp('aliasName', alias);
-        this.change.emit({ subject: 'aliasName' });
+        changeColumnProp('alias', alias);
+        this.change.emit({ subject: 'alias' });
       }
     );
   }
@@ -396,9 +407,17 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
-        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        const aggregate =
+          AGGREGATE_TYPES_OBJ[
+            column.aggregate && column.aggregate.toLowerCase()
+          ];
         let type = column.type;
-        if (aggregate && ['count', 'distinctCount'].includes(aggregate.value)) {
+        if (
+          aggregate &&
+          ['count', 'distinctcount'].includes(
+            aggregate.value && aggregate.value.toLowerCase()
+          )
+        ) {
           type = aggregate.type || column.type;
           isNumberType = true;
         }
@@ -412,7 +431,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
           ? { formatter: getFormatter(preprocessedFormat) }
           : column.format;
         const field: ReportGridField = {
-          caption: column.aliasName || column.displayName,
+          caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
           dataType: isNumberType ? 'number' : type,
           type,

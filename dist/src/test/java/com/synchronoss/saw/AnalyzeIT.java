@@ -47,7 +47,12 @@ public class AnalyzeIT extends BaseIT {
     String analysisId = analysis.get("id").asText();
     String analysisName = "Test (" + System.currentTimeMillis() + ")";
     savePivotAnalysis(token, analysisId, analysisName, analysis);
-    listAnalyses(token, analysisName);
+    /**
+     * below comment is temporary change made as part of sip-7149(filter chart and pivot analysis
+     * from /analysis Api).This test creates analysis for pivots ,so if we call listAnalysis it does
+     * not return data since we filtered pivot and charts from /analysis API.
+     */
+    // listAnalyses(token, analysisName);
     executeAnalysis(token, analysisId);
     String executionId = listSingleExecution(token, analysisId);
     List<Map<String, String>> data = getExecution(token, analysisId, executionId);

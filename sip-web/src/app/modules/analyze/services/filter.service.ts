@@ -13,6 +13,8 @@ import * as find from 'lodash/find';
 import { Location } from '@angular/common';
 
 import { AnalyzeDialogService } from './analyze-dialog.service';
+import { Analysis, AnalysisDSL } from '../types';
+import { isDSLAnalysis } from '../designer/types';
 
 export const BOOLEAN_CRITERIA = [
   {
@@ -201,7 +203,11 @@ export class FilterService {
     return filter(f => f.isRuntimeFilter, filters);
   }
 
-  openRuntimeModal(analysis, filters = [], navigateBack: string) {
+  openRuntimeModal(
+    analysis: Analysis | AnalysisDSL,
+    filters = [],
+    navigateBack: string
+  ) {
     return new Promise(resolve => {
       this._dialog
         .openFilterPromptDialog(filters, analysis)
@@ -212,9 +218,11 @@ export class FilterService {
           }
           const nonRuntimeFilters = filter(
             f => !(f.isRuntimeFilter || f.isGlobalFilter),
-            analysis.sqlBuilder.filters
+            isDSLAnalysis(analysis)
+              ? analysis.sipQuery.filters
+              : analysis.sqlBuilder.filters
           );
-          analysis.sqlBuilder.filters = fpPipe(
+          const allFilters = fpPipe(
             // block optional runtime filters that have no model
             filter(
               ({ isRuntimeFilter, isOptional, model }) =>
@@ -222,13 +230,21 @@ export class FilterService {
             ),
             runtimeFilters => [...runtimeFilters, ...nonRuntimeFilters]
           )(result.filters);
+          if (isDSLAnalysis(analysis)) {
+            analysis.sipQuery.filters = allFilters;
+          } else {
+            analysis.sqlBuilder.filters = allFilters;
+          }
           // analysis.sqlBuilder.filters = result.filters.concat(
           //   filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
           // );
 
           resolve(analysis);
           if (navigateBack === 'home') {
-            this.router.navigate(['analyze', analysis.categoryId]);
+            this.router.navigate([
+              'analyze',
+              isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+            ]);
           } else if (navigateBack === 'back') {
             this.locationService.back();
           }
@@ -260,7 +276,7 @@ export class FilterService {
   getRuntimeFilterValues(analysis, navigateBack: string = null) {
     const clone = cloneDeep(analysis);
     const runtimeFilters = this.getRuntimeFiltersFrom(
-      get(clone, 'sqlBuilder.filters', [])
+      get(clone, 'sqlBuilder.filters', get(clone, 'sipQuery.filters', []))
     );
 
     if (!runtimeFilters.length) {
