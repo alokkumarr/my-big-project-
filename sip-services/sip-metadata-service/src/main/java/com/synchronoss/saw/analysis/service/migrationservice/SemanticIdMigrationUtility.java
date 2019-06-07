@@ -37,7 +37,7 @@ public class SemanticIdMigrationUtility {
 
   private AnalysisServiceImpl analysisService;
 
-  private String tableName = "analysisMetadata";
+  private static String tableName;
 
   /**
    * Main method to be called from a script.
@@ -47,6 +47,7 @@ public class SemanticIdMigrationUtility {
   public static void main(String[] args) {
     basePath = args[0];
     metadataTable = args[1];
+    tableName = args[2];
     System.out.println("basePath : --> " + basePath);
     System.out.println("metadataTable : --> " + metadataTable);
     SemanticIdMigrationUtility uos = new SemanticIdMigrationUtility();
@@ -105,7 +106,6 @@ public class SemanticIdMigrationUtility {
                 } else {
                   LOGGER.error("Failed writing to maprDB!! Analysis id : {} ", analysis.getId());
                 }
-                break;
               }
             } else {
               LOGGER.warn("Artifacts is not present");
@@ -113,6 +113,7 @@ public class SemanticIdMigrationUtility {
           } else {
             LOGGER.warn("sipQuery not present");
           }
+          break;
         }
       }
     }
