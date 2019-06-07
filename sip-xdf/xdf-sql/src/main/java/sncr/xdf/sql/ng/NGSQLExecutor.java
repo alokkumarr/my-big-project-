@@ -44,6 +44,9 @@ public class NGSQLExecutor implements Serializable {
 
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
+        System.out.println("run getScriptWideTableMap size is : " + allTables.size());
+        System.out.println("rungetScriptWideTableMap keySet is : " + allTables.keySet());
+
         switch (descriptor.statementType) {
             case UNKNOWN:
                 break;
@@ -52,7 +55,7 @@ public class NGSQLExecutor implements Serializable {
                 long st = System.currentTimeMillis();
                 descriptor.startTime =  st;
                 Dataset<Row> df = null;
-                if (!"true".equalsIgnoreCase(parent.getNgctx().runningPipeLine)) {
+                if (parent.getNgctx().inputDataSets.size() > 0) {
 
                     for (String tn : allTables.keySet()) {
 
@@ -103,9 +106,9 @@ public class NGSQLExecutor implements Serializable {
                         jobDataFrames.put(tn, df);
                         df.createOrReplaceTempView(tn);
                     }
-
                 }
-                else
+
+                if (parent.getNgctx().runningPipeLine) {
                 {
                     //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
                     df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);

@@ -115,8 +115,8 @@ public abstract class AbstractComponent implements WithContext{
             return -1;
         }
         int ret = execute();
-        if ("true".equalsIgnoreCase(ngctx.runningPipeLine)) {
-            if ("true".equalsIgnoreCase(ngctx.persistMode)) {
+        if (ngctx.runningPipeLine) {
+            if (ngctx.persistMode) {
                 moveAndArchive(ret);
             }
         }

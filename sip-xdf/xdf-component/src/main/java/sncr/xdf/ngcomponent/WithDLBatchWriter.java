@@ -254,8 +254,8 @@ public interface WithDLBatchWriter {
 
                 boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
-                if ("true".equalsIgnoreCase(ngctx.runningPipeLine)) {
-                    if ("true".equalsIgnoreCase(ngctx.persistMode)) {
+                if (ngctx.runningPipeLine) {
+                    if (ngctx.persistMode) {
                         baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
                     }
                 }

@@ -90,7 +90,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 //2. Read input datasets
 
             Map<String, Dataset> dsMap = new HashMap();
-            if (! "true".equalsIgnoreCase(ngctx.runningPipeLine)) {
+            if (!(ngctx.runningPipeLine)) {
                 for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
                     Map<String, Object> desc = entry.getValue();
                     String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
@@ -114,7 +114,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             ngctx.componentConfiguration.getTransformer().getThreshold(),
                             tempLocation,
                             st   );
-                    if ("true".equalsIgnoreCase(ngctx.runningPipeLine))
+                    if (ngctx.runningPipeLine)
                         //jexlExecutorWithSchema.executeSingleProcessor(ngctx.datafileDFmap,ngctx);
                         jexlExecutorWithSchema.executeSingleProcessor(ngctx);
                     else
@@ -142,7 +142,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             tempLocation,
                             st,
                             odi);
-                    if ("true".equalsIgnoreCase(ngctx.runningPipeLine))
+                    if (ngctx.runningPipeLine)
                         janinoExecutor.executeSingleProcessor(ngctx);
                     else
                         janinoExecutor.execute(dsMap);

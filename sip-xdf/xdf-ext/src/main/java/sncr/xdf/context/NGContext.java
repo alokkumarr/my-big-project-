@@ -53,8 +53,8 @@ public class NGContext extends ContextMetadata {
     public Map<String,Dataset> datafileDFmap = new HashMap<>();
 
     public String dataSetName;
-    public String runningPipeLine;
-    public String persistMode;
+    public boolean runningPipeLine;
+    public boolean persistMode;
 
     @Override
     public String toString(){
