@@ -73,7 +73,6 @@ public class SemanticIdMigrationUtility {
    * @param semanticMap Map of semantic id and artifact name
    */
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
-    System.out.println("Semantic Map = {}" + semanticMap.size());
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
     if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
@@ -88,19 +87,16 @@ public class SemanticIdMigrationUtility {
             if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-                System.out.println(
-                    "Semantic id updated from {} to {}"
-                        + analysis.getSemanticId()
-                        + entry.getValue());
                 analysis.setSemanticId(entry.getKey());
                 if (updateAnalysis(analysis)) {
                   System.out.println(
-                      "Successfully Updated analysis id {} with semantic id - {} "
-                          + analysis.getId()
-                          + entry.getValue());
+                      String.format(
+                          "Successfully Updated analysis id [%s] with semantic id - [%s]",
+                          analysis.getId(), entry.getValue()));
                 } else {
                   LOGGER.error("Failed writing to maprDB!! Analysis id : {} ", analysis.getId());
                 }
+                break;
               }
             } else {
               LOGGER.warn("Artifacts is not present");
@@ -108,7 +104,6 @@ public class SemanticIdMigrationUtility {
           } else {
             LOGGER.warn("sipQuery not present");
           }
-          break;
         }
       }
     }
@@ -130,8 +125,6 @@ public class SemanticIdMigrationUtility {
         System.out.println("Inside Semantic Metadata Document.");
         for (Document d : docs) {
           MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-          System.out.println(
-              "toJsonElement(d).getAsJsonObject() --> : " + toJsonElement(d).getAsJsonObject());
           objDocs.add(toJsonElement(d).getAsJsonObject());
         }
       }
@@ -200,8 +193,6 @@ public class SemanticIdMigrationUtility {
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       doc = analysisMetadataStore.searchAll();
-      /*System.out.println("Document {} "
-      + doc);*/
       if (doc == null) {
         return null;
       }
