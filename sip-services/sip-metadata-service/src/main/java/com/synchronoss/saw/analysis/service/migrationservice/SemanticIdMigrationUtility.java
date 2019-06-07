@@ -53,12 +53,8 @@ public class SemanticIdMigrationUtility {
     uos.updateAnalysisWithSemanticInfo();
   }
 
-  /**
-   * Update the existing Analysis in maprDB to match semantic.
-   *
-   * @return boolean value
-   */
-  public boolean updateAnalysisWithSemanticInfo() {
+  /** Update the existing Analysis in maprDB to match semantic. */
+  public void updateAnalysisWithSemanticInfo() {
     analysisService = new AnalysisServiceImpl();
     System.out.println("Start semantic id migration");
     List<Analysis> analyses = getAllAnalyses();
@@ -66,12 +62,9 @@ public class SemanticIdMigrationUtility {
     if (analyses != null && analyses.size() > 0 && semanticMap != null && !semanticMap.isEmpty()) {
       for (Analysis analysis : analyses) {
         updatedSemanticId(analysis, semanticMap);
-        Analysis returnedAnalysis = updateAnalysis(analysis);
-        return returnedAnalysis != null ? true : false;
       }
     }
     System.out.println("Ends semantic id migration");
-    return false;
   }
 
   /**
@@ -83,12 +76,9 @@ public class SemanticIdMigrationUtility {
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
     System.out.println("Semantic Map = {}" + semanticMap);
     System.out.println("SipQuery definition = {}" + analysis);
-    LOGGER.debug("Semantic Map = {}", semanticMap);
-    LOGGER.debug("SipQuery definition = {}", analysis);
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
     System.out.println("Analysis semantic id = {}" + analysisSemanticId);
-    LOGGER.debug("Analysis semantic id = {}", analysisSemanticId);
     if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
       for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
         if (analysisSemanticId.equalsIgnoreCase(entry.getValue())) {
@@ -96,27 +86,18 @@ public class SemanticIdMigrationUtility {
         } else {
           String semanticArtifactName = entry.getKey();
           SipQuery sipQuery = analysis.getSipQuery();
-
           if (sipQuery != null) {
             List<Artifact> artifacts = sipQuery.getArtifacts();
-
             if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
-              LOGGER.debug("Artifact name = {}", artifactName);
               System.out.println("Artifact name = {}" + artifactName);
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-                LOGGER.info(
-                    "Semantic id updated from {} to {}",
-                    analysis.getSemanticId(),
-                    entry.getValue());
-
                 System.out.println(
                     "Semantic id updated from {} to {}"
                         + analysis.getSemanticId()
                         + entry.getValue());
-
                 analysis.setSemanticId(entry.getKey());
-                if (updateAnalysisWithSemanticInfo()) {
+                if (updateAnalysis(analysis)) {
                   LOGGER.debug(
                       "Successfully Updated analysis id {} with semantic id - {} ",
                       analysis.getId(),
@@ -149,7 +130,7 @@ public class SemanticIdMigrationUtility {
 
       semanticMedatadataStore = new AnalysisMetadata(metadataTable, basePath);
       List<Document> docs = semanticMedatadataStore.searchAll();
-      System.out.println("Semantic Metadata Document : -- >>" + docs);
+      System.out.println("Semantic Metadata Document : -- >>" + docs.size());
       if (docs != null && !docs.isEmpty() && docs.size() > 0) {
         System.out.println("Inside Semantic Metadata Document.");
         for (Document d : docs) {
@@ -164,12 +145,9 @@ public class SemanticIdMigrationUtility {
     }
 
     for (JsonObject semanticData : objDocs) {
-      LOGGER.debug("Semantic Metadata = " + semanticData);
       String id = semanticData.get("_id").getAsString();
-      LOGGER.debug("Semantic ID = " + id);
       if (id != null) {
         JsonArray artifacts = semanticData.getAsJsonArray(FieldNames.ARTIFACTS);
-        LOGGER.debug("Artifacts = " + artifacts);
         if (artifacts != null) {
           String artifactName =
               artifacts.get(0).getAsJsonObject().get(FieldNames.ARTIFACT_NAME).getAsString();
@@ -202,7 +180,6 @@ public class SemanticIdMigrationUtility {
    * @return JsonElement
    */
   public static JsonElement toJsonElement(String jsonString) {
-    LOGGER.trace("toJsonElement Called: String = ", jsonString);
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     JsonElement jsonElement;
     try {
@@ -253,7 +230,7 @@ public class SemanticIdMigrationUtility {
    * @return Analysis obj
    * @throws SipUpdateEntityException SipUpdateEntityException
    */
-  public Analysis updateAnalysis(Analysis analysis) throws SipUpdateEntityException {
+  public boolean updateAnalysis(Analysis analysis) throws SipUpdateEntityException {
 
     analysis.setModifiedTime(Instant.now().toEpochMilli());
     try {
@@ -264,6 +241,6 @@ public class SemanticIdMigrationUtility {
       LOGGER.error("Exception occurred while updating analysis", e);
       throw new SipUpdateEntityException("Exception occurred while updating analysis");
     }
-    return analysis;
+    return true;
   }
 }
