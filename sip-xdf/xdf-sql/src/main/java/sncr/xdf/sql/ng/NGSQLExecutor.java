@@ -105,7 +105,7 @@ public class NGSQLExecutor implements Serializable {
                         df.createOrReplaceTempView(tn);
                     }
                 }
-                
+
                 if (parent.getNgctx().runningPipeLine)
                 {
                     //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;

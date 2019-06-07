@@ -29,7 +29,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     }
 
     private  String PIPELINE_CONFIG;
-    private String RUNNING_MODE  = "true";
+    private boolean RUNNING_MODE  = true;
     private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
     Map<String, Dataset> datafileDFmap = new HashMap<>();
     String dataSetName = "";
@@ -71,17 +71,17 @@ public class XDFDataProcessor  extends AbstractComponent {
                 if ( pipeObj.get("component").equals("parser"))
                 {
                     logger.debug("Processing Parser Component ---> " + pipeObj.get("component"));
-                    processParser(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
+                    processParser(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
                 }
                 if ( pipeObj.get("component").equals("transformer"))
                 {
                     logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
-                    processTransformer(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
+                    processTransformer(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
                 }
                 if ( pipeObj.get("component").equals("sql"))
                 {
                     logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
-                    processSQL(parameters,pipeObj.get("configuration").toString(),pipeObj.get("persist").toString());
+                    processSQL(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
                 }
             }
 
@@ -123,7 +123,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         return pipelineObj;
     }
 
-    public void processTransformer(Map<String, Object> parameters, String configPath,String persistFlag)
+    public void processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
         try {
 
@@ -199,7 +199,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     }
 
 
-    public void processParser(Map<String, Object> parameters, String configPath,String persistFlag)
+    public void processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -271,7 +271,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     }
 
 
-    public void processSQL(Map<String, Object> parameters, String configPath,String persistFlag)
+    public void processSQL(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
         try {
 
