@@ -85,7 +85,10 @@ public class SIPAggregationBuilder {
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
             dataField.setDateFormat(DATE_FORMAT);
           if (dataField.getGroupInterval() != null
-              && dataField.getGroupInterval() != GroupInterval.ALL) {
+              && !dataField
+                  .getGroupInterval()
+                  .value()
+                  .equalsIgnoreCase(GroupInterval.ALL.value())) {
             if (dataField.getMinDocCount() == null) {
               dataField.setMinDocCount(1);
             }
@@ -139,7 +142,11 @@ public class SIPAggregationBuilder {
             || dataField.getType().name().equals(Field.Type.TIMESTAMP.name())) {
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
             dataField.setDateFormat(DATE_FORMAT);
-          if (dataField.getGroupInterval() != null) {
+          if (dataField.getGroupInterval() != null
+              && !dataField
+                  .getGroupInterval()
+                  .value()
+                  .equalsIgnoreCase(GroupInterval.ALL.value())) {
             if (dataField.getMinDocCount() == null) {
               dataField.setMinDocCount(1);
             }

@@ -12,11 +12,11 @@ import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 /**
  * This class will be used to get the query executed into designated<br/>
  * elastic search cluster
- * 
+ *
  * @author saurav.paul
  */
 public class SAWElasticSearchQueryExecutor {
-  
+
   Integer timeOut = 3; // in minutes
   public SAWElasticSearchQueryExecutor(){}
   public SAWElasticSearchQueryExecutor(Integer timeOut) {
@@ -25,7 +25,7 @@ public class SAWElasticSearchQueryExecutor {
   }
 
   /**
-   * 
+   *
    * @param searchSourceBuilder
    * @param jsonString
    * @return
@@ -37,7 +37,7 @@ public class SAWElasticSearchQueryExecutor {
     ObjectMapper objectMapper = new ObjectMapper();
     HttpEsUtils client = new HttpEsUtils();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze", timeOut, 
+    return SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze", timeOut,
         client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
   }
 
@@ -54,7 +54,7 @@ public class SAWElasticSearchQueryExecutor {
     ObjectMapper objectMapper = new ObjectMapper();
     HttpEsUtils client = new HttpEsUtils();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze",timeOut, 
+    return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze",timeOut,
         client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
   }
 
@@ -70,7 +70,7 @@ public class SAWElasticSearchQueryExecutor {
     ObjectMapper objectMapper = new ObjectMapper();
     HttpEsUtils client = new HttpEsUtils();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnDataAsString(executionObjectList,timeOut, 
+    return SAWElasticTransportService.executeReturnDataAsString(executionObjectList,timeOut,
         client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
   }
 
@@ -86,7 +86,7 @@ public class SAWElasticSearchQueryExecutor {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpEsUtils client = new HttpEsUtils();
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-        return SAWElasticTransportService.executeReturnDataAsString(kpiExecutionObject, timeOut, 
+        return SAWElasticTransportService.executeReturnDataAsString(kpiExecutionObject, timeOut,
             client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
     }
 

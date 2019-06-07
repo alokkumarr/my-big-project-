@@ -14,8 +14,8 @@
     <dependency>
       <groupId>com.mapr.db</groupId>
       <artifactId>maprdb</artifactId>
-      <version>6.0.1-mapr</version>
-      <scope>${s-value}</scope>
+      <version>${maprdb.version}</version>
+      <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>com.mapr.ojai</groupId>
