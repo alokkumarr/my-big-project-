@@ -520,7 +520,7 @@ public class ExportServiceImpl implements ExportService {
                     File file = new File(exportBean.getFileName());
                     file.getParentFile().mkdir();
 
-                    List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
+                    List<Field> fieldList = getPivotFields(sipQuery);
                     ElasticSearchAggeragationParser responseParser =
                         new ElasticSearchAggeragationParser(fieldList);
                     responseParser.setColumnDataType(exportBean);
@@ -590,15 +590,6 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       SipQuery sipQuery) {
     if (ftp != null && !ftp.equals("")) {
-      /*String url =
-      apiExportOtherProperties
-          + "/"
-          + analysisId
-          + "/executions/"
-          + executionId
-          + "/data?page=1&pageSize="
-          + ftpExportSize
-          + "&analysisType=pivot";*/
       String url = storageProxyUrl + "/internal/proxy/storage/" + executionId + "/executions/data";
       ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
           asyncRestTemplate.getForEntity(url, JsonNode.class);
@@ -643,18 +634,7 @@ public class ExportServiceImpl implements ExportService {
                 File file = new File(exportBean.getFileName());
                 file.getParentFile().mkdir();
 
-                /*AnalysisMetaData analysisMetaData = getAnalysisMetadata(analysisId);
-                ElasticSearchAggeragationParser elasticSearchAggeragationParser =
-                    new ElasticSearchAggeragationParser(analysisMetaData.getAnalyses().get(0));
-                List<Object> dataObj = elasticSearchAggeragationParser.parseData(entity.getBody());
-                elasticSearchAggeragationParser.setColumnDataType(
-                    exportBean, analysisMetaData.getAnalyses().get(0));
-                Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-                CreatePivotTable createPivotTable =
-                    new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
-                createPivotTable.createPivot(workbook, file);*/
-                List<Field> fieldList = sipQuery.getArtifacts().get(0).getFields();
-
+                List<Field> fieldList = getPivotFields(sipQuery);
                 ElasticSearchAggeragationParser responseParser =
                     new ElasticSearchAggeragationParser(fieldList);
                 responseParser.setColumnDataType(exportBean);
@@ -1467,4 +1447,34 @@ public class ExportServiceImpl implements ExportService {
       logger.error("Error sending mail" + e.getMessage() + ":::" + e.getStackTrace());
     }
   }
+
+	/**
+	 * This method to organize the pivot table structure
+	 *
+	 * @param sipQuery
+	 * @return
+	 */
+	private List<Field> getPivotFields(SipQuery sipQuery) {
+		List<Field> queryFields = sipQuery.getArtifacts().get(0).getFields();
+		List<Field> fieldList = new ArrayList<>();
+		// set first row fields
+		for (Field field : queryFields) {
+			if (field != null && "row".equalsIgnoreCase(field.getArea())) {
+				fieldList.add(field);
+			}
+		}
+		// set column fields
+		for (Field field : queryFields) {
+			if (field != null && "column".equalsIgnoreCase(field.getArea())) {
+				fieldList.add(field);
+			}
+		}
+		// set data fields
+		for (Field field : queryFields) {
+			if (field != null && "data".equalsIgnoreCase(field.getArea())) {
+				fieldList.add(field);
+			}
+		}
+		return fieldList;
+	}
 }
