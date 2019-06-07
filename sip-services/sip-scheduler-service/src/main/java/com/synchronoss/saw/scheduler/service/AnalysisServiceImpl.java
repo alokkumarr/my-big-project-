@@ -51,11 +51,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-
-    @PostConstruct
-    public void init() throws Exception {
-      restTemplate = restUtil.restTemplate();
-    }
+  @PostConstruct
+  public void init() throws Exception {
+    restTemplate = restUtil.restTemplate();
+  }
 
   public void executeAnalysis(String analysisId) {
     AnalysisExecution execution = ImmutableAnalysisExecution.builder().type("scheduled").build();
@@ -94,7 +93,7 @@ public class AnalysisServiceImpl implements AnalysisService {
       logger.error("Error reading s3 List: " + e.getMessage());
       s3List = "";
     }
-
+    Boolean isZipRequired = analysis.getZip();
     String[] latestExecution;
     boolean isDslScheduled =
         analysis.getType() != null
@@ -122,7 +121,8 @@ public class AnalysisServiceImpl implements AnalysisService {
             .userFullName(analysis.getUserFullName())
             .metricName(analysis.getMetricName())
             .jobGroup(analysis.getJobGroup())
-            .publishedTime(formatted);
+            .publishedTime(formatted)
+            .zip(isZipRequired);
 
     if (!recipients.equals("")) {
       executionBuilder.emailList(recipients).fileType(analysis.getFileType());

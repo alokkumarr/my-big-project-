@@ -37,4 +37,7 @@ interface DispatchBean {
     @Nullable
     String s3();
 
+    @Nullable
+    Boolean zip();
+
 }

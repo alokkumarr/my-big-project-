@@ -73,10 +73,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   errorFlagMsg = false;
   loadCron = false;
   emailValidateFlag = false;
-  isReport: boolean;
+  isEligibleToZip: boolean;
   fileType: string;
   startDateCorrectFlag = true;
-
+  zipFormatFlag: boolean = false;
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -96,7 +96,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.fetchCronDetails();
     });
 
-    this.isReport = ['report', 'esReport'].includes(
+    this.isEligibleToZip = ['report', 'esReport', 'pivot'].includes(
       get(this.data.analysis, 'type')
     );
 
@@ -235,7 +235,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         : analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
-      scheduleState: this.scheduleState
+      scheduleState: this.scheduleState,
+      zip: this.zipFormatFlag
     };
     this.triggerSchedule();
   }
@@ -264,6 +265,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         emailList: this.emails,
         ftp: this.ftp,
         s3: this.s3Bucket,
+        zip: this.zipFormatFlag,
         fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,

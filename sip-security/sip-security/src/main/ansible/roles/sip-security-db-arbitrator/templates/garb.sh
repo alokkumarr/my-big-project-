@@ -7,8 +7,4 @@ GALERA_NODES="
   {{ host }}:4567{% if not loop.last %} {% endif %}
 {%- endfor -%}
 "
-#GALERA_OPTIONS="
-#{%- if sip_secure -%}
-#socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem
-#{%- endif -%}
-#"
+GALERA_OPTIONS="{%- if sip_secure -%}socket.ssl_cert=/etc/bda/{{ansible_host}}-certificate.crt;socket.ssl_key=/etc/bda/{{ansible_host}}-key.pem;socket.ssl_cipher=AES128-SHA256{%- endif -%}"

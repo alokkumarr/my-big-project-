@@ -99,7 +99,6 @@ public class MigrationService {
       }
     }
     logger.info("Migration ended.." + migrationRequires);
-    System.out.println("Migration ended.." + migrationRequires);
   }
 
   /**
