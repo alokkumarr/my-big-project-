@@ -75,11 +75,9 @@ public class SemanticIdMigrationUtility {
    * @param semanticMap Map of semantic id and artifact name
    */
   private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
-    System.out.println("Semantic Map = {}" + semanticMap);
-    System.out.println("SipQuery definition = {}" + analysis);
+    System.out.println("Semantic Map = {}" + semanticMap.size());
     String analysisSemanticId =
         analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
-    System.out.println("Analysis semantic id = {}" + analysisSemanticId);
     if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
       for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
         if (analysisSemanticId.equalsIgnoreCase(entry.getValue())) {
@@ -91,7 +89,6 @@ public class SemanticIdMigrationUtility {
             List<Artifact> artifacts = sipQuery.getArtifacts();
             if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
-              System.out.println("Artifact name = {}" + artifactName);
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
                 System.out.println(
                     "Semantic id updated from {} to {}"
@@ -99,10 +96,10 @@ public class SemanticIdMigrationUtility {
                         + entry.getValue());
                 analysis.setSemanticId(entry.getKey());
                 if (updateAnalysis(analysis)) {
-                  LOGGER.debug(
-                      "Successfully Updated analysis id {} with semantic id - {} ",
-                      analysis.getId(),
-                      entry.getValue());
+                  System.out.println(
+                      "Successfully Updated analysis id {} with semantic id - {} "
+                          + analysis.getId()
+                          + entry.getValue());
                 } else {
                   LOGGER.error("Failed writing to maprDB!! Analysis id : {} ", analysis.getId());
                 }
