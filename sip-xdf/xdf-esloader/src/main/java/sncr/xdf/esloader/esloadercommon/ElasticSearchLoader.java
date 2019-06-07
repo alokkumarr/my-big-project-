@@ -62,7 +62,7 @@ public class ElasticSearchLoader {
         ESConfig config = new ESConfig(esHost, esUser, esPass, esPort, esIndex);
         config.setEsClusterName(esClusterName);
 
-        if (esLoader.getEsSslEnabled())
+        if (esLoader.getEsSslEnabled() !=null && esLoader.getEsSslEnabled())
         {
             config.setEsSslEnabled(true);
             config.setKeyStorePath(esLoader.getKeyStorePath());
