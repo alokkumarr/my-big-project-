@@ -28,7 +28,7 @@ public class SemanticIdMigrationUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(SemanticIdMigrationUtility.class);
   private static ObjectMapper MAPPER = new ObjectMapper();
 
-  private AnalysisMetadata semanticMedatadataStore = null;
+  private AnalysisMetadata semanticMetadataStore = null;
   private AnalysisMetadata analysisMetadataStore = null;
 
   private static String metadataTable;
@@ -48,8 +48,6 @@ public class SemanticIdMigrationUtility {
     basePath = args[0];
     metadataTable = args[1];
     tableName = args[2];
-    System.out.println("basePath : --> " + basePath);
-    System.out.println("metadataTable : --> " + metadataTable);
     SemanticIdMigrationUtility uos = new SemanticIdMigrationUtility();
     uos.updateAnalysisWithSemanticInfo();
   }
@@ -125,9 +123,8 @@ public class SemanticIdMigrationUtility {
     Map<String, String> semanticMap = new HashMap<>();
     List<JsonObject> objDocs = new ArrayList<>();
     try {
-
-      semanticMedatadataStore = new AnalysisMetadata(metadataTable, basePath);
-      List<Document> docs = semanticMedatadataStore.searchAll();
+      semanticMetadataStore = new AnalysisMetadata(metadataTable, basePath);
+      List<Document> docs = semanticMetadataStore.searchAll();
       System.out.println("Semantic Metadata Document : -- >>" + docs.size());
       if (docs != null && !docs.isEmpty() && docs.size() > 0) {
         System.out.println("Inside Semantic Metadata Document.");
