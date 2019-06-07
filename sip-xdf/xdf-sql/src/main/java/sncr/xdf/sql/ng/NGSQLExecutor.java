@@ -41,11 +41,9 @@ public class NGSQLExecutor implements Serializable {
 
     public int run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
+        System.out.println("NGSQLExecutor:Long run() **********************************HFileOperations.exists " + descriptor.transactionalLocation + "\n");
 
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
-
-        System.out.println("run getScriptWideTableMap size is : " + allTables.size());
-        System.out.println("rungetScriptWideTableMap keySet is : " + allTables.keySet());
 
         switch (descriptor.statementType) {
             case UNKNOWN:
@@ -107,8 +105,8 @@ public class NGSQLExecutor implements Serializable {
                         df.createOrReplaceTempView(tn);
                     }
                 }
-
-                if (parent.getNgctx().runningPipeLine) {
+                
+                if (parent.getNgctx().runningPipeLine)
                 {
                     //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
                     df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);
