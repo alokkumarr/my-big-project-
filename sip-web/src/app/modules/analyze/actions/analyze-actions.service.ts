@@ -11,6 +11,7 @@ import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { CUSTOM_HEADERS } from '../../../common/consts';
+import { Store } from '@ngxs/store';
 
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
@@ -19,6 +20,7 @@ import {
   EXECUTION_MODES,
   EXECUTION_DATA_MODES
 } from '../services/analyze.service';
+import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
 export class AnalyzeActionsService {
@@ -28,7 +30,8 @@ export class AnalyzeActionsService {
     public _publishService: PublishService,
     public _analyzeDialogService: AnalyzeDialogService,
     public _toastMessage: ToastService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private _store: Store
   ) {}
 
   execute(analysis, mode = EXECUTION_MODES.LIVE) {
@@ -135,39 +138,55 @@ export class AnalyzeActionsService {
     }
 
     return this._analyzeService
-      .readAnalysis(analysis.parentAnalysisId, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
-      .then(parentAnalysis => {
-        /* The destination category is different from parent analysis's category. Publish it normally */
-        if (
-          parentAnalysis.categoryId.toString() !==
-          analysis.categoryId.toString()
-        ) {
+      .readAnalysis(analysis.parentAnalysisId, !!(analysis as any).sipQuery, {
+        [CUSTOM_HEADERS.SKIP_TOAST]: '1'
+      })
+      .then(
+        parentAnalysis => {
+          if (!parentAnalysis) {
+            return publish();
+          }
+          /* The destination category is different from parent analysis's category. Publish it normally */
+          const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
+            ? parentAnalysis.category
+            : parentAnalysis.categoryId;
+          const childAnalysisCategoryId = isDSLAnalysis(analysis)
+            ? analysis.category
+            : analysis.categoryId;
+          if (
+            parentAnalysisCategoryId.toString() !==
+            childAnalysisCategoryId.toString()
+          ) {
+            return publish();
+          }
+
+          /* If the parent has been modified since fork/editing, allow user to choose whether
+           they want to overwrite the parent analysis */
+          if (
+            analysis.updatedTimestamp <
+            (<Analysis>parentAnalysis).updatedTimestamp
+          ) {
+            return this.showPublishOverwriteConfirmation()
+              .afterClosed()
+              .toPromise()
+              .then(shouldPublish => {
+                if (shouldPublish) {
+                  return overwriteParent(parentAnalysis, analysis);
+                } else {
+                  return null;
+                }
+              });
+          }
+          return overwriteParent(parentAnalysis, analysis);
+        },
+        err => {
+          delete analysis.parentAnalysisId;
+          delete analysis.parentCategoryId;
+          delete analysis.parentLastModified;
+
           return publish();
         }
-
-        /* If the parent has been modified since fork/editing, allow user to choose whether
-           they want to overwrite the parent analysis */
-        if (analysis.parentLastModified !== parentAnalysis.updatedTimestamp) {
-          return this.showPublishOverwriteConfirmation()
-            .afterClosed()
-            .toPromise()
-            .then(shouldPublish => {
-              if (shouldPublish) {
-                return overwriteParent(parentAnalysis, analysis);
-              } else {
-                return null;
-              }
-            });
-        }
-        return overwriteParent(parentAnalysis, analysis);
-      },
-      err => {
-        delete analysis.parentAnalysisId;
-        delete analysis.parentCategoryId;
-        delete analysis.parentLastModified;
-
-        return publish();
-      });
+      );
   }
 
   openPublishModal(analysis, type) {
@@ -194,7 +213,7 @@ export class AnalyzeActionsService {
                         ? 'Analysis has been updated.'
                         : 'Analysis schedule changes have been updated.'
                     );
-                    resolve(publishedAnalysis);
+                    resolve(publishedAnalysis as Analysis);
                   },
                   () => {
                     reject();
@@ -228,7 +247,7 @@ export class AnalyzeActionsService {
                           ? 'Analysis has been updated.'
                           : 'Analysis schedule changes have been updated.'
                       );
-                      resolve(updatedAnalysis);
+                      resolve(updatedAnalysis as Analysis);
                     },
                     () => {
                       reject();
@@ -243,7 +262,8 @@ export class AnalyzeActionsService {
 
   removeAnalysis(analysis) {
     // Delete schedule if exists
-    if (analysis.schedule) {
+    const cronJobs = this._store.selectSnapshot(state => state.common.jobs);
+    if (cronJobs && cronJobs[analysis.id]) {
       const deleteScheduleBody = {
         scheduleState: 'delete',
         jobName: analysis.id,

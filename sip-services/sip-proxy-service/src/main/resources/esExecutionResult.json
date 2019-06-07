@@ -1,0 +1,46 @@
+{
+  "queryBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [
+    ],
+    "sorts": [
+    ],
+    "dataFields": [
+      {
+        "tableName": "mct_tgt_session",
+        "columns": [
+          {
+            "columnName": "AVAILABLE_ITEMS",
+            "displayName": "Available Items",
+            "filterEligible": true,
+            "joinEligible": false,
+            "kpiEligible": true,
+            "name": "AVAILABLE_ITEMS",
+            "table": "mct_tgt_session",
+            "type": "double",
+            "checked": true,
+            "format": {
+              "precision": 2
+            },
+            "visibleIndex": 0
+          },
+          {
+            "columnName": "AVAILABLE_MB",
+            "displayName": "Available MB",
+            "filterEligible": true,
+            "joinEligible": false,
+            "kpiEligible": true,
+            "name": "AVAILABLE_MB",
+            "table": "mct_tgt_session",
+            "type": "double",
+            "checked": true,
+            "format": {
+              "precision": 2
+            },
+            "visibleIndex": 1
+          }
+        ]
+      }
+    ]
+  }
+}

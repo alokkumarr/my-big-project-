@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import * as reduce from 'lodash/reduce';
-import { Filter, Artifact, ArtifactColumn } from '../../types';
+import { Filter, Artifact } from '../../types';
 import {
   NUMBER_TYPES,
   DATE_TYPES,
@@ -9,6 +8,10 @@ import {
   STRING_FILTER_OPERATORS_OBJ,
   NUMBER_FILTER_OPERATORS_OBJ
 } from '../../../consts';
+import { AnalyzeService } from '../../../services/analyze.service';
+
+import { ArtifactDSL } from '../../../../../models/analysis-dsl.model';
+import moment from 'moment';
 
 export const getFilterValue = (filter: Filter) => {
   const { type } = filter;
@@ -38,6 +41,10 @@ export const getFilterValue = (filter: Filter) => {
   } else if (DATE_TYPES.includes(type)) {
     if (preset === CUSTOM_DATE_PRESET_VALUE) {
       return `: From ${gte} To ${lte}`;
+    } else if (operator === 'BTW') {
+      return `: From ${moment(value).format('YYYY-MM-DD')} to ${moment(
+        otherValue
+      ).format('YYYY-MM-DD')}`;
     }
     return `: ${preset}`;
   }
@@ -53,32 +60,22 @@ export class FilterChipsComponent {
   @Output() removeAll: EventEmitter<null> = new EventEmitter();
   @Input() filters: Filter[];
   @Input('artifacts')
-  set artifacts(artifacts: Artifact[]) {
+  set artifacts(artifacts: Artifact[] | ArtifactDSL[]) {
     if (!artifacts) {
       return;
     }
-    this.nameMap = reduce(
-      artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
-          (accum, col: ArtifactColumn) => {
-            accum[col.columnName] = col.displayName;
-            return accum;
-          },
-          {}
-        );
-        return acc;
-      },
-      {}
-    );
+    this.nameMap = this.analyzeService.calcNameMap(artifacts);
   }
   @Input() readonly: boolean;
 
   public nameMap;
 
+  constructor(private analyzeService: AnalyzeService) {}
+
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName][filter.columnName];
+    return this.nameMap[filter.tableName || filter.artifactsName][
+      filter.columnName
+    ];
   }
 
   onRemove(index) {

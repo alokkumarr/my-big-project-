@@ -18,12 +18,15 @@ export class AddTokenInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     // Clone the request to add the new header.
-    const authReq = req.clone({
-      headers: req.headers.set(
-        'Authorization',
-        `Bearer ${this.jwt.getAccessToken()}`
-      )
-    });
+    // Don't add headers to assets like svg
+    const authReq = /\.svg$/.test(req.url)
+      ? req.clone()
+      : req.clone({
+          headers: req.headers.set(
+            'Authorization',
+            `Bearer ${this.jwt.getAccessToken()}`
+          )
+        });
     // send the newly created request
     return next.handle(authReq).pipe(catchError((error, caught) => {
       return throwError(error);

@@ -12,7 +12,6 @@
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
       (change)="change.emit($event)"
-      [fieldCount]="fieldCount"
       [sqlBuilder]="sqlBuilder"
       [artifacts]="artifacts"
     >
@@ -42,9 +41,7 @@
       (change)="change.emit($event)"
       [analysisType]="analysisType"
       [analysisSubtype]="analysisSubtype"
-      [sqlBuilder]="sqlBuilder"
-      [artifacts]="artifacts"
-      [fieldCount]="fieldCount"
+      [sipQuery]="sipQuery"
       [auxSettings]="auxSettings"
       [chartTitle]="chartTitle"
     >
@@ -69,7 +66,6 @@
           (removeFilter)="onRemoveFilter($event)"
           [analysisType]="analysisType"
           [analysisSubtype]="analysisSubtype"
-          [artifacts]="artifacts"
           [filters]="filters"
           class="designer__selected-fields__container"
         >
@@ -164,25 +160,25 @@
             *ngIf="analysisType === 'pivot'"
             [data]="data"
             [sorts]="sorts"
-            [artifacts]="artifacts"
+            [artifacts]="sipQuery.artifacts"
             [updater]="pivotUpdater"
           >
           </designer-pivot>
           <designer-map
             class="designer__data"
-            *ngIf="(analysisType | isAnalysisType: 'map':analysisSubtype)"
+            *ngIf="analysisType | isAnalysisType: 'map':analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-map>
           <designer-map-chart
             class="designer__data"
-            *ngIf="(analysisType | isAnalysisType: 'mapChart':analysisSubtype)"
+            *ngIf="analysisType | isAnalysisType: 'mapChart':analysisSubtype"
             [chartType]="analysisSubtype"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-map-chart>
           <designer-chart
@@ -193,7 +189,7 @@
             [sorts]="sorts"
             [auxSettings]="auxSettings"
             [data]="data"
-            [sqlBuilder]="sqlBuilder"
+            [sipQuery]="sipQuery"
           >
           </designer-chart>
         </mat-card>

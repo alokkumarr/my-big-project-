@@ -34,6 +34,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   public clearFiltersListener: Subscription;
   public applyFiltersListener: Subscription;
   public closeFiltersListener: Subscription;
+  public defaultsLoaded = false;
 
   @Output() onModelChange = new EventEmitter();
 
@@ -78,11 +79,10 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
     if (data.model) {
       this.cacheFilters();
       this.loadDateRange(true);
+      this.onPresetChange({ value: this.model.preset });
     } else {
       this.loadDateRange(false);
     }
-
-    this.onPresetChange({ value: this.model.preset });
   }
 
   /**
@@ -113,6 +113,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
           max: moment(floor(parseFloat(data._max)))
         };
 
+        this.defaultsLoaded = true;
         this.loadDefaults(useCache);
         this.cacheFilters();
       });
@@ -181,6 +182,9 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalDateFilterComponent
    */
   onFilterChange() {
+    if (!this.defaultsLoaded) {
+      return;
+    }
     const payload = {
       ...this._filter,
       ...{

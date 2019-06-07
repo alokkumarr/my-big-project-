@@ -51,7 +51,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 @RestController
-@RequestMapping("/ingestion/batch")
+@RequestMapping("/ingestion/batch/sftp")
 public class SawBisPluginController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);

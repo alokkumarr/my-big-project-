@@ -12,10 +12,10 @@ import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import { Subject, Observable, isObservable } from 'rxjs';
 
-import { SqlBuilderChart } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
 import { ArtifactColumn } from '../../types';
+import { QueryDSL } from 'src/app/models';
 
 export enum MapChartStates {
   NO_MAP_SELECTED,
@@ -41,22 +41,22 @@ export class DesignerMapChartComponent implements OnInit {
   @Input() actionBus;
 
   @Input()
-  set sqlBuilder(sqlBuilder: SqlBuilderChart) {
-    const { dataFields, nodeFields } = sqlBuilder;
+  set sipQuery(sipQuery: QueryDSL) {
     this._fields = fpPipe(
-      fpFlatMap(x => x),
-      fpGroupBy('checked'),
+      fpFlatMap(artifact => artifact.fields),
+      fpGroupBy('area'),
       fpMapValues(([field]) => field)
-    )([dataFields, nodeFields]);
+    )(sipQuery.artifacts);
 
     const xField = this._fields.x;
-    if (xField.region) {
+    if (xField.geoRegion) {
       const oldState = this.currentState;
       this.currentState = MapChartStates.OK;
       if (oldState === MapChartStates.NO_MAP_SELECTED) {
-        this._mapData = this._mapDataService.getMapData(xField.region);
-        this.setSeries();
+        this._mapData = this._mapDataService.getMapData(xField.geoRegion);
       }
+      this._rawSeries = this.getRawSeries(this._data);
+      this.setSeries();
     } else {
       this.fieldWithNoRegion = xField;
     }
@@ -73,15 +73,9 @@ export class DesignerMapChartComponent implements OnInit {
     if (!executionData) {
       return;
     }
-    const series = this._chartService.splitToSeries(
-      map(executionData, clone),
-      this._fields,
-      'geo'
-    );
-    series[0].data = map(series[0].data, ({ x, y }) => ({ value: y, x }));
-    this._data = executionData;
-    this._rawSeries = series;
+    this._rawSeries = this.getRawSeries(executionData);
     this.setSeries();
+    this._data = executionData;
   }
 
   @Input() chartType: String;
@@ -98,6 +92,16 @@ export class DesignerMapChartComponent implements OnInit {
       this._auxSettings.legend
     );
     this.setChartConfig(legend);
+  }
+
+  getRawSeries(executionData) {
+    const series = this._chartService.splitToSeries(
+      map(executionData, clone),
+      this._fields,
+      'geo'
+    );
+    series[0].data = map(series[0].data, ({ x, y }) => ({ value: y, x }));
+    return series;
   }
 
   setSeries() {

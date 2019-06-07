@@ -5,13 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
+import com.mapr.db.exceptions.DBException;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
-import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import com.mapr.db.exceptions.DBException;
 
 
 /**
@@ -41,44 +40,44 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
     protected final int retries = 3;
 
     // TODO:: Replace altRoot with configuration reading
-     protected MetadataStore(String tableName, String altRoot) throws Exception {
-         super(altRoot);
-         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
-         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
-         logger.trace("Open table: " + fullTableName);
-         table = initTable(fullTableName, retries);
-         table.setOption(Table.TableOption.BUFFERWRITE, false);
-     }
+    protected MetadataStore(String tableName, String altRoot) throws Exception {
+        super(altRoot);
+        metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
+        String fullTableName = metaRoot + Path.SEPARATOR + tableName;
+        logger.trace("Open table: " + fullTableName);
+        table = initTable(fullTableName, retries);
+        table.setOption(Table.TableOption.BUFFERWRITE, false);
+    }
 
 
-     // This has been added to handle the use case
-     // while working on SIP-6061
-     private Table initTable(String tablePath, int retries) {
-       Table tableDesc = null;
-       if (MapRDB.tableExists(tablePath)) {
-         tableDesc = MapRDB.getTable(tablePath);
-       } else {
-         try {
-           tableDesc = MapRDB.createTable(tablePath);
-         } catch (DBException ex) {
-           logger.trace("Table possibly already created by other instance :" + ex);
-           logger.trace("Table path :" + tablePath);
-           if (MapRDB.tableExists(tablePath)) {
-             tableDesc = MapRDB.getTable(tablePath);
-           } else {
-             logger.trace("Number of retries :" + retries);
-             if (retries > 0) {
-               initTable(tablePath, retries - 1);
-             } else {
-               logger.trace("Number of retries has been exhausted:" + retries);
-               throw new DBException(
-                   "Exception occured while creating table with the path :" + tablePath);
-             }
-           }
-         }
-       }
-       return tableDesc;
-     }
+    // This has been added to handle the use case
+    // while working on SIP-6061
+    private Table initTable(String tablePath, int retries) {
+        Table tableDesc = null;
+        if (MapRDB.tableExists(tablePath)) {
+            tableDesc = MapRDB.getTable(tablePath);
+        } else {
+            try {
+                tableDesc = MapRDB.createTable(tablePath);
+            } catch (DBException ex) {
+                logger.trace("Table possibly already created by other instance :" + ex);
+                logger.trace("Table path :" + tablePath);
+                if (MapRDB.tableExists(tablePath)) {
+                    tableDesc = MapRDB.getTable(tablePath);
+                } else {
+                    logger.trace("Number of retries :" + retries);
+                    if (retries > 0) {
+                        initTable(tablePath, retries - 1);
+                    } else {
+                        logger.trace("Number of retries has been exhausted:" + retries);
+                        throw new DBException(
+                            "Exception occured while creating table with the path :" + tablePath);
+                    }
+                }
+            }
+        }
+        return tableDesc;
+    }
 
 
     protected void _save(String id, Document doc) throws Exception
@@ -124,6 +123,15 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         if (ds != null) {
             logger.trace("Entity: " + ds.asJsonString());
             return toJsonElement(ds);
+        }
+        return null;
+    }
+
+    public Document readDocumet(String id) throws Exception {
+        Document ds = _read(id);
+        if (ds != null) {
+            logger.trace("Entity: " + ds.asJsonString());
+            return ds;
         }
         return null;
     }

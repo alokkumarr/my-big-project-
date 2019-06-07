@@ -27,6 +27,7 @@ interface DispatchBean {
 
     String metricName();
 
+    @Nullable
     String userFullName();
 
     String publishedTime();
@@ -35,5 +36,8 @@ interface DispatchBean {
 
     @Nullable
     String s3();
+
+    @Nullable
+    Boolean zip();
 
 }

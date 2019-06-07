@@ -42,6 +42,7 @@
       [checked]="cell.data.selection"
       [disabled]="
         cell.data.noMetricInd ||
+        cell.data.legacyInd ||
         (cell.data.duplicateAnalysisInd && !cell.data.selection)
       "
     >
@@ -63,18 +64,21 @@
   >
     <span
       *ngIf="cell.data.errorInd"
+      class="log-error"
       style="cursor: pointer"
       (click)="displayError(cell.data.errorMsg)"
     >
       {{ cell.value }}
     </span>
-    <span *ngIf="!cell.data.errorInd"> {{ cell.value }} </span>
+    <span *ngIf="!cell.data.errorInd" class="log-noerror">
+      {{ cell.value }}
+    </span>
   </div>
 
   <div *dxTemplate="let cell of 'categoryCellTemplate'">
     <admin-import-category-select
       [categories]="categories"
-      [value]="cell.data.analysis.categoryId.toString()"
+      [value]="getCategoryId(cell.data.analysis).toString()"
       (change)="onSelectCategory($event, cell.data)"
     ></admin-import-category-select>
   </div>

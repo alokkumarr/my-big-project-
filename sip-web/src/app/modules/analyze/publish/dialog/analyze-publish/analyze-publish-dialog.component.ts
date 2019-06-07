@@ -9,6 +9,7 @@ import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dial
 import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
 import { USER_ANALYSIS_CATEGORY_NAME } from '../../../../../common/consts';
+import { isDSLAnalysis } from '../../../designer/types';
 
 @Component({
   selector: 'analyze-publish-dialog',
@@ -55,19 +56,38 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
   }
 
   onCategorySelected(value) {
-    this.data.analysis.categoryId = value;
+    if (isDSLAnalysis(this.data.analysis)) {
+      this.data.analysis.category = value;
+    } else {
+      this.data.analysis.categoryId = value;
+    }
+  }
+
+  get categoryId() {
+    if (isDSLAnalysis(this.data.analysis)) {
+      return this.data.analysis.category;
+    } else {
+      return this.data.analysis.categoryId;
+    }
   }
 
   setDefaultCategory() {
     const analysis = this.data.analysis;
-    if (!analysis.categoryId) {
+    const categoryId = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
+    if (!categoryId) {
       const defaultCategory = find(
         this.categories,
         category => category.children.length > 0
       );
 
       if (defaultCategory) {
-        analysis.categoryId = first(defaultCategory.children).id;
+        if (isDSLAnalysis(analysis)) {
+          analysis.category = first(defaultCategory.children).id;
+        } else {
+          analysis.categoryId = first(defaultCategory.children).id;
+        }
       }
     }
   }
