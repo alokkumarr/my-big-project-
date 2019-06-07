@@ -111,8 +111,10 @@ public class ElasticSearchLoader {
         configMap.put("es.index.auto.create", "false");
         if (config.isEsSslEnabled()){
         configMap.put("es.net.ssl","true");
-        configMap.put("es.net.ssl.keystore.location",config.getKeyStorePath());
-        configMap.put("es.net.ssl.keystore.pass",config.getStorePassword());
+        configMap.put("es.net.ssl.truststore.location",config.getKeyStorePath());
+        configMap.put("es.net.ssl.truststore.pass",config.getStorePassword());
+        configMap.put("es.nodes.wan.only","true");
+        configMap.put("es.net.ssl.cert.allow.self.signed","true");
         }
         return configMap;
     }

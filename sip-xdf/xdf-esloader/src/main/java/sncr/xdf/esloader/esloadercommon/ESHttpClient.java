@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -194,11 +196,21 @@ public class ESHttpClient {
    */
   private ClientResource getClientResource(String fullUrl) {
     ClientResource cr = null;
+    logger.debug("Inside getClientResource starts here.");
+    logger.debug("esConfig.isEsSslEnabled(): " + esConfig.isEsSslEnabled());
     if (esConfig.isEsSslEnabled()) {
       Client client = new Client(new Context(), Protocol.HTTPS);
       Series<Parameter> parameters = client.getContext().getParameters();
-      parameters.add("truststorePath", esConfig.getKeyStorePath());
-      parameters.add("keyStorePassword", esConfig.getStorePassword());
+      URL url = null;
+      try {
+        url = new URL(esConfig.getKeyStorePath());
+      } catch (MalformedURLException e) {
+        logger.error("Exception occurred while accesing the key store path: " + e);
+      }
+      parameters.add("truststorePath", url.getPath());
+      parameters.add("truststorePassword", esConfig.getStorePassword());
+      parameters.add("truststoreType", "JKS");
+      logger.debug("Parameter List: " + parameters.toString());
       cr = new ClientResource(fullUrl);
       cr.setNext(client);
       if (authentication != null) cr.setChallengeResponse(authentication);
@@ -206,6 +218,7 @@ public class ESHttpClient {
       cr = new ClientResource(fullUrl);
       if (authentication != null) cr.setChallengeResponse(authentication);
     }
+    logger.debug("Inside getClientResource ends here.");
     return cr;
   }
 
