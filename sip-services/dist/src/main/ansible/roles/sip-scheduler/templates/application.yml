@@ -91,6 +91,6 @@ connector: http
 
 saw-analysis-service-url: ${connector}://localhost:9200/analysis
 saw-dispatch-service-url: ${connector}://localhost:9400/exports
+bis-transfer-url: ${connector}://localhost:9903/ingestion/batch/channel/transfers/data
 sip-metadata-service-url: http://localhost:9501/dslanalysis
 sip-analysis-proxy-url: http://localhost:9800/internal/proxy/storage
-bis-transfer-url: ${connector}://localhost:9903/ingestion/batch/sftp/channel/transfers/data
