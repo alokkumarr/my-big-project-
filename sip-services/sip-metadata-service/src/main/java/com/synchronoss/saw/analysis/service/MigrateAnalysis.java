@@ -441,6 +441,11 @@ public class MigrateAnalysis {
     return jsonParser.parse(json);
   }
 
+  /**
+   * Invokes binary to json migration for analysis metadata.
+   *
+   * @throws Exception In case of errors
+   */
   public void start() throws Exception {
     if (migrationRequired) {
       logger.info("Migration initiated");

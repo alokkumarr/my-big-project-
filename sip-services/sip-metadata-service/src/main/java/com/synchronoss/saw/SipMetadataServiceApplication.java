@@ -60,13 +60,11 @@ public class SipMetadataServiceApplication {
   @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-    tomcat.addConnectorCustomizers(
-        (TomcatConnectorCustomizer)
-            connector -> {
-              if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
-                ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
-              }
-            });
+    tomcat.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
+      if ((connector.getProtocolHandler() instanceof AbstractHttp11Protocol<?>)) {
+        ((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
+      }
+    });
     return tomcat;
   }
 
