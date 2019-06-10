@@ -7,7 +7,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 
 import { DashboardService } from '../../../services/dashboard.service';
@@ -77,18 +76,9 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
     this.analyze.getAnalysesFor(id.toString()).then(
       result => {
         this.showProgress = false;
-
-        // Excluding mapbox analysis from being able to add in dashboard
-        // until mapbox chart download issue is fixed.
-        // https://jira.synchronoss.net:8443/jira/browse/SIP-6083
-        const EXCLUDE_MAPTYPE = ['map'];
-
         this.analyses = filter(
           result,
-          analysis =>
-            analysis &&
-            ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
-            !EXCLUDE_MAPTYPE.includes(get(analysis, 'mapOptions.mapType'))
+          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
         );
       },
       () => {

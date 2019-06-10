@@ -1,5 +1,11 @@
 import { MatSidenav } from '@angular/material';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  ElementRef
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
@@ -14,6 +20,7 @@ import {
 } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
+import * as Bowser from 'bowser';
 import * as forEach from 'lodash/forEach';
 
 import {
@@ -27,7 +34,7 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../services/execute.service';
-import { ToastService } from '../../../common/services/toastMessage.service';
+import { ToastService, HtmlDownloadService } from '../../../common/services';
 import {
   flattenPivotData,
   flattenChartData,
@@ -40,6 +47,11 @@ import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
 import { isDSLAnalysis, Filter } from '../designer/types';
 import { CUSTOM_DATE_PRESET_VALUE } from './../consts';
+
+const browser = get(
+  Bowser.getParser(window.navigator.userAgent).getBrowser(),
+  'name'
+);
 
 @Component({
   selector: 'executed-view',
@@ -73,12 +85,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   public filters: Filter[] = [];
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
+  @ViewChild('mapView') mapView: ElementRef;
 
   constructor(
     public _executeService: ExecuteService,
     public _analyzeService: AnalyzeService,
     public _router: Router,
     public _route: ActivatedRoute,
+    private _htmlService: HtmlDownloadService,
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
@@ -589,7 +603,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
               )
             };
           } else {
-            this.executedAnalysis = {...this.executedAnalysis, sqlBuilder: queryBuilder};
+            this.executedAnalysis = {
+              ...this.executedAnalysis,
+              sqlBuilder: queryBuilder
+            };
           }
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
@@ -678,6 +695,20 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       // TODO add export for Maps
       this.chartUpdater$.next({ export: true });
       this.chartActionBus$.next({ export: true });
+      break;
+    case 'map':
+      if (get(this.analysis, 'mapOptions.mapType') === 'map') {
+        if (browser !== 'Chrome') {
+          const title = 'Browser not supported.';
+          const msg =
+            'Downloading map analysis only works with Chrome browser at the moment.';
+          this._toastMessage.warn(msg, title);
+          return;
+        }
+        this._htmlService.turnHtml2pdf(this.mapView.nativeElement, this.analysis.name);
+      } else {
+        this.chartUpdater$.next({ export: true });
+      }
       break;
     default:
       const executionType = this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL;
