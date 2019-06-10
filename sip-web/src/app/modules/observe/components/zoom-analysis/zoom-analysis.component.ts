@@ -3,14 +3,18 @@ import {
   Inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ElementRef
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Select } from '@ngxs/store';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 
-import { Filter, Artifact, ArtifactColumn } from './../../../analyze/types';
+import { Filter } from './../../../analyze/types';
+import { isDSLAnalysis } from './../../../analyze/types';
+import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
   NUMBER_TYPES,
   DATE_TYPES,
@@ -19,7 +23,10 @@ import {
   STRING_FILTER_OPERATORS_OBJ,
   NUMBER_FILTER_OPERATORS_OBJ
 } from './../../../analyze/consts';
-import { reduce } from 'lodash';
+import * as forEach from 'lodash/forEach';
+import moment from 'moment';
+import { Observable, Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 let initialChartHeight = 0;
 @Component({
@@ -27,33 +34,42 @@ let initialChartHeight = 0;
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-export class ZoomAnalysisComponent implements OnInit, OnDestroy {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
+  private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public nameMap;
+  @Select(state => state.common.metrics) metrics$: Observable<{
+    [metricId: string]: any;
+  }>;
+  filters$ = this.metrics$.pipe(
+    map(() => {
+      const queryBuilder = isDSLAnalysis(this.data.analysis)
+        ? this.data.analysis.sipQuery
+        : this.data.analysis.sqlBuilder;
+      return isDSLAnalysis(this.data.analysis)
+        ? this.generateDSLDateFilters(queryBuilder.filters)
+        : queryBuilder.filters;
+    })
+  );
+  filterCount$ = this.filters$.pipe(map(filters => (filters || []).length));
+  displayNameBuilder$ = this.metrics$.pipe(
+    map(metrics => metrics[this.data.analysis.semanticId]),
+    tap(metric => {
+      this.nameMap = this.analyzeService.calcNameMap(metric.artifacts);
+    })
+  );
 
   @ViewChild('zoomAnalysisChartContainer') chartContainer: ElementRef;
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,
+    private analyzeService: AnalyzeService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
   ngOnInit() {
-    this.nameMap = reduce(
-      this.data.origAnalysis.artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
-          (accum, col: ArtifactColumn) => {
-            accum[col.columnName] = col.displayName;
-            return accum;
-          },
-          {}
-        );
-        return acc;
-      },
-      {}
-    );
+    const sub = this.displayNameBuilder$.subscribe();
+    this.subscriptions.push(sub);
 
     fpPipe(
       fpMap(val => {
@@ -89,13 +105,28 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
     this.data.updater.next([
       {
         path: 'chart.height',
         data: initialChartHeight
       }
     ]);
+  }
+
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      if (
+        !filtr.isRuntimeFilter &&
+        (filtr.type === 'date' && filtr.model && filtr.model.operator === 'BTW')
+      ) {
+        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    return filters;
   }
 
   getChartHeight(chartHeight) {
@@ -108,7 +139,9 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   }
 
   getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName][filter.columnName];
+    return this.nameMap[filter.tableName || filter.artifactsName][
+      filter.columnName
+    ];
   }
 
   getFilterValue(filter: Filter) {

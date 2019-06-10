@@ -13,11 +13,11 @@ import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonValidationException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
-import com.synchronoss.saw.semantic.SipSemanticUtils;
 import com.synchronoss.saw.semantic.model.DataSemanticObjects;
 import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -59,15 +59,14 @@ public class MigrationService {
   private static final Logger logger = LoggerFactory.getLogger(MigrationService.class);
   private String existingBinarySemanticPath = "/services/metadata/semantic_metadata";
 
-  @Autowired
-  private RestUtil restUtil;
-  
+  @Autowired private RestUtil restUtil;
+
   private RestTemplate restTemplate = null;
 
   @Value("${semantic.binary-migration-requires}")
   @NotNull
   private boolean migrationRequires;
- 
+
   @Value("${metastore.base}")
   @NotNull
   private String basePath;
@@ -83,10 +82,10 @@ public class MigrationService {
   @Value("${semantic.migration-metadata-home}")
   @NotNull
   private String migrationMetadataHome;
-  
+
   /**
    * This method provides an entry point to migration service.
-   * 
+   *
    * @throws Exception exception
    */
   public void init() throws Exception {
@@ -100,9 +99,8 @@ public class MigrationService {
       }
     }
     logger.info("Migration ended.." + migrationRequires);
-    System.out.println("Migration ended.." + migrationRequires);
   }
-  
+
   /**
    * Run migration.
    *
@@ -110,9 +108,15 @@ public class MigrationService {
    * @throws IOException exception
    */
   public static void main(String[] args) throws IOException {
-    String dataLocation = "{\n" + "    \"contents\": [\n" + "        {\n"
-        + "            \"dataLocation\": \"/var/sip/services/saw-analyze-samples/sample-spark/"
-        + "data-product.ndjson\"\n" + "        }\n" + "    ]\n" + "}";
+    String dataLocation =
+        "{\n"
+            + "    \"contents\": [\n"
+            + "        {\n"
+            + "            \"dataLocation\": \"/var/sip/services/saw-analyze-samples/sample-spark/"
+            + "data-product.ndjson\"\n"
+            + "        }\n"
+            + "    ]\n"
+            + "}";
 
     Resource resource = new ClassPathResource("semantic.json");
     ObjectMapper objectMapper = new ObjectMapper();
@@ -125,9 +129,10 @@ public class MigrationService {
         objectMapper.readValue(dataLocation, DataSemanticObjects.class);
     MetaDataObjects metaDataObjects = objectMapper.readValue(mdService, MetaDataObjects.class);
 
-    List<BinarySemanticNode> binaryNodes = objectMapper.readValue(
-        objectMapper.writeValueAsString(metaDataObjects.getContents().get(0).getAnalyze()),
-        new TypeReference<List<BinarySemanticNode>>() {});
+    List<BinarySemanticNode> binaryNodes =
+        objectMapper.readValue(
+            objectMapper.writeValueAsString(metaDataObjects.getContents().get(0).getAnalyze()),
+            new TypeReference<List<BinarySemanticNode>>() {});
     SemanticNode semanticNode = null;
     for (BinarySemanticNode binarySemanticNode : binaryNodes) {
       String id = binarySemanticNode.getId();
@@ -135,20 +140,23 @@ public class MigrationService {
       semanticNode.set_id(id);
       semanticNode.setId(id);
       semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
-      semanticNode
-          .setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
+      semanticNode.setModule(
+          com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
       semanticNode.setProjectCode(
-          binarySemanticNode.getProjectCode() != null ? binarySemanticNode.getProjectCode()
+          binarySemanticNode.getProjectCode() != null
+              ? binarySemanticNode.getProjectCode()
               : "workbench");
-      semanticNode
-          .setUsername(binarySemanticNode.getUsername() != null ? binarySemanticNode.getUsername()
+      semanticNode.setUsername(
+          binarySemanticNode.getUsername() != null
+              ? binarySemanticNode.getUsername()
               : "sipadmin@synchronoss.com");
       semanticNode.setMetricName(binarySemanticNode.getMetricName());
       if (binarySemanticNode.getEsRepository() != null) {
         semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
       } else {
-        JsonNode repository = objectMapper
-            .readTree(objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
+        JsonNode repository =
+            objectMapper.readTree(
+                objectMapper.writeValueAsString(binarySemanticNode.getRepository()));
         ArrayNode repositories = (ArrayNode) repository.get("objects");
         ObjectNode newRepoNode = null;
         List<Object> repositoryObjects = new ArrayList<>();
@@ -169,8 +177,9 @@ public class MigrationService {
       semanticNode.setSupports(binarySemanticNode.getSupports());
       System.out.println(objectMapper.writeValueAsString(semanticNode));
     }
-    JsonNode data = objectMapper
-        .readTree(objectMapper.writeValueAsString(contentDataLocation.getContents().get(0)));
+    JsonNode data =
+        objectMapper.readTree(
+            objectMapper.writeValueAsString(contentDataLocation.getContents().get(0)));
     System.out.println(data.get("dataLocation"));
     Path file = Paths.get("/var/sip/services/saw-analyze-samples/sample-spark/");
 
@@ -182,10 +191,11 @@ public class MigrationService {
   /**
    * This method will get the data from binary store & make it sure. binary & maprDB store are in
    * sync.
+   *
    * @throws Exception exception
    */
-  public void convertHBaseBinaryToMaprdbStore(String transportUri, String basePath,
-      String migrationMetadataHome) throws Exception {
+  public void convertHBaseBinaryToMaprdbStore(
+      String transportUri, String basePath, String migrationMetadataHome) throws Exception {
     logger.trace("migration process will begin here");
     HttpHeaders requestHeaders = new HttpHeaders();
     // Constructing the request structure to get the list of semantic from Binary
@@ -201,37 +211,46 @@ public class MigrationService {
     restTemplate = restUtil.restTemplate();
     ResponseEntity<MetaDataObjects> binarySemanticStoreData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, MetaDataObjects.class);
-    
+
     logger.trace(
         "binarySemanticStoreData status Code :" + binarySemanticStoreData.getStatusCode().value());
     logger.trace("binarySemanticStoreData hasBody :" + binarySemanticStoreData.hasBody());
-    logger.trace("binarySemanticStoreData body :"
-        + (binarySemanticStoreData.hasBody() ? binarySemanticStoreData.getBody().toString()
-            : "NA"));
+    logger.trace(
+        "binarySemanticStoreData body :"
+            + (binarySemanticStoreData.hasBody()
+                ? binarySemanticStoreData.getBody().toString()
+                : "NA"));
     logger.trace("binarySemanticStoreData getHeaders :" + binarySemanticStoreData.getHeaders());
-    logger.trace("binarySemanticStoreData getBody().getContents() :"
-        + binarySemanticStoreData.getBody().getContents().size());
+    logger.trace(
+        "binarySemanticStoreData getBody().getContents() :"
+            + binarySemanticStoreData.getBody().getContents().size());
     logger.trace(
         "binarySemanticStoreData.getBody()!=null :" + (binarySemanticStoreData.getBody() != null));
-    logger.trace("binarySemanticStoreData.getBody().getContents()!=null :"
-        + (binarySemanticStoreData.getBody().getContents() != null));
-    logger.trace("binarySemanticStoreData.getBody().getContents().size() > 0) :"
-        + (binarySemanticStoreData.getBody().getContents().size() > 0));
-    logger.trace("binarySemanticStoreData if size > 0 :"
-        + (binarySemanticStoreData.getBody().getContents().size() > 0
-            ? objectMapper.writeValueAsString(binarySemanticStoreData)
-            : "NA"));
-    logger.trace("if block :" + ((binarySemanticStoreData.getBody() != null
-        && (binarySemanticStoreData.getBody().getContents() != null
-            && binarySemanticStoreData.getBody().getContents().size() > 0))));
+    logger.trace(
+        "binarySemanticStoreData.getBody().getContents()!=null :"
+            + (binarySemanticStoreData.getBody().getContents() != null));
+    logger.trace(
+        "binarySemanticStoreData.getBody().getContents().size() > 0) :"
+            + (binarySemanticStoreData.getBody().getContents().size() > 0));
+    logger.trace(
+        "binarySemanticStoreData if size > 0 :"
+            + (binarySemanticStoreData.getBody().getContents().size() > 0
+                ? objectMapper.writeValueAsString(binarySemanticStoreData)
+                : "NA"));
+    logger.trace(
+        "if block :"
+            + ((binarySemanticStoreData.getBody() != null
+                && (binarySemanticStoreData.getBody().getContents() != null
+                    && binarySemanticStoreData.getBody().getContents().size() > 0))));
     if ((binarySemanticStoreData.getBody() != null
         && (binarySemanticStoreData.getBody().getContents() != null)
         && (binarySemanticStoreData.getBody().getContents().size() > 0))) {
       logger.trace(objectMapper.writeValueAsString(binarySemanticStoreData));
-      List<BinarySemanticNode> binaryNodes = objectMapper.readValue(
-          objectMapper.writeValueAsString(
-              binarySemanticStoreData.getBody().getContents().get(0).getAnalyze()),
-          new TypeReference<List<BinarySemanticNode>>() {});
+      List<BinarySemanticNode> binaryNodes =
+          objectMapper.readValue(
+              objectMapper.writeValueAsString(
+                  binarySemanticStoreData.getBody().getContents().get(0).getAnalyze()),
+              new TypeReference<List<BinarySemanticNode>>() {});
       SemanticNode semanticNode = null;
       for (BinarySemanticNode binarySemanticNode : binaryNodes) {
         String id = binarySemanticNode.getId();
@@ -241,36 +260,40 @@ public class MigrationService {
         logger.trace("Checking for the Id in existence : " + id);
         if (!(readSemantic(semanticNode, basePath))) {
           semanticNode.setCustomerCode(binarySemanticNode.getCustomerCode());
-          semanticNode
-              .setModule(com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
+          semanticNode.setModule(
+              com.synchronoss.saw.semantic.model.request.SemanticNode.Module.ANALYZE);
           semanticNode.setProjectCode(
-              binarySemanticNode.getProjectCode() != null ? binarySemanticNode.getProjectCode()
+              binarySemanticNode.getProjectCode() != null
+                  ? binarySemanticNode.getProjectCode()
                   : "workbench");
           semanticNode.setUsername(
-              binarySemanticNode.getUsername() != null ? binarySemanticNode.getUsername()
+              binarySemanticNode.getUsername() != null
+                  ? binarySemanticNode.getUsername()
                   : "sipadmin@synchronoss.com");
           semanticNode.setMetricName(binarySemanticNode.getMetricName());
           if (binarySemanticNode.getEsRepository() != null) {
-            JsonNode esRepository = objectMapper
-                .readTree(objectMapper.writeValueAsString(binarySemanticNode.getEsRepository()));
+            JsonNode esRepository =
+                objectMapper.readTree(
+                    objectMapper.writeValueAsString(binarySemanticNode.getEsRepository()));
             String indexName = esRepository.get("indexName").asText();
             // This check has been introduced due to special case where existing pods are
             // has both esRepository & repository SIP-4960
             if (indexName != null && !indexName.trim().equals("")) {
               semanticNode.setEsRepository(binarySemanticNode.getEsRepository());
             } else {
-              semanticNode = settingRepositories(binarySemanticNode, url,
-                  requestHeaders, semanticNode);
+              semanticNode =
+                  settingRepositories(binarySemanticNode, url, requestHeaders, semanticNode);
             }
           } else {
-            semanticNode = settingRepositories(binarySemanticNode, url,
-                requestHeaders, semanticNode);
+            semanticNode =
+                settingRepositories(binarySemanticNode, url, requestHeaders, semanticNode);
           }
           semanticNode.setArtifacts(binarySemanticNode.getArtifacts());
           semanticNode.setSupports(binarySemanticNode.getSupports());
           try {
-            logger.trace("semanticNode description which is going to migrate :"
-                + objectMapper.writeValueAsString(semanticNode));
+            logger.trace(
+                "semanticNode description which is going to migrate :"
+                    + objectMapper.writeValueAsString(semanticNode));
             addSemantic(semanticNode, basePath);
           } catch (Exception ex) {
             logger.trace("Throwing an exception while adding the semantic to the new store");
@@ -278,20 +301,26 @@ public class MigrationService {
                 "Exception generated during migration while creating an semantic entity ", ex);
           }
           try {
-            logger.info("HFileOperations.exists(basePath + existingBinarySemanticPath)): "
-                + migrationMetadataHome + existingBinarySemanticPath);
+            logger.info(
+                "HFileOperations.exists(basePath + existingBinarySemanticPath)): "
+                    + migrationMetadataHome
+                    + existingBinarySemanticPath);
             if (HFileOperations.exists(migrationMetadataHome + existingBinarySemanticPath)) {
               HFileOperations.deleteEnt(migrationMetadataHome + existingBinarySemanticPath);
             }
           } catch (Exception e) {
-            logger.trace("Exception occurred while removing " + migrationMetadataHome
-                + existingBinarySemanticPath + " :", e);
+            logger.trace(
+                "Exception occurred while removing "
+                    + migrationMetadataHome
+                    + existingBinarySemanticPath
+                    + " :",
+                e);
           }
           // end of Id check if it is there then ignore
         } else {
           logger.info("This " + semanticNode.get_id() + " already exists on the store");
         }
-      } 
+      }
     } else {
       logger.info("migration has been completed on previous installation");
     }
@@ -304,12 +333,18 @@ public class MigrationService {
    * @return String.
    */
   private String dataObjectQuery(String dataObjectId, String operation) {
-    return "{\"contents\":{\"keys\":[{\"id\":\"" + dataObjectId + "\"}],\"action\":\"" + operation
+    return "{\"contents\":{\"keys\":[{\"id\":\""
+        + dataObjectId
+        + "\"}],\"action\":\""
+        + operation
         + "\",\"context\":\"DataObject\"}}";
   }
 
-  private SemanticNode settingRepositories(BinarySemanticNode binarySemanticNode, String url,
-      HttpHeaders requestHeaders, SemanticNode semanticNode)
+  private SemanticNode settingRepositories(
+      BinarySemanticNode binarySemanticNode,
+      String url,
+      HttpHeaders requestHeaders,
+      SemanticNode semanticNode)
       throws JsonProcessingException, IOException {
     List<String> listOfDataObjectIds = new ArrayList<>();
     List<String> listOfDataObjectNames = new ArrayList<>();
@@ -336,16 +371,20 @@ public class MigrationService {
           "dataObjectRequestEntity : " + objectMapper.writeValueAsString(dataObjectRequestEntity));
       logger.debug("transportMetadataURIL server URL {}", url);
       restTemplate = restUtil.restTemplate();
-      binaryDataObjectNode = restTemplate.exchange(url, HttpMethod.POST, dataObjectRequestEntity,
-          DataSemanticObjects.class);
-      dataObjectData = objectMapper.readTree(
-          objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
+      binaryDataObjectNode =
+          restTemplate.exchange(
+              url, HttpMethod.POST, dataObjectRequestEntity, DataSemanticObjects.class);
+      dataObjectData =
+          objectMapper.readTree(
+              objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
       logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));
-      newRepoNode.put(DataSetProperties.PhysicalLocation.toString(),
+      newRepoNode.put(
+          DataSetProperties.PhysicalLocation.toString(),
           dataObjectData.get("dataLocation").asText());
       Path file = Paths.get(dataObjectData.get("dataLocation").asText());
-      String format = (FilenameUtils.getExtension(file.getFileName().toString()).equals("")
-          || FilenameUtils.getExtension(file.getFileName().toString()) != null)
+      String format =
+          (FilenameUtils.getExtension(file.getFileName().toString()).equals("")
+                  || FilenameUtils.getExtension(file.getFileName().toString()) != null)
               ? FilenameUtils.getExtension(file.getFileName().toString())
               : "parquet";
       newRepoNode.put(DataSetProperties.Format.toString(), format);
@@ -366,7 +405,8 @@ public class MigrationService {
    */
   private String semanticNodeQuery(String operation) {
     return "{\"contents\":{\"keys\":[{\"type\":\"semantic\",\"module\":\"ANALYZE\"}],\"action\":\""
-        + operation + "\",\"select\":\"everything\",\"context\":\"Semantic\"}}";
+        + operation
+        + "\",\"select\":\"everything\",\"context\":\"Semantic\"}}";
   }
 
   private void addSemantic(SemanticNode node, String basePath)
@@ -375,9 +415,11 @@ public class MigrationService {
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
-          node.get_id(), Action.create, Category.Semantic);
-      logger.trace("addSemantic : Before invoking request to MaprDB JSON store :{}",
+      List<MetaDataStoreStructure> structure =
+          SipMetadataUtils.node2JsonObject(
+              node, basePath, node.get_id(), Action.create, Category.Semantic);
+      logger.trace(
+          "addSemantic : Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -397,9 +439,11 @@ public class MigrationService {
     boolean exists = true;
     ObjectMapper mapper = new ObjectMapper();
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
-          node.get_id(), Action.read, Category.Semantic);
-      logger.trace("readSemantic : Before invoking request to MaprDB JSON store :{}",
+      List<MetaDataStoreStructure> structure =
+          SipMetadataUtils.node2JsonObject(
+              node, basePath, node.get_id(), Action.read, Category.Semantic);
+      logger.trace(
+          "readSemantic : Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -430,8 +474,9 @@ public class MigrationService {
     logger.trace("Deleting semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseObject = new SemanticNode();
     try {
-      List<MetaDataStoreStructure> structure = SipSemanticUtils.node2JsonObject(node, basePath,
-          node.get_id(), Action.delete, Category.Semantic);
+      List<MetaDataStoreStructure> structure =
+          SipMetadataUtils.node2JsonObject(
+              node, basePath, node.get_id(), Action.delete, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();

@@ -33,7 +33,7 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
     MenuItem[]
   >;
   @Select(ExportPageState.exportList) exportList$: Observable<any[]>;
-  @Select(state => state.admin.exportPage.categoryAnalyses)
+  @Select(ExportPageState.categoryAnalyses)
   exportAnalyses$: Observable<any[]>;
 
   isExportListEmpty$ = this.exportList$.pipe(map(list => list.length <= 0));
@@ -131,9 +131,7 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
    */
   export() {
     const zip = new JSZip();
-    const { analyses } = this.store.selectSnapshot(
-      state => state.admin.exportPage.exportData
-    );
+    const { analyses } = this.store.selectSnapshot(ExportPageState.exportData);
 
     const fileName = this.getFileName('ANALYZE');
     zip.file(

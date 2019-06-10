@@ -3,7 +3,7 @@
   </header>
   <div class="dialog__content"
        fxLayout="column">
-
+  {{ data.dateFormat}}
     <mat-radio-group [value]="data.format"
                      (change)="onFormatChange($event.value)">
       <mat-radio-button *ngFor="let dateFormat of dateFormats; trackBy: trackByIndex"

@@ -138,7 +138,7 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
-  
+
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
   @PostConstruct
@@ -698,16 +698,16 @@ public class SftpServiceImpl extends SipPluginContract {
                 logger.trace("Last modified hours limit configured:" 
                     + lastModifiedHoursLmt);
               }
-             
+
             }
-            
-            
-            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
+
+
+            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId)
                      && source.equals(SourceType.REGULAR.name())) {
-            
-              logger.info("Already process running for the route" + routeId 
+
+              logger.info("Already process running for the route" + routeId
                     + "and concurrency disabled hence skipping transfer");
-            
+
             } else {
               logger.trace("invocation of method transferData when "
                          + "directory is availble in destination with "
@@ -716,20 +716,20 @@ public class SftpServiceImpl extends SipPluginContract {
               Thread thread = Thread.currentThread();
               SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
               logger.info(
-                         "Transfer data started with routeId: " + routeId 
+                         "Transfer data started with routeId: " + routeId
                          + " started time: " + new Date());
               logger.info("Thread Id started with: " + thread);
               ZonedDateTime fileTransStartTime = ZonedDateTime.now();
               // Adding to a list has been removed as a part of optimization
               // SIP-6386
               transferDataFromChannel(template, sourceLocation, filePattern,
-                         destinationLocation, channelId, routeId, 
+                         destinationLocation, channelId, routeId,
                          fileExclusions, isDisable, source,lastModifiedHoursLmt);
               ZonedDateTime fileTransEndTime = ZonedDateTime.now();
               long durationInMillis =
                          Duration.between(fileTransStartTime, fileTransEndTime).toMillis();
               logger.info(
-                         "Transfer data ended with routeId: " + routeId 
+                         "Transfer data ended with routeId: " + routeId
                          + " ended time: " + new Date());
               logger.info("Thread Id ended with: " + thread);
               logger.info("Total time taken in seconds to complete the "
@@ -1208,7 +1208,271 @@ public class SftpServiceImpl extends SipPluginContract {
     }
     return exists;
   }
+
+  /**
+   * This is method to handle inconsistency during failure.
+   * Step1: Check if any long running process with 'InProgress'
+   * and mark them as failed.
+   * Step2: Retrive all 'Failed' or 'HOST_NOT_REACHABLE' entries
+   * and cleans up destination and update logs with 'Data_removed'
+   * Step3: Triggers transfer call as part of retry
+   */
+  @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
+  public void recoverFromInconsistentState() {
+    
+    //Mark long running 'InProgress to 'Failed'
+    sipLogService.updateLongRunningTransfers(maxInprogressMins);
+
+    logger.trace("recoverFromInconsistentState execution starts here");
+    int countOfRecords = sipLogService.countRetryIds(retryDiff);
+    logger.trace("Count listOfRetryIds :" + countOfRecords);
+    int totalNoOfPages = IntegrationUtils.calculatePages(countOfRecords, retryPageSize);
+    logger.trace("totalNoOfPages :" + totalNoOfPages);
+    for (int i = pageStart; i < totalNoOfPages; i++) {
+      List<BisFileLog> logs =
+          sipLogService.listOfRetryIds(retryDiff, i, retryPageSize, "checkpointDate");
+      logger.trace("Data listOfRetryIds :" + logs);
+      for (BisFileLog log : logs) {
+        logger.info("Process Id which is in inconsistent state: " + log.getPid());
+        long routeId = log.getRouteSysId();
+        logger.info("Route Id which is in inconsistent state: " + routeId);
+        long channelId = log.getBisChannelSysId();
+        logger.info("Channel Id which is in inconsistent state: " + channelId);
+        Optional<BisRouteEntity> bisRouteEntityPresent =
+            this.findRouteById(routeId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        JsonNode nodeEntity = null;
+        ObjectNode rootNode = null;
+        try {
+          BisRouteEntity bisRouteEntity;
+          if (bisRouteEntityPresent.isPresent()) {
+            bisRouteEntity = bisRouteEntityPresent.get();
+            nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+            rootNode = (ObjectNode) nodeEntity;
+            if (rootNode.get("disableDuplicate") != null
+                && !rootNode.get("disableDuplicate").isNull()) {
+              String disableDupFlag = rootNode.get("disableDuplicate").asText();
+              Boolean isDisable = Boolean.valueOf(disableDupFlag);
+              if (isDisable) {
+                logger.trace("Inside isDisable starts here");
+                if (sipLogService.isRouteAndChannelExists(routeId, channelId)) {
+                  updateAndDeleteCorruptFiles(log, fileStatus, procesStatus);
+                  // To retry only specific file instead of downloading all files
+                  // in the source folder
+                  if (log.getFileName() != null) {
+                    logger.trace("Inside isDisable transferData starts here");
+                    // SIP-6094 : this flow is related when user is set disableDuplicate as true
+                    // and to update the process status as DATA_REMOVED when there is a file
+                    // associated with it.
+                    updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
+                         BisComponentState.DATA_REMOVED.value());
+                    transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
+                          isDisable, SourceType.RETRY.name());
+                  } else {
+                    logger.trace("Inside isDisable transferData when starts here "
+                        + "log.getFileName() is null");
+                    // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
+                    // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
+                    // instead of inserting new one
+                    sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
+                        BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
+                    logger.trace("Inside the block of retry when process status is "
+                        + " inside disable block :"
+                        + BisComponentState.HOST_NOT_REACHABLE.value());
+                    logger.info("Channel Id with :" + BisComponentState.HOST_NOT_REACHABLE.value()
+                        + " will be triggered by retry in case of isDisable duplicate " + isDisable
+                        + " : " + channelId);
+                    transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
+                        log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value());
+                  }
+                }
+                logger.trace("Inside isDisable ends here");
+              } else {
+                // To retry only specific file instead of downloading all files in
+                // the in source folder
+                logger.trace(
+                    "Inside the block of retry when disable is not "
+                    + "checked for route Id :" + routeId);
+                // SIP-6094 : duplicate check has been introduced; no need to retry if file
+                // has been identified has duplicate
+                // and to update the process status as DATA_REMOVED when there is a file
+                // associated with it.
+                if (log.getFileName() != null
+                    && (sipLogService.duplicateCheckFilename(isDisable,log.getFileName()))) {
+                  updateAndDeleteCorruptFiles(log, BisProcessState.FAILED.value(),
+                      BisComponentState.DATA_REMOVED.value());
+                  logger
+                    .trace("Inside the block of retry when file is not duplicate :" + log.getPid());
+                  transferData(channelId, routeId, FilenameUtils.getName(log.getFileName()),
+                      isDisable, SourceType.RETRY.name());
+                } else {
+                  // This transfer initiates when it is likely to be HOST_NOT_REACHABLE
+                  // SIP-6094 : if HOST_NOT_REACHABLE then update the existing on
+                  // instead of inserting new one
+                  sipLogService.updateStatusFailed(BisProcessState.FAILED.value(),
+                      BisComponentState.HOST_NOT_REACHABLE.value(), log.getPid());
+                  logger.trace("Inside the block of retry when process status is :"
+                      + BisComponentState.HOST_NOT_REACHABLE.value());
+                  // log.pid() has been added as part of SIP-6292
+                  logger.info("Channel Id with :" + BisComponentState.HOST_NOT_REACHABLE.value()
+                      + " will be triggered by retry in case of isDisable duplicate " + isDisable
+                      + " : " + channelId);
+                  transferRetry(channelId, routeId, log.getBisChannelType(), isDisable,
+                      log.getPid(), BisComponentState.HOST_NOT_REACHABLE.value());
+                }
+              }
+            }
+          } else {
+            logger.trace("No route present with channelId: " 
+                + channelId + " routeID: " + routeId);
+          }
+        } catch (NotFoundException | IOException e) {
+          logger.error("Exception occurred while reading duplicate attribute ", e);
+        }
+      } // end of second for loop
+    } // end of first for loop
+    logger.trace("recoverFromInconsistentState execution ends here");
+  }
+  
+  private void transferRetry(Long channelId, Long routeId, String channelType, boolean isDisable,
+      String pid, String status)
+      throws NotFoundException {
+    logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
+        + channelId + " starts here");
+    logger.info("transferRetry with the process Id :" + pid);
+    final List<BisDataMetaInfo>  filesInfo = new ArrayList<>();
+    // This block needs to improved in future with appropriate design pattern like
+    // Abstract factory or switch block when more channel type will be added
+    switch (channelType) {
+      case "sftp":
+        SessionFactory<LsEntry> sesionFactory =
+            delegatingSessionFactory.getSessionFactory(channelId);
+        try (Session<?> session = sesionFactory.getSession()) {
+          if (session != null & session.isOpen()) {
+            Optional<BisRouteEntity> routeEntity = this.findRouteById(routeId);
+            if (routeEntity.isPresent()) {
+              ObjectMapper objectMapper = new ObjectMapper();
+              objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+              objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+              BisRouteEntity bisRouteEntity = routeEntity.get();
+              final BisDataMetaInfo metaInfo = new BisDataMetaInfo();
+              if (bisRouteEntity.getStatus() > 0) {
+                JsonNode nodeEntity = null;
+                ObjectNode rootNode = null;
+                nodeEntity = objectMapper.readTree(bisRouteEntity.getRouteMetadata());
+                rootNode = (ObjectNode) nodeEntity;
+                // The below change has been made for the task SIP-6292
+                
+                
+                String fileExclusions = null;
+                if (rootNode.get("fileExclusions") != null) {
+                  fileExclusions = rootNode.get("fileExclusions").asText();
+                }
+                metaInfo.setFilePattern(rootNode.get("filePattern").asText());
+                String destinationLocation = rootNode.get("destinationLocation").asText();
+                int lastModifiedHoursLmt = LAST_MODIFIED_DEFAUTL_VAL;
+                String sourceLocation = rootNode.get("sourceLocation").asText();
+                SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+                if (rootNode.get("lastModifiedLimitHours") != null  
+                    && !rootNode.get("lastModifiedLimitHours").isNull()) {
+                  String lastModifiedLimitHours = rootNode.get("lastModifiedLimitHours").asText();
+                  if (!lastModifiedLimitHours.isEmpty()) {
+                    lastModifiedHoursLmt = Integer.valueOf(lastModifiedLimitHours);
+                    logger.trace("Last modified hours limit configured:" 
+                          + lastModifiedHoursLmt);
+                  }
+                 
+                }
+                filesInfo.addAll(
+                    transferDataFromChannel(template, sourceLocation, metaInfo.getFilePattern(),
+                        destinationLocation, channelId, routeId, 
+                        fileExclusions, isDisable, SourceType.RETRY.name(), lastModifiedHoursLmt));
+                
+                logger.info("sourceLocation inside transferRetry :" + sourceLocation);
+                logger.info("destinationLocation inside transferRetry :" + destinationLocation);
+                logger.info(
+                    "metaInfo.getFilePattern() inside transferRetry :" + metaInfo.getFilePattern());
+
+              }
+            }
+          }
+          // This has been added as a part of SIP-6292 change
+          // when HOST_NOT_REACHABLE host is successfully connected
+          // this will rectify irrespective of route active or not
+          // and date are available on the source or not
+          // all it make sure it host got back online
+          // and after checking for existence then
+          // removes the entry from the store
+          if (sipLogService.checkAndDeleteLog(pid)) {
+            logger.info("deleted successfully the pid which had "
+                + BisComponentState.HOST_NOT_REACHABLE + " with pid " + pid);
+          }
+        } catch (Exception ex) {
+          logger.error(
+              "Exception occurred while connecting to channel with the channel Id:" + channelId
+              + " and with process id " + pid,
+              ex);
+          sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
+              BisComponentState.HOST_NOT_REACHABLE.value(), 
+              BisProcessState.FAILED.value(), SourceType.RETRY.name());
+        }
+        break;
+      case "jdbc":
+        break;
+      default:
+        throw new NotFoundException("channelType does not support");
+    }
+    logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
+        + channelId + " ends here");
+  }
   
   
- 
+
+  /**
+   * This is a common method to update the status.
+   *
+   * @param log log instance which has the details.
+   * @param fileStatus file status to be entered
+   * @param procesStatus component status to be updated
+   */
+  private void updateAndDeleteCorruptFiles(BisFileLog log, String fileStatus, String procesStatus) {
+    int rowId = 0;
+    rowId = sipLogService.updateStatusFailed(fileStatus, procesStatus, log.getPid());
+    logger.info("rowId updateAndDeleteCorruptFiles: " + log.getPid());
+    if (rowId <= 0) {
+      throw new PersistenceException(
+          "Exception occured while updating the bis log table to handle inconsistency");
+    }
+    // The below code fix which will be part of 
+    // TODO : SIP-6148
+    // This is known issue with this feature branch
+    String fileName = null;
+    if (log.getRecdFileName() != null) {
+      fileName = log.getRecdFileName();
+      logger.trace("Delete the corrupted file :" + fileName);
+      File fileDelete = new File(fileName);
+      if (fileDelete != null) {
+        logger.trace("Parent Directory deleted : " + fileDelete);
+        File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
+          @Override
+          public boolean accept(File file) {
+            return !file.isHidden();
+          }
+        });
+        if (files != null && files.length > 1) {
+          fileDelete.delete();
+        } else {
+          logger.trace("Directory deleted :", fileDelete);
+          IntegrationUtils.removeDirectory(fileDelete.getParentFile());
+        }
+      }
+    } else {
+      logger.trace("Corrupted file does not exist.");
+    }
+  }
+
+
+
 }

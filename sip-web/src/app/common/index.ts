@@ -6,7 +6,7 @@ import 'mottle';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {DragDropModule} from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { AngularSplitModule } from 'angular-split';
 
@@ -100,7 +100,8 @@ import {
   HeaderProgressService,
   DynamicModuleService,
   CustomIconService,
-  DndPubsubService
+  DndPubsubService,
+  CommonSemanticService
 } from './services';
 
 const MODULES = [
@@ -184,7 +185,8 @@ const SERVICES = [
   UserService,
   WindowService,
   CustomIconService,
-  DndPubsubService
+  DndPubsubService,
+  CommonSemanticService
 ];
 
 const INTERCEPTORS = [
@@ -208,7 +210,11 @@ const INTERCEPTORS = [
 
 const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
 @NgModule({
-  imports: [NgxsModule.forFeature([CommonState]), AngularSplitModule.forRoot(), ...MODULES],
+  imports: [
+    NgxsModule.forFeature([CommonState]),
+    AngularSplitModule.forRoot(),
+    ...MODULES
+  ],
   declarations: [...COMPONENTS, ...DIRECTIVES],
   entryComponents: COMPONENTS,
   exports: [

@@ -95,9 +95,7 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
             );
             expect(analysis).toBeTruthy();
             assert.isNotNull(analysis, 'analysis cannot be null');
-            analysisId = analysis.contents.analyze[0].executionId.split(
-              '::'
-            )[0];
+            analysisId = analysis.id;
             let promptFilterFunctions = new PromptFilterFunctions();
             promptFilterFunctions.applyFilters(
               categoryName,

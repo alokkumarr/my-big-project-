@@ -147,6 +147,11 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.6</version>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>sip-query-dsl</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

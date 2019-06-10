@@ -16,7 +16,9 @@ import {
   GridsterItem,
   GridsterComponent
 } from 'angular-gridster2';
+import { Store } from '@ngxs/store';
 import { Subscription, BehaviorSubject } from 'rxjs';
+import { first, tap } from 'rxjs/operators';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
@@ -28,7 +30,6 @@ import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 
-import { CUSTOM_HEADERS } from '../../../../common/consts';
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
@@ -38,10 +39,12 @@ import {
 } from '../../../../common/services/window.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
+import { isDSLAnalysis } from 'src/app/modules/analyze/types';
+import { ObserveService } from '../../services/observe.service';
+import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -84,12 +87,14 @@ export class DashboardGridComponent
   public initialised = false;
 
   constructor(
-    private analyze: AnalyzeService,
+    private observe: ObserveService,
     private filters: GlobalFilterService,
     private dashboardService: DashboardService,
     private windowService: WindowService,
     private sidenav: SideNavService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _analyzeService: AnalyzeService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -104,8 +109,8 @@ export class DashboardGridComponent
       margin: MARGIN_BETWEEN_TILES,
       minRows: 4,
       maxRows: 10000,
-      minItemRows: 6,
-      minItemCols: 10,
+      minItemRows: 1,
+      minItemCols: 1,
       maxItemCols: 100,
       maxItemRows: 10000,
       maxItemArea: 1000000,
@@ -164,7 +169,18 @@ export class DashboardGridComponent
     );
     this.listeners.push(globalFiltersSubscription);
 
-    setTimeout(_ => this.initialiseDashboard(), 100);
+    setTimeout(_ => {
+      /* Wait for metrics to load before initialising dashboard.
+      Metrics are needed to get full artifacts for filters */
+      const listener = this.store
+        .select(state => state.common.metrics)
+        .pipe(
+          first(metrics => values(metrics).length > 0),
+          tap(() => this.initialiseDashboard())
+        )
+        .subscribe();
+      this.listeners.push(listener);
+    }, 100);
   }
 
   isViewMode() {
@@ -234,9 +250,22 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
-    const columns = flatMap(analysis.artifacts, table => table.columns);
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    const metric = metrics[analysis.semanticId];
+    const columns = flatMap(
+      metric
+        ? metric.artifacts
+        : isDSLAnalysis(analysis)
+        ? analysis.sipQuery.artifacts
+        : analysis.artifacts,
+      table => table.columns || table.fields
+    );
 
-    const filters = get(analysis, 'sqlBuilder.filters', []);
+    const filters = get(
+      analysis,
+      'sqlBuilder.filters',
+      get(analysis, 'sipQuery.filters', [])
+    );
 
     this.filters.addFilter(
       filter(
@@ -246,7 +275,8 @@ export class DashboardGridComponent
             get(this.model, 'filters') || [],
             dashFilt =>
               dashFilt.semanticId === analysis.semanticId &&
-              dashFilt.tableName === flt.tableName &&
+              (dashFilt.tableName || dashFilt.artifactsName) ===
+                (flt.tableName || flt.artifactsName) &&
               dashFilt.columnName === flt.columnName &&
               flt.isGlobalFilter
           );
@@ -260,11 +290,11 @@ export class DashboardGridComponent
             ...{
               semanticId: analysis.semanticId,
               metricName: analysis.metricName,
-              esRepository: analysis.esRepository,
+              esRepository: this.getESRepository(analysis),
               displayName: this.filters.getDisplayNameFor(
                 columns,
                 flt.columnName,
-                flt.tableName
+                flt.tableName || flt.artifactsName
               )
             }
           };
@@ -272,6 +302,22 @@ export class DashboardGridComponent
         f => f.isGlobalFilter
       )
     );
+  }
+
+  getESRepository(analysis) {
+    if (analysis.esRepository) {
+      return analysis.esRepository;
+    } else if (analysis.sipQuery) {
+      const store = analysis.sipQuery.store;
+      const [indexName, indexType] = store.dataStore.split('/');
+      return {
+        storageType: store.storageType,
+        indexName,
+        type: indexType
+      };
+    } else {
+      return {};
+    }
   }
 
   /**
@@ -302,18 +348,28 @@ export class DashboardGridComponent
           return f;
         }),
 
-        tile.origAnalysis.sqlBuilder.filters,
+        (tile.origAnalysis.sqlBuilder || tile.origAnalysis.sipQuery).filters,
         (gFilt, filt) =>
-          gFilt.tableName === filt.tableName &&
+          (gFilt.tableName || gFilt.artifactsName) ===
+            (filt.tableName || filt.artifactsName) &&
           gFilt.columnName === filt.columnName
       );
 
-      const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-      tile.analysis = {
-        ...tile.origAnalysis,
-        ...{ sqlBuilder },
-        _executeTile: true
-      };
+      if (tile.origAnalysis.sqlBuilder) {
+        const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
+        tile.analysis = {
+          ...tile.origAnalysis,
+          ...{ sqlBuilder },
+          _executeTile: true
+        };
+      } else {
+        const sipQuery = { ...tile.origAnalysis.sipQuery, ...{ filters } };
+        tile.analysis = {
+          ...tile.origAnalysis,
+          ...{ sipQuery },
+          _executeTile: true
+        };
+      }
 
       this.dashboard.splice(id, 1, { ...tile });
     });
@@ -363,26 +419,37 @@ export class DashboardGridComponent
         return;
       }
 
-      this.analyze
-        .readAnalysis(tile.id, { [CUSTOM_HEADERS.SKIP_TOAST]: '1' })
-        .then(
-          data => {
-            tile.analysis = data;
-            tile.success = true;
-            this.addAnalysisTile(tile);
-            tileLoaded();
-            this.getDashboard.emit({ changed: true, dashboard: this.model });
-            this.refreshTile(tile);
-          },
-          err => {
-            tile.success = false;
-            this.dashboard.push(tile);
-            tileLoaded();
-          }
-        );
+      this.observe.readAnalysis(tile.id).then(
+        data => {
+          tile.analysis =
+            data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
+          tile.success = true;
+          this.addAnalysisTile(tile);
+          tileLoaded();
+          this.getDashboard.emit({ changed: true, dashboard: this.model });
+          this.refreshTile(tile);
+        },
+        () => {
+          tile.success = false;
+          this.dashboard.push(tile);
+          tileLoaded();
+        }
+      );
     });
 
     this.initialised = true;
+  }
+
+  fetchGeoAnalysis(analysis) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    const metric = metrics[analysis.semanticId];
+    return {
+      ...analysis,
+      sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+        get(metric, 'artifacts.0.columns', []),
+        analysis.sipQuery
+      )
+    };
   }
 
   addAnalysisTile(tile, executeTile = false) {
@@ -452,15 +519,20 @@ export class DashboardGridComponent
   onAnalysisRemove() {
     const analysisTiles = filter(this.dashboard, tile => tile.analysis);
     const globalFilters = filter(
-      flatMap(analysisTiles, tile =>
-        map(
-          get(tile.origAnalysis || tile.analysis, 'sqlBuilder.filters') || [],
+      flatMap(analysisTiles, tile => {
+        const analysis = tile.origAnalysis || tile.analysis;
+        return map(
+          get(
+            analysis,
+            'sqlBuilder.filters',
+            get(analysis, 'sipQuery.filters', [])
+          ),
           f => {
             f.semanticId = tile.analysis.semanticId;
             return f;
           }
-        )
-      ),
+        );
+      }),
       f => f.isGlobalFilter
     );
 
@@ -475,39 +547,39 @@ export class DashboardGridComponent
         (req: any = {}) => {
           /* prettier-ignore */
           switch (req.action) {
-          case 'add':
-            if (req.data && req.data.analysis) {
-              this.addAnalysisTile(req.data, true);
-            } else {
-              this.dashboard.push(req.data);
-            }
-            this.getDashboard.emit({
-              changed: true,
-              dashboard: this.prepareDashboard()
-            });
-            break;
+            case 'add':
+              if (req.data && req.data.analysis) {
+                this.addAnalysisTile(req.data, true);
+              } else {
+                this.dashboard.push(req.data);
+              }
+              this.getDashboard.emit({
+                changed: true,
+                dashboard: this.prepareDashboard()
+              });
+              break;
 
-          case 'remove':
-            const tiles = filter(
-              this.dashboard,
-              tile => get(tile, 'analysis.id') === get(req, 'data.id')
-            );
-            forEach(tiles, this.removeTile.bind(this));
-            break;
+            case 'remove':
+              const tiles = filter(
+                this.dashboard,
+                tile => get(tile, 'analysis.id') === get(req, 'data.id')
+              );
+              forEach(tiles, this.removeTile.bind(this));
+              break;
 
-          case 'get':
-            this.getDashboard.emit({
-              save: true,
-              dashboard: this.prepareDashboard()
-            });
-            break;
+            case 'get':
+              this.getDashboard.emit({
+                save: true,
+                dashboard: this.prepareDashboard()
+              });
+              break;
 
-          case 'refresh':
-            this.refreshDashboard();
-            break;
+            case 'refresh':
+              this.refreshDashboard();
+              break;
 
-          default:
-            this.getDashboard.emit({ dashboard: this.prepareDashboard() });
+            default:
+              this.getDashboard.emit({ dashboard: this.prepareDashboard() });
           }
         }
       );
