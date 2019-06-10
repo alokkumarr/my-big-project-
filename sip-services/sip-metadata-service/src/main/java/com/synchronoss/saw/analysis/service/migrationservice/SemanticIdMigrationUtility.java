@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 public class SemanticIdMigrationUtility {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SemanticIdMigrationUtility.class);
   private static ObjectMapper MAPPER = new ObjectMapper();
 
   private AnalysisMetadata semanticMetadataStore = null;
@@ -94,15 +93,17 @@ public class SemanticIdMigrationUtility {
                           "Successfully Updated analysis id [%s] with semantic id - [%s]",
                           analysis.getId(), entry.getValue()));
                 } else {
-                  LOGGER.error("Failed writing to maprDB!! Analysis id : {} ", analysis.getId());
+                  System.out.println(
+                      String.format(
+                          "Failed writing to maprDB!! Analysis id : {%s}", analysis.getId()));
                 }
                 break;
               }
             } else {
-              LOGGER.warn("Artifacts is not present");
+              System.out.println("Artifacts is not present");
             }
           } else {
-            LOGGER.warn("sipQuery not present");
+            System.out.println("SipQuery not present");
           }
         }
       }
@@ -129,7 +130,8 @@ public class SemanticIdMigrationUtility {
         }
       }
     } catch (Exception e) {
-      LOGGER.error("Exception occurred while fetching Semantic definition", e);
+      System.out.println(
+          String.format("Exception occurred while fetching Semantic definition. %s", e));
     }
 
     for (JsonObject semanticData : objDocs) {
@@ -172,12 +174,13 @@ public class SemanticIdMigrationUtility {
     JsonElement jsonElement;
     try {
       jsonElement = jsonParser.parse(jsonString);
-      LOGGER.info("json element parsed successfully");
-      LOGGER.trace("Parsed String = ", jsonElement);
+      System.out.println("json element parsed successfully");
       return jsonElement;
     } catch (JsonParseException jse) {
-      LOGGER.error("Can't parse String to Json, JsonParseException occurred!\n");
-      LOGGER.error(jse.getStackTrace().toString());
+      System.out.println(
+          String.format(
+              "Can't parse String to Json, JsonParseException occurred!\n %s",
+              jse.getStackTrace().toString()));
       return null;
     }
   }
@@ -201,7 +204,10 @@ public class SemanticIdMigrationUtility {
         objDocs.add(MAPPER.readValue(d.asJsonString(), Analysis.class));
       }
     } catch (Exception e) {
-      LOGGER.error("Exception occurred while fetching analysis by category for userId", e);
+      System.out.println(
+          String.format(
+              "Exception occurred while fetching analysis by category for userId. %s",
+              e.getStackTrace().toString()));
       throw new SipReadEntityException(
           "Exception occurred while fetching analysis by category for userId", e);
     }
@@ -224,7 +230,9 @@ public class SemanticIdMigrationUtility {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       analysisMetadataStore.update(analysis.getId(), parsedAnalysis);
     } catch (Exception e) {
-      LOGGER.error("Exception occurred while updating analysis", e);
+      System.out.println(
+          String.format(
+              "Exception occurred while updating analysis. %s", e.getStackTrace().toString()));
       throw new SipUpdateEntityException("Exception occurred while updating analysis");
     }
     return true;
