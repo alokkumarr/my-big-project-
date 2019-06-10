@@ -8,8 +8,6 @@ import { AnalyzeListViewComponent } from './list-view';
 import { AnalyzeNewDialogComponent } from './new-dialog';
 import { AnalysesFilterPipe } from './analyses-filter.pipe';
 
-
-
 const COMPONENTS = [
   AnalyzeViewComponent,
   AnalyzeCardViewComponent,
@@ -19,14 +17,8 @@ const COMPONENTS = [
 ];
 
 @NgModule({
-  imports: [
-    CommonModuleTs,
-    AnalyzeActionsModule
-  ],
-  declarations: [
-    ...COMPONENTS,
-    AnalysesFilterPipe
-  ],
+  imports: [CommonModuleTs, AnalyzeActionsModule],
+  declarations: [...COMPONENTS, AnalysesFilterPipe],
   entryComponents: COMPONENTS,
   exports: [AnalyzeViewComponent]
 })
