@@ -3,6 +3,7 @@ package com.synchronoss.saw;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -35,9 +36,9 @@ public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_PATH = "/services/ingestion/batch";
 
   private static final String TRANSFER_DATA_PATH =
-      "/services/ingestion/batch/sftp/channel/transfers/data";
+      "/services/ingestion/batch/channel/transfers/data";
 
-  private static final String PLUGNIN_PATH = "/services/ingestion/batch/sftp";
+  private static final String PLUGNIN_PATH = "/services/ingestion/batch";
 
   private static final String ROUTE_HISTORY_PATH = "/services/ingestion/batch/logs/";
   private static final String LOGS_HISTORY_INTERNAL = "/services/ingestion/batch/internal/logs";
@@ -142,7 +143,7 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("destinationLocation", "/data");
     routeMetadata.put("filePattern", "*.csv");
     routeMetadata.put("fileExclusions", "log");
-    routeMetadata.put("disableDuplicate", "false");
+    routeMetadata.put("disableDuplicate", false);
     routeMetadata.put("disableConcurrency", "false");
     routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
@@ -299,32 +300,6 @@ public class BatchIngestionIT extends BaseIT {
     return root;
   }
   
-  /**
-   * This method is used to prepare a route to use it while scheduling transfer. data on hourly
-   * basis
-   * 
-   * @return object {@link ObjectNode}
-   * @throws JsonProcessingException exception.
-   */
-  private ObjectNode prepareRouteDataSetForDisableConcurrency() throws JsonProcessingException {
-    ObjectNode childNode = mapper.createObjectNode();
-    childNode.put("routeName", "route-scheduled-transfer-" + testId());
-    childNode.put("sourceLocation", "/root/saw-batch-samples/log/small");
-    childNode.put("destinationLocation", "log/scheduled");
-    childNode.put("filePattern", "*.log");
-    childNode.put("fileExclusions", "csv");
-    childNode.put("disableDuplicate", "false");
-    childNode.put("disableConcurrency", "true");
-    childNode.put("lastModifiedLimitHours", "");
-    childNode.put("batchSize", "10");
-    childNode.set("schedulerExpression", prepareSchedulerNodeForScheduledTransfer());
-    childNode.put("description", "route has been created for scheduled test case");
-    ObjectNode root = mapper.createObjectNode();
-    root.put("createdBy", "sysadmin@synchronoss.com");
-    root.put("routeMetadata", new ObjectMapper().writeValueAsString(childNode));
-    root.put("status", 1);
-    return root;
-  }
 
   /**
    * This test-case is check the scenario to create a channel.
@@ -688,7 +663,7 @@ public class BatchIngestionIT extends BaseIT {
         .jsonPath().getLong("bisChannelSysId");
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
     String connectRouteUri =
-        BATCH_PATH + "/sftp/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
+        BATCH_PATH + "/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
     this.tearDownChannel();
   }
@@ -698,7 +673,9 @@ public class BatchIngestionIT extends BaseIT {
    */
   @Test
   public void transferData() throws JsonProcessingException {
-    ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/small");
+    ObjectNode routeMetadata = prepareRouteDataSetWithDuplicate(
+        "/root/saw-batch-samples/log/small");
+    routeMetadata.put("disableDuplicate", true);
     Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
         .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
         .getLong("bisChannelSysId");
@@ -711,18 +688,27 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-        .statusCode(200);
+    //given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    //    .statusCode(200);
     JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Request URL for transferData :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transfer data :" + path.prettyPrint());
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
-    assertEquals("SUCCESS", result);
-    String fileName = path.getString("logs[0].recdFileName");
+    
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
+    
+    JsonPath afterWaitPath = given(authSpec).when().get(
+        ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    String fileName = afterWaitPath.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
     assertNotNull(fileName);
+    String afterWaitStatus = afterWaitPath.getString("logs[0].mflFileStatus");
+    log.debug("Status of download : " + result);
+    
+    assertEquals("SUCCESS", afterWaitStatus);
     this.tearDownRoute();
     this.tearDownChannel();
     this.tearDownLogs();
@@ -730,19 +716,23 @@ public class BatchIngestionIT extends BaseIT {
 
   /**
    * This test-case is check the scenario to test the transfer data when duplicate file is not
-   * allowed disableDuplicate :false. filePattern : *.csv. disableDuplicate : false. And to simulate
+   * allowed disableDuplicate :true. filePattern : *.csv
+   * . And to simulate
    * the scenario, the API has been twice to make sure the file status to return as DUPLICATE
    * 
    * @throws IOException exception.
    */
   @Test
   public void transferDataDuplicateNotAllowed() throws IOException {
-    ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/small");
+    ObjectNode metaData = prepareRouteDataSetForTransferSchedule();
+    metaData.put("disableDuplicate", false);
     Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
         .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
         .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
+    
+    // First call as part this route is immediate transfer
+    ValidatableResponse response = given(authSpec).body(metaData).when().post(routeUri).then()
         .assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
     Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
@@ -750,10 +740,15 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-
-    // First call
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-        .statusCode(200);
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
+    // Second call explicit transfer call
+    // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    //     .statusCode(200);
+    try {
+      Thread.sleep(1 * 60 * 1000);
+    } catch (InterruptedException e) {
+      log.debug("Interrupted");
+    }
 
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
@@ -761,27 +756,15 @@ public class BatchIngestionIT extends BaseIT {
     log.debug(
         "Request URL for first transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for the first transfer data :" + caller1.prettyPrint());
-    String result1 = caller1.getString("logs[0].mflFileStatus");
-    log.debug("Status of download for the first transfer : " + result1);
+    String status = caller1.getString("logs[0].mflFileStatus");
+    String processState = caller1.getString("logs[0].bisProcessState");
     String fileName1 = caller1.getString("logs[0].recdFileName");
+   
     log.debug("Name of the downloaded file : " + fileName1);
-
-    // Second Call to simulate duplicate file
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-        .statusCode(200);
-    JsonPath caller2 = given(authSpec).when().get(LOGS_HISTORY_INTERNAL).then().assertThat()
-        .statusCode(200).extract().response().jsonPath();
-    log.debug("Request URL for second transfer data :" + LOGS_HISTORY_INTERNAL);
-    log.debug("Json Path for second transfer data :" + caller2.prettyPrint());
-
-    // This should have latest files because it will test
-    // the scenario of sorting in desc
-    log.debug("Status of download : " + caller2.getList("$").get(0));
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node =
-        (ObjectNode) mapper.readTree(mapper.writeValueAsString(caller2.getList("$").get(0)));
-    log.debug(node.get("bisProcessState").asText());
-    assertNotNull(node);
+    assertEquals("FAILED", status);
+    assertEquals("DUPLICATE", processState);
+   
+   
     this.tearDownRoute();
     this.tearDownChannel();
     this.tearDownLogs();
@@ -810,12 +793,14 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
-        .statusCode(200);
+    // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    //  .statusCode(200);
+    waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transferDataWithExclusion :" + caller1.prettyPrint());
+    
     String result1 = caller1.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result1);
     String fileName1 = caller1.getString("logs[0].recdFileName");
@@ -825,6 +810,7 @@ public class BatchIngestionIT extends BaseIT {
         .readTree(response.extract().body().jsonPath().getString("routeMetadata"));
     final String exclusion = routeData.get("fileExclusions").asText();
     String basePath = FilenameUtils.getFullPath(fileName1);
+    assertNotEquals("", basePath);
     log.debug("basePath :" + basePath);
     String extension = "*." + exclusion;
     log.debug("extension :" + extension);
@@ -868,7 +854,7 @@ public class BatchIngestionIT extends BaseIT {
     // First call
     given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
         .statusCode(200);
-
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
@@ -878,10 +864,11 @@ public class BatchIngestionIT extends BaseIT {
     String fileName1 = caller1.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName1);
 
+    // Second Call to simulate duplicate file
     given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
         .statusCode(200);
-
-    // Second Call to simulate duplicate file
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
+    
     JsonPath caller2 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
         .then().assertThat().statusCode(200).extract().response().jsonPath();
 
@@ -899,6 +886,7 @@ public class BatchIngestionIT extends BaseIT {
     final Boolean duplicate = Boolean.valueOf(routeData.get("disableDuplicate").asText());
     String processStatus = caller2.getString("logs[0].bisProcessState");
     assertTrue(duplicate.equals(Boolean.TRUE));
+    
     assertEquals("SUCCESS", result2);
     assertEquals("DATA_RECEIVED", processStatus);
     this.tearDownRoute();
@@ -945,7 +933,6 @@ public class BatchIngestionIT extends BaseIT {
    * This test case is temporary ignored due to build failures.
    * It will be reenabled as part of SIP-7169 after investigation
    */
-  @Ignore
   @Test
   public void transferDataSchedule() throws JsonProcessingException {
     ObjectNode routeMetadata = prepareRouteDataSetForTransferSchedule();
@@ -965,7 +952,7 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("routeId :" + routeId);
     log.debug("channelId :" + channelId);
     // Waiting for the data set to be available
-    waitForFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
+    this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     log.debug(
         "Request URL for transferDataSchedule :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
@@ -984,6 +971,7 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Json Path for wait for file to be available :" + jsonPath.prettify());
       assertEquals(true, jsonPath.getBoolean("status"));
     }
+    
     assertEquals("SUCCESS", result);
     this.tearDownRoute();
     this.tearDownChannel();
@@ -1010,6 +998,28 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Data has been downloaded");
     }
   }
+  
+  private void waitForSuccessFileTobeAvailable(int retries, Long channelId, Long routeId) {
+    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    log.debug("Json Path for transferDataSchedule :" + path.prettyPrint());
+    if (path.getList("logs").size() == 0 || !path.getString("logs[0].mflFileStatus")
+        .equals("SUCCESS")) {
+      if (retries == 0) {
+        throw new RuntimeException("Timed out waiting while waiting for dataset");
+      }
+      try {
+        Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+      } catch (InterruptedException e) {
+        log.debug("Interrupted");
+      }
+      log.debug("waitForFileTobeAvailable triggered with number of retries : " + retries);
+      waitForSuccessFileTobeAvailable(retries - 1, channelId, routeId);
+    } else {
+      log.debug("Data has been downloaded");
+    }
+  }
+  
 
 
   /**

@@ -57,7 +57,11 @@ public class NioFileProcessor implements FileProcessor{
 
   @Override
   public boolean deleteFile(String filePath, String defaultLoc, String user) throws IOException {
-   return new File(filePath).delete();
+    File fileDelete =new File(filePath);
+    boolean isFileDeleted = fileDelete.delete();
+    boolean isFolderDeleted = fileDelete.getParentFile().delete();
+    
+   return  isFileDeleted && isFolderDeleted;
   }
 
   @Override
