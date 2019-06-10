@@ -718,6 +718,7 @@ export class AnalyzeService {
         artifacts: [],
         booleanCriteria: 'AND',
         filters: [],
+        joins: [],
         sorts: [],
         store: {
           dataStore: null, // This is filled up when creating analysis

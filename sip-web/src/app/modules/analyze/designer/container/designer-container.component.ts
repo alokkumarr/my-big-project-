@@ -208,7 +208,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     }
     this.dslAnalysis$.subscribe(analysis => {
-      if (!analysis || ['report', 'esReport'].includes(analysisType)) {
+      if (!analysis || ['report'].includes(analysisType)) {
         return;
       }
       this.analysis = analysis;

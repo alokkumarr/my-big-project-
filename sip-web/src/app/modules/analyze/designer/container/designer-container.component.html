@@ -25,7 +25,6 @@
     [filters]="filters"
     [chartTitle]="chartTitle"
     [sipQuery]="analysis.sipQuery"
-    [sqlBuilder]="analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </single-table-designer-layout>
@@ -40,7 +39,7 @@
     [dataCount]="dataCount"
     [sorts]="sorts"
     [filters]="filters"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sqlBuilder]="analysis.sipQuery || analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </multi-table-designer-layout>
