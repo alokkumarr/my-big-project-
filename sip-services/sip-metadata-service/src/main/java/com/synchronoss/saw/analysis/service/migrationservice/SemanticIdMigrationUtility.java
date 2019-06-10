@@ -99,11 +99,7 @@ public class SemanticIdMigrationUtility {
                 }
                 break;
               }
-            } else {
-              System.out.println("Artifacts is not present");
             }
-          } else {
-            System.out.println("SipQuery not present");
           }
         }
       }
