@@ -476,13 +476,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
                         httpClientBuilder
                             .setDefaultCredentialsProvider(credentialsProvider))
                 .setRequestConfigCallback(
-                    new RestClientBuilder.RequestConfigCallback() {
-                      @Override
-                      public RequestConfig.Builder customizeRequestConfig(
-                          RequestConfig.Builder requestConfigBuilder) {
-                        return requestConfigBuilder.setConnectTimeout(5000).setSocketTimeout(60000);
-                      }
-                    })
+                    requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000).setSocketTimeout(60000))
                 .setMaxRetryTimeoutMillis(60000)
                 .build();
       } else {
@@ -514,13 +508,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
                         .setDefaultCredentialsProvider(credentialsProvider)
                         .setSSLContext(sslContext))
             .setRequestConfigCallback(
-                new RestClientBuilder.RequestConfigCallback() {
-                  @Override
-                  public RequestConfig.Builder customizeRequestConfig(
-                      RequestConfig.Builder requestConfigBuilder) {
-                    return requestConfigBuilder.setConnectTimeout(5000).setSocketTimeout(60000);
-                  }
-                })
+                requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(5000).setSocketTimeout(60000))
             .setMaxRetryTimeoutMillis(60000)
             .build();
 

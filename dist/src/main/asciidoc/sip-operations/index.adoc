@@ -421,8 +421,8 @@ file
                 sip_elasticsearch_keyStorePassword=<keystore password>
 
 SIP accepts JKS as keystore format, in case of any key format
- another like PEM key, Keys needs to be converted into jks format and
- configured
+another like PEM key, Keys needs to be converted into jks format and
+configured
 
 == Monitoring
 

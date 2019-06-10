@@ -55,6 +55,8 @@ elastic-search:
            storePassword: {{ sip_elasticsearch_keyStorePassword }}
 {% else %}
            sslEnabled: false
+           keyStorePath:
+           storePassword:
 {% endif %}
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
