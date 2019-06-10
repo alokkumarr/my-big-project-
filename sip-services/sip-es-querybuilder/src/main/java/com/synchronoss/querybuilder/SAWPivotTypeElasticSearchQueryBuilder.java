@@ -52,7 +52,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     this.jsonString = jsonString;
     this.timeOut = timeOut;
     this.client = client;
-    
+
   }
 
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut, HttpClient client) {
@@ -90,11 +90,11 @@ class SAWPivotTypeElasticSearchQueryBuilder {
         this.trustStore = trustStore;
         this.sslEnabled = sslEnabled;
 }
-  
+
     public String getDataSecurityString() {
     	return dataSecurityString;
     }
-    
+
     public String getJsonString() {
         return jsonString;
       }

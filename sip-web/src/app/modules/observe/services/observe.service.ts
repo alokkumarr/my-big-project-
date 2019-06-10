@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map as mapObservable } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Analysis, AnalysisDSL } from '../../analyze/types';
+import { AnalysisMapDSL } from '../../analyze/models';
+import { CUSTOM_HEADERS } from '../../../common/consts';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
@@ -10,7 +13,12 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as add from 'lodash/add';
 
-import { JwtService, MenuService } from '../../../common/services';
+import {
+  JwtService,
+  MenuService,
+  CommonSemanticService
+} from '../../../common/services';
+import { AnalyzeService } from '../../analyze/services/analyze.service';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../appConfig';
 import { BULLET_CHART_COLORS } from '../consts';
@@ -24,7 +32,9 @@ export class ObserveService {
     public jwt: JwtService,
     public router: Router,
     public route: ActivatedRoute,
-    public menu: MenuService
+    public menu: MenuService,
+    private semantic: CommonSemanticService,
+    private analyze: AnalyzeService
   ) {}
 
   addModelStructure(model) {
@@ -33,6 +43,44 @@ export class ObserveService {
         observe: [model]
       }
     };
+  }
+
+  /**
+   * Wraps analyze's readAnalysis. Tries to use new dsl GET api first.
+   * If it fails, tries to get old api result. This is because dashboards
+   * only store analysis id, and we don't know which are dsl or legacy.
+   *
+   * @param {string} id
+   * @returns {(Promise<Analysis | AnalysisDSL | AnalysisMapDSL>)}
+   * @memberof ObserveService
+   */
+  async readAnalysis(
+    id: string
+  ): Promise<Analysis | AnalysisDSL | AnalysisMapDSL> {
+    const skipToastHeader = {
+      [CUSTOM_HEADERS.SKIP_TOAST]: '1'
+    };
+    const analysis = await this.analyze.readAnalysis(id, true, skipToastHeader);
+
+    // If dsl analysis is successfully returned, use it
+    if (analysis) {
+      return analysis;
+    }
+
+    // Otherwise, try to get the analysis from legacy api
+    return this.analyze.readAnalysis(id, false, skipToastHeader);
+  }
+
+  getRequest<T>(path) {
+    return this.http.get<T>(`${this.api}/${path}`);
+  }
+
+  getMetricList$(): Observable<any[]> {
+    return this.semantic.getMetricList$();
+  }
+
+  getArtifactsForDataSet$(semanticId: string) {
+    return this.semantic.getArtifactsForDataSet$(semanticId);
   }
 
   /* Saves dashboard. If @model.entityId not present, uses create operation.
@@ -121,7 +169,7 @@ export class ObserveService {
     const payload = {
       globalFilters: [
         {
-          tableName: filter.tableName,
+          tableName: filter.tableName || filter.artifactsName,
           semanticId: filter.semanticId,
           filters: [
             {

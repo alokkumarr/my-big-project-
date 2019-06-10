@@ -27,7 +27,7 @@
       ></cron-job-schedular>
 
       <div class="form-container" fxLayout="column">
-        <div class="output-format" *ngIf="isReport">
+        <div class="output-format" *ngIf="isEligibleToZip">
           <label i18n>Output Format</label><br />
           <mat-radio-group
             [(ngModel)]="fileType"
@@ -37,6 +37,7 @@
             <mat-radio-button
               class="format-csv"
               value="csv"
+              *ngIf="data.analysis.type !== 'pivot'"
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
               >CSV</mat-radio-button
             >
@@ -46,6 +47,15 @@
               [attr.e2e]="'schedule-analysis-filetype-' + fileType"
               >XLSX</mat-radio-button
             >
+
+            <mat-checkbox
+              class="format-zip"
+              value="zip"
+              [(ngModel)]="zipFormatFlag"
+              [attr.e2e]="'schedule-analysis-filetype-' + fileType"
+            >
+              <strong>Zip/Compress the file</strong>
+            </mat-checkbox>
           </mat-radio-group>
         </div>
 

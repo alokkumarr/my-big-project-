@@ -44,18 +44,24 @@ export class AdminImportListComponent implements OnInit, OnChanges {
     this.validityChange.emit(true);
   }
 
+  getCategoryId(analysis: any) {
+    return analysis.hasOwnProperty('categoryId')
+      ? analysis.categoryId
+      : analysis.category;
+  }
+
   onChecked(row) {
     row.selection = !row.selection;
     const isValid = some(
       this.analyses,
       // tslint:disable-next-line:no-shadowed-variable
-      row => !row.noMetricInd && row.selection
+      row => !row.noMetricInd && !row.legacyInd && row.selection
     );
     if (row.selection) {
       this.areAllSelected = every(
         this.analyses,
         // tslint:disable-next-line:no-shadowed-variable
-        row => !row.noMetricInd && row.selection
+        row => !row.noMetricInd && !row.legacyInd && row.selection
       );
     } else {
       this.areAllSelected = false;
@@ -66,7 +72,7 @@ export class AdminImportListComponent implements OnInit, OnChanges {
   selectAll() {
     this.areAllSelected = !this.areAllSelected;
     forEach(this.analyses, row => {
-      if (!row.noMetricInd) {
+      if (!row.noMetricInd && !row.legacyInd) {
         row.selection = this.areAllSelected;
       }
     });

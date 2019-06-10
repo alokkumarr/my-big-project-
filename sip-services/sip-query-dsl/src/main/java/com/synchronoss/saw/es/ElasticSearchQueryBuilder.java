@@ -8,7 +8,6 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Filter.Type;
 import com.synchronoss.saw.model.Model;
-import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
@@ -42,14 +41,13 @@ public class ElasticSearchQueryBuilder {
   private static final String EPOCH_MILLIS = "epoch_millis";
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
-  String dataSecurityString;
   private static String appenderForGTLTE = "||/M";
 
-  public String buildDataQuery(SIPDSL sipdsl, Integer size)
+  public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
       throws IOException, ProcessingException {
-    SipQuery sipQuery = sipdsl.getSipQuery();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
+    DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
     if (size == null || size.equals(0)) size = 1000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
@@ -59,20 +57,14 @@ public class ElasticSearchQueryBuilder {
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
 
-    if (dataSecurityString != null && !dataSecurityString.trim().equals("")) {
-      DataSecurityKey dataSecurityKeyNode = buildDsk(dataSecurityString);
-    }
-
     // The below code to build filters
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
 
+      builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, builder);
       builder = buildFilters(filters, builder);
-
-      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder); TODO: Future
-      // Implementation
 
       boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
       searchSourceBuilder.query(boolQueryBuilder);
@@ -249,9 +241,8 @@ public class ElasticSearchQueryBuilder {
    */
   public List<QueryBuilder> buildFilters(List<Filter> filters, List<QueryBuilder> builder) {
     for (Filter item : filters) {
-      if (!item.getIsRuntimeFilter()
-          && item.getIsGlobalFilter() != null
-          && !item.getIsGlobalFilter()) {
+      if ((item.getIsRuntimeFilter() == null || !item.getIsRuntimeFilter())
+          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())) {
 
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
@@ -267,8 +258,9 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
-          } else if ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
-              || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND))) {
+          } else if ((item.getModel().getFormat() != null)
+              && ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
+                  || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
             if (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)) {
               logger.info("Filter format : epoch");
               logger.info("TimeStamp in Epoch(in seconds),Value " + item.getModel().getValue());
@@ -322,7 +314,8 @@ public class ElasticSearchQueryBuilder {
               builder.add(rangeQueryBuilder);
               logger.debug("Builder Obj : " + builder);
             }
-          } else if (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT)) {
+          } else if ((item.getModel().getFormat() != null)
+              && (item.getModel().getFormat().equalsIgnoreCase(ONLY_YEAR_FORMAT))) {
             DateFormat dateFormat = new SimpleDateFormat(EPOCH_TO_DATE_FORMAT);
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             GregorianCalendar startDate =
@@ -377,7 +370,8 @@ public class ElasticSearchQueryBuilder {
               /*In yyyy-MM format GT is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
                * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
                * */
-              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+              if ((item.getModel().getFormat() != null)
+                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
                 String date = item.getModel().getGt();
                 date = date + appenderForGTLTE;
                 rangeQueryBuilder.gt(date);
@@ -390,7 +384,8 @@ public class ElasticSearchQueryBuilder {
               /*In yyyy-MM format LTE is not working as elastic search is considing the date as yyyy-MM-01,so adding appenderForGTLTE
                * ref to github path for the solution https://github.com/elastic/elasticsearch/issues/24874
                * */
-              if (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM")) {
+              if ((item.getModel().getFormat() != null)
+                  && (item.getModel().getFormat().equalsIgnoreCase("yyyy-MM"))) {
                 String date = item.getModel().getLte();
                 date = date + appenderForGTLTE;
                 rangeQueryBuilder.lte(date);
@@ -410,10 +405,7 @@ public class ElasticSearchQueryBuilder {
         }
 
         if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType()
-                    .value()
-                    .toLowerCase()
-                    .equals(Filter.Type.INT.value().toLowerCase()))
+                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()
@@ -422,7 +414,9 @@ public class ElasticSearchQueryBuilder {
           builder = QueryBuilderUtil.numericFilter(item, builder);
         }
       }
-      if (item.getIsRuntimeFilter() && item.getModel() != null) {
+      if (item.getIsRuntimeFilter() != null
+          && item.getIsRuntimeFilter()
+          && item.getModel() != null) {
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
           if (item.getModel().getPreset() != null
@@ -451,10 +445,7 @@ public class ElasticSearchQueryBuilder {
           builder = QueryBuilderUtil.stringFilter(item, builder);
         }
         if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase())
-                || item.getType()
-                    .value()
-                    .toLowerCase()
-                    .equals(Filter.Type.INT.value().toLowerCase()))
+                || item.getType().value().toLowerCase().equals(Type.INTEGER.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
             || item.getType()
                 .value()

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SemanticNode {
@@ -476,4 +477,33 @@ public class SemanticNode {
       return this.value;
     }
   }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("statusMessage", statusMessage)
+            .append("type", type)
+            .append("_id", _id)
+            .append("id", id)
+            .append("createdBy", createdBy)
+            .append("updatedBy", updatedBy)
+            .append("parentDataSetNames", parentDataSetNames)
+            .append("parentDataSetIds", parentDataSetIds)
+            .append("customerCode", customerCode)
+            .append("projectCode", projectCode)
+            .append("dataSetId", dataSetId)
+            .append("groupByColumns", groupByColumns)
+            .append("sqlBuilder", sqlBuilder)
+            .append("saved", saved)
+            .append("username", username)
+            .append("dataSecurityKey", dataSecurityKey)
+            .append("module", module)
+            .append("metricName", metricName)
+            .append("supports", supports)
+            .append("artifacts", artifacts)
+            .append("esRepository", esRepository)
+            .append("repository", repository)
+            .append("additionalProperties", additionalProperties)
+            .toString();
+    }
 }

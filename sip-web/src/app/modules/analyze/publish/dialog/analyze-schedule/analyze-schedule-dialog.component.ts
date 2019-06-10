@@ -14,6 +14,7 @@ import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
+import { isDSLAnalysis } from '../../../designer/types';
 
 const SEMICOLON = 186;
 
@@ -72,10 +73,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   errorFlagMsg = false;
   loadCron = false;
   emailValidateFlag = false;
-  isReport: boolean;
+  isEligibleToZip: boolean;
   fileType: string;
   startDateCorrectFlag = true;
-
+  zipFormatFlag: boolean = false;
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -95,7 +96,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.fetchCronDetails();
     });
 
-    this.isReport = ['report', 'esReport'].includes(
+    this.isEligibleToZip = ['report', 'esReport', 'pivot'].includes(
       get(this.data.analysis, 'type')
     );
 
@@ -108,32 +109,43 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   onCategorySelected(value) {
-    this.data.analysis.categoryId = value;
+    if (isDSLAnalysis(this.data.analysis)) {
+      this.data.analysis.category = value;
+    } else {
+      this.data.analysis.categoryId = value;
+    }
   }
 
   setDefaultCategory() {
     const analysis = this.data.analysis;
-    if (!analysis.categoryId) {
+    const categoryPresent = isDSLAnalysis(analysis)
+      ? !!analysis.category
+      : !!analysis.categoryId;
+    if (!categoryPresent) {
       const defaultCategory = find(
         this.categories,
         category => category.children.length > 0
       );
 
       if (defaultCategory) {
-        analysis.categoryId = first(defaultCategory.children).id;
+        analysis[isDSLAnalysis(analysis) ? 'category' : 'categoryId'] = first(
+          defaultCategory.children
+        ).id;
       }
     }
   }
 
   fetchCronDetails() {
-    const { type, id, categoryId } = this.data.analysis;
+    const { type, id } = this.data.analysis;
     if (type !== 'chart') {
       this.getFTPLocations();
       this.getS3Locations();
     }
     const requestCron = {
       jobName: id,
-      categoryId: categoryId,
+      categoryId: isDSLAnalysis(this.data.analysis)
+        ? this.data.analysis.category
+        : this.data.analysis.categoryId,
       groupName: this.token.ticket.custCode
     };
     this._analyzeService.getCronDetails(requestCron).then(
@@ -218,10 +230,13 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     const analysis = this.data.analysis;
     this.scheduleState = 'delete';
     analysis.schedule = {
-      categoryId: analysis.categoryId,
+      categoryId: isDSLAnalysis(analysis)
+        ? +analysis.category
+        : analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
-      scheduleState: this.scheduleState
+      scheduleState: this.scheduleState,
+      zip: this.zipFormatFlag
     };
     this.triggerSchedule();
   }
@@ -239,7 +254,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           .local()
           .format();
       }
-
       analysis.schedule = {
         scheduleState: this.scheduleState,
         activeRadio: crondetails.activeRadio,
@@ -251,15 +265,18 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         emailList: this.emails,
         ftp: this.ftp,
         s3: this.s3Bucket,
+        zip: this.zipFormatFlag,
         fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,
         metricName: analysis.metricName,
         type: analysis.type,
-        userFullName: analysis.userFullName,
+        userFullName: analysis.userFullName || analysis.createdBy,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
-        categoryID: analysis.categoryId,
+        categoryID: isDSLAnalysis(analysis)
+          ? analysis.category
+          : analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };
       this.triggerSchedule();

@@ -1,6 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Analysis, Sort, isDSLAnalysis, AnalysisDSL } from './../../../analyze/types';
 import { GridsterItem } from 'angular-gridster2';
 import { BehaviorSubject } from 'rxjs';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
 
 import {
   AnalyzeService,
@@ -16,6 +19,7 @@ import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 export class ObservePivotComponent implements OnInit {
   public artifactColumns: Array<any> = [];
   public data: any;
+  public sorts: Sort;
 
   @Input() analysis: any;
   @Input() item: GridsterItem;
@@ -25,7 +29,8 @@ export class ObservePivotComponent implements OnInit {
   constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
-    this.artifactColumns = [...this.analysis.artifacts[0].columns];
+    this.artifactColumns = this.configureArtifacts((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
+    this.sorts = isDSLAnalysis(this.analysis) ? this.analysis.sipQuery.sorts : this.analysis.sqlBuilder.sorts;
     if (this.analysis._executeTile === false) {
       return;
     }
@@ -33,11 +38,20 @@ export class ObservePivotComponent implements OnInit {
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
       .then(
         ({ data }) => {
-          this.data = flattenPivotData(data, this.analysis.sqlBuilder);
+          this.data = flattenPivotData(data, (<AnalysisDSL>this.analysis).sipQuery || (<Analysis>this.analysis).sqlBuilder);
         },
         err => {
           throw err;
         }
       );
+  }
+
+  configureArtifacts(fields) {
+    return fpPipe(
+      fpMap(value => {
+          value.checked = true;
+          return value;
+      })
+    )(fields);
   }
 }

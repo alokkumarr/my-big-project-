@@ -1,0 +1,885 @@
+{
+  "contents": {
+    "keys": [
+      {
+        "customerCode": "SYNCHRONOSS",
+        "module": "ANALYZE",
+        "id": "58add38e-857d-40af-a5e7-9a5d78142655",
+        "type": "map"
+      }
+    ],
+    "action": "update",
+    "analyze": [
+      {
+        "metricName": "ATT Orders Data",
+        "semanticId": "attordersdata0001",
+        "type": "map",
+        "chartType": "chart_scale",
+        "name": "Geo Map Migration ]Test",
+        "description": "",
+        "scheduled": null,
+        "supports": [
+          {
+            "category": "map",
+            "children": [
+              {
+                "icon": "icon-geo-chart",
+                "label": "Choropleth map",
+                "type": "map:chart"
+              }
+            ],
+            "label": "Geo Location"
+          }
+        ],
+        "statusMessage": "Entity has retrieved successfully",
+        "id": "58add38e-857d-40af-a5e7-9a5d78142655",
+        "createdBy": "sawadmin@synchronoss.com",
+        "customerCode": "SYNCHRONOSS",
+        "projectCode": "workbench",
+        "saved": true,
+        "username": "sawadmin@synchronoss.com",
+        "module": "ANALYZE",
+        "artifacts": [
+          {
+            "artifactName": "order_data",
+            "columns": [
+              {
+                "aliasName": "STATE_NAME",
+                "columnName": "STATE_NAME.keyword",
+                "displayName": "STATE_NAME",
+                "filterEligible": true,
+                "geoType": "state:name",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "STATE_NAME",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "SERVICE_CITY",
+                "columnName": "SERVICE_CITY.keyword",
+                "displayName": "SERVICE_CITY",
+                "filterEligible": true,
+                "geoType": "city:name",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "SERVICE_CITY",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ORDER_END_TIMESTAMP",
+                "columnName": "ORDER_END_TIMESTAMP",
+                "displayName": "ORDER_END_TIMESTAMP",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_END_TIMESTAMP",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORD_CNLD_GT",
+                "columnName": "ORD_CNLD_GT",
+                "displayName": "ORD_CNLD_GT",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": true,
+                "name": "ORD_CNLD_GT",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "ORD_OM_STATUS",
+                "columnName": "ORD_OM_STATUS.keyword",
+                "displayName": "ORD_OM_STATUS",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORD_OM_STATUS",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_STATUS_DATE",
+                "columnName": "PRODUCT_STATUS_DATE",
+                "displayName": "PRODUCT_STATUS_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_STATUS_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_RECEIVED_DATE",
+                "columnName": "ORDER_RECEIVED_DATE",
+                "displayName": "ORDER_RECEIVED_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_RECEIVED_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_CLASSIFICATION",
+                "columnName": "ORDER_CLASSIFICATION.keyword",
+                "displayName": "ORDER_CLASSIFICATION",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_CLASSIFICATION",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ENR_LOCATION_ADDRESS",
+                "columnName": "ENR_LOCATION_ADDRESS.keyword",
+                "displayName": "ENR_LOCATION_ADDRESS",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ENR_LOCATION_ADDRESS",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PARTNER",
+                "columnName": "PARTNER.keyword",
+                "displayName": "PARTNER",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PARTNER",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_GROUP_NAME",
+                "columnName": "PRODUCT_GROUP_NAME.keyword",
+                "displayName": "PRODUCT_GROUP_NAME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_GROUP_NAME",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_CNT",
+                "columnName": "PRODUCT_CNT",
+                "displayName": "PRODUCT_CNT",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": true,
+                "name": "PRODUCT_CNT",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "AFFILIATE_DISPLAY_NAME",
+                "columnName": "AFFILIATE_DISPLAY_NAME.keyword",
+                "displayName": "AFFILIATE_DISPLAY_NAME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "AFFILIATE_DISPLAY_NAME",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "BANDWIDTH_BUCKET",
+                "columnName": "BANDWIDTH_BUCKET.keyword",
+                "displayName": "BANDWIDTH_BUCKET",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "BANDWIDTH_BUCKET",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_END_TIMESTAMP",
+                "columnName": "PRODUCT_END_TIMESTAMP",
+                "displayName": "PRODUCT_END_TIMESTAMP",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_END_TIMESTAMP",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "REC_KEY",
+                "columnName": "REC_KEY.keyword",
+                "displayName": "REC_KEY",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "REC_KEY",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "FULFILLMENT_INDICATOR",
+                "columnName": "FULFILLMENT_INDICATOR.keyword",
+                "displayName": "FULFILLMENT_INDICATOR",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "FULFILLMENT_INDICATOR",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "BUNDLE_TYPE",
+                "columnName": "BUNDLE_TYPE.keyword",
+                "displayName": "BUNDLE_TYPE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "BUNDLE_TYPE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "REGION",
+                "columnName": "REGION.keyword",
+                "displayName": "REGION",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "REGION",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_COMPLETION_TIME",
+                "columnName": "PRODUCT_COMPLETION_TIME",
+                "displayName": "PRODUCT_COMPLETION_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_COMPLETION_TIME",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "CHANNEL",
+                "columnName": "CHANNEL.keyword",
+                "displayName": "CHANNEL",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "CHANNEL",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "SERVICE_LEVEL_DESC",
+                "columnName": "SERVICE_LEVEL_DESC.keyword",
+                "displayName": "SERVICE_LEVEL_DESC",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "SERVICE_LEVEL_DESC",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ORDER_RECEIVED_TIMESTAMP",
+                "columnName": "ORDER_RECEIVED_TIMESTAMP",
+                "displayName": "ORDER_RECEIVED_TIMESTAMP",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_RECEIVED_TIMESTAMP",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_STATUS_DATE",
+                "columnName": "ORDER_STATUS_DATE",
+                "displayName": "ORDER_STATUS_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_STATUS_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "REASON_DESC",
+                "columnName": "REASON_DESC.keyword",
+                "displayName": "REASON_DESC",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "REASON_DESC",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "CUSTOMER_TYPE",
+                "columnName": "CUSTOMER_TYPE.keyword",
+                "displayName": "CUSTOMER_TYPE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "CUSTOMER_TYPE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PROD_OM_STATUS",
+                "columnName": "PROD_OM_STATUS.keyword",
+                "displayName": "PROD_OM_STATUS",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PROD_OM_STATUS",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_DISPLAY_NAME",
+                "columnName": "PRODUCT_DISPLAY_NAME.keyword",
+                "displayName": "PRODUCT_DISPLAY_NAME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_DISPLAY_NAME",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "MOVE_PRODUCT_TYPE",
+                "columnName": "MOVE_PRODUCT_TYPE.keyword",
+                "displayName": "MOVE_PRODUCT_TYPE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "MOVE_PRODUCT_TYPE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "CON_SMB",
+                "columnName": "CON_SMB.keyword",
+                "displayName": "CON_SMB",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "CON_SMB",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "STATUS_DESC",
+                "columnName": "STATUS_DESC.keyword",
+                "displayName": "STATUS_DESC",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "STATUS_DESC",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "SERVICE_ZIPCODE",
+                "columnName": "SERVICE_ZIPCODE.keyword",
+                "displayName": "SERVICE_ZIPCODE",
+                "filterEligible": true,
+                "geoType": "zip",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "SERVICE_ZIPCODE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PROCESSING_DATE",
+                "columnName": "PROCESSING_DATE",
+                "displayName": "PROCESSING_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PROCESSING_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "REC_STATE",
+                "columnName": "REC_STATE",
+                "displayName": "REC_STATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "REC_STATE",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "AUTOMATION_INDICATOR",
+                "columnName": "AUTOMATION_INDICATOR.keyword",
+                "displayName": "AUTOMATION_INDICATOR",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "AUTOMATION_INDICATOR",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_CANCELLATION_TIME",
+                "columnName": "PRODUCT_CANCELLATION_TIME",
+                "displayName": "PRODUCT_CANCELLATION_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_CANCELLATION_TIME",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "PRODUCT_DESC",
+                "columnName": "PRODUCT_DESC.keyword",
+                "displayName": "PRODUCT_DESC",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_DESC",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_END_QUARTER_KEY",
+                "columnName": "PRODUCT_END_QUARTER_KEY.keyword",
+                "displayName": "PRODUCT_END_QUARTER_KEY",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_END_QUARTER_KEY",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "SERVICE_STATE",
+                "columnName": "SERVICE_STATE.keyword",
+                "displayName": "SERVICE_STATE",
+                "filterEligible": true,
+                "geoType": "state:postal-code",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "SERVICE_STATE",
+                "table": "order_data",
+                "type": "string",
+                "area": "x",
+                "checked": true,
+                "areaIndex": 0,
+                "region": {
+                  "name": "United States of America",
+                  "path": "countries/us/us-all.geo.json"
+                }
+              },
+              {
+                "aliasName": "INSTALL_DATE",
+                "columnName": "INSTALL_DATE",
+                "displayName": "INSTALL_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "INSTALL_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "EVER_PENDING_INSTALL",
+                "columnName": "EVER_PENDING_INSTALL.keyword",
+                "displayName": "EVER_PENDING_INSTALL",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "EVER_PENDING_INSTALL",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "PRODUCT_STATUS_TIME",
+                "columnName": "PRODUCT_STATUS_TIME",
+                "displayName": "PRODUCT_STATUS_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_STATUS_TIME",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "PRODUCT_STATUS_START_DATE",
+                "columnName": "PRODUCT_STATUS_START_DATE",
+                "displayName": "PRODUCT_STATUS_START_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_STATUS_START_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_COMPLETION_TIME",
+                "columnName": "ORDER_COMPLETION_TIME",
+                "displayName": "ORDER_COMPLETION_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_COMPLETION_TIME",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "ORDER_TYPE",
+                "columnName": "ORDER_TYPE.keyword",
+                "displayName": "ORDER_TYPE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_TYPE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ORDER_RECEIVED_MONTH_KEY",
+                "columnName": "ORDER_RECEIVED_MONTH_KEY.keyword",
+                "displayName": "ORDER_RECEIVED_MONTH_KEY",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_RECEIVED_MONTH_KEY",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "START_DATE",
+                "columnName": "START_DATE",
+                "displayName": "START_DATE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "START_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_CNT",
+                "columnName": "ORDER_CNT",
+                "displayName": "ORDER_CNT",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": true,
+                "name": "ORDER_CNT",
+                "table": "order_data",
+                "type": "double",
+                "area": "y",
+                "checked": true,
+                "aggregate": "sum",
+                "areaIndex": 1
+              },
+              {
+                "aliasName": "PRODUCT_TYPES",
+                "columnName": "PRODUCT_TYPES.keyword",
+                "displayName": "PRODUCT_TYPES",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_TYPES",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "REGION_GROUP",
+                "columnName": "REGION_GROUP.keyword",
+                "displayName": "REGION_GROUP",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "REGION_GROUP",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "STATE_CODE",
+                "columnName": "STATE_CODE.keyword",
+                "displayName": "STATE_CODE",
+                "filterEligible": true,
+                "geoType": "state:postal-code",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "STATE_CODE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ORDER_CANCELLATION_TIME",
+                "columnName": "ORDER_CANCELLATION_TIME",
+                "displayName": "ORDER_CANCELLATION_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_CANCELLATION_TIME",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "LOCALE",
+                "columnName": "LOCALE.keyword",
+                "displayName": "LOCALE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "LOCALE",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "DIFF_DAYS",
+                "columnName": "DIFF_DAYS",
+                "displayName": "DIFF_DAYS",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "DIFF_DAYS",
+                "table": "order_data",
+                "type": "integer",
+                "area": "y",
+                "checked": true,
+                "aggregate": "sum",
+                "areaIndex": 0
+              },
+              {
+                "aliasName": "ORD_CNLD_LTE",
+                "columnName": "ORD_CNLD_LTE",
+                "displayName": "ORD_CNLD_LTE",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORD_CNLD_LTE",
+                "table": "order_data",
+                "type": "integer"
+              },
+              {
+                "aliasName": "PRODUCT_CATEGORY",
+                "columnName": "PRODUCT_CATEGORY.keyword",
+                "displayName": "PRODUCT_CATEGORY",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "PRODUCT_CATEGORY",
+                "table": "order_data",
+                "type": "string"
+              },
+              {
+                "aliasName": "ORDER_STATUS_START_DATE",
+                "columnName": "ORDER_STATUS_START_DATE",
+                "displayName": "ORDER_STATUS_START_DATE",
+                "filterEligible": true,
+                "format": "yyyy-MM-dd",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_STATUS_START_DATE",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "ORDER_STATUS_TIME",
+                "columnName": "ORDER_STATUS_TIME",
+                "displayName": "ORDER_STATUS_TIME",
+                "filterEligible": true,
+                "format": "yyyy-MM-dd HH:mm:ss",
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "ORDER_STATUS_TIME",
+                "table": "order_data",
+                "type": "date"
+              },
+              {
+                "aliasName": "LAST_REFRESH_TIME",
+                "columnName": "LAST_REFRESH_TIME",
+                "displayName": "LAST_REFRESH_TIME",
+                "filterEligible": true,
+                "include": true,
+                "joinEligible": false,
+                "kpiEligible": false,
+                "name": "LAST_REFRESH_TIME",
+                "table": "order_data",
+                "type": "date"
+              }
+            ]
+          }
+        ],
+        "esRepository": {
+          "indexName": "order_data",
+          "storageType": "ES",
+          "type": "order_record"
+        },
+        "userFullName": "system sncr admin",
+        "category": "orders",
+        "createdTimestamp": 1555048407626,
+        "userId": 1,
+        "sqlBuilder": {
+          "booleanCriteria": "AND",
+          "filters": [
+            {
+              "type": "integer",
+              "tableName": "order_data",
+              "isOptional": false,
+              "columnName": "DIFF_DAYS",
+              "isRuntimeFilter": false,
+              "isGlobalFilter": false,
+              "model": {
+                "operator": "GTE",
+                "value": 1
+              }
+            },
+            {
+              "type": "date",
+              "tableName": "order_data",
+              "isOptional": false,
+              "columnName": "INSTALL_DATE",
+              "isRuntimeFilter": false,
+              "isGlobalFilter": false,
+              "model": {
+                "preset": "NA",
+                "lte": "2019-04-12",
+                "gte": "2016-01-01"
+              }
+            }
+          ],
+          "sorts": [
+            {
+              "tableName": "order_data",
+              "aggregate": "sum",
+              "columnName": "ORDER_CNT",
+              "type": "double",
+              "order": "desc"
+            },
+            {
+              "tableName": "order_data",
+              "columnName": "SERVICE_STATE.keyword",
+              "type": "string",
+              "order": "desc"
+            }
+          ],
+          "dataFields": [
+            {
+              "aggregate": "sum",
+              "alias": "DIFF_DAYS",
+              "checked": "y",
+              "columnName": "DIFF_DAYS",
+              "name": "DIFF_DAYS",
+              "displayName": "DIFF_DAYS",
+              "table": "order_data",
+              "tableName": "order_data",
+              "type": "integer"
+            },
+            {
+              "aggregate": "sum",
+              "alias": "ORDER_CNT",
+              "checked": "y",
+              "columnName": "ORDER_CNT",
+              "name": "ORDER_CNT",
+              "displayName": "ORDER_CNT",
+              "table": "order_data",
+              "tableName": "order_data",
+              "type": "double"
+            }
+          ],
+          "nodeFields": [
+            {
+              "alias": "SERVICE_STATE",
+              "checked": "x",
+              "columnName": "SERVICE_STATE.keyword",
+              "name": "SERVICE_STATE.keyword",
+              "displayName": "SERVICE_STATE",
+              "table": "order_data",
+              "tableName": "order_data",
+              "type": "string",
+              "geoType": "state:postal-code",
+              "region": {
+                "name": "United States of America",
+                "path": "countries/us/us-all.geo.json"
+              }
+            }
+          ]
+        },
+        "mapSettings": {
+          "mapStyle": "mapbox://styles/mapbox/streets-v9"
+        },
+        "edit": false,
+        "categoryId": 5,
+        "updatedTimestamp": 1555048952189,
+        "updatedUserName": "system sncr admin",
+        "isScheduled": "false"
+      }
+    ]
+  }
+}

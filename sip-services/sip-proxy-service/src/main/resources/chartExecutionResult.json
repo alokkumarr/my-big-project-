@@ -1,0 +1,125 @@
+{
+  "queryBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [
+      {
+        "type": "date",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "date",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "preset": "LY"
+        }
+      },
+      {
+        "type": "string",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "string.keyword",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "modelValues": [
+            "str"
+          ],
+          "operator": "CONTAINS"
+        }
+      },
+      {
+        "type": "double",
+        "tableName": "sample",
+        "isOptional": false,
+        "columnName": "double",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "operator": "GTE",
+          "value": 1
+        }
+      }
+    ],
+    "sorts": [
+      {
+        "order": "desc",
+        "columnName": "date",
+        "type": "date"
+      },
+      {
+        "tableName": "sample",
+        "aggregate": "sum",
+        "columnName": "double",
+        "type": "double",
+        "order": "desc"
+      }
+    ],
+    "dataFields": [
+      {
+        "aggregate": "sum",
+        "alias": "",
+        "checked": "y",
+        "columnName": "double",
+        "name": "double",
+        "comboType": "column",
+        "displayName": "Double",
+        "table": "sales",
+        "tableName": "sales",
+        "type": "double",
+        "chartType": "column"
+      },
+      {
+        "aggregate": "sum",
+        "alias": "",
+        "checked": "y",
+        "columnName": "float",
+        "name": "float",
+        "comboType": "column",
+        "displayName": "Float",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "float",
+        "chartType": "column"
+      },
+      {
+        "aggregate": "sum",
+        "alias": "",
+        "checked": "y",
+        "columnName": "integer",
+        "name": "integer",
+        "comboType": "column",
+        "displayName": "Integer",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "integer",
+        "chartType": "column"
+      },
+      {
+        "aggregate": "sum",
+        "alias": "Long",
+        "checked": "y",
+        "columnName": "long",
+        "name": "long",
+        "comboType": "column",
+        "displayName": "Long",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "long",
+        "chartType": "column"
+      }
+    ],
+    "nodeFields": [
+      {
+        "alias": "",
+        "checked": "x",
+        "columnName": "date",
+        "name": "date",
+        "displayName": "Date",
+        "table": "sample",
+        "tableName": "sample",
+        "type": "date",
+        "dateFormat": "MMM d YYYY"
+      }
+    ]
+  }
+}

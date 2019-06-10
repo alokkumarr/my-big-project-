@@ -7,26 +7,24 @@ import {
   EventEmitter
 } from '@angular/core';
 import { CdkDragDrop, CdkDrag } from '@angular/cdk/drag-drop';
-import { Subject, Observable } from 'rxjs';
-import { takeWhile, last } from 'rxjs/operators';
+import { Subject, Observable, Subscription } from 'rxjs';
+import { takeWhile, last, tap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 
-import * as isEmpty from 'lodash/isEmpty';
+import * as findIndex from 'lodash/findIndex';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
 import * as reduce from 'lodash/reduce';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
-import { DesignerService } from '../../designer.service';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
 import { getArtifactColumnGeneralType } from '../../utils';
 import {
   IDEsignerSettingGroupAdapter,
-  Artifact,
   ArtifactColumn,
-  ArtifactColumns,
   Filter,
   DesignerChangeEvent
 } from '../../types';
+import { AnalyzeService } from '../../../services/analyze.service';
 import { DesignerState } from '../../state/designer.state';
 import {
   DesignerInitGroupAdapters,
@@ -50,29 +48,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   @Input() analysisSubtype: string;
   @Input() filters: Filter[];
   public groupAdapters: IDEsignerSettingGroupAdapter[];
-  public artifactColumns: ArtifactColumns;
-  private _dndSubscription;
-  @Input('artifacts')
-  public set setArtifactColumns(artifacts: Artifact[]) {
-    if (!isEmpty(artifacts)) {
-      this.artifactColumns = artifacts[0].columns;
-    }
-    this.nameMap = reduce(
-      artifacts,
-      (acc, artifact: Artifact) => {
-        acc[artifact.artifactName] = reduce(
-          artifact.columns,
-          (accum, col: ArtifactColumn) => {
-            accum[col.columnName] = col.displayName;
-            return accum;
-          },
-          {}
-        );
-        return acc;
-      },
-      {}
-    );
-  }
+  private subscriptions: Subscription[] = [];
 
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
     IDEsignerSettingGroupAdapter[]
@@ -89,9 +65,9 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
   constructor(
-    private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService,
-    private _store: Store
+    private _store: Store,
+    private analyzeService: AnalyzeService
   ) {
     this._changeSettingsDebounced = debounce(
       this._changeSettingsDebounced,
@@ -100,16 +76,10 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._store.dispatch(
-      new DesignerInitGroupAdapters(
-        this.artifactColumns,
-        this.analysisType,
-        this.analysisSubtype
-      )
-    );
-    this._dndSubscription = this._dndPubsub.subscribe(
-      this.onDndEvent.bind(this)
-    );
+    this._store.dispatch(new DesignerInitGroupAdapters());
+    this.subscribeToMetrics();
+    const subscription = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
+    this.subscriptions.push(subscription);
     this.groupAdapters$.subscribe(adapters => {
       this.canAcceptMap = reduce(
         adapters,
@@ -123,12 +93,25 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this._dndSubscription.unsubscribe();
+  subscribeToMetrics() {
+    const subscription = this._store
+      .select(state => state.designerState.metric)
+      .pipe(
+        tap(metric => {
+          this.nameMap = this.analyzeService.calcNameMap(metric.artifacts);
+        })
+      )
+      .subscribe();
+    this.subscriptions.push(subscription);
   }
 
-  getDisplayName(filter: Filter) {
-    return this.nameMap[filter.tableName][filter.columnName];
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  getDisplayName(filter) {
+    const table = filter.artifactsName || filter.tableName;
+    return this.nameMap[table][filter.columnName] || [filter.columnName];
   }
 
   onDndEvent(event: DndEvent) {
@@ -159,11 +142,21 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     artifactColumn: ArtifactColumn,
     groupAdapter: IDEsignerSettingGroupAdapter
   ) {
-    this._designerService.removeArtifactColumnFromGroup(
-      artifactColumn,
-      groupAdapter
+    artifactColumn.aliasName = '';
+    const columnIndex = findIndex(
+      groupAdapter.artifactColumns,
+      ({ columnName }) => artifactColumn.columnName === columnName
+    );
+    const adapterIndex = this.groupAdapters.indexOf(groupAdapter);
+    this._store.dispatch(
+      new DesignerRemoveColumnFromGroupAdapter(columnIndex, adapterIndex)
     );
     this.onFieldsChange();
+    // this._designerService.removeArtifactColumnFromGroup(
+    //   artifactColumn,
+    //   groupAdapter
+    // );
+    // this.onFieldsChange();
   }
 
   onFieldsChange() {

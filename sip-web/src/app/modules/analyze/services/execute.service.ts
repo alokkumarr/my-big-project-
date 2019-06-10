@@ -53,7 +53,7 @@ export class ExecuteService {
       });
   }
 
-  doExecute(analysis, mode = EXECUTION_MODES.LIVE) {
+  doExecute(analysis, mode = EXECUTION_MODES.PUBLISH) {
     const id = analysis.id;
     const exec$ = new BehaviorSubject<IExecuteEvent>({
       state: EXECUTION_STATES.EXECUTING
@@ -62,7 +62,6 @@ export class ExecuteService {
       id,
       subject: exec$
     });
-
     this._analyzeService.applyAnalysis(analysis, mode, { take: 25 }).then(
       response => {
         exec$.next({

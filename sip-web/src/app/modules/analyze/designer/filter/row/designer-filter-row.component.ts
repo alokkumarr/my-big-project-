@@ -59,7 +59,6 @@ export class DesignerFilterRowComponent implements OnInit {
       map(value => (typeof value === 'string' ? value : value.displayName)),
       map(name => (name ? this.nameFilter(name) : this.artifactColumns.slice()))
     );
-
     if (this.filter.isRuntimeFilter) {
       delete this.filter.model;
     }
@@ -128,6 +127,6 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   displayWith(artifactColumn) {
-    return artifactColumn ? artifactColumn.displayName : '';
+    return artifactColumn ? artifactColumn.displayName: '';
   }
 }

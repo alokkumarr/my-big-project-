@@ -15,7 +15,7 @@
           <mat-select
             class="publish-select"
             (selectionChange)="onCategorySelected($event.value)"
-            [value]="data.analysis.categoryId"
+            [value]="categoryId"
           >
             <mat-optgroup
               *ngFor="let category of categories"
