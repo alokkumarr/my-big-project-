@@ -241,7 +241,7 @@ public class AnalysisController {
       }
       return analysisService.getAnalysisByCategory(categoryId, authTicket);
     } else {
-      throw new SipAuthorizationException(100001,"Category");
+      throw new SipAuthorizationException("You are not authorized to view this Category");
     }
   }
 }
