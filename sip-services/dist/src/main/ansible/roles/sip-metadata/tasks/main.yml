@@ -41,3 +41,13 @@
 - meta: flush_handlers
 - name: Enable SIP Metadata Service
   systemd: name=sip-metadata-proxy.socket enabled=true state=started
+# Create migration directroy under /opt/. The result of analysis migration
+# will be written into this directory.
+- name: Create migration directory
+  file:
+    path: /opt/migration
+    state: directory
+    owner: mapr
+    group: mapr
+    mode: "0666"
+    recurse: yes

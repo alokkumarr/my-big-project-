@@ -11,13 +11,12 @@
     </ng-template>
     <perfect-scrollbar [config]="config">
       <designer-data-option-field
-        *ngFor="let col of selectedColumns"
+        *ngFor="let col of selectedColumns; trackBy: selectedColsTrackByFn"
         (change)="change.emit($event)"
         [artifactColumn]="col"
         [analysisType]="analysisType"
-        [sqlBuilder]="sqlBuilder"
+        [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
-        [fieldCount]="fieldCount"
       >
       </designer-data-option-field>
     </perfect-scrollbar>

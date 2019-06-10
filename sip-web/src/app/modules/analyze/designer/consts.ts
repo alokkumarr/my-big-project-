@@ -23,11 +23,26 @@ export enum DesignerStates {
 }
 
 export const DEFAULT_MAP_SETTINGS: MapSettings = {
-  mapStyle: 'mapbox://styles/mapbox/streets-v9'
+  mapStyle: 'mapbox://styles/mapbox/streets-v9',
+  mapType: 'chart_scale',
+  labelOptions: {
+    enabled: false,
+    value: ''
+  },
+  legend: {
+    align: 'right',
+    layout: 'vertical'
+  }
 };
 
-export const MAP_STYLES = ['basic', 'streets', 'bright', 'light', 'dark', 'satellite']
-  .map(style => ({
-    label: startCase(style),
-    value: `mapbox://styles/mapbox/${style}-v9`
-  }));
+export const MAP_STYLES = [
+  'basic',
+  'streets',
+  'bright',
+  'light',
+  'dark',
+  'satellite'
+].map(style => ({
+  label: startCase(style),
+  value: `mapbox://styles/mapbox/${style}-v9`
+}));

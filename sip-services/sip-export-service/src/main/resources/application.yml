@@ -39,6 +39,14 @@ analysis:
     ftpExportSize: 100000
     s3ExportSize: 1000000
 
+proxy:
+    service:
+        host: http://localhost:9800
+
+metadata:
+  service:
+    host: http://localhost:9501
+
 published:
   path: /tmp
 

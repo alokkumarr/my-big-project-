@@ -6,14 +6,17 @@ import {
   AnalysisDialogData,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   DesignerMode,
   Sort,
   Filter,
   IToolbarActionData,
   Artifact,
-  Format
+  Format,
+  isDSLAnalysis
 } from '../types';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
+import { Store } from '@ngxs/store';
 import {
   DesignerFilterDialogComponent,
   DesignerFilterDialogData
@@ -26,7 +29,7 @@ import { ConfirmDialogData } from '../../../common/types';
 
 @Injectable()
 export class AnalyzeDialogService {
-  constructor(public dialog: MatDialog, private router: Router) {}
+  constructor(public dialog: MatDialog, private router: Router,  private _store: Store) {}
 
   openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
     const data: AnalysisDialogData = {
@@ -46,8 +49,13 @@ export class AnalyzeDialogService {
 
   openAnalysisDialog(data: AnalysisDialogData) {
     const mode = data.designerMode || 'new';
-    const analysisStarter = <any>(data.analysisStarter || {});
-    const analysis = data.analysis ? { analysisId: data.analysis.id } : {};
+    const analysisStarter = data.analysisStarter || {};
+    const analysis = data.analysis
+      ? {
+          analysisId: data.analysis.id,
+          isDSLAnalysis: !!(data.analysis as any).sipQuery
+        }
+      : {};
 
     return this.router.navigate(['analyze/designer'], {
       queryParams: {
@@ -95,10 +103,12 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterPromptDialog(filters, analysis) {
+  openFilterPromptDialog(filters, analysis: Analysis | AnalysisDSL) {
     const data: DesignerFilterDialogData = {
       filters,
-      artifacts: analysis.artifacts,
+      artifacts: isDSLAnalysis(analysis)
+        ? this._store.selectSnapshot(state => state.common.metrics[analysis.semanticId]).artifacts
+        : analysis.artifacts,
       isInRuntimeMode: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
@@ -109,7 +119,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openPreviewDialog(analysis: Analysis) {
+  openPreviewDialog(analysis: Analysis | AnalysisDSL) {
     const data = {
       analysis
     };
@@ -152,7 +162,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSaveDialog(analysis: Analysis, designerMode) {
+  openSaveDialog(analysis: Analysis | AnalysisDSL, designerMode) {
     const data = {
       action: 'save',
       analysis,

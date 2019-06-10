@@ -1,16 +1,8 @@
-import {
-  ArtifactColumnReport,
-  Artifact,
-  Sort
-} from '../../../models';
+import { ArtifactColumnReport, Artifact, Sort } from '../../../models';
 
 export interface ReportGridChangeEvent {
-  subject: 'format' | 'aliasName' | 'removeColumn' | 'visibleIndex' | 'aggregate';
+  subject: 'format' | 'alias' | 'removeColumn' | 'visibleIndex' | 'aggregate';
   column?: ArtifactColumnReport;
 }
 
-export {
-  ArtifactColumnReport,
-  Artifact,
-  Sort
-};
+export { ArtifactColumnReport, Artifact, Sort };

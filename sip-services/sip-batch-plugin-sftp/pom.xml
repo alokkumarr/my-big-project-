@@ -31,7 +31,7 @@
 		<common.io>2.6</common.io>
 		<sshd.core>1.4.0</sshd.core>
 		<compress>1.18</compress>
-		<mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
+		<mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
 	</properties>
 	<repositories>
 		<repository>

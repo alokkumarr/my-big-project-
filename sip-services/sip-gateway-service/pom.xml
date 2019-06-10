@@ -29,11 +29,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.synchronoss.bda.sip</groupId>
-			<artifactId>sip-common-components</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
@@ -61,6 +56,11 @@
 	    <groupId>io.micrometer</groupId>
 	    <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
+	<dependency>
+		<groupId>com.synchronoss.bda.sip</groupId>
+		<artifactId>sip-common-components</artifactId>
+		<version>${revision}</version>
+	</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>

@@ -18,13 +18,13 @@ public class CronJob extends QuartzJobBean implements InterruptableJob{
 	private volatile boolean toStopFlag = true;
 
 	protected final static String JOB_DATA_MAP_ID="JOB_DATA_MAP";
-	
+
 	@Autowired
 	JobService jobService;
 
 	@Autowired
 	AnalysisService analysisService;
-	
+
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		JobDetail jobDetail =
@@ -34,8 +34,14 @@ public class CronJob extends QuartzJobBean implements InterruptableJob{
 				+ " , Thread Name :"+Thread.currentThread().getName() + " ,Time now :"+new Date());
 		SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-        analysisService.executeAnalysis(job.getAnalysisID());
-        analysisService.scheduleDispatch(job);
+    boolean isDslScheduled =  job.getType() != null && (job.getType().equalsIgnoreCase("pivot")
+        || job.getType().equalsIgnoreCase("chart"));
+    if (isDslScheduled) {
+			analysisService.executeDslAnalysis(job.getAnalysisID());
+		} else {
+			analysisService.executeAnalysis(job.getAnalysisID());
+		}
+		analysisService.scheduleDispatch(job);
 		/**
          *  For retrieving stored key-value pairs
          */

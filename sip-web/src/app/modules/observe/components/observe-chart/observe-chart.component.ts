@@ -66,7 +66,7 @@ export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE)
       .then(
         ({ data }) => {
-          const parsedData = flattenChartData(data, this.analysis.sqlBuilder);
+          const parsedData = flattenChartData(data, this.analysis.sipQuery);
           this.data = parsedData;
           return parsedData;
         },
