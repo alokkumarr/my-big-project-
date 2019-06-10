@@ -3,10 +3,18 @@ info:
 spring:
   application:
     name: saw-sechduler-service
-  #mariaDB (metadata) DB details
+
   datasource:
-    #The MariaDB instances are in the saw-security Ansible group.
+
+    {% if sip_secure %}
+
+    url: jdbc:mariadb://{% for host in groups['saw-security'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/saw_scheduler?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&verifyServerCertificate=true&useSSL=true&requireSSL=true&trustCertificateKeyStoreUrl=file:{{ store_path }}/{{ ansible_host }}/truststore.jks&trustCertificateKeyStorePassword={{sip_keystore_password}}&disableSslHostnameVerification=true
+
+    {% else %}
+
     url: jdbc:mariadb://{% for host in groups['saw-security'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/saw_scheduler
+    {% endif %}
+
     username: saw_scheduler
     password: {{ saw_scheduler_db_password }}
     driver-class-name: org.mariadb.jdbc.Driver
@@ -83,4 +91,6 @@ connector: http
 
 saw-analysis-service-url: ${connector}://localhost:9200/analysis
 saw-dispatch-service-url: ${connector}://localhost:9400/exports
+sip-metadata-service-url: http://localhost:9501/dslanalysis
+sip-analysis-proxy-url: http://localhost:9800/internal/proxy/storage
 bis-transfer-url: ${connector}://localhost:9903/ingestion/batch/sftp/channel/transfers/data

@@ -1,9 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as forEach from 'lodash/forEach';
-import * as set from 'lodash/set';
-import * as orderBy from 'lodash/orderBy';
-import * as get from 'lodash/get';
-import * as map from 'lodash/map';
 import * as fpGet from 'lodash/fp/get';
 
 import { map as mapObservable, first } from 'rxjs/operators';
@@ -18,9 +13,7 @@ const ANALYZE_MODULE_NAME = 'ANALYZE';
 interface MetricResponse {
   data: { contents: Array<{}> };
 }
-interface AnalysisResponse {
-  data: { contents: { analyze: any[] } };
-}
+
 interface DashboardResponse {
   data: { contents: { observe: any[] } };
 }
@@ -31,31 +24,6 @@ export class ExportService {
     public _adminService: AdminService,
     public _jwtService: JwtService
   ) {}
-
-  getAnalysesByCategoryId(categoryId: number | string): Observable<any[]> {
-    const customerCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
-    const params = {
-      contents: {
-        action: 'search',
-        keys: [
-          {
-            customerCode,
-            module: ANALYZE_MODULE_NAME,
-            categoryId: categoryId.toString()
-          }
-        ]
-      }
-    };
-    return this._adminService
-      .request<AnalysisResponse>('analysis', params, { forWhat: 'export' })
-      .pipe(
-        first(),
-        mapObservable(fpGet('contents.analyze')),
-        mapObservable(analyses =>
-          orderBy(analyses, ['createdTimestamp'], ['desc'])
-        )
-      );
-  }
 
   getDashboardsForCategory(categoryId): Observable<any[]> {
     const userId = this._jwtService.getUserId();
@@ -84,31 +52,7 @@ export class ExportService {
     return this.getMetricList$().toPromise();
   }
 
-  getAnalysisByMetricIds(metricIds) {
-    const customerCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
-    const params = {
-      contents: {
-        action: 'export',
-        keys: map(metricIds, metricId => ({
-          customerCode,
-          module: ANALYZE_MODULE_NAME,
-          semanticId: metricId
-        }))
-      }
-    };
-    return this._adminService
-      .request<AnalysisResponse>('analysis', params, { forWhat: 'export' })
-      .pipe(mapObservable(fpGet(`contents.analyze`)))
-      .toPromise();
-  }
-
-  getRequestParams(params = []) {
-    const reqParams = this._jwtService.getRequestParams();
-
-    set(reqParams, 'contents.keys.[0].module', ANALYZE_MODULE_NAME);
-    forEach(params, tuple => {
-      set(reqParams, tuple[0], tuple[1]);
-    });
-    return reqParams;
+  getAnalysesByCategoryId(subCategoryId: number | string) {
+    return this._adminService.getAnalysesByCategoryId(subCategoryId);
   }
 }

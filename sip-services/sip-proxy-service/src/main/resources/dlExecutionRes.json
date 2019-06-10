@@ -1,0 +1,57 @@
+{
+  "queryBuilder": {
+    "booleanCriteria": "AND",
+    "filters": [
+    ],
+    "orderByColumns": [
+    ],
+    "dataFields": [
+      {
+        "tableName": "SALES",
+        "columns": [
+          {
+            "aliasName": "",
+            "columnName": "float",
+            "displayName": "Float",
+            "filterEligible": true,
+            "joinEligible": false,
+            "name": "float",
+            "table": "sales",
+            "type": "float",
+            "format": {
+              "precision": 2
+            },
+            "visibleIndex": 0,
+            "aggregate": "count"
+          },
+          {
+            "aliasName": "MYCOL",
+            "columnName": "date",
+            "displayName": "Date",
+            "filterEligible": true,
+            "joinEligible": false,
+            "name": "date",
+            "table": "sales",
+            "type": "date",
+            "format": "yyyy-MM-dd",
+            "visibleIndex": 1
+          },
+          {
+            "aliasName": "",
+            "columnName": "integer",
+            "displayName": "Integer",
+            "filterEligible": true,
+            "joinEligible": false,
+            "name": "integer",
+            "table": "sample",
+            "type": "integer",
+            "visibleIndex": 2,
+            "aggregate": "percentage"
+          }
+        ]
+      }
+    ],
+    "joins": [
+    ]
+  }
+}

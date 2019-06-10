@@ -7,10 +7,11 @@ import * as isArray from 'lodash/isArray';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpGet from 'lodash/fp/get';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import { Observable, isObservable, Subject } from 'rxjs';
 
-import { AnalysisChart, SqlBuilderChart } from '../../../types';
+import { AnalysisChart } from '../../../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { MapDataService } from '../../../../common/components/charts/map-data.service';
 
@@ -32,16 +33,16 @@ export class MapChartViewerComponent {
 
   @Input()
   set analysis(analysis: AnalysisChart) {
-    const { dataFields, nodeFields } = analysis.sqlBuilder as SqlBuilderChart;
     this._fields = fpPipe(
-      fpFlatMap(x => x),
-      fpGroupBy('checked'),
+      fpGet('sipQuery.artifacts'),
+      fpFlatMap(artifact => artifact.fields),
+      fpGroupBy('area'),
       fpMapValues(([field]) => field)
-    )([dataFields, nodeFields]);
+    )(analysis);
 
     const xField = this._fields.x;
-    if (xField.region) {
-      this._mapData = this._mapDataService.getMapData(xField.region);
+    if (xField.geoRegion) {
+      this._mapData = this._mapDataService.getMapData(xField.geoRegion);
       this.setSeries();
     }
 

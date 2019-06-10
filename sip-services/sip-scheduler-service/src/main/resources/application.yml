@@ -19,13 +19,6 @@ spring:
   flyway:
     baseline-on-migrate: true
 
-logging:
-  level:
-    com.synchronoss.saw.scheduler: INFO
-    org.springframework: INFO
-    org.hibernate.type : INFO
-    org.quartz: TRACE
-
 server:
   address: localhost
   port: 9601
@@ -77,6 +70,8 @@ sip:
    
      
 saw-analysis-service-url: http://localhost:9200/analysis
+sip-metadata-service-url: http://localhost:9501/dslanalysis
+sip-analysis-proxy-url: http://localhost:9800/internal/proxy/storage
 saw-dispatch-service-url: http://localhost:9400/exports
 bis-transfer-url: http://localhost:9642/ingestion/batch/sftp/channel/transfers/data
        

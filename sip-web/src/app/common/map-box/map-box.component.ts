@@ -11,12 +11,15 @@ import last from 'lodash/last';
 import split from 'lodash/split';
 import reduce from 'lodash/reduce';
 import get from 'lodash/get';
+import fpGroupBy from 'lodash/fp/groupBy';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
+import fpFlatMap from 'lodash/fp/flatMap';
 import fpFilter from 'lodash/fp/filter';
 import fpToPairs from 'lodash/fp/toPairs';
 import { environment } from '../../../environments/environment';
 import { MarkerDataPoint } from './types';
+import { AGGREGATE_TYPES_OBJ } from '../consts';
 
 @Component({
   selector: 'map-box',
@@ -36,9 +39,13 @@ export class MapBoxComponent implements OnChanges {
     this.mapStyle = settings.mapStyle;
   }
 
-  @Input('sqlBuilder') set setSqlBuilder(sqlBuilder) {
-    this.coordinateField = first(sqlBuilder.nodeFields);
-    this.dataFields = sqlBuilder.dataFields;
+  @Input('sipQuery') set setSipQuery(sipQuery) {
+    const groupedFields = fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpGroupBy('area')
+    )(sipQuery.artifacts);
+    this.coordinateField = first(groupedFields.x);
+    this.dataFields = groupedFields.y;
   }
 
   @Input() data: any[];
@@ -89,7 +96,7 @@ export class MapBoxComponent implements OnChanges {
 
     // set center if possible
     if (features.length > 0) {
-      const centerIndex = features.length / 2;
+      const centerIndex = Math.ceil(features.length / 2);
       this.center = features[centerIndex].geometry['coordinates'];
     }
   }
@@ -114,22 +121,22 @@ export class MapBoxComponent implements OnChanges {
       },
       {}
     );
-    return map(data, datum => {
-      const coordinatesKey = coordinateField.columnName;
+    return map(data, (datum, index) => {
+      const [coordinatesKey] = split(coordinateField.columnName, '.');
       const [lng, lat] = split(datum[coordinatesKey], ',');
       const lnglat = [parseFloat(lng), parseFloat(lat)];
       const aggregates: MarkerDataPoint = fpPipe(
         fpToPairs,
         fpFilter(([key]) => key !== coordinatesKey),
         fpMap(([key, value]) => {
-          const alias = get(fieldsMap, `${key}.alias`);
-          const displayName = get(fieldsMap, `${key}.displayName`);
-          const aggregate: MarkerDataPoint = {
+          const { alias, displayName, aggregate } = get(fieldsMap, key);
+          const aggregateFun = AGGREGATE_TYPES_OBJ[aggregate].designerLabel;
+          const label = alias ? alias : `${aggregateFun}(${displayName})`;
+          return {
             key,
             value,
-            label: alias || displayName
+            label
           };
-          return aggregate;
         })
       )(datum);
 

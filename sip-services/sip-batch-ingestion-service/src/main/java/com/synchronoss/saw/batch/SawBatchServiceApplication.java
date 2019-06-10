@@ -27,7 +27,6 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-
 @EnableJpaAuditing
 @EnableIntegration
 @EnableAsync

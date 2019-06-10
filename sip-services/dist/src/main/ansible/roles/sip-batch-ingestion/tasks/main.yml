@@ -4,7 +4,7 @@
 - name: Install SAW Batch Ingestion package
   yum: name=/tmp/saw-batch-ingestion.rpm state=present
   notify:
-    - restart saw-batch-ingestion
+    - restart sip-batch-ingestion
 - name: Migrate Batch Service database password from old location
   fetch:
     src: /etc/bda/saw-batch-ingestion-db-password
@@ -28,7 +28,7 @@
 - name: Install SAW Batch Ingestion Service configuration file
   template: src=application.yml dest=/opt/bda/saw-batch-ingestion-service/conf
   notify:
-    - restart saw-batch-ingestion
+    - restart sip-batch-ingestion
 
 - name: Set the SAW Batch Ingestion Service database password
   copy:

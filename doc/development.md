@@ -54,14 +54,15 @@ integration tests can run.
 
 To build and run the full SAW system locally in development mode,
 execute the following commands to start SAW in Docker containers:
+Note: `-Dsip-cloud-secure=False or -Dsip-cloud-secure=True`. This is necessary to activate & deactivate http/https
 
         $ cd sip
-        $ mvn package
+        $ mvn package -Dsip-cloud-secure=False
         $ mvn -Ddocker-start=local
 
 SAW also Support data-lake report execution with YARN.
 To run SAW system locally with YARN execute the following commands:
-           
+
         $ cd sip
         $ mvn package
         $ mvn -Ddocker-start=local -Dsaw.yarn.enabled=true
@@ -78,7 +79,7 @@ at [http://localhost/](http://localhost/).
 To list running containers, execute the following command:
 
         $ docker ps
-        
+
 All SIP containers are named according to the pattern `sip-*`, for
 example `sip-admin`, `sip-app1` and so on.  (The `sip-app` containers
 have a numeric suffix, because there can be multiple of them in high
@@ -264,7 +265,7 @@ integration:
 
 1. Provision the environment according to the requirements in the
    "Installing and Configuring" section of the [SIP Operations Guide]
-   
+
 2. Create a `sip` user on nodes of the environment, to be used for
    executing the deployment.  Add `sip ALL=(ALL) NOPASSWD:ALL` to
    `/etc/sudoers.d/sip`, to ensure the deployment has needed
@@ -291,7 +292,7 @@ To make a release of the project, execute the following steps:
 1. Identify the Git revision to be used for the release.  This will
    typically be `origin/master` after all required pull requests have
    been merged.
-   
+
 2. Update your local repository to include the latest merges for the
    remote master branch:
 

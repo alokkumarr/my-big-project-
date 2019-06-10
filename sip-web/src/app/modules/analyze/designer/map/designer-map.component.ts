@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 })
 export class DesignerMapComponent implements OnInit {
   data: Array<any>;
-  sqlBuilder;
+  sipQuery;
   auxSettings: any = {};
 
   public chartOptions = {};
@@ -16,9 +16,9 @@ export class DesignerMapComponent implements OnInit {
 
   @Input() actionBus;
 
-  @Input('sqlBuilder')
-  set setSqlBuilder(sqlBuilder) {
-    this.sqlBuilder = sqlBuilder;
+  @Input('sipQuery')
+  set setSipQuery(sipQuery) {
+    this.sipQuery = sipQuery;
   }
 
   @Input('auxSettings')
@@ -34,8 +34,5 @@ export class DesignerMapComponent implements OnInit {
     this.data = d;
   }
 
-  ngOnInit() {
-
-  }
-
+  ngOnInit() {}
 }

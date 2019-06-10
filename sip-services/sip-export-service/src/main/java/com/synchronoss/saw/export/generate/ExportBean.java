@@ -1,6 +1,7 @@
 package com.synchronoss.saw.export.generate;
 
 import com.synchronoss.saw.export.model.DataField;
+import com.synchronoss.saw.model.Field;
 
 public class ExportBean {
 	
@@ -13,6 +14,7 @@ public class ExportBean {
 	private String publishDate;
 	private String createdBy;
 	private String fileType;
+	private Field.Type[] columnFieldDataType;
 
     /**
      *
@@ -152,5 +154,19 @@ public class ExportBean {
 	 */
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	/**
+	 * @return the columnFieldDataType
+	 */
+	public Field.Type[] getColumnFieldDataType() {
+		return columnFieldDataType;
+	}
+
+	/**
+	 * @param columnFieldDataType the columnFieldDataType to set
+	 */
+	public void setColumnFieldDataType(Field.Type[] columnFieldDataType) {
+		this.columnFieldDataType = columnFieldDataType;
 	}
 }

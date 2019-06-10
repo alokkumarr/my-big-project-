@@ -11,17 +11,21 @@
       <div class="filter__list">
         <designer-filter-row
           *ngFor="
-            let filter of groupedFilters[artifact.artifactName];
+            let filter of groupedFilters[
+              artifact.artifactName || artifact.artifactsName
+            ];
             let i = index;
             trackBy: trackByIndex
           "
-          (removeRequest)="removeFilter(i, artifact.artifactName)"
+          (removeRequest)="
+            removeFilter(i, artifact.artifactName || artifact.artifactsName)
+          "
           (filterChange)="onFilterChange()"
           (filterModelChange)="onFilterModelChange()"
           [filter]="filter"
           [supportsGlobalFilters]="data.supportsGlobalFilters"
           [isInRuntimeMode]="data.isInRuntimeMode"
-          [artifactColumns]="artifact.columns"
+          [artifactColumns]="artifact.columns || artifact.fields"
         >
         </designer-filter-row>
       </div>

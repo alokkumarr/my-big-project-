@@ -41,6 +41,10 @@
          the old SIP version is installed before installing the new
          version, to simulate upgrading the environment.  -->
     <sip.upgrade.skip>true</sip.upgrade.skip>
+    <!-- This is to control where the cloud environment
+    to be activated secure or not. Default value is set to False
+    -->
+    <sip.cloud.secure>${sip-cloud-secure}</sip.cloud.secure>
   </properties>
   <dependencies>
     <dependency>
@@ -108,7 +112,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf</artifactId>
       <version>${project.version}</version>
@@ -151,7 +155,7 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency> --> 
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
@@ -654,7 +658,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/sip/web/ --suite=${saw.e2e.suite}</arguments>
+              <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite} --isHttps=${sip.cloud.secure}</arguments>
             </configuration>
           </execution>
            <execution>
@@ -883,7 +887,17 @@
         <directory>src/test/resources-filtered</directory>
         <filtering>true</filtering>
       </testResource>
+      <testResource>
+        <directory>${basedir}/src/test/docker-admin/sip-deploy/resources</directory>
+        <includes>
+            <include>sip-config</include>
+        </includes>
+        <filtering>true</filtering>
+        <targetPath>${basedir}/src/test/docker-admin/sip-deploy</targetPath>
+      </testResource>
     </testResources>
+
+
   </build>
   <repositories>
     <repository>

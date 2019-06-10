@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { NgxsModule } from '@ngxs/store';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -57,6 +58,7 @@ import { DashboardService } from './services/dashboard.service';
 import { CommonModuleTs } from '../../common';
 import { FirstDashboardGuard } from './guards';
 import { ZoomAnalysisComponent } from './components/zoom-analysis/zoom-analysis.component';
+import { ObserveState } from './state/observe.state';
 
 const components = [
   ObservePageComponent,
@@ -86,6 +88,7 @@ const GUARDS = [FirstDashboardGuard];
   imports: [
     AngularCommonModule,
     RouterModule.forChild(routes),
+    NgxsModule.forFeature([ObserveState]),
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,

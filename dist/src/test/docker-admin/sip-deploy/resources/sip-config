@@ -8,7 +8,7 @@ ansible_user=root
 ansible_ssh_pass=root
 
 # The below parameter should made active if we want to  environment to be active
-sip_secure=False
+sip_secure=${sip.cloud.secure}
 # The EPEL is installed in the SIP container base images, so mark it
 # as provided
 sip_epel_yum_provided=true
@@ -44,7 +44,7 @@ saw_spark_master_url=local[*]
 #saw_spark_master_url=yarn
 #saw_spark_yarn_queue_regular=saw-regular
 #saw_spark_yarn_queue_fast=saw-fast
-#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.2.1/jars
+#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.3.2/jars
 #saw_spark_yarn_zips=/opt/saw/service/spark.zip
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=sip-mapr
@@ -121,13 +121,7 @@ saw_publish_rows_limit=10000
 saw_executor_restart_threshold=50
 
 # FTP JSON config
-# ##########################################
-#
-#
-# DO NOT SPLIT THIS INTO MULTIPLE LINES
-#
-#
-# ##########################################
+# (Do not split this into multiple lines)
 ## FTP host should be setup in docker instance itself but for timing being we are setting the external FTP enviroment for testing.
 ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}]}'
 
@@ -154,6 +148,7 @@ sip-app2
 
 [saw-security:vars]
 saw_security_email_host=sip-admin
+
 
 [saw-security-arbitrator]
 sip-app3

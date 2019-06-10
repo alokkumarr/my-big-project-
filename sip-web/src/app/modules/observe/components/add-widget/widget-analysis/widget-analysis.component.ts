@@ -76,7 +76,6 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
     this.analyze.getAnalysesFor(id.toString()).then(
       result => {
         this.showProgress = false;
-
         this.analyses = filter(
           result,
           analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)

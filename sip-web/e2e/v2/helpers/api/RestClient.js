@@ -59,6 +59,27 @@ class RestClient {
       return null;
     }
   }
+    put(url, payload, token) {
+    logger.info('making put call to url :' + url);
+    logger.debug('put call payload :' + JSON.stringify(payload));
+    logger.silly('Api call token :' + token);
+    let headers = {};
+    if (token) {
+      headers['Authorization'] = token;
+    }
+    let response = request('PUT', url, {
+      headers: headers,
+      json: payload
+    });
+    if (response.statusCode === 200) {
+      let data = JSON.parse(response.getBody());
+      logger.debug('put call response-->' + JSON.stringify(data))
+      return data;
+    } else {
+      logger.error('put call failed with status code:' + response.statusCode + ' url: ' + url + ' with response ->' + JSON.stringify(response) + ',Hence returning null');
+      return null;
+    }
+  }
 }
 
 module.exports = RestClient;

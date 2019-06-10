@@ -22,7 +22,7 @@ export interface ArtifactColumn {
     | 'count'
     | 'distinctCount'
     | 'percentage'
-    | 'percentageByRow';
+    | 'percentagebyrow';
   name?: string;
   geoType?: string;
 }
@@ -35,7 +35,7 @@ export interface ArtifactColumnChart extends ArtifactColumn {
   dateFormat?: string;
   dateInterval?: string;
   geoType?: string;
-  region?: Region;
+  geoRegion?: Region;
 }
 
 export interface ArtifactColumnPivot extends ArtifactColumn {

@@ -17,6 +17,7 @@ export interface Schedule {
   emailList?: string[];
   ftp?: string[];
   s3?: string[];
+  zip: boolean;
   fileType?: string;
   endDate?: string;
   timezone?: string;
@@ -24,6 +25,6 @@ export interface Schedule {
   type?: string;
   userFullName?: string;
   jobScheduleTime?: string;
-  categoryID?: number;
+  categoryID?: any;
   jobGroup?: string;
 }

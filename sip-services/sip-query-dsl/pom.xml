@@ -70,4 +70,38 @@
       <version>2.9.6</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!--<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.18</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <configuration>
+              <configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml
+              </configLocation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <violationSeverity>warning</violationSeverity>
+              &lt;!&ndash; Exclude files that were added before Checkstyle was enabled.  Gradually
+                make also these files conform to checkstyle rules and remove the exclusions &ndash;&gt;
+             &lt;!&ndash; <excludes>**/observe/model/Observe.java,**/semantic/model/request/SemanticNode.java
+                ,**/semantic/model/request/BinarySemanticNode.java</excludes>&ndash;&gt;
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+    </plugins>
+  </build>
 </project>

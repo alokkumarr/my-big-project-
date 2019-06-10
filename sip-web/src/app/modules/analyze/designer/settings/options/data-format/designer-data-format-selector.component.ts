@@ -27,7 +27,9 @@ export class DesignerDataFormatSelectorComponent implements OnInit {
   public isFloat: boolean;
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.changeNumberSample();
+  }
 
   changeNumberSample() {
     const format = this.artifactColumn.format;

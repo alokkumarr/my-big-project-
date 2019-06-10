@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Store } from '@ngxs/store';
 import {
   COMBO_TYPES,
   COMBO_TYPES_OBJ,
@@ -10,6 +11,7 @@ import {
   DesignerChangeEvent,
   ArtifactColumnChart
 } from '../../../types';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
 
 @Component({
   selector: 'designer-combo-type-selector',
@@ -22,6 +24,8 @@ export class DesignerComboTypeSelectorComponent {
   @Input() public comboTypes;
 
   public enablePercentByRow = true;
+
+  constructor(private _store: Store) {}
 
   /**
    * asChartColumn - Typecasts artifact column to ArtifactColumnChart
@@ -36,8 +40,26 @@ export class DesignerComboTypeSelectorComponent {
 
   onComboTypeChange(comboType) {
     this.enablePercentByRow = comboType === 'column' ? true : false;
-    (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
+    const { table, columnName } = this.artifactColumn;
+    this._store.dispatch(
+      new DesignerUpdateArtifactColumn({
+        table,
+        columnName,
+        displayType: comboType
+      })
+    );
     this.change.emit({ subject: 'comboType', column: this.artifactColumn });
+  }
+
+  get comboType(): string {
+    if (!this.artifactColumn) {
+      return '';
+    }
+
+    return (
+      (<ArtifactColumnChart>this.artifactColumn).comboType ||
+      (<any>this.artifactColumn).displayType
+    );
   }
 
   getComboIcon(comboType) {

@@ -21,12 +21,14 @@ const GEO_TYPES_WITH_IDENTIFIER = {
 };
 export const GEO_TYPES = fpPipe(
   fpToPairs,
-  fpFlatMap(([geoType, identifiers]) => map(identifiers, identifier => {
-    if (!identifier) {
-      return geoType;
-    }
-    return `${geoType}:${identifier}`;
-  }))
+  fpFlatMap(([geoType, identifiers]) =>
+    map(identifiers, identifier => {
+      if (!identifier) {
+        return geoType;
+      }
+      return `${geoType}:${identifier}`;
+    })
+  )
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
@@ -64,6 +66,51 @@ export const CHART_COLORS = [
   '#C47373',
   '#DFB2B2'
 ];
+
+export const PIVOT_DATE_FORMATS = [
+  {
+    label: 'Default',
+    value: 'yyyy-MM-dd',
+    momentValue: 'YYYY-MM-DD'
+  },
+  {
+    label: 'September 1, 2017',
+    value: 'MMMM d, yyyy',
+    momentValue: 'MMMM D, YYYY'
+  },
+  {
+    label: '09/01/2017 (MM/DD/YYYY)',
+    value: 'MM/dd/yyyy',
+    momentValue: 'MM/DD/YYYY'
+  },
+  {
+    label: '01/09/2017 (DD/MM/YYYY)',
+    value: 'dd/MM/yyyy',
+    momentValue: 'DD/MM/YYYY'
+  },
+  {
+    label: 'September 2017',
+    value: 'MMMM yyyy',
+    momentValue: 'MMMM YYYY'
+  },
+  {
+    label: 'September 1',
+    value: 'MMMM d',
+    momentValue: 'MMMM D'
+  },
+  {
+    label: '09/01/2017 11:20:36',
+    value: 'MM/dd/yyyy HH:mm:ss',
+    momentValue: 'MM/DD/YYYY HH:mm:ss'
+  }
+];
+
+export const DEFAULT_PIVOT_DATE_FORMAT = PIVOT_DATE_FORMATS[0];
+
+export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(PIVOT_DATE_FORMATS);
 
 export const DATE_FORMATS = [
   {
@@ -117,22 +164,27 @@ export const DATE_FORMATS_OBJ = fpPipe(
 export const CHART_DATE_FORMATS = [
   {
     value: 'MMMM d YYYY, h:mm:ss a',
+    groupInterval: 'day',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {
     value: 'MMM d YYYY',
+    groupInterval: 'day',
     label: ' Sep 1st 2017'
   },
   {
     value: 'MMM YYYY',
+    groupInterval: 'month',
     label: 'September 2017'
   },
   {
     value: 'MM YYYY',
+    groupInterval: 'month',
     label: '09 2017'
   },
   {
     value: 'YYYY',
+    groupInterval: 'year',
     label: '2017'
   }
 ];
@@ -184,7 +236,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Distinct Count',
     designerLabel: 'CNTD',
-    value: 'distinctCount',
+    value: 'distinctcount',
     icon: 'icon-Count',
     type: 'long',
     valid: ['chart', 'pivot', 'report', 'esReport', 'map']
@@ -200,7 +252,7 @@ export const AGGREGATE_TYPES = [
   {
     label: 'Percentage By Row',
     designerLabel: 'PCTR',
-    value: 'percentageByRow',
+    value: 'percentagebyrow',
     icon: 'icon-Percentage',
     type: 'float',
     valid: ['chart']
@@ -237,19 +289,6 @@ export const AGGREGATE_TYPES = [
   //   type: 'float',
   //   valid: ['chart']
   // }
-];
-
-export const AGGREGATE_STRING_TYPES = [
-  {
-    label: 'Count',
-    value: 'count',
-    icon: 'icon-Count'
-  },
-  {
-    label: 'Distinct Count',
-    value: 'distinctCount',
-    icon: 'icon-Count'
-  }
 ];
 
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
