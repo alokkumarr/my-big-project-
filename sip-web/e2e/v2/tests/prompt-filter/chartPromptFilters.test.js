@@ -110,7 +110,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             chartType
           );
           expect(analysis).toBeTruthy();
-          analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
+          analysisId = analysis.id;
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
           const header = new Header();
