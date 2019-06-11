@@ -2,7 +2,7 @@
   "EDITDELETEALERTS": {
     "alerts": {
       "ALERT001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 1 ",
@@ -40,7 +40,7 @@
         "description": "User should be able to create and add alerts."
       },
       "ALERT003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 3",
@@ -59,7 +59,7 @@
         "description": "admin should be able to create and add alerts."
       },
       "ALERT004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 4",
@@ -78,7 +78,7 @@
         "description": "User should be able to create and add alerts ."
       },
       "ALERT005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 5",
@@ -96,7 +96,6 @@
         },
         "description": "User should be able to create and add alerts ."
       },
-
 
       "ALERT006": {
         "suites": ["smoke", "sanity", "critical", "regression"],
@@ -118,7 +117,7 @@
         "description": "Admin should be able to create and add alerts."
       },
       "ALERT007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 7",
@@ -137,7 +136,7 @@
         "description": "User should be able to create and add alerts."
       },
       "ALERT008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 8",
@@ -156,7 +155,7 @@
         "description": "admin should be able to create and add alerts."
       },
       "ALERT009": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 9",
@@ -175,7 +174,7 @@
         "description": "User should be able to create and add alerts ."
       },
       "ALERT010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["smoke", "sanity", "regression"],
         "user": "admin",
         "editAlertInfo": {
           "alertName": "name 10",
