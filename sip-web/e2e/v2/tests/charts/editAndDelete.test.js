@@ -27,7 +27,6 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
   const yAxisName2 = 'Long';
   const groupName = 'Date';
   const sizeByName = 'Float';
-  const xAxisName = 'Date';
 
   let analysisId;
   let editedAnalysisId;
