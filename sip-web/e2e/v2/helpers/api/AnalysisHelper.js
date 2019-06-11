@@ -241,7 +241,6 @@ class AnalysisHelper {
       analysisType === Constants.CHART || analysisType == Constants.PIVOT
         ? createAnalysisResponse.analysisId
         : createAnalysisResponse.contents.analyze[0].id;
-    logger.error('analysisId----' + id);
     //Update analysis with fields
     let currentTimeStamp = new Date().getTime();
     let user = users.masterAdmin;
