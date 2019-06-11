@@ -2,7 +2,11 @@
 object BIS_CHANNEL
 object BIS_ROUTE
 object BIS_LOGS
+object BIS_JOB
 BIS_CHANNEL o-- "n" BIS_ROUTE : "1..n"
 BIS_LOGS *-- BIS_CHANNEL
 BIS_LOGS *-- BIS_ROUTE
+BIS_JOB *-- BIS_ROUTE
+BIS_LOGS *-- BIS_JOB
+BIS_JOB o-- "n" BIS_LOGS : "1..n"
 @enduml

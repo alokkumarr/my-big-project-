@@ -3,22 +3,18 @@
     <div
       fxLayout="row"
       fxLayoutAlign="start center"
-      *ngIf="data.origAnalysis.sqlBuilder.filters.length > 0"
+      *ngIf="(filterCount$ | async) > 0"
     >
       <div fxLayout="column">
         <span class="filter-counter" i18n
-          >{data.origAnalysis.sqlBuilder.filters.length, plural, =1 {1 Filter}
-          other {{{data.origAnalysis.sqlBuilder.filters.length}} Filters} }
-          Applied</span
+          >{(filterCount$ | async), plural, =1 {1 Filter} other
+          {{{(filterCount$ | async)}} Filters} } Applied</span
         >
       </div>
 
       <mat-chip-list #chipList>
         <mat-chip
-          *ngFor="
-            let filter of data.origAnalysis.sqlBuilder.filters;
-            let i = index
-          "
+          *ngFor="let filter of filters$ | async; let i = index"
           style="padding-bottom: 1px;padding-top: 3px;"
         >
           {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
@@ -33,7 +29,8 @@
     >
       <observe-map
         *ngIf="
-          data.analysis.type | isAnalysisType: 'map':data.analysis?.chartType
+          data.analysis.type
+            | isAnalysisType: 'map':data.analysis?.mapOptions?.mapType
         "
         class="analysis-container"
         [item]="data"
@@ -46,7 +43,7 @@
       <observe-map-chart
         *ngIf="
           data.analysis.type
-            | isAnalysisType: 'mapChart':data.analysis?.chartType
+            | isAnalysisType: 'mapChart':data.analysis?.mapOptions?.mapType
         "
         class="analysis-container"
         [item]="data"
@@ -60,7 +57,8 @@
 
       <observe-chart
         *ngIf="
-          data.analysis.type | isAnalysisType: 'chart':data.analysis?.chartType
+          data.analysis.type
+            | isAnalysisType: 'chart':data.analysis?.chartOptions?.chartType
         "
         class="analysis-container"
         [item]="data"

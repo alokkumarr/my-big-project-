@@ -7,11 +7,11 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipJsonMissingException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
-import com.synchronoss.saw.semantic.SipSemanticUtils;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.semantic.service.SemanticService;
+import com.synchronoss.saw.util.SipMetadataUtils;
 import java.io.IOException;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -50,13 +50,14 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.CREATED)
   public SemanticNode addSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @RequestBody SemanticNode requestBody,@RequestHeader Map<String, String> headers)
+      @RequestBody SemanticNode requestBody,
+      @RequestHeader Map<String, String> headers)
       throws SipJsonMissingException {
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
-    SipSemanticUtils.setAuditInformation(requestBody, headers);
-    SipSemanticUtils.checkMandatoryFields(requestBody);
+    SipMetadataUtils.setAuditInformation(requestBody, headers);
+    SipMetadataUtils.checkSemanticMandatoryFields(requestBody);
     logger.trace("Request Body to create a semantic node:{}", requestBody);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -109,7 +110,7 @@ public class SipSemanticController {
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String id, @RequestBody SemanticNode requestBody,
-      @RequestHeader Map<String, String> headers) throws SipJsonMissingException { 
+      @RequestHeader Map<String, String> headers) throws SipJsonMissingException {
     logger.trace("Request Body to update a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();

@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
@@ -76,9 +75,8 @@ export class ObserveMapComponent implements OnInit, OnDestroy, AfterViewInit {
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE)
       .then(
         ({ data }) => {
-          const parsedData = flattenChartData(data, this.analysis.sqlBuilder);
-          this.data = parsedData;
-          return parsedData;
+          this.data = data;
+          return data;
         },
         err => {
           throw err;

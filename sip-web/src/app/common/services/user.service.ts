@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import { Store } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../appConfig';
@@ -6,6 +7,9 @@ import { JwtService } from './jwt.service';
 const loginUrl = AppConfig.login.url;
 const refreshTokenEndpoint = 'getNewAccessToken';
 import { BehaviorSubject } from 'rxjs';
+import { CommonResetStateOnLogout } from '../actions/menu.actions';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -13,7 +17,11 @@ export class UserService {
 
   loginChange$ = new BehaviorSubject(false);
 
-  constructor(public _http: HttpClient, public _jwtService: JwtService) {}
+  constructor(
+    public _http: HttpClient,
+    public _jwtService: JwtService,
+    private store: Store
+  ) {}
 
   attemptAuth(formData) {
     const LoginDetails = {
@@ -52,7 +60,7 @@ export class UserService {
   /**
    * Exchanges a single-sign-on token for actual login tokens
    */
-  exchangeLoginToken(token) {
+  exchangeLoginToken(token): Observable<boolean> {
     const route = '/authentication';
 
     return this._http
@@ -61,21 +69,22 @@ export class UserService {
           jwt: token
         }
       })
-      .toPromise()
-      .then(response => {
-        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
+      .pipe(
+        map(response => {
+          const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
-        // Store the user's info for easy lookup
-        if (this._jwtService.isValid(resp)) {
-          // this._jwtService.destroy();
-          this._jwtService.set(
-            get(response, 'aToken'),
-            get(response, 'rToken')
-          );
-        }
+          // Store the user's info for easy lookup
+          if (this._jwtService.isValid(resp)) {
+            // this._jwtService.destroy();
+            this._jwtService.set(
+              get(response, 'aToken'),
+              get(response, 'rToken')
+            );
+          }
 
-        return true;
-      });
+          return true;
+        })
+      );
   }
 
   logout(path) {
@@ -95,6 +104,7 @@ export class UserService {
       .toPromise()
       .then(() => {
         this._jwtService.destroy();
+        this.store.dispatch(new CommonResetStateOnLogout());
         if (path === 'logout') {
           // TODO do something here for logout
           // this._state.reload();

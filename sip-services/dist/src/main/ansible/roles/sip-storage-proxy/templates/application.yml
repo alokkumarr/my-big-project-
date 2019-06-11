@@ -49,6 +49,15 @@ elastic-search:
            cluster-name: {{ saw_elasticsearch_cluster_name }}
            transport-hosts: {{ saw_elasticsearch_host }}
            transport-ports: {{ saw_elasticsearch_port | default('9200') }}
+{% if saw_elasticsearch_protocol == 'https' %}
+           sslEnabled: {{ true | default('false') }}
+           keyStorePath: {{ sip_elasticsearch_keyStorePath }}
+           storePassword: {{ sip_elasticsearch_keyStorePassword }}
+{% else %}
+           sslEnabled: false
+           keyStorePath:
+           storePassword:
+{% endif %}
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}
@@ -56,3 +65,15 @@ elastic-xpack :
 
 metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
+    binary-store-path:  /services/metadata/analysis_results
+    migration: analysisMigration
+
+metadata:
+  service:
+    host: http://localhost:9501
+    execution-migration-flag: false
+    transporthost: http://localhost:9200/analysis
+
+sip:
+  ssl:
+    enable : false

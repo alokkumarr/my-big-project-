@@ -23,8 +23,8 @@ server:
     key-store: /Users/spau0004/Desktop/keystore/keystore.jks
     key-alias: sipcert
     key-store-password: sip@123
-    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks 
-    trust-store-password: sip@123  
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    trust-store-password: sip@123
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
@@ -36,14 +36,17 @@ application:
 
 metastore:
   base:  hdfs:///main/
-  
-connector: https  
+  analysis: analysisMetadata
+  migration: analysisMigration
+  metadataTable: semanticDataStore
+
+connector: https
 semantic:
   workbench-url:  ${connector}://localhost:9700
   transport-metadata-url:  ${connector}://localhost:9642
   binary-migration-requires: false
   migration-metadata-home: /var/sip/
-  
+
 sip:
    ssl:
      enable : true
@@ -53,4 +56,8 @@ sip:
    key:
       store: /Users/spau0004/Desktop/keystore/keystore.jks
       password: sip@123
-  
+
+
+analysis:
+  get-analysis-url:  ${connector}://localhost:9200
+  binary-migration-required: false

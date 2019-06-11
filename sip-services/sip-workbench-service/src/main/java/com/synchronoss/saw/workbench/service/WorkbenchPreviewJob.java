@@ -1,8 +1,8 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.cloudera.livy.Job;
-import com.cloudera.livy.JobContext;
 import java.util.Iterator;
+import org.apache.livy.Job;
+import org.apache.livy.JobContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -22,6 +22,7 @@ public class WorkbenchPreviewJob implements Job<Integer> {
 
   /**
    * This is parameterized constructor.
+   *
    * @param id of type String.
    * @param location is of type String.
    * @param limit is of type Integer.
@@ -46,31 +47,32 @@ public class WorkbenchPreviewJob implements Job<Integer> {
     if (dataset != null) {
       StructField[] fields = dataset.schema().fields();
       Iterator<Row> rows = dataset.limit(limit).toLocalIterator();
-      rows.forEachRemaining((Row row) -> {
-        document.addNewMap();
-        for (int i = 0; i < row.size(); i++) {
-          if (row.isNullAt(i)) {
-            continue;
-          }
-          String name = fields[i].name();
-          DataType dataType = fields[i].dataType();
-          if (dataType.equals(DataTypes.StringType)) {
-            document.put(name, row.getString(i));
-          } else if (dataType.equals(DataTypes.IntegerType)) {
-            document.put(name, row.getInt(i));
-          } else if (dataType.equals(DataTypes.LongType)) {
-            document.put(name, row.getLong(i));
-          } else if (dataType.equals(DataTypes.FloatType)) {
-            document.put(name, row.getFloat(i));
-          } else if (dataType.equals(DataTypes.DoubleType)) {
-            document.put(name, row.getDouble(i));
-          } else {
-            log.warn("Unhandled Spark data type: {}", dataType);
-            document.put(name, row.get(i).toString());
-          }
-        }
-        document.endMap();
-      });
+      rows.forEachRemaining(
+          (Row row) -> {
+            document.addNewMap();
+            for (int i = 0; i < row.size(); i++) {
+              if (row.isNullAt(i)) {
+                continue;
+              }
+              String name = fields[i].name();
+              DataType dataType = fields[i].dataType();
+              if (dataType.equals(DataTypes.StringType)) {
+                document.put(name, row.getString(i));
+              } else if (dataType.equals(DataTypes.IntegerType)) {
+                document.put(name, row.getInt(i));
+              } else if (dataType.equals(DataTypes.LongType)) {
+                document.put(name, row.getLong(i));
+              } else if (dataType.equals(DataTypes.FloatType)) {
+                document.put(name, row.getFloat(i));
+              } else if (dataType.equals(DataTypes.DoubleType)) {
+                document.put(name, row.getDouble(i));
+              } else {
+                log.warn("Unhandled Spark data type: {}", dataType);
+                document.put(name, row.get(i).toString());
+              }
+            }
+            document.endMap();
+          });
     }
     document.endArray();
     preview.insert();

@@ -13,7 +13,11 @@ const AnalyzeServiceStub = {
 
 const analysisStub = {
   artifacts: [{ columns: [] }],
-  sqlBuilder: { sorts: [], filters: [], dataFields: [], nodeFields: [] }
+  sipQuery: {
+    artifacts: [{ artifactsName: 'abc', fields: [] }],
+    sorts: [],
+    filters: []
+  }
 };
 
 @Component({

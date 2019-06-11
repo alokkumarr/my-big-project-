@@ -7,7 +7,7 @@
     <div matTooltip="Metric Name" class="header-description">
       &#40;&nbsp;
       <mat-icon fontIcon="icon-report"></mat-icon>
-      <span i18n>{{ analysis.metricName }}</span
+      <span i18n>{{ analysis.metricName || (metricName | async) }}</span
       >&nbsp;&#41;
     </div>
     <span fxFlex></span>
@@ -21,7 +21,7 @@
   <pivot-grid
     *ngIf="previewData && analysis.type === 'pivot'"
     [artifactColumns]="artifactColumns"
-    [sorts]="data.analysis.sqlBuilder.sorts"
+    [sorts]="data.analysis.sipQuery.sorts"
     [data]="previewData"
     mode="preview"
   >
@@ -39,30 +39,32 @@
   >
   </report-grid-upgraded>
   <designer-map-chart
-    *ngIf="(analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)"
+    *ngIf="
+      analysis.type | isAnalysisType: 'mapChart':analysis?.mapOptions?.mapType
+    "
     [chartType]="chartType"
     [data]="previewData"
     [auxSettings]="{ legend: analysis.legend }"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sipQuery]="analysis.sipQuery"
   >
   </designer-map-chart>
   <designer-chart
     *ngIf="analysis.type === 'chart'"
     [chartType]="chartType"
-    [sorts]="analysis.sqlBuilder.sorts"
-    [auxSettings]="{ isInverted: analysis.isInverted, legend: analysis.legend }"
+    [sorts]="analysis.sipQuery.sorts"
+    [auxSettings]="analysis?.chartOptions"
     [data]="previewData"
-    [sqlBuilder]="analysis.sqlBuilder"
+    [sipQuery]="analysis.sipQuery"
   >
   </designer-chart>
   <div
-    *ngIf="(analysis.type | isAnalysisType: 'map':analysis?.chartType)"
+    *ngIf="analysis.type | isAnalysisType: 'map':analysis?.mapOptions?.mapType"
     class="map-container"
   >
     <designer-map
-      [auxSettings]="analysis.mapSettings"
+      [auxSettings]="analysis.mapOptions"
       [data]="previewData"
-      [sqlBuilder]="analysis.sqlBuilder"
+      [sipQuery]="analysis.sipQuery"
     >
     </designer-map>
   </div>

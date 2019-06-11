@@ -6,13 +6,19 @@ import {
   SqlBuilderEsReport,
   Join,
   AnalysisType,
-  MapSettings
+  MapSettings,
+  LabelOptions,
+  Legend,
+  Axis,
+  AnalysisChartDSL,
+  AnalysisMapDSL
 } from '../models';
 import { JsPlumbCanvasChangeEvent } from '../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   Sort,
@@ -23,20 +29,24 @@ import {
   ArtifactColumnReport,
   ArtifactColumn,
   ArtifactColumns,
+  ArtifactColumnDSL,
   IToolbarActionData,
   DesignerToolbarAciton,
   IToolbarActionResult,
   Artifact,
   Format,
   AnalysisDialogData,
-  Region
+  Region,
+  isDSLAnalysis
 } from '../types';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   ArtifactColumnReport,
+  ArtifactColumnDSL,
   Analysis,
+  AnalysisDSL,
   AnalysisChart,
   AnalysisReport,
   DesignerMode,
@@ -61,7 +71,10 @@ export {
   JsPlumbCanvasChangeEvent,
   AnalysisDialogData,
   Region,
-  MapSettings
+  MapSettings,
+  isDSLAnalysis,
+  AnalysisChartDSL,
+  AnalysisMapDSL
 };
 
 export interface ArtifactColumnFilter {
@@ -103,9 +116,11 @@ export interface IDEsignerSettingGroupAdapter {
 export interface DesignerChangeEvent {
   subject:
     | 'format'
+    | 'alias'
+    | 'aliasname'
     | 'aggregate'
     | 'dateInterval'
-    | 'aliasName'
+    | 'alias'
     | 'sort'
     | 'filter'
     | 'filterRemove'
@@ -124,7 +139,7 @@ export interface DesignerChangeEvent {
     | 'chartTitle'
     | 'fetchLimit'
     | 'changeQuery'
-    | 'region'
+    | 'geoRegion'
     | 'chartType'
     | 'mapSettings';
   column?: ArtifactColumn;
@@ -133,9 +148,24 @@ export interface DesignerChangeEvent {
 
 export interface DesignerSaveEvent {
   requestExecution: boolean;
-  analysis: Analysis;
+  analysis: Analysis | AnalysisDSL;
 }
 
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
+  analysis: AnalysisDSL;
+  metric: {
+    metricName: string;
+    artifacts: Artifact[];
+  };
+}
+
+export interface DSLChartOptionsModel {
+  chartType: string;
+  chartTitle: string;
+  isInverted: boolean;
+  legend?: Legend;
+  labelOptions?: LabelOptions;
+  xAxis: Axis;
+  yAxis: Axis;
 }

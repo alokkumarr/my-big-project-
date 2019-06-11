@@ -2,11 +2,11 @@
   mat-icon-button
   [matMenuTriggerFor]="aggregatemenu"
   class="aggregate-chooser__btn"
-  [attr.e2e]="AGGREGATE_TYPES_OBJ[aggregate].value"
+  [attr.e2e]="AGGREGATE_TYPES_OBJ[aggregate | lowercase].value"
 >
   <mat-icon
     [style.width.px]="40"
-    [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"
+    [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate | lowercase].icon : 'icon-more'"
   ></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
@@ -15,7 +15,7 @@
       [attr.e2e]="aggregateType.value"
       mat-menu-item
       (click)="onAggregateChange(aggregateType.value)"
-      *ngIf="checkColumn(aggregateType.value, sqlBuilder)"
+      *ngIf="checkColumn(aggregateType.value, sipQuery)"
       [ngStyle]="{
         color: aggregate === aggregateType.value ? '#0077BE' : '#737373'
       }"

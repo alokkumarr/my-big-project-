@@ -35,7 +35,8 @@
 
       <observe-map
         *ngIf="
-          item.analysis.type | isAnalysisType: 'map':item.analysis?.chartType
+          item.analysis.type
+            | isAnalysisType: 'map':item.analysis?.mapOptions?.mapType
         "
         class="analysis-container"
         [item]="item"
@@ -49,7 +50,7 @@
       <observe-map-chart
         *ngIf="
           item.analysis.type
-            | isAnalysisType: 'mapChart':item.analysis?.chartType
+            | isAnalysisType: 'mapChart':item.analysis?.mapOptions?.mapType
         "
         class="analysis-container"
         [item]="item"

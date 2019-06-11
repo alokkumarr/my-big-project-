@@ -5,7 +5,7 @@ spring:
     name: saw-storage-proxy-service
 logging:
   level:
-    com.synchronoss.saw: trace
+    com.synchronoss.saw: info
 server:
   address: localhost
   port: 9800
@@ -25,10 +25,24 @@ elastic-search:
            cluster-name: elasticsearch
            transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net,es-rd602.ana.dev.vaste.sncrcorp.net
            transport-ports: 9200,9200
+           sslEnabled: false
+           keyStorePath: /codebase/sip/server.keystore
+           storePassword: es123
 elastic-xpack :
           cluster-active: false
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
 metastore:
-    base:  hdfs:///main/        
-         
+    base:  hdfs:///main
+    binary-store-path:  /services/metadata/analysis_results
+    migration: analysisMigration
+
+metadata:
+  service:
+    host: http://localhost:9501
+    execution-migration-flag: false
+    transporthost: http://localhost:9200/analysis
+
+sip:
+  ssl:
+    enable : false

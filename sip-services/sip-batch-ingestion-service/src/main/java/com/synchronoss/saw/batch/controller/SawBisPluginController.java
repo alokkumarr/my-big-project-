@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -50,7 +51,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 @RestController
-@RequestMapping("/ingestion/batch/sftp")
+@RequestMapping("/ingestion/batch")
 public class SawBisPluginController {
 
   private static final Logger logger = LoggerFactory.getLogger(SawBisPluginController.class);
@@ -178,8 +179,9 @@ public class SawBisPluginController {
       }
       if (Long.valueOf(requestBody.getChannelId()) > 0L
           && Long.valueOf(requestBody.getRouteId()) > 0L) {
-        response = sipTransferService.transferData(Long.valueOf(requestBody.getChannelId()),
-            Long.valueOf(requestBody.getRouteId()), null, false, SourceType.REGULAR.name());
+        response = sipTransferService.scanFilesForPattern(Long.valueOf(requestBody.getChannelId()),
+            Long.valueOf(requestBody.getRouteId()), null, false, 
+            SourceType.REGULAR.name(), Optional.empty(), requestBody.getChannelType().toString());
       } else {
         response = sipTransferService.immediateTransfer(requestBody);
       }
@@ -253,10 +255,10 @@ public class SawBisPluginController {
     if (Long.valueOf(requestBody.getChannelId()) > 0L
         && Long.valueOf(requestBody.getRouteId()) > 0L) {
       CompletableFuture
-          .supplyAsync(() -> sipTransferService.transferData(
+          .supplyAsync(() -> sipTransferService.scanFilesForPattern(
               Long.valueOf(requestBody.getChannelId()),
               Long.valueOf(requestBody.getRouteId()), null, false,
-              SourceType.REGULAR.name()), transactionPostExecutor)
+              SourceType.REGULAR.name(), Optional.empty(), channelType),transactionPostExecutor)
           .whenComplete((p, throwable) -> {
             logger.trace("Current Thread Name :{}", Thread.currentThread().getName());
             if (throwable != null) {

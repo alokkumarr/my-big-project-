@@ -1,12 +1,12 @@
 <div fxLayout="row" fxLayoutAlign="start center">
-  <mat-form-field appearance="outline" fxFlex (click)="openDateFormatDialog()">
-    <input
+  <mat-form-field appearance="outline" fxFlex (click)="openDateFormatDialog()" style="cursor: pointer">
+    <input style="-webkit-user-select: none;
+        pointer-events: none;"
       matInput
       type="text"
       placeholder="Format"
       disabled
       autocomplete="off"
-      style="cursor: pointer;"
       [value]="getDateLabel(artifactColumn)"
     />
   </mat-form-field>
