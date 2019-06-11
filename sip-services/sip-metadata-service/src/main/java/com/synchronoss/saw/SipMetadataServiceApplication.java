@@ -1,5 +1,6 @@
 package com.synchronoss.saw;
 
+import com.synchronoss.saw.analysis.service.MigrateAnalysis;
 import com.synchronoss.saw.semantic.service.MigrationService;
 import info.faljse.SDNotify.SDNotify;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
@@ -52,9 +53,10 @@ public class SipMetadataServiceApplication {
   }
 
   /**
-   *  tomcatEmbedded.
+   * tomcatEmbedded.
+   *
    * @return TomcatServletWebServerFactory
-   * */
+   */
   @Bean
   public TomcatServletWebServerFactory tomcatEmbedded() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
@@ -66,11 +68,12 @@ public class SipMetadataServiceApplication {
     return tomcat;
   }
 
-  @Autowired
-  private  MigrationService migrationService;
+  @Autowired private MigrationService migrateSemantic;
+  @Autowired private MigrateAnalysis migrateAnalysis;
 
   /**
-   * method.
+   * Invokes the semantic migration and analysis migration services.
+   *
    * @param event ready event.
    * @throws Exception exception.
    */
@@ -78,8 +81,17 @@ public class SipMetadataServiceApplication {
   public void onApplicationEvent(ApplicationStartedEvent event) throws Exception {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
-    migrationService.init();
+
+    try {
+      migrateSemantic.init();
+    } catch (Exception ex) {
+      LOG.error("Semantic migration failed", ex);
+    }
+
+    try {
+      migrateAnalysis.start();
+    } catch (Exception ex) {
+      LOG.error("Analysis migration failed", ex);
+    }
   }
-
-
 }

@@ -17,13 +17,12 @@ import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import javassist.NotFoundException;
-
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -36,8 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import sncr.bda.core.file.FileProcessor;
+import sncr.bda.core.file.FileProcessorFactory;
+
+
 
 @Service
 public class RetryExecutorService {
@@ -48,6 +52,8 @@ public class RetryExecutorService {
 
   @Autowired
   private BisRouteDataRestRepository bisRouteDataRestRepository;
+  
+
 
   @Autowired
   private SipLogging sipLogService;
@@ -95,6 +101,11 @@ public class RetryExecutorService {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
+  
+  
+  @Value("${sip.service.max.inprogress.job.mins}")
+  @NotNull
+  private Integer maxInprogressJobMins;
 
   private static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
 
@@ -103,6 +114,16 @@ public class RetryExecutorService {
 
   @Autowired
   private SipRetryPluginFactory factory;
+  
+  FileProcessor processor;
+  
+  
+  @PostConstruct
+  private void init() throws Exception {
+    
+    processor = FileProcessorFactory.getFileProcessor(defaultDestinationLocation);
+
+  }
 
   /**
    * This is method to handle inconsistency during failure. Step1: Check if any
@@ -111,11 +132,12 @@ public class RetryExecutorService {
    * destination and update logs with 'Data_removed' Step3: Triggers transfer
    * call as part of retry
    */
-  @Scheduled(fixedDelayString = "${sip.service.retry.delay}")
+  @Async("retryExecutor")
   public void recoverFromInconsistentState() {
 
     // Mark long running 'InProgress to 'Failed'
     sipLogService.updateLongRunningTransfers(maxInprogressMins);
+    sipLogService.updateLongRunningJobs(maxInprogressJobMins);
 
     logger.trace("recoverFromInconsistentState execution starts here");
     int countOfRecords = sipLogService.countRetryIds(retryDiff);
@@ -129,11 +151,11 @@ public class RetryExecutorService {
       logger.trace("Data listOfRetryIds :" + logs);
       for (BisFileLog log : logs) {
         logger
-            .info("Process Id which is in inconsistent state: " + log.getPid());
+            .trace("Process Id which is in inconsistent state: " + log.getPid());
         long routeId = log.getRouteSysId();
-        logger.info("Route Id which is in inconsistent state: " + routeId);
+        logger.trace("Route Id which is in inconsistent state: " + routeId);
         long channelId = log.getBisChannelSysId();
-        logger.info("Channel Id which is in inconsistent state: " + channelId);
+        logger.trace("Channel Id which is in inconsistent state: " + channelId);
         Optional<BisRouteEntity> bisRouteEntityPresent = this
             .findRouteById(routeId);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -177,7 +199,7 @@ public class RetryExecutorService {
                         BisComponentState.DATA_REMOVED.value());
                     sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                         FilenameUtils.getName(log.getFileName()), isDisable,
-                        SourceType.RETRY.name());
+                        SourceType.RETRY.name(), log.getJob().getJobId(), channelType);
                     // transferData(channelId, routeId,
                     // FilenameUtils.getName(log.getFileName()),
                     // isDisable, SourceType.RETRY.name());
@@ -198,13 +220,13 @@ public class RetryExecutorService {
                         "Inside the block of retry when process status is "
                             + " inside disable block :"
                             + BisComponentState.HOST_NOT_REACHABLE.value());
-                    logger.info("Channel Id with :"
+                    logger.trace("Channel Id with :"
                         + BisComponentState.HOST_NOT_REACHABLE.value()
                         + " will be triggered by retry in case of isDisable duplicate "
                         + isDisable + " : " + channelId);
                     sipRetryContract.retryFailedJob(channelId, routeId,
                         log.getBisChannelType(), isDisable, log.getPid(),
-                        BisComponentState.HOST_NOT_REACHABLE.value());
+                        BisComponentState.HOST_NOT_REACHABLE.value(), log.getJob().getJobId());
                     // transferRetry(channelId, routeId,
                     // log.getBisChannelType(), isDisable,
                     // log.getPid(),
@@ -234,7 +256,7 @@ public class RetryExecutorService {
                           + log.getPid());
                   sipRetryContract.retryFailedFileTransfer(channelId, routeId,
                       FilenameUtils.getName(log.getFileName()), isDisable,
-                      SourceType.RETRY.name());
+                      SourceType.RETRY.name(),log.getJob().getJobId(), null);
                   // transferData(channelId, routeId,
                   // FilenameUtils.getName(log.getFileName()),
                   // isDisable, SourceType.RETRY.name());
@@ -252,13 +274,13 @@ public class RetryExecutorService {
                       "Inside the block of retry when process status is :"
                           + BisComponentState.HOST_NOT_REACHABLE.value());
                   // log.pid() has been added as part of SIP-6292
-                  logger.info("Channel Id with :"
+                  logger.trace("Channel Id with :"
                       + BisComponentState.HOST_NOT_REACHABLE.value()
                       + " will be triggered by retry in case of isDisable duplicate "
                       + isDisable + " : " + channelId);
                   sipRetryContract.retryFailedJob(channelId, routeId,
                       log.getBisChannelType(), isDisable, log.getPid(),
-                      BisComponentState.HOST_NOT_REACHABLE.value());
+                      BisComponentState.HOST_NOT_REACHABLE.value(), null);
                   // transferRetry(channelId, routeId, log.getBisChannelType(),
                   // isDisable,
                   // log.getPid(),
@@ -293,14 +315,9 @@ public class RetryExecutorService {
    */
   private void updateAndDeleteCorruptFiles(BisFileLog log, String fileStatus,
       String procesStatus) {
-    int rowId = 0;
-    rowId = sipLogService.updateStatusFailed(fileStatus, procesStatus,
+    sipLogService.updateStatusFailed(fileStatus, procesStatus,
         log.getPid());
     logger.info("rowId updateAndDeleteCorruptFiles: " + log.getPid());
-    if (rowId <= 0) {
-      throw new PersistenceException(
-          "Exception occured while updating the bis log table to handle inconsistency");
-    }
     // The below code fix which will be part of
     // TODO : SIP-6148
     // This is known issue with this feature branch
@@ -309,19 +326,15 @@ public class RetryExecutorService {
       fileName = log.getRecdFileName();
       logger.trace("Delete the corrupted file :" + fileName);
       File fileDelete = new File(fileName);
-      if (fileDelete != null) {
+      if (fileDelete != null && fileDelete
+          .getParentFile() != null) {
         logger.trace("Parent Directory deleted : " + fileDelete);
-        File[] files = fileDelete.getParentFile().listFiles(new FileFilter() {
-          @Override
-          public boolean accept(File file) {
-            return !file.isHidden();
-          }
-        });
-        if (files != null && files.length > 1) {
-          fileDelete.delete();
-        } else {
-          logger.trace("Directory deleted :", fileDelete);
-          IntegrationUtils.removeDirectory(fileDelete.getParentFile());
+        try {
+          processor.deleteFile(fileDelete.getPath(), 
+              defaultDestinationLocation, mapRfsUser);
+        } catch (IOException ex) {
+          logger.error("Error during delete of currupted file:" 
+                + ex.getMessage());
         }
       }
     } else {

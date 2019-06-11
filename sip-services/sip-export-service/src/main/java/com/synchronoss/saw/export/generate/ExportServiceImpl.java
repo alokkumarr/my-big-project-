@@ -1383,16 +1383,14 @@ public class ExportServiceImpl implements ExportService {
    * @return SipQuery
    */
   public SipQuery getSipQuery(String analysisId) {
-    SipQuery sipQuery = null;
-    ObjectMapper objectMapper = new ObjectMapper();
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = restUtil.restTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
     logger.debug("SIP query url for analysis fetch : " + url);
     AnalysisResponse analysisResponse = restTemplate.getForObject(url, AnalysisResponse.class);
-    sipQuery = analysisResponse.getAnalysis().getSipQuery();
+    SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
 
     logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
     return sipQuery;
