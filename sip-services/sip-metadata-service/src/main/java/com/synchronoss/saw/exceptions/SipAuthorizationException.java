@@ -1,6 +1,5 @@
 package com.synchronoss.saw.exceptions;
 
-import com.synchronoss.saw.util.MessageBundle;
 
 public class SipAuthorizationException extends RuntimeException {
   private static final long serialVersionUID = 1L;
@@ -9,22 +8,6 @@ public class SipAuthorizationException extends RuntimeException {
 
   public SipAuthorizationException(String msg) {
     super(msg);
-  }
-
-  public SipAuthorizationException(Integer errorcode) {
-    super(MessageBundle.getMessage(errorcode.toString()));
-  }
-
-  public SipAuthorizationException(Integer errorcode, Object[] values) {
-    super(MessageBundle.getMessage(errorcode.toString(), values));
-  }
-
-  public SipAuthorizationException(Integer errorcode, Object value) {
-    super(MessageBundle.getMessage(errorcode.toString(), value));
-  }
-
-  public SipAuthorizationException(Integer errorcode, Object value1, Object value2) {
-    super(MessageBundle.getMessage(errorcode.toString(), value1,value2));
   }
 
   /**

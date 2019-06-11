@@ -73,18 +73,22 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   set category(id: number | string) {
     this.searchTerm = '';
     this.showProgress = true;
-    this.analyze.getAnalysesFor(id.toString()).then(
-      result => {
-        this.showProgress = false;
-        this.analyses = filter(
-          result,
-          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
-        );
-      },
-      () => {
-        this.showProgress = false;
-      }
-    );
+    this.analyze
+      .getAnalysesFor(id.toString())
+      .toPromise()
+      .then(
+        result => {
+          this.showProgress = false;
+          this.analyses = filter(
+            result,
+            analysis =>
+              analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+          );
+        },
+        () => {
+          this.showProgress = false;
+        }
+      );
   }
 
   sendAnalysisAction(action, analysis) {

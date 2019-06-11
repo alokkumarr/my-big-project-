@@ -409,6 +409,21 @@ cluster encrypt data stored in the database.  Database encryption is
 set up automatically on the first installation and happens thereafter
 transparently.
 
+=== Elasticsearch SSL configuration
+
+SIP communication with SSL enabled elasticsearch cluster require
+elasticsearch SSL keystore and password (in case of secured with
+password). We need to specify the below properties in sip-config
+file
+
+                saw_elasticsearch_protocol=https
+                sip_elasticsearch_keyStorePath=<JKS Keystorepath>
+                sip_elasticsearch_keyStorePassword=<keystore password>
+
+SIP accepts JKS as keystore format, in case of any key format
+another like PEM key, Keys needs to be converted into jks format and
+configured
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health
