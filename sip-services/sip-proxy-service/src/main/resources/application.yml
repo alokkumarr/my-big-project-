@@ -54,13 +54,10 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-  {% if sip_secure %}
+{% if sip_secure %}
   ssl:
     enable : true
-
-  {% else %}
-
+{% else %}
   ssl:
     enable: false
-
-  {% endif %}
+{% endif %}

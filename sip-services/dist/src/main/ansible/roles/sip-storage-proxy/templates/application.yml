@@ -16,7 +16,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-  {% if sip_secure %}
+{% if sip_secure %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -25,7 +25,7 @@ server:
    trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
    trust-store-password: "{{ sip_keystore_password }}"
 
-  {% endif %}
+{% endif %}
 
 
 
@@ -82,13 +82,10 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-  {% if sip_secure %}
+{% if sip_secure %}
   ssl:
     enable : true
-
-  {% else %}
-
+{% else %}
   ssl:
     enable: false
-
-  {% endif %}
+{% endif %}
