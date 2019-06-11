@@ -123,6 +123,79 @@ public class XDFDataProcessor  extends AbstractComponent {
         return pipelineObj;
     }
 
+    public void processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    {
+        try {
+            String configAsStr = ConfigLoader.loadConfiguration(configPath);
+
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
+
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices pcs[] = {
+                ComponentServices.OutputDSMetadata,
+                ComponentServices.Project,
+                ComponentServices.TransformationMetadata,
+                ComponentServices.Spark
+            };
+
+            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+
+            NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
+
+            ngParserCtxSvc.initContext();
+
+            ngParserCtxSvc.registerOutputDataSet();
+
+            ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
+            String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
+
+            logger.warn("Output datasets:");
+
+            ngParserCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.warn(id)
+            );
+
+            logger.warn(ngParserCtxSvc.getNgctx().toString());
+
+            ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngParserCtxSvc.getNgctx().persistMode = persistFlag;
+
+            NGParser component = new NGParser(ngParserCtxSvc.getNgctx());
+
+            if (!component.initComponent(null))
+                System.exit(-1);
+
+            component.run();
+
+            datafileDFmap =  new HashMap<>();
+            datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName));
+            dataSetName = parserKey;
+
+            logger.debug("End Of Parser Component  dataSetName :" + dataSetName +  "\n" );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
     public void processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
         try {
@@ -190,79 +263,12 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(transOutKey,ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
+            //ngTransformerCtxSvc.getNgctx().dataSetName = transOutKey;
             dataSetName = transOutKey;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+            logger.debug("End Of Transformer Component  dataSetName :" + dataSetName +  "\n" );
 
 
-    public void processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
-    {
-        try {
-            String configAsStr = ConfigLoader.loadConfiguration(configPath);
-
-            if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
-            }
-
-            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
-            if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
-            }
-
-            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
-            if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
-            }
-
-            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
-            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
-            }
-
-            ComponentServices pcs[] = {
-                ComponentServices.OutputDSMetadata,
-                ComponentServices.Project,
-                ComponentServices.TransformationMetadata,
-                ComponentServices.Spark
-            };
-
-            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
-
-            NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
-
-            ngParserCtxSvc.initContext();
-
-            ngParserCtxSvc.registerOutputDataSet();
-
-            ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
-            String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
-            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
-
-            logger.warn("Output datasets:");
-
-            ngParserCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
-                logger.warn(id)
-            );
-
-            logger.warn(ngParserCtxSvc.getNgctx().toString());
-
-            ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            ngParserCtxSvc.getNgctx().persistMode = persistFlag;
-
-            NGParser component = new NGParser(ngParserCtxSvc.getNgctx());
-
-            if (!component.initComponent(null))
-                System.exit(-1);
-
-            component.run();
-
-            datafileDFmap =  new HashMap<>();
-            datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName));
-            dataSetName = parserKey;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -298,6 +304,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ComponentServices[] sqlcs =
                 {
+                    //ComponentServices.InputDSMetadata,
                     ComponentServices.OutputDSMetadata,
                     ComponentServices.Project,
                     ComponentServices.TransformationMetadata,
@@ -305,6 +312,8 @@ public class XDFDataProcessor  extends AbstractComponent {
                 };
 
             logger.debug("Starting SQL component :" + "\n" );
+
+            logger.debug("Starting SQL component  dataSetName :" + dataSetName +  "\n" );
 
             ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
@@ -321,7 +330,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
 
-            String sqlInKey =  config.getInputs().get(0).getDataSet().toString(); //TRANS_out
+            String sqlInKey =  dataSetName;//config.getInputs().get(0).getDataSet().toString(); //TRANS_out0
             String sqlOutKey =  config.getOutputs().get(0).getDataSet().toString(); //TRANS_out
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
 
@@ -330,16 +339,21 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
 
+            logger.debug("SQL component getInputs :" + config.getInputs().size() + "\n" );
+            logger.debug("SQL component getInputs :" + config.getInputs() + "\n" );
+
             NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
 
-            if (!sqlcomponent.initSQLComponent(null))
+            if (!sqlcomponent.initComponent(null))
                 System.exit(-1);
+
 
             sqlcomponent.run();
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(sqlOutKey,ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
-            dataSetName = sqlOutKey;
+            //ngSQLCtxSvc.getNgctx().dataSetName = sqlOutKey;
+            //dataSetName = sqlOutKey;
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -124,11 +124,11 @@ public interface WithDataSet {
 
         sb.append(Path.SEPARATOR + in.getDataSet()).append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
-        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
-            sb.append(Path.SEPARATOR + in.getCatalog());
-        sb
-            .append(Path.SEPARATOR + in.getDataSet())
-            .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+//        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+//            sb.append(Path.SEPARATOR + in.getCatalog());
+//        sb
+//            .append(Path.SEPARATOR + in.getDataSet())
+//            .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
         DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 

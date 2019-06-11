@@ -78,7 +78,8 @@ public class NGJobExecutor {
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
             scriptDescriptor.parseSQLScript();
-            if (!(parent.getNgctx().runningPipeLine)) {
+
+            if (parent.getNgctx().inputDataSets.size() > 0) {
                 scriptDescriptor.resolveTableNames();
             }
             scriptDescriptor.resultIntegrityCheck();

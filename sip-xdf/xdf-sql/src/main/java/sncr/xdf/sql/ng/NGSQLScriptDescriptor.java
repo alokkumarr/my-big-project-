@@ -287,16 +287,18 @@ public class NGSQLScriptDescriptor {
             TableDescriptor td = scriptWideTableMap.get(tn);
             if (td.isTargetTable ^ td.isInDropStatement) continue;
 
-            //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
-            logger.trace("Resolving in table: " + tn);
-            if (inputDataObjects.containsKey(tn)) {
-                Map<String, Object> doProps = inputDataObjects.get(tn);
-                td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
-                td.format = (String) doProps.get( DataSetProperties.Format.name() );
-                td.mode = (String) doProps.get(DataSetProperties.Mode.name());
-                logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
-            } else {
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
+            if (!tn.equalsIgnoreCase(ctx.dataSetName)) {
+                //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
+                logger.trace("Resolving in table: " + tn);
+                if (inputDataObjects.containsKey(tn)) {
+                    Map<String, Object> doProps = inputDataObjects.get(tn);
+                    td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
+                    td.format = (String) doProps.get( DataSetProperties.Format.name() );
+                    td.mode = (String) doProps.get(DataSetProperties.Mode.name());
+                    logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
+                } else {
+                    throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
+                }
             }
         }
     }
