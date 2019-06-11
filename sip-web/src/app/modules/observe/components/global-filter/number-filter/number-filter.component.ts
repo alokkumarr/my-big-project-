@@ -1,12 +1,14 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  ViewChild,
   OnInit,
   OnDestroy,
   Input,
   Output,
   EventEmitter
 } from '@angular/core';
+import { DxRangeSliderComponent } from 'devextreme-angular/ui/range-slider';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
@@ -21,6 +23,7 @@ import * as get from 'lodash/get';
 })
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
+  @ViewChild('slider') slider: DxRangeSliderComponent;
 
   public _filter;
   public step = 1; // tslint:disable-line
@@ -36,6 +39,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
     showMode: 'always',
     position: 'top'
   };
+  private defaultsLoaded = false;
 
   constructor(
     public observe: ObserveService,
@@ -56,6 +60,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       state => {
         if (!state) {
           this.loadDefaults(true); // load cached filter data since last apply
+        } else {
+          /* When slider is painted in display: none component, tooltips look incorrect.
+          Need to call repaint when container sidenav is opened to recalculate correct
+          styles */
+          this.slider.instance.repaint();
         }
       }
     );
@@ -94,6 +103,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       /* Give time for changes to min/max to propagate properly. The
         range slider may use a settimeout to update changes in min/max.
       */
+      this.defaultsLoaded = true;
       setTimeout(() => {
         this.loadDefaults(useCache);
         this.cacheFilters();
@@ -147,6 +157,9 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalNumberFilterComponent
    */
   onSliderChange(data) {
+    if (!this.defaultsLoaded) {
+      return;
+    }
     this.value = data;
     const payload = {
       ...this._filter,

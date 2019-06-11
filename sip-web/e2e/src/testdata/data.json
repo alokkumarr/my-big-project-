@@ -1096,7 +1096,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1116,7 +1117,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1136,7 +1138,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1156,7 +1159,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1176,7 +1180,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1196,7 +1201,8 @@
             "isOptional": false,
             "columnName": "string.keyword",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1217,7 +1223,8 @@
             "isOptional": false,
             "columnName": "date",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1237,7 +1244,8 @@
             "isOptional": false,
             "columnName": "long",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1257,7 +1265,8 @@
             "isOptional": false,
             "columnName": "integer",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1277,7 +1286,8 @@
             "isOptional": false,
             "columnName": "double",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1297,7 +1307,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       }
@@ -1337,7 +1348,8 @@
             "isOptional": false,
             "columnName": "float",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1356,7 +1368,8 @@
             "isOptional": false,
             "columnName": "string.keyword",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1375,7 +1388,8 @@
             "isOptional": false,
             "columnName": "string.keyword",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1394,7 +1408,8 @@
             "isOptional": false,
             "columnName": "double",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1413,7 +1428,8 @@
             "isOptional": false,
             "columnName": "double",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1433,7 +1449,8 @@
             "isOptional": false,
             "columnName": "date",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1453,7 +1470,8 @@
             "isOptional": false,
             "columnName": "date",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1472,7 +1490,8 @@
             "isOptional": false,
             "columnName": "long",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1491,7 +1510,8 @@
             "isOptional": false,
             "columnName": "long",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1510,7 +1530,8 @@
             "isOptional": false,
             "columnName": "integer",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       },
@@ -1529,7 +1550,8 @@
             "isOptional": false,
             "columnName": "integer",
             "isRuntimeFilter": false,
-            "isGlobalFilter": true
+            "isGlobalFilter": true,
+            "artifactsName": "sample"
           }
         ]
       }

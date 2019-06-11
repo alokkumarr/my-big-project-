@@ -47,7 +47,9 @@ export class AnalyzeExportService {
           columnNames
         };
 
-        exportData = ['report', 'esReport'].includes(analysisType) ? checkNullinReportData(exportData) : exportData;
+        exportData = ['report', 'esReport'].includes(analysisType)
+          ? checkNullinReportData(exportData)
+          : exportData;
 
         json2csv(
           exportData,
@@ -57,7 +59,11 @@ export class AnalyzeExportService {
                 'There was an error while exporting, please try again witha different dataset.'
               );
             }
-            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields, analysis);
+            const csvWithDisplayNames = this.replaceCSVHeader(
+              csv,
+              fields,
+              analysis
+            );
             this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
@@ -82,9 +88,9 @@ export class AnalyzeExportService {
           return columnName;
         }
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
-          return `distinctCount(${field.aliasName || field.displayName})`;
+          return `distinctCount(${field.alias || field.displayName})`;
         }
-        return field.aliasName || field.displayName;
+        return field.alias || field.displayName;
       })
       .join(',');
     return replace(csv, firstRow, displayNames);
@@ -94,9 +100,9 @@ export class AnalyzeExportService {
     /* If report was using designer mode, find checked columns */
     if (!analysis.edit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
-        fpPipe(fpMap(fpPick(['columnName', 'aliasName', 'displayName', 'aggregate'])))(
-          artifact.columns
-        )
+        fpPipe(
+          fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
+        )(artifact.columns)
       );
     }
     /* If report was using sql mode, we don't really have any info

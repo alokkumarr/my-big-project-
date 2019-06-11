@@ -190,6 +190,7 @@ export class AnalyzeNewDialogComponent {
       metricName,
       supports
     };
+
     this._dialogRef.afterClosed().subscribe(() => {
       this._analyzeDialogService.openNewAnalysisDialog(model);
     });

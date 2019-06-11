@@ -20,6 +20,7 @@ import * as clone from 'lodash/clone';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
 import * as find from 'lodash/find';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {
   globalChartOptions,
@@ -102,6 +103,9 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getChartSettingsType(chartType) {
+    if (isUndefined(chartType)) {
+      return;
+    }
     if (chartType.substring(0, 2) === 'ts') {
       return 'highStock';
     }
@@ -242,7 +246,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         this.addExportConfig(this.config);
         const requestConfig = cloneDeep(this.config);
         forEach(this.config.series, seriesOptions => {
-          if (['percentageByRow'].includes(seriesOptions.aggregate)) {
+          if (['percentagebyrow'].includes(seriesOptions.aggregate)) {
             set(requestConfig, 'plotOptions.column.stacking', 'percent');
           }
         });

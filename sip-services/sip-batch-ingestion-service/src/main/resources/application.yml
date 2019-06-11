@@ -19,6 +19,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
+        generate_statistics: false
         format_sql : true
 
 logging:
@@ -77,6 +78,16 @@ sip:
     retry.diff.mins: 5
     retry.page.size: 20
     max.inprogress.mins: 45
+    max.inprogress.job.mins: 60
+    worker.delay: 5000
+  transfer:
+    core-pool-size: 10
+    max-pool-size: 50
+    queue-capacity: 10000
+  retry:
+    core-pool-size: 10
+    max-pool-size: 50
+    queue-capacity: 10000
   ssl:
     enable : true
   trust:
@@ -85,8 +96,10 @@ sip:
   key:
      store: /Users/spau0004/Desktop/keystore/truststore.jks
      password: sip@123
+     
   
 connector: https
+
 
 bis:
   transfer-batch-size: 10
@@ -96,5 +109,6 @@ bis:
   recheck-file-modified: false
   destination-fs-user: mapr
   duplicate-entry: true
+ 
   
 

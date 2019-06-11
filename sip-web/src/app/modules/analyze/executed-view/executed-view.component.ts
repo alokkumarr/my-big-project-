@@ -1,8 +1,15 @@
 import { MatSidenav } from '@angular/material';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  ElementRef
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
+import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 import {
   Subscription,
@@ -13,6 +20,8 @@ import {
 } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
+import * as Bowser from 'bowser';
+import * as forEach from 'lodash/forEach';
 
 import {
   AnalyzeService,
@@ -25,7 +34,7 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../services/execute.service';
-import { ToastService } from '../../../common/services/toastMessage.service';
+import { ToastService, HtmlDownloadService } from '../../../common/services';
 import {
   flattenPivotData,
   flattenChartData,
@@ -34,9 +43,15 @@ import {
 import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
 
-import { Analysis } from '../types';
+import { Analysis, AnalysisDSL } from '../types';
 import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
-import { isUndefined } from 'util';
+import { isDSLAnalysis, Filter } from '../designer/types';
+import { CUSTOM_DATE_PRESET_VALUE } from './../consts';
+
+const browser = get(
+  Bowser.getParser(window.navigator.userAgent).getBrowser(),
+  'name'
+);
 
 @Component({
   selector: 'executed-view',
@@ -44,9 +59,10 @@ import { isUndefined } from 'util';
   styleUrls: ['./executed-view.component.scss']
 })
 export class ExecutedViewComponent implements OnInit, OnDestroy {
-  analysis: Analysis; // the latest analysis definition
-  executedAnalysis: Analysis; // the exact analysis that was executed
+  analysis: Analysis | AnalysisDSL; // the latest analysis definition
+  executedAnalysis: Analysis | AnalysisDSL; // the exact analysis that was executed
   analyses: Analysis[];
+  metric: any;
   onetimeExecution: boolean;
   executedBy: string;
   executedAt: any;
@@ -66,14 +82,17 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
   chartActionBus$: Subject<Object> = new Subject<Object>();
+  public filters: Filter[] = [];
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
+  @ViewChild('mapView') mapView: ElementRef;
 
   constructor(
     public _executeService: ExecuteService,
     public _analyzeService: AnalyzeService,
     public _router: Router,
     public _route: ActivatedRoute,
+    private _htmlService: HtmlDownloadService,
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
@@ -95,27 +114,57 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
+  fetchFilters(analysis) {
+    const queryBuilder = isDSLAnalysis(analysis)
+      ? analysis.sipQuery
+      : analysis.sqlBuilder;
+    this.filters = isDSLAnalysis(analysis)
+      ? this.generateDSLDateFilters(queryBuilder.filters)
+      : queryBuilder.filters;
+  }
+
+  generateDSLDateFilters(filters) {
+    forEach(filters, filtr => {
+      if (
+        !filtr.isRuntimeFilter &&
+        !filtr.isGlobalFilter &&
+        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+      ) {
+        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
+        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
+      }
+    });
+    return filters;
+  }
+
   onParamsChange(params, queryParams) {
     const { analysisId } = params;
-    const { awaitingExecution, loadLastExecution, executionId } = queryParams;
+    const {
+      awaitingExecution,
+      loadLastExecution,
+      executionId,
+      isDSL
+    } = queryParams;
 
     this.executionId = executionId;
-
-    this.loadAnalysisById(analysisId).then((analysis: Analysis) => {
-      this.analysis = analysis;
-      this.setPrivileges(analysis);
-
-      /* If an execution is not already going on, create a new execution
-       * as applicable. */
-      this.executeIfNotWaiting(
-        analysis,
-        /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
-         * but all query params come as strings. So typecast them properly */
-        awaitingExecution === 'true',
-        loadLastExecution === 'true',
-        executionId
-      );
-    });
+    this.loadAnalysisById(analysisId, isDSL === 'true').then(
+      (analysis: Analysis | AnalysisDSL) => {
+        this.analysis = analysis;
+        this.setPrivileges(analysis);
+        this.fetchFilters(analysis);
+        /* If an execution is not already going on, create a new execution
+         * as applicable. */
+        this.executeIfNotWaiting(
+          analysis,
+          /* awaitingExecution and loadLastExecution paramaters are supposed to be boolean,
+           * but all query params come as strings. So typecast them properly */
+          awaitingExecution === 'true',
+          loadLastExecution === 'true',
+          executionId
+        );
+      }
+    );
 
     this.executionsSub = this._executeService.subscribe(
       analysisId,
@@ -158,7 +207,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   onSidenavChange(isOpen: boolean) {
     if (isOpen && !this.analyses) {
-      this.loadExecutedAnalyses(this.analysis.id).then(analyses => {
+      this.loadExecutedAnalyses(
+        this.analysis.id,
+        isDSLAnalysis(this.analysis)
+      ).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
@@ -200,6 +252,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = get(this.analysis, 'type') === 'report';
     this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
+    this.filters = isDSLAnalysis(this.analysis)
+      ? this.generateDSLDateFilters(response.queryBuilder.filters)
+      : response.queryBuilder.filters;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -250,7 +305,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         queryParams: {
           executionId,
           awaitingExecution: false,
-          loadLastExecution: false
+          loadLastExecution: false,
+          isDSL: isDSLAnalysis(this.analysis)
         }
       }
     );
@@ -313,13 +369,42 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         finished: null
       }
     ).finished;
-
-    this.executedAt = finished ? this.utcToLocal(finished) : this.executedAt;
+    /* If a valid finish time is found, use that. If not, and if we don't have an
+      execution id, we're showing last execution. Use the time from last execution list
+    */
+    this.executedAt = finished
+      ? this.utcToLocal(finished)
+      : executionId
+      ? this.executedAt
+      : this.utcToLocal(get(this.analyses, '0.finished', this.executedAt));
+    if (isUndefined(this.executedAt)) {
+      this.executedAt = moment(
+        this.secondsToMillis(
+          (<Analysis>this.analysis).updatedTimestamp ||
+            this.analysis.modifiedTime
+        )
+      )
+        .local()
+        .format('YYYY/MM/DD h:mm A');
+    }
   }
 
-  loadExecutedAnalyses(analysisId) {
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
+  }
+
+  loadExecutedAnalyses(analysisId, isDSL) {
     return this._analyzeService
-      .getPublishedAnalysesByAnalysisId(analysisId)
+      .getPublishedAnalysesByAnalysisId(analysisId, isDSL)
       .then(
         (analyses: Analysis[]) => {
           this.analyses = analyses;
@@ -333,9 +418,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadAnalysisById(analysisId) {
-    return this._analyzeService.readAnalysis(analysisId).then(
-      (analysis: Analysis) => {
+  loadAnalysisById(analysisId, isDSL: boolean) {
+    return this._analyzeService
+      .readAnalysis(analysisId, isDSL)
+      .then((analysis: Analysis) => {
         this.analysis = analysis;
         // this._analyzeService
         //   .getLastExecutionData(this.analysis.id, {
@@ -344,13 +430,28 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         //   .then(data => {
         //     console.log(data);
         //   });
-        this.executedAnalysis = { ...this.analysis };
-        return analysis;
-      },
-      err => {
-        throw err;
-      }
-    );
+        /* Get metrics to get full artifacts. Needed to show filters for fields
+        that aren't selected for data */
+        return this._analyzeService
+          .getArtifactsForDataSet(this.analysis.semanticId)
+          .toPromise();
+      })
+      .then(metric => {
+        this.metric = metric;
+        if (isDSLAnalysis(this.analysis) && this.analysis.type === 'map') {
+          this.executedAnalysis = {
+            ...this.analysis,
+            sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+              get(this.metric, 'artifacts.0.columns', []),
+              this.analysis.sipQuery
+            )
+          };
+          return this.analysis;
+        } else {
+          this.executedAnalysis = { ...this.analysis };
+          return this.analysis;
+        }
+      });
   }
 
   loadDataOrSetDataLoader(
@@ -371,9 +472,20 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          sqlBuilder:
-            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+          ...(isDSLAnalysis(this.executedAnalysis)
+            ? {
+                sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                  get(this.metric, 'artifacts.0.columns', []),
+                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                )
+              }
+            : {
+                sqlBuilder:
+                  executeResponse.queryBuilder ||
+                  this.executedAnalysis.sqlBuilder
+              })
         };
+        this.fetchFilters(this.executedAnalysis);
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
 
@@ -415,8 +527,18 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       if (executeResponse) {
         this.executedAnalysis = {
           ...this.analysis,
-          sqlBuilder:
-            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+          ...(isDSLAnalysis(this.executedAnalysis)
+            ? {
+                sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                  get(this.metric, 'artifacts.0.columns', []),
+                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                )
+              }
+            : {
+                sqlBuilder:
+                  executeResponse.queryBuilder ||
+                  this.executedAnalysis.sqlBuilder
+              })
         };
         this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = this.utcToLocal(executeResponse.executedAt);
@@ -435,8 +557,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   utcToLocal(utcTime) {
-    return moment
-      .utc(utcTime)
+    if (isUndefined(utcTime)) {
+      return;
+    }
+    return moment(utcTime)
       .local()
       .format('YYYY/MM/DD h:mm A');
   }
@@ -445,10 +569,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return flattenPivotData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, (<AnalysisDSL>analysis).sipQuery || (<Analysis>analysis).sqlBuilder);
     case 'chart':
     case 'map':
-      return flattenChartData(data, analysis.sqlBuilder);
+      return flattenChartData(data, isDSLAnalysis(analysis) ? analysis.sipQuery : analysis.sqlBuilder);
     default:
       return data;
     }
@@ -456,7 +580,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
-
+    options.isDSL = isDSLAnalysis(this.analysis);
     return (executionId
       ? this._analyzeService.getExecutionData(analysisId, executionId, options)
       : this._analyzeService.getLastExecutionData(analysisId, options)
@@ -470,9 +594,21 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          this.executedAnalysis.sqlBuilder = queryBuilder;
+          if (isDSLAnalysis(this.executedAnalysis)) {
+            this.executedAnalysis = {
+              ...this.executedAnalysis,
+              sipQuery: this._analyzeService.copyGeoTypeFromMetric(
+                get(this.metric, 'artifacts.0.columns', []),
+                queryBuilder
+              )
+            };
+          } else {
+            this.executedAnalysis = {
+              ...this.executedAnalysis,
+              sqlBuilder: queryBuilder
+            };
+          }
         }
-
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
           data = clone(flattenReportData(data, this.analysis));
@@ -480,6 +616,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
 
         this.setExecutedBy(executedBy);
         this.setExecutedAt(executionId);
+        this.fetchFilters(this.executedAnalysis);
         return { data: data, totalCount: count };
       },
       err => {
@@ -488,7 +625,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  setPrivileges({ categoryId, userId }: Analysis) {
+  setPrivileges(analysis: Analysis | AnalysisDSL) {
+    const categoryId = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
+    const userId = isDSLAnalysis(analysis)
+      ? analysis.createdBy
+      : analysis.userId;
     this.canUserPublish = this._jwt.hasPrivilege('PUBLISH', {
       subCategoryId: categoryId
     });
@@ -505,7 +648,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   goBackToMainPage(analysis) {
-    this._router.navigate(['analyze', get(analysis, 'categoryId')]);
+    this._router.navigate([
+      'analyze',
+      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+    ]);
   }
 
   edit() {
@@ -549,6 +695,20 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       // TODO add export for Maps
       this.chartUpdater$.next({ export: true });
       this.chartActionBus$.next({ export: true });
+      break;
+    case 'map':
+      if (get(this.analysis, 'mapOptions.mapType') === 'map') {
+        if (browser !== 'Chrome') {
+          const title = 'Browser not supported.';
+          const msg =
+            'Downloading map analysis only works with Chrome browser at the moment.';
+          this._toastMessage.warn(msg, title);
+          return;
+        }
+        this._htmlService.turnHtml2pdf(this.mapView.nativeElement, this.analysis.name);
+      } else {
+        this.chartUpdater$.next({ export: true });
+      }
       break;
     default:
       const executionType = this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL;

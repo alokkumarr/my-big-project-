@@ -1,6 +1,6 @@
 import { MenuItem } from '../../../../common/state/common.state.model';
 import { Dashboard } from '../../../observe/models/dashboard.interface';
-import { Analysis } from '../../../analyze/models';
+import { Analysis, AnalysisDSL } from '../../../analyze/models';
 
 export class ResetExportPageState {
   static readonly type = '[Admin Export Page OnDestroy] Reset page state';
@@ -24,12 +24,12 @@ export class ExportLoadDashboards {
 
 export class AddAnalysisToExport {
   static readonly type = '[Admin Export Page] Add analysis to export';
-  constructor(public analysis: Analysis) {}
+  constructor(public analysis: Analysis | AnalysisDSL) {}
 }
 
 export class RemoveAnalysisFromExport {
   static readonly type = '[Admin Export Page] Remove analysis from export';
-  constructor(public analysis: Analysis) {}
+  constructor(public analysis: Analysis | AnalysisDSL) {}
 }
 
 export class AddAllAnalysesToExport {
@@ -41,6 +41,11 @@ export class AddAllAnalysesToExport {
 export class RemoveAllAnalysesFromExport {
   static readonly type =
     '[Admin Export Page] Remove all analyses in selected category from export';
+  constructor() {}
+}
+
+export class ExportLoadMetrics {
+  static readonly type = '[Admin Export Page] Load metrics for all analyses';
   constructor() {}
 }
 

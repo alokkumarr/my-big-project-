@@ -13,35 +13,46 @@
         </mat-expansion-panel-header>
         <mat-divider></mat-divider>
 
-        <div class="detail-top">
-          <strong *ngIf="analysis.userFullName">Created By:</strong>
-          {{ analysis.userFullName | changeCase: 'title' }}
+        <div
+          class="detail-top"
+          *ngIf="analysis.userFullName || analysis.createdBy"
+        >
+          <strong>Created By:</strong>
+          {{
+            analysis.userFullName || analysis.createdBy | changeCase: 'title'
+          }}
         </div>
-        <div>
-          <strong *ngIf="analysis.createdTimestamp">Created Time:</strong>
-          {{ utcToLocal(analysis.createdTimestamp) }}
+        <div *ngIf="analysis.createdTimestamp || analysis.createdTime">
+          <strong>Created Time:</strong>
+          {{
+            utcToLocal(analysis.createdTimestamp) ||
+              utcToLocal(analysis.createdTime)
+          }}
         </div>
-        <div>
-          <strong *ngIf="analysis.updatedUserName">Last Modified By:</strong>
-          {{ analysis.updatedUserName }}
+        <div *ngIf="analysis.updatedUserName || analysis.modifiedBy">
+          <strong>Last Modified By:</strong>
+          {{ analysis.updatedUserName || analysis.modifiedBy }}
         </div>
-        <div>
-          <strong *ngIf="analysis.updatedTimestamp">Last Modified Time:</strong>
-          {{ utcToLocal(analysis.updatedTimestamp) }}
+        <div *ngIf="analysis.updatedTimestamp || analysis.modifiedTime">
+          <strong>Last Modified Time:</strong>
+          {{
+            utcToLocal(analysis.updatedTimestamp) ||
+              utcToLocal(analysis.modifiedTime)
+          }}
         </div>
-        <div>
-          <strong *ngIf="executedBy">Executed By:</strong> {{ executedBy }}
+        <div *ngIf="executedBy">
+          <strong>Executed By:</strong> {{ executedBy }}
         </div>
-        <div>
-          <strong *ngIf="executedAt">Execution Time:</strong>
+        <div *ngIf="executedAt">
+          <strong>Execution Time:</strong>
           {{ executedAt }}
         </div>
-        <div class="analysis-detail-description">
-          <strong *ngIf="analysis.description">Description</strong>
+        <div class="analysis-detail-description" *ngIf="analysis.description">
+          <strong>Description</strong>
           <p>{{ analysis.description }}</p>
         </div>
-        <div>
-          <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+        <div *ngIf="analysis.scheduleHuman">
+          <strong>Schedule:</strong>
           {{ analysis.scheduleHuman }}
         </div>
       </mat-expansion-panel>
@@ -54,7 +65,6 @@
         </mat-expansion-panel-header>
 
         <mat-divider></mat-divider>
-
         <executed-list
           *ngIf="analysis && analyses && analyses.length"
           style="padding-top: 20px;"
@@ -66,7 +76,7 @@
     </mat-card>
   </mat-sidenav>
   <mat-sidenav-content
-    [ngClass]="analysis.type === 'chart' ? 'executed-view' : ''"
+    [ngClass]="analysis?.type === 'chart' ? 'executed-view' : ''"
   >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
@@ -91,7 +101,7 @@
               >
             </div>
             <div *ngIf="analysis" class="analysis__subheader">
-              {{ analysis.metrics }}
+              <!-- {{ analysis.metrics }} -->
             </div>
           </div>
         </div>
@@ -129,12 +139,14 @@
         <filter-chips-u
           *ngIf="
             analysis &&
+            executedAnalysis &&
             !(analysis.type === 'report' && analysis.edit) &&
-            executedAnalysis.sqlBuilder.filters.length > 0
+            (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
+              .length > 0
           "
-          [filters]="executedAnalysis.sqlBuilder.filters"
+          [filters]="filters"
           [readonly]="true"
-          [artifacts]="analysis.artifacts"
+          [artifacts]="metric && metric.artifacts"
         ></filter-chips-u>
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
@@ -177,6 +189,7 @@
             *ngSwitchCase="'pivot'"
             [analysis]="executedAnalysis"
             [data]="data"
+            [artifacts]="metric && metric.artifacts"
             [updater]="pivotUpdater$"
           >
           </executed-pivot-view>
@@ -189,10 +202,11 @@
           >
           </executed-chart-view>
 
-          <div *ngSwitchCase="'map'">
+          <div *ngSwitchCase="'map'" #mapView>
             <executed-map-view
               *ngIf="
-                (analysis.type | isAnalysisType: 'map':analysis?.chartType)
+                analysis.type
+                  | isAnalysisType: 'map':analysis?.mapOptions?.mapType
               "
               [analysis]="executedAnalysis"
               [data]="data"
@@ -201,7 +215,7 @@
             </executed-map-view>
             <executed-map-chart-view
               *ngIf="
-                (analysis.type | isAnalysisType: 'mapChart':analysis?.chartType)
+                analysis.type | isAnalysisType: 'mapChart':analysis?.chartType
               "
               [analysis]="executedAnalysis"
               [data]="data"

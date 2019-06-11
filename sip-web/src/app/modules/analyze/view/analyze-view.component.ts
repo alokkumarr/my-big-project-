@@ -2,16 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
+import { Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as reduce from 'lodash/reduce';
+import * as values from 'lodash/values';
 
 import { JwtService } from '../../../common/services';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { AnalyzeNewDialogComponent } from './new-dialog';
-import { Analysis, AnalyzeViewActionEvent } from './types';
+import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
+import { isDSLAnalysis } from '../designer/types';
+import {
+  CommonLoadAllMetrics,
+  CommonStateScheuleJobs
+} from 'src/app/common/actions/menu.actions';
+import { first, map, tap, switchMap } from 'rxjs/operators';
 
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
@@ -30,8 +38,8 @@ const SEARCH_CONFIG = [
   styleUrls: ['./analyze-view.component.scss']
 })
 export class AnalyzeViewComponent implements OnInit {
-  public analyses: Analysis[] = [];
-  public filteredAnalyses: Analysis[];
+  public analyses: Array<Analysis | AnalysisDSL> = [];
+  public filteredAnalyses: Array<Analysis | AnalysisDSL>;
   public categoryName: Promise<string>;
   public cronJobs: any;
   public LIST_VIEW = 'list';
@@ -47,6 +55,7 @@ export class AnalyzeViewComponent implements OnInit {
     ['chart', 'Chart'],
     ['report', 'Report'],
     ['pivot', 'Pivot'],
+    ['map', 'Map'],
     ['scheduled', 'Scheduled']
   ].map(([value, label]) => ({ value, label }));
   public filterObj = {
@@ -63,8 +72,23 @@ export class AnalyzeViewComponent implements OnInit {
     public _localSearch: LocalSearchService,
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
-    public _executeService: ExecuteService
-  ) {}
+    public _executeService: ExecuteService,
+    private store: Store
+  ) {
+    const metrics$ = this.store
+      .select(state => state.common.metrics)
+      .pipe(first(metrics => values(metrics).length > 0));
+    let analyses;
+    this._route.data
+      .pipe(
+        switchMap(data => {
+          analyses = data.analyses;
+          return metrics$;
+        }),
+        tap(() => this.prepareLoadedAnalyses(analyses))
+      )
+      .subscribe();
+  }
 
   ngOnInit() {
     this._route.params.subscribe(params => {
@@ -83,7 +107,6 @@ export class AnalyzeViewComponent implements OnInit {
       .getCategory(this.analysisId)
       .then(category => category.name);
 
-    this.loadAnalyses(this.analysisId);
     this.getCronJobs(this.analysisId);
   }
 
@@ -141,11 +164,11 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
+    const isDSL = analysis.sipQuery ? true : false;
     this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
       queryParams: {
-        executedAnalysis: null,
-        awaitingExecution: true,
-        loadLastExecution: false
+        isDSL,
+        awaitingExecution: true
       }
     });
   }
@@ -153,7 +176,10 @@ export class AnalyzeViewComponent implements OnInit {
   afterPublish(analysis) {
     this.getCronJobs(this.analysisId);
     /* Update the new analysis in the current list */
-    this._router.navigate(['analyze', analysis.categoryId]);
+    this._router.navigate([
+      'analyze',
+      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+    ]);
   }
 
   spliceAnalyses(analysis, replace) {
@@ -172,42 +198,66 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
-    this._analyzeService.getSemanticLayerData().then(metrics => {
-      this._dialog
-        .open(AnalyzeNewDialogComponent, {
-          width: 'auto',
-          height: 'auto',
-          autoFocus: false,
-          data: {
-            metrics,
-            id: this.analysisId
-          }
-        } as MatDialogConfig)
-        .afterClosed()
-        .subscribe(event => {
-          if (!event) {
-            return;
-          }
-          const { analysis, requestExecution } = event;
-          if (analysis) {
-            this.loadAnalyses(this.analysisId).then(() => {
-              if (requestExecution) {
-                this._executeService.executeAnalysis(
-                  analysis,
-                  EXECUTION_MODES.PUBLISH
-                );
-              }
-            });
-          }
-        });
-    });
+    this.store.dispatch(new CommonLoadAllMetrics());
+    this.store
+      .select(state => state.common.metrics)
+      .pipe(
+        first(metrics => values(metrics).length > 0),
+        map(metrics => values(metrics))
+      )
+      .toPromise()
+      .then(metrics => {
+        this._dialog
+          .open(AnalyzeNewDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            autoFocus: false,
+            data: {
+              metrics,
+              id: this.analysisId
+            }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(event => {
+            if (!event) {
+              return;
+            }
+            const { analysis, requestExecution } = event;
+            if (analysis) {
+              this.loadAnalyses(this.analysisId).then(() => {
+                if (requestExecution) {
+                  this._executeService.executeAnalysis(
+                    analysis,
+                    EXECUTION_MODES.PUBLISH
+                  );
+                }
+              });
+            }
+          });
+      });
+  }
+
+  prepareLoadedAnalyses(analyses) {
+    this.analyses = this.applyMetricNames(analyses);
+    this.filteredAnalyses = [...this.analyses];
   }
 
   loadAnalyses(analysisId) {
-    return this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
-      this.analyses = analyses;
-      this.filteredAnalyses = [...analyses];
-    });
+    return this.store
+      .dispatch(new CommonLoadAllMetrics())
+      .pipe(switchMap(() => this._analyzeService.getAnalysesFor(analysisId)))
+      .toPromise()
+      .then(this.prepareLoadedAnalyses.bind(this));
+  }
+
+  applyMetricNames(analyses: Array<Analysis | AnalysisDSL>) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    return analyses.map(analysis => ({
+      ...analysis,
+      metricName: metrics[analysis.semanticId]
+        ? metrics[analysis.semanticId].metricName
+        : ''
+    }));
   }
 
   getCronJobs(analysisId) {
@@ -229,6 +279,7 @@ export class AnalyzeViewComponent implements OnInit {
             },
             {}
           );
+          this.store.dispatch(new CommonStateScheuleJobs(this.cronJobs));
         } else {
           this.cronJobs = {};
         }

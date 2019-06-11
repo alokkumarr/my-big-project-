@@ -1,6 +1,6 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
   <div flex></div>
-  <h1 class="title" [textContent]="analysis.chartTitle || analysis.name"></h1>
+  <h1 class="title" [textContent]="chartTitle"></h1>
 
   <div class="toggle-icons">
     <mat-icon
@@ -70,23 +70,27 @@
   *ngIf="!toggleToGrid && analysis.type == 'chart'"
   [updater]="updater"
   [options]="chartOptions"
-  [chartType]="analysis.chartType"
+  [chartType]="
+    analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType
+  "
   [enableExport]="true"
-  [attr.e2e]="'chart-type:' + analysis.chartType"
+  [attr.e2e]="
+    'chart-type:' +
+    (analysis.sipQuery ? analysis.chartOptions.chartType : analysis.chartType)
+  "
 >
 </chart>
-
 <map-box
-  *ngIf="!toggleToGrid && analysis.chartType == 'map'"
+  *ngIf="!toggleToGrid && analysis?.mapOptions?.mapType == 'map'"
   [data]="data"
-  [sqlBuilder]="analysis.sqlBuilder"
-  [mapSettings]="analysis.mapSettings"
+  [sipQuery]="analysis.sipQuery"
+  [mapSettings]="analysis.mapOptions"
   [attr.e2e]="'map-type-' + analysis.chartType"
 ></map-box>
 
 <map-chart-viewer
-  *ngIf="!toggleToGrid && analysis.chartType == 'chart_scale'"
-  [chartType]="analysis.chartType"
+  *ngIf="!toggleToGrid && analysis?.mapOptions?.mapType == 'chart_scale'"
+  [chartType]="analysis.mapOptions.chartType"
   [data]="data"
   [analysis]="analysis"
   [updater]="updater"

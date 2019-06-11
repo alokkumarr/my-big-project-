@@ -13,10 +13,10 @@
       class="designer-data-limit__type"
       appearance="legacy"
     >
-      <mat-button-toggle value="top">
+      <mat-button-toggle (click)="onToggleClicked('top')" value="top">
         Top
       </mat-button-toggle>
-      <mat-button-toggle value="bottom">
+      <mat-button-toggle (click)="onToggleClicked('bottom')" value="bottom">
         Bottom
       </mat-button-toggle>
     </mat-button-toggle-group>
