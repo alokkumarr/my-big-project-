@@ -58,6 +58,13 @@ elastic-search:
            keyStorePath:
            storePassword:
 {% endif %}
+
+{% if sip_secure %}
+connector : https
+{% else %}
+connector : http
+{% endif %}
+
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}
@@ -70,10 +77,18 @@ metastore:
 
 metadata:
   service:
-    host: http://localhost:9501
-    execution-migration-flag: false
-    transporthost: http://localhost:9200/analysis
+    host: ${connector}://localhost:9501
+    execution-migration-flag: true
+    transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+  {% if sip_secure %}
   ssl:
-    enable : false
+    enable : true
+
+  {% else %}
+
+  ssl:
+    enable: false
+
+  {% endif %}

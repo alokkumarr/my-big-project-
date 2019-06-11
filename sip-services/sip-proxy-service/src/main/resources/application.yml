@@ -37,12 +37,30 @@ metastore:
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
+
+connector : http
+
+{% endif %}
+
 metadata:
   service:
-    host: http://localhost:9501
-    execution-migration-flag: false
-    transporthost: http://localhost:9200/analysis
+    host: ${connector}://localhost:9501
+    execution-migration-flag: true
+    transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+  {% if sip_secure %}
   ssl:
-    enable : false
+    enable : true
+
+  {% else %}
+
+  ssl:
+    enable: false
+
+  {% endif %}
