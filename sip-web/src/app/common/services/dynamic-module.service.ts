@@ -67,7 +67,7 @@ interface ModuleInfo {
 @Injectable()
 export class DynamicModuleService {
   existingRoutes$: BehaviorSubject<Route[]>;
-  api = get(APP_CONFIG, 'api.pluginUrl');
+  api = get(APP_CONFIG, 'api.productModulesUrl');
   constructor(private compiler: Compiler, private router: Router) {
     this.existingRoutes$ = new BehaviorSubject<Route[]>(this.routes);
   }

@@ -16,6 +16,7 @@ import { routes } from './routes';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 
 import { CommonModuleTs } from '../../common';
+import { HtmlDownloadService } from '../../common/services';
 import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
@@ -53,7 +54,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   ],
   declarations: [...COMPONENTS],
   entryComponents: COMPONENTS,
-  providers: [AnalysesResolver, ...GUARDS],
+  providers: [...GUARDS, AnalysesResolver, HtmlDownloadService],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}

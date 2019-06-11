@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -51,7 +53,7 @@ public class BisFileLog implements Serializable {
 
  
 
-@ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
+  @ApiModelProperty(value = "Indicates the file name at the source location", dataType = "String",
       allowEmptyValue = false)
   @Column(name = "BIS_FILE_NAME")
   String fileName;
@@ -104,7 +106,32 @@ public class BisFileLog implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date checkpointDate;
   
+  @ManyToOne
+  @JoinColumn(name="JOB_ID")
+  private BisJobEntity job;
   
+   
+  @ApiModelProperty(value = "Indicates the status of the component process", dataType = "String",
+  allowEmptyValue = false, allowableValues = "DATA_RECEIVED, DATA_REMOVED, HOST_NOT_REACHABLE")
+  @Column(name = "STATE_REASON")
+  private String reason;
+
+
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(String reason) {
+    this.reason = reason;
+  }
+
+  public BisJobEntity getJob() {
+    return job;
+  }
+
+  public void setJob(BisJobEntity job) {
+    this.job = job;
+  }
 
   public String getPid() {
     return pid;

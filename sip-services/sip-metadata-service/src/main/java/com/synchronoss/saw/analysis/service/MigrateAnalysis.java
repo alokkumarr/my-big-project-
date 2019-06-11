@@ -19,89 +19,72 @@ import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
-import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.SipQuery;
-import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.util.FieldNames;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.validation.constraints.NotNull;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@Service
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
 
-  public String migrationDirectory = "/opt/migration/";
-  public String migrationStatusFile = "migrationStatus.json";
+  @Autowired private RestUtil restUtil;
+  RestTemplate restTemplate = null;
+
+  @Value("${analysis.binary-migration-required}")
+  @NotNull
+  private boolean migrationRequired;
+
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
+  @Value("${metastore.analysis}")
+  private String tableName;
+
+  @Value("${metastore.migration}")
+  private String migrationStatusTable;
+
+  @Value("${metastore.metadataTable}")
+  private String metadataTable;
+
+  @Value("${analysis.get-analysis-url}")
+  @NotNull
+  private String listAnalysisUrl;
 
   private AnalysisMetadata analysisMetadataStore = null;
   private AnalysisMetadata semanticMedatadataStore = null;
-  private String listAnalysisUrl;
-  private String tableName;
-  private String basePath;
-  private String migrationStatusTable;
-  private String metadataTable;
+
   private static ObjectMapper objectMapper = new ObjectMapper();
   private Map<String, String> semanticMap;
 
   public MigrateAnalysis() {}
 
-  /**
-   * Parameterized constructor.
-   *
-   * @param tableName MAPR DB table
-   * @param basePath MAPR DB location
-   * @param listAnalysisUri List analysis API endpoint
-   * @param statusFilePath Output location for migration status
-   */
-  public MigrateAnalysis(
-      String tableName,
-      String basePath,
-      String listAnalysisUri,
-      String statusFilePath,
-      String migrationStatusTable) {
-
-    this.basePath = basePath;
-    this.tableName = tableName;
-    this.listAnalysisUrl = listAnalysisUri;
-    this.migrationStatusTable = migrationStatusTable;
-    //    this.statusFilePath = statusFilePath;
-  }
-
-  /**
-   * Converts analysis definition in binary table to new SIP DSL format.
-   *
-   * @param tableName - Analysis metastore table name
-   * @param basePath - Table path
-   * @param listAnalysisUri - API to get list of existing analysis
-   */
-  public void convertBinaryToJson(
-      String tableName,
-      String basePath,
-      String listAnalysisUri,
-      String migrationStatusTable,
-      String metadataTable)
-      throws Exception {
+  /** Converts analysis definition in binary table to new SIP DSL format. */
+  public void convertBinaryToJson() throws Exception {
     logger.trace("Migration process will begin here");
-    this.migrationStatusTable = migrationStatusTable;
-    this.basePath = basePath;
-    this.metadataTable = metadataTable;
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
     semanticMap = getMetaData();
     HttpHeaders requestHeaders = new HttpHeaders();
@@ -110,9 +93,10 @@ public class MigrateAnalysis {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
-    logger.debug("Analysis server URL {}", listAnalysisUri + "/analysis");
-    String url = listAnalysisUri + "/analysis";
-    RestTemplate restTemplate = new RestTemplate();
+    logger.debug("Analysis server URL {}", listAnalysisUrl + "/analysis");
+    String url = listAnalysisUrl + "/analysis";
+
+    restTemplate = restUtil.restTemplate();
     ResponseEntity analysisBinaryData =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
     if (analysisBinaryData.getBody() != null) {
@@ -123,9 +107,9 @@ public class MigrateAnalysis {
           analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
 
       MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
-      logger.info("Total number of Files for migration : ", migrationStatus.getTotalAnalysis());
-      logger.info("Number of Files Successfully Migrated : ", migrationStatus.getSuccessCount());
-      logger.info("Number of Files Successfully Migrated : ", migrationStatus.getFailureCount());
+      logger.info("Total number of Files for migration : {}", migrationStatus.getTotalAnalysis());
+      logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getSuccessCount());
+      logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getFailureCount());
     }
   }
 
@@ -325,8 +309,10 @@ public class MigrateAnalysis {
               String artifactName = artifacts.get(0).getArtifactsName();
               logger.debug("Artifact name = {}", artifactName);
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-                logger.info("Semantic id updated from {} to {}",
-                    analysis.getSemanticId(), entry.getValue());
+                logger.info(
+                    "Semantic id updated from {} to {}",
+                    analysis.getSemanticId(),
+                    entry.getValue());
                 analysis.setSemanticId(entry.getKey());
                 break;
               }
@@ -453,5 +439,18 @@ public class MigrateAnalysis {
     String json = doc.asJsonString();
     com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
     return jsonParser.parse(json);
+  }
+
+  /**
+   * Invokes binary to json migration for analysis metadata.
+   *
+   * @throws Exception In case of errors
+   */
+  public void start() throws Exception {
+    if (migrationRequired) {
+      logger.info("Migration initiated");
+      convertBinaryToJson();
+    }
+    logger.info("Migration ended..");
   }
 }
