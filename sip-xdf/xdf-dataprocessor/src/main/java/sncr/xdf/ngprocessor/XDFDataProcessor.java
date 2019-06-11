@@ -22,6 +22,7 @@ import java.util.Map;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.parser.NGParser;
 import sncr.xdf.sql.ng.NGSQLComponent;
+import sncr.xdf.esloader.NGESLoaderComponent;
 
 public class XDFDataProcessor  extends AbstractComponent {
     {
@@ -82,6 +83,11 @@ public class XDFDataProcessor  extends AbstractComponent {
                 {
                     logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
                     processSQL(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
+                }
+                if ( pipeObj.get("component").equals("esloader"))
+                {
+                    logger.debug("Processing ESLoader Component ---> " + pipeObj.get("component"));
+                    processESLoader(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
                 }
             }
 
@@ -361,6 +367,77 @@ public class XDFDataProcessor  extends AbstractComponent {
         }
     }
 
+    public void processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    {
+        try {
+
+            String configAsStr = ConfigLoader.loadConfiguration(configPath);
+
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
+
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices[] sqlcs =
+                {
+                    //ComponentServices.InputDSMetadata,
+                    ComponentServices.OutputDSMetadata,
+                    ComponentServices.Project,
+                    ComponentServices.TransformationMetadata,
+                    ComponentServices.Spark
+                };
+
+            logger.debug("Starting ESLoader component :" + "\n" );
+
+            logger.debug("Starting ESLoader component  dataSetName :" + dataSetName +  "\n" );
+
+            ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
+
+            NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
+                "esloader", batchId);
+            ngSQLCtxSvc.initContext(); // debug
+            ngSQLCtxSvc.registerOutputDataSet();
+
+            logger.trace("Output datasets:   ");
+
+            ngSQLCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.trace(id)
+            );
+
+            ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+
+            logger.debug("ESLoader component getInputs :" + config.getInputs().size() + "\n" );
+            logger.debug("ESLoader component getInputs :" + config.getInputs() + "\n" );
+
+            NGESLoaderComponent esloader = new NGESLoaderComponent(ngSQLCtxSvc.getNgctx());
+
+            if (!esloader.initComponent(null))
+                System.exit(-1);
+
+
+            esloader.run();
+
+            logger.debug("ESLoader Component done : " + "\n" );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
 
 }

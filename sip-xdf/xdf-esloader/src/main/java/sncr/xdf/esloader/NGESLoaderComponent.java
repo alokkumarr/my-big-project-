@@ -1,6 +1,6 @@
 package sncr.xdf.esloader;
 
-    import com.google.gson.JsonArray;
+import com.google.gson.JsonArray;
     import com.google.gson.JsonElement;
     import com.google.gson.JsonObject;
     import com.google.gson.JsonParser;
@@ -37,7 +37,7 @@ package sncr.xdf.esloader;
     import static java.util.stream.Collectors.toList;
 
 /**
- * Created by skbm0001 on 29/1/2018.
+ * Created by suku0001 on Jun 2019.
  */
 public class NGESLoaderComponent extends AbstractComponent implements WithSpark, WithDataSet {
 
@@ -61,10 +61,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
     public NGESLoaderComponent(NGContext ngctx) {
         super(ngctx);
     }
-
-    public NGESLoaderComponent() {  super(); }
-
-
 
     public static void main(String[] args) {
 
@@ -103,7 +99,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark,
             };
-            ComponentConfiguration cfg = ESLoaderComponent.analyzeAndValidate(configAsStr);
+            ComponentConfiguration cfg = NGESLoaderComponent.analyzeAndValidate(configAsStr);
             ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
@@ -127,20 +123,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             System.exit(-1);
         }
     }
-
-//    public static void main(String[] args) {
-//        ESLoaderComponent component = new ESLoaderComponent();
-//
-//        try {
-//            if (component.collectCommandLineParameters(args) == 0) {
-//                int r = component.run();
-//                System.exit(r);
-//            }
-//        } catch (Exception e){
-//            e.printStackTrace();
-//            System.exit(-1);
-//        }
-//    }
 
     @Override
     protected int execute() {

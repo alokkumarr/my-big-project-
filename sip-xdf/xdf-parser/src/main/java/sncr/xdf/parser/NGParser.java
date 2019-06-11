@@ -207,10 +207,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 
-//    protected ComponentConfiguration validateConfig(String config) throws Exception {
-//        return AsynchNGParser.analyzeAndValidate(config);
-//    }
-
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
         ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
