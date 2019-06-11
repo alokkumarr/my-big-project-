@@ -438,9 +438,10 @@ public class MigrationService {
     logger.trace("creating store starts here ");
     ObjectMapper mapper = new ObjectMapper();
     try {
+      SemanticNode  node = new SemanticNode();
       List<MetaDataStoreStructure> structure =
           SipMetadataUtils.node2JsonObject(
-              null, basePath, null, Action.init, Category.Semantic);
+              node, basePath, null, Action.init, Category.Semantic);
       logger.trace(
           "createStore : Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
