@@ -15,8 +15,11 @@ import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 import { isDSLAnalysis } from '../designer/types';
-import { CommonLoadAllMetrics, CommonStateScheuleJobs } from 'src/app/common/actions/menu.actions';
-import { first, map } from 'rxjs/operators';
+import {
+  CommonLoadAllMetrics,
+  CommonStateScheuleJobs
+} from 'src/app/common/actions/menu.actions';
+import { first, map, tap, switchMap } from 'rxjs/operators';
 
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
@@ -71,7 +74,21 @@ export class AnalyzeViewComponent implements OnInit {
     public _dialog: MatDialog,
     public _executeService: ExecuteService,
     private store: Store
-  ) {}
+  ) {
+    const metrics$ = this.store
+      .select(state => state.common.metrics)
+      .pipe(first(metrics => values(metrics).length > 0));
+    let analyses;
+    this._route.data
+      .pipe(
+        switchMap(data => {
+          analyses = data.analyses;
+          return metrics$;
+        }),
+        tap(() => this.prepareLoadedAnalyses(analyses))
+      )
+      .subscribe();
+  }
 
   ngOnInit() {
     this._route.params.subscribe(params => {
@@ -90,7 +107,6 @@ export class AnalyzeViewComponent implements OnInit {
       .getCategory(this.analysisId)
       .then(category => category.name);
 
-    this.loadAnalyses(this.analysisId);
     this.getCronJobs(this.analysisId);
   }
 
@@ -221,23 +237,26 @@ export class AnalyzeViewComponent implements OnInit {
       });
   }
 
+  prepareLoadedAnalyses(analyses) {
+    this.analyses = this.applyMetricNames(analyses);
+    this.filteredAnalyses = [...this.analyses];
+  }
+
   loadAnalyses(analysisId) {
     return this.store
       .dispatch(new CommonLoadAllMetrics())
+      .pipe(switchMap(() => this._analyzeService.getAnalysesFor(analysisId)))
       .toPromise()
-      .then(() =>
-        this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
-          this.analyses = this.applyMetricNames(analyses);
-          this.filteredAnalyses = [...this.analyses];
-        })
-      );
+      .then(this.prepareLoadedAnalyses.bind(this));
   }
 
   applyMetricNames(analyses: Array<Analysis | AnalysisDSL>) {
     const metrics = this.store.selectSnapshot(state => state.common.metrics);
     return analyses.map(analysis => ({
       ...analysis,
-      metricName: metrics[analysis.semanticId] ? metrics[analysis.semanticId].metricName : ''
+      metricName: metrics[analysis.semanticId]
+        ? metrics[analysis.semanticId].metricName
+        : ''
     }));
   }
 

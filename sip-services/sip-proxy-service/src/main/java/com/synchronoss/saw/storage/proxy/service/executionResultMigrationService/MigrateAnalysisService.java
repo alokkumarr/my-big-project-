@@ -75,8 +75,8 @@ public class MigrateAnalysisService {
 
   MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
 
-  @PostConstruct
-  private void init() {
+  /** Call this method to start the migration event based */
+  public void startExecutionResult() {
     if (migrationFlag) {
       LOGGER.info("Execution Result Migration set to true, Starting Migration !!");
       convertBinaryStoreToDslJsonStore();
