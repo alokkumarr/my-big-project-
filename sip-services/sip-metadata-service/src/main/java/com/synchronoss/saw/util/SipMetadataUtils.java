@@ -486,4 +486,61 @@ public class SipMetadataUtils {
     }
     return false;
   }
+
+  /**
+   * check  category is authorized for user.
+   *
+   * @param authTicket ticket
+   * @param categoryId category id
+   * @return boolean
+   */
+  public static Boolean checkCategoryAccessible(Ticket authTicket, String categoryId) {
+    List<Long> catIds = getCategoryIds(authTicket);
+    if (catIds.contains(Long.valueOf(categoryId))) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * get list of category id.
+   *
+   * @param authTicket ticket
+   * @return List category id list
+   */
+  public static List<Long> getCategoryIds(Ticket authTicket) {
+    List<Long> categoryList = new ArrayList<>();
+    List<Products> products = authTicket.getProducts();
+    if (products.size() > 0) {
+      products.forEach(
+          (product) -> {
+            List<ProductModules> prodModules = product.getProductModules();
+            if (prodModules.size() > 0) {
+              prodModules.forEach(
+                  productModules -> {
+                    List<ProductModuleFeature> prodModFeatures = productModules.getProdModFeature();
+                    getCatIds(prodModFeatures, categoryList);
+                  });
+            }
+          });
+    }
+    return categoryList;
+  }
+
+  /**
+   * check given category is exist for user.
+   *
+   * @param productModules productModules
+   * @param list category list
+   */
+  public static void getCatIds(List<ProductModuleFeature> productModules, List list) {
+    if (productModules == null) {
+      return;
+    } else {
+      for (ProductModuleFeature p : productModules) {
+        list.add(p.getProdModFeatureID());
+        getCatIds(p.getProductModuleSubFeatures(), list);
+      }
+    }
+  }
 }

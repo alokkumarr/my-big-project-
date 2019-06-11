@@ -8,6 +8,7 @@ import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
+import { AnalysesResolver } from './view/analyses.resolver';
 import { AnalyzeDesignerModule } from './designer/index';
 
 import { routes } from './routes';
@@ -53,7 +54,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   ],
   declarations: [...COMPONENTS],
   entryComponents: COMPONENTS,
-  providers: [...GUARDS, HtmlDownloadService],
+  providers: [...GUARDS, AnalysesResolver, HtmlDownloadService],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}

@@ -5,6 +5,7 @@ import { AnalyzePageComponent } from './page';
 import { DesignerPageComponent } from './designer';
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { DefaultAnalyzeCategoryGuard } from './guards';
+import { AnalysesResolver } from './view/analyses.resolver';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,9 @@ export const routes: Routes = [
       {
         // name: 'analyze.view',
         path: ':id',
+        resolve: {
+          analyses: AnalysesResolver
+        },
         component: AnalyzeViewComponent
       }
     ]
