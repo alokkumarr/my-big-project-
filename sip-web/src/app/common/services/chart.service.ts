@@ -1052,14 +1052,13 @@ export class ChartService {
         ? xIsString
           ? point.key
           : xIsNumber
-          ? round(point.x, 2)
+          ? point.total ? round(point.total, 2) : round(point.x, 2)
           : point.x
         : xIsString
         ? '{point.key}'
         : xIsNumber
         ? '{point.x:,.2f}'
         : '{point.x}';
-
       const xString = `<tr>
         <th>${fields.x.alias ||
           get(opts, 'labels.x', '') ||
