@@ -35,7 +35,15 @@ class Header extends SideNav {
     this._workbenchLink = element(
       by.xpath('//a[contains(@class,"module-workbench")]')
     );
+
+    this._alertsLink = element(
+      by.xpath('//a[contains(@class,"module-alerts")]')
+    );
+
     this._toastMessage = element(by.css(`[id="toast-container"]`));
+    this._configureAlert = element(
+      by.xpath(`//a[contains(text()," Configure Alerts ")]`)
+    );
   }
 
   clickOnModuleLauncher() {
@@ -96,6 +104,14 @@ class Header extends SideNav {
 
   clickOnToastMessage() {
     commonFunctions.clickOnElement(this._toastMessage);
+  }
+
+  clickOnAlertsLink() {
+    commonFunctions.clickOnElement(this._alertsLink);
+  }
+
+  clickOnConfigureAlert() {
+    commonFunctions.clickOnElement(this._configureAlert);
   }
 }
 module.exports = Header;

@@ -15,7 +15,8 @@ const API_ROUTES = {
   USERS: '/sip/security/auth/admin/cust/manage/users/add',
   ADD_CATEGORIES: '/sip/security/auth/admin/cust/manage/categories/add',
   PRIVILEGES: '/sip/security/auth/admin/cust/manage/privileges/upsert',
-  DELETE_DASHBOARD: '/sip/services/observe/dashboards'
+  DELETE_DASHBOARD: '/sip/services/observe/dashboards',
+  ALERTS: '/sip/services/alerts'
 };
 
 const LOG_LEVELS = {
