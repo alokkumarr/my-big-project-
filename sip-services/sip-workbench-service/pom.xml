@@ -29,7 +29,7 @@
     <mapr.db.version>6.1.0-mapr</mapr.db.version>
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
     <jjwt.version>0.7.0</jjwt.version>
-    <spark-version>2.3.1</spark-version>
+    <spark-version>2.3.2</spark-version>
 
     <!-- TODO: Check livy version 0.5.0 (not getting resolved) -->
     <livy.version>0.5.0-incubating</livy.version>
