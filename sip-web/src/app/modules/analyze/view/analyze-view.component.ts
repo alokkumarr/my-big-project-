@@ -174,12 +174,15 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    this.getCronJobs(this.analysisId);
-    /* Update the new analysis in the current list */
-    this._router.navigate([
-      'analyze',
-      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
-    ]);
+    setTimeout(() => {
+      // Wait till cron job and schedule is created or updated or deleted successfully.
+      this.getCronJobs(analysis.category);
+      /* Update the new analysis in the current list */
+      this._router.navigate([
+        'analyze',
+        isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+      ]);
+    }, 100);
   }
 
   spliceAnalyses(analysis, replace) {
