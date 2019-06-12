@@ -6,8 +6,10 @@ import {
   OnDestroy,
   ElementRef
 } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
+import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
@@ -18,7 +20,7 @@ import {
   combineLatest,
   timer
 } from 'rxjs';
-import { debounce } from 'rxjs/operators';
+import { debounce, first } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
 import * as Bowser from 'bowser';
 import * as forEach from 'lodash/forEach';
@@ -96,7 +98,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
-    public _toastMessage: ToastService
+    public _toastMessage: ToastService,
+    private store: Store
   ) {
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
@@ -313,19 +316,24 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   executeAnalysis(analysis, mode) {
-    this._analyzeActionsService
-      .execute(analysis, mode)
-      .then(executionStarted => {
-        // this.afterExecuteLaunched(analysis);
-        if (!executionStarted && !this.analyses) {
-          // at least load the executed analyses if none are loaded
-          this.loadExecutedAnalysesAndExecutionData(
-            analysis.id,
-            null,
-            analysis.type,
-            null
-          );
-        }
+    this.store
+      .select(state => state.common.metrics)
+      .pipe(first(metrics => values(metrics).length > 0))
+      .subscribe(() => {
+        this._analyzeActionsService
+          .execute(analysis, mode)
+          .then(executionStarted => {
+            // this.afterExecuteLaunched(analysis);
+            if (!executionStarted && !this.analyses) {
+              // at least load the executed analyses if none are loaded
+              this.loadExecutedAnalysesAndExecutionData(
+                analysis.id,
+                null,
+                analysis.type,
+                null
+              );
+            }
+          });
       });
   }
 
@@ -364,11 +372,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   setExecutedAt(executionId) {
-    const finished = (
-      find(this.analyses, execution => execution.id === executionId) || {
-        finished: null
-      }
-    ).finished;
+    const finishedExecution = find(
+      this.analyses,
+      execution => (execution.id || execution.executionId) === executionId
+    ) || {
+      finished: null
+    };
+    const finished =
+      finishedExecution.finished || finishedExecution.finishedTime;
     /* If a valid finish time is found, use that. If not, and if we don't have an
       execution id, we're showing last execution. Use the time from last execution list
     */
@@ -376,7 +387,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       ? this.utcToLocal(finished)
       : executionId
       ? this.executedAt
-      : this.utcToLocal(get(this.analyses, '0.finished', this.executedAt));
+      : this.utcToLocal(Date.now());
     if (isUndefined(this.executedAt)) {
       this.executedAt = moment(
         this.secondsToMillis(
