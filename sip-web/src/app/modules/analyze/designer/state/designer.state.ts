@@ -400,6 +400,7 @@ export class DesignerState {
         return patchState({
           analysis: {
             ...analysis,
+            chartType: subType,
             chartOptions: { ...chartOptions, chartType: subType }
           }
         });
