@@ -23,7 +23,8 @@ public class SipDslIT extends BaseIT {
             .body(jsonNode)
             .when()
             .post(
-                "/saw/services/internal/proxy/storage/fetch?id=f37cde24-b833-46ba-ae2d-42e286c3fc39&ExecutionType=preview")
+                "/saw/services/internal/proxy/storage/fetch"
+                    + "?id=f37cde24-b833-46ba-ae2d-42e286c3fc39&ExecutionType=preview")
             .then()
             .assertThat()
             .statusCode(200)

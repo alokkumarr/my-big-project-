@@ -66,6 +66,7 @@ public class BaseIT {
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
 
+  /** Set up data for All DSL queries. */
   public void setUpData() {
     testData = new JsonObject();
     testData.addProperty("type", "chart");
@@ -81,11 +82,9 @@ public class BaseIT {
     testData.addProperty("modifiedBy", "sipadmin@synchronoss.com");
 
     sipQuery = new JsonObject();
-    JsonArray artifacts = new JsonArray();
 
     JsonObject artifact1 = new JsonObject();
     artifact1.addProperty("artifactName", "sample");
-    JsonArray artifactFields = new JsonArray();
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", "string");
@@ -94,6 +93,7 @@ public class BaseIT {
     field1.addProperty("columnName", "string.keyword");
     field1.addProperty("displayName", "String");
     field1.addProperty("type", "string");
+    JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
 
     JsonObject field2 = new JsonObject();
@@ -142,11 +142,11 @@ public class BaseIT {
     artifactFields.add(field6);
 
     artifact1.add("fields", artifactFields);
+    JsonArray artifacts = new JsonArray();
     artifacts.add(artifact1);
     sipQuery.add("artifacts", artifacts);
     sipQuery.addProperty("booleanCriteria", "AND");
 
-    JsonArray filters = new JsonArray();
     JsonObject filter1 = new JsonObject();
     filter1.addProperty("type", "long");
     filter1.addProperty("artifactsName", "sample");
@@ -158,6 +158,7 @@ public class BaseIT {
     model.addProperty("operator", "EQ");
     model.addProperty("value", 1000);
     filter1.add("model", model);
+    JsonArray filters = new JsonArray();
     filters.add(filter1);
 
     JsonObject filter2 = new JsonObject();
@@ -170,8 +171,8 @@ public class BaseIT {
     model = new JsonObject();
     model.addProperty("format", "epoch_second");
     model.addProperty("operator", "NEQ");
-    model.addProperty("value", 1483228800000l);
-    model.addProperty("otherValue", 1483228800000l);
+    model.addProperty("value", 1483228800000L);
+    model.addProperty("otherValue", 1483228800000L);
     filter2.add("model", model);
     filters.add(filter2);
 
@@ -185,8 +186,8 @@ public class BaseIT {
     model = new JsonObject();
     model.addProperty("format", "epoch_millis");
     model.addProperty("operator", "BTW");
-    model.addProperty("value", 1451606400000l);
-    model.addProperty("otherValue", 1551606400000l);
+    model.addProperty("value", 1451606400000L);
+    model.addProperty("otherValue", 1551606400000L);
     filter3.add("model", model);
     filters.add(filter3);
 
@@ -206,13 +207,13 @@ public class BaseIT {
 
     sipQuery.add("filters", filters);
 
-    JsonArray sorts = new JsonArray();
     JsonObject sort1 = new JsonObject();
     sort1.addProperty("artifacts", "sample");
     sort1.addProperty("aggregate", "sum");
     sort1.addProperty("columnName", "long");
     sort1.addProperty("type", "long");
     sort1.addProperty("order", "asc");
+    JsonArray sorts = new JsonArray();
     sorts.add(sort1);
 
     sipQuery.add("sorts", sorts);
