@@ -287,7 +287,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     if (!isEmpty(data.analysisFilters)) {
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
-    if (!isEmpty(data.kpiFilters) && !isEmpty(data.kpiFilters.preset)) {
+    if (!isEmpty(data.kpiFilters)) {
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
     this.sidenav.close();
