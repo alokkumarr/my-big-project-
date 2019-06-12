@@ -80,6 +80,8 @@ public class BaseIT {
     testData.addProperty("createdBy", "sipadmin@synchronoss.com");
     testData.addProperty("modifiedTime", 1543921879);
     testData.addProperty("modifiedBy", "sipadmin@synchronoss.com");
+    testData.addProperty("category","5");
+    testData.addProperty("userId",1);
 
     sipQuery = new JsonObject();
 

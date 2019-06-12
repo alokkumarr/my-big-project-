@@ -5,12 +5,14 @@ import static io.restassured.RestAssured.given;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SipDslIT extends BaseIT {
+  String analysisId;
 
   @Test
   public void testSipDsl() throws IOException {
@@ -23,7 +25,7 @@ public class SipDslIT extends BaseIT {
             .body(jsonNode)
             .when()
             .post(
-                "/saw/services/internal/proxy/storage/fetch"
+                "/sip/services/internal/proxy/storage/fetch"
                     + "?id=f37cde24-b833-46ba-ae2d-42e286c3fc39&ExecutionType=preview")
             .then()
             .assertThat()
@@ -46,7 +48,7 @@ public class SipDslIT extends BaseIT {
             .header("Authorization", "Bearer " + token)
             .body(jsonNode)
             .when()
-            .post("/saw/services/internal/proxy/storage/execute")
+            .post("/sip/services/internal/proxy/storage/execute")
             .then()
             .assertThat()
             .statusCode(200)
@@ -55,5 +57,99 @@ public class SipDslIT extends BaseIT {
     Assert.assertNotNull(response);
     ArrayNode root = response.getBody().as(ArrayNode.class);
     Assert.assertEquals(root.get(0).get("string").asText(), testStringFilter);
+  }
+
+  @Test
+  public void testCreateAnalysis() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(jsonNode)
+            .when()
+            .post("/sip/services/dslanalysis/")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    Assert.assertNotNull(response);
+    ObjectNode root = response.getBody().as(ObjectNode.class);
+    analysisId = root.get("analysisId").asText();
+  }
+
+  @Test
+  public void testUpdateAnalysis() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(jsonNode)
+        .when()
+        .put("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testGetAnalysis() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .get("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testGetAnalysisByCategory() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .get("/sip/services/dslanalysis/" + analysisId + "?category=5")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testDeleteAnalysis() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testListExecutions() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .get("/sip/services/internal/proxy/storage/" + analysisId + "/executions")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testLastExecutionsData() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
+        .then()
+        .assertThat()
+        .statusCode(200);
   }
 }
