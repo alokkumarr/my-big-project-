@@ -22,10 +22,10 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   //updated fields
-  const yAxisName = 'Integer';
-  const xAxisName = 'String';
+  const metrics = 'Integer';
+  const dimension = 'Date';
   const yAxisName2 = 'Long';
-  const groupName = 'Date';
+  const groupName = 'String';
   const sizeByName = 'Float';
 
   let analysisId;
@@ -112,12 +112,16 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
         executePage.clickOnEditLink();
 
         const chartDesignerPage = new ChartDesignerPage();
+        chartDesignerPage.searchInputPresent();
         chartDesignerPage.clearAttributeSelection();
 
-        chartDesignerPage.searchInputPresent();
-        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
-        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
-
+        if (data.chartType === 'chart:pie') {
+          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+        } else {
+          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        }
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
           chartDesignerPage.clickOnAttribute(groupName, 'Color By');
