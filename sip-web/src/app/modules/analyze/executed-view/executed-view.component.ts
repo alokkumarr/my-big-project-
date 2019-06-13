@@ -217,9 +217,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
-          if (!this.executedAt) {
-            this.setExecutedAt(this.executionId);
-          }
+          this.setExecutedAt(this.executionId);
         }
       });
     }
@@ -388,7 +386,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     } else {
       /* If execution id is present, try to find an already existing execution
          to load execution time. If not found, it's a weird case, so show
-         last modified time. Can't do much here.
+         current time. Can't do much here.
       */
       const finishedExecution = find(
         this.analyses,
@@ -401,12 +399,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       if (finished) {
         this.executedAt = this.utcToLocal(finished);
       } else {
-        this.executedAt = this.utcToLocal(
-          this.secondsToMillis(
-            (<Analysis>this.analysis).updatedTimestamp ||
-              this.analysis.modifiedTime
-          )
-        );
+        this.executedAt = this.utcToLocal(Date.now());
       }
     }
   }
