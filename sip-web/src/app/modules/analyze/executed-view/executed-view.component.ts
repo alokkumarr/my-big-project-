@@ -298,7 +298,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.detailsSidenav && this.detailsSidenav.close();
-    window['siden'] = this.detailsSidenav;
     this.onetimeExecution = false;
     this._router.navigate(
       ['analyze', 'analysis', this.analysis.id, 'executed'],
@@ -375,7 +374,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
        2. We are loading last execution data
     */
     if (!executionId) {
-      if (this.canAutoRefresh) {
+      if (this.onetimeExecution) {
         this.executedAt = this.utcToLocal(Date.now());
       } else if (this.analyses && this.analyses.length) {
         const execution: any = this.analyses[0];
