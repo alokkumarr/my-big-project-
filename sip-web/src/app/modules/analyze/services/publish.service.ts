@@ -52,8 +52,7 @@ export class PublishService {
       this._executeService.executeAnalysis(model, EXECUTION_MODES.PUBLISH);
     }
     if (type === 'schedule') {
-      this._analyzeService.changeSchedule(model);
-      return Promise.resolve(model);
+      return this._analyzeService.changeSchedule(model).then(() => model);
     } else {
       return <Promise<AnalysisDSL>>this._analyzeService.updateAnalysis(model);
     }
