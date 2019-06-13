@@ -17,7 +17,6 @@ import com.google.gson.JsonArray;
     import sncr.bda.conf.ESLoader;
     import sncr.bda.core.file.HFileOperations;
     import sncr.bda.datasets.conf.DataSetProperties;
-    import sncr.xdf.component.Component;
     import sncr.xdf.context.ComponentServices;
     import sncr.xdf.context.NGContext;
     import sncr.xdf.esloader.esloadercommon.ESHttpClient;
@@ -94,16 +93,17 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             }
 
             ComponentServices pcs[] = {
-                ComponentServices.OutputDSMetadata,
                 ComponentServices.Project,
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark,
             };
-            ComponentConfiguration cfg = NGESLoaderComponent.analyzeAndValidate(configAsStr);
+
+
+            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
             ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
-            logger.warn("Output datasets:");
+            logger.debug("Output datasets:");
             ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.warn(id)
             );
@@ -111,6 +111,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             NGESLoaderComponent component = new NGESLoaderComponent(ngCtxSvc.getNgctx());
             if (!component.initComponent(null))
                 System.exit(-1);
+
+            logger.debug("Starting NGESLoaderComponent......:");
             int rc = component.run();
 
             long end_time = System.currentTimeMillis();
@@ -127,8 +129,10 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
     @Override
     protected int execute() {
         int retVal = 0;
+
         try {
             esLoaderConfig = ngctx.componentConfiguration.getEsLoader();
+
             if (ngctx.inputDataSets != null && !ngctx.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = ngctx.inputDataSets.keySet().iterator().next();
             }
@@ -150,7 +154,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             JsonElement inputDsConfig =
                 new WithDataSet.DataSetHelper(ngctx, services.md).dl.getDSStore().read(ngctx.applicationID + "::" + ESLOADER_DATASET);
             logger.debug("Input DS config = " + inputDsConfig);
-
 
             Tuple2<Integer, Map<String, String>> ret =
                 loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
@@ -187,6 +190,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
      * @throws Exception In case of failures during metadata retrival
      */
     private int registerOrUpdateESDataset(String indexType, ESHttpClient esHttpClient) throws Exception {
+
         String datasetId = ngctx.applicationID + MetadataStore.delimiter + ESLOADER_DATASET;
 
         // Append '_esdata' to the dataset id to identify this as ES dataset
@@ -201,7 +205,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         if (esDatasetElement == null) {
             // Create ES dataset using input dataset
 
-            logger.info("ES dataset doesn't exist. Creating it with input dataset");
+            logger.debug("ES dataset doesn't exist. Creating it with input dataset");
             esDatasetElement = new WithDataSet.DataSetHelper(ngctx, services.md).dl.getDSStore()
                 .read(datasetId);
 
@@ -274,7 +278,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         long recordCount = extractRecordCount(esHttpClient, updatedIndex);
 
         esDatasetObject.addProperty(DataSetProperties.RecordCount.toString(), recordCount);
-
 
         // Update ID Field
         esDatasetObject.addProperty("_id", esDatasetId);
@@ -470,29 +473,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
         return ESLoaderComponent.analyzeAndValidate(config);
-    }
-
-    public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
-
-        ComponentConfiguration compConf = Component.analyzeAndValidate(cfgAsStr);
-        ESLoader esLoaderConfig = compConf.getEsLoader();
-        if (esLoaderConfig == null)
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "es-loader");
-
-        if (esLoaderConfig.getEsNodes() == null || esLoaderConfig.getEsNodes().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
-        }
-        if (esLoaderConfig.getEsPort() == 0) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Port configuration missing.");
-        }
-        if (esLoaderConfig.getDestinationIndexName() == null || esLoaderConfig.getDestinationIndexName().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
-        }
-        if (esLoaderConfig.getEsClusterName() == null || esLoaderConfig.getEsClusterName().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch clustername configuration missing.");
-        }
-
-        return compConf;
     }
 
     private Map<String, Dataset> createDatasetMap() {

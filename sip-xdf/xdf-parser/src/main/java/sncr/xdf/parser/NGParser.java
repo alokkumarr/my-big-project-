@@ -22,7 +22,8 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.file.DLDataSetOperations;
+import sncr.xdf.parser.parsers.NGJsonFileParser;
+import sncr.xdf.parser.parsers.NGParquetFileParser;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
@@ -30,6 +31,7 @@ import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
+import sncr.xdf.parser.spark.HeaderFilter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,11 +41,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.bda.conf.ParserInputFileFormat;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = Logger.getLogger(NGParser.class);
 
+    private ParserInputFileFormat parserInputFileFormat;
     private String lineSeparator;
     private char delimiter;
     private char quoteChar;
@@ -56,6 +60,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private String outputDataSetName;
     private String outputDataSetLocation;
     private String outputFormat;
+    private String outputDataSetMode;
 
 
     private String rejectedDatasetName;
@@ -94,116 +99,271 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     public NGParser() {  super(); }
 
 
+//    protected int execute(){
+//        int retval = 0;
+//
+//        parserInputFileFormat = ctx.componentConfiguration.getParser().getParserInputFileFormat();
+//        sourcePath = ngctx.componentConfiguration.getParser().getFile();
+//        headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
+//        tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
+//            ngctx.batchID,
+//            ngctx.componentName,
+//            null, null);
+//        archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
+//
+//        lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
+//        delimiter = ngctx.componentConfiguration.getParser().getDelimiter().charAt(0);
+//        quoteChar = ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
+//        quoteEscapeChar = ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
+//
+//        errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
+//        recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
+//
+//        schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
+//
+//        tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
+//        logger.trace(tsFormats.toString());
+//
+//        internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
+//
+//        // Output data set
+//        if(ngctx.outputDataSets.size() != 1){
+//            // error - must be only one for parser
+//            logger.error("Found multiple output data set definitions "+ ngctx.outputDataSets.size());
+//        }
+//
+//        logger.info("Outputs = " + ngctx.outputs + "\n");
+//        logger.info("Output DS Size = " + ngctx.outputDataSets.size() + "\n");
+//        logger.info("Output DS = " + ngctx.outputDataSets + "\n");
+//
+//        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
+//        outputDataSetName = ds.getKey();
+//        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
+//        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
+//        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
+//        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
+//
+//        logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+//
+//        Map<String, Object> rejDs = getRejectDatasetDetails() ;
+//
+//        logger.debug("Rejected dataset details = " + rejDs);
+//        if (rejDs != null) {
+//            rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
+//            rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
+//            rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
+//            rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
+//
+//            logger.debug("Rejected dataset " + rejectedDatasetName + " at "
+//                + rejectedDatasetLocation + " with format " + rejectedDataFormat);
+//
+//            if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
+//                rejectedDataFormat = "parquet";
+//            }
+//
+//            logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
+//                + " with format " + rejectedDataFormat);
+//        }
+//
+//        FileSystem fs = HFileOperations.getFileSystem();
+//        try {
+//
+//            if (ctx.fs.exists(new Path(tempDir)))
+//                HFileOperations.deleteEnt(tempDir);
+//
+//
+//            if(headerSize >= 1) {
+//                FileStatus[] files = fs.globStatus(new Path(sourcePath));
+//                // Check if directory has been given
+//                if(files.length == 1 && files[0].isDirectory()){
+//                    // If so - we have to process all the files inside - create the mask
+//                    sourcePath += Path.SEPARATOR + "*";
+//                    // ... and query content
+//                    files = fs.globStatus(new Path(sourcePath));
+//                }
+//                retval = parseFiles(files,  DLDataSetOperations.MODE_APPEND);
+//            } else {
+//                retval = parse(DLDataSetOperations.MODE_APPEND);
+//            }
+//
+//            //Write Consolidated Accepted data
+//            if (this.acceptedDataCollector != null) {
+//                scala.collection.Seq<Column> outputColumns =
+//                    scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+//                Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
+//                ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS);
+//            }
+//
+//            //Write rejected data
+//            if (this.rejectedDataCollector != null) {
+//                boolean status = writeRejectedData();
+//
+//                if (!status) {
+//                    logger.warn("Unable to write rejected data");
+//                }
+//            }
+//
+//        }catch (IOException e){
+//            logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
+//            retval =  -1;
+//        } catch (Exception e) {
+//            logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
+//            retval =  -1;
+//        }
+//        return retval;
+//    }
+
     protected int execute(){
+
         int retval = 0;
 
+        parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ngctx.componentConfiguration.getParser().getFile();
-        headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
         tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
-            ngctx.batchID,
-            ngctx.componentName,
-            null, null);
+                                        ngctx.batchID,
+                                        ngctx.componentName,
+                                      null, null);
+
         archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
 
-        lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
-        delimiter = ngctx.componentConfiguration.getParser().getDelimiter().charAt(0);
-        quoteChar = ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
-        quoteEscapeChar = ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
+        Map<String, Object> outputDataset = getOutputDatasetDetails();
+        logger.debug("Output dataset details = " + outputDataset);
+        outputDataSetName = outputDataset.get(DataSetProperties.Name.name()).toString();
+        outputDataSetLocation = outputDataset.get(DataSetProperties.PhysicalLocation.name()).toString();
 
+        outputDataSetMode = outputDataset.get(DataSetProperties.Mode.name()).toString();
+        logger.debug("Output dataset mode = " + outputDataSetMode);
+
+        outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
+        outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
+        pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
-        schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
+        logger.debug("Input file format = " + this.parserInputFileFormat);
 
-        tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
-        logger.trace(tsFormats.toString());
+        if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+            headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
 
-        internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
+            lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
+            delimiter = (ngctx.componentConfiguration.getParser().getDelimiter() != null)? ngctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+            quoteChar = (ngctx.componentConfiguration.getParser().getQuoteChar() != null)? ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+            quoteEscapeChar = (ngctx.componentConfiguration.getParser().getQuoteEscape() != null)? ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
 
-        // Output data set
-        if(ngctx.outputDataSets.size() != 1){
-            // error - must be only one for parser
-            logger.error("Found multiple output data set definitions "+ ngctx.outputDataSets.size());
-        }
+            schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
+            tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
+            logger.info(tsFormats);
 
-        logger.info("Outputs = " + ngctx.outputs + "\n");
-        logger.info("Output DS Size = " + ngctx.outputDataSets.size() + "\n");
-        logger.info("Output DS = " + ngctx.outputDataSets + "\n");
+            internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
 
-        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
-        outputDataSetName = ds.getKey();
-        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
-        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
-        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
-
-        logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
-
-        Map<String, Object> rejDs = getRejectDatasetDetails() ;
-
-        logger.debug("Rejected dataset details = " + rejDs);
-        if (rejDs != null) {
-            rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
-            rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
-            rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
-            rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
-
-            logger.debug("Rejected dataset " + rejectedDatasetName + " at "
-                + rejectedDatasetLocation + " with format " + rejectedDataFormat);
-
-            if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
-                rejectedDataFormat = "parquet";
+            // Output data set
+            if (ngctx.outputDataSets.size() == 0) {
+                logger.error("Output dataset not defined");
+                return -1;
             }
 
-            logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
-                + " with format " + rejectedDataFormat);
-        }
+            logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
-        FileSystem fs = HFileOperations.getFileSystem();
-        try {
+            Map<String, Object> rejDs = getRejectDatasetDetails();
 
-            if (ctx.fs.exists(new Path(tempDir)))
-                HFileOperations.deleteEnt(tempDir);
+            logger.debug("Rejected dataset details = " + rejDs);
+            if (rejDs != null) {
+//            rejectedDatasetName = DATASET.rejected.toString();
+                rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
+                rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
+                rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
+                rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
 
+                logger.debug("Rejected dataset " + rejectedDatasetName + " at "
+                    + rejectedDatasetLocation + " with format " + rejectedDataFormat);
 
-            if(headerSize >= 1) {
-                FileStatus[] files = fs.globStatus(new Path(sourcePath));
-                // Check if directory has been given
-                if(files.length == 1 && files[0].isDirectory()){
-                    // If so - we have to process all the files inside - create the mask
-                    sourcePath += Path.SEPARATOR + "*";
-                    // ... and query content
-                    files = fs.globStatus(new Path(sourcePath));
+                if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
+                    rejectedDataFormat = "parquet";
                 }
-                retval = parseFiles(files,  DLDataSetOperations.MODE_APPEND);
-            } else {
-                retval = parse(DLDataSetOperations.MODE_APPEND);
+
+                logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
+                    + " with format " + rejectedDataFormat);
             }
 
-            //Write Consolidated Accepted data
-            if (this.acceptedDataCollector != null) {
-                scala.collection.Seq<Column> outputColumns =
-                    scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-                Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
-                ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS);
-            }
+            //TODO: If data set exists and flag is not append - error
+            // This is good for UI what about pipeline? Talk to Suren
 
-            //Write rejected data
-            if (this.rejectedDataCollector != null) {
-                boolean status = writeRejectedData();
+            // Check what sourcePath referring
+            FileSystem fs = HFileOperations.getFileSystem();
 
-                if (!status) {
-                    logger.warn("Unable to write rejected data");
+            try {
+
+                if (ctx.fs.exists(new Path(tempDir)))
+                    HFileOperations.deleteEnt(tempDir);
+
+                if(headerSize >= 1) {
+                    logger.debug("Header present");
+                    FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+                    logger.debug("Total number of files in the directory = " + files.length);
+                    // Check if directory has been given
+                    if(files.length == 1 && files[0].isDirectory()){
+                        logger.debug("Files length = 1 and is a directory");
+                        // If so - we have to process all the files inside - create the mask
+                        sourcePath += Path.SEPARATOR + "*";
+                        // ... and query content
+                        files = fs.globStatus(new Path(sourcePath));
+                    }
+                    retval = parseFiles(files,  outputDataSetMode);
+                } else {
+                    logger.debug("No Header");
+                    retval = parse(outputDataSetMode);
                 }
+
+                //Write Consolidated Accepted data
+                if (this.acceptedDataCollector != null) {
+                    scala.collection.Seq<Column> outputColumns =
+                        scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+                    Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
+                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS);
+                }
+
+                //Write rejected data
+                if (this.rejectedDataCollector != null) {
+                    boolean status = writeRejectedData();
+
+                    if (!status) {
+                        logger.warn("Unable to write rejected data");
+                    }
+                }
+
+            }catch (IOException e){
+                logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
+                retval =  -1;
+            } catch (Exception e) {
+                logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
+                retval =  -1;
             }
 
-        }catch (IOException e){
-            logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
-            retval =  -1;
-        } catch (Exception e) {
-            logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
-            retval =  -1;
+        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON)) {
+            NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
+
+            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath);
+
+            this.recCounter.setValue(inputDataset.count());
+
+            commitDataSetFromDSMap(ngctx, inputDataset, outputFormat, tempDir, "append");
+
+            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+
+        } else if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET)) {
+            NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
+            Dataset<Row> inputDataset = parquetFileParser.parseInput(sourcePath);
+
+            this.recCounter.setValue(inputDataset.count());
+
+            commitDataSetFromDSMap(ngctx, inputDataset, outputFormat, tempDir, "append");
+
+            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
         }
+
         return retval;
     }
 
@@ -290,10 +450,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             if (file.isFile()) {
                 // + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0 ) {
+                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
                 }
             }
         }
-        ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
         return 0;
     }
 
@@ -301,8 +461,16 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaRDD<Row> rdd = reader.readToRDD(file.toString(), headerSize)
-            .map(new ConvertToRow(  schema,
+        JavaRDD<String> rdd = reader.readToRDD(file.toString(), 1);
+
+        JavaRDD<Row> parseRdd = rdd
+            // Add line numbers
+            .zipWithIndex()
+            // Filter out header based on line number
+            .filter(new HeaderFilter(headerSize))
+            // Get rid of file numbers
+            .keys()
+            .map(new ConvertToRow(schema,
                 tsFormats,
                 lineSeparator,
                 delimiter,
@@ -315,10 +483,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-        JavaRDD<Row> outputRdd = getOutputData(rdd);
+        JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
-        collectAcceptedData(rdd,outputRdd);
+        collectAcceptedData(parseRdd,outputRdd);
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
@@ -337,7 +505,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Write dataset status = " + rc);
 
         //Filter out Rejected Data
-        collectRejectedData(rdd, outputRdd);
+        collectRejectedData(parseRdd, outputRdd);
         return rc;
     }
 
@@ -375,6 +543,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
      */
     private boolean collectRejectedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
         boolean status = true;
+
         try {
             // Get all entries which are rejected
             logger.debug("Collecting rejected data");
@@ -471,6 +640,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             status = false;
         }
 
+
+
         return status;
     }
 
@@ -518,6 +689,17 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         return  new StructType(structFields);
     }
+
+    private Map<String, Object> getOutputDatasetDetails() {
+        Map<String, Object> outputDataset = null;
+        logger.info("Outputs = " + ngctx.outputs);
+        logger.info("Output DS = " + ngctx.outputDataSets);
+        outputDataset = ngctx.outputs.get(RequiredNamedParameters.Output.toString());
+        logger.debug("Output dataset = " + outputDataset);
+
+        return outputDataset;
+    }
+
 
     private Map<String, Object> getRejectDatasetDetails() {
         Map<String, Object> rejectDataset = null;

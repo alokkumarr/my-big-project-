@@ -336,12 +336,15 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
 
-            String sqlInKey =  dataSetName;//config.getInputs().get(0).getDataSet().toString(); //TRANS_out0
-            String sqlOutKey =  config.getOutputs().get(0).getDataSet().toString(); //TRANS_out
+            String sqlInKey =  dataSetName;
+            int sqlOutputSize = config.getOutputs().size();
+
+            logger.debug("SQL component sqlOutputSize  :" + sqlOutputSize + "\n" );
+
+            String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet();
+
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
-
             ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey,datafileDFmap.get(dataSetName)); //TRANS_OUT
-
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
 
@@ -356,10 +359,16 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             sqlcomponent.run();
 
+            logger.debug("SQL ngSQLCtxSvc.getNgctx().dataSetName  :" + ngSQLCtxSvc.getNgctx().dataSetName + "\n" );
+
+
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(sqlOutKey,ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
-            //ngSQLCtxSvc.getNgctx().dataSetName = sqlOutKey;
-            //dataSetName = sqlOutKey;
+            ngSQLCtxSvc.getNgctx().dataSetName = sqlOutKey;
+            dataSetName = sqlOutKey;
+
+            logger.debug("END SQL ngSQLCtxSvc.getNgctx().dataSetName  :" + ngSQLCtxSvc.getNgctx().dataSetName + "\n" );
+            logger.debug("END SQL sqlOutKey :" + sqlOutKey + "\n" );
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -394,8 +403,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ComponentServices[] sqlcs =
                 {
-                    //ComponentServices.InputDSMetadata,
-                    ComponentServices.OutputDSMetadata,
                     ComponentServices.Project,
                     ComponentServices.TransformationMetadata,
                     ComponentServices.Spark
@@ -403,10 +410,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("Starting ESLoader component :" + "\n" );
 
-            logger.debug("Starting ESLoader component  dataSetName :" + dataSetName +  "\n" );
-
-            ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
-
+            ComponentConfiguration config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
             NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
                 "esloader", batchId);
             ngSQLCtxSvc.initContext(); // debug
@@ -419,15 +423,10 @@ public class XDFDataProcessor  extends AbstractComponent {
             );
 
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-
-            logger.debug("ESLoader component getInputs :" + config.getInputs().size() + "\n" );
-            logger.debug("ESLoader component getInputs :" + config.getInputs() + "\n" );
-
             NGESLoaderComponent esloader = new NGESLoaderComponent(ngSQLCtxSvc.getNgctx());
 
             if (!esloader.initComponent(null))
                 System.exit(-1);
-
 
             esloader.run();
 

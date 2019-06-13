@@ -279,7 +279,7 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
         ComponentConfiguration compConf = new Gson().fromJson(config, ComponentConfiguration.class);
 
-        sncr.bda.conf.Parser parserProps = compConf.getParser();
+        Parser parserProps = compConf.getParser();
         if (parserProps == null) {
             throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
         }
@@ -298,17 +298,41 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
         ComponentConfiguration compConf = new Gson().fromJson(cfgAsStr, ComponentConfiguration.class);
 
-        Sql sparkSQLProps = compConf.getSql();
-        if (sparkSQLProps == null) {
+        Sql SQLProps = compConf.getSql();
+        if (SQLProps == null) {
             throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "sql");
         }
-        if (sparkSQLProps.getScript() == null || sparkSQLProps.getScript().isEmpty()) {
+        if (SQLProps.getScript() == null || SQLProps.getScript().isEmpty()) {
             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL does not have SQL script name.");
         }
-        if (sparkSQLProps.getScriptLocation() == null || sparkSQLProps.getScriptLocation().isEmpty()) {
+        if (SQLProps.getScriptLocation() == null || SQLProps.getScriptLocation().isEmpty()) {
             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
         }
         return compConf;
     }
+
+    public static ComponentConfiguration analyzeAndValidateEsLoaderConf(String cfgAsStr){
+
+        ComponentConfiguration compConf = new Gson().fromJson(cfgAsStr, ComponentConfiguration.class);
+
+        ESLoader esLoaderConfig = compConf.getEsLoader();
+        if (esLoaderConfig == null)
+            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "es-loader");
+
+        if (esLoaderConfig.getEsNodes() == null || esLoaderConfig.getEsNodes().isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
+        }
+        if (esLoaderConfig.getEsPort() == 0) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Port configuration missing.");
+        }
+        if (esLoaderConfig.getDestinationIndexName() == null || esLoaderConfig.getDestinationIndexName().isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
+        }
+        if (esLoaderConfig.getEsClusterName() == null || esLoaderConfig.getEsClusterName().isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: ElasticSearch clustername configuration missing.");
+        }
+        return compConf;
+    }
+
 
 }
