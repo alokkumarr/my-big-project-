@@ -176,11 +176,13 @@ export class AnalyzeListViewComponent implements OnInit {
         caption: 'LAST MODIFIED ON',
         width: '10%',
         calculateCellValue: rowData =>
-          rowData.updatedTimestamp ||
-          rowData.modifiedTime ||
-          rowData.createdTimestamp ||
-          rowData.createdTime ||
-          null,
+          this.secondsToMillis(
+            rowData.updatedTimestamp ||
+              rowData.modifiedTime ||
+              rowData.createdTimestamp ||
+              rowData.createdTime ||
+              null
+          ),
         cellTemplate: 'dateCellTemplate'
       },
       {
@@ -212,5 +214,18 @@ export class AnalyzeListViewComponent implements OnInit {
         });
       }
     });
+  }
+
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
   }
 }

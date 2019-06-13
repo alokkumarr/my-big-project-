@@ -372,6 +372,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   setExecutedAt(executionId) {
+    /* If no execution id present, there can be two possible reasons:
+       1. We executed right now using either auto-refresh or manually
+       2. We are loading last execution data
+    */
     if (!executionId) {
       if (this.canAutoRefresh) {
         this.executedAt = this.utcToLocal(Date.now());
@@ -382,6 +386,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     } else {
+      /* If execution id is present, try to find an already existing execution
+         to load execution time. If not found, it's a weird case, so show
+         last modified time. Can't do much here.
+      */
       const finishedExecution = find(
         this.analyses,
         execution => (execution.id || execution.executionId) === executionId
