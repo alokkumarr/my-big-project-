@@ -372,31 +372,34 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   setExecutedAt(executionId) {
-    const finishedExecution = find(
-      this.analyses,
-      execution => (execution.id || execution.executionId) === executionId
-    ) || {
-      finished: null
-    };
-    const finished =
-      finishedExecution.finished || finishedExecution.finishedTime;
-    /* If a valid finish time is found, use that. If not, and if we don't have an
-      execution id, we're showing last execution. Use the time from last execution list
-    */
-    this.executedAt = finished
-      ? this.utcToLocal(finished)
-      : executionId
-      ? this.executedAt
-      : this.utcToLocal(Date.now());
-    if (isUndefined(this.executedAt)) {
-      this.executedAt = moment(
-        this.secondsToMillis(
-          (<Analysis>this.analysis).updatedTimestamp ||
-            this.analysis.modifiedTime
-        )
-      )
-        .local()
-        .format('YYYY/MM/DD h:mm A');
+    if (!executionId) {
+      if (this.canAutoRefresh) {
+        this.executedAt = this.utcToLocal(Date.now());
+      } else if (this.analyses && this.analyses.length) {
+        const execution: any = this.analyses[0];
+        this.executedAt = this.utcToLocal(
+          this.secondsToMillis(execution.finished || execution.finishedTime)
+        );
+      }
+    } else {
+      const finishedExecution = find(
+        this.analyses,
+        execution => (execution.id || execution.executionId) === executionId
+      ) || {
+        finished: null
+      };
+      const finished =
+        finishedExecution.finished || finishedExecution.finishedTime;
+      if (finished) {
+        this.executedAt = this.utcToLocal(finished);
+      } else {
+        this.executedAt = this.utcToLocal(
+          this.secondsToMillis(
+            (<Analysis>this.analysis).updatedTimestamp ||
+              this.analysis.modifiedTime
+          )
+        );
+      }
     }
   }
 

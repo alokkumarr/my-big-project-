@@ -22,11 +22,12 @@
             analysis.userFullName || analysis.createdBy | changeCase: 'title'
           }}
         </div>
-        <div *ngIf="analysis.createdTimestamp || analysis.createdTime">
+        <div *ngIf="analysis.createdTime || analysis.createdTime">
           <strong>Created Time:</strong>
           {{
-            utcToLocal(analysis.createdTimestamp) ||
-              utcToLocal(analysis.createdTime)
+            utcToLocal(
+              secondsToMillis(analysis.createdTime || analysis.createdTimestamp)
+            )
           }}
         </div>
         <div *ngIf="analysis.updatedUserName || analysis.modifiedBy">
@@ -36,8 +37,11 @@
         <div *ngIf="analysis.updatedTimestamp || analysis.modifiedTime">
           <strong>Last Modified Time:</strong>
           {{
-            utcToLocal(analysis.updatedTimestamp) ||
-              utcToLocal(analysis.modifiedTime)
+            utcToLocal(
+              secondsToMillis(
+                analysis.updatedTimestamp || analysis.modifiedTime
+              )
+            )
           }}
         </div>
         <div *ngIf="executedBy">
