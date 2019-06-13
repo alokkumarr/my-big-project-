@@ -66,8 +66,13 @@ public class HFileProcessor implements FileProcessor {
     conf.set("hadoop.job.ugi", user);
     FileSystem fs = FileSystem.get(URI.create(location), conf);
     Path path = new Path(filePath);
+    Path parent = path.getParent();
     if (fs.exists(path)) {
-      isFileDeleted = fs.delete(path, false);
+      isFileDeleted = fs.delete(path, true);
+    }
+    if( fs.exists(parent) && fs.
+        listStatus(parent).length == 0) {
+      fs.delete(parent,true);
     }
     return isFileDeleted;
   }

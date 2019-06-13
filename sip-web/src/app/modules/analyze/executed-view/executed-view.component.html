@@ -76,7 +76,7 @@
     </mat-card>
   </mat-sidenav>
   <mat-sidenav-content
-    [ngClass]="analysis && analysis.type === 'chart' ? 'executed-view' : ''"
+    [ngClass]="analysis?.type === 'chart' ? 'executed-view' : ''"
   >
     <div fxLayout="column">
       <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
@@ -202,12 +202,8 @@
           >
           </executed-chart-view>
 
-          <div *ngSwitchCase="'map'">
+          <div *ngSwitchCase="'map'" #mapView>
             <executed-map-view
-              *ngIf="
-                analysis?.mapOptions?.mapType === 'map' ||
-                analysis?.mapOptions?.mapType === 'chart_scale'
-              "
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"

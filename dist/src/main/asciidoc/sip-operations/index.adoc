@@ -409,6 +409,21 @@ cluster encrypt data stored in the database.  Database encryption is
 set up automatically on the first installation and happens thereafter
 transparently.
 
+=== Elasticsearch SSL configuration
+
+SIP communication with SSL enabled elasticsearch cluster require
+elasticsearch SSL keystore and password (in case of secured with
+password). We need to specify the below properties in sip-config
+file
+
+                saw_elasticsearch_protocol=https
+                sip_elasticsearch_keyStorePath=<JKS Keystorepath>
+                sip_elasticsearch_keyStorePassword=<keystore password>
+
+SIP accepts JKS as keystore format, in case of any key format
+another like PEM key, Keys needs to be converted into jks format and
+configured
+
 == Monitoring
 
 To support monitoring of a SIP environment, services expose health
@@ -819,6 +834,23 @@ Service to use the required number of session, add the below to the
 
 After that run `systemctl reload sshd` to reload the SSH daemon
 configuration.
+
+The Batch Ingestion Service intitially scans for matching files 
+with pattern and creates records for processing. Scanned records
+will be picked up by worker threads for transfer. Below property
+is used to for worker threads schedule to pick up scanned records
+
+    worker.delay: 5000
+
+Any long running 'INPROGRESS' file transfers/jobs will be marked as 'FAILED'
+Long runing transfers will be again picked up by retry. Long running job is marked 
+as failed  after waiting for 1 day(default value) to make sure no impact on 
+huge files.
+
+
+    max.inprogress.mins: 45
+    max.inprogress.job.mins: 1440
+
 
 == Batch Ingestion : High Availability
 

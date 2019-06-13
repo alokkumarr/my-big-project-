@@ -8,6 +8,7 @@ import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
+import { AnalysesResolver } from './view/analyses.resolver';
 import { AnalyzeDesignerModule } from './designer/index';
 
 import { routes } from './routes';
@@ -15,22 +16,18 @@ import { routes } from './routes';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 
 import { CommonModuleTs } from '../../common';
+import { HtmlDownloadService } from '../../common/services';
 import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
-import {
-  DesignerPageComponent,
-} from './designer';
+import { DesignerPageComponent } from './designer';
 
 import { AnalyzeFilterModule } from './designer/filter';
 
 import { AnalyzePageComponent } from './page';
 import { AnalyzeState } from './state/analyze.state';
 
-const COMPONENTS = [
-  DesignerPageComponent,
-  AnalyzePageComponent
-];
+const COMPONENTS = [DesignerPageComponent, AnalyzePageComponent];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
 
@@ -57,7 +54,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   ],
   declarations: [...COMPONENTS],
   entryComponents: COMPONENTS,
-  providers: [...GUARDS],
+  providers: [...GUARDS, AnalysesResolver, HtmlDownloadService],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModule {}
