@@ -26,7 +26,7 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "description": "userOne should be apply prompt filter wih Number attribute"
       },
       "ESPFL004": {
@@ -36,7 +36,7 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "description": "Admin should be apply prompt filter wih String attribute"
       },
       "ESPFL005": {
@@ -46,7 +46,7 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "description": "userOne should be apply prompt filter wih String attribute"
       },
       "ESPFL006": {
@@ -56,7 +56,7 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "description": "Admin should be apply prompt filter wih Number attribute"
       }
     }
