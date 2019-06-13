@@ -28,7 +28,7 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "chartType": "chart:combo",
         "description": "Admin should be able to add Number prompt filter and execute chart:combo"
       },
@@ -39,7 +39,7 @@
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "chartType": "chart:combo",
         "description": "User should be able to add Number prompt filter and execute chart:combo"
       },
@@ -50,7 +50,7 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "chartType": "chart:combo",
         "description": "Admin should be able to add String prompt filter and execute chart:combo"
       },
@@ -61,7 +61,7 @@
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "chartType": "chart:combo",
         "description": "User should be able to add String prompt filter and execute chart:combo"
       }

@@ -17,12 +17,12 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
   let analysisId;
   let host;
   let token;
-  const yAxisName = 'Double';
-  const xAxisName = 'Date';
-  const groupName = 'String';
   const metricName = dataSets.pivotChart;
-  const sizeByName = 'Float';
+  const metrics = 'Integer';
+  const dimension = 'Date';
   const yAxisName2 = 'Long';
+  const groupName = 'String';
+  const sizeByName = 'Float';
 
   beforeAll(() => {
     logger.info('Starting charts/createAndDelete.test.js.....');
@@ -75,8 +75,14 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
 
         const chartDesignerPage = new ChartDesignerPage();
         chartDesignerPage.searchInputPresent();
-        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
-        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
+
+        if (data.chartType === 'chart:pie') {
+          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+        } else {
+          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        }
 
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
