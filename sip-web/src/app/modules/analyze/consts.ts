@@ -258,6 +258,14 @@ export const ANALYSIS_METHODS = [
             type: 'chart:bubble'
           },
           {
+            label: 'Packed Bubble Chart',
+            icon: {
+              font: 'icon-bubble-chart',
+              svg: 'bubble-chart-col'
+            },
+            type: 'chart:packedbubble'
+          },
+          {
             label: 'Pie Chart',
             icon: {
               font: 'icon-pie-chart',

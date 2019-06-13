@@ -51,6 +51,8 @@ const onReorder = (columns: ArtifactColumns) => {
 
 const canAcceptNumberType = ({ type }: ArtifactColumnChart) =>
   NUMBER_TYPES.includes(type);
+const canAcceptStringType = ({ type }: ArtifactColumnChart) =>
+  type === 'string';
 const canAcceptDateType = ({ type }: ArtifactColumnChart) =>
   DATE_TYPES.includes(type);
 const canAcceptGeoType = ({ geoType }: ArtifactColumnChart) =>
@@ -313,7 +315,18 @@ export class DesignerService {
       unset(artifactColumn, 'limitValue');
     };
 
-    const metricTitle = chartType === 'pie' ? 'Angle' : 'Metrics';
+    let metricTitle;
+    switch (chartType) {
+      case 'packedbubble':
+        metricTitle = 'Size';
+        break;
+      case 'pie':
+        metricTitle = 'Angle';
+        break;
+      default:
+        metricTitle = 'Metrics';
+        break;
+    }
     const groupByTitle = chartType === 'bubble' ? 'Color By' : 'Group By';
     const dimensionTitle = chartType === 'pie' ? 'Color By' : 'Dimension';
 
@@ -361,9 +374,11 @@ export class DesignerService {
         groupAdapters,
         adapter => adapter.title === groupByTitle
       );
+      const isMoreThanOneGroupField = groupByGroupAdapter
+        ? groupByGroupAdapter.artifactColumns.length > 0
+        : true;
       return (
-        groupByGroupAdapter.artifactColumns.length > 0 &&
-        groupAdapter.artifactColumns.length === 1
+        isMoreThanOneGroupField && groupAdapter.artifactColumns.length === 1
       );
     };
 
@@ -384,6 +399,8 @@ export class DesignerService {
 
     const canAcceptDimensionType = isStockChart
       ? canAcceptDateType
+      : chartType === 'packedbubble'
+      ? canAcceptStringType
       : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
@@ -409,7 +426,9 @@ export class DesignerService {
       type: 'chart',
       marker: 'y',
       maxAllowed: () =>
-        ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity,
+        ['pie', 'bubble', 'stack', 'packedbubble'].includes(chartType)
+          ? 1
+          : Infinity,
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,

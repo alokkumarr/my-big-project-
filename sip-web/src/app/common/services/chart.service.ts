@@ -662,8 +662,7 @@ export class ChartService {
           name: data[i].drilldown.categories[j],
           y: data[i].drilldown.data[j],
           /* eslint-disable */
-          color: this._Highcharts
-            .Color(data[i].color)
+          color: new this._Highcharts.Color(data[i].color)
             .brighten(brightness)
             .get()
           /* eslint-enable */
@@ -959,6 +958,9 @@ export class ChartService {
     };
 
     switch (type) {
+      case 'packedbubble':
+        changes = this.getPackedBubbleChartConfig(fields, gridData);
+        break;
       case 'pie':
         changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
@@ -977,6 +979,56 @@ export class ChartService {
     }
 
     return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
+  }
+
+  getPackedBubbleChartConfig(fields, gridData) {
+    const groupField = fields.g;
+    const hasGroupBy = Boolean(groupField);
+
+    const dataMapper = dataPoint => {
+      const valueProp = fields.y[0].columnName;
+      const nameProp = fields.x.dataField;
+      return { name: dataPoint[nameProp], value: dataPoint[valueProp] };
+    };
+
+    const dataLabels = {
+      enabled: true,
+      format: '{point.name}',
+      style: {
+        color: 'black',
+        textOutline: 'none',
+        fontWeight: 'normal'
+      },
+      minSize: '30%',
+      maxSize: '120%',
+      zMin: 0,
+      zMax: 1000,
+      layoutAlgorithm: {
+        splitSeries: false,
+        gravitationalConstant: 0.02
+      }
+    };
+
+    if (hasGroupBy) {
+      const groupProp = groupField.dataField;
+      const series = fpPipe(
+        fpGroupBy(fields.g.dataField),
+        fpMap(group => {
+          const name = group[0][groupProp];
+          return { name, data: map(group, dataMapper) };
+        })
+      )(gridData);
+      return [
+        { path: 'series', data: series },
+        { path: 'plotOptions.packedbubble.dataLabels', data: dataLabels }
+      ];
+    }
+
+    const data = map(gridData, dataMapper);
+    return [
+      { path: 'series', data: [{ data: data }] },
+      { path: 'plotOptions.packedbubble.dataLabels', data: dataLabels }
+    ];
   }
 
   addTooltipsAndLegend(fields, chartType, opts) {
