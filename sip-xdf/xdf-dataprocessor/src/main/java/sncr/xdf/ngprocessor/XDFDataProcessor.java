@@ -161,16 +161,9 @@ public class XDFDataProcessor  extends AbstractComponent {
             };
 
             ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
-
             NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
-
             ngParserCtxSvc.initContext();
-
             ngParserCtxSvc.registerOutputDataSet();
-
-            ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
-            String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
-            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
 
             logger.warn("Output datasets:");
 
@@ -180,6 +173,9 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.warn(ngParserCtxSvc.getNgctx().toString());
 
+            ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
+            String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
             ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
@@ -251,12 +247,12 @@ public class XDFDataProcessor  extends AbstractComponent {
                 logger.trace(id)
             );
 
-            ngTransformerCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String transInKey =  config.getInputs().get(0).getDataSet().toString();
             String transOutKey =  config.getOutputs().get(0).getDataSet().toString();
+
+            ngTransformerCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
             ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey,datafileDFmap.get(dataSetName));
-
             ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
@@ -334,7 +330,6 @@ public class XDFDataProcessor  extends AbstractComponent {
                 logger.trace(id)
             );
 
-            ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
 
             String sqlInKey =  dataSetName;
             int sqlOutputSize = config.getOutputs().size();
@@ -343,32 +338,27 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet();
 
+            ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
             ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey,datafileDFmap.get(dataSetName)); //TRANS_OUT
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
-
-            logger.debug("SQL component getInputs :" + config.getInputs().size() + "\n" );
-            logger.debug("SQL component getInputs :" + config.getInputs() + "\n" );
 
             NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
 
             if (!sqlcomponent.initComponent(null))
                 System.exit(-1);
 
-
             sqlcomponent.run();
 
             logger.debug("SQL ngSQLCtxSvc.getNgctx().dataSetName  :" + ngSQLCtxSvc.getNgctx().dataSetName + "\n" );
 
-
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(sqlOutKey,ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
-            ngSQLCtxSvc.getNgctx().dataSetName = sqlOutKey;
             dataSetName = sqlOutKey;
 
-            logger.debug("END SQL ngSQLCtxSvc.getNgctx().dataSetName  :" + ngSQLCtxSvc.getNgctx().dataSetName + "\n" );
-            logger.debug("END SQL sqlOutKey :" + sqlOutKey + "\n" );
+            logger.debug("End Of SQL Component  dataSetName :" + dataSetName +  "\n" );
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -401,7 +391,7 @@ public class XDFDataProcessor  extends AbstractComponent {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
             }
 
-            ComponentServices[] sqlcs =
+            ComponentServices[] escs =
                 {
                     ComponentServices.Project,
                     ComponentServices.TransformationMetadata,
@@ -411,26 +401,33 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.debug("Starting ESLoader component :" + "\n" );
 
             ComponentConfiguration config = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
-            NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
+            NGContextServices ngESCtxSvc = new NGContextServices(escs, xdfDataRootSys, config, appId,
                 "esloader", batchId);
-            ngSQLCtxSvc.initContext(); // debug
-            ngSQLCtxSvc.registerOutputDataSet();
+            ngESCtxSvc.initContext(); // debug
 
             logger.trace("Output datasets:   ");
 
-            ngSQLCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+            ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.trace(id)
             );
 
-            ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            NGESLoaderComponent esloader = new NGESLoaderComponent(ngSQLCtxSvc.getNgctx());
+            String dataSetInKey =  config.getInputs().get(0).getDataSet();
+
+            logger.debug("ES loader Dataset Name is    " + dataSetInKey);
+
+            ngESCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
+            ngESCtxSvc.getNgctx().dataSetName = dataSetInKey;
+            ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey,datafileDFmap.get(dataSetName));
+            ngESCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+
+            NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
 
             if (!esloader.initComponent(null))
                 System.exit(-1);
 
             esloader.run();
 
-            logger.debug("ESLoader Component done : " + "\n" );
+            logger.debug("End of ESLoader Component done : " + ngESCtxSvc.getNgctx().dataSetName + "\n" );
 
         } catch (Exception e) {
             e.printStackTrace();
