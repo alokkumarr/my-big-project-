@@ -1,0 +1,51 @@
+<div fxLayout="row" fxFill fxLayoutAlign="space-between start">
+  <div
+    fxFlex
+    class="weather__description"
+    fxLayout="column"
+    fxLayoutAlign="start start"
+  >
+    <img *ngIf="weather" [src]="weather?.iconUrl" />
+    <mat-icon [class]="weather?.iconClass + ' weather-icon'"></mat-icon>
+    <span>{{ weather?.description | titlecase }}</span>
+    <div fxLayout="row" fxLayoutGap="25px">
+      <span class="temperature"> {{ weather?.temp }}°F </span>
+      <div>
+        <div class="details" fxLayout="row" fxLayoutGap="7px">
+          <mat-icon class="wi wi-thermometer"></mat-icon>
+          <div>Min: {{ weather?.minTemp }}°</div>
+          <div>Max: {{ weather?.maxTemp }}°</div>
+        </div>
+        <div class="details" fxLayout="row" fxLayoutGap="7px">
+          <mat-icon class="wi wi-barometer"></mat-icon>
+          <span>Pressure: {{ weather?.pressure }} hPa</span>
+        </div>
+        <div class="details" fxLayout="row" fxLayoutGap="7px">
+          <mat-icon class="wi wi-humidity"></mat-icon>
+          <span>Humidity: {{ weather?.humidity }} %</span>
+        </div>
+        <div class="details" fxLayout="row" fxLayoutGap="7px">
+          <mat-icon class="wi wi-windy"></mat-icon>
+          <span>Wind: {{ weather?.wind?.speed }} m/hr</span>
+          <!-- <mat-icon [class]="windIcon"></mat-icon> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="location-info"
+    fxLayout="column"
+    fxFlex="30"
+    fxLayoutAlign="end end"
+  >
+    <div class="location">
+      {{ weather?.location | titlecase }}
+    </div>
+    <div class="local-time">
+      {{ localTime }}
+    </div>
+    <div class="local-date">
+      {{ localDate }}
+    </div>
+  </div>
+</div>

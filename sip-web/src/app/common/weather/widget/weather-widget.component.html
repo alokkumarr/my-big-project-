@@ -1,0 +1,14 @@
+<mat-card
+  fxLayout="column"
+  [style.background-image]="bgImgUrl"
+  fxFlex
+  fxLayoutGap="15px"
+>
+  <weather-today
+    fxFlex="60"
+    [weather]="weather$ | async"
+    (bgURL)="getbgURL($event)"
+  ></weather-today>
+  <weather-forecast fxFlex="40" [forecasts]="forecasts$ | async">
+  </weather-forecast>
+</mat-card>

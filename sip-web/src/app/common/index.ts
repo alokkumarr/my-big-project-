@@ -90,6 +90,8 @@ import {
   CreatefolderDialogComponent
 } from './components/remote-folder-selector';
 
+import { WeatherModule } from './weather/weather.module';
+
 import {
   DxDataGridService,
   ErrorDetailService,
@@ -133,7 +135,8 @@ const MODULES = [
   OwlNativeDateTimeModule,
   UChartModule,
   ClickOutsideModule,
-  MapBoxModule
+  MapBoxModule,
+  WeatherModule
 ];
 
 const COMPONENTS = [
