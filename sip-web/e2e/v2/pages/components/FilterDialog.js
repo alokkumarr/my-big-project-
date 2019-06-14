@@ -95,6 +95,7 @@ class FilterDialog {
 
   clickOnApplyFilterButton() {
     commonFunctions.clickOnElement(this._applyFiltersBtn);
+    browser.sleep(2000);
   }
 
   clickOnPromptCheckBox() {
