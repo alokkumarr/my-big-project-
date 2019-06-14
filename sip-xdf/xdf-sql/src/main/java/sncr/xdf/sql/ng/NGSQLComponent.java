@@ -55,8 +55,6 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         try {
             executor = new NGJobExecutor(this);
             String tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
-                ngctx.batchID,
-                ngctx.componentName,
                 null, null);
             logger.info("tempDir : " +tempDir);
             int rc = executor.start(tempDir);

@@ -220,8 +220,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
         sourcePath = ngctx.componentConfiguration.getParser().getFile();
         tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
-                                        ngctx.batchID,
-                                        ngctx.componentName,
                                       null, null);
 
         archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
@@ -445,17 +443,22 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
-        String tempPath = tempDir;
+
         for (FileStatus file : files) {
             if (file.isFile()) {
-                // + Path.SEPARATOR + file.getPath().getName();
-                if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0 ) {
-                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+                String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
+
+                int retVal = parseSingleFile(file.getPath(), new Path(tempPath));
+                if (retVal == 0) {
+                    ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
+                } else {
+                    return retVal;
                 }
             }
         }
         return 0;
     }
+
 
     private int parseSingleFile(Path file, Path destDir){
         logger.trace("Parsing " + file + " to " + destDir +"\n");
@@ -500,6 +503,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         int rc = 0;
         logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
+
         rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), "append");
 
         logger.debug("Write dataset status = " + rc);
@@ -523,6 +527,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else {
                 acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
             }
+            logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
+
         } catch (Exception exception) {
             logger.error(exception);
             logger.debug(ExceptionUtils.getStackTrace(exception));

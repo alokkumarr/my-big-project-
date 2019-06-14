@@ -63,10 +63,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
     @Override
     protected int execute(){
+
         try {
             tempLocation = generateTempLocation(new DataSetHelper(ngctx, services.md),
-                ngctx.batchID,
-                ngctx.componentName,
                 null, null);
 
 //1. Read expression/scripts, compile it??
@@ -100,6 +99,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     dsMap.put(entry.getKey(), ds);
                 }
             }
+
             Transformer.ScriptEngine engine = ngctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ngctx.componentConfiguration.getTransformer().getOutputSchema();
             if (ou != null && ou.size() > 0){
@@ -115,7 +115,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                             tempLocation,
                             st   );
                     if (ngctx.runningPipeLine)
-                        //jexlExecutorWithSchema.executeSingleProcessor(ngctx.datafileDFmap,ngctx);
                         jexlExecutorWithSchema.executeSingleProcessor(ngctx);
                     else
                         jexlExecutorWithSchema.execute(dsMap);
@@ -125,7 +124,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     if ( ngctx.componentConfiguration.getTransformer().getScriptPreamble() != null &&
                         ! ngctx.componentConfiguration.getTransformer().getScriptPreamble().isEmpty())
                         preamble = HFileOperations.readFile(ngctx.componentConfiguration.getTransformer().getScriptPreamble());
-
 
                     script = preamble + script;
                     logger.trace( "Script to execute: " + script);

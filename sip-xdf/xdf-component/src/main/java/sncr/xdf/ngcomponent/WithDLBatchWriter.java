@@ -39,6 +39,7 @@ public interface WithDLBatchWriter {
     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
+
         try {
 
             WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
@@ -63,7 +64,6 @@ public interface WithDLBatchWriter {
                     String sampleDirSource = helper.getSampleSourceDir(moveTask);
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
-
                     WithDLBatchWriterHelper.logger.debug("Clean up sample for " + moveTask.objectName);
                     if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
 
@@ -74,6 +74,8 @@ public interface WithDLBatchWriter {
                 else{
                     WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
+
+                helper.createDestDir(moveTask.dest, moveTask.source);
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
@@ -240,8 +242,8 @@ public interface WithDLBatchWriter {
                     outputDS = ngctx.outputs.get(dataSetName);
 
                 String name = (String) outputDS.get(DataSetProperties.Name.name());
-
-                String loc = location + Path.SEPARATOR + name;
+                String loc = location;
+                //String loc = location + Path.SEPARATOR + name;
                 logger.info("Output write location : " + loc);
 
                 format = (String) outputDS.get(DataSetProperties.Format.name());
@@ -312,8 +314,6 @@ public interface WithDLBatchWriter {
             } else if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_JSON)) {
             }
 
-            createOrCleanUpDestDir(dest, objectName);
-
             WithDLBatchWriterHelper.logger.info("Moving files from " + source + " to " + dest);
 
             //get list of files to be processed
@@ -356,6 +356,22 @@ public interface WithDLBatchWriter {
                     for (int i = 0; i < list.length; i++) {
                         fs.delete(list[i].getPath(), true);
                     }
+
+                } else {
+                    logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
+                    fs.mkdirs(objOutputPath);
+                }
+            } catch (IOException e) {
+                logger.warn("IO exception in attempt to create/clean up: destination directory", e);
+                return -1;
+            }
+            return 0;
+        }
+
+        public int createDestDir(String dest, String objectName) {
+            Path objOutputPath = new Path(dest);
+            try {
+                if (fs.exists(objOutputPath)) {
 
                 } else {
                     logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");

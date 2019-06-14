@@ -1,5 +1,6 @@
 package sncr.xdf.transformer.ng;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -11,6 +12,8 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.context.DSMapKey;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
@@ -39,6 +42,7 @@ public abstract class NGExecutor {
     protected Dataset<Row> rejectedRecords;
 
     protected WithContext parent;
+
 
     private static final Logger logger = Logger.getLogger(NGExecutor.class);
 
@@ -79,7 +83,14 @@ public abstract class NGExecutor {
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
 
         WithDLBatchWriter pres = (WithDLBatchWriter) parent;
-        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location, "replace");
+
+        Map<String, Object> outputDS = parent.getNgctx().outputs.get(resType);
+        String name = (String) outputDS.get(DataSetProperties.Name.name());
+        String loc = location + Path.SEPARATOR + name;
+        logger.debug("writeResults keySet is : " + outputDS.keySet());
+        logger.debug("writeResults name is : " + name);
+        logger.debug("writeResults location is : " + loc);
+        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, loc, "replace");
     }
 
     public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
@@ -125,9 +136,11 @@ public abstract class NGExecutor {
 
     }
 
+
     protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
 
         ds.schema();
+        //getOutputDatasetDetails();
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
         Column trRC = ds.col(RECORD_COUNTER);

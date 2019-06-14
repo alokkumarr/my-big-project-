@@ -35,7 +35,6 @@ public class XDFDataProcessor  extends AbstractComponent {
     Map<String, Dataset> datafileDFmap = new HashMap<>();
     String dataSetName = "";
 
-
     public static void main(String[] args)  {
 
         long start_time = System.currentTimeMillis();
@@ -191,7 +190,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             dataSetName = parserKey;
 
             logger.debug("End Of Parser Component  dataSetName :" + dataSetName +  "\n" );
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -231,7 +229,6 @@ public class XDFDataProcessor  extends AbstractComponent {
                     ComponentServices.Spark
                 };
 
-
             logger.debug("Starting Transformer component :" + "\n" );
 
             ComponentConfiguration config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
@@ -265,12 +262,9 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(transOutKey,ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
-            //ngTransformerCtxSvc.getNgctx().dataSetName = transOutKey;
             dataSetName = transOutKey;
 
             logger.debug("End Of Transformer Component  dataSetName :" + dataSetName +  "\n" );
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -336,7 +330,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("SQL component sqlOutputSize  :" + sqlOutputSize + "\n" );
 
-            String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet();
+            String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet().toString();
 
             ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out

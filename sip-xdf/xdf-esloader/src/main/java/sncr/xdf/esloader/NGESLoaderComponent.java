@@ -117,7 +117,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
             long end_time = System.currentTimeMillis();
             long difference = end_time-start_time;
-            logger.info("Parser total time " + difference );
+            logger.info("ESLoader total time " + difference );
 
             System.exit(rc);
         } catch (Exception e) {

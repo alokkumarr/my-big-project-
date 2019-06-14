@@ -58,16 +58,23 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
 
         Dataset ds = dsMap.get(ngctx.dataSetName);
+
+        ds.toDF().show();
+
         prepareRefData(dsMap);
 
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+
         Long c = transformationResult.count();
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
 
+        df.show();
+        df.printSchema();
+
         //df.schema().prettyJson();
-        logger.trace("Transformation completed: "  +  c + " Schema: " + df.schema().prettyJson());
+        logger.trace("Transformation completed: " + c   + " Schema: " + df.schema().prettyJson());
 
         createFinalDS(df.cache(),ngctx);
     }

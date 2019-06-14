@@ -1,5 +1,6 @@
 package sncr.xdf.sql.ng;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -136,8 +137,10 @@ public class NGSQLExecutor implements Serializable {
 
                 logger.debug(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.transactionalLocation);
 
+                String loc = descriptor.transactionalLocation + Path.SEPARATOR +  descriptor.targetTableName;
+
                 if(!descriptor.isTemporaryTable) {
-                    pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.transactionalLocation , "append");
+                    pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
 
                     long wt = System.currentTimeMillis();
                     descriptor.writeTime = (int) ((wt - exet) / 1000);
