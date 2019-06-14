@@ -45,7 +45,11 @@ import {
   ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import { IsUserLoggedInGuard, DefaultModuleGuard } from './guards';
+import {
+  IsUserLoggedInGuard,
+  DefaultModuleGuard,
+  SSOAuthGuard
+} from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -76,6 +80,7 @@ import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 import { ChartGridComponent } from './components/chart-grid';
+import { SSOAuthComponent } from './components/sso-auth/sso-auth.component';
 
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
@@ -157,7 +162,8 @@ const COMPONENTS = [
   CronJobSchedularComponent,
   ChartGridComponent,
   RemoteFolderSelectorComponent,
-  CreatefolderDialogComponent
+  CreatefolderDialogComponent,
+  SSOAuthComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -208,7 +214,7 @@ const INTERCEPTORS = [
   }
 ];
 
-const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
+const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard, SSOAuthGuard];
 @NgModule({
   imports: [
     NgxsModule.forFeature([CommonState]),

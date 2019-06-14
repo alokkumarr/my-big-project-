@@ -11,14 +11,14 @@ public class S3RetryServiceImpl implements SipRetryContract{
 
 	@Override
 	public void retryFailedJob(Long channelId, Long routeId, String channelType, boolean isDisable, String pid,
-			String status) throws NotFoundException {
+			String status, Long jobId) throws NotFoundException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName, boolean isDisable,
-			String source) {
+			String source, Long jobId, String channelType) {
 		// TODO Auto-generated method stub
 		
 	}

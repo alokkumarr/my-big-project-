@@ -32,8 +32,7 @@
     <div *dxTemplate="let cell of 'linkCellTemplate'">
       <a
         [innerHtml]="cell.text | highlight: searchTerm"
-        [queryParams]="{ isDSL: !!cell.data.sipQuery }"
-        routerLink="../analysis/{{ cell.data.id }}/executed"
+        (click)="navigate(cell.data)"
       >
       </a>
 

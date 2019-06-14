@@ -38,46 +38,12 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${metastore.analysis}")
   private String tableName;
 
-  @Value("${metastore.migration}")
-  private String migrationStatusTable;
-
-  @Value("${metastore.metadataTable}")
-  private String metadataTable;
-
-  @Value("${analysis.get-analysis-url}")
-  @NotNull
-  private String analysisUri;
-
-  @Value("${analysis.binary-migration-required}")
-  @NotNull
-  private boolean migrationRequires;
-
   private ObjectMapper objectMapper = new ObjectMapper();
   private AnalysisMetadata analysisMetadataStore;
 
-  /*{
-    try {
-      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-    } catch (Exception e) {
-      throw new SipIoException("Exception occurred while initializing the analysis metadata table");
-    }
-  }*/
-  @PostConstruct
-  private void init() throws Exception {
-    if (migrationRequires) {
-      logger.trace("Migration initiated.. " + migrationRequires);
-      new MigrateAnalysis()
-          .convertBinaryToJson(
-              tableName, basePath, analysisUri, migrationStatusTable, metadataTable);
-    }
-    logger.trace("Migration ended..");
-  }
-
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
-    // analysis.setCreatedBy(ticket.getMasterLoginId());
     analysis.setCreatedTime(Instant.now().toEpochMilli());
-    // analysis.setCustomerCode(ticket.getCustomerCode());
     try {
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
@@ -92,9 +58,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Override
   public Analysis updateAnalysis(Analysis analysis, Ticket ticket) throws SipUpdateEntityException {
-    // analysis.setModifiedBy(ticket.getMasterLoginId());
     analysis.setModifiedTime(Instant.now().toEpochMilli());
-    // analysis.setCustomerCode(ticket.getCustomerCode());
     try {
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
@@ -118,7 +82,6 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
   }
 
-  // TODO : Response to be changed back to Analysis type
   @Override
   public Analysis getAnalysis(String analysisId, Ticket ticket) throws SipReadEntityException {
     Document doc;

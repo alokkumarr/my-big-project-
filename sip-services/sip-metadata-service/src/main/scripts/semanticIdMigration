@@ -1,6 +1,6 @@
 #!/bin/bash
 ###########################################################################
-# semanticIdMigration.sh
+# semanticIdMigration
 # Author: Alok KumarR
 # Creation Date: JUNE 4 2019
 ###########################################################################
@@ -13,7 +13,7 @@ SEMANTIC_METADATA=${2} # semanticDataStore
 DSL_ANALYSIS_TABLE_NAME=${3} #analysisMetadata
 
 # Fetch the list of mapr libraries
-MAPR_LIB_PATH=${mapr classpath}
+MAPR_LIB_PATH=$(mapr classpath)
 
 METADATA_SERVICE_DIR="/opt/bda/sip-metadata-service"
 JAR_FILE="sip-metadata.jar"

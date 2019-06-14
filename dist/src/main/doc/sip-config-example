@@ -113,6 +113,8 @@ saw_elasticsearch_password=password
 saw_elasticsearch_data_store_limit=10000
 saw_elasticsearch_cluster_name=clustername
 saw_elasticsearch_xpack=true
+#sip_elasticsearch_keyStorePath=server.keystore
+#sip_elasticsearch_keyStorePassword=es123
 
 
 #

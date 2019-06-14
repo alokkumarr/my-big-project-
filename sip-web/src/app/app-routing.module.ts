@@ -1,6 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
+import {
+  IsUserLoggedInGuard,
+  DefaultModuleGuard,
+  SSOAuthGuard
+} from './common/guards';
+import { SSOAuthComponent } from './common/components/sso-auth/sso-auth.component';
 import { MainPageComponent } from './layout';
 
 const routes: Routes = [
@@ -33,6 +38,13 @@ const routes: Routes = [
     path: 'login',
     loadChildren: './login/login.module#LoginModule'
   },
+
+  {
+    path: 'authenticate',
+    canActivate: [SSOAuthGuard],
+    component: SSOAuthComponent
+  },
+
   {
     path: '**',
     redirectTo: ''

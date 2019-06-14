@@ -6,6 +6,7 @@ import {
   Input,
   Output
 } from '@angular/core';
+import { Router } from '@angular/router';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
@@ -61,13 +62,20 @@ export class AnalyzeListViewComponent implements OnInit {
     public _DxDataGridService: DxDataGridService,
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
-    public _executeService: ExecuteService
+    public _executeService: ExecuteService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.config = this.getGridConfig();
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this._executeService.subscribeToAllExecuting(this.onExecutionEvent);
+  }
+
+  navigate(data) {
+    this.router.navigate([`/analyze/analysis/${data.id}/executed`], {
+      queryParams: { isDSL: !!data.sipQuery }
+    });
   }
 
   onExecutionEvent(e) {
@@ -168,11 +176,13 @@ export class AnalyzeListViewComponent implements OnInit {
         caption: 'LAST MODIFIED ON',
         width: '10%',
         calculateCellValue: rowData =>
-          rowData.updatedTimestamp ||
-          rowData.modifiedTime ||
-          rowData.createdTimestamp ||
-          rowData.createdTime ||
-          null,
+          this.secondsToMillis(
+            rowData.updatedTimestamp ||
+              rowData.modifiedTime ||
+              rowData.createdTimestamp ||
+              rowData.createdTime ||
+              null
+          ),
         cellTemplate: 'dateCellTemplate'
       },
       {
@@ -204,5 +214,18 @@ export class AnalyzeListViewComponent implements OnInit {
         });
       }
     });
+  }
+
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
   }
 }

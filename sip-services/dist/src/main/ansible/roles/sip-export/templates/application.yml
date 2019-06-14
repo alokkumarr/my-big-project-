@@ -88,11 +88,11 @@ analysis:
 
 proxy:
   service:
-    host: http://localhost:9800
+    host: ${connector}://localhost:9800
 
 metadata:
   service:
-    host: http://localhost:9501
+    host: ${connector}://localhost:9501
 
 logging:
   config: /opt/bda/saw-export-service/conf/logback.xml

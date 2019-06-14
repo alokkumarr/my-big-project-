@@ -75,8 +75,8 @@ public class MigrateAnalysisService {
 
   MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
 
-  @PostConstruct
-  private void init() {
+  /** Call this method to start the migration event based */
+  public void startExecutionResult() {
     if (migrationFlag) {
       LOGGER.info("Execution Result Migration set to true, Starting Migration !!");
       convertBinaryStoreToDslJsonStore();
@@ -88,7 +88,7 @@ public class MigrateAnalysisService {
   public void convertBinaryStoreToDslJsonStore() {
     List<MigrationStatusObject> mgObj = getMigratedAnalysis();
     Map<String, Boolean> analysisIds = extractAnalysisId(mgObj);
-    LOGGER.debug("Total number analysis migrated : " + analysisIds.size());
+    LOGGER.debug("Total number analysis migrated : {}", analysisIds.size());
     if (analysisIds != null && !analysisIds.isEmpty()) {
       try {
         // base check - open Hbase connection
@@ -99,7 +99,7 @@ public class MigrateAnalysisService {
           if (analysisId != null && !flag) {
             LOGGER.debug("Fetch execution Ids for migration.!");
             Set<String> executionIds = getExecutionIds(analysisId);
-            LOGGER.debug("Total count of execution Ids : ", executionIds.size());
+            LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
             if (!executionIds.isEmpty()) {
               readExecutionResultFromBinaryStore(executionIds, analysisId, connection);
             }
@@ -222,7 +222,7 @@ public class MigrateAnalysisService {
             if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
               LOGGER.info(
                   "Migration result saved successfully !! : {}"
-                      + migrationStatusObject.isExecutionsMigrated());
+                      , migrationStatusObject.isExecutionsMigrated());
             } else {
               LOGGER.error("Unable to write update AnalysisMigration table!!");
             }
@@ -242,7 +242,7 @@ public class MigrateAnalysisService {
         }
       }
     } catch (Exception ex) {
-      LOGGER.error("Execution failed due to missing data." + ex);
+      LOGGER.error("Execution failed due to missing data : {}", ex);
       migrationStatusObject.setExecutionsMigrated(false);
       migrationStatusObject.setMessage("Failed while migration: " + ex.getMessage());
       saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath);
@@ -319,14 +319,15 @@ public class MigrateAnalysisService {
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
       executionResult.setData(objectList);
-      executionResult.setExecutionType(executionType != null ? ExecutionType.valueOf(executionType) : null);
+      executionResult.setExecutionType(
+          executionType != null ? ExecutionType.valueOf(executionType) : null);
       executionResult.setStatus(executionStatus);
       executionResult.setExecutedBy(executedBy);
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in jason Store.");
     } catch (Exception ex) {
-      LOGGER.error(" {Stack trace} : " + ex);
-      LOGGER.error("Error occurred during saving Execution Result :" + ex.getMessage());
+      LOGGER.error(" Stack trace : {}" , ex);
+      LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());
     }
   }
 
@@ -395,7 +396,7 @@ public class MigrateAnalysisService {
       analysisMetadataStore.update(msObj.getAnalysisId(), parsedMigrationStatus);
     } catch (Exception e) {
       LOGGER.error("Error occurred while writing the status to location: {}", msObj.toString());
-      LOGGER.error("stack trace : {}" + e.getMessage());
+      LOGGER.error("stack trace : {}", e.getMessage());
 
       status = false;
     }
@@ -423,7 +424,7 @@ public class MigrateAnalysisService {
         executionList.forEach(
             (JsonObject -> executionIds.add(JsonObject.getAsJsonObject().get("id").getAsString())));
       }
-      LOGGER.info("Number of execution for analysis Id : " + executionIds.size());
+      LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
     }
     return executionIds;
   }
