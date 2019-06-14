@@ -40,6 +40,9 @@ public class SipQuery {
   @JsonProperty("semanticId")
   private String semanticId;
 
+  @JsonProperty("type")
+  private String type;
+
   @JsonProperty("artifacts")
   public List<Artifact> getArtifacts() {
     return artifacts;
@@ -120,7 +123,17 @@ public class SipQuery {
     this.semanticId = semanticId;
   }
 
-    @Override
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
+
+  @JsonProperty("type")
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("artifacts", artifacts)
