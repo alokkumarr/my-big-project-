@@ -287,13 +287,16 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     if (!isEmpty(data.analysisFilters)) {
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
-    if (!isEmpty(data.kpiFilters)) {
+
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
     this.sidenav.close();
   }
 
   loadDashboard(): Observable<Dashboard> {
+    this.filters.resetLastKPIFilterApplied();
     return this.observe.getDashboard(this.dashboardId).pipe(
       map((data: Dashboard) => {
         this.dashboard = data;
