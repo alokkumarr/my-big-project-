@@ -7,7 +7,7 @@ import {
   map as fpMap,
   sortBy as fpSortBy
 } from 'lodash/fp';
-import { map, min, max, head, chain, get } from 'lodash';
+import { map, min, max, head, chain } from 'lodash';
 import moment from 'moment';
 
 @Component({

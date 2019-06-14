@@ -2,19 +2,13 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { map, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import APP_CONFIG from '../../appConfig';
+import APP_CONFIG from '../../../../../appConfig';
 import { PollingService } from './polling.service';
 import {
   WeatherQueryParams,
   CurrentWeather,
   Forecast
 } from '../weather.interfaces';
-import {
-  pipe as fpPipe,
-  filter as fpFilter,
-  toPairs as fpToPairs,
-  fromPairs as fpFromPairs
-} from 'lodash/fp';
 import { get, isUndefined } from 'lodash';
 @Injectable()
 export abstract class WeatherApiService {
