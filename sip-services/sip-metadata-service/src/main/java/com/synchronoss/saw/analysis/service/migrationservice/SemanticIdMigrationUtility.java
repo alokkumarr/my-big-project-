@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.analysis.service.AnalysisServiceImpl;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.model.Artifact;
@@ -32,8 +31,6 @@ public class SemanticIdMigrationUtility {
 
   private static String basePath;
 
-  private AnalysisServiceImpl analysisService;
-
   private static final String tableName = "analysisMetadata";
 
   /**
@@ -49,7 +46,6 @@ public class SemanticIdMigrationUtility {
 
   /** Update the existing Analysis in maprDB to match semantic. */
   public void updateAnalysisWithSemanticInfo() {
-    analysisService = new AnalysisServiceImpl();
     System.out.println("Start semantic id migration");
     List<Analysis> analyses = getAllAnalyses();
     Map<String, String> semanticMap = getMetaData();
@@ -82,7 +78,7 @@ public class SemanticIdMigrationUtility {
             if (artifacts != null && artifacts.size() != 0) {
               String artifactName = artifacts.get(0).getArtifactsName();
               if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-                analysis.setSemanticId(entry.getKey());
+                analysis.setSemanticId(entry.getValue());
                 if (updateAnalysis(analysis)) {
                   System.out.println(
                       String.format(
@@ -139,7 +135,7 @@ public class SemanticIdMigrationUtility {
         }
       }
     }
-    System.out.println("Semantcic map {} " + semanticMap.size());
+    System.out.println("Semantic map " + semanticMap.size());
     return semanticMap;
   }
 
@@ -203,7 +199,7 @@ public class SemanticIdMigrationUtility {
       throw new SipReadEntityException(
           "Exception occurred while fetching analysis by category for userId", e);
     }
-    System.out.println("Document objDocs size {} " + objDocs.size());
+    System.out.println("Document objDocs size " + objDocs.size());
     return objDocs;
   }
 
