@@ -12,6 +12,18 @@ if ! command -v ansible-playbook > /dev/null; then
     yum_install ansible
 fi
 
+# installing required ansible version if the current version
+# is less than 2.7
+
+yum list ansible-2.8.0-2.el7 > /dev/null
+if [ $? -eq 0 ]
+then
+    echo "Installing ansible-2.8.0-2.el7 if requried"
+    yum -y install ansible-2.8.0-2.el7 > /dev/null
+else
+    echo "Package not found. Install ansible > 2.7 manually"
+fi
+
 # Workaround: Ansible version 2.4 has deprecated using the "include"
 # directive for importing playbooks, so it has been changed to
 # "import_playbook".  However, there are still some environments on
