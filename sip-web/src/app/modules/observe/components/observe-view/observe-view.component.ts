@@ -284,7 +284,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!isEmpty(data.analysisFilters)) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
 
@@ -297,6 +298,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
   loadDashboard(): Observable<Dashboard> {
     this.filters.resetLastKPIFilterApplied();
+    this.filters.resetLastAnalysisFiltersApplied();
     return this.observe.getDashboard(this.dashboardId).pipe(
       map((data: Dashboard) => {
         this.dashboard = data;

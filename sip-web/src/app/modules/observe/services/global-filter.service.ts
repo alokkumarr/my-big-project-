@@ -3,6 +3,8 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isEqual from 'lodash/isEqual';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
@@ -27,6 +29,7 @@ export class GlobalFilterService {
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
   private _lastKPIFilter: KPIFilter = null;
+  private _lastAnalysisFilters = {};
 
   constructor() {}
 
@@ -74,7 +77,23 @@ export class GlobalFilterService {
   }
 
   set lastKPIFilter(filt: KPIFilter) {
-    this._lastKPIFilter = filt;
+    this._lastKPIFilter = cloneDeep(filt);
+  }
+
+  haveAnalysisFiltersChanged(filts) {
+    return !isEqual(this._lastAnalysisFilters, filts);
+  }
+
+  resetLastAnalysisFiltersApplied() {
+    this._lastAnalysisFilters = {};
+  }
+
+  get lastAnalysisFilters() {
+    return this._lastAnalysisFilters;
+  }
+
+  set lastAnalysisFilters(filts) {
+    this._lastAnalysisFilters = cloneDeep(filts);
   }
 
   /**
