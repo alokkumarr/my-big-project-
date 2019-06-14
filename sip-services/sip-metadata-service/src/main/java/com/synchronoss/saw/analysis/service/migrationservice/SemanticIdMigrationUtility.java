@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ojai.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SemanticIdMigrationUtility {
 
@@ -30,13 +28,13 @@ public class SemanticIdMigrationUtility {
   private AnalysisMetadata semanticMetadataStore = null;
   private AnalysisMetadata analysisMetadataStore = null;
 
-  private static String metadataTable;
+  private static final String metadataTable = "semanticDataStore";
 
   private static String basePath;
 
   private AnalysisServiceImpl analysisService;
 
-  private static String tableName;
+  private static final String tableName = "analysisMetadata";
 
   /**
    * Main method to be called from a script.
@@ -45,8 +43,6 @@ public class SemanticIdMigrationUtility {
    */
   public static void main(String[] args) {
     basePath = args[0];
-    metadataTable = args[1];
-    tableName = args[2];
     SemanticIdMigrationUtility uos = new SemanticIdMigrationUtility();
     uos.updateAnalysisWithSemanticInfo();
   }

@@ -220,21 +220,30 @@ be installed.
 SIP 3.3.0 needs mapr 6.1.0 and spark 2.3.2. Please look into the
 <<Prerequisites, prerequisites>> section for more information.
 
-There are some use cases where semantic id which are created long
-back are missed during semantic migration. This breaks the relationship
-of semantic and reports, as the reports would store the info semantic id
+There are possibilities where semantic definitions are created manually by
+users and missed during semantic migration, this breaks the relationship
+of semantic ID's for existing reports, as the reports would store the info semantic id
 as part of its definition. To overcome this, run the following shell
 script, which updates the semantic id info of each reports with matching
 semantic node present in semanticDataStore.
 
-Steps to run the shell script :
+Run the below command manually in sip-node as mapr user
 
-1. Login to saw node as root user
-2. Navigate to /opt/bda/sip-metadata-service
-3. Run the following command by providing the following parameters.
-bash semanticIdMigration <base maprdb path> <semantic json metadata table name>
-<analysis json metadata table name>
-E.g.: bash semanticIdMigration maprfs:///var/sip semanticDataStore analysisMetadata
+ /opt/bda/sip-metadata-service semanticIdMigration <metadata base path>
+
+For Example:
+
+       bash semanticIdMigration maprfs:///var/sip
+
+NOTE: This script has not enabled for auto run with SIP installation
+due special scenario where existing semantic node was deleted and recreated
+manually instead of using previous SIP version auto migration.
+
+****
+Some content here
+****
+
+
 
 ==== Interfaces
 
@@ -249,7 +258,7 @@ Large header settings: Include the below properties in NGINX server
 config file to support, HTTP requests with large headers (more than
 8K).
 
-       client_body_buffer_size 32k;
+
        client_header_buffer_size 16k;
        large_client_header_buffers 8 64k;
 

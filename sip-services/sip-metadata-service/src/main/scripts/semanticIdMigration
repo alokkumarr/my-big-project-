@@ -9,8 +9,6 @@
 NOW=$(date +"%m-%d-%Y %r")
 
 BASE_PATH=${1}  # eg: maprfs:///var/sip3
-SEMANTIC_METADATA=${2} # semanticDataStore
-DSL_ANALYSIS_TABLE_NAME=${3} #analysisMetadata
 
 # Fetch the list of mapr libraries
 MAPR_LIB_PATH=$(mapr classpath)
@@ -24,8 +22,6 @@ echo
 echo SEMANTIC ID MIGRATION STARTING AT $NOW
 echo ---------------------------------------------------------------------
 echo Table Base Path             :            ${BASE_PATH}
-echo Semantic Metadata Table     :            ${SEMANTIC_METADATA}
-echo DSL ANALYSIS Table Name     :            ${DSL_ANALYSIS_TABLE_NAME}
 echo ---------------------------------------------------------------------
 echo
 CMD="java -cp ${METADATA_SERVICE_DIR}/${JAR_FILE}:${MAPR_LIB_PATH} -Dloader.main=${MIGRATION_CLASS} org.springframework.boot.loader.PropertiesLauncher $@"
