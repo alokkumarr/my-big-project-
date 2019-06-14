@@ -14,6 +14,7 @@ import { LocalSearchService } from '../../../common/services/local-search.servic
 import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
+import { isDSLAnalysis } from '../designer/types';
 import {
   CommonLoadAllMetrics,
   CommonStateScheuleJobs
@@ -173,8 +174,9 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
+    const categroyID = isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId;
     // Wait till cron job and schedule is created or updated or deleted successfully.
-    this.getCronJobs(analysis.category);
+    this.getCronJobs(categroyID);
   }
 
   spliceAnalyses(analysis, replace) {
