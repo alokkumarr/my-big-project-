@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.synchronoss.saw.export.generate.interfaces;
 
