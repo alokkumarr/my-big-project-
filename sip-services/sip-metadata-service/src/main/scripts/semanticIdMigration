@@ -1,0 +1,38 @@
+#!/bin/bash
+###########################################################################
+# semanticIdMigration.sh
+# Author: Alok KumarR
+# Creation Date: JUNE 4 2019
+###########################################################################
+
+
+NOW=$(date +"%m-%d-%Y %r")
+
+BASE_PATH=${1}  # eg: maprfs:///var/sip3
+SEMANTIC_METADATA=${2} # semanticDataStore
+DSL_ANALYSIS_TABLE_NAME=${3} #analysisMetadata
+MAPR_LIB_PATH=${mapr classpath}
+
+METADATA_SERVICE_DIR="/opt/bda/sip-metadata-service"
+JAR_FILE="sip-metadata.jar"
+MIGRATION_CLASS="com.synchronoss.saw.analysis.service.migrationservice.SemanticIdMigrationUtility"
+
+echo
+echo
+echo SEMANTIC ID MIGRATION SHELL SCRIPT EXECUTING AT $NOW
+echo ---------------------------------------------------------------------
+echo Table Base Path             :            ${BASE_PATH}
+echo Semantic Metadata Table     :            ${SEMANTIC_METADATA}
+echo DSL ANALYSIS Table Name     :            ${DSL_ANALYSIS_TABLE_NAME}
+echo ---------------------------------------------------------------------
+echo
+CMD="java -cp ${METADATA_SERVICE_DIR}/${JAR_FILE}:${MAPR_LIB_PATH} -Dloader.main=${MIGRATION_CLASS} org.springframework.boot.loader.PropertiesLauncher $@"
+
+echo "Running ${CMD}"
+
+sudo su mapr -c "$CMD"
+RETVAL=$?
+echo ---------------------------------------------------------------------
+echo JOB RETURN CODE:  $RETVAL
+echo ---------------------------------------------------------------------
+exit $RETVAL
