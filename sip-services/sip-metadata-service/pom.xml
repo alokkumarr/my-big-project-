@@ -267,6 +267,12 @@
                   <name>/opt/bda/sip-metadata-service/conf/application.yml</name>
                   <file>src/main/resources/application.yml</file>
                 </entry>
+                <entry>
+                  <name>/opt/bda/sip-metadata-service/semanticIdMigration</name>
+                  <file>src/main/scripts/semanticIdMigration</file>
+                  <mode>0755</mode>
+                  <user>mapr</user>
+                </entry>
               </entries>
               <afterInstallation>
                 <script>systemctl daemon-reload</script>
