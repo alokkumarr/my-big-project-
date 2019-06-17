@@ -8,6 +8,8 @@ const loginUrl = AppConfig.login.url;
 const refreshTokenEndpoint = 'getNewAccessToken';
 import { BehaviorSubject } from 'rxjs';
 import { CommonResetStateOnLogout } from '../actions/menu.actions';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -58,7 +60,7 @@ export class UserService {
   /**
    * Exchanges a single-sign-on token for actual login tokens
    */
-  exchangeLoginToken(token) {
+  exchangeLoginToken(token): Observable<boolean> {
     const route = '/authentication';
 
     return this._http
@@ -67,21 +69,22 @@ export class UserService {
           jwt: token
         }
       })
-      .toPromise()
-      .then(response => {
-        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
+      .pipe(
+        map(response => {
+          const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
-        // Store the user's info for easy lookup
-        if (this._jwtService.isValid(resp)) {
-          // this._jwtService.destroy();
-          this._jwtService.set(
-            get(response, 'aToken'),
-            get(response, 'rToken')
-          );
-        }
+          // Store the user's info for easy lookup
+          if (this._jwtService.isValid(resp)) {
+            // this._jwtService.destroy();
+            this._jwtService.set(
+              get(response, 'aToken'),
+              get(response, 'rToken')
+            );
+          }
 
-        return true;
-      });
+          return true;
+        })
+      );
   }
 
   logout(path) {

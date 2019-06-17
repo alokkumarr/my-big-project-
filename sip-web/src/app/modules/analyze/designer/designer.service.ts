@@ -124,6 +124,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'aggregate');
     };
 
     const areMoreThenMaxFields = (columns: ArtifactColumns): boolean => {
@@ -222,6 +223,7 @@ export class DesignerService {
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
       unset(artifactColumn, 'geoRegion');
+      unset(artifactColumn, 'aggregate');
     };
 
     const maxAllowedDecorator = (
@@ -308,6 +310,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.checked = false;
       artifactColumn.alias = '';
+      unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
       unset(artifactColumn, 'limitValue');

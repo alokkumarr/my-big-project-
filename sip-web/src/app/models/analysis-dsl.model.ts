@@ -83,6 +83,7 @@ export interface AnalysisBaseDSL {
 }
 
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
+  chartType: string;
   chartOptions: {
     chartType: string;
     chartTitle: string;

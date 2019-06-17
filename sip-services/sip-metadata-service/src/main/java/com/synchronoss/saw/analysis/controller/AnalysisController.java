@@ -6,6 +6,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
+import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -221,7 +222,7 @@ public class AnalysisController {
   public List<Analysis> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "category") String categoryId) {
+      @RequestParam(name = "category") String categoryId) throws  Exception {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
@@ -230,11 +231,17 @@ public class AnalysisController {
 
       // TODO: return analysis response here. Will be taken care in the future.
     }
-    Long userId = authTicket.getUserId();
-    Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, categoryId);
-    if (privateCategory) {
-      return analysisService.getAnalysisByCategoryForUserId(categoryId, userId, authTicket);
+    Boolean isCatgryAuthorized = SipMetadataUtils.checkCategoryAccessible(authTicket, categoryId);
+    if (isCatgryAuthorized) {
+      Long userId = authTicket.getUserId();
+      SipMetadataUtils.checkCategoryAccessible(authTicket, categoryId);
+      Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, categoryId);
+      if (privateCategory) {
+        return analysisService.getAnalysisByCategoryForUserId(categoryId, userId, authTicket);
+      }
+      return analysisService.getAnalysisByCategory(categoryId, authTicket);
+    } else {
+      throw new SipAuthorizationException("You are not authorized to view this Category");
     }
-    return analysisService.getAnalysisByCategory(categoryId, authTicket);
   }
 }

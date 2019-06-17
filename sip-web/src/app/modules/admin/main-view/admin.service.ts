@@ -5,7 +5,6 @@ import { ToastService } from '../../../common/services/toastMessage.service';
 import AppConfig from '../../../../../appConfig';
 import { JwtService } from '../../../common/services';
 import { AnalyzeService } from '../../analyze/services/analyze.service';
-import { from } from 'rxjs';
 
 import * as forEach from 'lodash/forEach';
 import * as set from 'lodash/set';
@@ -60,7 +59,7 @@ export class AdminService {
   }
 
   getAnalysesByCategoryId(subCategoryId: string | number) {
-    return from(this._analyzeService.getAnalysesFor(subCategoryId.toString()));
+    return this._analyzeService.getAnalysesFor(subCategoryId.toString());
   }
 
   getRequest<T>(path, options: RequestOptions = {}) {

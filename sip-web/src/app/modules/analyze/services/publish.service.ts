@@ -29,11 +29,12 @@ export class PublishService {
     execute = false,
     type
   ): Promise<Analysis> {
+    let promise = Promise.resolve(true);
     if (type === 'schedule') {
-      this._analyzeService.changeSchedule(model);
+      promise = this._analyzeService.changeSchedule(model);
     }
 
-    return <Promise<Analysis>>(
+    return <Promise<Analysis>>promise.then(() =>
       this._analyzeService.updateAnalysis(model).then(analysis => {
         if (execute) {
           this._executeService.executeAnalysis(model, EXECUTION_MODES.PUBLISH);
@@ -52,8 +53,7 @@ export class PublishService {
       this._executeService.executeAnalysis(model, EXECUTION_MODES.PUBLISH);
     }
     if (type === 'schedule') {
-      this._analyzeService.changeSchedule(model);
-      return Promise.resolve(model);
+      return this._analyzeService.changeSchedule(model).then(() => model);
     } else {
       return <Promise<AnalysisDSL>>this._analyzeService.updateAnalysis(model);
     }
