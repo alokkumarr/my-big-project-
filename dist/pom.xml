@@ -7,7 +7,7 @@
     <artifactId>sip</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>dist</artifactId>
+  <artifactId>sip-package</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <name>sip-dist</name>
