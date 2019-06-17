@@ -20,20 +20,6 @@
 		<url>https://stash.synchronoss.net/scm/bda/sncr_saw.git</url>
 		<tag>HEAD</tag>
   </scm>
-
-  <distributionManagement>
-			<repository>
-				<id>client-releases</id>
-				<name>SNCR Repository</name>
-				<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
-			</repository>
-			<snapshotRepository>
-				<id>client-snapshots</id>
-				<name>SNCR Snapshot Repository</name>
-				<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
-			</snapshotRepository>
-  </distributionManagement>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <output.directory>${output}</output.directory>
@@ -742,3 +728,4 @@
     </site>
   </distributionManagement>
 </project>
+B
