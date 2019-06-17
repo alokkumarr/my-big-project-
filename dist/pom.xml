@@ -7,7 +7,7 @@
     <artifactId>sip</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>dist</artifactId>
+  <artifactId>sip-package</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <name>sip-dist</name>
@@ -1002,4 +1002,20 @@
       </build>
     </profile>
   </profiles>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>
