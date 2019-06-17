@@ -377,9 +377,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
         }
 
-        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
-            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
-        }
+//        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
+//            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+//        }
         return compConf;
     }
 
