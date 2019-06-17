@@ -58,13 +58,13 @@ sip_var_path=/var/sip
 #
 # If the MapR cluster "mapr" user or group ID differs from the
 # expected default, use the variable below to set it
-#saw_mapr_user_id=500
+#saw_mapr_user_id=5000
 #saw_mapr_group_id=5000
 
 #
 # Spark configuration
 #
-saw_spark_master_url=spark://localhost:7077
+saw_spark_master_url=yarn
 # If Spark is configured to use YARN, use the variable below to set
 # the YARN queue
 #saw_spark_yarn_queue_regular=saw-regular
