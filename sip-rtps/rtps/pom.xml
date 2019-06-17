@@ -125,7 +125,7 @@
                 </entry>
                 <entry>
                   <name>/opt/bda/sip-rtps/lib/sip-rtps.jar</name>
-                  <file>target/rtps-${revision}.jar</file>
+                  <file>target/rtps-${revision.nodash}.jar</file>
                 </entry>
                 <entry>
                   <name>/usr/lib/systemd/system/sip-rtps.service</name>
