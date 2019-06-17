@@ -289,6 +289,7 @@ public class WorkbenchIT extends BaseIT {
     waitForDataset(id, WAIT_RETRIES);
   }
 
+  @Ignore
   @Test
   public void testParseDataset() throws IOException {
     /* Create CSV file to be parsed */
