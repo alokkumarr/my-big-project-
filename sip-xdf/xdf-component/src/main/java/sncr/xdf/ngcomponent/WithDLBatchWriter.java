@@ -246,6 +246,8 @@ public interface WithDLBatchWriter {
                 //String loc = location + Path.SEPARATOR + name;
                 logger.info("Output write location : " + loc);
 
+                dataset.show(4);
+
                 format = (String) outputDS.get(DataSetProperties.Format.name());
                 numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
                 keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());

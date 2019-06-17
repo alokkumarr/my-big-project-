@@ -99,120 +99,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     public NGParser() {  super(); }
 
 
-//    protected int execute(){
-//        int retval = 0;
-//
-//        parserInputFileFormat = ctx.componentConfiguration.getParser().getParserInputFileFormat();
-//        sourcePath = ngctx.componentConfiguration.getParser().getFile();
-//        headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
-//        tempDir = generateTempLocation(new DataSetHelper(ngctx, services.md),
-//            ngctx.batchID,
-//            ngctx.componentName,
-//            null, null);
-//        archiveDir = generateArchiveLocation(new DataSetHelper(ngctx, services.md));
-//
-//        lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
-//        delimiter = ngctx.componentConfiguration.getParser().getDelimiter().charAt(0);
-//        quoteChar = ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
-//        quoteEscapeChar = ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
-//
-//        errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
-//        recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
-//
-//        schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
-//
-//        tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
-//        logger.trace(tsFormats.toString());
-//
-//        internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
-//
-//        // Output data set
-//        if(ngctx.outputDataSets.size() != 1){
-//            // error - must be only one for parser
-//            logger.error("Found multiple output data set definitions "+ ngctx.outputDataSets.size());
-//        }
-//
-//        logger.info("Outputs = " + ngctx.outputs + "\n");
-//        logger.info("Output DS Size = " + ngctx.outputDataSets.size() + "\n");
-//        logger.info("Output DS = " + ngctx.outputDataSets + "\n");
-//
-//        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
-//        outputDataSetName = ds.getKey();
-//        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-//        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
-//        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
-//        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
-//
-//        logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
-//
-//        Map<String, Object> rejDs = getRejectDatasetDetails() ;
-//
-//        logger.debug("Rejected dataset details = " + rejDs);
-//        if (rejDs != null) {
-//            rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
-//            rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
-//            rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
-//            rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
-//
-//            logger.debug("Rejected dataset " + rejectedDatasetName + " at "
-//                + rejectedDatasetLocation + " with format " + rejectedDataFormat);
-//
-//            if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
-//                rejectedDataFormat = "parquet";
-//            }
-//
-//            logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
-//                + " with format " + rejectedDataFormat);
-//        }
-//
-//        FileSystem fs = HFileOperations.getFileSystem();
-//        try {
-//
-//            if (ctx.fs.exists(new Path(tempDir)))
-//                HFileOperations.deleteEnt(tempDir);
-//
-//
-//            if(headerSize >= 1) {
-//                FileStatus[] files = fs.globStatus(new Path(sourcePath));
-//                // Check if directory has been given
-//                if(files.length == 1 && files[0].isDirectory()){
-//                    // If so - we have to process all the files inside - create the mask
-//                    sourcePath += Path.SEPARATOR + "*";
-//                    // ... and query content
-//                    files = fs.globStatus(new Path(sourcePath));
-//                }
-//                retval = parseFiles(files,  DLDataSetOperations.MODE_APPEND);
-//            } else {
-//                retval = parse(DLDataSetOperations.MODE_APPEND);
-//            }
-//
-//            //Write Consolidated Accepted data
-//            if (this.acceptedDataCollector != null) {
-//                scala.collection.Seq<Column> outputColumns =
-//                    scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-//                Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
-//                ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS);
-//            }
-//
-//            //Write rejected data
-//            if (this.rejectedDataCollector != null) {
-//                boolean status = writeRejectedData();
-//
-//                if (!status) {
-//                    logger.warn("Unable to write rejected data");
-//                }
-//            }
-//
-//        }catch (IOException e){
-//            logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
-//            retval =  -1;
-//        } catch (Exception e) {
-//            logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
-//            retval =  -1;
-//        }
-//        return retval;
-//    }
-
     protected int execute(){
 
         int retval = 0;
@@ -338,29 +224,32 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 retval =  -1;
             }
 
-        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON)) {
+        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
+        {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
             Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath);
 
             this.recCounter.setValue(inputDataset.count());
 
-            commitDataSetFromDSMap(ngctx, inputDataset, outputFormat, tempDir, "append");
+            commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
 
-        } else if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET)) {
-            NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
-            Dataset<Row> inputDataset = parquetFileParser.parseInput(sourcePath);
+        } else
+            if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
+            {
+                NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
+                Dataset<Row> inputDataset = parquetFileParser.parseInput(sourcePath);
 
-            this.recCounter.setValue(inputDataset.count());
+                this.recCounter.setValue(inputDataset.count());
 
-            commitDataSetFromDSMap(ngctx, inputDataset, outputFormat, tempDir, "append");
+                commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
 
-            ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-                outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-        }
+                ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                    outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+            }
 
         return retval;
     }
@@ -396,13 +285,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.debug("Total files = " + files.length);
 
                 int archiveCounter = 0;
+                String currentTimestamp = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
+
+                Path archivePath = new Path(archiveDir + "/" + currentTimestamp
+                    + "_" + UUID.randomUUID() + "/");
+                ctx.fs.mkdirs(archivePath);
+                logger.debug("Archive directory " + archivePath);
 
                 for(FileStatus fiile: files) {
-                    String currentTimestamp = LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-
-                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-                    ctx.fs.mkdirs(archivePath);
 
                     if (archiveSingleFile(fiile.getPath(), archivePath)) {
                         archiveCounter++;
@@ -421,6 +312,46 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         return result;
     }
+
+
+//    protected int archive(){
+//        int result = 0;
+//        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+//
+//        try {
+//            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+//
+//            if (files != null && files.length != 0) {
+//                //Create archive directory
+//
+//                logger.debug("Total files = " + files.length);
+//
+//                int archiveCounter = 0;
+//
+//                for(FileStatus fiile: files) {
+//                    String currentTimestamp = LocalDateTime.now()
+//                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
+//
+//                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
+//                    ctx.fs.mkdirs(archivePath);
+//
+//                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
+//                        archiveCounter++;
+//                    }
+//                }
+//
+//                logger.info("Total files archived = " + archiveCounter);
+//            }
+//        } catch (IOException e) {
+//            logger.error("Archival failed");
+//
+//            logger.error(ExceptionUtils.getStackTrace(e));
+//
+//            result = 1;
+//        }
+//
+//        return result;
+//    }
 
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
