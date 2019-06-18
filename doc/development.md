@@ -310,7 +310,10 @@ To make a release of the project, execute the following steps:
 5. Start a customized build of the [project] on the continuous
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
-   release tag, for example `v1.0.0`, in the Revision field).
+   release tag, for example `v1.0.0`, in the Revision field). Change 
+   the packaging as deploy to publish package, after entering the custom 
+   revision (Click on "Override a variable" and change the value for
+    for variable artifact.release to `deploy`) 
 
 6. After starting the build, go to the Build result summary page and
    add the label "release" (which ensures it will be available for
@@ -318,8 +321,10 @@ To make a release of the project, execute the following steps:
    deleted by the continuous integration server).
 
 7. When the build finishes successfully, announce it by publishing a
-   link to the artifacts page in the project Slack channel.  Also add
-   the link to the corresponding [release notes] in Confluence.
+   nexus link to the artifacts 
+   Example: http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases/com/synchronoss/saw/sip-package/ 
+   in the project Slack channel.  Also add the link to the corresponding 
+   [release notes] in Confluence.
 
 If additional fixes are needed after tagging, just repeat the same
 process above but increase the patch component of the version (for
