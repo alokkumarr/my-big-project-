@@ -29,6 +29,12 @@ public class XDFDataProcessor  extends AbstractComponent {
         componentName = "pipeline";
     }
 
+    public XDFDataProcessor(Dataset dataset)
+    {
+        Map<String, Dataset> datafileDFmap = new HashMap<>();
+        datafileDFmap.put("DATA_STREAM",dataset);
+    }
+
     private  String PIPELINE_CONFIG;
     private boolean RUNNING_MODE  = true;
     private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
@@ -171,6 +177,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             );
 
             logger.warn(ngParserCtxSvc.getNgctx().toString());
+
+            logger.debug("Parser Input dataset size is : " + datafileDFmap.size() );
 
             ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
