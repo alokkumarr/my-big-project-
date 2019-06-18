@@ -29,6 +29,11 @@ public class XDFDataProcessor  extends AbstractComponent {
         componentName = "pipeline";
     }
 
+    public XDFDataProcessor()
+    {
+
+    }
+
     public XDFDataProcessor(Dataset dataset)
     {
         Map<String, Dataset> datafileDFmap = new HashMap<>();
