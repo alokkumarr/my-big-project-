@@ -25,6 +25,9 @@ elastic-search:
            cluster-name: elasticsearch
            transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net,es-rd602.ana.dev.vaste.sncrcorp.net
            transport-ports: 9200,9200
+           sslEnabled: false
+           keyStorePath: /codebase/sip/server.keystore
+           storePassword: es123
 elastic-xpack :
           cluster-active: false
           cluster-username: elastic
@@ -34,12 +37,27 @@ metastore:
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
+
+connector : http
+
+{% endif %}
+
 metadata:
   service:
-    host: http://localhost:9501
-    execution-migration-flag: false
-    transporthost: http://localhost:9200/analysis
+    host: ${connector}://localhost:9501
+    execution-migration-flag: true
+    transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+{% if sip_secure %}
   ssl:
-    enable : false
+    enable : true
+{% else %}
+  ssl:
+    enable: false
+{% endif %}

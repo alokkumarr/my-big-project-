@@ -14,6 +14,7 @@ import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.batch.sftp.integration.RuntimeSessionFactoryLocator;
 import com.synchronoss.saw.logs.constants.SourceType;
+import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
 
   @Override
   public void retryFailedJob(Long channelId, Long routeId, String channelType, boolean isDisable,
-      String pid, String status) throws NotFoundException {
+      String pid, String status, Long jobId) throws NotFoundException {
 
     logger.info("inside transfer retry block for channel type " + channelType + ": channelId "
         + channelId + " starts here");
@@ -107,7 +108,11 @@ public class SftpRetryServiceImpl implements SipRetryContract {
                     sftpServiceImpl.transferDataFromChannel(
                         template, sourceLocation, metaInfo.getFilePattern(),
                         destinationLocation, channelId, routeId, 
-                        fileExclusions, isDisable, SourceType.RETRY.name(), lastModifiedHoursLmt));
+                        fileExclusions, isDisable, SourceType.RETRY.name(),
+                        lastModifiedHoursLmt, jobId, true));
+                BisJobEntity job = sipLogService.retriveJobById(jobId);
+                job.setJobStatus("INPROGRESS");
+                sipLogService.saveJob(job);
                 
                 logger.info("sourceLocation inside transferRetry :" + sourceLocation);
                 logger.info("destinationLocation inside transferRetry :" + destinationLocation);
@@ -135,7 +140,7 @@ public class SftpRetryServiceImpl implements SipRetryContract {
               ex);
           sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
               BisComponentState.HOST_NOT_REACHABLE.value(), 
-              BisProcessState.FAILED.value(), SourceType.RETRY.name());
+              BisProcessState.FAILED.value(), SourceType.RETRY.name(), jobId);
         }
         break;
       case "jdbc":
@@ -151,9 +156,9 @@ public class SftpRetryServiceImpl implements SipRetryContract {
 
   @Override
   public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName,
-      boolean isDisable, String source) {
-    this.sftpServiceImpl.transferData(channelId, routeId, fileName,
-        isDisable, SourceType.RETRY.name());
+      boolean isDisable, String source, Long jobId, String channelType) {
+    this.sftpServiceImpl.scanFilesForPattern(channelId, routeId, fileName,
+        isDisable, SourceType.RETRY.name(), Optional.of(jobId), channelType);
   }
 
 

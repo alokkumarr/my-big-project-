@@ -90,7 +90,7 @@
 
 <map-chart-viewer
   *ngIf="!toggleToGrid && analysis?.mapOptions?.mapType == 'chart_scale'"
-  [chartType]="analysis.mapOptions.chartType"
+  [chartType]="analysis.mapOptions.mapType"
   [data]="data"
   [analysis]="analysis"
   [updater]="updater"
