@@ -321,10 +321,8 @@ To make a release of the project, execute the following steps:
    deleted by the continuous integration server).
 
 7. When the build finishes successfully, announce it by publishing a
-   nexus link to the artifacts 
-   Example: http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases/com/synchronoss/saw/sip-package/ 
-   in the project Slack channel.  Also add the link to the corresponding 
-   [release notes] in Confluence.
+   nexus [Artifact release link] to the in the project Slack channel.  Also 
+   add the link to the corresponding [release notes] in Confluence.
 
 If additional fixes are needed after tagging, just repeat the same
 process above but increase the patch component of the version (for
@@ -332,6 +330,7 @@ example 1.0.1, 1.0.2 and so on).
 
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [release notes]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Releases+Documentation
+[Artifact release link]: http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases/com/synchronoss/saw/sip-package/
 
 # Release branches
 
