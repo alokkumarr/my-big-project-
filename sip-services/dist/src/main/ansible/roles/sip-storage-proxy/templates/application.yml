@@ -16,7 +16,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-  {% if sip_secure %}
+{% if sip_secure %}
 
   ssl:
    key-store: {{ store_path }}/{{ ansible_host }}/keystore.jks
@@ -25,7 +25,7 @@ server:
    trust-store: {{ store_path }}/{{ ansible_host }}/truststore.jks
    trust-store-password: "{{ sip_keystore_password }}"
 
-  {% endif %}
+{% endif %}
 
 
 
@@ -58,6 +58,13 @@ elastic-search:
            keyStorePath:
            storePassword:
 {% endif %}
+
+{% if sip_secure %}
+connector : https
+{% else %}
+connector : http
+{% endif %}
+
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}
@@ -70,10 +77,15 @@ metastore:
 
 metadata:
   service:
-    host: http://localhost:9501
-    execution-migration-flag: false
-    transporthost: http://localhost:9200/analysis
+    host: ${connector}://localhost:9501
+    execution-migration-flag: true
+    transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+{% if sip_secure %}
   ssl:
-    enable : false
+    enable : true
+{% else %}
+  ssl:
+    enable: false
+{% endif %}

@@ -276,3 +276,12 @@ ingestion.
 include::{snippets}/apidoc-rtis/paths.adoc[]
 include::{snippets}/apidoc-rtis/definitions.adoc[]
 include::{snippets}/apidoc-rtis/security.adoc[]
+
+= Export Service API
+
+The Export Service allows clients to export reports and send
+email in various formats including csv, xls, zip..etc
+
+include::{snippets}/apidoc-export/paths.adoc[]
+include::{snippets}/apidoc-export/definitions.adoc[]
+include::{snippets}/apidoc-export/security.adoc[]

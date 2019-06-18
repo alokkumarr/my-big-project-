@@ -59,7 +59,7 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
       }
     );
 
-    const applyFiltersListener = this.globalFilterService.onApplyFilter.subscribe(
+    const applyFiltersListener = this.globalFilterService.onApplyKPIFilter.subscribe(
       () => {
         this.cacheFilters();
       }

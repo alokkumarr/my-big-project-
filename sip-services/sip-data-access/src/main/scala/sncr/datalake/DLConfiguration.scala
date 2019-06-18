@@ -7,6 +7,7 @@ import com.typesafe.config.Config
 import files.HFileOperations
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.{SparkConf, SparkContext}
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.saw.common.config.SAWServiceConfig
@@ -29,6 +30,7 @@ object DLConfiguration {
   def getSC: SparkContext = DLConfiguration.ctx
   def getFS: FileSystem = DLConfiguration.fs
   def getSparkConfig : SparkConf = sparkConf
+  def getSparkSession :SparkSession = sparkSession
 
   /**
     * Spark context/configuration holders.
@@ -36,6 +38,7 @@ object DLConfiguration {
   protected val cfg: Config = SAWServiceConfig.spark_conf
   protected var ctx : SparkContext = null
   protected var sparkConf : SparkConf = null
+  protected var sparkSession :SparkSession = null
 
   logger debug "Configure MAPR: "
   protected val config = new Configuration
@@ -111,6 +114,7 @@ object DLConfiguration {
     sparkConf.set("spark.ui.enabled", "false")
     ctx = SparkContext.getOrCreate(sparkConf)
     jarFiles.foreach(f => ctx.addJar( jarLocation + Path.SEPARATOR + f))
+    sparkSession= SparkSession.builder().config(sparkConf).getOrCreate();
     initialized = true
   }
 
