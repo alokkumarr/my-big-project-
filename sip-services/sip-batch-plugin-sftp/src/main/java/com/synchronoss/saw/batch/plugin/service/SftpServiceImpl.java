@@ -145,7 +145,7 @@ public class SftpServiceImpl extends SipPluginContract {
   @Value("${sip.service.max.inprogress.mins}")
   @NotNull
   private Integer maxInprogressMins = 45;
-
+  
   public static final int LAST_MODIFIED_DEFAUTL_VAL = 0;
   
 
@@ -734,14 +734,14 @@ public class SftpServiceImpl extends SipPluginContract {
                 logger.trace("Last modified hours limit configured:" 
                     + lastModifiedHoursLmt);
               }
-
+             
             }
-
-
-            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId)
+            
+            
+            if (isConcurDisable && sipLogService.checkIfAlreadyRunning(routeId) 
                      && source.equals(SourceType.REGULAR.name())) {
-
-              logger.info("Already process running for the route" + routeId
+            
+              logger.info("Already process running for the route" + routeId 
                     + "and concurrency disabled hence skipping transfer");
               BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
               sipLogService.updateJobLog(jobEntity.getJobId(),"SUCCESS", 0L, 0L);

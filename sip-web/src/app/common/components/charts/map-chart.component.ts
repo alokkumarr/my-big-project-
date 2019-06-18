@@ -1,9 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  ViewChild
-} from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { Subject, isObservable } from 'rxjs';
 
 import * as Highmaps from 'highcharts/highmaps';
@@ -13,10 +8,7 @@ import * as get from 'lodash/get';
 import * as isArray from 'lodash/isArray';
 import * as reduce from 'lodash/reduce';
 
-import {
-  globalChartOptions,
-  geoChartOptions
-} from './default-chart-options';
+import { globalChartOptions, geoChartOptions } from './default-chart-options';
 
 export interface IChartUpdate {
   path: string;
@@ -30,9 +22,14 @@ export interface IChartAction {
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'map-chart',
-  template: `<div #container></div>`
+  template: `
+    <div #container></div>
+  `
 })
 export class MapChartComponent {
+  @Input()
+  isExportEnabled: boolean;
+
   @Input()
   set updater(updater: Subject<IChartUpdate>) {
     this._updater = updater;
@@ -52,8 +49,7 @@ export class MapChartComponent {
     this._options = options;
     this.setOptions(this._options);
   }
-  @Input()
-  isExportEnabled: boolean;
+
   @ViewChild('container')
   container: ElementRef;
 
@@ -92,10 +88,14 @@ export class MapChartComponent {
   onOptionsUpdate(update: IChartUpdate) {
     const chartUpdate = this.transformUpdateIfNeeded(update);
 
-    this.delayIfNeeded(!this.chart, () => {
-      this.chart.update(chartUpdate, true, true);
-      this.chart.reflow();
-    }, 0);
+    this.delayIfNeeded(
+      !this.chart,
+      () => {
+        this.chart.update(chartUpdate, true, true);
+        this.chart.reflow();
+      },
+      0
+    );
   }
 
   delayIfNeeded(condition, fn, delay) {
@@ -111,10 +111,14 @@ export class MapChartComponent {
    */
   transformUpdateIfNeeded(updates) {
     if (isArray(updates)) {
-      return reduce(updates, (acc, update) => {
-        set(acc, update.path, update.data);
-        return acc;
-      }, {});
+      return reduce(
+        updates,
+        (acc, update) => {
+          set(acc, update.path, update.data);
+          return acc;
+        },
+        {}
+      );
     }
 
     return updates;
@@ -128,14 +132,16 @@ export class MapChartComponent {
 
   getExportConfig(fileName) {
     return {
-      enabled: true,
-      allowHTML: false,
-      fallbackToExportServer: false,
-      fileName,
-      chartOptions: {
-        legend: {
-          navigation: {
-            enabled: false
+      exporting: {
+        enabled: true,
+        allowHTML: false,
+        fallbackToExportServer: false,
+        fileName,
+        chartOptions: {
+          legend: {
+            navigation: {
+              enabled: false
+            }
           }
         }
       }

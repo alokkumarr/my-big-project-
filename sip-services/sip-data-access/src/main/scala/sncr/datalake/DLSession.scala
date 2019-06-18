@@ -1,14 +1,10 @@
 package sncr.datalake
 
-import java.io.OutputStream
-import java.util
 import java.util.UUID
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import files.HFileOperations
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.storage.StorageLevel
 import org.json4s.JsonAST.{JString, _}
 import org.json4s.native.JsonMethods._
@@ -35,11 +31,10 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   lazy val id = UUID.randomUUID().toString
   def getId = id
   var lastUsed = System.currentTimeMillis()
-  lazy val sparkConf: SparkConf = DLConfiguration.getSparkConfig
-
-  lazy val sparkSession = SparkSession.builder().config(sparkConf)
-    .appName("SAW-SQL-Executor::" + (if(sessionName == "unnamed") id else sessionName))
-    .getOrCreate()
+  // Get spark session from DLConfiguration to avoid wicked executor
+  // as there are possibilities in case fetching the session on-demand
+  // may lead new context.
+  lazy val sparkSession = DLConfiguration.getSparkSession
 
    /* ToDo:: Below spark listener doesn't work with spark 2.1 to find the records count.
      As per spark community, new listeners added in spark 2.2 and same needs to be

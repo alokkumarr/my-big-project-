@@ -177,32 +177,30 @@ export class AnalyzeService {
    */
   getAnalysesFor(
     subCategoryId: string | number /* , opts = {} */
-  ): Promise<Array<Analysis | AnalysisDSL>> {
+  ): Observable<Array<Analysis | AnalysisDSL>> {
     // Create fp sort's type to nail everything down with types
     type FPSort<T> = (input: Array<T>) => Array<T>;
 
     return zip(
       this.getAnalysesForNonDSL(subCategoryId),
       this.getAnalysesDSL(subCategoryId)
-    )
-      .pipe(
-        // Merge list of analyses from both observables into one
-        map(([nonDSLAnalyses, dslAnalyses]) => {
-          return [].concat(nonDSLAnalyses).concat(dslAnalyses);
-        }),
+    ).pipe(
+      // Merge list of analyses from both observables into one
+      map(([nonDSLAnalyses, dslAnalyses]) => {
+        return [].concat(nonDSLAnalyses).concat(dslAnalyses);
+      }),
 
-        // Sort all the analyses based on their create time in descending order (newest first).
-        // Uses correct time field based on if analysis is new dsl type or not
-        map(<FPSort<Analysis | AnalysisDSL>>(
-          fpSortBy([
-            analysis =>
-              isDSLAnalysis(analysis)
-                ? -(analysis.createdTime || 0)
-                : -(analysis.createdTimestamp || 0)
-          ])
-        ))
-      )
-      .toPromise();
+      // Sort all the analyses based on their create time in descending order (newest first).
+      // Uses correct time field based on if analysis is new dsl type or not
+      map(<FPSort<Analysis | AnalysisDSL>>(
+        fpSortBy([
+          analysis =>
+            isDSLAnalysis(analysis)
+              ? -(analysis.createdTime || 0)
+              : -(analysis.createdTimestamp || 0)
+        ])
+      ))
+    );
   }
 
   getPublishedAnalysesByAnalysisId(id, isDSL) {
