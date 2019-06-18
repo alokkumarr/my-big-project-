@@ -267,6 +267,12 @@
                   <name>/opt/bda/sip-metadata-service/conf/application.yml</name>
                   <file>src/main/resources/application.yml</file>
                 </entry>
+                <entry>
+                  <name>/opt/bda/sip-metadata-service/semanticIdMigration</name>
+                  <file>src/main/scripts/semanticIdMigration</file>
+                  <mode>0755</mode>
+                  <user>mapr</user>
+                </entry>
               </entries>
               <afterInstallation>
                 <script>systemctl daemon-reload</script>
@@ -289,4 +295,20 @@
       <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>
