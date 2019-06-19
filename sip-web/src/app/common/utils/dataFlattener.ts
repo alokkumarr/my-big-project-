@@ -1,6 +1,5 @@
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
-import * as assign from 'lodash/assign';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
@@ -123,15 +122,6 @@ function getChildNodeName(node) {
   return childNodeName;
 }
 
-/** the mapping between the tree level, and the columName of the field
- * Example:
- * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
- * string_field_2: 1 -> SOURCE_MANUFACTURER
- */
-function getNodeFieldMapChart(nodeFields) {
-  return map(nodeFields, 'columnName');
-}
-
 export function getStringFieldsFromDSLArtifact(
   fields: ArtifactColumnDSL[]
 ): string[] {
@@ -149,12 +139,13 @@ export function getStringFieldsFromDSLArtifact(
  * }, ..]
  */
 export function flattenChartData(data, sqlBuilder) {
+  const sorts = sqlBuilder.sorts;
   if (sqlBuilder.artifacts) {
     const stringFields = getStringFieldsFromDSLArtifact(
       sqlBuilder.artifacts[0].fields
     );
     if (stringFields.length === 0) {
-      return data;
+      return sortChartData(data, sorts);
     } else {
       /* If any string data is blank, replace it with 'Undefined'. This avoids
       highcharts giving default 'Series 1' label to blank data
@@ -164,29 +155,11 @@ export function flattenChartData(data, sqlBuilder) {
         stringFields.forEach(field => {
           res[field] = res[field] || 'Undefined';
         });
-        return res;
+        return sortChartData(res, sorts);
       });
-      return result;
+      return sortChartData(result, sorts);
     }
   }
-
-  const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
-  const sorts = sqlBuilder.sorts;
-
-  return fpPipe(
-    nestedData => parseNodeChart(data, {}, nodeFieldMap, 1),
-    flattenedData => {
-      /* Order chart data manually. Backend doesn't sort chart data. */
-      if (!isEmpty(sorts)) {
-        return orderBy(
-          flattenedData,
-          map(sorts, 'columnName'),
-          map(sorts, 'order')
-        );
-      }
-      return flattenedData;
-    }
-  )(data);
 }
 
 export function checkNullinReportData(data) {
@@ -233,30 +206,10 @@ export function flattenReportData(data, analysis) {
   });
 }
 
-function parseNodeChart(node, dataObj, nodeFieldMap, level) {
-  if (!isUndefined(node.key)) {
-    dataObj[nodeFieldMap[level - 2]] = node.key;
-    if (!node.key) {
-      dataObj[nodeFieldMap[level - 2]] = 'Undefined';
-    }
-  }
-  // dataObj[nodeFieldMap[level - 2]] = !isUndefined(node.key) ? node.key
-  const childNode = node[`node_field_${level}`];
-  if (childNode) {
-    const data = flatMap(childNode.buckets, bucket =>
-      parseNodeChart(bucket, dataObj, nodeFieldMap, level + 1)
-    );
-    return data;
-  }
-  const datum = parseLeafChart(node, dataObj);
-  return datum;
-}
-
-function parseLeafChart(node, dataObj) {
-  const dataFields = fpPipe(
-    fpOmit(['doc_count', 'key', 'key_as_string']),
-    fpMapValues('value')
-  )(node);
-
-  return assign(dataFields, dataObj);
+function sortChartData(data, sorts) {
+  return orderBy(
+    data,
+    map(sorts, 'columnName'),
+    map(sorts, 'order')
+  );
 }
