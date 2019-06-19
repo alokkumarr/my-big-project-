@@ -174,9 +174,6 @@ class SuiteSetup {
     if (currentSuite) {
       completeTestData = this.filterDataBySuite(completeTestData, currentSuite);
     }
-    logger.warn(
-      'completeTestData after filter---' + JSON.stringify(completeTestData)
-    );
     return completeTestData;
   }
 
