@@ -12,7 +12,6 @@ public class ExecutionResult {
   String status;
   Long startTime;
   Long finishedTime;
-  SipQuery sipQuery;
   Analysis analysis;
   String executedBy;
   Object data;
@@ -99,20 +98,6 @@ public class ExecutionResult {
   /** Sets finishedTime. */
   public void setFinishedTime(Long finishedTime) {
     this.finishedTime = finishedTime;
-  }
-
-  /**
-   * Gets sipQuery.
-   *
-   * @return value of sipQuery
-   */
-  public SipQuery getSipQuery() {
-    return sipQuery;
-  }
-
-  /** Sets sipQuery. */
-  public void setSipQuery(SipQuery sipQuery) {
-    this.sipQuery = sipQuery;
   }
 
   /**
