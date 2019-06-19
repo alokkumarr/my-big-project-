@@ -84,7 +84,9 @@ import {
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerAddArtifactColumn,
+  DesignerRemoveArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -612,9 +614,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (isDSLAnalysis(this.analysis)) {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         const subscription = this._store
-          .select(DesignerState.groupAdapters)
+          .select(DesignerState.artifactFields)
           .pipe(
-            takeWhile(adapters => isEmpty(adapters)),
+            takeWhile(fields => isEmpty(fields)),
             finalize(() => {
               this.requestData();
             })
@@ -958,15 +960,21 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     switch (event.subject) {
     // backend data refresh needed
     case 'column':
-      this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
+      if (event.column.checked) {
+        this._store.dispatch(new DesignerAddArtifactColumn(event.column));
+      } else {
+        this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+      }
+      this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.areMinRequirmentsMet = this.canRequestData();
       this.loadGridWithoutData(event.column, 'add');
       break;
     case 'removeColumn':
-      this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
+      this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+      this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
       this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);

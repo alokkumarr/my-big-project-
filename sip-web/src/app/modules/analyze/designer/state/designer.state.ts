@@ -103,6 +103,14 @@ export class DesignerState {
     return state.groupAdapters;
   }
 
+  @Selector()
+  static artifactFields(state: DesignerStateModel) {
+    return fpFlatMap(
+      artifact => artifact.fields,
+      get(state, 'analysis.sipQuery.artifacts')
+    );
+  }
+
   @Action(DesignerMergeSupportsIntoAnalysis)
   mergeSupportsIntoAnalysis(
     { getState, patchState }: StateContext<DesignerStateModel>,
