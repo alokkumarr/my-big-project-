@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.model;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.SipQuery;
 
 public class ExecutionResult {
@@ -12,6 +13,7 @@ public class ExecutionResult {
   Long startTime;
   Long finishedTime;
   SipQuery sipQuery;
+  Analysis analysis;
   String executedBy;
   Object data;
 
@@ -136,8 +138,22 @@ public class ExecutionResult {
     return data;
   }
 
-  /** Sets result */
+  /** Sets result. */
   public void setData(Object data) {
     this.data = data;
+  }
+
+  /**
+   * Gets analysis.
+   *
+   * @return value of Analysis
+   */
+  public Analysis getAnalysis() {
+    return analysis;
+  }
+
+  /** Sets analysis. */
+  public void setAnalysis(Analysis analysis) {
+    this.analysis = analysis;
   }
 }
