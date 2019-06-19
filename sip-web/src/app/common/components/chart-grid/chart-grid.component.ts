@@ -7,9 +7,9 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
+import { setReverseProperty } from './../../../common/utils/dataFlattener';
 
 import { ChartService } from '../../services';
 import {
@@ -151,19 +151,7 @@ export class ChartGridComponent implements OnInit {
       isDSLAnalysis(analysis) ? chartType : analysis.chartType,
       { chart, legend }
     );
-    this.chartOptions = this.setReverseProperty(this.chartOptions, analysis.sipQuery);
-  }
-
-  setReverseProperty(chartOptions, sipQuery) {
-    const xAxisFields = [
-      find(sipQuery.artifacts[0].fields, field => field.area === 'x')
-    ];
-    if (!isEmpty(sipQuery.sorts)) {
-      forEach(sipQuery.sorts, sort => {
-        chartOptions.xAxis.reversed = (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) ? true : false;
-      });
-    }
-    return chartOptions;
+    this.chartOptions = setReverseProperty(this.chartOptions, analysis.sipQuery);
   }
 
   fetchColumnData(axisName, value) {

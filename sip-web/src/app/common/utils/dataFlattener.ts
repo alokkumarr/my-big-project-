@@ -15,6 +15,7 @@ import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
+import * as forEach from 'lodash/forEach';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -204,6 +205,29 @@ export function flattenReportData(data, analysis) {
       return key;
     });
   });
+}
+
+
+  /**
+   * Includes a new property to chart options for the chart engine.
+   * reversed instucts the highchart engine to plot the chart in descending order
+   * which is needed when desc is applied for a field in x-axis.
+   *
+   * @param {*} chartOptions
+   * @param {*} sipQuery
+   * @returns {chartOptions}
+   */
+
+export function setReverseProperty(chartOptions, sipQuery) {
+  const xAxisFields = [
+    find(sipQuery.artifacts[0].fields, field => field.area === 'x')
+  ];
+  if (!isEmpty(sipQuery.sorts)) {
+    forEach(sipQuery.sorts, sort => {
+      chartOptions.xAxis.reversed = (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) ? true : false;
+    });
+  }
+  return chartOptions;
 }
 
 function sortChartData(data, sorts) {
