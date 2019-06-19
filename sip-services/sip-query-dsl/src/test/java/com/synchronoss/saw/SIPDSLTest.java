@@ -1,8 +1,10 @@
 package com.synchronoss.saw;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
@@ -22,6 +24,8 @@ import org.junit.Test;
 
 /** Unit test . */
 public class SIPDSLTest {
+    private static final String esFileName= "sample.json";
+    private static final String dlFileName = "sample_dl.json";
 
   /** Query Builder Tests with aggregation. */
   @Test
@@ -56,7 +60,7 @@ public class SIPDSLTest {
   /** Query Builder Test for building Sort */
   @Test
   public void testBuildQuery() throws IOException {
-    SIPDSL sipdsl = getSipDsl();
+    SIPDSL sipdsl = getSipDsl(esFileName);
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder =
@@ -67,7 +71,7 @@ public class SIPDSLTest {
   /** Query Builder Test for building Filter with boolean */
   @Test
   public void testBuildFilter() throws IOException {
-    SIPDSL sipdsl = getSipDsl();
+    SIPDSL sipdsl = getSipDsl(esFileName);
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder boolQueryBuilder1 = null;
@@ -84,11 +88,20 @@ public class SIPDSLTest {
     Assert.assertNotNull(searchSourceBuilder);
   }
 
-  public SIPDSL getSipDsl() throws IOException {
+  public SIPDSL getSipDsl(String fileName) throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    File file = new File(classLoader.getResource("sample.json").getPath());
+    File file = new File(classLoader.getResource(fileName).getPath());
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
     return sipdsl;
+  }
+
+  @Test
+  public void testDlSelect() throws IOException {
+      SIPDSL sipdsl = getSipDsl(dlFileName);
+      DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
+      String query = dlSparkQueryBuilder.buildDataQuery(sipdsl);
+    System.out.println("Query = "+query);
   }
 }

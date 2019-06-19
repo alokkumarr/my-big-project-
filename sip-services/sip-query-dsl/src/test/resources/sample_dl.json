@@ -1,10 +1,8 @@
 {
   "sipQuery": {
-    "page": 1,
-    "pageSize": 25,
     "artifacts": [
       {
-        "artifactsName": "sample",
+        "artifactsName": "SALES",
         "fields": [
           {
             "dataField": "string",
@@ -58,7 +56,7 @@
             "name": "float",
             "displayName": "Float",
             "type": "double",
-            "aggregate": "avg"
+            "aggregate": "distinctcount"
           }
         ]
       }
@@ -67,7 +65,7 @@
     "filters": [
       {
         "type": "long",
-        "artifactsName": "sample",
+        "artifactsName": "SALES",
         "isOptional": false,
         "columnName": "long",
         "isRuntimeFilter": false,
@@ -80,7 +78,7 @@
     ],
     "sorts": [
       {
-        "artifactsName": "sample",
+        "artifacts": "SALES",
         "aggregate": "sum",
         "columnName": "long",
         "type": "long",
@@ -93,7 +91,7 @@
         "criteria": [
           {
             "joinCondition": {
-              "operator": "EQ",
+              "operator": "=",
               "left": {
                 "artifactsName": "SALES",
                 "columnName": "string"
