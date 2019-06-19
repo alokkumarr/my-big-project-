@@ -18,6 +18,9 @@ import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { QueryDSL } from 'src/app/models';
+import * as isEmpty from 'lodash/isEmpty';
+import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
 
 @Component({
   selector: 'designer-chart',
@@ -79,7 +82,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
         chartType: this.chartType
       })
     });
-
+    this.chartOptions = this.setReverseProperty(this.chartOptions, this.sipQuery);
     if (!this.updater) {
       this.updater = new BehaviorSubject([]);
     }
@@ -121,6 +124,18 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
     });
 
     return builderLike;
+  }
+
+  setReverseProperty(chartOptions, sipQuery) {
+    const xAxisFields = [
+      find(sipQuery.artifacts[0].fields, field => field.area === 'x')
+    ];
+    if (!isEmpty(sipQuery.sorts)) {
+      forEach(sipQuery.sorts, sort => {
+        chartOptions.xAxis.reversed = (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) ? true : false;
+      });
+    }
+    return chartOptions;
   }
 
   /**
