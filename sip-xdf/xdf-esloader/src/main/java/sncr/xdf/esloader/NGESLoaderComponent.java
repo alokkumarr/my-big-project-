@@ -40,9 +40,9 @@ import com.google.gson.JsonArray;
  */
 public class NGESLoaderComponent extends AbstractComponent implements WithSpark, WithDataSet {
 
-    private static final Logger logger = Logger.getLogger(ESLoaderComponent.class);
+    private static final Logger logger = Logger.getLogger(NGESLoaderComponent.class);
 
-    //TODO: Remove this
+    //TODO: Remove thisx
     public static String ESLOADER_DATASET;
 
     private Map<String, Object> esDataset;
@@ -162,6 +162,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
 
             retVal = ret._1;
+
+            logger.debug("NGESLoaderComponent execute " + retVal);
 
             if (retVal == 0) {
                 Map<String, String> indexMap = ret._2;
