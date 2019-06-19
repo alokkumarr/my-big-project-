@@ -132,3 +132,5 @@ export const CHANNEL_TYPES: ChannelType[] = [
     supported: false
   }
 ];
+
+export const DEFAULT_CHANNEL_TYPE = CHANNEL_TYPES[0];

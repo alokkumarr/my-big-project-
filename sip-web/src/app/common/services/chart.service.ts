@@ -662,8 +662,7 @@ export class ChartService {
           name: data[i].drilldown.categories[j],
           y: data[i].drilldown.data[j],
           /* eslint-disable */
-          color: this._Highcharts
-            .Color(data[i].color)
+          color: new this._Highcharts.Color(data[i].color)
             .brighten(brightness)
             .get()
           /* eslint-enable */

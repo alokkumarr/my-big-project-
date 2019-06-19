@@ -66,11 +66,11 @@ export interface ChannelType {
 
 export interface WorkbenchStateModel {
   channelTypeList: ChannelType[];
-  selectedChannelType: ChannelType;
+  selectedChannelTypeId: string;
   channelList: ChannelForJobs[];
-  selectedChannel: ChannelForJobs;
+  selectedChannelId: number;
   routeList: RouteForJobs[];
-  selectedRoute: RouteForJobs;
+  selectedRouteId: number;
   jobs: Job[];
   jobLogs: JobLog[];
 }

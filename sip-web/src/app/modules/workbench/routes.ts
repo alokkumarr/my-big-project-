@@ -60,7 +60,7 @@ export const routes: Routes = [
         canActivate: [IsAdminGuard]
       },
       {
-        path: 'datasource/jobs/:jobId',
+        path: 'datasource/joblogs/:jobId',
         component: JobLogsPageComponent,
         canActivate: [IsAdminGuard]
       },

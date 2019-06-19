@@ -1,9 +1,3 @@
-import {
-  ChannelForJobs,
-  RouteForJobs,
-  ChannelType
-} from '../models/workbench.interface';
-
 export class LoadJobs {
   static readonly type = '[Workbench] Load jobs';
   constructor() {}
@@ -21,20 +15,20 @@ export class LoadChannelList {
 
 export class LoadRouteList {
   static readonly type = '[Workbench] Load route list';
-  constructor(public channelId: string) {}
+  constructor(public channelId: number) {}
 }
 
-export class SelectChannelType {
-  static readonly type = '[Workbench] Select channel type';
-  constructor(public channelType: ChannelType) {}
+export class SelectChannelTypeId {
+  static readonly type = '[Workbench] Select channel type id';
+  constructor(public channelType: string) {}
 }
 
-export class SelectChannel {
-  static readonly type = '[Workbench] Select channel';
-  constructor(public channel: ChannelForJobs) {}
+export class SelectChannelId {
+  static readonly type = '[Workbench] Select channel id';
+  constructor(public channelId: number) {}
 }
 
-export class SelectRoute {
-  static readonly type = '[Workbench] Select route';
-  constructor(public route: RouteForJobs) {}
+export class SelectRouteId {
+  static readonly type = '[Workbench] Select route id';
+  constructor(public routeId: number) {}
 }

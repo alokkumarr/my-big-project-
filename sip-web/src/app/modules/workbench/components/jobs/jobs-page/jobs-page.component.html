@@ -10,28 +10,27 @@
         <mat-select
           class="form-field"
           (selectionChange)="onChannelTypeSelected($event.value)"
-          [value]="selectedChannelType$ | async"
+          [value]="selectedChannelTypeId$ | async"
         >
           <mat-option
             [disabled]="!type.supported"
             *ngFor="let type of channelTypeList$ | async"
-            [value]="type"
+            [value]="type.uid"
           >
             {{ type.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
-
       <mat-form-field class="select-form-field" appearance="outline">
         <mat-label i18n>Channel name</mat-label>
         <mat-select
           class="form-field"
           (selectionChange)="onChannelSelected($event.value)"
-          [value]="selectedChannel$ | async"
+          [value]="selectedChannelId$ | async"
         >
           <mat-option
             *ngFor="let channel of channelList$ | async"
-            [value]="channel"
+            [value]="channel.id"
           >
             {{ channel.name }}
           </mat-option>
@@ -42,11 +41,14 @@
         <mat-label i18n>Route name</mat-label>
         <mat-select
           class="form-field"
-          [disabled]="!(selectedChannel$ | async)"
+          [disabled]="!(selectedChannelId$ | async)"
           (selectionChange)="onRouteSelected($event.value)"
-          [value]="selectedRoute$ | async"
+          [value]="selectedRouteId$ | async"
         >
-          <mat-option *ngFor="let route of routeList$ | async" [value]="route">
+          <mat-option
+            *ngFor="let route of routeList$ | async"
+            [value]="route.id"
+          >
             {{ route.name }}
           </mat-option>
         </mat-select>
@@ -138,7 +140,7 @@
     ></dxi-column>
 
     <div *dxTemplate="let cell of 'linkCellTemplate'">
-      <a routerLink="./{{ cell.data.jobId }}">
+      <a routerLink="../joblogs/{{ cell.data.jobId }}">
         {{ cell.data.jobName }}
       </a>
     </div>

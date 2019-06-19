@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -49,19 +50,25 @@ export class JobLogsPageComponent implements OnInit {
     ]
   ];
 
-  constructor(private _store: Store, private route: ActivatedRoute) {}
+  constructor(
+    private _store: Store,
+    private _route: ActivatedRoute,
+    private _location: Location
+  ) {}
 
   ngOnInit() {
     this.loadJobsIfNeeded();
 
-    this.route.params.subscribe(({ jobId }) => {
+    this._route.params.subscribe(({ jobId }) => {
       this._store.dispatch(new LoadJobLogs(jobId));
     });
 
-    combineLatest(this.route.params, this.jobs$).subscribe(([params, jobs]) => {
-      const jobId = parseInt(params.jobId, 10);
-      this.job = find(jobs, job => job.jobId === jobId);
-    });
+    combineLatest(this._route.params, this.jobs$).subscribe(
+      ([params, jobs]) => {
+        const jobId = parseInt(params.jobId, 10);
+        this.job = find(jobs, job => job.jobId === jobId);
+      }
+    );
   }
 
   loadJobsIfNeeded() {
@@ -69,5 +76,9 @@ export class JobLogsPageComponent implements OnInit {
     if (isEmpty(jobs)) {
       this._store.dispatch(new LoadJobs());
     }
+  }
+
+  goBack() {
+    this._location.back();
   }
 }

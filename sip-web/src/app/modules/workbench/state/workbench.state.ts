@@ -5,23 +5,21 @@ import {
   LoadJobLogs,
   LoadChannelList,
   LoadRouteList,
-  SelectChannelType,
-  SelectChannel,
-  SelectRoute
+  SelectChannelTypeId,
+  SelectChannelId,
+  SelectRouteId
 } from './workbench.actions';
 import { DatasourceService } from '../services/datasource.service';
 import { WorkbenchStateModel } from '../models/workbench.interface';
-import { CHANNEL_TYPES } from '../wb-comp-configs';
-
-const defaultChannelType = CHANNEL_TYPES[0];
+import { CHANNEL_TYPES, DEFAULT_CHANNEL_TYPE } from '../wb-comp-configs';
 
 const defaultWorkbenchState: WorkbenchStateModel = {
   channelTypeList: CHANNEL_TYPES,
-  selectedChannelType: defaultChannelType,
+  selectedChannelTypeId: DEFAULT_CHANNEL_TYPE.uid,
   channelList: [],
-  selectedChannel: null,
+  selectedChannelId: null,
   routeList: [],
-  selectedRoute: null,
+  selectedRouteId: null,
   jobs: [],
   jobLogs: []
 };
@@ -52,63 +50,67 @@ export class WorkbenchState {
   }
 
   @Selector()
-  static selectedChannelType(state: WorkbenchStateModel) {
-    return state.selectedChannelType;
+  static selectedChannelTypeId(state: WorkbenchStateModel) {
+    return state.selectedChannelTypeId;
   }
   @Selector()
   static selectedChannelId(state: WorkbenchStateModel) {
-    return state.selectedChannel;
+    return state.selectedChannelId;
   }
   @Selector()
-  static selectedRoutName(state: WorkbenchStateModel) {
-    return state.selectedRoute;
+  static selectedRouteId(state: WorkbenchStateModel) {
+    return state.selectedRouteId;
   }
 
-  @Action(SelectChannelType)
-  selectChannelType(
+  @Action(SelectChannelTypeId)
+  selectChannelTypeId(
     { patchState }: StateContext<WorkbenchStateModel>,
-    { channelType }: SelectChannelType
+    { channelType }: SelectChannelTypeId
   ) {
     return patchState({
-      selectedChannelType: channelType,
-      selectedChannel: null,
-      selectedRoute: null
+      selectedChannelTypeId: channelType,
+      selectedChannelId: null,
+      selectedRouteId: null
     });
   }
 
-  @Action(SelectChannel)
-  selectChannel(
+  @Action(SelectChannelId)
+  selectChannelId(
     { patchState }: StateContext<WorkbenchStateModel>,
-    { channel }: SelectChannel
+    { channelId }: SelectChannelId
   ) {
-    return patchState({ selectedChannel: channel, selectedRoute: null });
+    return patchState({ selectedChannelId: channelId, selectedRouteId: null });
   }
 
-  @Action(SelectRoute)
-  SelectRoute(
+  @Action(SelectRouteId)
+  SelectRouteId(
     { patchState }: StateContext<WorkbenchStateModel>,
-    { route }: SelectRoute
+    { routeId }: SelectRouteId
   ) {
-    return patchState({ selectedRoute: route });
+    return patchState({ selectedRouteId: routeId });
   }
 
   @Action(LoadJobs)
   loadJobs({ getState, patchState }: StateContext<WorkbenchStateModel>) {
-    const { selectedChannelType, selectedChannel, selectedRoute } = getState();
+    const {
+      selectedChannelTypeId,
+      selectedChannelId,
+      selectedRouteId
+    } = getState();
 
-    if (selectedRoute && selectedChannel) {
+    if (selectedRouteId && selectedChannelId) {
       return this._datasourceService
-        .getJobsForRoute(selectedChannel.id, selectedRoute.id)
+        .getJobsForRoute(selectedChannelId, selectedRouteId)
         .then(jobs => patchState({ jobs }));
     }
-    if (selectedChannel) {
+    if (selectedChannelId) {
       return this._datasourceService
-        .getJobsForChannel(selectedChannel.id)
+        .getJobsForChannel(selectedChannelId)
         .then(jobs => patchState({ jobs }));
     }
-    if (selectedChannelType) {
+    if (selectedChannelTypeId) {
       return this._datasourceService
-        .getJobsForChannelType(selectedChannelType.uid)
+        .getJobsForChannelType(selectedChannelTypeId)
         .then(jobs => patchState({ jobs }));
     }
   }
