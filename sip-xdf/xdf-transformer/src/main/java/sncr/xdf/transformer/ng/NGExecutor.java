@@ -153,8 +153,6 @@ public abstract class NGExecutor {
 
         ngctx.datafileDFmap.put(ngctx.dataSetName,outputResult);
 
-        outputResult.toDF().show(4);
-
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
