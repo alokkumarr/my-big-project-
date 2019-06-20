@@ -1,11 +1,12 @@
 package com.synchronoss.saw.storage.proxy.model;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.SipQuery;
 
 public class ExecutionResponse {
 
   Object data;
-  SipQuery sipQuery;
+  Analysis analysis;
   String executedBy;
 
   /**
@@ -23,20 +24,6 @@ public class ExecutionResponse {
   }
 
   /**
-   * Gets sipQuery.
-   *
-   * @return value of sipQuery
-   */
-  public SipQuery getSipQuery() {
-    return sipQuery;
-  }
-
-  /** Sets sipQuery. */
-  public void setSipQuery(SipQuery sipQuery) {
-    this.sipQuery = sipQuery;
-  }
-
-  /**
    * Gets executedBy.
    *
    * @return value of executedBy
@@ -48,5 +35,19 @@ public class ExecutionResponse {
   /** Sets executedBy. */
   public void setExecutedBy(String executedBy) {
     this.executedBy = executedBy;
+  }
+
+  /**
+   * Gets analysis.
+   *
+   * @return value of Analysis
+   */
+  public Analysis getAnalysis() {
+    return analysis;
+  }
+
+  /** Sets analysis. */
+  public void setAnalysis(Analysis analysis) {
+    this.analysis = analysis;
   }
 }
