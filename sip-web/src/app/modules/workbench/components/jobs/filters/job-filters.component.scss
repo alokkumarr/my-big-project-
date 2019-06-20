@@ -1,0 +1,30 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  height: calc(100% - 8px);
+  padding: 3px 5px 5px 5px;
+  background-color: $background-color;
+  min-width: 98% !important;
+
+  .filter-panel {
+    width: 310px;
+    background-color: $background-color;
+
+    .filter-panel-header {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .mat-card-title {
+      font-weight: normal;
+    }
+  }
+
+  .flow-arrow {
+    transform: rotate(-90deg);
+    height: 16px;
+    width: 16px;
+    margin: 4px;
+  }
+}

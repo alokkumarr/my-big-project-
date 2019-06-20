@@ -1,152 +1,114 @@
 <div>
-  <mat-toolbar>
-    <mat-toolbar-row fxLayoutGap="5px">
-      <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center">
-        <span i18n>Jobs</span>
-      </div>
-
-      <mat-form-field class="select-form-field" appearance="outline">
-        <mat-label i18n>Channel type</mat-label>
-        <mat-select
-          class="form-field"
-          (selectionChange)="onChannelTypeSelected($event.value)"
-          [value]="selectedChannelTypeId$ | async"
-        >
-          <mat-option
-            [disabled]="!type.supported"
-            *ngFor="let type of channelTypeList$ | async"
-            [value]="type.uid"
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav
+      #sidenav
+      position="end"
+      mode="over"
+      autoFocus="false"
+      class="filter-panel"
+    >
+      <job-filters></job-filters>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <mat-toolbar>
+        <mat-toolbar-row fxLayoutGap="5px">
+          <div fxFlex="100" fxLayout="row" fxLayoutAlign="start space-between">
+            <span i18n>Jobs</span>
+          </div>
+          <button
+            mat-icon-button
+            color="secondary"
+            (click)="sidenav.toggle()"
+            matTooltip="Toggle Filter Pannel"
           >
-            {{ type.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="select-form-field" appearance="outline">
-        <mat-label i18n>Channel name</mat-label>
-        <mat-select
-          class="form-field"
-          (selectionChange)="onChannelSelected($event.value)"
-          [value]="selectedChannelId$ | async"
-        >
-          <mat-option
-            *ngFor="let channel of channelList$ | async"
-            [value]="channel.id"
-          >
-            {{ channel.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+            <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+          </button>
+        </mat-toolbar-row>
+      </mat-toolbar>
 
-      <mat-form-field class="select-form-field" appearance="outline">
-        <mat-label i18n>Route name</mat-label>
-        <mat-select
-          class="form-field"
-          [disabled]="!(selectedChannelId$ | async)"
-          (selectionChange)="onRouteSelected($event.value)"
-          [value]="selectedRouteId$ | async"
-        >
-          <mat-option
-            *ngFor="let route of routeList$ | async"
-            [value]="route.id"
-          >
-            {{ route.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-toolbar-row>
-  </mat-toolbar>
+      <dx-data-grid
+        class="jobs-grid"
+        [dataSource]="jobs$ | async"
+        [showBorders]="false"
+        [columnAutoWidth]="false"
+        [showColumnLines]="false"
+        [rowAlternationEnabled]="true"
+        [width]="'100%'"
+        [allowColumnResizing]="true"
+        e2e="jobs-container"
+      >
+        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
+        <dxo-scrolling
+          mode="virtual"
+          showScrollbar="always"
+          [useNative]="false"
+        ></dxo-scrolling>
+        <dxi-column
+          caption="Job name"
+          dataField="jobName"
+          alignment="left"
+          cellTemplate="linkCellTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Start time"
+          dataField="startTime"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="End time"
+          dataField="endTime"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Job status"
+          dataField="jobStatus"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Total count"
+          dataField="totalCount"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Success count"
+          dataField="successCount"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="File patter"
+          dataField="filePattern"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Job type"
+          dataField="jobType"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Created at"
+          dataField="createdDate"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Updated at"
+          dataField="updatedDate"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
 
-  <dx-data-grid
-    class="jobs-grid"
-    [dataSource]="jobs$ | async"
-    [showBorders]="false"
-    [columnAutoWidth]="false"
-    [showColumnLines]="false"
-    [rowAlternationEnabled]="true"
-    [width]="'100%'"
-    [allowColumnResizing]="true"
-    e2e="jobs-container"
-  >
-    <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
-    <dxo-scrolling
-      mode="virtual"
-      showScrollbar="always"
-      [useNative]="false"
-    ></dxo-scrolling>
-    <dxi-column
-      caption="Job name"
-      dataField="jobName"
-      alignment="left"
-      cellTemplate="linkCellTemplate"
-    ></dxi-column>
-    <dxi-column
-      caption="Start time"
-      dataField="startTime"
-      alignment="left"
-      cellTemplate="dateTemplate"
-    ></dxi-column>
-    <dxi-column
-      caption="End time"
-      dataField="endTime"
-      alignment="left"
-      cellTemplate="dateTemplate"
-    ></dxi-column>
-    <dxi-column
-      caption="Job status"
-      dataField="jobStatus"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="Total count"
-      dataField="totalCount"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="Success count"
-      dataField="successCount"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="File patter"
-      dataField="filePattern"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="Job type"
-      dataField="jobType"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="Created at"
-      dataField="createdDate"
-      alignment="left"
-      cellTemplate="dateTemplate"
-    ></dxi-column>
-    <dxi-column
-      caption="Created by"
-      dataField="createdBy"
-      alignment="left"
-    ></dxi-column>
-    <dxi-column
-      caption="Updated at"
-      dataField="updatedDate"
-      alignment="left"
-      cellTemplate="dateTemplate"
-    ></dxi-column>
-    <dxi-column
-      caption="Updated by"
-      dataField="updatedBy"
-      alignment="left"
-    ></dxi-column>
+        <div *dxTemplate="let cell of 'linkCellTemplate'">
+          <a routerLink="../joblogs/{{ cell.data.jobId }}">
+            {{ cell.data.jobName }}
+          </a>
+        </div>
 
-    <div *dxTemplate="let cell of 'linkCellTemplate'">
-      <a routerLink="../joblogs/{{ cell.data.jobId }}">
-        {{ cell.data.jobName }}
-      </a>
-    </div>
-
-    <div *dxTemplate="let cell of 'dateTemplate'">
-      {{ cell.text | date: 'short' }}
-    </div>
-  </dx-data-grid>
+        <div *dxTemplate="let cell of 'dateTemplate'">
+          {{ cell.text | date: 'short' }}
+        </div>
+      </dx-data-grid>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

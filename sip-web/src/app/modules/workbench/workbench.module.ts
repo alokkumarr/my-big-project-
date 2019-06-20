@@ -49,7 +49,11 @@ import {
   SourceFolderDialogComponent
 } from './components/datasource-management/index';
 
-import { JobsPageComponent, JobLogsPageComponent } from './components/jobs';
+import {
+  JobsPageComponent,
+  JobLogsPageComponent,
+  JobFiltersComponent
+} from './components/jobs';
 
 import { DefaultWorkbenchPageGuard } from './guards';
 import { IsAdminGuard } from '../admin/guards';
@@ -89,7 +93,8 @@ const COMPONENTS = [
   ConfirmActionDialogComponent,
   SourceFolderDialogComponent,
   JobsPageComponent,
-  JobLogsPageComponent
+  JobLogsPageComponent,
+  JobFiltersComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
