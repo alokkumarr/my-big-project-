@@ -65,9 +65,12 @@ public class XDFDataProcessor  extends AbstractComponent {
 
     protected void  processData(String[] args)
     {
+        int ret = 0 ;
+
         CliHandler cli = new CliHandler();
 
         try {
+
             HFileOperations.init(10);
             Map<String, Object> parameters = cli.parse(args);
 
@@ -79,42 +82,34 @@ public class XDFDataProcessor  extends AbstractComponent {
             for(int i=0;i<pipeline.size();i++)
             {
                 JSONObject pipeObj = (JSONObject)pipeline.get(i);
-                if ( pipeObj.get("component").equals("parser"))
+
+                String component = pipeObj.get("component").toString();
+                boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+                switch(component)
                 {
-                    logger.debug("Processing Parser Component ---> " + pipeObj.get("component"));
-                    processParser(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
-                }
-                if ( pipeObj.get("component").equals("transformer"))
-                {
-                    logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
-                    processTransformer(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
-                }
-                if ( pipeObj.get("component").equals("sql"))
-                {
-                    logger.debug("Processing Transformer Component ---> " + pipeObj.get("component"));
-                    processSQL(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
-                }
-                if ( pipeObj.get("component").equals("esloader"))
-                {
-                    logger.debug("Processing ESLoader Component ---> " + pipeObj.get("component"));
-                    processESLoader(parameters,pipeObj.get("configuration").toString(),Boolean.parseBoolean(pipeObj.get("persist").toString()));
+                    case "parser" :
+                    ret = processParser(parameters,pipeObj.get("configuration").toString(),persist);
+                    break;
+
+                    case "transformer" :
+                    ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
+                    break;
+
+                    case "sql" :
+                    ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
+                    break;
+
+                    case "esloader" :
+                    ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
+                    break;
                 }
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
+            logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
+            System.exit(ret);
         }
-    }
-
-    protected int archive()
-    {
-        return 0;
-    }
-
-    protected int move()
-    {
-        return 0;
     }
 
 
@@ -125,7 +120,6 @@ public class XDFDataProcessor  extends AbstractComponent {
         return config;
     }
 
-
     public JSONObject LoadPipelineConfig(String cfg)
     {
         JSONParser parser = new JSONParser();
@@ -134,13 +128,15 @@ public class XDFDataProcessor  extends AbstractComponent {
         try {
             pipelineObj = (JSONObject) parser.parse(reader);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.debug("XDFDataProcessor:LoadPipelineConfig() ParseException is : " + e + "\n");
+            System.exit(-1);
         }
         return pipelineObj;
     }
 
-    public void processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
+        int ret = 0;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
@@ -196,21 +192,28 @@ public class XDFDataProcessor  extends AbstractComponent {
             if (!component.initComponent(null))
                 System.exit(-1);
 
-            component.run();
+            ret = component.run();
+
+            if (ret != 0){
+                error = "Could not complete Parser component " + "entry";
+                throw new Exception(error);
+            }
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName));
             dataSetName = parserKey;
 
-            logger.debug("End Of Parser Component  dataSetName :" + dataSetName +  "\n" );
+            logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
             System.exit(-1);
         }
+        return ret;
     }
 
-    public void processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
+        int ret = 0;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -271,23 +274,31 @@ public class XDFDataProcessor  extends AbstractComponent {
             if (!tcomponent.initTransformerComponent(null))
                 System.exit(-1);
 
-            tcomponent.run();
+            ret = tcomponent.run();
+
+            if (ret != 0){
+                error = "Could not complete Transformer component " + "entry";
+                throw new Exception(error);
+            }
+
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(transOutKey,ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
             dataSetName = transOutKey;
 
-            logger.debug("End Of Transformer Component  dataSetName :" + dataSetName +  "\n" );
+            logger.debug("End Of Transformer Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("XDFDataProcessor:processTransformer() Exception is : " + e + "\n");
             System.exit(-1);
         }
+        return ret;
     }
 
 
-    public void processSQL(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int processSQL(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
+        int ret = 0;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -320,8 +331,6 @@ public class XDFDataProcessor  extends AbstractComponent {
                     ComponentServices.Spark
                 };
 
-            logger.debug("Starting SQL component :" + "\n" );
-
             logger.debug("Starting SQL component  dataSetName :" + dataSetName +  "\n" );
 
             ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
@@ -336,7 +345,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngSQLCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.trace(id)
             );
-
 
             String sqlInKey =  dataSetName;
             int sqlOutputSize = config.getOutputs().size();
@@ -356,25 +364,33 @@ public class XDFDataProcessor  extends AbstractComponent {
             if (!sqlcomponent.initComponent(null))
                 System.exit(-1);
 
-            sqlcomponent.run();
+            ret = sqlcomponent.run();
 
-            logger.debug("SQL ngSQLCtxSvc.getNgctx().dataSetName  :" + ngSQLCtxSvc.getNgctx().dataSetName + "\n" );
+            if (ret != 0){
+                error = "Could not complete SQL component " + "entry";
+                logger.error(error);
+                throw new Exception(error);
+            }
+
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(sqlOutKey,ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
             dataSetName = sqlOutKey;
 
-            logger.debug("End Of SQL Component  dataSetName :" + dataSetName +  "\n" );
+            logger.debug("End Of SQL Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
             System.exit(-1);
         }
+        return ret;
     }
 
-    public void processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
+        int ret = 0;
+
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -432,14 +448,31 @@ public class XDFDataProcessor  extends AbstractComponent {
             if (!esloader.initComponent(null))
                 System.exit(-1);
 
-            esloader.run();
+            ret = esloader.run();
 
-            logger.debug("End of ESLoader Component done : " + ngESCtxSvc.getNgctx().dataSetName + "\n" );
+            if (ret != 0){
+                error = "Could not complete ESLoader component " + "entry";
+                throw new Exception(error);
+            }
+
+            logger.debug("End Of ESLoader Component ==>  dataSetName  & size " +  ngESCtxSvc.getNgctx().dataSetName + "," + ngESCtxSvc.getNgctx().datafileDFmap.size()+ "\n");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("XDFDataProcessor:processESLoader() Exception is : " + e + "\n");
             System.exit(-1);
         }
+        return ret;
+    }
+
+
+    protected int archive()
+    {
+        return 0;
+    }
+
+    protected int move()
+    {
+        return 0;
     }
 
 

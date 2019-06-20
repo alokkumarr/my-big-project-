@@ -70,8 +70,7 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
 
-        df.show();
-        df.printSchema();
+        df.show(4);
 
         //df.schema().prettyJson();
         logger.trace("Transformation completed: " + c   + " Schema: " + df.schema().prettyJson());

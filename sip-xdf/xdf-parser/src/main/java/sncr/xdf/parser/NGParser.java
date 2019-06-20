@@ -127,6 +127,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Input file format = " + this.parserInputFileFormat);
 
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+
             headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
 
             lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
@@ -146,7 +147,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 return -1;
             }
 
-            logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+            logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
             Map<String, Object> rejDs = getRejectDatasetDetails();
 
@@ -224,6 +225,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 retval =  -1;
             }
 
+            logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
+
         } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
@@ -237,6 +240,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
 
+            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
+
+            logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
             if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
             {
@@ -249,6 +255,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+
+                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
+                logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             }
 
         return retval;

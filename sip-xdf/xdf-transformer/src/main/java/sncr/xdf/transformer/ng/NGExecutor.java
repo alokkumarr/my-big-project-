@@ -150,12 +150,10 @@ public abstract class NGExecutor {
             .drop(trRC);
 
         ds.toDF().show(4);
-        ds.toDF().printSchema();
 
         ngctx.datafileDFmap.put(ngctx.dataSetName,outputResult);
 
         outputResult.toDF().show(4);
-        outputResult.toDF().printSchema();
 
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));

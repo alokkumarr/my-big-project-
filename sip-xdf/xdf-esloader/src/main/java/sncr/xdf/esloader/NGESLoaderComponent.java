@@ -149,8 +149,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
             Dataset<Row> inputDataset = dataSetMap.get(this.dataSetName);
 
-            inputDataset.printSchema();
-            inputDataset.show(10);
+            inputDataset.show(4);
 
             ElasticSearchLoader loader = new ElasticSearchLoader(this.ctx.sparkSession, esLoaderConfig);
 

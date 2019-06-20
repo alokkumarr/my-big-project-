@@ -51,8 +51,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
                 //TODO:: Get correct partitionList
                 Map<String, Object> ds1 = inputDataSets.get((String) inputDataSets.keySet().toArray()[0]);
                 Dataset<String> src = ctx.sparkSession.read().textFile((String)ds1.get(DataSetProperties.PhysicalLocation));
-                src.show(10);
-                src.printSchema();
+                src.show(4);
 
                 LongAccumulator maxFieldCount = ctx.sparkSession.sparkContext().longAccumulator();
                 maxFieldCount.setValue(0L);
