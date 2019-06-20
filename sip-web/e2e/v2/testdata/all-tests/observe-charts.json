@@ -2,97 +2,97 @@
   "CHART_DASHBOARD": {
     "dashboard": {
       "DASHB001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "chartType": "chart:combo",
         "description": "Admin should be able to create combo charts in the dashboards."
       },
       "DASHB002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:combo",
         "description": "User should be able to create combo charts in the dashboards."
       },
       "DASHB003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:column",
         "description": "Admin should be able to create column charts in the dashboards."
       },
       "DASHB004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:column",
         "description": "User should be able to create column charts in the dashboards."
       },
       "DASHB005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bar",
         "description": "Admin should be able to create bar charts in the dashboards."
       },
       "DASHB006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bar",
         "description": "User should be able to create bar charts in the dashboards."
       },
       "DASHB007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:stack",
         "description": "Admin should be able to create stack charts in the dashboards."
       },
       "DASHB008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:stack",
         "description": "User should be able to create stack charts in the dashboards."
       },
       "DASHB009": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:line",
         "description": "Admin should be able to create line charts in the dashboards."
       },
       "DASHB010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:line",
         "description": "User should be able to create line charts in the dashboards."
       },
       "DASHB011": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:area",
         "description": "Admin should be able to create area charts in the dashboards."
       },
       "DASHB012": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:area",
         "description": "User should be able to create area charts in the dashboards."
       },
       "DASHB013": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:scatter",
         "description": "Admin should be able to create scatter charts in the dashboards."
       },
       "DASHB014": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:scatter",
         "description": "User should be able to create scatter charts in the dashboards."
       },
       "DASHB015": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bubble",
         "description": "Admin should be able to create bubble charts in the dashboards."
       },
       "DASHB016": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bubble",
         "description": "User should be able to create bubble charts in the dashboards."

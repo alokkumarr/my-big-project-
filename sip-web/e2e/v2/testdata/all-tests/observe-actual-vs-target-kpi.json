@@ -2,7 +2,7 @@
   "ACTUAL_VS_TARGET": {
     "dashboard": {
       "ACVTA001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "skip": false,
         "kpiInfo": {
@@ -18,7 +18,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with long column values."
       },
       "ACVTA002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",
@@ -33,7 +33,7 @@
         "description": "User should create & delete dashboards using actual vs target kpi with float values."
       },
       "ACVTA003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "kpiInfo": {
           "column": "Integer",
@@ -48,7 +48,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with integer values."
       },
       "ACVTA004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Double",
@@ -63,7 +63,7 @@
         "description": "User should create & delete dashboards using actual vs target kpi with double values."
       },
       "ACVTA005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "skip": false,
         "kpiInfo": {
@@ -79,7 +79,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with long values."
       },
       "ACVTA006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",
@@ -94,7 +94,7 @@
         "description": "User should create & delete dashboards using actual vs target kpi with float and last week values."
       },
       "ACVTA007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "skip": false,
         "kpiInfo": {
@@ -110,7 +110,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with long and last 6 weeks values."
       },
       "ACVTA008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",
@@ -125,7 +125,7 @@
         "description": "User should create & delete dashboards using actual vs target kpi with float and last 2 weeks values."
       },
       "ACVTA009": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "skip": false,
         "kpiInfo": {
@@ -141,7 +141,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with long and last month values."
       },
       "ACVTA010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",
@@ -156,7 +156,7 @@
         "description": "User should create & delete dashboards using actual vs target kpi with float and last quarter values."
       },
       "ACVTA011": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "skip": false,
         "kpiInfo": {
@@ -172,7 +172,7 @@
         "description": "Admin should create & delete dashboards using actual vs target kpi with long and last 3 months values."
       },
       "ACVTA012": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",

@@ -19,7 +19,7 @@ class GlobalFilters {
     );
     this._numberSliderLow = element(
       by.xpath(
-        `//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]`
+        `//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"dx-rangeslider-start-handle")]`
       )
     );
     this._selectedPresetValue = value =>
