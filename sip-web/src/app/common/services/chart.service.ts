@@ -630,20 +630,22 @@ export class ChartService {
   dataToNestedDonut(series, categories) {
     /* Group by option forms the inner circle. X axis option forms the outer region
        This logic is adapted from https://www.highcharts.com/demo/pie-donut */
-
     const colors = this._Highcharts.getOptions().colors;
     const gCategories = map(series, s => s.name);
     const data = map(series, (s, i) => {
       const drilldown = {
         color: colors[i],
         categories: map(s.data, d => get(categories, `x.${d.x}`)),
-        data: map(s.data, d => d.y)
+        data: map(s.data, d => d.y),
+        xData: map(s.data, d => d.x)
       };
       return {
         drilldown,
-        y: sum(drilldown.data)
+        y: sum(drilldown.data),
+        x: sum(drilldown.xData)
       };
     });
+
     const innerData = [];
     const outerData = [];
     const dataLen = data.length;
@@ -652,15 +654,17 @@ export class ChartService {
       innerData.push({
         name: gCategories[i],
         y: data[i].y,
+        x: data[i].x,
         color: data[i].color
       });
-
       const drillDataLen = data[i].drilldown.data.length;
       for (let j = 0; j < drillDataLen; j += 1) {
         const brightness = 0.2 - j / drillDataLen;
         outerData.push({
           name: data[i].drilldown.categories[j],
           y: data[i].drilldown.data[j],
+          x: data[i].drilldown.xData[j],
+
           /* eslint-disable */
           color: this._Highcharts
             .Color(data[i].color)
@@ -670,7 +674,6 @@ export class ChartService {
         });
       }
     }
-
     const { aggregate, aggrSymbol, dataType } = get(series, '0', {});
 
     const chartSeries = [
@@ -721,17 +724,15 @@ export class ChartService {
       if (!fields.g) {
         mapperFn = ({ x, y }) => {
           const category = get(categories, `x.${x}`, toString(x || 0));
-          return { name: category, y, drilldown: category };
+          return { name: category, y, drilldown: category, x};
         };
         forEach(series, serie => {
           serie.data = map(serie.data, mapperFn);
         });
-
         chartSeries = series;
       } else {
         chartSeries = this.dataToNestedDonut(series, categories);
       }
-
       return { chartSeries };
 
     default:
@@ -751,7 +752,6 @@ export class ChartService {
       enabled: true,
       value: 'percentage'
     });
-
     const { series, categories } = this.splitToSeriesAndCategories(
       gridData,
       fields,
@@ -789,7 +789,6 @@ export class ChartService {
       path: 'series',
       data: chartSeries
     });
-
     return changes;
   }
 
@@ -975,7 +974,6 @@ export class ChartService {
         changes = this.getBarChangeConfig(type, fields, gridData, opts);
         break;
     }
-
     return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
   }
 
@@ -1050,7 +1048,11 @@ export class ChartService {
         ? xIsString
           ? point.key
           : xIsNumber
-          ? point.total ? round(point.total, 2) : round(point.x, 2)
+          ? point.x
+            ? point.x
+            : point.total
+            ? round(point.total, 2)
+            : round(point.x, 2)
           : point.x
         : xIsString
         ? '{point.key}'
@@ -1143,7 +1145,6 @@ export class ChartService {
       path: 'tooltip',
       data: tooltipObj
     });
-
     // if there is no grouping disable the legend
     // because there is only one data series
     changes.push({
