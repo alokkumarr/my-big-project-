@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  *  The AbstractComponent class is base class for all XDF components.
  *  All component should be implemented as follows:
@@ -49,6 +48,7 @@ import java.util.Map;
  *     These are runtime options.
  *
  */
+
 public abstract class AbstractComponent implements WithContext{
 
     private static final Logger logger = Logger.getLogger(AbstractComponent.class);
@@ -641,6 +641,8 @@ public abstract class AbstractComponent implements WithContext{
             ( ret == 0)? "SUCCESS":
                 ((ret == 1)? "PARTIAL":
                     "FAILED");
+
+        logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
         int rc[] = {0}; rc[0] = 0;
         try {
 
@@ -703,7 +705,10 @@ public abstract class AbstractComponent implements WithContext{
                         return;
                     }
                 });
+                logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
                 services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID);
+               // logger.info("Status updating to:::"+  services.transformationMD.ts.);
+
             }
         } catch (Exception e) {
             error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
