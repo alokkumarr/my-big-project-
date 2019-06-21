@@ -116,7 +116,7 @@ public class DLSparkQueryBuilder {
         Relation2<String, String> tablesRelation = null;
         for (Criteria criteria : join.getCriteria()) {
           JoinCondition joinCondition = criteria.getJoinCondition();
-          String joinOperator = " = "; // default EQ.
+          String joinOperator = "="; // default EQ.
           if (joinCondition.getOperator() != null
               && !joinCondition.getOperator().trim().isEmpty()) {
             String op = joinCondition.getOperator().trim();
@@ -124,7 +124,7 @@ public class DLSparkQueryBuilder {
                 || op.equalsIgnoreCase("Not Equals")
                 || op.equalsIgnoreCase("<>")
                 || op.equalsIgnoreCase("!=")) {
-              joinOperator = " <> ";
+              joinOperator = "<>";
             }
           }
 

@@ -292,6 +292,7 @@ public class SIPDSLTest {
     dskDefList.add(dskDef1);
     dsk.setDataSecuritykey(dskDefList);
     String query = dlSparkQueryBuilder.buildDskDataQuery(sipdsl, dsk);
-    System.out.println("Query = " + query);
+    String assertQuery = "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE SALES.long = 1000.0 AND SALES.Double = 2000.0 AND SALES.string in ('String 1', 'str') AND SALES.string in ('String 123', 'string 456') GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+    Assert.assertEquals(query,assertQuery);
   }
 }
