@@ -86,7 +86,8 @@ import {
   DesignerLoadMetric,
   DesignerResetState,
   DesignerAddArtifactColumn,
-  DesignerRemoveArtifactColumn
+  DesignerRemoveArtifactColumn,
+  DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
@@ -607,9 +608,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
-      /* If it's a DSL analysis, since we're depending on group adapters
-         to generate sipQuery, wait until group adapters are loaded before
-         requesting data.
+      /* If it's a DSL analysis, check if there are any fields added before trying
+        to load data.
          */
       if (isDSLAnalysis(this.analysis)) {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
@@ -981,6 +981,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
+      this._store.dispatch(new DesignerUpdateArtifactColumn({
+        columnName: event.column.columnName,
+        table: event.column.table || event.column['tableName'],
+        aggregate: event.column.aggregate
+      }));
       forEach(this.analysis.artifacts, artifactcolumns => {
         forEach(artifactcolumns.columns, col => {
           if (col.name === event.column.name) {
