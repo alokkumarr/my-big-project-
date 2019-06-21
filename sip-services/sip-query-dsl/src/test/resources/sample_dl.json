@@ -74,6 +74,18 @@
           "operator": "EQ",
           "value": 1000
         }
+      },
+      {
+        "type": "Double",
+        "artifactsName": "SALES",
+        "isOptional": false,
+        "columnName": "Double",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "operator": "EQ",
+          "value": 2000
+        }
       }
     ],
     "sorts": [
@@ -83,6 +95,13 @@
         "columnName": "long",
         "type": "long",
         "order": "asc"
+      },
+      {
+        "artifacts": "SALES",
+        "aggregate": "avg",
+        "columnName": "double",
+        "type": "double",
+        "order": "desc"
       }
     ],
     "joins": [

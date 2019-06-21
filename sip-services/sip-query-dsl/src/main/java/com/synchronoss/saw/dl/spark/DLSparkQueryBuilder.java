@@ -3,6 +3,8 @@ package com.synchronoss.saw.dl.spark;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
+import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Filter;
@@ -15,9 +17,13 @@ import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +38,6 @@ public class DLSparkQueryBuilder {
   private static final String EPOCH_SECOND = "epoch_second";
   private static final String EPOCH_MILLIS = "epoch_millis";
 
-  String dataSecurityString;
   List<String> groupByColumns = new ArrayList<>();
 
   public String buildDataQuery(SIPDSL sipdsl) {
@@ -42,15 +47,14 @@ public class DLSparkQueryBuilder {
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
     select = select.concat(finalSelect);
+    select =
+        select.concat(
+            " FROM " + buildFrom(sipQuery) + buildFilter(sipQuery.getFilters()) + buildGroupBy());
+
     return select.concat(
-        " FROM "
-            + buildFrom(sipQuery)
-            + " WHERE "
-            + buildFilter(sipQuery.getFilters())
-            + " GROUP BY "
-            + String.join(", ", groupByColumns)
-            + " ORDER BY "
-            + buildSort(sipdsl.getSipQuery().getSorts()));
+        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+            ? ""
+            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
   }
 
   /**
@@ -58,6 +62,7 @@ public class DLSparkQueryBuilder {
    * @return
    */
   public List<String> buildSelect(List<Artifact> artifactList) {
+    AtomicInteger aggCount = new AtomicInteger();
     List<String> selectColumns = new ArrayList<>();
     artifactList.forEach(
         artifact -> {
@@ -67,8 +72,13 @@ public class DLSparkQueryBuilder {
                   field -> {
                     String column = null;
                     if (field.getAggregate() != null && !field.getAggregate().value().isEmpty()) {
+                      aggCount.getAndIncrement();
                       if (field.getAggregate() == Aggregate.DISTINCTCOUNT) {
                         column = buildDistinctCount(artifact.getArtifactsName(), field);
+                      } else if (field.getAggregate() == Aggregate.PERCENTAGE) {
+                        column = buildForPercentage(artifact.getArtifactsName(), field);
+                        groupByColumns.add(
+                            artifact.getArtifactsName() + "." + field.getColumnName());
                       } else {
                         column =
                             field.getAggregate().value()
@@ -88,6 +98,9 @@ public class DLSparkQueryBuilder {
                     selectColumns.add(column);
                   });
         });
+    if (aggCount.get() == 0) {
+      groupByColumns.clear(); // If aggregartion is not present Group By should not be set.
+    }
     return selectColumns;
   }
 
@@ -143,6 +156,12 @@ public class DLSparkQueryBuilder {
     return fromString;
   }
 
+  /**
+   * Build sql query for Filters.
+   *
+   * @param filterList {@link List} of {@link Filter}
+   * @return String where clause
+   */
   private String buildFilter(List<Filter> filterList) {
     List<String> whereFilters = new ArrayList<>();
     for (Filter filter : filterList) {
@@ -174,10 +193,85 @@ public class DLSparkQueryBuilder {
         throw new SipDslProcessingException("Filter Type is missing");
       }
     }
-    String whereConditions = StringUtils.join(whereFilters, "AND");
+    String firstFilter = null;
+    if (whereFilters.size() != 0) {
+      firstFilter = whereFilters.get(0);
+      whereFilters.remove(0);
+      whereFilters.add(0, " WHERE " + firstFilter);
+    }
+    String whereConditions = StringUtils.join(whereFilters, " AND ");
     return whereConditions;
   }
 
+  /**
+   * Build Actual query to be ran over background (DSK Included).
+   *
+   * @param sipdsl SIPDSL Object
+   * @param dataSecurityKey DataSecurityKey Object
+   * @return String dsk included query
+   */
+  public String buildDskDataQuery(SIPDSL sipdsl, DataSecurityKey dataSecurityKey) {
+    SipQuery sipQuery = sipdsl.getSipQuery();
+    sipQuery.getArtifacts();
+    String select = "SELECT ";
+    List<String> selectList = buildSelect(sipQuery.getArtifacts());
+    String selectWithJoin = String.join(", ", selectList);
+    select = select.concat(selectWithJoin);
+    select =
+        select.concat(
+            " FROM "
+                + buildFrom(sipQuery)
+                + buildFilter(sipQuery.getFilters())
+                + queryDskBuilder(dataSecurityKey, sipQuery)
+                + buildGroupBy());
+
+    return select.concat(
+        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+            ? ""
+            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+  }
+
+  /**
+   * @param dataSecurityKeyObj
+   * @param sipQuery
+   * @return
+   */
+  private String queryDskBuilder(DataSecurityKey dataSecurityKeyObj, SipQuery sipQuery) {
+    String dskFilter = "";
+    if (dataSecurityKeyObj != null) {
+      if (buildFilter(sipQuery.getFilters()).trim().isEmpty()) {
+        dskFilter = " WHERE ";
+      } else {
+        dskFilter = " AND ";
+      }
+      int dskFlag = 0;
+
+      if (dataSecurityKeyObj.getDataSecuritykey() != null
+          && dataSecurityKeyObj.getDataSecuritykey().size() > 0) {
+        for (DataSecurityKeyDef dsk : dataSecurityKeyObj.getDataSecuritykey()) {
+          dskFilter = dskFlag != 0 ? dskFilter.concat(" AND ") : dskFilter;
+          dskFilter = dskFilter.concat(dsk.getName() + " in (");
+          List<String> values = dsk.getValues();
+          int initFlag = 0;
+          for (String value : values) {
+            dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
+            dskFilter = dskFilter.concat("'" + value + "'");
+            initFlag++;
+          }
+          dskFilter = dskFilter.concat(")");
+          dskFlag++;
+        }
+      }
+    }
+    return dskFilter;
+  }
+
+  /**
+   * Adding sql support for different date formats we support.
+   *
+   * @param filter Filter Object
+   * @return String filter query
+   */
   private String buildDateTimestampFilter(Filter filter) {
     String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
     Operator op = filter.getModel().getOperator();
@@ -191,8 +285,14 @@ public class DLSparkQueryBuilder {
           whereClause = whereClause.concat(dateFilterUtil(filter));
           break;
         case EPOCH_MILLIS:
+          whereClause =
+              "from_unixtime(" + filter.getArtifactsName() + "." + filter.getColumnName() + ")";
+          whereClause = whereClause.concat(epochDateFilterUtil(filter, true));
           break;
         case EPOCH_SECOND:
+          whereClause =
+              "from_unixtime(" + filter.getArtifactsName() + "." + filter.getColumnName() + ")";
+          whereClause = whereClause.concat(epochDateFilterUtil(filter, false));
           break;
         case ONLY_YEAR_FORMAT:
           whereClause = whereClause.concat(onlyYearFilter(filter));
@@ -200,6 +300,59 @@ public class DLSparkQueryBuilder {
       }
     }
     return whereClause;
+  }
+
+  /**
+   * @param filter
+   * @param isMilli
+   * @return
+   */
+  private String epochDateFilterUtil(Filter filter, boolean isMilli) {
+    String whereCond = null;
+    if (filter.getModel().getPreset() != null
+        || filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
+      DynamicConvertor dynamicConvertor =
+          BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
+      String gte = dynamicConvertor.getGte();
+      String lte = dynamicConvertor.getLte();
+      whereCond = setGteLteForDate(gte, lte, filter);
+    } else if ((filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())
+            || (filter.getModel().getOperator().equals(Operator.BTW)))
+        && filter.getModel().getGte() != null
+        && filter.getModel().getLte() != null) {
+      long gteInEpoch;
+      long lteInEpoch;
+      if (filter.getModel().getValue() == null && filter.getModel().getOtherValue() == null) {
+        gteInEpoch =
+            isMilli == true
+                ? Long.parseLong(filter.getModel().getGte()) / 1000
+                /**
+                 * Spark sql method : from_unixtime(<epoch_second>), accepts epoch second. So
+                 * Converting milli to second
+                 */
+                : Long.parseLong(filter.getModel().getGte());
+        lteInEpoch =
+            isMilli == true
+                ? Long.parseLong(filter.getModel().getLte()) / 1000
+                : Long.parseLong(filter.getModel().getLte());
+      } else {
+        gteInEpoch =
+            isMilli == true
+                ? filter.getModel().getValue().longValue() / 1000
+                : filter.getModel().getValue().longValue();
+        lteInEpoch =
+            isMilli == true
+                ? filter.getModel().getOtherValue().longValue() / 1000
+                : filter.getModel().getOtherValue().longValue();
+      }
+      Date date = new Date(gteInEpoch);
+      DateFormat dateFormat = new SimpleDateFormat(DATE_WITH_HOUR_MINUTES);
+      String gte = dateFormat.format(date);
+      date = new Date(lteInEpoch);
+      String lte = dateFormat.format(date);
+      whereCond = setGteLteForDate(gte, lte, filter);
+    }
+    return whereCond;
   }
 
   private String dateFilterUtil(Filter filter) {
@@ -374,5 +527,42 @@ public class DLSparkQueryBuilder {
       whereClause = " < TO_DATE('" + startDate + "')";
     }
     return whereClause;
+  }
+
+  private String buildForPercentage(String artifactName, Field field) {
+    String buildPercentage = "";
+    if (artifactName != null && !artifactName.trim().isEmpty() && field.getColumnName() != null) {
+      buildPercentage =
+          buildPercentage.concat(
+              "("
+                  + artifactName
+                  + "."
+                  + field.getColumnName()
+                  + "*100)/(Select sum("
+                  + artifactName
+                  + "."
+                  + field.getColumnName()
+                  + ") FROM "
+                  + artifactName
+                  + ") as `percentage("
+                  + field.getColumnName()
+                  + ")`");
+    }
+
+    return buildPercentage;
+  }
+
+  /**
+   * Build Group by clause.
+   *
+   * @return String group by clause
+   */
+  public String buildGroupBy() {
+    String groupBy = "";
+    if (groupByColumns != null && groupByColumns.size() > 0) {
+      groupBy = " GROUP BY " + String.join(", ", groupByColumns);
+    }
+
+    return groupBy;
   }
 }
