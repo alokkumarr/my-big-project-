@@ -81,7 +81,7 @@ describe('Executing privilege tests from privilege.test.js', () => {
         analyzePage.clickOnActionMenu();
 
         analyzePage.verifyElementPresent(
-          analyzePage._executeButton,
+          analyzePage._analyzeExecuteButton,
           data.execute,
           'Execute button on card is expected to be ' +
             data.execute +
@@ -159,7 +159,7 @@ describe('Executing privilege tests from privilege.test.js', () => {
         analyzePage.clickOnActionMenu();
 
         analyzePage.verifyElementPresent(
-          analyzePage._executeButton,
+          analyzePage._analyzeExecuteButton,
           data.execute,
           'Execute action button on execute page is expected to be ' +
             data.execute +
