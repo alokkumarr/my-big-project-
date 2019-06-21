@@ -105,6 +105,8 @@ class ExecutePage extends ConfirmationModel {
   verifyAppliedFilter(filters) {
     filters.forEach(filter => {
       const value = `${filter.field}: ${filter.displayedValue}`;
+      browser.sleep(1500);// Some how this need to be added
+      commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
     });
   }

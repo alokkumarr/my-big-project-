@@ -3,7 +3,7 @@
     "createAndDeleteChannel": {
       "CHANN001": {
         "id": "CHANN001",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -14,7 +14,7 @@
       },
       "CHANN002": {
         "id": "CHANN002",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "eからe",
@@ -27,7 +27,7 @@
     "updateAndDeleteChannel": {
       "CHANN003": {
         "id": "CHANN003",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -38,7 +38,7 @@
       },
       "CHANN004": {
         "id": "CHANN004",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
@@ -51,7 +51,7 @@
     "deActivateChannel": {
       "CHANN005": {
         "id": "CHANN005",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -62,7 +62,7 @@
       },
       "CHANN006": {
         "id": "CHANN006",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
@@ -75,7 +75,7 @@
     "createAndDeleteRoute": {
       "CHANN007": {
         "id": "CHANN007",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -87,7 +87,7 @@
       },
       "CHANN008": {
         "id": "CHANN008",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
@@ -101,7 +101,7 @@
     "activateDeactivateRoute": {
       "CHANN009": {
         "id": "CHANN009",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -114,7 +114,7 @@
       },
       "CHANN010": {
         "id": "CHANN010",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
@@ -127,7 +127,7 @@
       },
       "CHANN011": {
         "id": "CHANN011",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
@@ -140,7 +140,7 @@
       },
       "CHANN012": {
         "id": "CHANN012",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -155,7 +155,7 @@
     "routeSchedule": {
       "CHANN013": {
         "id": "CHANN013",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e2e",
@@ -167,7 +167,7 @@
       },
       "CHANN014": {
         "id": "CHANN014",
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "sourceType": "SFTP",
         "channelName": "e到e",
