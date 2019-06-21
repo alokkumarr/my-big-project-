@@ -1015,7 +1015,9 @@ export class ChartService {
             ? point.value.toFixed(
                 getPrecision(options.aggregate, options.dataType)
               )
-            : point.y.toFixed(getPrecision(options.aggregate, options.dataType))
+            : (point.y || 0).toFixed(
+                getPrecision(options.aggregate, options.dataType)
+              )
           : round(
               options.aggregate === 'percentagebyrow'
                 ? round(point.percentage, 2)

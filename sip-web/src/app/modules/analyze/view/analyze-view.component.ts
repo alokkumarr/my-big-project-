@@ -174,12 +174,9 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    this.getCronJobs(this.analysisId);
-    /* Update the new analysis in the current list */
-    this._router.navigate([
-      'analyze',
-      isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
-    ]);
+    const categroyID = isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId;
+    // Wait till cron job and schedule is created or updated or deleted successfully.
+    this.getCronJobs(categroyID);
   }
 
   spliceAnalyses(analysis, replace) {
@@ -266,7 +263,7 @@ export class AnalyzeViewComponent implements OnInit {
       categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
-    this._analyzeService
+    return this._analyzeService
       .getAllCronJobs(requestModel)
       .then((response: any) => {
         if (response.statusCode === 200) {

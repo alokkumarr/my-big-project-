@@ -17,16 +17,17 @@ const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
 
-describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
+describe('Executing create and delete chart tests from charts/editAndDelete.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   //updated fields
   const metrics = 'Integer';
-  const dimension = 'String';
+  const dimension = 'Date';
   const yAxisName2 = 'Long';
-  const groupName = 'Date';
+  const groupName = 'String';
   const sizeByName = 'Float';
+
   let analysisId;
   let editedAnalysisId;
   let host;
@@ -111,12 +112,16 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
         executePage.clickOnEditLink();
 
         const chartDesignerPage = new ChartDesignerPage();
+        chartDesignerPage.searchInputPresent();
         chartDesignerPage.clearAttributeSelection();
 
-        chartDesignerPage.searchInputPresent();
-        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
-        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
-
+        if (data.chartType === 'chart:pie') {
+          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+        } else {
+          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        }
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
           chartDesignerPage.clickOnAttribute(groupName, 'Color By');
