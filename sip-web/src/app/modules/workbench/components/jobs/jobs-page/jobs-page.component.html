@@ -12,8 +12,15 @@
     <mat-sidenav-content>
       <mat-toolbar>
         <mat-toolbar-row fxLayoutGap="5px">
-          <div fxFlex="100" fxLayout="row" fxLayoutAlign="start space-between">
+          <div fxFlex fxLayout="row" fxLayoutAlign="start space-between">
             <span i18n>Jobs</span>
+          </div>
+          <div fxFlex>
+            <mat-chip
+              class="tag-chip"
+              *ngFor="let jobFilter of jobFilters$ | async"
+              >{{ jobFilter }}</mat-chip
+            >
           </div>
           <button
             mat-icon-button

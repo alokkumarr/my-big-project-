@@ -1,5 +1,9 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as find from 'lodash/find';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
 import {
   LoadJobs,
   LoadJobLogs,
@@ -41,11 +45,11 @@ export class WorkbenchState {
     return state.channelTypeList;
   }
   @Selector()
-  static channelIdList(state: WorkbenchStateModel) {
+  static channelList(state: WorkbenchStateModel) {
     return state.channelList;
   }
   @Selector()
-  static routeNameList(state: WorkbenchStateModel) {
+  static routeList(state: WorkbenchStateModel) {
     return state.routeList;
   }
 
@@ -60,6 +64,36 @@ export class WorkbenchState {
   @Selector()
   static selectedRouteId(state: WorkbenchStateModel) {
     return state.selectedRouteId;
+  }
+
+  @Selector()
+  static jobFilters(state: WorkbenchStateModel) {
+    const {
+      selectedChannelTypeId,
+      channelTypeList,
+      selectedChannelId,
+      channelList,
+      selectedRouteId,
+      routeList
+    } = state;
+    const targetChannelType = find(
+      channelTypeList,
+      ({ uid }) => selectedChannelTypeId === uid
+    );
+    const targetChannel = find(
+      channelList,
+      ({ id }) => selectedChannelId === id
+    );
+    const targetRoute = find(routeList, ({ id }) => selectedRouteId === id);
+
+    return fpPipe(
+      fpFilter(([, value]) => Boolean(value)),
+      fpMap(([key, value]) => `${key}: ${value.name}`)
+    )([
+      ['Channel type', targetChannelType],
+      ['Channel name', targetChannel],
+      ['Route name', targetRoute]
+    ]);
   }
 
   @Action(SelectChannelTypeId)

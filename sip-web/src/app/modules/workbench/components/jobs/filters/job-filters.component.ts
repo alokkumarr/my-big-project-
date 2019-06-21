@@ -12,6 +12,7 @@ import {
   LoadChannelList,
   LoadRouteList
 } from '../../../state/workbench.actions';
+import { WorkbenchState } from '../../../state/workbench.state';
 const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
 
 @Component({
@@ -20,25 +21,26 @@ const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
   styleUrls: ['job-filters.component.scss']
 })
 export class JobFiltersComponent implements OnInit {
-  @Select(state => state.workbench.channelTypeList)
+  @Select(WorkbenchState.channelTypeList)
   channelTypeList$: Observable<ChannelType[]>;
-  @Select(state => state.workbench.channelList) channelList$: Observable<
+  @Select(WorkbenchState.channelList) channelList$: Observable<
     ChannelForJobs[]
   >;
-  @Select(state => state.workbench.routeList) routeList$: Observable<
-    RouteForJobs[]
-  >;
+  @Select(WorkbenchState.routeList) routeList$: Observable<RouteForJobs[]>;
 
-  @Select(state => state.workbench.selectedChannelTypeId)
+  @Select(WorkbenchState.selectedChannelTypeId)
   selectedChannelTypeId$: Observable<string>;
-  @Select(state => state.workbench.selectedChannelId)
+  @Select(WorkbenchState.selectedChannelId)
   selectedChannelId$: Observable<number>;
-  @Select(state => state.workbench.selectedRouteId)
+  @Select(WorkbenchState.selectedRouteId)
   selectedRouteId$: Observable<number>;
 
   private selectedChannelTypeId;
   private selectedChannelId;
   private selectedRouteId;
+
+  public isApplyDisabled = false;
+  public isResetDisabled = false;
 
   constructor(private _router: Router, private _store: Store) {
     this.selectedChannelTypeId$.subscribe(selectedChannelTypeId => {
@@ -60,20 +62,37 @@ export class JobFiltersComponent implements OnInit {
     if (selectedChannelId) {
       this._store.dispatch(new LoadRouteList(selectedChannelId));
     }
+    this.onFilterChange();
   }
 
   onChannelTypeSelected(selectedChannelTypeId) {
     this.selectedChannelTypeId = selectedChannelTypeId;
+    this.onFilterChange();
     // TODO when other channel types are supported load channels here
   }
 
   onChannelSelected(selectedChannelId) {
     this.selectedChannelId = selectedChannelId;
     this._store.dispatch(new LoadRouteList(selectedChannelId));
+    this.onFilterChange();
   }
 
   onRouteSelected(selectedRouteId) {
     this.selectedRouteId = selectedRouteId;
+    this.onFilterChange();
+  }
+
+  onFilterChange() {
+    const {
+      selectedChannelTypeId,
+      selectedChannelId,
+      selectedRouteId
+    } = this._store.snapshot().workbench;
+    this.isApplyDisabled =
+      selectedChannelTypeId === this.selectedChannelTypeId &&
+      selectedChannelId === this.selectedChannelId &&
+      selectedRouteId === this.selectedRouteId;
+    this.isResetDisabled = !(selectedChannelId || selectedRouteId);
   }
 
   onApply() {
@@ -86,11 +105,13 @@ export class JobFiltersComponent implements OnInit {
     const url = `${baseUrl}${
       this.selectedChannelTypeId
     }${channelIdQueryParam}${routeIdIdQueryParam}`;
+    setTimeout(() => this.onFilterChange());
     this._router.navigateByUrl(url);
   }
 
   onReset() {
     const url = `${baseUrl}${this.selectedChannelTypeId}`;
+    setTimeout(() => this.onFilterChange());
     this._router.navigateByUrl(url);
   }
 }

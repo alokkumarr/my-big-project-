@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +11,7 @@ import {
   SelectChannelId,
   SelectRouteId
 } from '../../../state/workbench.actions';
+import { WorkbenchState } from '../../../state/workbench.state';
 import { Job } from '../../../models/workbench.interface';
 
 const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
@@ -19,7 +21,9 @@ const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
   styleUrls: ['jobs-page.component.scss']
 })
 export class JobsPageComponent implements OnInit {
-  @Select(state => state.workbench.jobs) jobs$: Observable<Job[]>;
+  @Select(WorkbenchState.jobFilters) jobFilters$: Observable<string[]>;
+  @Select(WorkbenchState.jobs) jobs$: Observable<Job[]>;
+  @ViewChild('sidenav') sidenav: MatSidenav;
 
   constructor(
     private _store: Store,
@@ -50,6 +54,7 @@ export class JobsPageComponent implements OnInit {
       }
 
       this._store.dispatch(new LoadJobs());
+      this.sidenav.close();
     });
   }
 
