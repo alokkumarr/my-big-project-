@@ -2,7 +2,7 @@
   "PRERESETPASSWORD": {
     "positiveTests": {
       "PRERESET001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "expected": {
           "message": "Mail sent successfully to e2e@email.com"
@@ -10,7 +10,7 @@
         "description": "Mail should be sent to userOne for resetting password "
       },
       "PRERESET002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "expected": {
           "message": "Mail sent successfully to e2e@email.com"
@@ -20,7 +20,7 @@
     },
     "negativeTests": {
       "PRERESET003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin1",
         "expected": {
           "message": "Invalid user Id"
