@@ -1,5 +1,6 @@
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
+import * as assign from 'lodash/assign';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
@@ -16,6 +17,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 import * as forEach from 'lodash/forEach';
+import { NUMBER_TYPES } from './../consts';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -123,6 +125,15 @@ function getChildNodeName(node) {
   return childNodeName;
 }
 
+/** the mapping between the tree level, and the columName of the field
+ * Example:
+ * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
+ * string_field_2: 1 -> SOURCE_MANUFACTURER
+ */
+function getNodeFieldMapChart(nodeFields) {
+  return map(nodeFields, 'columnName');
+}
+
 export function getStringFieldsFromDSLArtifact(
   fields: ArtifactColumnDSL[]
 ): string[] {
@@ -140,13 +151,12 @@ export function getStringFieldsFromDSLArtifact(
  * }, ..]
  */
 export function flattenChartData(data, sqlBuilder) {
-  const sorts = sqlBuilder.sorts;
   if (sqlBuilder.artifacts) {
     const stringFields = getStringFieldsFromDSLArtifact(
       sqlBuilder.artifacts[0].fields
     );
     if (stringFields.length === 0) {
-      return sortChartData(data, sorts);
+      return data;
     } else {
       /* If any string data is blank, replace it with 'Undefined'. This avoids
       highcharts giving default 'Series 1' label to blank data
@@ -156,11 +166,29 @@ export function flattenChartData(data, sqlBuilder) {
         stringFields.forEach(field => {
           res[field] = res[field] || 'Undefined';
         });
-        return sortChartData(res, sorts);
+        return res;
       });
-      return sortChartData(result, sorts);
+      return result;
     }
   }
+
+  const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
+  const sorts = sqlBuilder.sorts;
+
+  return fpPipe(
+    nestedData => parseNodeChart(data, {}, nodeFieldMap, 1),
+    flattenedData => {
+      /* Order chart data manually. Backend doesn't sort chart data. */
+      if (!isEmpty(sorts)) {
+        return orderBy(
+          flattenedData,
+          map(sorts, 'columnName'),
+          map(sorts, 'order')
+        );
+      }
+      return flattenedData;
+    }
+  )(data);
 }
 
 export function checkNullinReportData(data) {
@@ -207,6 +235,33 @@ export function flattenReportData(data, analysis) {
   });
 }
 
+function parseNodeChart(node, dataObj, nodeFieldMap, level) {
+  if (!isUndefined(node.key)) {
+    dataObj[nodeFieldMap[level - 2]] = node.key;
+    if (!node.key) {
+      dataObj[nodeFieldMap[level - 2]] = 'Undefined';
+    }
+  }
+  // dataObj[nodeFieldMap[level - 2]] = !isUndefined(node.key) ? node.key
+  const childNode = node[`node_field_${level}`];
+  if (childNode) {
+    const data = flatMap(childNode.buckets, bucket =>
+      parseNodeChart(bucket, dataObj, nodeFieldMap, level + 1)
+    );
+    return data;
+  }
+  const datum = parseLeafChart(node, dataObj);
+  return datum;
+}
+
+function parseLeafChart(node, dataObj) {
+  const dataFields = fpPipe(
+    fpOmit(['doc_count', 'key', 'key_as_string']),
+    fpMapValues('value')
+  )(node);
+
+  return assign(dataFields, dataObj);
+}
 
   /**
    * Includes a new property to chart options for the chart engine.
@@ -222,18 +277,13 @@ export function setReverseProperty(chartOptions, sipQuery) {
   const xAxisFields = [
     find(sipQuery.artifacts[0].fields, field => field.area === 'x')
   ];
+  if (!NUMBER_TYPES.includes(xAxisFields[0].type)) {
+    return chartOptions;
+  }
   if (!isEmpty(sipQuery.sorts)) {
     forEach(sipQuery.sorts, sort => {
       chartOptions.xAxis.reversed = (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) ? true : false;
     });
   }
   return chartOptions;
-}
-
-function sortChartData(data, sorts) {
-  return orderBy(
-    data,
-    map(sorts, 'columnName'),
-    map(sorts, 'order')
-  );
 }
