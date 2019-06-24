@@ -2,133 +2,133 @@
   "FORKDELETECHARTS": {
     "positiveTests": {
       "FRKED001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "chartType": "chart:combo",
         "description": "User should be able to fork edit and delete combo charts"
       },
       "FRKED002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "chartType": "chart:combo",
         "description": "Admin should be able to fork edit and delete combo charts"
       },
       "FRKED003": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:column",
         "description": "User should be able to fork edit and delete column charts"
       },
       "FRKED004": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:column",
         "description": "Admin should be able to fork edit and delete column charts"
       },
       "FRKED005": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bar",
         "description": "User should be able to fork edit and delete bar charts"
       },
       "FRKED006": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bar",
         "description": "Admin should be able to fork edit and delete bar charts"
       },
       "FRKED007": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:stack",
         "description": "User should be able to fork edit and delete stack charts"
       },
       "FRKED008": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:stack",
         "description": "Admin should be able to fork edit and delete stack charts"
       },
       "FRKED009": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:line",
         "description": "User should be able to fork edit and delete line charts"
       },
       "FRKED010": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:line",
         "description": "Admin should be able to fork edit and delete line charts"
       },
       "FRKED011": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:area",
         "description": "User should be able to fork edit and delete area charts"
       },
       "FRKED012": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:area",
         "description": "Admin should be able to fork edit and delete area charts"
       },
       "FRKED013": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:scatter",
         "description": "User should be able to fork edit and delete scatter charts"
       },
       "FRKED014": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:scatter",
         "description": "Admin should be able to fork edit and delete scatter charts"
       },
       "FRKED015": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bubble",
         "description": "User should be able to fork edit and delete bubble charts"
       },
       "FRKED016": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bubble",
         "description": "Admin should be able to fork edit and delete bubble charts"
       },
       "FRKED017": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:pie",
         "description": "User should be able to fork edit and delete pie charts"
       },
       "FRKED018": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:pie",
         "description": "Admin should be able to fork edit and delete pie charts"
       },
       "FRKED019": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:tsspline",
         "description": "User should be able to fork edit and delete tsspline charts"
       },
       "FRKED020": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:tsspline",
         "description": "Admin should be able to fork edit and delete tsspline charts"
       },
       "FRKED021": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:tsPane",
         "description": "User should be able to fork edit and delete tsPane charts"
       },
       "FRKED022": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:tsPane",
         "description": "Admin should be able to fork edit and delete tsPane charts"
