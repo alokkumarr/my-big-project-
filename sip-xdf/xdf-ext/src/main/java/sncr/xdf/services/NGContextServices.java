@@ -252,12 +252,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             for( Output outK: compConf.getOutputs()) {
                 if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
                     valid = true;
-                } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
-                    rvalid = true;
                 }
             }
-            if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
-
+            if (!valid ) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output' does not exist .");
             return compConf;
 
     }
