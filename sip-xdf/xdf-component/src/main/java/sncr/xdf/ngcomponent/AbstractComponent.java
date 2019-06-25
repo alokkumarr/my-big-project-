@@ -117,18 +117,18 @@ public abstract class AbstractComponent implements WithContext{
         int ret = execute();
         if (ngctx.runningPipeLine) {
             if (ngctx.persistMode) {
-                moveAndArchive(ret);
+                ret = moveAndArchive(ret);
             }
         }
         else
         {
-            moveAndArchive(ret);
+            ret = moveAndArchive(ret);
         }
         return ret;
     }
 
 
-    public void moveAndArchive(int ret)
+    public int moveAndArchive(int ret)
     {
         if (ret == 0)
         {
@@ -147,6 +147,7 @@ public abstract class AbstractComponent implements WithContext{
             logger.error("Could not complete execution phase!");
         }
 
+        return ret;
     }
 
     /**
