@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -300,7 +301,8 @@ public class WorkbenchIT extends BaseIT {
     String id = "workbench::" + name;
     waitForDataset(id, WAIT_RETRIES);
   }
-
+  
+  @Ignore
   @Test
   public void testSqlDataset() throws IOException {
     String name = "test-sql-" + testId();
