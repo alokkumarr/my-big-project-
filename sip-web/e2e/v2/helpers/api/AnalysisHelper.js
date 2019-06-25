@@ -213,7 +213,7 @@ class AnalysisHelper {
     let semanticId = semantic
       ? semantic
       : this.getSemanticId(url, dataSetName, token);
-    logger.error('semanticId:---' + semanticId);
+
     if (!semanticId) {
       logger.error('semanticId can not be null, Please check logs');
       return null;
@@ -241,7 +241,6 @@ class AnalysisHelper {
       analysisType === Constants.CHART || analysisType == Constants.PIVOT
         ? createAnalysisResponse.analysisId
         : createAnalysisResponse.contents.analyze[0].id;
-    logger.error('analysisId----' + id);
     //Update analysis with fields
     let currentTimeStamp = new Date().getTime();
     let user = users.masterAdmin;
@@ -374,19 +373,21 @@ class AnalysisHelper {
       logger.info('Invalid analysis type, please check the logs.');
       return null;
     }
-    logger.error(JSON.stringify(updatePayload));
+
     //Update
     if (analysisType === Constants.CHART || analysisType == Constants.PIVOT) {
       const updateResponse = new RestClient().put(
-        url + Constants.API_ROUTES.DSL_ANALYSIS+id,
+        url + Constants.API_ROUTES.DSL_ANALYSIS + id,
         updatePayload,
         token
       );
       if (!updateResponse) {
-          logger.error('updateResponse dsl analysis api failed, Please check the logs...');
-          return null;
-        }
-        return updateResponse;
+        logger.error(
+          'updateResponse dsl analysis api failed, Please check the logs...'
+        );
+        return null;
+      }
+      return updateResponse;
     } else {
       const updateResponse = new RestClient().post(
         url + Constants.API_ROUTES.ANALYSIS,

@@ -2,18 +2,19 @@
   "LOGIN": {
     "positiveTests": {
       "LOGIN001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "description": "userOne should be able to login with valid credentials"
       },
       "LOGIN002": {
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to login with valid credentials"
       }
     },
     "negativeTests": {
       "LOGIN003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "password": "worngpassword",
         "description": "Try to login with valid user & invalid password, should not be able to login",
@@ -22,7 +23,7 @@
         }
       },
       "LOGIN004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin1",
         "password": "Sawsyncnewuser1!",
         "description": "Try to login with invalid user name & valid password, should not be able to login",
@@ -31,7 +32,7 @@
         }
       },
       "LOGIN005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin1",
         "password": "Sawsyncnewuser2!",
         "description": "Try to login with invalid user name & password, should not be able to login",
@@ -40,7 +41,7 @@
         }
       },
       "LOGIN006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "",
         "password": "",
         "description": "Try to login with without user name & password, should not be able to login",
@@ -49,7 +50,7 @@
         }
       },
       "LOGIN007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "password": "",
         "description": "Try to login with valid user name & without password, should not be able to login",
