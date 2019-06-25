@@ -12,6 +12,7 @@ import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.JoinCondition;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operator;
+import com.synchronoss.saw.model.Model.Preset;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
@@ -42,7 +43,6 @@ public class DLSparkQueryBuilder {
 
   public String buildDataQuery(SIPDSL sipdsl) {
     SipQuery sipQuery = sipdsl.getSipQuery();
-    sipQuery.getArtifacts();
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
@@ -71,28 +71,27 @@ public class DLSparkQueryBuilder {
               .forEach(
                   field -> {
                     String column = null;
-                    if (field.getAggregate() != null && !field.getAggregate().value().isEmpty()) {
+                    Aggregate aggregate = field.getAggregate();
+                    String artifactName = artifact.getArtifactsName();
+                    String columnName = field.getColumnName();
+                    if (aggregate != null && !aggregate.value().isEmpty()) {
                       aggCount.getAndIncrement();
-                      if (field.getAggregate() == Aggregate.DISTINCTCOUNT) {
-                        column = buildDistinctCount(artifact.getArtifactsName(), field);
-                      } else if (field.getAggregate() == Aggregate.PERCENTAGE) {
-                        column = buildForPercentage(artifact.getArtifactsName(), field);
-                        groupByColumns.add(
-                            artifact.getArtifactsName() + "." + field.getColumnName());
+                      if (aggregate == Aggregate.DISTINCTCOUNT) {
+                        column = buildDistinctCount(artifactName, field);
+                      } else if (aggregate == Aggregate.PERCENTAGE) {
+                        column = buildForPercentage(artifactName, field);
+                        groupByColumns.add(artifactName + "." + columnName);
                       } else {
                         column =
-                            field.getAggregate().value()
+                            aggregate.value()
                                 + "("
-                                + artifact.getArtifactsName()
+                                + artifactName
                                 + "."
-                                + field.getColumnName().replace(".keyword", "")
+                                + columnName.replace(".keyword", "")
                                 + ")";
                       }
                     } else {
-                      column =
-                          artifact.getArtifactsName()
-                              + "."
-                              + field.getColumnName().replace(".keyword", "");
+                      column = artifactName + "." + columnName.replace(".keyword", "");
                       groupByColumns.add(column);
                     }
                     selectColumns.add(column);
@@ -211,8 +210,7 @@ public class DLSparkQueryBuilder {
       whereFilters.remove(0);
       whereFilters.add(0, " WHERE " + firstFilter);
     }
-    String whereConditions = StringUtils.join(whereFilters, " AND ");
-    return whereConditions;
+    return StringUtils.join(whereFilters, " AND ");
   }
 
   /**
@@ -224,7 +222,6 @@ public class DLSparkQueryBuilder {
    */
   public String buildDskDataQuery(SIPDSL sipdsl, DataSecurityKey dataSecurityKey) {
     SipQuery sipQuery = sipdsl.getSipQuery();
-    sipQuery.getArtifacts();
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
@@ -321,65 +318,68 @@ public class DLSparkQueryBuilder {
    */
   private String epochDateFilterUtil(Filter filter, boolean isMilli) {
     String whereCond = null;
-    if (filter.getModel().getPreset() != null
-        || filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
-      DynamicConvertor dynamicConvertor =
-          BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
-      String gte = dynamicConvertor.getGte();
-      String lte = dynamicConvertor.getLte();
+    Preset preset = filter.getModel().getPreset();
+    Operator operator = filter.getModel().getOperator();
+    String gte = filter.getModel().getGte();
+    String lte = filter.getModel().getLte();
+    Double value = filter.getModel().getValue();
+    Double otherValue = filter.getModel().getOtherValue();
+    if (preset != null || preset.value().equals(Model.Preset.NA.toString())) {
+      DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
+      gte = dynamicConvertor.getGte();
+      lte = dynamicConvertor.getLte();
       whereCond = setGteLteForDate(gte, lte, filter);
-    } else if ((filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())
-            || (filter.getModel().getOperator().equals(Operator.BTW)))
-        && filter.getModel().getGte() != null
-        && filter.getModel().getLte() != null) {
+    } else if ((preset.value().equals(Model.Preset.NA.toString())
+            || (operator.equals(Operator.BTW)))
+        && gte != null
+        && lte != null) {
       long gteInEpoch;
       long lteInEpoch;
-      if (filter.getModel().getValue() == null && filter.getModel().getOtherValue() == null) {
+      if (value == null && otherValue == null) {
         gteInEpoch =
             isMilli == true
-                ? Long.parseLong(filter.getModel().getGte()) / 1000
+                ? Long.parseLong(gte) / 1000
                 /**
                  * Spark sql method : from_unixtime(<epoch_second>), accepts epoch second. So
                  * Converting milli to second
                  */
-                : Long.parseLong(filter.getModel().getGte());
-        lteInEpoch =
-            isMilli == true
-                ? Long.parseLong(filter.getModel().getLte()) / 1000
-                : Long.parseLong(filter.getModel().getLte());
+                : Long.parseLong(gte);
+        lteInEpoch = isMilli == true ? Long.parseLong(lte) / 1000 : Long.parseLong(lte);
       } else {
-        gteInEpoch =
-            isMilli == true
-                ? filter.getModel().getValue().longValue() / 1000
-                : filter.getModel().getValue().longValue();
-        lteInEpoch =
-            isMilli == true
-                ? filter.getModel().getOtherValue().longValue() / 1000
-                : filter.getModel().getOtherValue().longValue();
+        gteInEpoch = isMilli == true ? value.longValue() / 1000 : value.longValue();
+        lteInEpoch = isMilli == true ? otherValue.longValue() / 1000 : otherValue.longValue();
       }
       Date date = new Date(gteInEpoch);
       DateFormat dateFormat = new SimpleDateFormat(DATE_WITH_HOUR_MINUTES);
-      String gte = dateFormat.format(date);
+      gte = dateFormat.format(date);
       date = new Date(lteInEpoch);
-      String lte = dateFormat.format(date);
+      lte = dateFormat.format(date);
       whereCond = setGteLteForDate(gte, lte, filter);
     }
     return whereCond;
   }
 
+  /**
+   * This util method is used to apply data ranges for filter(For both Preset and custom dates).
+   *
+   * @param filter Filter object
+   * @return Where clause for date
+   */
   private String dateFilterUtil(Filter filter) {
     String whereCond = null;
-    if (filter.getModel().getPreset() != null
-        || filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())) {
-      DynamicConvertor dynamicConvertor =
-          BuilderUtil.dynamicDecipher(filter.getModel().getPreset().value());
-      String gte = dynamicConvertor.getGte();
-      String lte = dynamicConvertor.getLte();
+    Preset preset = filter.getModel().getPreset();
+    Operator operator = filter.getModel().getOperator();
+    String gte = filter.getModel().getGte();
+    String lte = filter.getModel().getLte();
+    if (preset != null || preset.value().equals(Model.Preset.NA.toString())) {
+      DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
+      gte = dynamicConvertor.getGte();
+      lte = dynamicConvertor.getLte();
       whereCond = setGteLteForDate(gte, lte, filter);
-    } else if ((filter.getModel().getPreset().value().equals(Model.Preset.NA.toString())
-            || (filter.getModel().getOperator().equals(Operator.BTW)))
-        && filter.getModel().getGte() != null
-        && filter.getModel().getLte() != null) {
+    } else if ((preset.value().equals(Model.Preset.NA.toString())
+            || (operator.equals(Operator.BTW)))
+        && gte != null
+        && lte != null) {
       whereCond = setGteLteForDate(filter.getModel().getGte(), filter.getModel().getLte(), filter);
     }
     return whereCond;
@@ -509,32 +509,27 @@ public class DLSparkQueryBuilder {
   private String onlyYearFilter(Filter filter) {
     GregorianCalendar startDate;
     String whereClause = null;
-    if (filter.getModel().getGte() != null) {
-      int year =
-          filter.getModel().getValue() == null
-              ? Integer.parseInt(filter.getModel().getGte())
-              : filter.getModel().getValue().intValue();
+    String gte = filter.getModel().getGte();
+    String lte = filter.getModel().getLte();
+    String gt = filter.getModel().getGt();
+    String lt = filter.getModel().getLt();
+    Double value = filter.getModel().getValue();
+    Double otherValue = filter.getModel().getOtherValue();
+
+    if (gte != null) {
+      int year = value == null ? Integer.parseInt(gte) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
       whereClause = " >= TO_DATE('" + startDate + "')";
-    } else if (filter.getModel().getGt() != null) {
-      int year =
-          filter.getModel().getValue() == null
-              ? Integer.parseInt(filter.getModel().getGt())
-              : filter.getModel().getValue().intValue();
+    } else if (gt != null) {
+      int year = value == null ? Integer.parseInt(gt) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
       whereClause = " > TO_DATE('" + startDate + "')";
-    } else if (filter.getModel().getLte() != null) {
-      int year =
-          filter.getModel().getValue() == null
-              ? Integer.parseInt(filter.getModel().getLte())
-              : filter.getModel().getValue().intValue();
+    } else if (lte != null) {
+      int year = value == null ? Integer.parseInt(lte) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
       whereClause = " <= TO_DATE('" + startDate + "')";
-    } else if (filter.getModel().getLt() != null) {
-      int year =
-          filter.getModel().getValue() == null
-              ? Integer.parseInt(filter.getModel().getLt())
-              : filter.getModel().getValue().intValue();
+    } else if (lt != null) {
+      int year = value == null ? Integer.parseInt(lt) : value.intValue();
       startDate = new GregorianCalendar(year, 0, 1, 0, 0, 0);
       whereClause = " < TO_DATE('" + startDate + "')";
     }
@@ -543,21 +538,22 @@ public class DLSparkQueryBuilder {
 
   private String buildForPercentage(String artifactName, Field field) {
     String buildPercentage = "";
-    if (artifactName != null && !artifactName.trim().isEmpty() && field.getColumnName() != null) {
+    String columnName = field.getColumnName();
+    if (artifactName != null && !artifactName.trim().isEmpty() && columnName != null) {
       buildPercentage =
           buildPercentage.concat(
               "("
                   + artifactName
                   + "."
-                  + field.getColumnName()
+                  + columnName
                   + "*100)/(Select sum("
                   + artifactName
                   + "."
-                  + field.getColumnName()
+                  + columnName
                   + ") FROM "
                   + artifactName
                   + ") as `percentage("
-                  + field.getColumnName()
+                  + columnName
                   + ")`");
     }
 
