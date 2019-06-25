@@ -230,7 +230,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
         List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(ngctx.outputs.get(RequiredNamedParameters.Output.toString()));
-        if(!ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()).isEmpty()) {
+        if(ngctx.outputs != null && ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()) != null) {
         	dss.add(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
         }
         for ( Map<String, Object> ads : dss) {
