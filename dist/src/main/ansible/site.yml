@@ -61,7 +61,8 @@
 - import_playbook: modules/sip-services/ansible/site.yml
 - import_playbook: modules/sip-web/ansible/site.yml
 - import_playbook: modules/sip-xdf/ansible/site.yml
-- import_playbook: modules/sip-a2/ansible/site.yml
+#  This has been commented as a part of SIP-7525
+#- import_playbook: modules/sip-a2/ansible/site.yml
 - import_playbook: modules/sip-rtis/ansible/site.yml
 - import_playbook: modules/sip-rtps/ansible/site.yml
 # Note: Keep Prometheus at the end to avoid starting socket-activated
