@@ -37,7 +37,7 @@ export class JobLogsPageComponent implements OnInit {
       { label: 'Success Count', prop: 'successCount' }
     ],
     [
-      { label: 'File Patter', prop: 'filePattern' },
+      { label: 'File Pattern', prop: 'filePattern' },
       { label: 'Job Type', prop: 'jobType' }
     ],
     [

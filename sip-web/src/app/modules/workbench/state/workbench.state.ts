@@ -90,7 +90,7 @@ export class WorkbenchState {
       fpFilter(([, value]) => Boolean(value)),
       fpMap(([key, value]) => `${key}: ${value.name}`)
     )([
-      ['Channel type', targetChannelType],
+      ['Source type', targetChannelType],
       ['Channel name', targetChannel],
       ['Route name', targetRoute]
     ]);

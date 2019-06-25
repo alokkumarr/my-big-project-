@@ -1,12 +1,6 @@
 <div>
   <mat-sidenav-container class="example-container">
-    <mat-sidenav
-      #sidenav
-      position="end"
-      mode="over"
-      autoFocus="false"
-      class="filter-panel"
-    >
+    <mat-sidenav #sidenav position="end" mode="over" autoFocus="false">
       <job-filters></job-filters>
     </mat-sidenav>
     <mat-sidenav-content>
@@ -57,6 +51,16 @@
           cellTemplate="linkCellTemplate"
         ></dxi-column>
         <dxi-column
+          caption="Channel name"
+          dataField="channelName"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
+          caption="Route name"
+          dataField="routeName"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
           caption="Start time"
           dataField="startTime"
           alignment="left"
@@ -84,7 +88,7 @@
           alignment="left"
         ></dxi-column>
         <dxi-column
-          caption="File patter"
+          caption="File pattern"
           dataField="filePattern"
           alignment="left"
         ></dxi-column>
@@ -92,18 +96,6 @@
           caption="Job type"
           dataField="jobType"
           alignment="left"
-        ></dxi-column>
-        <dxi-column
-          caption="Created at"
-          dataField="createdDate"
-          alignment="left"
-          cellTemplate="dateTemplate"
-        ></dxi-column>
-        <dxi-column
-          caption="Updated at"
-          dataField="updatedDate"
-          alignment="left"
-          cellTemplate="dateTemplate"
         ></dxi-column>
 
         <div *dxTemplate="let cell of 'linkCellTemplate'">

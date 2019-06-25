@@ -35,9 +35,9 @@ export class JobFiltersComponent implements OnInit {
   @Select(WorkbenchState.selectedRouteId)
   selectedRouteId$: Observable<number>;
 
-  private selectedChannelTypeId;
-  private selectedChannelId;
-  private selectedRouteId;
+  public selectedChannelTypeId;
+  public selectedChannelId;
+  public selectedRouteId;
 
   public isApplyDisabled = false;
   public isResetDisabled = false;
@@ -80,6 +80,22 @@ export class JobFiltersComponent implements OnInit {
   onRouteSelected(selectedRouteId) {
     this.selectedRouteId = selectedRouteId;
     this.onFilterChange();
+  }
+
+  clearChannel() {
+    const isChannelChanged =
+      this._store.snapshot().workbench.selectedChannelId !==
+      this.selectedChannelId;
+    if (isChannelChanged) {
+      this.selectedChannelId = null;
+    } else {
+      this.selectedChannelId = null;
+      this.onFilterChange();
+    }
+  }
+
+  clearRoute() {
+    this.selectedRouteId = null;
   }
 
   onFilterChange() {
