@@ -381,7 +381,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       { format: payload.format, type },
       format => {
         changeColumnProp('format', format);
-        this.change.emit({ subject: 'format' });
+        this.change.emit({ subject: 'format', column: payload });
       }
     );
   }

@@ -51,7 +51,8 @@ import {
   AnalysisDSL,
   LabelOptions,
   AnalysisChartDSL,
-  AnalysisMapDSL
+  AnalysisMapDSL,
+  QueryDSL
 } from '../../../../models';
 import {
   DesignerStates,
@@ -111,6 +112,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   >;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
+  );
+
+  sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery)
   );
 
   public isInDraftMode = false;
@@ -1030,6 +1035,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       if (isDSLAnalysis(this.analysis)) {
+        this._store.dispatch(new DesignerUpdateArtifactColumn({
+          columnName: event.column.columnName,
+          table: event.column.table || event.column['tableName'],
+          format: event.column.format
+        }));
         this.analysis.sipQuery = {...this.analysis.sipQuery};
       } else {
         this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};

@@ -39,7 +39,7 @@
     [dataCount]="dataCount"
     [sorts]="sorts"
     [filters]="filters"
-    [sqlBuilder]="analysis.sipQuery || analysis.sqlBuilder"
+    [sqlBuilder]="analysis.sipQuery ? (sipQuery$ | async) : analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </multi-table-designer-layout>
