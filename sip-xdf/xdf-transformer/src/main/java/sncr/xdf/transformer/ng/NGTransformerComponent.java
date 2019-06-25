@@ -230,8 +230,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
         List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(ngctx.outputs.get(RequiredNamedParameters.Output.toString()));
-        /* Commented out based on SIP-7522 */
-        //dss.add(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
+        if(!ngctx.outputs.get(RequiredNamedParameters.Output.toString()).isEmpty()) {
+        	dss.add(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
+        }
         for ( Map<String, Object> ads : dss) {
             String name = (String) ads.get(DataSetProperties.Name.name());
             String src = tempLocation + Path.SEPARATOR + name;

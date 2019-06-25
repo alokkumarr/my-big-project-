@@ -132,8 +132,12 @@ public abstract class NGExecutor {
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
 
         writeResults(outputResult, outDataSetName, tempLoc);
-        /* Commented out based on SIP-7522 */
-        //writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        
+        logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
+        if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        }
+        
 
     }
 
@@ -161,8 +165,10 @@ public abstract class NGExecutor {
         //logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
 
         writeResults(outputResult, outDataSetName, tempLoc);
-        /* Commented out based on SIP-7522 */
-        //writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
+        if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        }
     }
 
 }
