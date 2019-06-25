@@ -6,6 +6,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -100,7 +101,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     protected int execute(){
-
+    	logger.debug("######Starting NG Parser #########");
         int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
@@ -369,14 +370,43 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     // Parse data without headers
     int parse(String mode){
-        int rc = parseSingleFile(new Path(sourcePath), new Path(tempDir));
 
-        if (rc != 0){
-            error = "Could not parse file: " + sourcePath;
-            logger.error(error);
-            return rc;
+        logger.info("Parsing " + sourcePath + " to " + tempDir);
+        logger.info("Header size : " + headerSize);
+        // Keep the minimum partition as same as number of files (outputNOF) requested for output.
+        // Spark also optimize and handle the number of partition automatically based on input
+        // data and number of executor configured. This will also avoid the repartitioning of
+        // Dataset later on to insure output number of files.
+        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+            .textFile(sourcePath, outputNOF);
+        logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
+
+        JavaRDD<Row> parsedRdd = rdd.map(
+            new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
+                '\'', recCounter, errCounter));
+        // Create output dataset
+        scala.collection.Seq<Column> outputColumns =
+            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+
+        logger.debug("Output rdd length = " + recCounter.value());
+        logger.debug("Rejected rdd length = " + errCounter.value());
+
+        JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
+        logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
+        Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
+        int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
+        if (status != 0) {
+            return -1;
         }
-        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir  + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+
+        boolean rejectedStatus = collectRejectedData(parsedRdd, outputRdd);
+        if (status != 0 || !rejectedStatus) {
+            logger.error("Failed to write rejected data");
+        }
+
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, pkeys));
+
         return 0;
     }
 
