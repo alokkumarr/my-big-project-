@@ -41,6 +41,7 @@ import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
+import { ArtifactDSL } from 'src/app/models';
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -403,7 +404,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
+      fpFlatMap(
+        (artifact: Artifact | ArtifactDSL) =>
+          (<ArtifactDSL>artifact).fields ||
+          (<Artifact>artifact).columns || [artifact]
+      ),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
@@ -493,7 +498,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   fetchColumsUponCheck() {
-    return map(this.analysis.artifacts, artifact => {
+    const artifacts = this.analysis.sipQuery
+      ? this.analysis.sipQuery.artifacts
+      : this.analysis.artifacts;
+    return map(artifacts, artifact => {
+      if (this.analysis.sipQuery) {
+        return artifact;
+      }
+
       const columns = filter(artifact.columns, 'checked');
       return {
         ...artifact,

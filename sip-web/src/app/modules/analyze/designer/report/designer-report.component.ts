@@ -22,6 +22,14 @@ export class DesignerReportComponent {
     this.currentDataCount = Math.min(this.totalDataCount, (val || []).length);
   }
 
+  get analysisArtifacts() {
+    return this.analysis.edit
+      ? null
+      : this.analysis.sipQuery
+      ? this.analysis.sipQuery.artifacts
+      : this.artifacts;
+  }
+
   @Input('dataCount')
   set dataCount(count) {
     this.totalDataCount = count || 0;
