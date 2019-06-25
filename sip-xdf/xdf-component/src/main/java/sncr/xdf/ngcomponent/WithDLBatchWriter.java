@@ -75,7 +75,7 @@ public interface WithDLBatchWriter {
                     WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
 
-                //helper.createDestDir(moveTask.dest, moveTask.source);
+                helper.createDestDir(moveTask.dest, moveTask.source);
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
@@ -242,8 +242,8 @@ public interface WithDLBatchWriter {
                     outputDS = ngctx.outputs.get(dataSetName);
 
                 String name = (String) outputDS.get(DataSetProperties.Name.name());
-                //String loc = location;
-                String loc = location + Path.SEPARATOR + name;
+                String loc = location;
+                //String loc = location + Path.SEPARATOR + name;
                 logger.info("Output write location : " + loc);
 
                 format = (String) outputDS.get(DataSetProperties.Format.name());
@@ -313,7 +313,7 @@ public interface WithDLBatchWriter {
                 DLDataSetOperations.cleanupDataDirectory(source);
             } else if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_JSON)) {
             }
-            createOrCleanUpDestDir(dest, objectName);
+
             WithDLBatchWriterHelper.logger.info("Moving files from " + source + " to " + dest);
 
             //get list of files to be processed
