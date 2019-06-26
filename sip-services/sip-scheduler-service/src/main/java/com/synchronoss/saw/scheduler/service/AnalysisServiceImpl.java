@@ -45,6 +45,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${saw-dispatch-service-url}")
   private String dispatchUrl;
 
+  @Value("${sip-dispatch-row-limit}")
+  private int dispatchRowLimit;
+
   @Autowired private RestUtil restUtil;
 
   private RestTemplate restTemplate;
@@ -240,7 +243,7 @@ public class AnalysisServiceImpl implements AnalysisService {
     SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
     logger.info("SIP Query :" + analysisResponse.getAnalysis());
 
-    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
+    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&size" + dispatchRowLimit + "&ExecutionType=scheduled";
     HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
 
     restTemplate.postForObject(url, requestEntity, String.class);
