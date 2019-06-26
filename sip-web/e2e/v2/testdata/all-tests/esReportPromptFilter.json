@@ -2,6 +2,7 @@
   "ES_REPORT_PROMPT_FILTER": {
     "positiveTests": {
       "ESPFL001": {
+        "suites": ["critical", "regression"],
         "user": "admin",
         "fieldType": "date",
         "value": "This Week",
@@ -10,6 +11,7 @@
         "description": "Admin should be apply prompt filter wih Date attribute"
       },
       "ESPFL002": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "value": "This Week",
@@ -18,39 +20,43 @@
         "description": "userOne should be apply prompt filter wih Date attribute"
       },
       "ESPFL003": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "number",
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "description": "userOne should be apply prompt filter wih Number attribute"
       },
       "ESPFL004": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "description": "Admin should be apply prompt filter wih String attribute"
       },
       "ESPFL005": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
         "value": "string 450",
         "fieldName": "String",
-        "displayedValue": "Equals",
+        "displayedValue": "Equals string 450",
         "description": "userOne should be apply prompt filter wih String attribute"
       },
       "ESPFL006": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "operator": "Equal to",
         "value": 99999.33,
         "fieldName": "Double",
-        "displayedValue": "Equal to",
+        "displayedValue": "Equal to 99999.33",
         "description": "Admin should be apply prompt filter wih Number attribute"
       }
     }

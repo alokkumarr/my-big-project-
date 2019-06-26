@@ -2,7 +2,7 @@
   "CREATEREPORT": {
     "dlreport": {
       "REPOR001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "description": "userOne should be able create dl report with sales table",
         "tables": [
@@ -13,7 +13,7 @@
         ]
       },
       "REPOR002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to create dl report with sales table",
         "tables": [
@@ -24,7 +24,7 @@
         ]
       },
       "REPOR003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to create dl report with product table",
         "tables": [
@@ -35,7 +35,7 @@
         ]
       },
       "REPOR004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "userOne should be able create dl report with product table",
         "tables": [
@@ -46,7 +46,7 @@
         ]
       },
       "REPOR005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "userOne should be able create dl report with sales & product table",
         "tables": [
@@ -61,7 +61,7 @@
         ]
       },
       "REPOR006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able create dl report with sales & product table",
         "tables": [
@@ -78,7 +78,7 @@
     },
     "esreport": {
       "REPOR007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to create es report",
         "tables": [
@@ -89,7 +89,7 @@
         ]
       },
       "REPOR008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "userOne should be able create es report",
         "tables": [

@@ -2,12 +2,12 @@
   "PIVOT_DASHBOARD": {
     "dashboard": {
       "PIVOT001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "description": "Admin should be able to create/delete dashboards with Pivot."
       },
       "PIVOT002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "User should be able to create/delete dashboards with Pivot."
       }
