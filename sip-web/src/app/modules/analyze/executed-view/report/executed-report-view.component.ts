@@ -6,7 +6,7 @@ import * as get from 'lodash/get';
   templateUrl: 'executed-report-view.component.html'
 })
 export class ExecutedReportViewComponent {
-  public analysisSorts: any;
+  // public analysisSorts: any;
 
   @Input('analysis')
   set setAnalysis(analysis: Analysis) {
@@ -42,9 +42,6 @@ export class ExecutedReportViewComponent {
       // DL report
       this.artifacts = dataFields;
     }
-    this.analysisSorts = isDSLAnalysis(analysis)
-      ? analysis.sipQuery.sorts
-      : analysis.sqlBuilder.sorts || analysis.sqlBuilder.orderByColumns;
   }
   @Input()
   dataLoader: Function;
@@ -53,4 +50,11 @@ export class ExecutedReportViewComponent {
   artifacts: Artifact[];
 
   constructor() {}
+
+  get analysisSorts() {
+    return isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.sorts
+      : this.analysis.sqlBuilder.sorts ||
+          this.analysis.sqlBuilder.orderByColumns;
+  }
 }
