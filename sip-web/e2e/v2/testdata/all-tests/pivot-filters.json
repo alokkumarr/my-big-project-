@@ -2,6 +2,7 @@
   "PIVOT": {
     "pivotFilters": {
       "PIVOT001": {
+        "suites": ["critical", "regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -9,6 +10,7 @@
         "description": "Admin should be able to add filter with Date_This_Week_Group_Interval_not_specified"
       },
       "PIVOT002": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -17,6 +19,7 @@
         "description": "Admin should be able to add filter with Date_MTD_Month_to_Date_Group_Interval_Year"
       },
       "PIVOT003": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -25,6 +28,7 @@
         "description": "Admin should be able to add filter with Date_YTD_Year_to_Date_Group_Interval_Quarter"
       },
       "PIVOT004": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -33,6 +37,7 @@
         "description": "Admin should be able to add filter with Date_Last_Week_Group_Interval_Month"
       },
       "PIVOT005": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -41,6 +46,7 @@
         "description": "Admin should be able to add filter Date_Last_2_Weeks_Group_Interval_Date"
       },
       "PIVOT006": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -48,6 +54,7 @@
         "description": "Admin should be able to add filter Date_Last_Month_Group_Interval_not_specified"
       },
       "PIVOT007": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -55,6 +62,7 @@
         "description": "Admin should be able to add filter Date_Las_Quarter_Group_Interval_not_specified"
       },
       "PIVOT008": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -62,6 +70,7 @@
         "description": "Admin should be able to add filter Date_Last_3_Months_Group_Interval_not_specified"
       },
       "PIVOT009": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -69,6 +78,7 @@
         "description": "Admin should be able to add filter Date_Last_6_Months_Group_Interval_not_specified"
       },
       "PIVOT010": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -76,6 +86,7 @@
         "description": "User should be able to add filter Date_This_Week_Group_Interval_not_specified"
       },
       "PIVOT011": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -84,6 +95,7 @@
         "description": "User should be able to add filter Date_MTD_Month_to_Date_Group_Interval_Year"
       },
       "PIVOT012": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -92,6 +104,7 @@
         "description": "User should be able to add filter Date_YTD_Year_to_Date_Group_Interval_Quarter"
       },
       "PIVOT013": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -100,6 +113,7 @@
         "description": "User should be able to add filter Date_Last_Week_Group_Interval_Month"
       },
       "PIVOT014": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": true,
@@ -108,6 +122,7 @@
         "description": "User should be able to add filter Date_Last_2_Weeks_Group_Interval_Date"
       },
       "PIVOT015": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -115,6 +130,7 @@
         "description": "User should be able to add filter Date_Last_Month_Group_Interval_not_specified"
       },
       "PIVOT016": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -122,6 +138,7 @@
         "description": "User should be able to add filter Date_Last_Quarter_Group_Interval_not_specified"
       },
       "PIVOT017": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -129,6 +146,7 @@
         "description": "User should be able to add filter Date_Last_3_Months_Group_Interval_not_specified"
       },
       "PIVOT018": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -136,6 +154,7 @@
         "description": "User should be able to add filter Date_Last_6_Months_Group_Interval_not_specified"
       },
       "PIVOT019": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Equals",
@@ -143,6 +162,7 @@
         "description": "Admin should be able to add filter String_Equals"
       },
       "PIVOT020": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Not equal",
@@ -150,6 +170,7 @@
         "description": "Admin should be able to add filter String_Not_equal"
       },
       "PIVOT021": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Is in",
@@ -157,6 +178,7 @@
         "description": "Admin should be able to add filter String_Is_in"
       },
       "PIVOT022": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Is not in",
@@ -164,6 +186,7 @@
         "description": "Admin should be able to add filter String_Is_not_in"
       },
       "PIVOT023": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Contains",
@@ -171,6 +194,7 @@
         "description": "Admin should be able to add filter String_Contains"
       },
       "PIVOT024": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Starts with",
@@ -178,6 +202,7 @@
         "description": "Admin should be able to add filter String_Starts_with"
       },
       "PIVOT025": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "string",
         "operator": "Ends with",
@@ -185,6 +210,7 @@
         "description": "Admin should be able to add filter String_Ends_with"
       },
       "PIVOT026": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Equals",
@@ -192,6 +218,7 @@
         "description": "User should be able to add filter String_Equals"
       },
       "PIVOT027": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Not equal",
@@ -199,6 +226,7 @@
         "description": "User should be able to add filter String_Not_equal"
       },
       "PIVOT028": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Is in",
@@ -206,6 +234,7 @@
         "description": "User should be able to add filter String_Is_in"
       },
       "PIVOT029": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Is not in",
@@ -213,6 +242,7 @@
         "description": "User should be able to add filter String_Is_not_in"
       },
       "PIVOT030": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Contains",
@@ -220,6 +250,7 @@
         "description": "User should be able to add filter String_Contains"
       },
       "PIVOT031": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Starts with",
@@ -227,6 +258,7 @@
         "description": "User should be able to add filter String_Starts_with"
       },
       "PIVOT032": {
+        "suites": ["regression"],
         "user": "userOne",
         "fieldType": "string",
         "operator": "Ends with",
@@ -234,6 +266,7 @@
         "description": "User should be able to add filter String_Ends_with"
       },
       "PIVOT033": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": "avg",
@@ -242,6 +275,7 @@
         "description": "Admin should be able to add filter Number_Greater_than_Aggregate_function_Average"
       },
       "PIVOT034": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": "min",
@@ -250,6 +284,7 @@
         "description": "Admin should be able to add filter Number_Less_than_Aggregate_function_Minimum"
       },
       "PIVOT035": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": "max",
@@ -258,6 +293,7 @@
         "description": "Admin should be able to add filter Number_Greater_than_or_equal_to_Aggregate_function_Maximum"
       },
       "PIVOT036": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": "count",
@@ -266,6 +302,7 @@
         "description": "Admin should be able to add filter Number_Less_than_or_equal_to_Aggregate_function_Count"
       },
       "PIVOT037": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,
@@ -274,6 +311,7 @@
         "description": "Admin should be able to add filter Number_Greater_than_Aggregate_function_default"
       },
       "PIVOT038": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,
@@ -282,6 +320,7 @@
         "description": "Admin should be able to add filter Number_Less_than_Aggregate_function_default"
       },
       "PIVOT039": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,
@@ -290,6 +329,7 @@
         "description": "Admin should be able to add filter Number_Greater_than_or_equal_to_Aggregate_function_default"
       },
       "PIVOT040": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,
@@ -298,6 +338,7 @@
         "description": "Admin should be able to add filter Number_Less_than_or_equal_to_Aggregate_function_default"
       },
       "PIVOT041": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,
@@ -306,6 +347,7 @@
         "description": "Admin should be able to add filter Number_Equal_to_Aggregate_function_default"
       },
       "PIVOT042": {
+        "suites": ["regression"],
         "user": "admin",
         "fieldType": "number",
         "aggregateFunction": false,

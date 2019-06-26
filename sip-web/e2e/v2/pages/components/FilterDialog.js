@@ -57,6 +57,7 @@ class FilterDialog {
     this._selectedFilterField = element(
       by.css(`[e2e="filter-autocomplete-input"]`)
     );
+    this._allFilterButton=element(by.xpath(`//button[contains(*,'All')]`));
   }
 
   clickOnAddFilterButtonByTableName(tableName) {
@@ -86,6 +87,7 @@ class FilterDialog {
     commonFunctions.clickOnElement(this._stringOperatorDropDownItem(operator));
     if (operator === 'Is in' || operator === 'Is not in') {
       commonFunctions.fillInput(this._filterStringIsInIsNotInInput, value);
+      this._allFilterButton.click();
     } else {
       commonFunctions.fillInput(this._filterStringInput, value);
     }
@@ -93,6 +95,7 @@ class FilterDialog {
 
   clickOnApplyFilterButton() {
     commonFunctions.clickOnElement(this._applyFiltersBtn);
+    browser.sleep(2000);
   }
 
   clickOnPromptCheckBox() {

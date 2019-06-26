@@ -2,7 +2,7 @@
   "SNAPSHOT_KPI": {
     "dashboard": {
       "SNAPK001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "kpiInfo": {
           "column": "Long",
@@ -21,7 +21,7 @@
         "description": "Admin should create snapshot kpi dashboard with columns."
       },
       "SNAPK002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Float",
@@ -40,7 +40,7 @@
         "description": "User should create snapshot kpi dashboard with float values."
       },
       "SNAPK003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "kpiInfo": {
           "column": "Integer",
@@ -59,7 +59,7 @@
         "description": "Admin should create snapshot kpi dashboard with integer values."
       },
       "SNAPK004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "kpiInfo": {
           "column": "Double",
