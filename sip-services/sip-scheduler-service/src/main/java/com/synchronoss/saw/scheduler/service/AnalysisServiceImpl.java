@@ -243,7 +243,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
     logger.info("SIP Query :" + analysisResponse.getAnalysis());
 
-    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&size" + dispatchRowLimit + "&ExecutionType=scheduled";
+    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&size=" + dispatchRowLimit + "&ExecutionType=scheduled";
+    logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
 
     restTemplate.postForObject(url, requestEntity, String.class);
