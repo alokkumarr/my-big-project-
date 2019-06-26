@@ -10,6 +10,11 @@
 # turn depends on the MapR Operating System Support Matrix.
 FROM centos:7.5.1804
 
+# initilize the arugument to download and install corretto (Java).
+ARG rpm=java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
+ARG path=https://d3pxv6yz143wms.cloudfront.net/8.212.04.2
+ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
+
 # Workaround: Package installations (like mapr-core which depends on
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
@@ -87,8 +92,21 @@ RUN useradd mapr -u 500 -g mapr
 # System web application
 RUN echo mapr | passwd --stdin mapr
 
-# Install Java
-RUN yum -y -q install java-1.8.0-openjdk-headless
+# Download and verify the PGP signature for java and Installation.
+# Also install fontconfig remove a common source of configuration problems.
+# have recommended that Java images include font support.
+RUN curl -O $path/$rpm \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys $key \
+    && gpg --armor --export $key > corretto.asc \
+    && rpm --import corretto.asc \
+    && rpm -K $rpm \
+    && rpm -i $rpm \
+    && rm -r $GNUPGHOME corretto.asc $rpm \
+    && yum install -y fontconfig \
+    && yum clean all
+
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto
 
 # Add SIP container health check command
 COPY sip-health-check /root/

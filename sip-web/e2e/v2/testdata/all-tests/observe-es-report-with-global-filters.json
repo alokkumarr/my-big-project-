@@ -2,7 +2,7 @@
   "ES_REPORT_GLOBAL_FILTER": {
     "dashboard": {
       "ESGLB001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {
@@ -23,7 +23,7 @@
         "description": "Admin should create and delete dashboards with es reports with Float global filter."
       },
       "ESGLB002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -44,7 +44,7 @@
         "description": "User should create and delete dashboards with es reports with Float global filter."
       },
       "ESGLB003": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {
@@ -65,7 +65,7 @@
         "description": "Admin should create and delete dashboards with es reports with String global filter."
       },
       "ESGLB004": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -86,7 +86,7 @@
         "description": "User should create and delete dashboards with es reports with Float global filter."
       },
       "ESGLB005": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -107,7 +107,7 @@
         "description": "User should create and delete dashboards with es reports with Double global filter."
       },
       "ESGLB006": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {
@@ -128,7 +128,7 @@
         "description": "Admin should create and delete dashboards with es reports with Double global filter."
       },
       "ESGLB007": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {
@@ -150,7 +150,7 @@
         "description": "Admin should create and delete dashboards with es reports with Date global filter."
       },
       "ESGLB008": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -172,7 +172,7 @@
         "description": "User should create and delete dashboards with es reports with Date global filter."
       },
       "ESGLB009": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {
@@ -193,7 +193,7 @@
         "description": "Admin should create and delete dashboards with es reports with Long global filter."
       },
       "ESGLB010": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -214,7 +214,7 @@
         "description": "User should create and delete dashboards with es reports with Long global filter."
       },
       "ESGLB011": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "dashboardGlobalFilters": [
           {
@@ -235,7 +235,7 @@
         "description": "User should create and delete dashboards with es reports with Integer global filter."
       },
       "ESGLB012": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "dashboardGlobalFilters": [
           {

@@ -2,133 +2,133 @@
   "EDITELETECHART": {
     "positiveTests": {
       "EDITC001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "chartType": "chart:combo",
         "description": "User should be able to edit and delete combo charts"
       },
       "EDITC002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "admin",
         "chartType": "chart:combo",
         "description": "Admin should be able to edit and delete combo charts"
       },
       "EDITC003": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:column",
         "description": "User should be able to edit and delete column charts"
       },
       "EDITC004": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:column",
         "description": "Admin should be able to edit and delete column charts"
       },
       "EDIT005": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bar",
         "description": "User should be able to edit and delete bar charts"
       },
       "EDIT006": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bar",
         "description": "Admin should be able to edit and delete bar charts"
       },
       "EDIT007": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:stack",
         "description": "User should be able to edit and delete stack charts"
       },
       "EDIT008": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:stack",
         "description": "Admin should be able to edit and delete stack charts"
       },
       "EDIT009": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:line",
         "description": "User should be able to edit and delete line charts"
       },
       "EDIT010": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:line",
         "description": "Admin should be able to edit and delete line charts"
       },
       "EDIT011": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:area",
         "description": "User should be able to edit and delete area charts"
       },
       "EDIT012": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:area",
         "description": "Admin should be able to edit and delete area charts"
       },
       "EDIT013": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:scatter",
         "description": "User should be able to edit and delete scatter charts"
       },
       "EDIT014": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:scatter",
         "description": "Admin should be able to edit and delete scatter charts"
       },
       "EDIT015": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:bubble",
         "description": "User should be able to edit and delete bubble charts"
       },
       "EDIT016": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:bubble",
         "description": "Admin should be able to edit and delete bubble charts"
       },
       "EDIT017": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:pie",
         "description": "User should be able to edit and delete pie charts"
       },
       "EDIT018": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:pie",
         "description": "Admin should be able to edit and delete pie charts"
       },
       "EDIT019": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:tsspline",
         "description": "User should be able to edit and delete tsspline charts"
       },
       "EDIT020": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:tsspline",
         "description": "Admin should be able to edit and delete tsspline charts"
       },
       "EDIT021": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:tsPane",
         "description": "User should be able to edit and delete tsPane charts"
       },
       "EDIT022": {
-        "suites": ["smoke", "sanity", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:tsPane",
         "description": "Admin should be able to edit and delete tsPane charts"
