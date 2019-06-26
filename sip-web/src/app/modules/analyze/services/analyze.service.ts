@@ -550,7 +550,7 @@ export class AnalyzeService {
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
             queryBuilder: { ...model.sipQuery },
-            count: fpGet(`totalRows`, resp)
+            count: fpGet(`totalRows`, resp) || resp.length
           };
         })
       )
