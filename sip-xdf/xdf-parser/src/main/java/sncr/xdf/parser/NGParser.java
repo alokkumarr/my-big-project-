@@ -101,7 +101,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     protected int execute(){
-    	logger.debug("######Starting NG Parser #########");
         int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
@@ -151,7 +150,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
             Map<String, Object> rejDs = getRejectDatasetDetails();
-
+            
+            
             logger.debug("Rejected dataset details = " + rejDs);
             if (rejDs != null) {
 //            rejectedDatasetName = DATASET.rejected.toString();
@@ -211,7 +211,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 //Write rejected data
                 if (this.rejectedDataCollector != null) {
-                    boolean status = writeRejectedData();
+					boolean status = writeRejectedData();
 
                     if (!status) {
                         logger.warn("Unable to write rejected data");
@@ -392,10 +392,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rejected rdd length = " + errCounter.value());
 
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
+        
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
+        
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
+        
         if (status != 0) {
             return -1;
         }
@@ -434,32 +438,33 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.trace("Parsing " + file + " to " + destDir +"\n");
         logger.trace("Header size : " + headerSize +"\n");
 
-        JavaRDD<String> rdd = reader.readToRDD(file.toString(), 1);
+        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+                .textFile(file.toString(), 1);
+
 
         JavaRDD<Row> parseRdd = rdd
-            // Add line numbers
-            .zipWithIndex()
-            // Filter out header based on line number
-            .filter(new HeaderFilter(headerSize))
-            // Get rid of file numbers
-            .keys()
-            .map(new ConvertToRow(schema,
-                tsFormats,
-                lineSeparator,
-                delimiter,
-                quoteChar,
-                quoteEscapeChar,
-                '\'',
-                recCounter,
-                errCounter));
+                // Add line numbers
+                .zipWithIndex()
+                // Filter out header based on line number
+                .filter(new HeaderFilter(headerSize))
+                // Get rid of file numbers
+                .keys()
+                .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                    quoteEscapeChar, '\'', recCounter, errCounter));
 
-        // Create output dataset
+        
+     // Create output dataset
         scala.collection.Seq<Column> outputColumns =
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+            scala.collection.JavaConversions.asScalaBuffer(
+                createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+        JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
+        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        
 
         collectAcceptedData(parseRdd,outputRdd);
+        
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
