@@ -91,7 +91,7 @@ import {
   DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
-import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -1059,11 +1059,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   setColumnPropsToDefaultIfNeeded(column) {
     unset(column, 'aggregate');
-    if (FLOAT_TYPES.includes(column.type)) {
+    if (NUMBER_TYPES.includes(column.type)) {
       if (!column.format) {
         column.format = {};
       }
-      if (!column.format.precision) {
+      if (FLOAT_TYPES.includes(column.type) && !column.format.precision) {
         column.format.precision = DEFAULT_PRECISION;
       }
     }
