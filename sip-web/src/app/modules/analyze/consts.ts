@@ -260,8 +260,8 @@ export const ANALYSIS_METHODS = [
           {
             label: 'Packed Bubble Chart',
             icon: {
-              font: 'icon-bubble-chart',
-              svg: 'bubble-chart-col'
+              font: 'icon-packed-bubble-chart',
+              svg: 'packed-bubble-chart-col'
             },
             type: 'chart:packedbubble'
           },
