@@ -77,8 +77,22 @@ public interface WithDataSet {
     default Map<String, Map<String, Object>> discoverInputDataSetsWithInput(DataSetHelper aux) throws Exception {
 
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
+        List<Input> input = aux.ctx.componentConfiguration.getInputs();
+        if (aux.ctx.runningPipeLine && "sql".equalsIgnoreCase(aux.ctx.pipeComponentName))
+        {
+           if (input.size() > 0 )
+            {
+                Iterator itr = input.iterator();
+                while (itr.hasNext())
+                {
+                    Input dsInput = (Input) itr.next();
+                    if (dsInput.getDataSet().equalsIgnoreCase(aux.ctx.dataSetName))
+                        itr.remove();
+                }
+            }
+        }
 
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) {
+        for (Input in: input) {
             if (in.getDataSet() == null)
                 throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
             retval.put(in.getDataSet(), discoverDataSetWithInput(aux, in));

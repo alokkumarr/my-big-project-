@@ -358,6 +358,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey,datafileDFmap.get(dataSetName)); //TRANS_OUT
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
+            ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
             NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
 
