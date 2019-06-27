@@ -147,7 +147,7 @@ public class MigrateAnalysisService {
           migrationStatusObject.setType(type);
           LOGGER.debug(
               "Contents from Binary Store : " + content.toString() + " and Type : " + type);
-          if (type != null && type.matches("pivot|chart")) {
+          if (type != null && type.matches("pivot|chart|esReport")) {
             analysisId = analysisId != null ? analysisId : content.get("id").getAsString();
             JsonElement executedByElement = content.get("executedBy");
             String executedBy =
@@ -183,14 +183,14 @@ public class MigrateAnalysisService {
             }
             SipQuery sipQuery =
                 queryBuilder != null ? migrateExecutions.migrate(queryBuilder) : null;
-            LOGGER.debug("SIP query for pivot/chart : {}", sipQuery);
+            LOGGER.debug("SIP query for pivot/chart/esReport : {}", sipQuery);
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode dataNode = null, queryNode = null;
             byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
             if (dataObject != null && dataObject.length > 0) {
               dataNode = objectMapper.readTree(new String(dataObject));
-              LOGGER.debug("Data Json Node which need to parsed for pivot/chart : {}", dataNode);
+              LOGGER.debug("Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
             }
 
             byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
@@ -198,7 +198,7 @@ public class MigrateAnalysisService {
               JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
               queryNode =
                   jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
-              LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
+              LOGGER.debug("Query Node which need to parsed for pivot/chart/esReport : {}", queryNode);
             }
 
             Object dslExecutionResult = null;
@@ -272,7 +272,7 @@ public class MigrateAnalysisService {
           objectList = ((PivotResultMigration) dataConverter).parseData(dataNode, queryNode);
           break;
         case "esReport":
-          throw new UnsupportedOperationException("ES Report migration not supported yet");
+          return dataNode;
         case "report":
           throw new UnsupportedOperationException("DL Report migration not supported yet");
         case "map":
@@ -309,16 +309,13 @@ public class MigrateAnalysisService {
       String executionStatus,
       Object dslExecutionResult) {
     try {
-      List<Object> objectList = new ArrayList<>();
-      objectList.add(dslExecutionResult);
-
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
       executionResult.setDslQueryId(dslQueryId);
       executionResult.setSipQuery(sipQuery);
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
-      executionResult.setData(objectList);
+      executionResult.setData(dslExecutionResult);
       executionResult.setExecutionType(
           executionType != null ? ExecutionType.valueOf(executionType) : null);
       executionResult.setStatus(executionStatus);
