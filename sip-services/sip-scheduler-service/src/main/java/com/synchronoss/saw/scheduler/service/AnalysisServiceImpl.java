@@ -96,9 +96,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     Boolean isZipRequired = analysis.getZip();
     String[] latestExecution;
     boolean isDslScheduled =
-        analysis.getType() != null
-            && (analysis.getType().equalsIgnoreCase("pivot")
-                || analysis.getType().equalsIgnoreCase("chart"));
+        analysis.getType() != null && analysis.getType().matches("pivot|chart|map|esReport");
+
     if (isDslScheduled) {
       latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
     } else {
