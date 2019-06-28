@@ -112,8 +112,7 @@ public class ExportServiceImpl implements ExportService {
 
   @Autowired private ServiceUtils serviceUtils;
 
-  @Autowired
-  private RestUtil restUtil;
+  @Autowired private RestUtil restUtil;
 
   @Override
   public DataResponse dataToBeExportedSync(
@@ -733,10 +732,10 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       ExportBean exportBean,
       boolean isZip) {
-      logger.info("Inside S3 dispatch Pivot");
-      String finalS3 = s3;
-      String finalJobGroup = jobGroup;
-      File cfile = new File(exportBean.getFileName());
+    logger.info("Inside S3 dispatch Pivot");
+    String finalS3 = s3;
+    String finalJobGroup = jobGroup;
+    File cfile = new File(exportBean.getFileName());
     if (isZip) {
       logger.debug("S3 - zip = true!!");
       try {
@@ -774,9 +773,9 @@ public class ExportServiceImpl implements ExportService {
         logger.error("Error writing to zip!!");
       }
     } else {
-          s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
-          logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-      }
+      s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
+      logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
+    }
   }
 
   @Override
@@ -1087,16 +1086,14 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
+
     String url =
-        apiExportOtherProperties
-            + "/"
-            + analysisId
-            + "/executions/"
+        storageProxyUrl
+            + "/internal/proxy/storage/"
             + executionId
-            + "/data?page=1&pageSize="
-            + exportSize
-            + "&analysisType="
-            + analysisType;
+            + "/executions/data?page=1&pageSize="
+            + exportSize;
+
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.getForEntity(url, DataResponse.class);
     responseStringFuture.addCallback(
@@ -1446,33 +1443,33 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
-	/**
-	 * This method to organize the pivot table structure
-	 *
-	 * @param sipQuery
-	 * @return
-	 */
-	private List<Field> getPivotFields(SipQuery sipQuery) {
-		List<Field> queryFields = sipQuery.getArtifacts().get(0).getFields();
-		List<Field> fieldList = new ArrayList<>();
-		// set first row fields
-		for (Field field : queryFields) {
-			if (field != null && "row".equalsIgnoreCase(field.getArea())) {
-				fieldList.add(field);
-			}
-		}
-		// set column fields
-		for (Field field : queryFields) {
-			if (field != null && "column".equalsIgnoreCase(field.getArea())) {
-				fieldList.add(field);
-			}
-		}
-		// set data fields
-		for (Field field : queryFields) {
-			if (field != null && "data".equalsIgnoreCase(field.getArea())) {
-				fieldList.add(field);
-			}
-		}
-		return fieldList;
-	}
+  /**
+   * This method to organize the pivot table structure
+   *
+   * @param sipQuery
+   * @return
+   */
+  private List<Field> getPivotFields(SipQuery sipQuery) {
+    List<Field> queryFields = sipQuery.getArtifacts().get(0).getFields();
+    List<Field> fieldList = new ArrayList<>();
+    // set first row fields
+    for (Field field : queryFields) {
+      if (field != null && "row".equalsIgnoreCase(field.getArea())) {
+        fieldList.add(field);
+      }
+    }
+    // set column fields
+    for (Field field : queryFields) {
+      if (field != null && "column".equalsIgnoreCase(field.getArea())) {
+        fieldList.add(field);
+      }
+    }
+    // set data fields
+    for (Field field : queryFields) {
+      if (field != null && "data".equalsIgnoreCase(field.getArea())) {
+        fieldList.add(field);
+      }
+    }
+    return fieldList;
+  }
 }
