@@ -7,8 +7,8 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
+import * as get from 'lodash/get';
 
 import { DashboardService } from '../../../services/dashboard.service';
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
@@ -16,6 +16,7 @@ import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot', 'map'];
+const EXCLUDE_MAPTYPE = ['map'];
 
 @Component({
   selector: 'widget-analysis',
@@ -74,27 +75,24 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   set category(id: number | string) {
     this.searchTerm = '';
     this.showProgress = true;
-    this.analyze.getAnalysesFor(id.toString()).then(
-      result => {
-        this.showProgress = false;
-
-        // Excluding mapbox analysis from being able to add in dashboard
-        // until mapbox chart download issue is fixed.
-        // https://jira.synchronoss.net:8443/jira/browse/SIP-6083
-        const EXCLUDE_MAPTYPE = ['map'];
-
-        this.analyses = filter(
-          result,
-          analysis =>
-            analysis &&
-            ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
-            !EXCLUDE_MAPTYPE.includes(get(analysis, 'mapOptions.mapType'))
-        );
-      },
-      () => {
-        this.showProgress = false;
-      }
-    );
+    this.analyze
+      .getAnalysesFor(id.toString())
+      .toPromise()
+      .then(
+        result => {
+          this.showProgress = false;
+          this.analyses = filter(
+            result,
+            analysis =>
+              analysis &&
+              ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
+              !EXCLUDE_MAPTYPE.includes(get(analysis, 'mapOptions.mapType'))
+          );
+        },
+        () => {
+          this.showProgress = false;
+        }
+      );
   }
 
   sendAnalysisAction(action, analysis) {

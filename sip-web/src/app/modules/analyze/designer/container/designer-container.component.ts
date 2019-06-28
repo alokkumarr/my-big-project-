@@ -1170,7 +1170,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<AnalysisChart>this.analysis).chartType = to;
       (<any>this.analysis).isInverted = to === 'bar';
     }
-
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
     // this.artifacts = [...this.artifacts];
   }

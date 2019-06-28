@@ -260,10 +260,18 @@ module.  Entity BIS_ROUTE is used to hold the details of route i.e it
 holds the details of destination, frequency etc etc.  Entity
 BIS_CHANNEL is used to hold the details of channel i.e it holds the
 details of data channel.  Entity BIS_FILE_LOGS is used to log details
-related to the files or data retrieved from the custom.
+related to the files or data retrieved from the custom. Entity BIS_JOB 
+holds job level info. Job status will be updated based on all transfers 
+executed in the schedule for the route. 
 
 .Figure: SIP Batch Ingestion Component Diagram
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
+
+SIP Batch Ingestion Service implementation is provided as part of
+batch plugin implementation based on channel type. 
+Ex: sip-batch-plugin-sftp, sip-batch-plugin-s3. Each of plugin
+has implementation for file transfer and retry logic for corresponding
+channel type.
 
 High Availability & Resiliency
 

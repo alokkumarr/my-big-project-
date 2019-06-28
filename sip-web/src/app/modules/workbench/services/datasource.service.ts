@@ -260,7 +260,7 @@ export class DatasourceService {
    */
   testChannel(channelID): Observable<any> {
     return this.http
-      .get(`${this.api}/ingestion/batch/sftp/channels/${channelID}/status`)
+      .get(`${this.api}/ingestion/batch/channels/${channelID}/status`)
       .pipe(catchError(this.handleError('data', {})));
   }
 
@@ -273,7 +273,7 @@ export class DatasourceService {
    */
   testRoute(routeID): Observable<any> {
     return this.http
-      .get(`${this.api}/ingestion/batch/sftp/routes/${routeID}/status`)
+      .get(`${this.api}/ingestion/batch/routes/${routeID}/status`)
       .pipe(catchError(this.handleError('data', {})));
   }
 
@@ -285,7 +285,7 @@ export class DatasourceService {
    * @memberof DatasourceService
    */
   testChannelWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/sftp/channels/test`;
+    const endpoint = `${this.api}/ingestion/batch/channels/test`;
 
     return this.http
       .post(endpoint, payload)
@@ -300,7 +300,7 @@ export class DatasourceService {
    * @memberof DatasourceService
    */
   testRouteWithBody(payload): Observable<any> {
-    const endpoint = `${this.api}/ingestion/batch/sftp/routes/test`;
+    const endpoint = `${this.api}/ingestion/batch/routes/test`;
 
     return this.http
       .post(endpoint, payload)

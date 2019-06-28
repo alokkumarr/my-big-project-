@@ -164,7 +164,7 @@ export const DATE_FORMATS_OBJ = fpPipe(
 export const CHART_DATE_FORMATS = [
   {
     value: 'MMMM d YYYY, h:mm:ss a',
-    groupInterval: 'day',
+    groupInterval: 'hour',
     label: 'September 1st 2017, 1:28:31 pm'
   },
   {

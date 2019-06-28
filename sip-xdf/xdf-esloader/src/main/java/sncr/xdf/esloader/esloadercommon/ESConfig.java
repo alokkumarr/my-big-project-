@@ -14,7 +14,9 @@ public class ESConfig {
     private String esUser;
     private String esPassword;
     private int esPort;
-
+    private boolean esSslEnabled;
+    private String keyStorePath;
+    private String storePassword;
     private String esIndex;
 
     private String dataLocation;
@@ -23,7 +25,6 @@ public class ESConfig {
         this.esHost = esHost;
         this.esUser = esUser;
         this.esPassword = esPassword;
-
         this.esIndex = esIndex;
     }
 
@@ -33,7 +34,6 @@ public class ESConfig {
         this.esUser = esUser;
         this.esPassword = esPassword;
         this.esPort = esPort;
-
         this.esIndex = esIndex;
     }
 
@@ -85,6 +85,54 @@ public class ESConfig {
         this.esIndex = esIndex;
     }
 
+    /**
+     * Gets esSslEnabled
+     *
+     * @return value of esSslEnabled
+     */
+    public boolean isEsSslEnabled() {
+        return esSslEnabled;
+    }
+
+    /**
+     * Sets esSslEnabled
+     */
+    public void setEsSslEnabled(boolean esSslEnabled) {
+        this.esSslEnabled = esSslEnabled;
+    }
+
+    /**
+     * Gets keyStorePath
+     *
+     * @return value of keyStorePath
+     */
+    public String getKeyStorePath() {
+        return keyStorePath;
+    }
+
+    /**
+     * Sets keyStorePath
+     */
+    public void setKeyStorePath(String keyStorePath) {
+        this.keyStorePath = keyStorePath;
+    }
+
+    /**
+     * Gets storePassword
+     *
+     * @return value of storePassword
+     */
+    public String getStorePassword() {
+        return storePassword;
+    }
+
+    /**
+     * Sets storePassword
+     */
+    public void setStorePassword(String storePassword) {
+        this.storePassword = storePassword;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,6 +148,9 @@ public class ESConfig {
                 .append(esUser, esConfig.esUser)
                 .append(esPassword, esConfig.esPassword)
                 .append(esIndex, esConfig.esIndex)
+                .append(esSslEnabled,esConfig.esSslEnabled)
+                .append(keyStorePath, esConfig.keyStorePath)
+                .append(storePassword,esConfig.storePassword)
                 .isEquals();
     }
 
@@ -112,6 +163,9 @@ public class ESConfig {
                 .append(esPassword)
                 .append(esPort)
                 .append(esIndex)
+                .append(esSslEnabled)
+                .append(keyStorePath)
+                .append(storePassword)
                 .toHashCode();
     }
 }

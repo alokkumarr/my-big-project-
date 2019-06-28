@@ -62,6 +62,13 @@ public class ElasticSearchLoader {
         ESConfig config = new ESConfig(esHost, esUser, esPass, esPort, esIndex);
         config.setEsClusterName(esClusterName);
 
+        if (esLoader.getEsSslEnabled() !=null && esLoader.getEsSslEnabled())
+        {
+            config.setEsSslEnabled(true);
+            config.setKeyStorePath(esLoader.getKeyStorePath());
+            config.setStorePassword(esLoader.getStorePassword());
+        }
+
         this.esConfig = generateESParamMap(config);
 
         // If documentIDField is specified, configure that as document mapping id
@@ -102,7 +109,13 @@ public class ElasticSearchLoader {
         configMap.put(ES_PARAM_CLUSTER, config.getEsClusterName());
 
         configMap.put("es.index.auto.create", "false");
-
+        if (config.isEsSslEnabled()){
+        configMap.put("es.net.ssl","true");
+        configMap.put("es.net.ssl.truststore.location",config.getKeyStorePath());
+        configMap.put("es.net.ssl.truststore.pass",config.getStorePassword());
+        configMap.put("es.nodes.wan.only","true");
+        configMap.put("es.net.ssl.cert.allow.self.signed","true");
+        }
         return configMap;
     }
 

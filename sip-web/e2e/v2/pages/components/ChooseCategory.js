@@ -11,6 +11,7 @@ class ChooseCategory extends SelectedItem {
   }
 
   clickOnCategoryOrMetricName(name) {
+    browser.sleep(2000); // Added for bamboo : SIP-7298
     commonFunctions.clickOnElement(this._categoryOrMetricName(name));
   }
 }

@@ -52,6 +52,7 @@ public class BisCronJob extends QuartzJobBean implements InterruptableJob {
       logger.trace("restUtil.getTrustStore(): " + restUtil.getTrustStore());
       logger.trace("restUtil.getTrustStorePassword(): " + restUtil.getTrustStorePassword());
       restTemplate.postForLocation(bisTransferUrl, jobRequest);
+      
     } catch (Exception exception) {
       /**
        * As BIS is async process for larger files async timesout. 
