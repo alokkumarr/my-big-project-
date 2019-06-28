@@ -59,6 +59,7 @@ const normalSipQuery = {
   filters: [],
   booleanCriteria: 'AND',
   sorts: [],
+  joins: [],
   store: {
     dataStore: '',
     storageType: ''
@@ -99,6 +100,7 @@ const sipQueryWithXFieldContainingRegion = {
   filters: [],
   booleanCriteria: 'AND',
   sorts: [],
+  joins: [],
   store: {
     dataStore: '',
     storageType: ''
