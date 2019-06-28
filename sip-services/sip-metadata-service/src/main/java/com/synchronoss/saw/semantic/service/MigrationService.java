@@ -89,16 +89,17 @@ public class MigrationService {
    * @throws Exception exception
    */
   public void init() throws Exception {
-    logger.info("Migration initiated.. " + migrationRequires);
-    System.out.println("Migration initiated.. " + migrationRequires);
+    logger.info("Migration initiated: " + migrationRequires);
     if (migrationRequires) {
       try {
         convertHBaseBinaryToMaprdbStore(transportUri, basePath, migrationMetadataHome);
       } catch (Exception ex) {
-        ex.printStackTrace();
+        logger.error("Exception occurred while migrating semantic binary store to MapRDB", ex);
       }
+    } else {
+      createStore(basePath);
     }
-    logger.info("Migration ended.." + migrationRequires);
+    logger.info("Migration ended: " + migrationRequires);
   }
 
   /**
@@ -322,6 +323,7 @@ public class MigrationService {
         }
       }
     } else {
+      createStore(basePath);
       logger.info("migration has been completed on previous installation");
     }
     logger.trace("migration process will ends here");
@@ -430,6 +432,29 @@ public class MigrationService {
     logger.trace("Response : " + node.toString());
   }
 
+
+  private void createStore(String basePath)
+      throws SipJsonValidationException, SipCreateEntityException {
+    logger.trace("creating store starts here ");
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      SemanticNode  node = new SemanticNode();
+      List<MetaDataStoreStructure> structure =
+          SipMetadataUtils.node2JsonObject(
+              node, basePath, null, Action.init, Category.Semantic);
+      logger.trace(
+          "createStore : Before invoking request to MaprDB JSON store :{}",
+          mapper.writeValueAsString(structure));
+      MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
+      requestMetaDataStore.process();
+    } catch (Exception ex) {
+      logger.error("Problem on the storage while creating an entity", ex);
+      throw new SipCreateEntityException("Problem on the storage while creating an entity.", ex);
+    }
+    logger.trace("creating store ends here ");
+  }
+  
+  
   private boolean readSemantic(SemanticNode node, String basePath)
       throws SipJsonValidationException, SipReadEntityException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");

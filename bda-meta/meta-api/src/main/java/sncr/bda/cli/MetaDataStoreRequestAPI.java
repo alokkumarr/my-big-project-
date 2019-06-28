@@ -63,6 +63,7 @@ public class MetaDataStoreRequestAPI {
     protected JsonElement request;
     private Action action;
     private String id;
+    private String tablePath;
     private String response;
     private String rFile;
     private JsonObject src;
@@ -360,6 +361,7 @@ public class MetaDataStoreRequestAPI {
                             case update: sds.update(id, src); break;
                             case read: result = sds.read(id); break;
                             case search : doSearch(); break;
+                            case init : sds.createStore(xdfRoot); break;
                             default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
                         }
                         break;
@@ -396,7 +398,7 @@ public class MetaDataStoreRequestAPI {
           category = Category.valueOf(cat);
           action = Action.valueOf(a);
           if (action == Action.create || action == Action.delete || action == Action.update
-              || action == Action.read)
+              || action == Action.read || action == Action.init)
             return analyzeAndValidateCRUD(item);
           else {
             return analyzeAndValidateSearch(item);
@@ -408,8 +410,8 @@ public class MetaDataStoreRequestAPI {
       }
 
       private boolean analyzeAndValidateCRUD(JsonObject item) {
-        if ((action == Action.create || action == Action.delete || action == Action.update
-            || action == Action.read) && !item.has("id")) {
+        if (((action == Action.create || action == Action.delete || action == Action.update
+            || action == Action.read) && !item.has("id")) || action == Action.init) {
           logger.error("Requested action requires ID");
           return false;
         }
