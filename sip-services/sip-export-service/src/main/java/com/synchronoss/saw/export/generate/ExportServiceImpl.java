@@ -1176,18 +1176,28 @@ public class ExportServiceImpl implements ExportService {
       // This page number will make sure that we process the last bit of info
       page = i;
       // Paginated URL for limitPerPage records till the end of the file.
+      /*String url =
+      apiExportOtherProperties
+          + "/"
+          + analysisId
+          + "/executions/"
+          + executionId
+          + "/data?page="
+          + page
+          + "&pageSize="
+          + limitPerPage
+          + "&analysisType="
+          + analysisType;*/
+
       String url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/"
+          storageProxyUrl
+              + "/internal/proxy/storage/"
               + executionId
-              + "/data?page="
+              + "/executions/data?page="
               + page
               + "&pageSize="
-              + limitPerPage
-              + "&analysisType="
-              + analysisType;
+              + limitPerPage;
+
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
@@ -1213,18 +1223,26 @@ public class ExportServiceImpl implements ExportService {
     page += 1;
     if (leftOutRows > 0) {
       // Paginated URL for limitPerPage records till the end of the file.
+      /*String url =
+      apiExportOtherProperties
+          + "/"
+          + analysisId
+          + "/executions/"
+          + executionId
+          + "/data?page="
+          + page
+          + "&pageSize="
+          + leftOutRows
+          + "&analysisType="
+          + analysisType;*/
       String url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/"
+          storageProxyUrl
+              + "/internal/proxy/storage/"
               + executionId
-              + "/data?page="
+              + "/executions/data?page="
               + page
               + "&pageSize="
-              + leftOutRows
-              + "&analysisType="
-              + analysisType;
+              + leftOutRows;
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
