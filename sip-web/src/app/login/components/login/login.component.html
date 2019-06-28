@@ -52,18 +52,17 @@
         matSuffix
         mat-icon-button
         aria-label="show"
+        (click)="togglePassword()"
       >
         <mat-icon
           matTooltip="Show Password"
           *ngIf="!showPassword"
           fontIcon="icon-show"
-          (click)="togglePassword()"
         ></mat-icon>
         <mat-icon
           matTooltip="Hide Password"
           *ngIf="showPassword"
           fontIcon="icon-hide"
-          (click)="togglePassword()"
         ></mat-icon>
       </button>
 
