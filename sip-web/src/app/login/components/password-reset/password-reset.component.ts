@@ -26,6 +26,7 @@ export class PasswordResetComponent implements OnInit {
   ngOnInit() {
     this.errorMsg = '';
     this.showNewPassword = false;
+    this.showNewConfirmPassword = false;
     this._route.queryParams.subscribe(({ rhc }) => {
       const params = { rhc };
       this._UserService.verify(params).then((res: any) => {
