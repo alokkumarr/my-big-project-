@@ -26,7 +26,8 @@
         e2e="username-input"
         required
       />
-      <button mat-button matSuffix mat-icon-button>
+
+      <button tabindex="-1" mat-button matSuffix mat-icon-button>
         <mat-icon matTooltip="Username" fontIcon="icon-chat-bot"></mat-icon>
       </button>
     </mat-form-field>
@@ -41,7 +42,7 @@
         [(ngModel)]="dataHolder.password"
         placeholder="Password"
         [ngModelOptions]="{ standalone: true }"
-        e2e="password-input-hiden"
+        e2e="password-input"
         required
       />
 
@@ -58,6 +59,7 @@
       />
 
       <button
+        tabindex="-1"
         e2e="show-password-login"
         color="primary"
         mat-button
