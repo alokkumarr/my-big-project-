@@ -26,9 +26,9 @@ libraryDependencies ++= Seq(
   // javaJdbc, // Play! Jcompileva database plugin
   // javaWs    // Play! Java web services client plugin
    //libraryDependencies += jdbc
-  "org.apache.kafka" % "kafka-clients" % "0.9.0.0-mapr-1602",
-  "com.mapr.db" % "maprdb" % "5.1.0-mapr",
-  "com.mapr" % "mapr-release" % "5.1.0.37689-mapr",
+  "org.apache.kafka" % "kafka-clients" % "1.1.1-mapr-1808",
+  "com.mapr.db" % "maprdb" % "6.1.0-mapr",
+  "com.mapr" % "mapr-release" % "6.1.0-mapr",
   "org.reactivemongo" %% "reactivemongo-play-json" % "0.11.11",
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "io.swagger" %% "swagger-play2" % "1.5.2",
@@ -64,4 +64,3 @@ fork in test := true
 //PlayKeys.devSettings := Seq("play.server.http.port" -> "8080")
 // Run parameters: run -Dhttp.port=1234
                                        
-									   

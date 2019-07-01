@@ -24,7 +24,8 @@
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
 		<jwt.version>0.7.0</jwt.version>
-    <amazon-s3-version>1.11.534</amazon-s3-version>
+    	<amazon-s3-version>1.11.534</amazon-s3-version>
+		<poi.version>4.1.0</poi.version>
 	</properties>
 
 	<dependencies>
@@ -34,6 +35,16 @@
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>${amazon-s3-version}</version>
     </dependency>
+		<dependency>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>sip-query-dsl</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>sip-metadata-service</artifactId>
+			<version>${revision}</version>
+		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -123,27 +134,20 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>19.0</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml-schemas</artifactId>
-			<version>3.17</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>info.faljse</groupId>
@@ -187,7 +191,25 @@
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
     </dependency>
+    
+    <dependency>
+		<groupId>io.springfox</groupId>
+		<artifactId>springfox-swagger2</artifactId>
+		<version> 2.8.0 </version>
+	</dependency>
+	 <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+	<dependency>
+		<groupId>com.google.guava</groupId>
+		<artifactId>guava</artifactId>
+		<version>19.0</version>
+	</dependency>
 	</dependencies>
+	
+	
 
 	<build>
 		<plugins>
@@ -301,4 +323,20 @@
 			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>

@@ -19,6 +19,8 @@ import * as unset from 'lodash/unset';
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalysisType, Analysis } from '../types';
+import { AnalysisDSL, AnalysisPivotDSL } from '../../../models';
+
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
@@ -61,7 +63,10 @@ const canAcceptAnyType = () => true;
 export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) {}
 
-  createAnalysis(semanticId: string, type: AnalysisType): Promise<Analysis> {
+  createAnalysis(
+    semanticId: string,
+    type: AnalysisType
+  ): Promise<Analysis | AnalysisDSL | AnalysisPivotDSL> {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
@@ -119,6 +124,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'aggregate');
     };
 
     const areMoreThenMaxFields = (columns: ArtifactColumns): boolean => {
@@ -141,7 +147,7 @@ export class DesignerService {
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
-      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+      artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
     const canAcceptDataType = canAcceptNumberType;
@@ -216,6 +222,8 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'geoRegion');
+      unset(artifactColumn, 'aggregate');
     };
 
     const maxAllowedDecorator = (
@@ -245,7 +253,7 @@ export class DesignerService {
       title: metricTitle,
       type: 'map',
       marker: 'y',
-      maxAllowed: () => Infinity,
+      maxAllowed: () => (subType === 'map' ? Infinity : 1),
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
@@ -301,8 +309,8 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
       artifactColumn.checked = false;
-      artifactColumn.alias = artifactColumn.displayName || '';
-      artifactColumn.aliasName = artifactColumn.alias;
+      artifactColumn.alias = '';
+      unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
       unset(artifactColumn, 'limitValue');
@@ -632,7 +640,7 @@ export class DesignerService {
           const isDateType = DATE_TYPES.includes(artifactColumn.type);
           return {
             ...(isDataArea ? { aggregate: artifactColumn.aggregate } : {}),
-            alias: artifactColumn.aliasName,
+            alias: artifactColumn.alias,
             checked: artifactColumn.area,
             columnName: artifactColumn.columnName,
             name: artifactColumn.columnName,
@@ -644,7 +652,7 @@ export class DesignerService {
             limitValue: artifactColumn.limitValue,
             limitType: artifactColumn.limitType,
             geoType: artifactColumn.geoType,
-            region: artifactColumn.region,
+            geoRegion: artifactColumn.geoRegion,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {

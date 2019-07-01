@@ -2,10 +2,22 @@ import { Injectable } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isEqual from 'lodash/isEqual';
+import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
 
 import { Subject, BehaviorSubject } from 'rxjs';
+
+import { CUSTOM_DATE_PRESET_VALUE } from '../../analyze/consts';
+
+interface KPIFilter {
+  preset: string;
+  gte?: string;
+  lte?: string;
+}
 
 @Injectable()
 export class GlobalFilterService {
@@ -16,6 +28,8 @@ export class GlobalFilterService {
   public onApplyKPIFilter = new BehaviorSubject(null);
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
+  private _lastKPIFilter: KPIFilter = null;
+  private _lastAnalysisFilters = {};
 
   constructor() {}
 
@@ -31,6 +45,55 @@ export class GlobalFilterService {
 
   get globalFilters() {
     return groupBy(this.updatedFilters, 'semanticId');
+  }
+
+  hasKPIFilterChanged(kpiFilter: KPIFilter) {
+    const lastPreset = get(this._lastKPIFilter, 'preset');
+    const currentPreset = get(kpiFilter, 'preset');
+    if (isEmpty(lastPreset) && isEmpty(currentPreset)) {
+      return false;
+    }
+
+    if (lastPreset !== currentPreset) {
+      return true;
+    }
+
+    if (lastPreset === CUSTOM_DATE_PRESET_VALUE) {
+      return (
+        this._lastKPIFilter.gte !== kpiFilter.gte ||
+        this._lastKPIFilter.lte !== kpiFilter.lte
+      );
+    } else {
+      return false;
+    }
+  }
+
+  resetLastKPIFilterApplied() {
+    this._lastKPIFilter = null;
+  }
+
+  get lastKPIFilter() {
+    return this._lastKPIFilter;
+  }
+
+  set lastKPIFilter(filt: KPIFilter) {
+    this._lastKPIFilter = cloneDeep(filt);
+  }
+
+  haveAnalysisFiltersChanged(filts) {
+    return !isEqual(this._lastAnalysisFilters, filts);
+  }
+
+  resetLastAnalysisFiltersApplied() {
+    this._lastAnalysisFilters = {};
+  }
+
+  get lastAnalysisFilters() {
+    return this._lastAnalysisFilters;
+  }
+
+  set lastAnalysisFilters(filts) {
+    this._lastAnalysisFilters = cloneDeep(filts);
   }
 
   /**
@@ -51,7 +114,7 @@ export class GlobalFilterService {
       artifacts,
       column =>
         column.columnName === columnName &&
-        (column.table || column.tableName) === tableName
+        (column.table || column.tableName || column.artifactsName) === tableName
     );
     return col ? col.displayName || col.columnName : columnName;
   }
@@ -59,7 +122,8 @@ export class GlobalFilterService {
   areFiltersEqual(f1, f2) {
     return (
       f1.semanticId === f2.semanticId &&
-      f1.tableName === f2.tableName &&
+      (f1.tableName || f1.artifactsName) ===
+        (f2.tableName || f2.artifactsName) &&
       f1.columnName === f2.columnName
     );
   }
@@ -110,7 +174,8 @@ export class GlobalFilterService {
       f =>
         f.semanticId === data.semanticId &&
         f.columnName === data.columnName &&
-        f.tableName === data.tableName
+        (f.tableName || f.artifactsName) ===
+          (data.tableName || data.artifactsName)
     );
 
     /* Push or replace existing filter */

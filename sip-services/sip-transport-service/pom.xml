@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.synchronoss</groupId>
         <artifactId>sip-services</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
     <groupId>com.synchronoss.saw</groupId>
     <artifactId>sip-transport-service</artifactId>
@@ -18,9 +18,8 @@
         <project.basedir>.</project.basedir>
         <play2.version>2.5.10</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
-        <mapr.client>6.0.1-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
-        <io.netty.version>4.0.42.Final</io.netty.version>
+        <io.netty.version>4.1.17.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
@@ -29,12 +28,11 @@
         <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>
         <app.group>mapr</app.group>
-        <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
         <es.version>6.3.0</es.version>
         <threeten.extra>1.2</threeten.extra>
         <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
         <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
-        <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
+        <hbase.version>1.1.8-mapr-1901</hbase.version>
     </properties>
     <dependencies>
       <dependency>
@@ -175,6 +173,11 @@
             <artifactId>reactivemongo_${scala.major.version}</artifactId>
             <version>${play2.json.reactive.mongo}</version>
         </dependency>
+      <dependency>
+        <groupId>com.synchronoss.saw</groupId>
+        <artifactId>play-netty</artifactId>
+        <version>${project.version}</version>
+      </dependency>
         <dependency>
             <!-- net.jodah.typetools-0.4.1.jar -->
             <groupId>net.jodah</groupId>
@@ -334,7 +337,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.8.0.Final</version>
+            <version>3.9.9.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -366,49 +369,13 @@
             <artifactId>netty-transport</artifactId>
             <version>${io.netty.version}</version>
         </dependency>
-<!--  
-       <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-epoll</artifactId>
-            <version>${io.netty.version}</version>
-        </dependency>
- -->    
+
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <version>2.0.0</version>
         </dependency>
-        <!--
-                <dependency>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                    <version>3.19.0-GA</version>
-                </dependency>
-                <dependency>
 
-                <groupId>oauth.signpost</groupId>
-                    <artifactId>signpost-commonshttp4</artifactId>
-                    <version>1.2.1.2</version>
-                </dependency>
-                <dependency>
-
-                <groupId>oauth.signpost</groupId>
-                    <artifactId>signpost-core</artifactId>
-                    <version>1.2.1.2</version>
-                </dependency>
-
-                <dependency>
-                <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>5.2.4.Final</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
-                    <version>3.2.1.Final</version>
-                </dependency>
-        -->
         <dependency>
             <groupId>com.fasterxml</groupId>
             <artifactId>classmate</artifactId>
@@ -465,13 +432,13 @@
         <dependency>
           <groupId>com.mapr.streams</groupId>
           <artifactId>mapr-streams</artifactId>
-          <version>6.0.1-mapr</version>
+          <version>${mapr.streams.version}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka-clients</artifactId>
-          <version>1.0.1-mapr-1803</version>
+          <version>${kafka.client.version}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
@@ -646,6 +613,11 @@
                         <ruleset>default</ruleset>
                       </entry>
                       <entry>
+                        <name>${rpm.ts.root}/play-netty-lib</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
                         <name>${rpm.ts.root}/conf</name>
                         <directory>true</directory>
                         <ruleset>default</ruleset>
@@ -692,6 +664,13 @@
                         <name>${rpm.ts.root}/lib</name>
                         <collect>
                           <from>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/play-netty-lib</name>
+                        <collect>
+                          <from>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/play-netty-lib</from>
                         </collect>
                         <ruleset>default</ruleset>
                       </entry>
@@ -797,9 +776,9 @@
                       <file>rpm-scripts/preremove</file>
                     </beforeRemoval>
                     <requires>
-                      <require>mapr-client &gt;= 6.0.1</require>
-                      <require>mapr-spark &gt;= 2.2.1</require>
-                      <require>mapr-kafka &gt;= 1.0.1</require>
+                      <require>mapr-client &gt;= 6.1.0</require>
+                      <require>mapr-spark &gt;= 2.3.2</require>
+                      <require>mapr-kafka &gt;= 1.1.1</require>
                       <require>mapr-hbase &gt;= 1.1.8</require>
                       <require>perl &gt;= 5.16.3</require>
                     </requires>
@@ -836,4 +815,20 @@
             </plugin>
         </plugins>
     </build>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>

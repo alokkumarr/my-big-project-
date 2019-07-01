@@ -7,10 +7,13 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
+import com.synchronoss.sip.utils.RestUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +38,20 @@ public class BisRouteService {
   private static final Logger logger = LoggerFactory.getLogger(BisRouteService.class);
   @Autowired
   BisRouteDataRestRepository bisRouteRepository;
-  RestTemplate restTemplate = new RestTemplate();
   
   @Autowired
   private ChannelTypeService channelTypeService;
+  
+  @Autowired
+  private RestUtil restUtil;
+
+
+  private RestTemplate restTemplate = null;
+
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
   
   /**
    * Temporarily deactivate or re activate a route 

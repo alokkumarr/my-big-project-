@@ -6,7 +6,7 @@ import 'mottle';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {DragDropModule} from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { AngularSplitModule } from 'angular-split';
 
@@ -45,7 +45,11 @@ import {
   ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import { IsUserLoggedInGuard, DefaultModuleGuard } from './guards';
+import {
+  IsUserLoggedInGuard,
+  DefaultModuleGuard,
+  SSOAuthGuard
+} from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -76,6 +80,7 @@ import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 import { ChartGridComponent } from './components/chart-grid';
+import { SSOAuthComponent } from './components/sso-auth/sso-auth.component';
 
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
@@ -100,7 +105,8 @@ import {
   HeaderProgressService,
   DynamicModuleService,
   CustomIconService,
-  DndPubsubService
+  DndPubsubService,
+  CommonSemanticService
 } from './services';
 
 const MODULES = [
@@ -156,7 +162,8 @@ const COMPONENTS = [
   CronJobSchedularComponent,
   ChartGridComponent,
   RemoteFolderSelectorComponent,
-  CreatefolderDialogComponent
+  CreatefolderDialogComponent,
+  SSOAuthComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
@@ -184,7 +191,8 @@ const SERVICES = [
   UserService,
   WindowService,
   CustomIconService,
-  DndPubsubService
+  DndPubsubService,
+  CommonSemanticService
 ];
 
 const INTERCEPTORS = [
@@ -206,9 +214,13 @@ const INTERCEPTORS = [
   }
 ];
 
-const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
+const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard, SSOAuthGuard];
 @NgModule({
-  imports: [NgxsModule.forFeature([CommonState]), AngularSplitModule.forRoot(), ...MODULES],
+  imports: [
+    NgxsModule.forFeature([CommonState]),
+    AngularSplitModule.forRoot(),
+    ...MODULES
+  ],
   declarations: [...COMPONENTS, ...DIRECTIVES],
   entryComponents: COMPONENTS,
   exports: [

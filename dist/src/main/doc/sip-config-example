@@ -58,18 +58,18 @@ sip_var_path=/var/sip
 #
 # If the MapR cluster "mapr" user or group ID differs from the
 # expected default, use the variable below to set it
-#saw_mapr_user_id=500
+#saw_mapr_user_id=5000
 #saw_mapr_group_id=5000
 
 #
 # Spark configuration
 #
-saw_spark_master_url=spark://localhost:7077
+saw_spark_master_url=yarn
 # If Spark is configured to use YARN, use the variable below to set
 # the YARN queue
 #saw_spark_yarn_queue_regular=saw-regular
 #saw_spark_yarn_queue_fast=saw-fast
-#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.2.1/jars
+#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.3.2/jars
 #saw_spark_yarn_zips=/opt/saw/service/spark.zip
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=localhost
@@ -113,6 +113,8 @@ saw_elasticsearch_password=password
 saw_elasticsearch_data_store_limit=10000
 saw_elasticsearch_cluster_name=clustername
 saw_elasticsearch_xpack=true
+#sip_elasticsearch_keyStorePath=server.keystore
+#sip_elasticsearch_keyStorePassword=es123
 
 
 #

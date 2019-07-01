@@ -3,6 +3,7 @@ package com.synchronoss.saw.export.generate.interfaces;
 import javax.servlet.http.HttpServletRequest;
 
 import com.synchronoss.saw.export.model.AnalysisMetaData;
+import com.synchronoss.saw.model.SipQuery;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;

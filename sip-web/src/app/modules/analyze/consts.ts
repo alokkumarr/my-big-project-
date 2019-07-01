@@ -52,6 +52,8 @@ export {
   DEFAULT_PRECISION
 };
 
+export const DSL_ANALYSIS_TYPES = ['chart', 'map', 'pivot'];
+
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
 };
@@ -353,13 +355,15 @@ export const DATE_INTERVALS = [
   },
   {
     label: 'Year',
-    value: 'year'
+    value: 'year',
+    format: 'yyyy',
+    momentFormat: 'yyyy'
   },
   {
     label: 'Quarter',
     value: 'quarter',
     format: 'yyyy-QQQ',
-    momentFormat: 'YYYY-Q'
+    momentFormat: 'YYYY-[Q]Q'
   },
   {
     label: 'Month',
@@ -369,7 +373,9 @@ export const DATE_INTERVALS = [
   },
   {
     label: 'Date',
-    value: 'day'
+    value: 'day',
+    format: 'yyyy-MM-dd',
+    momentFormat: 'YYYY-MM-DD'
   }
 ];
 

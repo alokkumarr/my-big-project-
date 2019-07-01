@@ -15,10 +15,8 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-
 import java.util.UUID;
 import java.util.regex.Pattern;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -31,16 +29,15 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 public class BaseIT {
   @Rule
-  public TestWatcher watcher = new TestWatcher() {
-      @Override
-      public void starting(final Description method) {
-        log.debug("Test: {}", method.getMethodName());
-      }
-    };
+  public TestWatcher watcher =
+      new TestWatcher() {
+        @Override
+        public void starting(final Description method) {
+          log.debug("Test: {}", method.getMethodName());
+        }
+      };
 
-  @Rule
-  public final JUnitRestDocumentation restDocumentation =
-      new JUnitRestDocumentation();
+  @Rule public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
 
   protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -62,19 +59,19 @@ public class BaseIT {
     RestAssured.baseURI = "http://" + host + ":" + port + "/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
-    
 
   @Before
   public void setUp() throws JsonProcessingException {
     mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    spec = new RequestSpecBuilder()
-           .addFilter(documentationConfiguration(restDocumentation))
-           .build();
+    spec =
+        new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)).build();
     token = authenticate();
-    authSpec = new RequestSpecBuilder()
-               .addFilter(documentationConfiguration(restDocumentation))
-               .build().header("Authorization", "Bearer " + token);
+    authSpec =
+        new RequestSpecBuilder()
+            .addFilter(documentationConfiguration(restDocumentation))
+            .build()
+            .header("Authorization", "Bearer " + token);
   }
 
   private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
@@ -85,21 +82,25 @@ public class BaseIT {
     node.put("masterLoginId", TEST_USERNAME);
     node.put("password", TEST_PASSWORD);
     String json = mapper.writeValueAsString(node);
-    Response response = given(spec)
-                        .accept("application/json")
-                        .header("Content-Type", "application/json")
-                        .body(json)
-                        .filter(document(
-                                  "authenticate",
-                                  preprocessRequest(
-                                    preprocessReplace(
-                                      TEST_USERNAME, "user@example.com"),
-                                    preprocessReplace(
-                                      TEST_PASSWORD, "password123"))))
-                        .when().post("/security/doAuthenticate")
-                        .then().assertThat().statusCode(200)
-                        .body("aToken", startsWith(""))
-                        .extract().response();
+    Response response =
+        given(spec)
+            .accept("application/json")
+            .header("Content-Type", "application/json")
+            .body(json)
+            .filter(
+                document(
+                    "authenticate",
+                    preprocessRequest(
+                        preprocessReplace(TEST_USERNAME, "user@example.com"),
+                        preprocessReplace(TEST_PASSWORD, "password123"))))
+            .when()
+            .post("/security/doAuthenticate")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .body("aToken", startsWith(""))
+            .extract()
+            .response();
     return response.path("aToken");
   }
 
@@ -108,8 +109,8 @@ public class BaseIT {
   }
 
   /**
-   * Generate ID suitable for use as suffix in dataset names to ensure
-   * each test gets a unique dataset name.
+   * Generate ID suitable for use as suffix in dataset names to ensure each test gets a unique
+   * dataset name.
    */
   protected String testId() {
     return UUID.randomUUID().toString();

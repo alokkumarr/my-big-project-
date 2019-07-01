@@ -58,11 +58,6 @@ RUN if $yarn_enabled; then \
 # again as part of configuring.
 RUN systemctl disable mapr-warden mapr-zookeeper
 
-# Configure MapR using configure script
-COPY sip-mapr-configure /root/
-COPY sip-mapr-configure.service /etc/systemd/system/
-RUN systemctl enable sip-mapr-configure
-
 # Note: Installing Apache Spark in standalone mode is disabled by
 # default for now, while there are developers still deploying using
 # local Docker with memory constraints.  Instead local Spark contexts
@@ -75,27 +70,32 @@ RUN systemctl enable sip-mapr-configure
 #COPY mapr-spark-worker.service /etc/systemd/system/
 #RUN systemctl enable mapr-spark-worker
 #
-#ENV spark_home=/opt/mapr/spark/spark-2.2.1
+#ENV spark_home=/opt/mapr/spark/spark-2.3.2
 #RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo "export SPARK_MASTER_IP=sip-mapr" >> $spark_home/conf/spark-env.sh
 #RUN echo 'export SPARK_DIST_CLASSPATH=$MAPR_SPARK_CLASSPATH:$(hadoop classpath)' >> $spark_home/conf/spark-env.sh
 #RUN sed -i -e 's/^export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=2g/' \
 #    $spark_home/conf/spark-env.sh
 
-# Install Apache Livy
-RUN yum -y -q install mapr-livy
-ENV livy_home=/opt/mapr/livy/livy-0.3.0
-ENV livy_conf=$livy_home/conf/livy.conf
-RUN echo "livy.spark.master = local[*]" > $livy_conf
-# Workaround: The Workbench JAR exceeds the default maximum upload
-# file size of Livy, so increase it.
-RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
+ # Install Apache Livy
+ RUN yum -y -q install mapr-livy
+ ENV livy_home=/opt/mapr/livy/livy-0.5.0
+ ENV livy_conf=$livy_home/conf/livy.conf
+ RUN echo "livy.spark.master = local[*]" > $livy_conf
+ # Workaround: The Workbench JAR exceeds the default maximum upload
+ # file size of Livy, so increase it.
+ RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
 
-RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath)' \
-  >> $livy_home/conf/livy-env.sh.template
+ RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath)' \
+   >> $livy_home/conf/livy-env.sh.template
 # Workaround: The MapR "yarn classpath" command gives an error about
 # the "which" not being found, so install it here
 RUN yum -y -q install which
+
+# Configure MapR using configure script
+COPY sip-mapr-configure /root/
+COPY sip-mapr-configure.service /etc/systemd/system/
+RUN systemctl enable sip-mapr-configure
 
 # Workaround: MapR does not log into the systemd journal.  So install
 # MapR log forwrding as a workaround, so that all logs are aggregated

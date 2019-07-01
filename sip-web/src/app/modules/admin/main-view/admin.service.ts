@@ -3,6 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import AppConfig from '../../../../../appConfig';
+import { JwtService } from '../../../common/services';
+import { AnalyzeService } from '../../analyze/services/analyze.service';
+
+import * as forEach from 'lodash/forEach';
+import * as set from 'lodash/set';
+
+const ANALYZE_MODULE_NAME = 'ANALYZE';
 
 interface RequestOptions {
   toast?: { successMsg: string; errorMsg?: string };
@@ -21,7 +28,12 @@ const apiUrl = AppConfig.api.url;
 
 @Injectable()
 export class AdminService {
-  constructor(public http: HttpClient, public _toastMessage: ToastService) {}
+  constructor(
+    public http: HttpClient,
+    public _toastMessage: ToastService,
+    public _jwtService: JwtService,
+    private _analyzeService: AnalyzeService
+  ) {}
 
   showToastMessageIfNeeded(toast) {
     return resp => {
@@ -34,6 +46,20 @@ export class AdminService {
         this._toastMessage.error(toast.errorMsg || resp.validityMessage);
       }
     };
+  }
+
+  getRequestParams(params = []) {
+    const reqParams = this._jwtService.getRequestParams();
+
+    set(reqParams, 'contents.keys.[0].module', ANALYZE_MODULE_NAME);
+    forEach(params, tuple => {
+      set(reqParams, tuple[0], tuple[1]);
+    });
+    return reqParams;
+  }
+
+  getAnalysesByCategoryId(subCategoryId: string | number) {
+    return this._analyzeService.getAnalysesFor(subCategoryId.toString());
   }
 
   getRequest<T>(path, options: RequestOptions = {}) {

@@ -47,33 +47,39 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
-  
+
   /**
    * creating rest template using SSL connection.
    */
   public RestTemplate restTemplate() {
+    
+    
     HttpClient client = null;
+    
+    logger.trace("ssl enable?" + sipSslEnable);
     logger.trace("restTemplate trustStore: " + trustStore);
     logger.trace("restTemplate keyStore: " + keyStore);
     logger.trace("restTemplate keyStorePassword: " + keyStorePassword);
     logger.trace("restTemplate trustStorePassword: " + trustStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
+      logger.trace("RestUtil if block");
       SSLContext sslContext = null;
       try {
         sslContext = SSLContextBuilder.create()
             .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
                 keyStorePassword.toCharArray())
             .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray()).build();
+        client = HttpClients.custom().setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+        HttpComponentsClientHttpRequestFactory factory =
+            new HttpComponentsClientHttpRequestFactory(client);
+        restTemplate = new RestTemplate(factory);
       } catch (Exception e) {
         logger.error("Exception :" + e);
       }
-      client = HttpClients.custom().setSSLContext(sslContext)
-          .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-      HttpComponentsClientHttpRequestFactory factory =
-          new HttpComponentsClientHttpRequestFactory(client);
-      restTemplate = new RestTemplate(factory);
     } else {
+      logger.info("RestUtil if block");
       restTemplate = new RestTemplate();
     }
     return restTemplate;
@@ -97,21 +103,21 @@ public class RestUtil {
             .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(),
                 keyPassword.toCharArray())
             .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
+        client = HttpClients.custom().setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+        HttpComponentsClientHttpRequestFactory factory =
+            new HttpComponentsClientHttpRequestFactory(client);
+        restTemplate = new RestTemplate(factory);
       } catch (Exception e) {
         logger.error("Exception :" + e);
       }
-      client = HttpClients.custom().setSSLContext(sslContext)
-          .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-      HttpComponentsClientHttpRequestFactory factory =
-          new HttpComponentsClientHttpRequestFactory(client);
-      restTemplate = new RestTemplate(factory);
     } else {
       restTemplate = new RestTemplate();
     }
     return restTemplate;
   }
-  
-  
+
+
   /**
    * creating async rest template using SSL connection. TODO: This method should be changed when
    * AsyncRestTemplate changes to WebClient
@@ -223,7 +229,7 @@ public class RestUtil {
   public Boolean getSipSslEnable() {
     return sipSslEnable;
   }
-  
-  
+
+
 
 }

@@ -20,7 +20,8 @@ if [ ! -e $marker ]; then
     # too little) to ensure that MapR-FS can start up
     fallocate -l 20G $disk
     /opt/mapr/server/configure.sh -C $host -Z $host -D $disk -N sip
-
+    # Refresh the roles for mapr configuration.
+    /opt/mapr/server/configure.sh -R
     # Set replication to 1 for single-node cluster
     default=cldb.volumes.default
     replication="{ $default.replication: 1, $default.min.replication: 1 }"

@@ -39,7 +39,7 @@ public class SAWElasticTransportService {
 
   private Integer timeOut = 3;
   private static String endpoint = "internal/proxy/storage/";
-  
+
 
   private static String execute(String query, String jsonString, String dsk, String username,
     String moduleName,boolean isReport, Integer timeOut, HttpClient httpClient) throws JsonProcessingException, IOException, NullPointerException{
@@ -47,7 +47,7 @@ public class SAWElasticTransportService {
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
     String indexName = repository.get("indexName").asText();
     String type = repository.get("type").textValue();
-    
+
     ESProxy esProxy = new ESProxy();
     esProxy.setStorageType("ES");
     esProxy.setIndexName(indexName);
@@ -64,16 +64,16 @@ public class SAWElasticTransportService {
     mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     mapper.disable(SerializationFeature.INDENT_OUTPUT);
     logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
-    
+
     HttpPost httpPost = new HttpPost(url + endpoint);
     httpPost.setConfig(setRequestConfig(timeOut));
     StringEntity entity = new StringEntity(mapper.writeValueAsString(esProxy));
     httpPost.setEntity(entity);
     httpPost.addHeader("Accept", "application/json");
     httpPost.addHeader("Content-type", "application/json");
-    
+
     HttpResponse response = httpClient.execute(httpPost);
-    
+
     logger.trace("Elasticsearch response: {}", response);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -107,7 +107,7 @@ public class SAWElasticTransportService {
       return esResponse.get("aggregationData").toString();
   }
 
-  
+
   /**
    *
    * @param query
@@ -144,7 +144,7 @@ public class SAWElasticTransportService {
   public static String executeReturnDataAsString(String query, String jsonString, String dsk,
                                              String userName, String moduleName, Integer timeOut, HttpClient client) throws IOException, NullPointerException
   {
-    
+
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     String response = execute(query, jsonString, dsk, userName, moduleName,true, timeOut, client);
@@ -199,23 +199,24 @@ public class SAWElasticTransportService {
         mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
         logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
-        
+
         HttpPost httpPost = new HttpPost(url + endpoint);
+        httpPost.setConfig(setRequestConfig(timeOut));
         httpPost.setConfig(setRequestConfig(timeOut));
         StringEntity entity = new StringEntity(mapper.writeValueAsString(esProxy));
         httpPost.setEntity(entity);
         httpPost.addHeader("Accept", "application/json");
         httpPost.addHeader("Content-type", "application/json");
-        
+
         logger.trace("Elasticsearch request: {}", httpPost);
         HttpResponse response = httpClient.execute(httpPost);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-        
+
         String responseString = EntityUtils.toString(response.getEntity());
         logger.trace("responseStringdfd" + responseString);
-        
+
         JsonNode esResponse = objectMapper.readTree(responseString);
         if (esResponse.get("aggregationData") == null) {
             throw new NullPointerException("Data is not available based on provided query criteria");
@@ -283,12 +284,12 @@ public class SAWElasticTransportService {
 
         logger.trace("Elasticsearch request: {}", httpPost);
         HttpResponse response = httpClient.execute(httpPost);
-        
+
         logger.trace("Elasticsearch response: {}", response);
-        
+
         String responseString = EntityUtils.toString(response.getEntity());
         logger.info("responseStringdfd" + responseString);
-        
+
         JsonNode esResponse = objectMapper.readTree(responseString);
         if (esResponse.get("aggregationData") == null) {
             throw new NullPointerException("Data is not available based on provided query criteria");
@@ -299,12 +300,12 @@ public class SAWElasticTransportService {
     public Integer getTimeOut() {
       return timeOut;
     }
-    
+
     private static RequestConfig setRequestConfig(int timeOut) {
       RequestConfig config = RequestConfig.custom().
           setConnectTimeout(timeOut * 10000).build();
           //setConnectionRequestTimeout(timeOut * 10000).build();
-          //setSocketTimeout(timeOut * 1000).build();  
+          //setSocketTimeout(timeOut * 1000).build();
       return config;
     }
 }

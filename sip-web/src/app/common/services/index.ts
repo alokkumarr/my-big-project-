@@ -14,3 +14,5 @@ export { WindowService } from './window.service';
 export { ChartService } from './chart.service';
 export { CustomIconService } from './custom-icon.service';
 export { DndPubsubService, DndEvent } from './dnd-pubsub.service';
+export { HtmlDownloadService } from './html-download.service';
+export { CommonSemanticService } from './semantic.service';

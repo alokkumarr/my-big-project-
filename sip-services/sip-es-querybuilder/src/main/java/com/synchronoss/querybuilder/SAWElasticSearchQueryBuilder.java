@@ -39,6 +39,8 @@ public class SAWElasticSearchQueryBuilder {
     this.client = client;
   }
 
+  
+
   public SAWElasticSearchQueryBuilder(Integer size, String trustStore, String trustPassWord, String keyStore, String keyPassword,
       boolean sslEnabled)
   {
@@ -66,12 +68,12 @@ public class SAWElasticSearchQueryBuilder {
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query
    * @throws AssertionError
-   * @throws ProcessingException 
+   * @throws ProcessingException
    */
   public String getQuery(EntityType type, String jsonString, Integer timeOut) throws IllegalArgumentException, ProcessingException {
     String query = null;
@@ -95,7 +97,7 @@ public class SAWElasticSearchQueryBuilder {
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query
@@ -121,7 +123,7 @@ public class SAWElasticSearchQueryBuilder {
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
-   * 
+   *
    * @param type
    * @param jsonString
    * @return query

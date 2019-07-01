@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -76,14 +78,26 @@ public abstract class SipPluginContract {
 
   /**
    * * This method is to test connect the source.
- * @param source TODO
+   * 
+   * @param source      TODO
+   * @param channelType TODO
    */
-  public List<BisDataMetaInfo> transferData(Long channelId, Long routeId, String filePattern,
-      boolean isDisable, String source) throws SipNestedRuntimeException {
+  public List<BisDataMetaInfo> scanFilesForPattern(Long channelId, Long routeId,
+      String filePattern, boolean isDisable, String source,
+      Optional<Long> jobId, String channelType)
+      throws SipNestedRuntimeException {
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();
   }
+  
+  /**
+   * This method  executes actual file transfer
+   * used by worker threads.
+   */
+  public  abstract void executeFileTransfer(String logId, Long jobId, Long channelId, 
+      Long routeId, String fileName);
+
 
   /**
    * This method are the requires to complete the transfer.
@@ -123,4 +137,6 @@ public abstract class SipPluginContract {
   }
 
   public abstract boolean isDataExists(String data) throws Exception;
+
+ 
 }

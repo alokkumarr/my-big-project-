@@ -44,8 +44,9 @@
     <json.vesion>20080701</json.vesion>
     <joda.version>2.9.4</joda.version>
     <commons-collections.version>3.2.1</commons-collections.version>
-    <mapr.core.version>6.0.1</mapr.core.version>
-    <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
+    <mapr.core.version>6.1.0</mapr.core.version>
+    <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
+    <maprdb.version>${mapr.core.version}-mapr</maprdb.version>
     <gson.version>2.2.4</gson.version>
     <junit.version>4.12</junit.version>
     <!-- XDF package -->
@@ -66,7 +67,7 @@
     <app.user>mapr</app.user>
     <app.group>mapr</app.group>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <s-value>provided</s-value>
+    <scope-value>provided</scope-value>
   </properties>
   <!--dependencyManagement-->
   <dependencies>
@@ -84,7 +85,7 @@
       <groupId>com.mapr.hadoop</groupId>
       <artifactId>maprfs</artifactId>
       <version>${mapr.core.version}-mapr</version>
-      <scope>${s-value}</scope>
+      <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
@@ -95,19 +96,19 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <version>${mapr.hadoop.client.version}</version>
-      <scope>${s-value}</scope>
+      <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
       <version>${mapr.hadoop.client.version}</version>
-      <scope>${s-value}</scope>
+      <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
       <version>${mapr.hadoop.client.version}</version>
-      <scope>${s-value}</scope>
+      <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -119,7 +120,7 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
-        <scope>provided</scope>
+        <scope>${scope-value}</scope>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>

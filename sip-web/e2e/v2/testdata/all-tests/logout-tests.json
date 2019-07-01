@@ -2,12 +2,12 @@
   "LOGOUT": {
     "positiveTests": {
       "LOGOUT001": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "description": "userOne should be able to logout"
       },
       "LOGOUT002": {
-        "suites": ["smoke", "sanity", "critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to logout"
       }

@@ -86,6 +86,13 @@ analysis:
     ftpExportSize: "{{ saw_ftp_export_size | default('1000000') }}"
     s3ExportSize: "{{ saw_s3_export_size | default('1000000') }}"
 
+proxy:
+  service:
+    host: ${connector}://localhost:9800
+
+metadata:
+  service:
+    host: ${connector}://localhost:9501
 
 logging:
   config: /opt/bda/saw-export-service/conf/logback.xml

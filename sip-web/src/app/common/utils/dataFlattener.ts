@@ -15,9 +15,47 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
+import { ArtifactColumnDSL } from 'src/app/models';
+import * as forEach from 'lodash/forEach';
+import { NUMBER_TYPES } from './../consts';
 
-export function flattenPivotData(data, sqlBuilder) {
-  const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
+// function substituteEmptyValues(data, fields) {
+//   return flatMap(fields, field =>
+//     fpPipe(
+//       fpMap(value => {
+//         // As per AC on 5216, if key is empty show undefined
+//         if (field.area === 'data') {
+//           return value;
+//         }
+//         if (isEmpty(value[field.name])) {
+//           value[field.name] = 'undefined';
+//         }
+//         return value;
+//       })
+//     )(data)
+//   );
+// }
+
+export function substituteEmptyValues(data) {
+  return fpPipe(
+    fpMap(
+      fpMapValues(value => {
+        return value === '' ? 'Undefined' : value;
+      })
+    )
+  )(data);
+}
+
+export function flattenPivotData(data, sipQuery) {
+  if (sipQuery.artifacts) {
+    // const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
+    //   ['row', 'column', 'data'].includes(field.area)
+    // );
+    // As per AC on 5216, if key is empty show undefined
+    data = substituteEmptyValues(data);
+    return data;
+  }
+  const nodeFieldMap = getNodeFieldMapPivot(sipQuery);
   return parseNodePivot(data, {}, nodeFieldMap, 0);
 }
 
@@ -96,6 +134,14 @@ function getNodeFieldMapChart(nodeFields) {
   return map(nodeFields, 'columnName');
 }
 
+export function getStringFieldsFromDSLArtifact(
+  fields: ArtifactColumnDSL[]
+): string[] {
+  return fields
+    .filter(field => field.type === 'string')
+    .map(field => field.columnName.replace('.keyword', ''));
+}
+
 /** parse the tree structure data and return a flattened array:
  * [{
  *   x: ..,
@@ -105,6 +151,27 @@ function getNodeFieldMapChart(nodeFields) {
  * }, ..]
  */
 export function flattenChartData(data, sqlBuilder) {
+  if (sqlBuilder.artifacts) {
+    const stringFields = getStringFieldsFromDSLArtifact(
+      sqlBuilder.artifacts[0].fields
+    );
+    if (stringFields.length === 0) {
+      return data;
+    } else {
+      /* If any string data is blank, replace it with 'Undefined'. This avoids
+      highcharts giving default 'Series 1' label to blank data
+      */
+      const result = data.map(row => {
+        const res = { ...row };
+        stringFields.forEach(field => {
+          res[field] = res[field] || 'Undefined';
+        });
+        return res;
+      });
+      return result;
+    }
+  }
+
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
 
@@ -126,9 +193,11 @@ export function flattenChartData(data, sqlBuilder) {
 
 export function checkNullinReportData(data) {
   return fpPipe(
-    fpMap(fpMapValues(value => {
-      return value === null ? 'null' : value;
-    }))
+    fpMap(
+      fpMapValues(value => {
+        return value === null ? 'null' : value;
+      })
+    )
   )(data);
 }
 
@@ -192,4 +261,33 @@ function parseLeafChart(node, dataObj) {
   )(node);
 
   return assign(dataFields, dataObj);
+}
+
+  /**
+   * Includes a new property to chart options for the chart engine.
+   * reversed instucts the highchart engine to plot the chart in descending order
+   * which is needed when desc is applied for a field in x-axis.
+   *
+   * @param {*} chartOptions
+   * @param {*} sipQuery
+   * @returns {chartOptions}
+   */
+
+export function setReverseProperty(chartOptions, sipQuery) {
+  const xAxisFields = [
+    find(sipQuery.artifacts[0].fields, field => field.area === 'x')
+  ];
+  if (!NUMBER_TYPES.includes(xAxisFields[0].type)) {
+    return chartOptions;
+  }
+  if (!isEmpty(sipQuery.sorts)) {
+    forEach(sipQuery.sorts, sort => {
+      chartOptions.xAxis.reversed = false;
+      if (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) {
+        chartOptions.xAxis.reversed = true;
+        return false;
+      }
+    });
+  }
+  return chartOptions;
 }

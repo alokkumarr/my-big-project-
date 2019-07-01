@@ -53,9 +53,10 @@ export class ExecutedListComponent {
         dataField: 'finished',
         dataType: 'date',
         calculateCellValue: rowData => {
-          return rowData.finished
+          const timeStamp = rowData.finished || rowData.finishedTime;
+          return timeStamp
             ? moment
-                .utc(rowData.finished)
+                .utc(timeStamp)
                 .local()
                 .format('YYYY/MM/DD h:mm A')
             : null;
@@ -86,7 +87,7 @@ export class ExecutedListComponent {
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
-        this.selectExecution.emit(get(row, 'data.id'));
+        this.selectExecution.emit(get(row, 'data.id') || get(row, 'data.executionId'));
       },
       columns,
       paging: {
