@@ -235,7 +235,7 @@ export class DashboardGridComponent
 
     const dimensions = this.getDimensions(item);
     if (item.kpi) {
-      item.dimensions = dimensions;
+      item.dimensions = {...dimensions};
       return;
     }
 
