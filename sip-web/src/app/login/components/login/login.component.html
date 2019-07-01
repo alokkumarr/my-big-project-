@@ -41,7 +41,19 @@
         [(ngModel)]="dataHolder.password"
         placeholder="Password"
         [ngModelOptions]="{ standalone: true }"
-        e2e="password-input"
+        e2e="password-input-hiden"
+        required
+      />
+
+      <input
+        *ngIf="showPassword"
+        matInput
+        type="text"
+        maxlength="30"
+        [(ngModel)]="dataHolder.password"
+        placeholder="Password"
+        [ngModelOptions]="{ standalone: true }"
+        e2e="password-input-visible"
         required
       />
 
@@ -58,25 +70,15 @@
           matTooltip="Show Password"
           *ngIf="!showPassword"
           fontIcon="icon-show"
+          e2e="show-password"
         ></mat-icon>
         <mat-icon
           matTooltip="Hide Password"
           *ngIf="showPassword"
           fontIcon="icon-hide"
+          e2e="hide-password"
         ></mat-icon>
       </button>
-
-      <input
-        *ngIf="showPassword"
-        matInput
-        type="text"
-        maxlength="30"
-        [(ngModel)]="dataHolder.password"
-        placeholder="Password"
-        [ngModelOptions]="{ standalone: true }"
-        e2e="password-input-visible"
-        required
-      />
     </mat-form-field>
     <div class="login-buttons button-row">
       <div class="forgot-password">
