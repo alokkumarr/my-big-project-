@@ -9,6 +9,7 @@ import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
+import { setReverseProperty } from './../../../common/utils/dataFlattener';
 
 import { ChartService } from '../../services';
 import {
@@ -150,6 +151,7 @@ export class ChartGridComponent implements OnInit {
       isDSLAnalysis(analysis) ? chartType : analysis.chartType,
       { chart, legend }
     );
+    this.chartOptions = setReverseProperty(this.chartOptions, analysis.sipQuery);
   }
 
   fetchColumnData(axisName, value) {
