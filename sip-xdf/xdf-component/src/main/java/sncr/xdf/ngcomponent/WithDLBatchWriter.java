@@ -16,8 +16,6 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.adapters.writers.*;
 
-
-
 import java.io.IOException;
 import java.util.*;
 
@@ -104,10 +102,16 @@ public interface WithDLBatchWriter {
                             // We also need list of partitions (directories) for reporting and appending/replacing
                             // We will extract parent directory of the file for that
                             String ss = file.getPath().getParent().toString();
+                            
+                            
                             //
                             // Potential bug: if batch name contains object name - position will be calculated incorrectly
                             //
-                            int i = ss.indexOf(lp.getName());
+                            /**
+                             * Updated to last index as it fails case lp.getName is found in 
+                             * beginning itself
+                             */
+                            int i = ss.lastIndexOf(lp.getName());
                             // Store full partition path for future use in unique collection
                             // Should <set> to be used instead of <map>?
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
@@ -126,6 +130,7 @@ public interface WithDLBatchWriter {
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
+                    	 
                         Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
@@ -160,6 +165,8 @@ public interface WithDLBatchWriter {
                                       MoveDataDescriptor moveDataDesc,
                                       InternalContext ctx ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
+            
+            
             Path source = new Path(moveDataDesc.source + partitionKey);
             Path dest = new Path(moveDataDesc.dest +  partitionKey);
 
