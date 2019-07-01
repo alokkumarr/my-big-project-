@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
@@ -7,7 +7,10 @@ import { JwtService, UserService } from '../../../common/services';
   templateUrl: 'password-change.component.html',
   styleUrls: ['./password-change.component.scss']
 })
-export class PasswordChangeComponent {
+export class PasswordChangeComponent implements OnInit {
+  public showOldPassword: boolean;
+  public showNewPassword: boolean;
+  public showNewConfirmPassword: boolean;
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
@@ -23,6 +26,12 @@ export class PasswordChangeComponent {
   public errorMsg;
 
   public formState: boolean;
+
+  ngOnInit() {
+    this.showOldPassword = false;
+    this.showNewPassword = false;
+    this.showNewConfirmPassword = false;
+  }
 
   changePwd() {
     const token = this._JwtService.get();
@@ -47,5 +56,17 @@ export class PasswordChangeComponent {
 
   cancel() {
     this._router.navigate(['login']);
+  }
+
+  toggleOldPassword() {
+    this.showOldPassword = !this.showOldPassword;
+  }
+
+  toggleNewPassword() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleNewConfirmPassword() {
+    this.showNewConfirmPassword = !this.showNewConfirmPassword;
   }
 }

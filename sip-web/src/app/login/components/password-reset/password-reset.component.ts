@@ -20,9 +20,12 @@ export class PasswordResetComponent implements OnInit {
   public confNewPwd;
   public rhcToken;
   public newPwd;
+  public showNewPassword: boolean;
+  public showNewConfirmPassword: boolean;
 
   ngOnInit() {
     this.errorMsg = '';
+    this.showNewPassword = false;
     this._route.queryParams.subscribe(({ rhc }) => {
       const params = { rhc };
       this._UserService.verify(params).then((res: any) => {
@@ -49,5 +52,13 @@ export class PasswordResetComponent implements OnInit {
 
   login() {
     this._router.navigate(['/#/login']);
+  }
+
+  toggleNewPassword() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleNewConfirmPassword() {
+    this.showNewConfirmPassword = !this.showNewConfirmPassword;
   }
 }
