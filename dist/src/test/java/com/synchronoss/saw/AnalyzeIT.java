@@ -498,9 +498,9 @@ public class AnalyzeIT extends BaseIT {
             .extract()
             .response();
     ObjectNode root = response.as(ObjectNode.class);
-    JsonNode jsonNode = root.get("long");
-    Assert.assertTrue("Range filter max value ", jsonNode.get("_max").asLong() == 1552);
-    Assert.assertTrue("Range filter max value ", jsonNode.get("_min").asLong() == 1000);
+    JsonNode jsonNode= root.get("long");
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1553);
+    Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
   }
 
   private RequestSpecification request(String token) {
