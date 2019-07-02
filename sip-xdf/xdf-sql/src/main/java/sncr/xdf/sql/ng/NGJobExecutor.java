@@ -42,7 +42,7 @@ public class NGJobExecutor {
 
     private String getScriptFullPath() {
         String sqlScript = this.parent.getNgctx().componentConfiguration.getSql().getScriptLocation() + Path.SEPARATOR + this.parent.getNgctx().componentConfiguration.getSql().getScript();
-        logger.info(String.format("Get script %s in location: ", sqlScript));
+        logger.debug(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
 
@@ -50,13 +50,13 @@ public class NGJobExecutor {
     {
         this.parent = parent;
         if (this.parent.getNgctx().componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
-            logger.info("Script is inline encoded");
+            logger.debug("Script is inline encoded");
             script = new String (Base64.getDecoder().decode(this.parent.getNgctx().componentConfiguration.getSql().getScript()));
             logger.trace("Inline Script :" + script);
         }
         else {
             String pathToSQLScript = getScriptFullPath();
-            logger.info("Path to script: " + pathToSQLScript);
+            logger.debug("Path to script: " + pathToSQLScript);
             try {
                 script = HFileOperations.readFile(pathToSQLScript);
             } catch (FileNotFoundException e) {
@@ -72,9 +72,9 @@ public class NGJobExecutor {
         int rc = 0;
         try {
 
-            logger.info(String.format("Temp dir: %s %n", tempDir ));
+            logger.debug(String.format("Temp dir: %s %n", tempDir ));
             NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getNgctx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
-            logger.info("Step 0: Remove comments: " + script);
+            logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
             scriptDescriptor.parseSQLScript();
@@ -120,14 +120,14 @@ public class NGJobExecutor {
                     }
                 }
 
-                //TODO:: info, test and comment the DROP Table functionality
+                //TODO:: Debug, test and comment the DROP Table functionality
                 else if (descriptor.statementType  == StatementType.DROP_TABLE) {
 
                     String destDir;
                     if (descriptor.tableDescriptor != null &&
                         descriptor.tableDescriptor.getLocation() != null &&
                         !descriptor.tableDescriptor.getLocation().isEmpty() ) {
-                        logger.info("Try location from statement table descriptor: " + descriptor.tableDescriptor.getLocation());
+                        logger.debug("Try location from statement table descriptor: " + descriptor.tableDescriptor.getLocation());
                         destDir = descriptor.tableDescriptor.getLocation();
 
                     }else{
@@ -142,7 +142,7 @@ public class NGJobExecutor {
 
                         if (HFileOperations.exists(descriptor.location)) {
                             HFileOperations.deleteEnt(descriptor.location);
-                            logger.info(String.format("Table %s was successfully removed from location: %s", descriptor.targetTableName, destDir));
+                            logger.debug(String.format("Table %s was successfully removed from location: %s", descriptor.targetTableName, destDir));
                         }
                     }
                     else{
@@ -152,20 +152,20 @@ public class NGJobExecutor {
                         return -1;
                     }
                 }
-                logger.info("SQL statement was successfully processed: " + descriptor.tableDescriptor.toString());
+                logger.debug("SQL statement was successfully processed: " + descriptor.tableDescriptor.toString());
             }
 
             for( SQLDescriptor sqlDescriptor: report) {
                 //Remove temporary tables/objects
                 if (sqlDescriptor.isTemporaryTable) {
                     //Don't add descriptor for temp table in the result
-                    logger.info("Do not process temporary table: " + sqlDescriptor.targetTableName);
+                    logger.debug("Do not process temporary table: " + sqlDescriptor.targetTableName);
                     if (HFileOperations.exists(sqlDescriptor.transactionalLocation+Path.SEPARATOR+sqlDescriptor.targetTableName))
                         HFileOperations.deleteEnt(sqlDescriptor.transactionalLocation+Path.SEPARATOR+sqlDescriptor.targetTableName);
                     continue;
                 }
                 else{
-                    logger.info("Add result table: " + sqlDescriptor.targetTableName );
+                    logger.debug("Add result table: " + sqlDescriptor.targetTableName );
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
                     Map<String, Object> ods = parent.getNgctx().outputDataSets.get(sqlDescriptor.targetTableName);
                     ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
