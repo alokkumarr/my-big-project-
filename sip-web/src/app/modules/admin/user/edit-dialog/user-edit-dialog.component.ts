@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { combineLatest } from 'rxjs';
@@ -14,7 +14,9 @@ const dummyPassword = '*********';
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss']
 })
-export class UserEditDialogComponent extends BaseDialogComponent {
+export class UserEditDialogComponent extends BaseDialogComponent
+  implements OnInit {
+  public showPassword: boolean;
   formGroup: FormGroup;
   formIsValid = false;
   statuses = [
@@ -48,6 +50,14 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       this.formIsValid = true;
     }
     this.createForm(this.data.model);
+  }
+
+  ngOnInit() {
+    this.showPassword = false;
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
   create() {
