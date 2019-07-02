@@ -697,7 +697,9 @@ public abstract class AbstractComponent implements WithContext{
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");
+                            services.md.updateDS(id, ngctx, ds, schema, 0, 0);
                         }
+                        
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                         logger.error(error);

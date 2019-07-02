@@ -185,8 +185,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 if(headerSize >= 1) {
                     logger.debug("Header present");
                     FileStatus[] files = fs.globStatus(new Path(sourcePath));
-
-                    logger.debug("Total number of files in the directory = " + files.length);
+                    
+                    if(files != null) {
+                    	logger.debug("Total number of files in the directory = " + files.length);
+                    }
+                    
                     // Check if directory has been given
                     if(files.length == 1 && files[0].isDirectory()){
                         logger.debug("Files length = 1 and is a directory");
