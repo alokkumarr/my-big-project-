@@ -68,10 +68,12 @@ sip:
     store: /Users/spau0004/Desktop/keystore/keystore.jks
     password: sip@123
    
-     
-saw-analysis-service-url: http://localhost:9200/analysis
-sip-metadata-service-url: http://localhost:9501/dslanalysis
-sip-analysis-proxy-url: http://localhost:9800/internal/proxy/storage
-saw-dispatch-service-url: http://localhost:9400/exports
-bis-transfer-url: http://localhost:9642/ingestion/batch/channel/transfers/data
+connector: http
+
+saw-analysis-service-url: ${connector}://localhost:9200/analysis
+sip-metadata-service-url: ${connector}://localhost:9501/dslanalysis
+sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
+saw-dispatch-service-url: ${connector}://localhost:9400/exports
+bis-transfer-url: ${connector}://localhost:9642/ingestion/batch/channel/transfers/data
+sip-dispatch-row-limit: 50000
        
