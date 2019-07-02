@@ -3,6 +3,7 @@ package com.synchronoss.saw.batch.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
+import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
 import com.synchronoss.saw.batch.model.BisChannelType;
@@ -186,4 +187,65 @@ public class BisRouteService {
     return route.isPresent();
   }
 
+  /**
+   * sets the last fire time next fire time to routeDto.
+   *
+   * @param routeDtos list of routes
+   * @param channelId id of the channel
+   */
+  public void setLastNextFireTime(List<BisRouteDto> routeDtos, Long channelId) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    routeDtos.forEach(
+        route -> {
+          Long routeId = route.getBisRouteSysId();
+          logger.info(
+              "Invoking scheduler for last fire time and next fire time "
+                  + "values. URL :  "
+                  + bisSchedulerUrl
+                  + "/jobs?categoryId="
+                  + channelId
+                  + "&groupkey="
+                  + routeId);
+          String response =
+              restTemplate.getForObject(
+                  bisSchedulerUrl
+                      + scheduleUri
+                      + "/jobs?categoryId="
+                      + channelId
+                      + "&groupkey="
+                      + routeId,
+                  String.class);
+          logger.info("response from scheduler on last fire, next fire" + response);
+          JsonNode rootNode;
+          JsonNode dataNode;
+          Long lastFired = null;
+          Long nextFired = null;
+          try {
+            rootNode = objectMapper.readTree(response);
+            dataNode = rootNode.get("data");
+            logger.info("data node from response " + dataNode);
+            if (dataNode.isArray() && dataNode.size() > 0) {
+              JsonNode objNode = dataNode.get(0);
+              if (!objNode.get("lastFiredTime").isNull()) {
+                logger.info(
+                    "Retreive from Database lastFiredTime :"
+                        + objNode.get("lastFiredTime").asLong());
+                lastFired = objNode.get("lastFiredTime").asLong();
+                route.setLastFireTime(lastFired);
+              }
+              if (!objNode.get("nextFireTime").isNull()) {
+                logger.info(
+                    "Retreive from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
+                nextFired = objNode.get("nextFireTime").asLong();
+                route.setNextFireTime(nextFired);
+              }
+
+              logger.info("latFired from response after parsing in long" + lastFired);
+              logger.info("nextFired from response after parsing in long" + nextFired);
+            }
+          } catch (IOException exception) {
+            logger.error(exception.getMessage());
+          }
+        });
+  }
 }
