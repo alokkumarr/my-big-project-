@@ -32,7 +32,7 @@ public class WorkbenchIT extends BaseIT {
   private static final String PARSE_DATASET_NAME = "WBAPARSER01";
 
   private static final int WAIT_RETRIES = 30;
-   private static final int WAIT_SLEEP_SECONDS = 5;
+  private static final int WAIT_SLEEP_SECONDS = 5;
 
   /**
    * Parse a CSV file into dataset with given name using Workbench
