@@ -297,8 +297,8 @@ public class DLDataSetService {
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
 
-      if (schema == null || ds == null)
-          throw new IllegalArgumentException("Schema/DS descriptor must not be null");
+      /*if (schema == null || ds == null)
+          throw new IllegalArgumentException("Schema/DS descriptor must not be null");*/
 
       JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
 
@@ -319,7 +319,6 @@ public class DLDataSetService {
       ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
       ds.getAsJsonObject().add("transformations", trans);
       ds.getAsJsonObject().add("asOfNow", status);
-
       dsStore.update(id, ds);
       return ds;
   }

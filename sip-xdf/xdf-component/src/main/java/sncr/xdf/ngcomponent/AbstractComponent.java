@@ -643,7 +643,7 @@ public abstract class AbstractComponent implements WithContext{
                 ((ret == 1)? "PARTIAL":
                     "FAILED");
 
-        logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+        logger.warn("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
         int rc[] = {0}; rc[0] = 0;
         try {
 
@@ -667,7 +667,9 @@ public abstract class AbstractComponent implements WithContext{
                         Map<String, Object> outDS = ngctx.outputDataSets.get(dsname);
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
 
-                        if (schema != null) {
+                        if (schema == null) {
+                        	logger.warn("The component was not able to get schema from NG context, assume something went wrong");
+                        }
                             Path outputLocation = null;
                             if (outDS.get(DataSetProperties.PhysicalLocation.name()).toString() != null
                                 && !outDS.get(DataSetProperties.PhysicalLocation.name()).toString().trim()
@@ -682,22 +684,18 @@ public abstract class AbstractComponent implements WithContext{
                             if (outputLocation != null && ctx.fs.exists(outputLocation)) {
                                 size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
                             }
-                            logger.trace("Extracted size " + size);
+                            logger.debug("Extracted size " + size);
 
-                            logger.trace("Extracted schema: " + schema.toString());
+                           // logger.trace("Extracted schema: " + schema.toString());
 
                             // Set record count
                             long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
-                            logger.trace("Extracted record count " + recordCount);
+                            logger.debug("Extracted record count " + recordCount);
 
                             services.md.updateDS(id, ngctx, ds, schema, recordCount, size);
 
 
 
-                        }
-                        else{
-                            logger.warn("The component was not able to get schema from NG context, assume something went wrong");
-                        }
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                         logger.error(error);
@@ -706,7 +704,7 @@ public abstract class AbstractComponent implements WithContext{
                         return;
                     }
                 });
-                logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+                logger.warn("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
                 services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID);
                // logger.info("Status updating to:::"+  services.transformationMD.ts.);
 

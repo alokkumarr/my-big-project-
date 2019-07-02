@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,7 +32,7 @@ public class WorkbenchIT extends BaseIT {
   private static final String PARSE_DATASET_NAME = "WBAPARSER01";
 
   private static final int WAIT_RETRIES = 30;
-  private static final int WAIT_SLEEP_SECONDS = 5;
+   private static final int WAIT_SLEEP_SECONDS = 5;
 
   /**
    * Parse a CSV file into dataset with given name using Workbench
@@ -301,8 +300,7 @@ public class WorkbenchIT extends BaseIT {
     String id = "workbench::" + name;
     waitForDataset(id, WAIT_RETRIES);
   }
-  
-  @Ignore
+
   @Test
   public void testSqlDataset() throws IOException {
     String name = "test-sql-" + testId();
@@ -311,7 +309,7 @@ public class WorkbenchIT extends BaseIT {
     /* Execute SQL */
     executeSqlDataset(name);
     /* Workaround: Until the dataset creation API provides the
-     * dataset ID, construct it manually here. */
+     *  dataset ID, construct it manually here. */
     String id = "workbench::" + name;
     waitForDataset(id, WAIT_RETRIES);
   }
