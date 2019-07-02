@@ -1,7 +1,7 @@
 { "index" :{}}
 {"COORDINATES": "-83.52527778,42.46444444", "COUNTY": "MI","string": "string 1", "long": 1000, "float": 1000.01, "date": "2017-12-14 00:00:00", "integer": 100, "double": 99995.01}
 { "index" :{}}
-{"COORDINATES": "-96.914506,32.844442", "COUNTY": "TX","string": "string 2", "long": 1001, "float": 1000.02, "date": "2017-12-13 00:00:00", "integer": 101, "double": 99995.02}
+{"COORDINATES": "-36.914506,32.844442", "COUNTY": "TX","string": "string 2", "long": 1001, "float": 1000.02, "date": "2017-12-13 00:00:00", "integer": 101, "double": 99995.02}
 { "index" :{}}
 {"COORDINATES": "-86.1706667,39.76333333", "COUNTY": "IN","string": "string 3", "long": 1002, "float": 1000.03, "date": "2017-12-12 00:00:00", "integer": 102, "double": 99995.03}
 { "index" :{}}
@@ -21,21 +21,21 @@
 { "index" :{}}
 {"COORDINATES": "-76.07644444,39.63894444", "COUNTY": "MD","string": "string 11", "long": 1010, "float": 1000.11, "date": "2017-12-04 00:00:00", "integer": 110, "double": 99995.11}
 { "index" :{}}
-{"COORDINATES": "-97.362378,38.087494", "COUNTY": "KS","string": "string 12", "long": 1011, "float": 1000.12, "date": "2017-12-03 00:00:00", "integer": 111, "double": 99995.12}
+{"COORDINATES": "-17.362378,38.087494", "COUNTY": "KS","string": "string 12", "long": 1011, "float": 1000.12, "date": "2017-12-03 00:00:00", "integer": 111, "double": 99995.12}
 { "index" :{}}
-{"COORDINATES": "-152.401833,37.78436078", "COUNTY": "CA","string": "string 13", "long": 1012, "float": 1000.13, "date": "2017-12-02 00:00:00", "integer": 112, "double": 99995.13}
+{"COORDINATES": "-15.401833,37.78436078", "COUNTY": "CA","string": "string 13", "long": 1012, "float": 1000.13, "date": "2017-12-02 00:00:00", "integer": 112, "double": 99995.13}
 { "index" :{}}
 {"COORDINATES": "-81.52527778,80.46444444", "COUNTY": "CA","string": "string 14", "long": 1013, "float": 1000.14, "date": "2017-12-01 00:00:00", "integer": 113, "double": 99995.14}
 { "index" :{}}
-{"COORDINATES": "-96.914506,82.844442", "COUNTY": "CA","string": "string 15", "long": 1014, "float": 1000.15, "date": "2017-11-30 00:00:00", "integer": 114, "double": 99995.15}
+{"COORDINATES": "-86.914506,82.844442", "COUNTY": "CA","string": "string 15", "long": 1014, "float": 1000.15, "date": "2017-11-30 00:00:00", "integer": 114, "double": 99995.15}
 { "index" :{}}
-{"COORDINATES": "-56.914506,92.844442", "COUNTY": "CA","string": "string 16", "long": 1015, "float": 1000.16, "date": "2017-11-29 00:00:00", "integer": 115, "double": 99995.16}
+{"COORDINATES": "-56.914506,12.844442", "COUNTY": "CA","string": "string 16", "long": 1015, "float": 1000.16, "date": "2017-11-29 00:00:00", "integer": 115, "double": 99995.16}
 { "index" :{}}
 {"COORDINATES": "-46.914506,32.844442", "COUNTY": "CA","string": "string 17", "long": 1016, "float": 1000.17, "date": "2017-11-28 00:00:00", "integer": 116, "double": 99995.17}
 { "index" :{}}
 {"COORDINATES": "-26.914506,22.844442", "COUNTY": "CA","string": "string 18", "long": 1017, "float": 1000.18, "date": "2017-11-27 00:00:00", "integer": 117, "double": 99995.18}
 { "index" :{}}
-{"COORDINATES": "-90.359006,43.90156667", "COUNTY": "ME","string": "string 19", "long": 1018, "float": 1000.19, "date": "2017-11-26 00:00:00", "integer": 118, "double": 99995.19}
+{"COORDINATES": "-10.359006,43.90156667", "COUNTY": "ME","string": "string 19", "long": 1018, "float": 1000.19, "date": "2017-11-26 00:00:00", "integer": 118, "double": 99995.19}
 { "index" :{}}
 {"COORDINATES": "-70.359006,43.90156667", "COUNTY": "ME","string": "string 20", "long": 1019, "float": 1000.20, "date": "2017-11-25 00:00:00", "integer": 119, "double": 99995.20}
 { "index" :{}}
@@ -47,7 +47,7 @@
 { "index" :{}}
 {"COORDINATES": "-30.359006,43.90156667", "COUNTY": "ME","string": "string 24", "long": 1023, "float": 1000.24, "date": "2017-11-21 00:00:00", "integer": 123, "double": 99995.24}
 { "index" :{}}
-{"COORDINATES": "-96.21831944,59.89848056", "COUNTY": "IN","string": "string 25", "long": 1024, "float": 1000.25, "date": "2017-11-20 00:00:00", "integer": 124, "double": 99995.25}
+{"COORDINATES": "-16.21831944,59.89848056", "COUNTY": "IN","string": "string 25", "long": 1024, "float": 1000.25, "date": "2017-11-20 00:00:00", "integer": 124, "double": 99995.25}
 { "index" :{}}
 {"COORDINATES": "-86.21831944,69.89848056", "COUNTY": "IN","string": "string 26", "long": 1025, "float": 1000.26, "date": "2017-11-19 00:00:00", "integer": 125, "double": 99995.26}
 { "index" :{}}
@@ -65,7 +65,7 @@
 { "index" :{}}
 {"COORDINATES": "80.21831944,89.89848056", "COUNTY": "IN","string": "string 33", "long": 1032, "float": 1000.33, "date": "2017-11-12 00:00:00", "integer": 132, "double": 99995.33}
 { "index" :{}}
-{"COORDINATES": "-70.21831944,90.89848056", "COUNTY": "IN","string": "string 34", "long": 1033, "float": 1000.34, "date": "2017-11-11 00:00:00", "integer": 133, "double": 99995.34}
+{"COORDINATES": "-70.21831944,00.89848056", "COUNTY": "IN","string": "string 34", "long": 1033, "float": 1000.34, "date": "2017-11-11 00:00:00", "integer": 133, "double": 99995.34}
 { "index" :{}}
 {"COORDINATES": "85.21831944,59.89848056", "COUNTY": "IN","string": "string 35", "long": 1034, "float": 1000.35, "date": "2017-11-10 00:00:00", "integer": 134, "double": 99995.35}
 { "index" :{}}
@@ -99,7 +99,7 @@
 { "index" :{}}
 {"COORDINATES": "-76.07644444,89.63894444", "COUNTY": "MD","string": "string 50", "long": 1049, "float": 1000.50, "date": "2017-10-26 00:00:00", "integer": 149, "double": 99995.50}
 { "index" :{}}
-{"COORDINATES": "-96.914506,32.844442", "COUNTY": "TX","string": "string 51", "long": 1050, "float": 1000.51, "date": "2017-10-25 00:00:00", "integer": 150, "double": 99995.51}
+{"COORDINATES": "-26.914506,32.844442", "COUNTY": "TX","string": "string 51", "long": 1050, "float": 1000.51, "date": "2017-10-25 00:00:00", "integer": 150, "double": 99995.51}
 { "index" :{}}
 {"COORDINATES": "-86.914506,22.844442", "COUNTY": "TX","string": "string 52", "long": 1051, "float": 1000.52, "date": "2017-10-24 00:00:00", "integer": 151, "double": 99995.52}
 { "index" :{}}
@@ -113,7 +113,7 @@
 { "index" :{}}
 {"COORDINATES": "26.914506,82.844442", "COUNTY": "TX","string": "string 57", "long": 1056, "float": 1000.57, "date": "2017-10-19 00:00:00", "integer": 156, "double": 99995.57}
 { "index" :{}}
-{"COORDINATES": "-98.914506,22.844442", "COUNTY": "TX","string": "string 58", "long": 1057, "float": 1000.58, "date": "2017-10-18 00:00:00", "integer": 157, "double": 99995.58}
+{"COORDINATES": "-18.914506,22.844442", "COUNTY": "TX","string": "string 58", "long": 1057, "float": 1000.58, "date": "2017-10-18 00:00:00", "integer": 157, "double": 99995.58}
 { "index" :{}}
 {"COORDINATES": "33.914506,88.844442", "COUNTY": "TX","string": "string 59", "long": 1058, "float": 1000.59, "date": "2017-10-17 00:00:00", "integer": 158, "double": 99995.59}
 { "index" :{}}
@@ -121,7 +121,7 @@
 { "index" :{}}
 {"COORDINATES": "-22.914506,12.844442", "COUNTY": "TX","string": "string 61", "long": 1060, "float": 1000.61, "date": "2017-10-15 00:00:00", "integer": 160, "double": 99995.61}
 { "index" :{}}
-{"COORDINATES": "96.914506,64.844442", "COUNTY": "TX","string": "string 62", "long": 1061, "float": 1000.62, "date": "2017-10-14 00:00:00", "integer": 161, "double": 99995.62}
+{"COORDINATES": "86.914506,64.844442", "COUNTY": "TX","string": "string 62", "long": 1061, "float": 1000.62, "date": "2017-10-14 00:00:00", "integer": 161, "double": 99995.62}
 { "index" :{}}
 {"COORDINATES": "86.914506,52.844442", "COUNTY": "TX","string": "string 63", "long": 1062, "float": 1000.63, "date": "2017-10-13 00:00:00", "integer": 162, "double": 99995.63}
 { "index" :{}}
@@ -129,7 +129,7 @@
 { "index" :{}}
 {"COORDINATES": "45.914506,50.844442", "COUNTY": "TX","string": "string 65", "long": 1064, "float": 1000.65, "date": "2017-10-11 00:00:00", "integer": 164, "double": 99995.65}
 { "index" :{}}
-{"COORDINATES": "44.914506,92.844442", "COUNTY": "TX","string": "string 66", "long": 1065, "float": 1000.66, "date": "2017-10-10 00:00:00", "integer": 165, "double": 99995.66}
+{"COORDINATES": "44.914506,12.844442", "COUNTY": "TX","string": "string 66", "long": 1065, "float": 1000.66, "date": "2017-10-10 00:00:00", "integer": 165, "double": 99995.66}
 { "index" :{}}
 {"COORDINATES": "30.914506,10.844442", "COUNTY": "TX","string": "string 67", "long": 1066, "float": 1000.67, "date": "2017-10-09 00:00:00", "integer": 166, "double": 99995.67}
 { "index" :{}}
@@ -143,7 +143,7 @@
 { "index" :{}}
 {"COORDINATES": "-14.97556,20.36639449", "COUNTY": "PA","string": "string 72", "long": 1071, "float": 1000.72, "date": "2017-10-04 00:00:00", "integer": 171, "double": 99995.72}
 { "index" :{}}
-{"COORDINATES": "44.97556,140.36639449", "COUNTY": "PA","string": "string 73", "long": 1072, "float": 1000.73, "date": "2017-10-03 00:00:00", "integer": 172, "double": 99995.73}
+{"COORDINATES": "44.97556,14.36639449", "COUNTY": "PA","string": "string 73", "long": 1072, "float": 1000.73, "date": "2017-10-03 00:00:00", "integer": 172, "double": 99995.73}
 { "index" :{}}
 {"COORDINATES": "14.97556,60.36639449", "COUNTY": "PA","string": "string 74", "long": 1073, "float": 1000.74, "date": "2017-10-02 00:00:00", "integer": 173, "double": 99995.74}
 { "index" :{}}
@@ -163,13 +163,13 @@
 { "index" :{}}
 {"COORDINATES": "34.97556,29.36639449", "COUNTY": "PA","string": "string 82", "long": 1081, "float": 1000.82, "date": "2017-09-24 00:00:00", "integer": 181, "double": 99995.82}
 { "index" :{}}
-{"COORDINATES": "99.97556,-45.36639449", "COUNTY": "PA","string": "string 83", "long": 1082, "float": 1000.83, "date": "2017-09-23 00:00:00", "integer": 182, "double": 99995.83}
+{"COORDINATES": "89.97556,-45.36639449", "COUNTY": "PA","string": "string 83", "long": 1082, "float": 1000.83, "date": "2017-09-23 00:00:00", "integer": 182, "double": 99995.83}
 { "index" :{}}
 {"COORDINATES": "24.97556,40.36639449", "COUNTY": "PA","string": "string 84", "long": 1083, "float": 1000.84, "date": "2017-09-22 00:00:00", "integer": 183, "double": 99995.84}
 { "index" :{}}
 {"COORDINATES": "15.97556,41.36639449", "COUNTY": "PA","string": "string 85", "long": 1084, "float": 1000.85, "date": "2017-09-21 00:00:00", "integer": 184, "double": 99995.85}
 { "index" :{}}
-{"COORDINATES": "-97.362378,38.087494", "COUNTY": "KS","string": "string 86", "long": 1085, "float": 1000.86, "date": "2017-09-20 00:00:00", "integer": 185, "double": 99995.86}
+{"COORDINATES": "-67.362378,38.087494", "COUNTY": "KS","string": "string 86", "long": 1085, "float": 1000.86, "date": "2017-09-20 00:00:00", "integer": 185, "double": 99995.86}
 { "index" :{}}
 {"COORDINATES": "15.362378,18.087494", "COUNTY": "KS","string": "string 87", "long": 1086, "float": 1000.87, "date": "2017-09-19 00:00:00", "integer": 186, "double": 99995.87}
 { "index" :{}}
@@ -185,7 +185,7 @@
 { "index" :{}}
 {"COORDINATES": "35.362378,75.087494", "COUNTY": "KS","string": "string 93", "long": 1092, "float": 1000.93, "date": "2017-09-13 00:00:00", "integer": 192, "double": 99995.93}
 { "index" :{}}
-{"COORDINATES": "22.362378,90.087494", "COUNTY": "KS","string": "string 94", "long": 1093, "float": 1000.94, "date": "2017-09-12 00:00:00", "integer": 193, "double": 99995.94}
+{"COORDINATES": "22.362378,89.087494", "COUNTY": "KS","string": "string 94", "long": 1093, "float": 1000.94, "date": "2017-09-12 00:00:00", "integer": 193, "double": 99995.94}
 { "index" :{}}
 {"COORDINATES": "04.362378,43.087494", "COUNTY": "KS","string": "string 95", "long": 1094, "float": 1000.95, "date": "2017-09-11 00:00:00", "integer": 194, "double": 99995.95}
 { "index" :{}}
@@ -195,7 +195,7 @@
 { "index" :{}}
 {"COORDINATES": "87.362378,76.087494", "COUNTY": "KS","string": "string 98", "long": 1097, "float": 1000.98, "date": "2017-09-08 00:00:00", "integer": 197, "double": 99995.98}
 { "index" :{}}
-{"COORDINATES": "02.362378,90.087494", "COUNTY": "KS","string": "string 99", "long": 1098, "float": 1000.99, "date": "2017-09-07 00:00:00", "integer": 198, "double": 99995.99}
+{"COORDINATES": "02.362378,88.087494", "COUNTY": "KS","string": "string 99", "long": 1098, "float": 1000.99, "date": "2017-09-07 00:00:00", "integer": 198, "double": 99995.99}
 { "index" :{}}
 {"COORDINATES": "17.362378,30.087494", "COUNTY": "KS","string": "string 100", "long": 1099, "float": 1000.100, "date": "2017-09-06 00:00:00", "integer": 199, "double": 99995.100}
 { "index" :{}}
@@ -203,7 +203,7 @@
 { "index" :{}}
 {"COORDINATES": "65.362378,11.087494", "COUNTY": "KS","string": "string 102", "long": 1101, "float": 1000.102, "date": "2017-09-04 00:00:00", "integer": 201, "double": 99995.102}
 { "index" :{}}
-{"COORDINATES": "-97.362378,38.087494", "COUNTY": "KS","string": "string 103", "long": 1102, "float": 1000.103, "date": "2017-09-03 00:00:00", "integer": 202, "double": 99995.103}
+{"COORDINATES": "-87.362378,38.087494", "COUNTY": "KS","string": "string 103", "long": 1102, "float": 1000.103, "date": "2017-09-03 00:00:00", "integer": 202, "double": 99995.103}
 { "index" :{}}
 {"COORDINATES": "-76.07644444,39.63894444", "COUNTY": "MD","string": "string 104", "long": 1103, "float": 1000.104, "date": "2017-09-02 00:00:00", "integer": 203, "double": 99995.104}
 { "index" :{}}
@@ -219,7 +219,7 @@
 { "index" :{}}
 {"COORDINATES": "80.07644444,39.63894444", "COUNTY": "MD","string": "string 110", "long": 1109, "float": 1000.110, "date": "2017-08-27 00:00:00", "integer": 209, "double": 99995.110}
 { "index" :{}}
-{"COORDINATES": "99.07644444,39.63894444", "COUNTY": "MD","string": "string 111", "long": 1110, "float": 1000.111, "date": "2017-08-26 00:00:00", "integer": 210, "double": 99995.111}
+{"COORDINATES": "90.0000,39.63894444", "COUNTY": "MD","string": "string 111", "long": 1110, "float": 1000.111, "date": "2017-08-26 00:00:00", "integer": 210, "double": 99995.111}
 { "index" :{}}
 {"COORDINATES": "-72.07644444,39.63894444", "COUNTY": "MD","string": "string 112", "long": 1111, "float": 1000.112, "date": "2017-08-25 00:00:00", "integer": 211, "double": 99995.112}
 { "index" :{}}
@@ -227,7 +227,7 @@
 { "index" :{}}
 {"COORDINATES": "-87.07644444,39.63894444", "COUNTY": "MD","string": "string 114", "long": 1113, "float": 1000.114, "date": "2017-08-23 00:00:00", "integer": 213, "double": 99995.114}
 { "index" :{}}
-{"COORDINATES": "-92.07644444,39.63894444", "COUNTY": "MD","string": "string 115", "long": 1114, "float": 1000.115, "date": "2017-08-22 00:00:00", "integer": 214, "double": 99995.115}
+{"COORDINATES": "-90.0000,39.63894444", "COUNTY": "MD","string": "string 115", "long": 1114, "float": 1000.115, "date": "2017-08-22 00:00:00", "integer": 214, "double": 99995.115}
 { "index" :{}}
 {"COORDINATES": "-76.07644444,4.63894444", "COUNTY": "MD","string": "string 116", "long": 1115, "float": 1000.116, "date": "2017-08-21 00:00:00", "integer": 215, "double": 99995.116}
 { "index" :{}}
@@ -245,17 +245,17 @@
 { "index" :{}}
 {"COORDINATES": "35.359006,45.90156667", "COUNTY": "ME","string": "string 123", "long": 1122, "float": 1000.123, "date": "2017-08-14 00:00:00", "integer": 222, "double": 99995.123}
 { "index" :{}}
-{"COORDINATES": "75.359006,98.90156667", "COUNTY": "ME","string": "string 124", "long": 1123, "float": 1000.124, "date": "2017-08-13 00:00:00", "integer": 223, "double": 99995.124}
+{"COORDINATES": "75.359006,78.90156667", "COUNTY": "ME","string": "string 124", "long": 1123, "float": 1000.124, "date": "2017-08-13 00:00:00", "integer": 223, "double": 99995.124}
 { "index" :{}}
 {"COORDINATES": "-67.359006,47.90156667", "COUNTY": "ME","string": "string 125", "long": 1124, "float": 1000.125, "date": "2017-08-12 00:00:00", "integer": 224, "double": 99995.125}
 { "index" :{}}
 {"COORDINATES": "-38.359006,78.90156667", "COUNTY": "ME","string": "string 126", "long": 1125, "float": 1000.126, "date": "2017-08-11 00:00:00", "integer": 225, "double": 99995.126}
 { "index" :{}}
-{"COORDINATES": "-98.359006,83.90156667", "COUNTY": "ME","string": "string 127", "long": 1126, "float": 1000.127, "date": "2017-08-10 00:00:00", "integer": 226, "double": 99995.127}
+{"COORDINATES": "-68.359006,83.90156667", "COUNTY": "ME","string": "string 127", "long": 1126, "float": 1000.127, "date": "2017-08-10 00:00:00", "integer": 226, "double": 99995.127}
 { "index" :{}}
 {"COORDINATES": "-43.359006,39.90156667", "COUNTY": "ME","string": "string 128", "long": 1127, "float": 1000.128, "date": "2017-08-09 00:00:00", "integer": 227, "double": 99995.128}
 { "index" :{}}
-{"COORDINATES": "-09.359006,91.90156667", "COUNTY": "ME","string": "string 129", "long": 1128, "float": 1000.129, "date": "2017-08-08 00:00:00", "integer": 228, "double": 99995.129}
+{"COORDINATES": "-09.359006,71.90156667", "COUNTY": "ME","string": "string 129", "long": 1128, "float": 1000.129, "date": "2017-08-08 00:00:00", "integer": 228, "double": 99995.129}
 { "index" :{}}
 {"COORDINATES": "72.359006,13.90156667", "COUNTY": "ME","string": "string 130", "long": 1129, "float": 1000.130, "date": "2017-08-07 00:00:00", "integer": 229, "double": 99995.130}
 { "index" :{}}
@@ -263,7 +263,7 @@
 { "index" :{}}
 {"COORDINATES": "83.359006,18.90156667", "COUNTY": "ME","string": "string 132", "long": 1131, "float": 1000.132, "date": "2017-08-05 00:00:00", "integer": 231, "double": 99995.132}
 { "index" :{}}
-{"COORDINATES": "90.359006,67.90156667", "COUNTY": "ME","string": "string 133", "long": 1132, "float": 1000.133, "date": "2017-08-04 00:00:00", "integer": 232, "double": 99995.133}
+{"COORDINATES": "80.359006,67.90156667", "COUNTY": "ME","string": "string 133", "long": 1132, "float": 1000.133, "date": "2017-08-04 00:00:00", "integer": 232, "double": 99995.133}
 { "index" :{}}
 {"COORDINATES": "-66.359006,63.90156667", "COUNTY": "ME","string": "string 134", "long": 1133, "float": 1000.134, "date": "2017-08-03 00:00:00", "integer": 233, "double": 99995.134}
 { "index" :{}}
@@ -277,7 +277,7 @@
 { "index" :{}}
 {"COORDINATES": "-17.359006,13.90156667", "COUNTY": "ME","string": "string 139", "long": 1138, "float": 1000.139, "date": "2017-07-29 00:00:00", "integer": 238, "double": 99995.139}
 { "index" :{}}
-{"COORDINATES": "97.359006,33.90156667", "COUNTY": "ME","string": "string 140", "long": 1139, "float": 1000.140, "date": "2017-07-28 00:00:00", "integer": 239, "double": 99995.140}
+{"COORDINATES": "77.359006,33.90156667", "COUNTY": "ME","string": "string 140", "long": 1139, "float": 1000.140, "date": "2017-07-28 00:00:00", "integer": 239, "double": 99995.140}
 { "index" :{}}
 {"COORDINATES": "71.359006,38.90156667", "COUNTY": "ME","string": "string 141", "long": 1140, "float": 1000.141, "date": "2017-07-27 00:00:00", "integer": 240, "double": 99995.141}
 { "index" :{}}
@@ -299,7 +299,7 @@
 { "index" :{}}
 {"COORDINATES": "-14.359006,24.90156667", "COUNTY": "OR","string": "string 150", "long": 1149, "float": 1000.150, "date": "2017-07-18 00:00:00", "integer": 249, "double": 99995.150}
 { "index" :{}}
-{"COORDINATES": "-24.359006,98.90156667", "COUNTY": "OR","string": "string 151", "long": 1150, "float": 1000.151, "date": "2017-07-17 00:00:00", "integer": 250, "double": 99995.151}
+{"COORDINATES": "-24.359006,68.90156667", "COUNTY": "OR","string": "string 151", "long": 1150, "float": 1000.151, "date": "2017-07-17 00:00:00", "integer": 250, "double": 99995.151}
 { "index" :{}}
 {"COORDINATES": "-35.359006,54.90156667", "COUNTY": "OR","string": "string 152", "long": 1151, "float": 1000.152, "date": "2017-07-16 00:00:00", "integer": 251, "double": 99995.152}
 { "index" :{}}
@@ -357,7 +357,7 @@
 { "index" :{}}
 {"COORDINATES": "88.359006,75.90156666", "COUNTY": "LA","string": "string 179", "long": 1178, "float": 1000.179, "date": "2017-06-19 00:00:00", "integer": 278, "double": 99995.179}
 { "index" :{}}
-{"COORDINATES": "55.359006,99.90156663", "COUNTY": "LA","string": "string 180", "long": 1179, "float": 1000.180, "date": "2017-06-18 00:00:00", "integer": 279, "double": 99995.180}
+{"COORDINATES": "55.359006,79.90156663", "COUNTY": "LA","string": "string 180", "long": 1179, "float": 1000.180, "date": "2017-06-18 00:00:00", "integer": 279, "double": 99995.180}
 { "index" :{}}
 {"COORDINATES": "09.359006,62.90156661", "COUNTY": "LA","string": "string 181", "long": 1180, "float": 1000.181, "date": "2017-06-17 00:00:00", "integer": 280, "double": 99995.181}
 { "index" :{}}
@@ -387,11 +387,11 @@
 { "index" :{}}
 {"COORDINATES": "24.359026,76.90156667", "COUNTY": "AZ","string": "string 194", "long": 1193, "float": 1000.194, "date": "2017-06-04 00:00:00", "integer": 293, "double": 99995.194}
 { "index" :{}}
-{"COORDINATES": "14.359006,99.90156667", "COUNTY": "AZ","string": "string 195", "long": 1194, "float": 1000.195, "date": "2017-06-03 00:00:00", "integer": 294, "double": 99995.195}
+{"COORDINATES": "14.359006,89.90156667", "COUNTY": "AZ","string": "string 195", "long": 1194, "float": 1000.195, "date": "2017-06-03 00:00:00", "integer": 294, "double": 99995.195}
 { "index" :{}}
 {"COORDINATES": "64.359006,66.90156667", "COUNTY": "AZ","string": "string 196", "long": 1195, "float": 1000.196, "date": "2017-06-02 00:00:00", "integer": 295, "double": 99995.196}
 { "index" :{}}
-{"COORDINATES": "99.359006,72.90156667", "COUNTY": "AZ","string": "string 197", "long": 1196, "float": 1000.197, "date": "2017-06-01 00:00:00", "integer": 296, "double": 99995.197}
+{"COORDINATES": "39.359006,72.90156667", "COUNTY": "AZ","string": "string 197", "long": 1196, "float": 1000.197, "date": "2017-06-01 00:00:00", "integer": 296, "double": 99995.197}
 { "index" :{}}
 {"COORDINATES": "-15.359006,20.90156667", "COUNTY": "AZ","string": "string 198", "long": 1197, "float": 1000.198, "date": "2017-05-31 00:00:00", "integer": 297, "double": 99995.198}
 { "index" :{}}
@@ -401,7 +401,7 @@
 { "index" :{}}
 {"COORDINATES": "77.359006,22.90156667", "COUNTY": "AZ","string": "string 201", "long": 1200, "float": 1002.01, "date": "2017-05-28 00:00:00", "integer": 300, "double": 99997.01}
 { "index" :{}}
-{"COORDINATES": "99.359006,12.90156667", "COUNTY": "AZ","string": "string 202", "long": 1201, "float": 1002.02, "date": "2017-05-27 00:00:00", "integer": 301, "double": 99997.02}
+{"COORDINATES": "79.359006,12.90156667", "COUNTY": "AZ","string": "string 202", "long": 1201, "float": 1002.02, "date": "2017-05-27 00:00:00", "integer": 301, "double": 99997.02}
 { "index" :{}}
 {"COORDINATES": "10.359006,83.90156667", "COUNTY": "SD","string": "string 203", "long": 1202, "float": 1002.03, "date": "2017-05-26 00:00:00", "integer": 302, "double": 99997.03}
 { "index" :{}}
@@ -427,15 +427,15 @@
 { "index" :{}}
 {"COORDINATES": "29.359006,83.90122667", "COUNTY": "SD","string": "string 214", "long": 1213, "float": 1002.14, "date": "2017-05-15 00:00:00", "integer": 313, "double": 99997.14}
 { "index" :{}}
-{"COORDINATES": "43.359006,83.90153367", "COUNTY": "SD","string": "string 215", "long": 1214, "float": 1002.15, "date": "2017-05-14 00:00:00", "integer": 314, "double": 99997.15}
+{"COORDINATES": "33.359006,83.90153367", "COUNTY": "SD","string": "string 215", "long": 1214, "float": 1002.15, "date": "2017-05-14 00:00:00", "integer": 314, "double": 99997.15}
 { "index" :{}}
 {"COORDINATES": "83.359006,83.90156667", "COUNTY": "SD","string": "string 216", "long": 1215, "float": 1002.16, "date": "2017-05-13 00:00:00", "integer": 315, "double": 99997.16}
 { "index" :{}}
 {"COORDINATES": "83.359006,20.90156667", "COUNTY": "SD","string": "string 217", "long": 1216, "float": 1002.17, "date": "2017-05-12 00:00:00", "integer": 316, "double": 99997.17}
 { "index" :{}}
-{"COORDINATES": "92.359006,83.9015367", "COUNTY": "SD","string": "string 218", "long": 1217, "float": 1002.18, "date": "2017-05-11 00:00:00", "integer": 317, "double": 99997.18}
+{"COORDINATES": "22.359006,83.9015367", "COUNTY": "SD","string": "string 218", "long": 1217, "float": 1002.18, "date": "2017-05-11 00:00:00", "integer": 317, "double": 99997.18}
 { "index" :{}}
-{"COORDINATES": "97.359006,98.90156667", "COUNTY": "SD","string": "string 219", "long": 1218, "float": 1002.19, "date": "2017-05-10 00:00:00", "integer": 318, "double": 99997.19}
+{"COORDINATES": "67.359006,88.90156667", "COUNTY": "SD","string": "string 219", "long": 1218, "float": 1002.19, "date": "2017-05-10 00:00:00", "integer": 318, "double": 99997.19}
 { "index" :{}}
 {"COORDINATES": "10.359006,50.90156667", "COUNTY": "SD","string": "string 220", "long": 1219, "float": 1002.2, "date": "2017-05-09 00:00:00", "integer": 319, "double": 99997.2}
 { "index" :{}}
@@ -455,7 +455,7 @@
 { "index" :{}}
 {"COORDINATES": "33.359006,83.90156667", "COUNTY": "NV","string": "string 228", "long": 1227, "float": 1002.28, "date": "2017-05-01 00:00:00", "integer": 327, "double": 99997.28}
 { "index" :{}}
-{"COORDINATES": "99.359006,83.90156667", "COUNTY": "NV","string": "string 229", "long": 1228, "float": 1002.29, "date": "2017-04-30 00:00:00", "integer": 328, "double": 99997.29}
+{"COORDINATES": "79.359006,83.90156667", "COUNTY": "NV","string": "string 229", "long": 1228, "float": 1002.29, "date": "2017-04-30 00:00:00", "integer": 328, "double": 99997.29}
 { "index" :{}}
 {"COORDINATES": "52.359006,83.90156667", "COUNTY": "NV","string": "string 230", "long": 1229, "float": 1002.3, "date": "2017-04-29 00:00:00", "integer": 329, "double": 99997.3}
 { "index" :{}}
@@ -489,7 +489,7 @@
 { "index" :{}}
 {"COORDINATES": "63.359006,89.90151667", "COUNTY": "OK","string": "string 245", "long": 1244, "float": 1002.45, "date": "2017-04-14 00:00:00", "integer": 344, "double": 99997.45}
 { "index" :{}}
-{"COORDINATES": "-92.359006,93.90156667", "COUNTY": "OK","string": "string 246", "long": 1245, "float": 1002.46, "date": "2017-04-13 00:00:00", "integer": 345, "double": 99997.46}
+{"COORDINATES": "-72.359006,63.90156667", "COUNTY": "OK","string": "string 246", "long": 1245, "float": 1002.46, "date": "2017-04-13 00:00:00", "integer": 345, "double": 99997.46}
 { "index" :{}}
 {"COORDINATES": "-20.359006,83.90154467", "COUNTY": "OK","string": "string 247", "long": 1246, "float": 1002.47, "date": "2017-04-12 00:00:00", "integer": 346, "double": 99997.47}
 { "index" :{}}
@@ -509,23 +509,23 @@
 { "index" :{}}
 {"COORDINATES": "20.359006,10.90156667", "COUNTY": "MO","string": "string 255", "long": 1254, "float": 1002.55, "date": "2017-04-04 00:00:00", "integer": 354, "double": 99997.55}
 { "index" :{}}
-{"COORDINATES": "34.359006,98.90156667", "COUNTY": "MO","string": "string 256", "long": 1255, "float": 1002.56, "date": "2017-04-03 00:00:00", "integer": 355, "double": 99997.56}
+{"COORDINATES": "34.359006,38.90156667", "COUNTY": "MO","string": "string 256", "long": 1255, "float": 1002.56, "date": "2017-04-03 00:00:00", "integer": 355, "double": 99997.56}
 { "index" :{}}
 {"COORDINATES": "82.359006,26.90156667", "COUNTY": "MO","string": "string 257", "long": 1256, "float": 1002.57, "date": "2017-04-02 00:00:00", "integer": 356, "double": 99997.57}
 { "index" :{}}
-{"COORDINATES": "98.359006,67.90156667", "COUNTY": "MO","string": "string 258", "long": 1257, "float": 1002.58, "date": "2017-04-01 00:00:00", "integer": 357, "double": 99997.58}
+{"COORDINATES": "88.359006,67.90156667", "COUNTY": "MO","string": "string 258", "long": 1257, "float": 1002.58, "date": "2017-04-01 00:00:00", "integer": 357, "double": 99997.58}
 { "index" :{}}
 {"COORDINATES": "-52.359006,09.90156667", "COUNTY": "MO","string": "string 259", "long": 1258, "float": 1002.59, "date": "2017-03-31 00:00:00", "integer": 358, "double": 99997.59}
 { "index" :{}}
 {"COORDINATES": "-36.359006,76.90156667", "COUNTY": "MO","string": "string 260", "long": 1259, "float": 1002.6, "date": "2017-03-30 00:00:00", "integer": 359, "double": 99997.6}
 { "index" :{}}
-{"COORDINATES": "-94.359006,32.90156667", "COUNTY": "MO","string": "string 261", "long": 1260, "float": 1002.61, "date": "2017-03-29 00:00:00", "integer": 360, "double": 99997.61}
+{"COORDINATES": "-14.359006,32.90156667", "COUNTY": "MO","string": "string 261", "long": 1260, "float": 1002.61, "date": "2017-03-29 00:00:00", "integer": 360, "double": 99997.61}
 { "index" :{}}
 {"COORDINATES": "36.359006,12.90156667", "COUNTY": "MO","string": "string 262", "long": 1261, "float": 1002.62, "date": "2017-03-28 00:00:00", "integer": 361, "double": 99997.62}
 { "index" :{}}
 {"COORDINATES": "56.359006,34.90156667", "COUNTY": "MO","string": "string 263", "long": 1262, "float": 1002.63, "date": "2017-03-27 00:00:00", "integer": 362, "double": 99997.63}
 { "index" :{}}
-{"COORDINATES": "26.359006,97.90156667", "COUNTY": "MO","string": "string 264", "long": 1263, "float": 1002.64, "date": "2017-03-26 00:00:00", "integer": 363, "double": 99997.64}
+{"COORDINATES": "26.359006,17.90156667", "COUNTY": "MO","string": "string 264", "long": 1263, "float": 1002.64, "date": "2017-03-26 00:00:00", "integer": 363, "double": 99997.64}
 { "index" :{}}
 {"COORDINATES": "-29.359006,13.90156667", "COUNTY": "MO","string": "string 265", "long": 1264, "float": 1002.65, "date": "2017-03-25 00:00:00", "integer": 364, "double": 99997.65}
 { "index" :{}}
@@ -573,9 +573,9 @@
 { "index" :{}}
 {"COORDINATES": "-65.359006,39.90156667", "COUNTY": "MO","string": "string 287", "long": 1286, "float": 1002.87, "date": "2017-03-03 00:00:00", "integer": 386, "double": 99997.87}
 { "index" :{}}
-{"COORDINATES": "35.359006,99.90156667", "COUNTY": "MO","string": "string 288", "long": 1287, "float": 1002.88, "date": "2017-03-02 00:00:00", "integer": 387, "double": 99997.88}
+{"COORDINATES": "35.359006,89.90156667", "COUNTY": "MO","string": "string 288", "long": 1287, "float": 1002.88, "date": "2017-03-02 00:00:00", "integer": 387, "double": 99997.88}
 { "index" :{}}
-{"COORDINATES": "-14.359006,97.90156667", "COUNTY": "MO","string": "string 289", "long": 1288, "float": 1002.89, "date": "2017-03-01 00:00:00", "integer": 388, "double": 99997.89}
+{"COORDINATES": "-14.359006,87.90156667", "COUNTY": "MO","string": "string 289", "long": 1288, "float": 1002.89, "date": "2017-03-01 00:00:00", "integer": 388, "double": 99997.89}
 { "index" :{}}
 {"COORDINATES": "13.359006,56.90157767", "COUNTY": "MO","string": "string 290", "long": 1289, "float": 1002.9, "date": "2017-02-28 00:00:00", "integer": 389, "double": 99997.9}
 { "index" :{}}
@@ -591,7 +591,7 @@
 { "index" :{}}
 {"COORDINATES": "24.359006,26.90156267", "COUNTY": "MO","string": "string 296", "long": 1295, "float": 1002.96, "date": "2017-02-22 00:00:00", "integer": 395, "double": 99997.96}
 { "index" :{}}
-{"COORDINATES": "-15.359006,98.90156667", "COUNTY": "MO","string": "string 297", "long": 1296, "float": 1002.97, "date": "2017-02-21 00:00:00", "integer": 396, "double": 99997.97}
+{"COORDINATES": "-15.359006,18.90156667", "COUNTY": "MO","string": "string 297", "long": 1296, "float": 1002.97, "date": "2017-02-21 00:00:00", "integer": 396, "double": 99997.97}
 { "index" :{}}
 {"COORDINATES": "10.359006,23.90156667", "COUNTY": "MO","string": "string 298", "long": 1297, "float": 1002.98, "date": "2017-02-20 00:00:00", "integer": 397, "double": 99997.98}
 { "index" :{}}
@@ -599,13 +599,13 @@
 { "index" :{}}
 {"COORDINATES": "-20.359006,32.90156267", "COUNTY": "ID","string": "string 300", "long": 1299, "float": 1003, "date": "2017-02-18 00:00:00", "integer": 399, "double": 99998}
 { "index" :{}}
-{"COORDINATES": "23.359006,90.90156267", "COUNTY": "ID","string": "string 301", "long": 1300, "float": 1003.01, "date": "2017-02-17 00:00:00", "integer": 400, "double": 99998.01}
+{"COORDINATES": "23.359006,10.90156267", "COUNTY": "ID","string": "string 301", "long": 1300, "float": 1003.01, "date": "2017-02-17 00:00:00", "integer": 400, "double": 99998.01}
 { "index" :{}}
 {"COORDINATES": "67.359006,74.90156267", "COUNTY": "ID","string": "string 302", "long": 1301, "float": 1003.02, "date": "2017-02-16 00:00:00", "integer": 401, "double": 99998.02}
 { "index" :{}}
 {"COORDINATES": "87.359006,88.90156267", "COUNTY": "ID","string": "string 303", "long": 1302, "float": 1003.03, "date": "2017-02-15 00:00:00", "integer": 402, "double": 99998.03}
 { "index" :{}}
-{"COORDINATES": "-78.359006,92.90156267", "COUNTY": "ID","string": "string 304", "long": 1303, "float": 1003.04, "date": "2017-02-14 00:00:00", "integer": 403, "double": 99998.04}
+{"COORDINATES": "-78.359006,12.90156267", "COUNTY": "ID","string": "string 304", "long": 1303, "float": 1003.04, "date": "2017-02-14 00:00:00", "integer": 403, "double": 99998.04}
 { "index" :{}}
 {"COORDINATES": "-29.359006,56.90156267", "COUNTY": "ID","string": "string 305", "long": 1304, "float": 1003.05, "date": "2017-02-13 00:00:00", "integer": 404, "double": 99998.05}
 { "index" :{}}
@@ -613,13 +613,13 @@
 { "index" :{}}
 {"COORDINATES": "-22.359006,28.90156267", "COUNTY": "ID","string": "string 307", "long": 1306, "float": 1003.07, "date": "2017-02-11 00:00:00", "integer": 406, "double": 99998.07}
 { "index" :{}}
-{"COORDINATES": "99.359006,27.90156267", "COUNTY": "ID","string": "string 308", "long": 1307, "float": 1003.08, "date": "2017-02-10 00:00:00", "integer": 407, "double": 99998.08}
+{"COORDINATES": "19.359006,27.90156267", "COUNTY": "ID","string": "string 308", "long": 1307, "float": 1003.08, "date": "2017-02-10 00:00:00", "integer": 407, "double": 99998.08}
 { "index" :{}}
-{"COORDINATES": "45.359006,90.90156267", "COUNTY": "ID","string": "string 309", "long": 1308, "float": 1003.09, "date": "2017-02-09 00:00:00", "integer": 408, "double": 99998.09}
+{"COORDINATES": "45.359006,00.90156267", "COUNTY": "ID","string": "string 309", "long": 1308, "float": 1003.09, "date": "2017-02-09 00:00:00", "integer": 408, "double": 99998.09}
 { "index" :{}}
 {"COORDINATES": "10.359006,45.90156267", "COUNTY": "ID","string": "string 310", "long": 1309, "float": 1003.1, "date": "2017-02-08 00:00:00", "integer": 409, "double": 99998.1}
 { "index" :{}}
-{"COORDINATES": "98.359006,20.90156267", "COUNTY": "ID","string": "string 311", "long": 1310, "float": 1003.11, "date": "2017-02-07 00:00:00", "integer": 410, "double": 99998.11}
+{"COORDINATES": "18.359006,20.90156267", "COUNTY": "ID","string": "string 311", "long": 1310, "float": 1003.11, "date": "2017-02-07 00:00:00", "integer": 410, "double": 99998.11}
 { "index" :{}}
 {"COORDINATES": "-10.359006,37.90156267", "COUNTY": "ID","string": "string 312", "long": 1311, "float": 1003.12, "date": "2017-02-06 00:00:00", "integer": 411, "double": 99998.12}
 { "index" :{}}
@@ -633,11 +633,11 @@
 { "index" :{}}
 {"COORDINATES": "10.359006,55.90156267", "COUNTY": "ID","string": "string 317", "long": 1316, "float": 1003.17, "date": "2017-02-01 00:00:00", "integer": 416, "double": 99998.17}
 { "index" :{}}
-{"COORDINATES": "-13.359006,93.90116267", "COUNTY": "ID","string": "string 318", "long": 1317, "float": 1003.18, "date": "2017-01-31 00:00:00", "integer": 417, "double": 99998.18}
+{"COORDINATES": "-13.359006,23.90116267", "COUNTY": "ID","string": "string 318", "long": 1317, "float": 1003.18, "date": "2017-01-31 00:00:00", "integer": 417, "double": 99998.18}
 { "index" :{}}
 {"COORDINATES": "-10.359006,63.90126267", "COUNTY": "ID","string": "string 319", "long": 1318, "float": 1003.19, "date": "2017-01-30 00:00:00", "integer": 418, "double": 99998.19}
 { "index" :{}}
-{"COORDINATES": "25.359006,93.90155267", "COUNTY": "ID","string": "string 320", "long": 1319, "float": 1003.2, "date": "2017-01-29 00:00:00", "integer": 419, "double": 99998.2}
+{"COORDINATES": "25.359006,33.90155267", "COUNTY": "ID","string": "string 320", "long": 1319, "float": 1003.2, "date": "2017-01-29 00:00:00", "integer": 419, "double": 99998.2}
 { "index" :{}}
 {"COORDINATES": "65.359006,73.90151267", "COUNTY": "ID","string": "string 321", "long": 1320, "float": 1003.21, "date": "2017-01-28 00:00:00", "integer": 420, "double": 99998.21}
 { "index" :{}}
@@ -651,17 +651,17 @@
 { "index" :{}}
 {"COORDINATES": "67.359006,56.90151167", "COUNTY": "ID","string": "string 326", "long": 1325, "float": 1003.26, "date": "2017-01-23 00:00:00", "integer": 425, "double": 99998.26}
 { "index" :{}}
-{"COORDINATES": "87.359006,93.90156267", "COUNTY": "ID","string": "string 327", "long": 1326, "float": 1003.27, "date": "2017-01-22 00:00:00", "integer": 426, "double": 99998.27}
+{"COORDINATES": "87.359006,73.90156267", "COUNTY": "ID","string": "string 327", "long": 1326, "float": 1003.27, "date": "2017-01-22 00:00:00", "integer": 426, "double": 99998.27}
 { "index" :{}}
 {"COORDINATES": "29.359006,03.90156267", "COUNTY": "ID","string": "string 328", "long": 1327, "float": 1003.28, "date": "2017-01-21 00:00:00", "integer": 427, "double": 99998.28}
 { "index" :{}}
-{"COORDINATES": "10.359006,93.90156267", "COUNTY": "ID","string": "string 329", "long": 1328, "float": 1003.29, "date": "2017-01-20 00:00:00", "integer": 428, "double": 99998.29}
+{"COORDINATES": "10.359006,03.90156267", "COUNTY": "ID","string": "string 329", "long": 1328, "float": 1003.29, "date": "2017-01-20 00:00:00", "integer": 428, "double": 99998.29}
 { "index" :{}}
-{"COORDINATES": "-15.359006,-93.9015667", "COUNTY": "ID","string": "string 330", "long": 1329, "float": 1003.3, "date": "2017-01-19 00:00:00", "integer": 429, "double": 99998.3}
+{"COORDINATES": "-15.359006,-03.9015667", "COUNTY": "ID","string": "string 330", "long": 1329, "float": 1003.3, "date": "2017-01-19 00:00:00", "integer": 429, "double": 99998.3}
 { "index" :{}}
 {"COORDINATES": "-28.359006,-73.9015626", "COUNTY": "ID","string": "string 331", "long": 1330, "float": 1003.31, "date": "2017-01-18 00:00:00", "integer": 430, "double": 99998.31}
 { "index" :{}}
-{"COORDINATES": "-45.359006,93.90156267", "COUNTY": "ID","string": "string 332", "long": 1331, "float": 1003.32, "date": "2017-01-17 00:00:00", "integer": 431, "double": 99998.32}
+{"COORDINATES": "-45.359006,05.90156267", "COUNTY": "ID","string": "string 332", "long": 1331, "float": 1003.32, "date": "2017-01-17 00:00:00", "integer": 431, "double": 99998.32}
 { "index" :{}}
 {"COORDINATES": "-65.359006,63.90156267", "COUNTY": "ID","string": "string 333", "long": 1332, "float": 1003.33, "date": "2017-01-16 00:00:00", "integer": 432, "double": 99998.33}
 { "index" :{}}
@@ -701,59 +701,59 @@
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 351", "long": 1350, "float": 1003.51, "date": "2016-12-29 00:00:00", "integer": 450, "double": 99998.51}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 352", "long": 1351, "float": 1003.52, "date": "2016-12-28 00:00:00", "integer": 451, "double": 99998.52}
+{"COORDINATES": "-22.359006,23.90156267", "COUNTY": "AL","string": "string 352", "long": 1351, "float": 1003.52, "date": "2016-12-28 00:00:00", "integer": 451, "double": 99998.52}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 353", "long": 1352, "float": 1003.53, "date": "2016-12-27 00:00:00", "integer": 452, "double": 99998.53}
+{"COORDINATES": "-72.359006,13.90156267", "COUNTY": "AL","string": "string 353", "long": 1352, "float": 1003.53, "date": "2016-12-27 00:00:00", "integer": 452, "double": 99998.53}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 354", "long": 1353, "float": 1003.54, "date": "2016-12-26 00:00:00", "integer": 453, "double": 99998.54}
+{"COORDINATES": "-22.359006,23.90156267", "COUNTY": "AL","string": "string 354", "long": 1353, "float": 1003.54, "date": "2016-12-26 00:00:00", "integer": 453, "double": 99998.54}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 355", "long": 1354, "float": 1003.55, "date": "2016-12-25 00:00:00", "integer": 454, "double": 99998.55}
+{"COORDINATES": "-12.359006,53.90156267", "COUNTY": "AL","string": "string 355", "long": 1354, "float": 1003.55, "date": "2016-12-25 00:00:00", "integer": 454, "double": 99998.55}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 356", "long": 1355, "float": 1003.56, "date": "2016-12-24 00:00:00", "integer": 455, "double": 99998.56}
+{"COORDINATES": "-22.359006,83.90156267", "COUNTY": "AL","string": "string 356", "long": 1355, "float": 1003.56, "date": "2016-12-24 00:00:00", "integer": 455, "double": 99998.56}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 357", "long": 1356, "float": 1003.57, "date": "2016-12-23 00:00:00", "integer": 456, "double": 99998.57}
+{"COORDINATES": "-27.359006,73.90156267", "COUNTY": "AL","string": "string 357", "long": 1356, "float": 1003.57, "date": "2016-12-23 00:00:00", "integer": 456, "double": 99998.57}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 358", "long": 1357, "float": 1003.58, "date": "2016-12-22 00:00:00", "integer": 457, "double": 99998.58}
+{"COORDINATES": "-32.359006,53.90156267", "COUNTY": "AL","string": "string 358", "long": 1357, "float": 1003.58, "date": "2016-12-22 00:00:00", "integer": 457, "double": 99998.58}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 359", "long": 1358, "float": 1003.59, "date": "2016-12-21 00:00:00", "integer": 458, "double": 99998.59}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 360", "long": 1359, "float": 1003.6, "date": "2016-12-20 00:00:00", "integer": 459, "double": 99998.6}
+{"COORDINATES": "-62.359006,63.90156267", "COUNTY": "AL","string": "string 360", "long": 1359, "float": 1003.6, "date": "2016-12-20 00:00:00", "integer": 459, "double": 99998.6}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 361", "long": 1360, "float": 1003.61, "date": "2016-12-19 00:00:00", "integer": 460, "double": 99998.61}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 362", "long": 1361, "float": 1003.62, "date": "2016-12-18 00:00:00", "integer": 461, "double": 99998.62}
+{"COORDINATES": "-82.359006,73.90156267", "COUNTY": "AL","string": "string 362", "long": 1361, "float": 1003.62, "date": "2016-12-18 00:00:00", "integer": 461, "double": 99998.62}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 363", "long": 1362, "float": 1003.63, "date": "2016-12-17 00:00:00", "integer": 462, "double": 99998.63}
+{"COORDINATES": "12.359006,83.90156267", "COUNTY": "AL","string": "string 363", "long": 1362, "float": 1003.63, "date": "2016-12-17 00:00:00", "integer": 462, "double": 99998.63}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 364", "long": 1363, "float": 1003.64, "date": "2016-12-16 00:00:00", "integer": 463, "double": 99998.64}
+{"COORDINATES": "32.359006,53.90156267", "COUNTY": "AL","string": "string 364", "long": 1363, "float": 1003.64, "date": "2016-12-16 00:00:00", "integer": 463, "double": 99998.64}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 365", "long": 1364, "float": 1003.65, "date": "2016-12-15 00:00:00", "integer": 464, "double": 99998.65}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 366", "long": 1365, "float": 1003.66, "date": "2016-12-14 00:00:00", "integer": 465, "double": 99998.66}
+{"COORDINATES": "22.359006,23.90156267", "COUNTY": "AL","string": "string 366", "long": 1365, "float": 1003.66, "date": "2016-12-14 00:00:00", "integer": 465, "double": 99998.66}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 367", "long": 1366, "float": 1003.67, "date": "2016-12-13 00:00:00", "integer": 466, "double": 99998.67}
+{"COORDINATES": "12.359006,73.90156267", "COUNTY": "AL","string": "string 367", "long": 1366, "float": 1003.67, "date": "2016-12-13 00:00:00", "integer": 466, "double": 99998.67}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 368", "long": 1367, "float": 1003.68, "date": "2016-12-12 00:00:00", "integer": 467, "double": 99998.68}
+{"COORDINATES": "02.359006,03.90156267", "COUNTY": "AL","string": "string 368", "long": 1367, "float": 1003.68, "date": "2016-12-12 00:00:00", "integer": 467, "double": 99998.68}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 369", "long": 1368, "float": 1003.69, "date": "2016-12-11 00:00:00", "integer": 468, "double": 99998.69}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 370", "long": 1369, "float": 1003.7, "date": "2016-12-10 00:00:00", "integer": 469, "double": 99998.7}
+{"COORDINATES": "-22.359006,54.90156267", "COUNTY": "AL","string": "string 370", "long": 1369, "float": 1003.7, "date": "2016-12-10 00:00:00", "integer": 469, "double": 99998.7}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 371", "long": 1370, "float": 1003.71, "date": "2016-12-09 00:00:00", "integer": 470, "double": 99998.71}
+{"COORDINATES": "-22.359006,73.90156267", "COUNTY": "AL","string": "string 371", "long": 1370, "float": 1003.71, "date": "2016-12-09 00:00:00", "integer": 470, "double": 99998.71}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 372", "long": 1371, "float": 1003.72, "date": "2016-12-08 00:00:00", "integer": 471, "double": 99998.72}
+{"COORDINATES": "-22.359006,83.90156267", "COUNTY": "AL","string": "string 372", "long": 1371, "float": 1003.72, "date": "2016-12-08 00:00:00", "integer": 471, "double": 99998.72}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 373", "long": 1372, "float": 1003.73, "date": "2016-12-07 00:00:00", "integer": 472, "double": 99998.73}
+{"COORDINATES": "-22.359006,23.90156267", "COUNTY": "AL","string": "string 373", "long": 1372, "float": 1003.73, "date": "2016-12-07 00:00:00", "integer": 472, "double": 99998.73}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 374", "long": 1373, "float": 1003.74, "date": "2016-12-06 00:00:00", "integer": 473, "double": 99998.74}
+{"COORDINATES": "22.359006,83.90156267", "COUNTY": "AL","string": "string 374", "long": 1373, "float": 1003.74, "date": "2016-12-06 00:00:00", "integer": 473, "double": 99998.74}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 375", "long": 1374, "float": 1003.75, "date": "2016-12-05 00:00:00", "integer": 474, "double": 99998.75}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 376", "long": 1375, "float": 1003.76, "date": "2016-12-04 00:00:00", "integer": 475, "double": 99998.76}
+{"COORDINATES": "22.359006,63.90156267", "COUNTY": "AL","string": "string 376", "long": 1375, "float": 1003.76, "date": "2016-12-04 00:00:00", "integer": 475, "double": 99998.76}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 377", "long": 1376, "float": 1003.77, "date": "2016-12-03 00:00:00", "integer": 476, "double": 99998.77}
+{"COORDINATES": "02.359006,50.90156267", "COUNTY": "AL","string": "string 377", "long": 1376, "float": 1003.77, "date": "2016-12-03 00:00:00", "integer": 476, "double": 99998.77}
 { "index" :{}}
-{"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 378", "long": 1377, "float": 1003.78, "date": "2016-12-02 00:00:00", "integer": 477, "double": 99998.78}
+{"COORDINATES": "12.359006,73.90156267", "COUNTY": "AL","string": "string 378", "long": 1377, "float": 1003.78, "date": "2016-12-02 00:00:00", "integer": 477, "double": 99998.78}
 { "index" :{}}
 {"COORDINATES": "-22.359006,53.90156267", "COUNTY": "AL","string": "string 379", "long": 1378, "float": 1003.79, "date": "2016-12-01 00:00:00", "integer": 478, "double": 99998.79}
 { "index" :{}}
@@ -771,13 +771,13 @@
 { "index" :{}}
 {"COORDINATES": "88.359006,56.90122267", "COUNTY": "AL","string": "string 386", "long": 1385, "float": 1003.86, "date": "2016-11-24 00:00:00", "integer": 485, "double": 99998.86}
 { "index" :{}}
-{"COORDINATES": "93.359006,30.90133267", "COUNTY": "AL","string": "string 387", "long": 1386, "float": 1003.87, "date": "2016-11-23 00:00:00", "integer": 486, "double": 99998.87}
+{"COORDINATES": "13.359006,30.90133267", "COUNTY": "AL","string": "string 387", "long": 1386, "float": 1003.87, "date": "2016-11-23 00:00:00", "integer": 486, "double": 99998.87}
 { "index" :{}}
-{"COORDINATES": "93.359006,26.90144267", "COUNTY": "AL","string": "string 388", "long": 1387, "float": 1003.88, "date": "2016-11-22 00:00:00", "integer": 487, "double": 99998.88}
+{"COORDINATES": "23.359006,26.90144267", "COUNTY": "AL","string": "string 388", "long": 1387, "float": 1003.88, "date": "2016-11-22 00:00:00", "integer": 487, "double": 99998.88}
 { "index" :{}}
 {"COORDINATES": "87.359006,20.90100267", "COUNTY": "AL","string": "string 389", "long": 1388, "float": 1003.89, "date": "2016-11-21 00:00:00", "integer": 488, "double": 99998.89}
 { "index" :{}}
-{"COORDINATES": "-97.359006,53.92226267", "COUNTY": "AL","string": "string 390", "long": 1389, "float": 1003.9, "date": "2016-11-20 00:00:00", "integer": 489, "double": 99998.9}
+{"COORDINATES": "-17.359006,53.92226267", "COUNTY": "AL","string": "string 390", "long": 1389, "float": 1003.9, "date": "2016-11-20 00:00:00", "integer": 489, "double": 99998.9}
 { "index" :{}}
 {"COORDINATES": "-23.359006,53.90666267", "COUNTY": "AL","string": "string 391", "long": 1390, "float": 1003.91, "date": "2016-11-19 00:00:00", "integer": 490, "double": 99998.91}
 { "index" :{}}
@@ -785,11 +785,11 @@
 { "index" :{}}
 {"COORDINATES": "36.359006,53.90158967", "COUNTY": "AL","string": "string 393", "long": 1392, "float": 1003.93, "date": "2016-11-17 00:00:00", "integer": 492, "double": 99998.93}
 { "index" :{}}
-{"COORDINATES": "95.359006,53.90176267", "COUNTY": "AL","string": "string 394", "long": 1393, "float": 1003.94, "date": "2016-11-16 00:00:00", "integer": 493, "double": 99998.94}
+{"COORDINATES": "85.359006,53.90176267", "COUNTY": "AL","string": "string 394", "long": 1393, "float": 1003.94, "date": "2016-11-16 00:00:00", "integer": 493, "double": 99998.94}
 { "index" :{}}
-{"COORDINATES": "19.359006,53.90156267", "COUNTY": "AL","string": "string 395", "long": 1394, "float": 1003.95, "date": "2016-11-15 00:00:00", "integer": 494, "double": 99998.95}
+{"COORDINATES": "19.359006,50.90156267", "COUNTY": "AL","string": "string 395", "long": 1394, "float": 1003.95, "date": "2016-11-15 00:00:00", "integer": 494, "double": 99998.95}
 { "index" :{}}
-{"COORDINATES": "20.359006,53.90188267", "COUNTY": "AL","string": "string 396", "long": 1395, "float": 1003.96, "date": "2016-11-14 00:00:00", "integer": 495, "double": 99998.96}
+{"COORDINATES": "20.359006,23.90188267", "COUNTY": "AL","string": "string 396", "long": 1395, "float": 1003.96, "date": "2016-11-14 00:00:00", "integer": 495, "double": 99998.96}
 { "index" :{}}
 {"COORDINATES": "76.359006,53.90128267", "COUNTY": "AL","string": "string 397", "long": 1396, "float": 1003.97, "date": "2016-11-13 00:00:00", "integer": 496, "double": 99998.97}
 { "index" :{}}
@@ -799,19 +799,19 @@
 { "index" :{}}
 {"COORDINATES": "-22.359006,76.90156267", "COUNTY": "WA","string": "string 400", "long": 1399, "float": 1004, "date": "2016-11-10 00:00:00", "integer": 499, "double": 99999}
 { "index" :{}}
-{"COORDINATES": "23.359006,92.90156267", "COUNTY": "WA","string": "string 401", "long": 1400, "float": 1004.01, "date": "2016-11-09 00:00:00", "integer": 500, "double": 99999.01}
+{"COORDINATES": "23.359006,12.90156267", "COUNTY": "WA","string": "string 401", "long": 1400, "float": 1004.01, "date": "2016-11-09 00:00:00", "integer": 500, "double": 99999.01}
 { "index" :{}}
-{"COORDINATES": "76.359006,98.90156267", "COUNTY": "WA","string": "string 402", "long": 1401, "float": 1004.02, "date": "2016-11-08 00:00:00", "integer": 501, "double": 99999.02}
+{"COORDINATES": "76.359006,18.90156267", "COUNTY": "WA","string": "string 402", "long": 1401, "float": 1004.02, "date": "2016-11-08 00:00:00", "integer": 501, "double": 99999.02}
 { "index" :{}}
-{"COORDINATES": "88.359006,98.90156267", "COUNTY": "WA","string": "string 403", "long": 1402, "float": 1004.03, "date": "2016-11-07 00:00:00", "integer": 502, "double": 99999.03}
+{"COORDINATES": "88.359006,28.90156267", "COUNTY": "WA","string": "string 403", "long": 1402, "float": 1004.03, "date": "2016-11-07 00:00:00", "integer": 502, "double": 99999.03}
 { "index" :{}}
-{"COORDINATES": "91.359006,27.90156267", "COUNTY": "WA","string": "string 404", "long": 1403, "float": 1004.04, "date": "2016-11-06 00:00:00", "integer": 503, "double": 99999.04}
+{"COORDINATES": "81.359006,27.90156267", "COUNTY": "WA","string": "string 404", "long": 1403, "float": 1004.04, "date": "2016-11-06 00:00:00", "integer": 503, "double": 99999.04}
 { "index" :{}}
 {"COORDINATES": "67.359006,76.90156267", "COUNTY": "WA","string": "string 405", "long": 1404, "float": 1004.05, "date": "2016-11-05 00:00:00", "integer": 504, "double": 99999.05}
 { "index" :{}}
 {"COORDINATES": "-30.359006,25.90156267", "COUNTY": "WA","string": "string 406", "long": 1405, "float": 1004.06, "date": "2016-11-04 00:00:00", "integer": 505, "double": 99999.06}
 { "index" :{}}
-{"COORDINATES": "-51.359006,98.90156267", "COUNTY": "WA","string": "string 407", "long": 1406, "float": 1004.07, "date": "2016-11-03 00:00:00", "integer": 506, "double": 99999.07}
+{"COORDINATES": "-51.359006,68.90156267", "COUNTY": "WA","string": "string 407", "long": 1406, "float": 1004.07, "date": "2016-11-03 00:00:00", "integer": 506, "double": 99999.07}
 { "index" :{}}
 {"COORDINATES": "-87.359006,38.90156267", "COUNTY": "WA","string": "string 408", "long": 1407, "float": 1004.08, "date": "2016-11-02 00:00:00", "integer": 507, "double": 99999.08}
 { "index" :{}}
@@ -825,7 +825,7 @@
 { "index" :{}}
 {"COORDINATES": "10.359006,63.90156267", "COUNTY": "WA","string": "string 413", "long": 1412, "float": 1004.13, "date": "2016-10-28 00:00:00", "integer": 512, "double": 99999.13}
 { "index" :{}}
-{"COORDINATES": "92.359006,29.90156267", "COUNTY": "WA","string": "string 414", "long": 1413, "float": 1004.14, "date": "2016-10-27 00:00:00", "integer": 513, "double": 99999.14}
+{"COORDINATES": "22.359006,29.90156267", "COUNTY": "WA","string": "string 414", "long": 1413, "float": 1004.14, "date": "2016-10-27 00:00:00", "integer": 513, "double": 99999.14}
 { "index" :{}}
 {"COORDINATES": "09.359006,87.90156267", "COUNTY": "WA","string": "string 415", "long": 1414, "float": 1004.15, "date": "2016-10-26 00:00:00", "integer": 514, "double": 99999.15}
 { "index" :{}}
@@ -849,11 +849,11 @@
 { "index" :{}}
 {"COORDINATES": "-22.359006,41.90156267", "COUNTY": "WA","string": "string 425", "long": 1424, "float": 1004.25, "date": "2016-10-16 00:00:00", "integer": 524, "double": 99999.25}
 { "index" :{}}
-{"COORDINATES": "-98.359006,23.90156267", "COUNTY": "WA","string": "string 426", "long": 1425, "float": 1004.26, "date": "2016-10-15 00:00:00", "integer": 525, "double": 99999.26}
+{"COORDINATES": "-18.359006,23.90156267", "COUNTY": "WA","string": "string 426", "long": 1425, "float": 1004.26, "date": "2016-10-15 00:00:00", "integer": 525, "double": 99999.26}
 { "index" :{}}
 {"COORDINATES": "-20.359006,55.90156267", "COUNTY": "WA","string": "string 427", "long": 1426, "float": 1004.27, "date": "2016-10-14 00:00:00", "integer": 526, "double": 99999.27}
 { "index" :{}}
-{"COORDINATES": "92.359006,52.90156267", "COUNTY": "WA","string": "string 428", "long": 1427, "float": 1004.28, "date": "2016-10-13 00:00:00", "integer": 527, "double": 99999.28}
+{"COORDINATES": "72.359006,52.90156267", "COUNTY": "WA","string": "string 428", "long": 1427, "float": 1004.28, "date": "2016-10-13 00:00:00", "integer": 527, "double": 99999.28}
 { "index" :{}}
 {"COORDINATES": "22.359006,22.90156267", "COUNTY": "WA","string": "string 429", "long": 1428, "float": 1004.29, "date": "2016-10-12 00:00:00", "integer": 528, "double": 99999.29}
 { "index" :{}}
@@ -875,7 +875,7 @@
 { "index" :{}}
 {"COORDINATES": "-29.359006,78.90156267", "COUNTY": "WA","string": "string 438", "long": 1437, "float": 1004.38, "date": "2016-10-03 00:00:00", "integer": 537, "double": 99999.38}
 { "index" :{}}
-{"COORDINATES": "97.359006,53.90156267", "COUNTY": "WA","string": "string 439", "long": 1438, "float": 1004.39, "date": "2016-10-02 00:00:00", "integer": 538, "double": 99999.39}
+{"COORDINATES": "77.359006,53.90156267", "COUNTY": "WA","string": "string 439", "long": 1438, "float": 1004.39, "date": "2016-10-02 00:00:00", "integer": 538, "double": 99999.39}
 { "index" :{}}
 {"COORDINATES": "30.359006,53.90156267", "COUNTY": "WA","string": "string 440", "long": 1439, "float": 1004.4, "date": "2016-10-01 00:00:00", "integer": 539, "double": 99999.4}
 { "index" :{}}
@@ -895,11 +895,11 @@
 { "index" :{}}
 {"COORDINATES": "-29.359006,53.90156267", "COUNTY": "WA","string": "string 448", "long": 1447, "float": 1004.49, "date": "2016-09-22 00:00:00", "integer": 548, "double": 99999.49}
 { "index" :{}}
-{"COORDINATES": "92.359006,53.90156267", "COUNTY": "WA","string": "string 449", "long": 1448, "float": 1004.49, "date": "2016-09-22 00:00:00", "integer": 548, "double": 99999.49}
+{"COORDINATES": "62.359006,53.90156267", "COUNTY": "WA","string": "string 449", "long": 1448, "float": 1004.49, "date": "2016-09-22 00:00:00", "integer": 548, "double": 99999.49}
 { "index" :{}}
 {"COORDINATES": "-22.359006,52.90156267", "COUNTY": "IL","string": "string 450", "long": 1449, "float": 1004.5, "date": "2016-09-21 00:00:00", "integer": 549, "double": 99999.5}
 { "index" :{}}
-{"COORDINATES": "-22.359006,93.90156267", "COUNTY": "IL","string": "string 451", "long": 1450, "float": 1004.51, "date": "2016-09-20 00:00:00", "integer": 550, "double": 99999.51}
+{"COORDINATES": "-22.359006,73.90156267", "COUNTY": "IL","string": "string 451", "long": 1450, "float": 1004.51, "date": "2016-09-20 00:00:00", "integer": 550, "double": 99999.51}
 { "index" :{}}
 {"COORDINATES": "-20.359006,23.90156267", "COUNTY": "IL","string": "string 452", "long": 1451, "float": 1004.52, "date": "2016-09-19 00:00:00", "integer": 551, "double": 99999.52}
 { "index" :{}}
@@ -907,7 +907,7 @@
 { "index" :{}}
 {"COORDINATES": "-27.359006,53.90156267", "COUNTY": "IL","string": "string 454", "long": 1453, "float": 1004.54, "date": "2016-09-17 00:00:00", "integer": 553, "double": 99999.54}
 { "index" :{}}
-{"COORDINATES": "23.359006,98.90156267", "COUNTY": "IL","string": "string 455", "long": 1454, "float": 1004.56, "date": "2016-09-15 00:00:00", "integer": 555, "double": 99999.56}
+{"COORDINATES": "23.359006,88.90156267", "COUNTY": "IL","string": "string 455", "long": 1454, "float": 1004.56, "date": "2016-09-15 00:00:00", "integer": 555, "double": 99999.56}
 { "index" :{}}
 {"COORDINATES": "12.359006,22.90156267", "COUNTY": "IL","string": "string 456", "long": 1455, "float": 1004.56, "date": "2016-09-15 00:00:00", "integer": 555, "double": 99999.56}
 { "index" :{}}
@@ -917,7 +917,7 @@
 { "index" :{}}
 {"COORDINATES": "-33.359006,37.90156267", "COUNTY": "IL","string": "string 459", "long": 1458, "float": 1004.59, "date": "2016-09-12 00:00:00", "integer": 558, "double": 99999.59}
 { "index" :{}}
-{"COORDINATES": "98.359006,45.90156267", "COUNTY": "IL","string": "string 460", "long": 1459, "float": 1004.6, "date": "2016-09-11 00:00:00", "integer": 559, "double": 99999.6}
+{"COORDINATES": "08.359006,45.90156267", "COUNTY": "IL","string": "string 460", "long": 1459, "float": 1004.6, "date": "2016-09-11 00:00:00", "integer": 559, "double": 99999.6}
 { "index" :{}}
 {"COORDINATES": "22.359006,28.90156267", "COUNTY": "IL","string": "string 461", "long": 1460, "float": 1004.61, "date": "2016-09-10 00:00:00", "integer": 560, "double": 99999.61}
 { "index" :{}}
@@ -925,7 +925,7 @@
 { "index" :{}}
 {"COORDINATES": "42.359006,87.90156267", "COUNTY": "IL","string": "string 463", "long": 1462, "float": 1004.63, "date": "2016-09-08 00:00:00", "integer": 562, "double": 99999.63}
 { "index" :{}}
-{"COORDINATES": "02.359006,98.90156267", "COUNTY": "IL","string": "string 464", "long": 1463, "float": 1004.64, "date": "2016-09-07 00:00:00", "integer": 563, "double": 99999.64}
+{"COORDINATES": "02.359006,88.90156267", "COUNTY": "IL","string": "string 464", "long": 1463, "float": 1004.64, "date": "2016-09-07 00:00:00", "integer": 563, "double": 99999.64}
 { "index" :{}}
 {"COORDINATES": "32.359006,26.90156267", "COUNTY": "IL","string": "string 465", "long": 1464, "float": 1004.65, "date": "2016-09-06 00:00:00", "integer": 564, "double": 99999.65}
 { "index" :{}}
@@ -939,7 +939,7 @@
 { "index" :{}}
 {"COORDINATES": "-32.359006,10.90156267", "COUNTY": "IL","string": "string 470", "long": 1469, "float": 1004.7, "date": "2016-09-01 00:00:00", "integer": 569, "double": 99999.7}
 { "index" :{}}
-{"COORDINATES": "-42.359006,98.90156267", "COUNTY": "IL","string": "string 471", "long": 1470, "float": 1004.71, "date": "2016-08-31 00:00:00", "integer": 570, "double": 99999.71}
+{"COORDINATES": "-42.359006,28.90156267", "COUNTY": "IL","string": "string 471", "long": 1470, "float": 1004.71, "date": "2016-08-31 00:00:00", "integer": 570, "double": 99999.71}
 { "index" :{}}
 {"COORDINATES": "-52.359006,73.90156267", "COUNTY": "IL","string": "string 472", "long": 1471, "float": 1004.72, "date": "2016-08-30 00:00:00", "integer": 571, "double": 99999.72}
 { "index" :{}}
@@ -971,15 +971,15 @@
 { "index" :{}}
 {"COORDINATES": "82.359006,53.90156267", "COUNTY": "IL","string": "string 486", "long": 1485, "float": 1004.86, "date": "2016-08-16 00:00:00", "integer": 585, "double": 99999.86}
 { "index" :{}}
-{"COORDINATES": "98.359006,53.90156267", "COUNTY": "IL","string": "string 487", "long": 1486, "float": 1004.87, "date": "2016-08-15 00:00:00", "integer": 586, "double": 99999.87}
+{"COORDINATES": "89.359006,53.90156267", "COUNTY": "IL","string": "string 487", "long": 1486, "float": 1004.87, "date": "2016-08-15 00:00:00", "integer": 586, "double": 99999.87}
 { "index" :{}}
-{"COORDINATES": "98.359006,20.90156267", "COUNTY": "IL","string": "string 488", "long": 1487, "float": 1004.88, "date": "2016-08-14 00:00:00", "integer": 587, "double": 99999.88}
+{"COORDINATES": "88.359006,20.90156267", "COUNTY": "IL","string": "string 488", "long": 1487, "float": 1004.88, "date": "2016-08-14 00:00:00", "integer": 587, "double": 99999.88}
 { "index" :{}}
-{"COORDINATES": "-10.359006,90.90156267", "COUNTY": "IL","string": "string 489", "long": 1488, "float": 1004.89, "date": "2016-08-13 00:00:00", "integer": 588, "double": 99999.89}
+{"COORDINATES": "-10.359006,10.90156267", "COUNTY": "IL","string": "string 489", "long": 1488, "float": 1004.89, "date": "2016-08-13 00:00:00", "integer": 588, "double": 99999.89}
 { "index" :{}}
-{"COORDINATES": "90.359006,10.90156267", "COUNTY": "IL","string": "string 490", "long": 1489, "float": 1004.9, "date": "2016-08-12 00:00:00", "integer": 589, "double": 99999.9}
+{"COORDINATES": "70.359006,10.90156267", "COUNTY": "IL","string": "string 490", "long": 1489, "float": 1004.9, "date": "2016-08-12 00:00:00", "integer": 589, "double": 99999.9}
 { "index" :{}}
-{"COORDINATES": "90.359006,29.90156267", "COUNTY": "IL","string": "string 491", "long": 1490, "float": 1004.91, "date": "2016-08-11 00:00:00", "integer": 590, "double": 99999.91}
+{"COORDINATES": "60.359006,29.90156267", "COUNTY": "IL","string": "string 491", "long": 1490, "float": 1004.91, "date": "2016-08-11 00:00:00", "integer": 590, "double": 99999.91}
 { "index" :{}}
 {"COORDINATES": "82.359006,09.90156267", "COUNTY": "IL","string": "string 492", "long": 1491, "float": 1004.92, "date": "2016-08-10 00:00:00", "integer": 591, "double": 99999.92}
 { "index" :{}}
@@ -987,11 +987,11 @@
 { "index" :{}}
 {"COORDINATES": "33.359006,24.90156267", "COUNTY": "IL","string": "string 494", "long": 1493, "float": 1004.94, "date": "2016-08-08 00:00:00", "integer": 593, "double": 99999.94}
 { "index" :{}}
-{"COORDINATES": "89.359006,98.90156267", "COUNTY": "IL","string": "string 495", "long": 1494, "float": 1004.95, "date": "2016-08-07 00:00:00", "integer": 594, "double": 99999.95}
+{"COORDINATES": "89.359006,18.90156267", "COUNTY": "IL","string": "string 495", "long": 1494, "float": 1004.95, "date": "2016-08-07 00:00:00", "integer": 594, "double": 99999.95}
 { "index" :{}}
-{"COORDINATES": "02.359006,92.90156267", "COUNTY": "IL","string": "string 496", "long": 1495, "float": 1004.96, "date": "2016-08-06 00:00:00", "integer": 595, "double": 99999.96}
+{"COORDINATES": "02.359006,22.90156267", "COUNTY": "IL","string": "string 496", "long": 1495, "float": 1004.96, "date": "2016-08-06 00:00:00", "integer": 595, "double": 99999.96}
 { "index" :{}}
-{"COORDINATES": "78.359006,89.90156267", "COUNTY": "IL","string": "string 497", "long": 1496, "float": 1004.97, "date": "2016-08-05 00:00:00", "integer": 596, "double": 99999.97}
+{"COORDINATES": "78.359006,79.90156267", "COUNTY": "IL","string": "string 497", "long": 1496, "float": 1004.97, "date": "2016-08-05 00:00:00", "integer": 596, "double": 99999.97}
 { "index" :{}}
 {"COORDINATES": "02.359006,28.90156267", "COUNTY": "IL","string": "string 498", "long": 1497, "float": 1004.98, "date": "2016-08-04 00:00:00", "integer": 597, "double": 99999.98}
 { "index" :{}}
@@ -1013,7 +1013,7 @@
 { "index" :{}}
 {"COORDINATES": "35.359006,53.90156267", "COUNTY": "TN","string": "string 507", "long": 1506, "float": 1005.07, "date": "2018-11-23 00:00:00", "integer": 606, "double": 100000.07}
 { "index" :{}}
-{"COORDINATES": "98.359006,59.90156267", "COUNTY": "TN","string": "string 508", "long": 1507, "float": 1005.08, "date": "2018-11-24 00:00:00", "integer": 607, "double": 100000.08}
+{"COORDINATES": "08.359006,59.90156267", "COUNTY": "TN","string": "string 508", "long": 1507, "float": 1005.08, "date": "2018-11-24 00:00:00", "integer": 607, "double": 100000.08}
 { "index" :{}}
 {"COORDINATES": "27.359006,53.90156267", "COUNTY": "TN","string": "string 509", "long": 1508, "float": 1005.09, "date": "2018-11-25 00:00:00", "integer": 608, "double": 100000.09}
 { "index" :{}}
@@ -1021,17 +1021,17 @@
 { "index" :{}}
 {"COORDINATES": "12.359006,88.90156267", "COUNTY": "TN","string": "string 511", "long": 1510, "float": 1006.01, "date": "2018-11-27 00:00:00", "integer": 610, "double": 100001.01}
 { "index" :{}}
-{"COORDINATES": "32.359006,90.90156267", "COUNTY": "TN","string": "string 512", "long": 1511, "float": 1006.02, "date": "2018-11-28 00:00:00", "integer": 611, "double": 100001.02}
+{"COORDINATES": "32.359006,89.99156267", "COUNTY": "TN","string": "string 512", "long": 1511, "float": 1006.02, "date": "2018-11-28 00:00:00", "integer": 611, "double": 100001.02}
 { "index" :{}}
-{"COORDINATES": "86.359006,97.90156267", "COUNTY": "TN","string": "string 513", "long": 1512, "float": 1006.03, "date": "2018-11-29 00:00:00", "integer": 612, "double": 100001.03}
+{"COORDINATES": "86.359006,37.90156267", "COUNTY": "TN","string": "string 513", "long": 1512, "float": 1006.03, "date": "2018-11-29 00:00:00", "integer": 612, "double": 100001.03}
 { "index" :{}}
 {"COORDINATES": "22.359006,56.90156267", "COUNTY": "TN","string": "string 514", "long": 1513, "float": 1006.04, "date": "2018-11-30 00:00:00", "integer": 613, "double": 100001.04}
 { "index" :{}}
-{"COORDINATES": "68.359006,97.90156267", "COUNTY": "TN","string": "string 515", "long": 1514, "float": 1006.05, "date": "2018-12-01 00:00:00", "integer": 614, "double": 100001.05}
+{"COORDINATES": "68.359006,47.90156267", "COUNTY": "TN","string": "string 515", "long": 1514, "float": 1006.05, "date": "2018-12-01 00:00:00", "integer": 614, "double": 100001.05}
 { "index" :{}}
 {"COORDINATES": "36.359006,55.90156267", "COUNTY": "TN","string": "string 516", "long": 1515, "float": 1006.06, "date": "2018-12-02 00:00:00", "integer": 615, "double": 100001.06}
 { "index" :{}}
-{"COORDINATES": "98.359006,53.90156267", "COUNTY": "TN","string": "string 517", "long": 1516, "float": 1006.07, "date": "2018-12-03 00:00:00", "integer": 616, "double": 100001.07}
+{"COORDINATES": "88.359006,53.90156267", "COUNTY": "TN","string": "string 517", "long": 1516, "float": 1006.07, "date": "2018-12-03 00:00:00", "integer": 616, "double": 100001.07}
 { "index" :{}}
 {"COORDINATES": "23.359006,53.90156267", "COUNTY": "TN","string": "string 518", "long": 1517, "float": 1006.08, "date": "2018-12-04 00:00:00", "integer": 617, "double": 100001.08}
 { "index" :{}}
@@ -1049,7 +1049,7 @@
 { "index" :{}}
 {"COORDINATES": "26.359006,55.90156267", "COUNTY": "TN","string": "string 525", "long": 1524, "float": 1006.04, "date": "2018-12-11 00:00:00", "integer": 624, "double": 100002.05}
 { "index" :{}}
-{"COORDINATES": "98.359006,53.90156267", "COUNTY": "TN","string": "string 526", "long": 1525, "float": 1006.05, "date": "2018-12-12 00:00:00", "integer": 625, "double": 100002.06}
+{"COORDINATES": "08.359006,53.90156267", "COUNTY": "TN","string": "string 526", "long": 1525, "float": 1006.05, "date": "2018-12-12 00:00:00", "integer": 625, "double": 100002.06}
 { "index" :{}}
 {"COORDINATES": "28.359006,34.90156267", "COUNTY": "TN","string": "string 527", "long": 1526, "float": 1006.06, "date": "2018-12-13 00:00:00", "integer": 626, "double": 100002.07}
 { "index" :{}}
@@ -1057,7 +1057,7 @@
 { "index" :{}}
 {"COORDINATES": "-32.359006,53.90156267", "COUNTY": "TN","string": "string 529", "long": 1528, "float": 1006.08, "date": "2018-12-15 00:00:00", "integer": 628, "double": 100002.09}
 { "index" :{}}
-{"COORDINATES": "92.359006,87.90156267", "COUNTY": "TN","string": "string 530", "long": 1529, "float": 1006.09, "date": "2018-12-16 00:00:00", "integer": 629, "double": 100003.00}
+{"COORDINATES": "82.359006,87.90156267", "COUNTY": "TN","string": "string 530", "long": 1529, "float": 1006.09, "date": "2018-12-16 00:00:00", "integer": 629, "double": 100003.00}
 { "index" :{}}
 {"COORDINATES": "-22.359006,25.90156267", "COUNTY": "TN","string": "string 531", "long": 1530, "float": 1007.00, "date": "2018-12-16 00:00:00", "integer": 630, "double": 100003.01}
 { "index" :{}}
@@ -1069,9 +1069,9 @@
 { "index" :{}}
 {"COORDINATES": "-72.359006,55.90156267", "COUNTY": "TN","string": "string 535", "long": 1534, "float": 1007.04, "date": "2018-12-20 00:00:00", "integer": 634, "double": 100003.05}
 { "index" :{}}
-{"COORDINATES": "92.359006,53.918856267", "COUNTY": "TN","string": "string 536", "long": 1535, "float": 1007.05, "date": "2018-12-21 00:00:00", "integer": 635, "double": 100003.06}
+{"COORDINATES": "02.359006,53.918856267", "COUNTY": "TN","string": "string 536", "long": 1535, "float": 1007.05, "date": "2018-12-21 00:00:00", "integer": 635, "double": 100003.06}
 { "index" :{}}
-{"COORDINATES": "-82.359006,98.90156267", "COUNTY": "TN","string": "string 537", "long": 1536, "float": 1007.06, "date": "2018-12-22 00:00:00", "integer": 636, "double": 100003.07}
+{"COORDINATES": "-82.359006,48.90156267", "COUNTY": "TN","string": "string 537", "long": 1536, "float": 1007.06, "date": "2018-12-22 00:00:00", "integer": 636, "double": 100003.07}
 { "index" :{}}
 {"COORDINATES": "84.359006,23.90156267", "COUNTY": "TN","string": "string 538", "long": 1537, "float": 1007.07, "date": "2018-12-23 00:00:00", "integer": 637, "double": 100003.08}
 { "index" :{}}
@@ -1081,11 +1081,11 @@
 { "index" :{}}
 {"COORDINATES": "26.359006,57.90336267", "COUNTY": "TN","string": "string 541", "long": 1540, "float": 1008.00, "date": "2018-12-26 00:00:00", "integer": 640, "double": 100004.01}
 { "index" :{}}
-{"COORDINATES": "98.359006,63.90156267", "COUNTY": "TN","string": "string 542", "long": 1541, "float": 1008.01, "date": "2018-12-27 00:00:00", "integer": 641, "double": 100004.02}
+{"COORDINATES": "78.359006,63.90156267", "COUNTY": "TN","string": "string 542", "long": 1541, "float": 1008.01, "date": "2018-12-27 00:00:00", "integer": 641, "double": 100004.02}
 { "index" :{}}
-{"COORDINATES": "27.359006,97.90156267", "COUNTY": "TN","string": "string 543", "long": 1542, "float": 1008.02, "date": "2018-12-28 00:00:00", "integer": 642, "double": 100004.03}
+{"COORDINATES": "27.359006,57.90156267", "COUNTY": "TN","string": "string 543", "long": 1542, "float": 1008.02, "date": "2018-12-28 00:00:00", "integer": 642, "double": 100004.03}
 { "index" :{}}
-{"COORDINATES": "98.359006,54.90156267", "COUNTY": "TN","string": "string 544", "long": 1543, "float": 1008.03, "date": "2018-12-29 00:00:00", "integer": 643, "double": 100004.04}
+{"COORDINATES": "08.359006,54.90156267", "COUNTY": "TN","string": "string 544", "long": 1543, "float": 1008.03, "date": "2018-12-29 00:00:00", "integer": 643, "double": 100004.04}
 { "index" :{}}
 {"COORDINATES": "26.359006,54.90153367", "COUNTY": "TN","string": "string 545", "long": 1544, "float": 1008.04, "date": "2018-12-30 00:00:00", "integer": 644, "double": 100004.05}
 { "index" :{}}
@@ -1103,6 +1103,6 @@
 { "index" :{}}
 {"COORDINATES": "32.359006,87.90156267", "COUNTY": "TN","string": "string 550", "long": 1551, "float": null, "date": "2019-01-29 00:00:00", "integer": 651, "double": 100005.02}
 { "index" :{}}
-{"COORDINATES": "62.359006,98.90156267", "COUNTY": "TN","string": "", "long": 1552, "float": null, "date": "2019-01-30 00:00:00", "integer": 652, "double": 100005.03}
+{"COORDINATES": "62.359006,08.90156267", "COUNTY": "TN","string": "", "long": 1552, "float": null, "date": "2019-01-30 00:00:00", "integer": 652, "double": 100005.03}
 { "index" :{}}
-{"COORDINATES": "92.359006,59.90556267", "COUNTY": "TN","string": "", "long": 1553, "float": null, "date": "2019-01-31 00:00:00", "integer": 653, "double": 100005.04}
+{"COORDINATES": "12.359006,59.90556267", "COUNTY": "TN","string": "", "long": 1553, "float": null, "date": "2019-01-31 00:00:00", "integer": 653, "double": 100005.04}
