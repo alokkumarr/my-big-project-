@@ -12,7 +12,7 @@ import * as uniq from 'lodash/uniq';
 import * as reduce from 'lodash/reduce';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as isUndefined from 'lodash/isUndefined';
+import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -137,7 +137,7 @@ export class AnalyzeService {
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    const requestURL = isUndefined(executionId)
+    const requestURL = isNil(executionId)
       ? `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
     return this.getRequest(requestURL).toPromise();
@@ -550,7 +550,7 @@ export class AnalyzeService {
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
             queryBuilder: { ...model.sipQuery },
-            count: fpGet(`totalRows`, resp)
+            count: fpGet(`totalRows`, resp) || resp.length
           };
         })
       )
@@ -716,6 +716,7 @@ export class AnalyzeService {
         artifacts: [],
         booleanCriteria: 'AND',
         filters: [],
+        joins: [],
         sorts: [],
         store: {
           dataStore: null, // This is filled up when creating analysis
