@@ -15,16 +15,20 @@ const getPropPath = memoize(index => {
   return `children[0].next.${nexts}attribs['data-value']`;
 });
 
+function getFloatValue(tr, index) {
+  return parseFloat(get(tr, getPropPath(index)));
+}
+
 function getPropsFormTr(tr) {
   const path = get(tr, getPropPath(0));
-  const statements = get(tr, getPropPath(2));
-  const branches = get(tr, getPropPath(4));
-  const functions = get(tr, getPropPath(6));
-  const lines = get(tr, getPropPath(8));
+  const statements = getFloatValue(tr, 2);
+  const branches = getFloatValue(tr, 4);
+  const functions = getFloatValue(tr, 6);
+  const lines = getFloatValue(tr, 8);
   return { path, statements, branches, functions, lines };
 }
 
-export function html2Map() {
+function html2Map(htmlCoverage) {
   const $ = cheerio.load(htmlCoverage);
   const tableRows = Array.from($('tbody tr'));
   return reduce(
@@ -40,8 +44,13 @@ export function html2Map() {
   );
 }
 
-export function html2Array() {
+function html2Array(htmlCoverage) {
   const $ = cheerio.load(htmlCoverage);
   const tableRows = Array.from($('tbody tr'));
   return map(tableRows, tr => getPropsFormTr(tr), {});
 }
+
+module.exports = {
+  html2Map,
+  html2Array
+};

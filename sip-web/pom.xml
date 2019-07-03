@@ -299,7 +299,7 @@
                 </goals>
                 <phase>test</phase>
                 <configuration>
-                  <arguments>run test</arguments>
+                  <arguments>run coverage:check</arguments>
                 </configuration>
               </execution>
 
