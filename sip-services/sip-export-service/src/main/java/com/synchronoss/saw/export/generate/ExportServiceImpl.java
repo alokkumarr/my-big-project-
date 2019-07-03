@@ -436,6 +436,8 @@ public class ExportServiceImpl implements ExportService {
               });
       xlsxExporter.autoSizeColumns(workBook);
       workBook.write(stream);
+    } catch (Exception ex) {
+      logger.error("Error while creating xlsx Report : {}", ex);
     } finally {
       stream.flush();
       stream.close();
@@ -1424,7 +1426,7 @@ public class ExportServiceImpl implements ExportService {
           logger.info("Written " + written + " bytes to " + zipFileName);
         } catch (Exception e) {
           logger.error("Error while writing to zip: " + e.getMessage());
-        } finally{
+        } finally {
           zos.closeEntry();
           zos.close();
         }

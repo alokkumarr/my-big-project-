@@ -57,7 +57,7 @@ public class XlsxExporter implements IFileExporter {
         buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
-    // logger.debug(this.getClass().getName() + " addxlsxDataRows ends");
+    logger.debug(this.getClass().getName() + " addxlsxDataRows ends");
   }
 
   /**
@@ -72,7 +72,7 @@ public class XlsxExporter implements IFileExporter {
   private void addXlsxCell(
       String value, Cell cell, String specialType, Workbook workBook, CellStyle cellStyle) {
 
-    if (StringUtils.isEmpty(value) || value.equalsIgnoreCase("EMPTY")) {
+    if (StringUtils.isEmpty(value) || value.equalsIgnoreCase("EMPTY") || value.equalsIgnoreCase("null")) {
       cell.setCellValue("");
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
