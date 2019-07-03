@@ -49,7 +49,7 @@ cat2 <- c("X", "Y", "Z")
 
 dat <- data.frame()
 for(id in id_vars){
-  n <- floor(runif(1)*100)
+  n <- floor(runif(1, 0.1)*100)
   d <- data.frame(id = id,
                  date = sample(dates, n, replace = TRUE),
                  cat1 = sample(cat1, n, replace = TRUE),
