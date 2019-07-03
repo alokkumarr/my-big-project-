@@ -16,9 +16,14 @@ const dummyPassword = '*********';
 })
 export class UserEditDialogComponent extends BaseDialogComponent
   implements OnInit {
-  public showPassword: boolean;
   formGroup: FormGroup;
   formIsValid = false;
+  public showEditUserPassword: boolean;
+  public showPassword: boolean;
+
+  public showCreateUserPassword: boolean;
+
+  public userPassword: String = dummyPassword;
   statuses = [
     {
       id: 1,
@@ -53,13 +58,10 @@ export class UserEditDialogComponent extends BaseDialogComponent
   }
 
   ngOnInit() {
+    this.showEditUserPassword = false;
     this.showPassword = false;
+    this.showCreateUserPassword = false;
   }
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-
   create() {
     const formValues = this.formGroup.getRawValue();
     // if the password wasn't changed, set it to null
@@ -93,13 +95,17 @@ export class UserEditDialogComponent extends BaseDialogComponent
     if (this.data.mode === 'edit' && event.target.value === dummyPassword) {
       const password = '';
       this.formGroup.patchValue({ password });
+      this.userPassword = '';
     }
   }
 
   onPasswordBlur(event) {
     if (this.data.mode === 'edit' && event.target.value === '') {
+      this.showEditUserPassword = false;
+      this.showPassword = false;
       const password = dummyPassword;
       this.formGroup.patchValue({ password });
+      this.userPassword = dummyPassword;
     }
   }
 
@@ -164,5 +170,26 @@ export class UserEditDialogComponent extends BaseDialogComponent
         this.formIsValid = false;
       }
     });
+  }
+
+  passwordChange(event) {
+    if (
+      event.target.value === '' ||
+      event.target.value === undefined ||
+      this.userPassword === dummyPassword
+    ) {
+      this.showEditUserPassword = false;
+      this.showPassword = false;
+    } else {
+      this.showEditUserPassword = true;
+    }
+  }
+
+  togglePassword() {
+    if (this.data.mode === 'create') {
+      this.showCreateUserPassword = !this.showCreateUserPassword;
+    } else {
+      this.showPassword = !this.showPassword;
+    }
   }
 }
