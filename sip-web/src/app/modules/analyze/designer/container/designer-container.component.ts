@@ -1036,9 +1036,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       if (isDSLAnalysis(this.analysis)) {
         this._store.dispatch(new DesignerUpdateArtifactColumn({
+          alias: event.column.alias,
           columnName: event.column.columnName,
           table: event.column.table || event.column['tableName'],
-          format: event.column.format
+          format: event.column.format,
+          dateFormat: event.column['dateFormat']
         }));
         this.analysis.sipQuery = {...this.analysis.sipQuery};
       } else {

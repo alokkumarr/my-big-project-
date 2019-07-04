@@ -383,10 +383,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
     this.getNewDataThroughDialog(
       component,
-      { format: payload.format, type },
+      { format: payload.format || payload.dateFormat, type },
       format => {
         changeColumnProp('format', format);
-        this.change.emit({ subject: 'format', column: payload });
+        this.change.emit({
+          subject: 'format',
+          column: {
+            ...payload,
+            ...(payload.type === 'date' ? { dateFormat: format } : { format })
+          }
+        });
       }
     );
   }
@@ -438,7 +444,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         );
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
-          : column.format;
+          : column.format || column.dateFormat;
         const field: ReportGridField = {
           caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
@@ -458,6 +464,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         if (
           DATE_TYPES.includes(column.type) &&
           isUndefined(column.format) &&
+          isUndefined(column.dateFormat) &&
           !aggregate
         ) {
           field.format = 'yyyy-MM-dd';
