@@ -199,11 +199,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
-  public pager = {
-    showNavigationButtons: true,
-    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
-    showPageSizeSelector: true
-  };
+  public pager;
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
@@ -230,6 +226,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
+
+    this.pager = {
+      showNavigationButtons: true,
+      allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
+      showPageSizeSelector: true,
+      visible: !this.isEditable
+    };
+
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
