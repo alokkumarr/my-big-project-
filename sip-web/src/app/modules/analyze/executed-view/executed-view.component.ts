@@ -610,10 +610,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         if (this.executedAnalysis && queryBuilder) {
           if (isDSLAnalysis(this.executedAnalysis)) {
             this.executedAnalysis = {
-              ...this.executedAnalysis,
+              ...queryBuilder,
               sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                 get(this.metric, 'artifacts.0.columns', []),
-                queryBuilder
+                queryBuilder.sipQuery
               )
             };
           } else {
