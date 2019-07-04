@@ -209,7 +209,7 @@ export function flattenReportData(data, analysis) {
     fpFlatMap(artifact => artifact.columns),
     fpReduce((accumulator, column) => {
       const { columnName, aggregate } = column;
-      const key = `${columnName})-${aggregate}`;
+      const key = `${columnName}-${aggregate}`;
       accumulator[key] = column;
       return accumulator;
     }, {})
@@ -220,7 +220,7 @@ export function flattenReportData(data, analysis) {
       const hasAggregateFunction = key.includes('(') && key.includes(')');
 
       if (!hasAggregateFunction) {
-        return key;
+        return removeKeyword(key);
       }
       const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
@@ -228,11 +228,18 @@ export function flattenReportData(data, analysis) {
       const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
 
       if (isInArtifactColumn) {
-        return columnName.split(')')[0];
+        return removeKeyword(columnName.split(')')[0]);
       }
-      return key;
+      return removeKeyword(key);
     });
   });
+}
+
+function removeKeyword(key: string) {
+  if (!key) {
+    return key;
+  }
+  return key.replace('.keyword', '');
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
