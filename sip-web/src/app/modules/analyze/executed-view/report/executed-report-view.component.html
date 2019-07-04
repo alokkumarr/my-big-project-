@@ -2,8 +2,7 @@
   class="view-analysis-grid"
   [ngStyle]="{
     height:
-      analysis.sipQuery.filters.lenght != 0 ||
-      analysis.sqlBuilder.filters.length !== 0
+      (analysis.sipQuery || analysis.sqlBuilder).filters.length != 0
         ? 'calc(100vh - 312px)'
         : 'calc(100vh - 193px)'
   }"
