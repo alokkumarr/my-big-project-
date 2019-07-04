@@ -174,6 +174,7 @@ public class XlsxExporter implements IFileExporter {
       }
       if (header == null || header.length <= 0) {
         header = exportBean.getColumnHeader();
+        addHeaderRow(exportBean, workBook, workSheet);
       }
       buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
     }

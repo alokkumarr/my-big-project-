@@ -339,7 +339,8 @@ public class ExportServiceImpl implements ExportService {
 
       // stream the page output to file.
       if (fileType.equalsIgnoreCase(DEFAULT_FILE_TYPE) || fileType == null || fileType.isEmpty()) {
-        streamToCSVReport(entity, limitPerPage, exportBean, osw);
+        ExportBean bean = getCSVExportBean(exportBean);
+        streamToCSVReport(entity, limitPerPage, bean, osw);
         osw.close();
         fos.close();
       } else {
@@ -352,6 +353,23 @@ public class ExportServiceImpl implements ExportService {
               + this.getClass().getName()
               + "  method dataToBeDispatchedAsync()");
     }
+  }
+
+  /**
+   * Build new export bean to build report CSV to nullify column header.
+   *
+   * @param bean
+   * @return exportBean
+   */
+  private ExportBean getCSVExportBean(ExportBean bean) {
+    ExportBean exportBean = new ExportBean();
+    exportBean.setFileType(bean.getFileType());
+    exportBean.setFileName(bean.getFileName());
+    exportBean.setReportName(bean.getReportName());
+    exportBean.setReportDesc(bean.getReportDesc());
+    exportBean.setPublishDate(bean.getPublishDate());
+    exportBean.setCreatedBy(bean.getCreatedBy());
+    return exportBean;
   }
 
   /**
