@@ -51,11 +51,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author spau0004 This class is used to perform CRUD operation by storage The requests are JSON
- *     documents in the following formats "{ "contents": { "proxy" : [ { "storage" : "ES", "action"
- *     : "search", "query" : "", "requestBy" :"admin@sycnchrnoss.com", "objectType" : "",
- *     "indexName": "", "tableName": "", "objectName":"", "requestedTime":"", "productCode": "",
- *     "moduleName":"", "dataSecurityKey":[], "resultFormat":"", "data": [] } ] } }"
+ * This class is used to perform all kind of operation by JSON store
+ *
+ * @author spau0004
  */
 @RestController
 @Api(
@@ -64,7 +62,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
-
   @Autowired private StorageProxyService proxyService;
 
   @Value("${metadata.service.host}")
@@ -92,8 +89,6 @@ public class StorageProxyController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      // StorageProxyNode proxyNode =
-      // StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
       logger.trace(
           "Storage Proxy async request object : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture =
@@ -180,8 +175,6 @@ public class StorageProxyController {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     try {
-      // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
-      // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture = proxyService.execute(requestBody);
@@ -253,7 +246,6 @@ public class StorageProxyController {
       logger.error("Exception generated while validating incoming json against schema.", e);
       throw new JSONProcessingSAWException(
           "Exception generated while validating incoming json against schema.");
-      // responseObjectFuture = StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
@@ -307,12 +299,11 @@ public class StorageProxyController {
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
 
     try {
-      // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
-      // "contents");
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
-      responseObjectFuture = proxyService.execute(analysis.getSipQuery(), size, dataSecurityKeyNode);
+      responseObjectFuture =
+          proxyService.execute(analysis.getSipQuery(), size, dataSecurityKeyNode);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
@@ -325,7 +316,8 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
-        executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+        String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
+        executionResult.setExecutedBy(executedBy);
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {
@@ -338,11 +330,9 @@ public class StorageProxyController {
       logger.error("Exception generated while validating incoming json against schema.", e);
       throw new JSONProcessingSAWException(
           "Exception generated while validating incoming json against schema.");
-      // responseObjectFuture = StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
-      //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     }
     logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
     return responseObjectFuture;
@@ -383,11 +373,13 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse executionsData(
+      @RequestParam(name = "page", required = false) Integer page,
+      @RequestParam(name = "size", required = false) Integer size,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchExecutionsData(executionId);
+      return proxyService.fetchExecutionsData(executionId, page, size);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -406,11 +398,13 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse lastExecutionsData(
+      @RequestParam(name = "page", required = false) Integer page,
+      @RequestParam(name = "size", required = false) Integer size,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(executionId);
+      return proxyService.fetchLastExecutionsData(executionId, page, size);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

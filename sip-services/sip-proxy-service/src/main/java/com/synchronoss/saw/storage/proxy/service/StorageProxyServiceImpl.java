@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
@@ -424,15 +423,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
+      throws Exception {
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
-      if (dataSecurityKey == null) {
-          logger.info("DataSecurity key is not set !!");
-      } else {
-          logger.info("DataSecurityKey : " + dataSecurityKey.toString());
-      }
-      boolean isPercentage =
+    if (dataSecurityKey == null) {
+      logger.info("DataSecurity key is not set !!");
+    } else {
+      logger.info("DataSecurityKey : " + dataSecurityKey.toString());
+    }
+    boolean isPercentage =
         dataFields.stream()
             .anyMatch(
                 dataField ->
@@ -442,8 +442,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .value()
                             .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
-        SearchSourceBuilder searchSourceBuilder =
-            elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
+      SearchSourceBuilder searchSourceBuilder =
+          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
       JsonNode percentageData =
           storageConnectorService.ExecuteESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
@@ -452,7 +452,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     String query;
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
-    logger.trace("ES -Query {} "+query);
+    logger.trace("ES -Query {} " + query);
     List<Object> result = null;
     JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
@@ -475,10 +475,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectMapper objectMapper = new ObjectMapper();
       ExecutionResultStore executionResultStore =
           new ExecutionResultStore(executionResultTable, basePath);
-      executionResultStore.create(executionResult.getExecutionId(), objectMapper.writeValueAsString(executionResult));
+      executionResultStore.create(
+          executionResult.getExecutionId(), objectMapper.writeValueAsString(executionResult));
       return true;
     } catch (Exception e) {
-
       logger.error("Error occurred while storing the execution result data");
       logger.error(e.getMessage());
     }
@@ -495,67 +495,95 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<?> fetchDslExecutionsList(String dslQueryId) {
     try {
       // Create executionResult table if doesn't exists.
-          new ExecutionResultStore(executionResultTable, basePath);
+      new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
-      String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType"};
+      String fields[] = {
+        "executionId",
+        "dslQueryId",
+        "status",
+        "startTime",
+        "finishedTime",
+        "executedBy",
+        "executionType"
+      };
       ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode node = objectMapper.createObjectNode();
-       ObjectNode objectNode =  node.putObject("$eq");
-        objectNode.put("dslQueryId",dslQueryId);
-      return maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",5);
+      ObjectNode node = objectMapper.createObjectNode();
+      ObjectNode objectNode = node.putObject("$eq");
+      objectNode.put("dslQueryId", dslQueryId);
+      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
     } catch (Exception e) {
-      logger.error("Error occurred while storing the execution result data" , e);
+      logger.error("Error occurred while storing the execution result data", e);
     }
     return null;
   }
 
-    @Override
-    public ExecutionResponse fetchExecutionsData(String executionId)
-    {
-        ExecutionResponse executionResponse = new ExecutionResponse();
-        ObjectMapper objectMapper = new ObjectMapper();
-        ExecutionResultStore executionResultStore =
-            null;
-        try {
-            executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
-            Document doc = executionResultStore.readDocumet(executionId);
-            logger.info("Doc : "+doc.asJsonString());
-            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            ExecutionResult executionResult = objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
-            executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy(executionResult.getExecutedBy());
-            executionResponse.setAnalysis(executionResult.getAnalysis());
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching the execution result data" , e);
-        }
-        return executionResponse;
-    }
+  @Override
+  public ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer size) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    ObjectMapper objectMapper = new ObjectMapper();
+    ExecutionResultStore executionResultStore;
+    try {
+      executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      Document doc = executionResultStore.readDocumet(executionId);
+      logger.info("Doc : " + doc.asJsonString());
+      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      ExecutionResult executionResult =
+          objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
 
-
-    @Override
-    public ExecutionResponse fetchLastExecutionsData(String dslQueryId)
-    {
-        ExecutionResponse executionResponse = new ExecutionResponse();
-        JsonElement element = null;
-        try {
-            MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
-            String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType","data","analysis"};
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode node = objectMapper.createObjectNode();
-            ObjectNode objectNode =  node.putObject("$eq");
-                objectNode.put("dslQueryId",dslQueryId);
-            List<JsonNode> elements = maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",1);
-            // its last execution for the for Query Id , So consider 0 index.
-            objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-            ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-            executionResponse.setData(executionResult.getData());
-            executionResponse.setExecutedBy(executionResult.getExecutedBy());
-            executionResponse.setAnalysis(executionResult.getAnalysis());
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching the execution result data" , e);
-        }
-        return executionResponse;
+      // paginated execution data
+      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, size);
+      executionResponse.setData(data != null ? data : executionResult.getData());
+      executionResponse.setTotalRows(getTotalRows(doc, null));
+      executionResponse.setExecutedBy(executionResult.getExecutedBy());
+      executionResponse.setAnalysis(executionResult.getAnalysis());
+    } catch (Exception e) {
+      logger.error("Error occurred while fetching the execution result data", e);
     }
+    return executionResponse;
+  }
+
+  @Override
+  public ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer size) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    try {
+      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      String fields[] = {
+        "executionId",
+        "dslQueryId",
+        "status",
+        "startTime",
+        "finishedTime",
+        "executedBy",
+        "executionType",
+        "data",
+        "sipQuery"
+      };
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectNode node = objectMapper.createObjectNode();
+      ObjectNode objectNode = node.putObject("$eq");
+      objectNode.put("dslQueryId", dslQueryId);
+
+      List<JsonNode> elements =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 1);
+      // its last execution for the for Query Id , So consider 0 index.
+      objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+
+      ExecutionResult executionResult =
+          objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+
+      // paginated execution data
+      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, size);
+      executionResponse.setData(data != null ? data : executionResult.getData());
+      executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
+      executionResponse.setExecutedBy(executionResult.getExecutedBy());
+      executionResponse.setAnalysis(executionResult.getAnalysis());
+    } catch (Exception e) {
+      logger.error("Error occurred while fetching the execution result data", e);
+    }
+    return executionResponse;
+  }
 
   public int getSize() {
     return size;
@@ -563,5 +591,28 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   public void setSize(int size) {
     this.size = size;
+  }
+
+  /**
+   * Count the total number of rows.
+   *
+   * @param doc
+   * @param jsonNode
+   * @return long number of row count.
+   */
+  private long getTotalRows(Document doc, JsonNode jsonNode) {
+    try {
+      if (doc != null) {
+        List<Object> totalRows = doc.getList("data");
+        logger.debug("Total number of rows :" + totalRows.size());
+        return totalRows.size() > 0 ? totalRows.size() : 0l;
+      } else if (jsonNode != null && jsonNode.size() > 0) {
+        logger.debug("Total number of rows :" + jsonNode.get("data").size());
+        return jsonNode.get("data").size();
+      }
+    } catch (Exception ex) {
+      logger.error("Error while count the total rows : {}", ex);
+    }
+    return 0l;
   }
 }

@@ -9,15 +9,16 @@ import java.util.List;
 
 public interface StorageProxyService {
 
-  public StorageProxy execute(StorageProxy proxy) throws Exception;
+  StorageProxy execute(StorageProxy proxy) throws Exception;
 
-  List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception;
+  List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
+      throws Exception;
 
-    Boolean saveDslExecutionResult(ExecutionResult executionResult);
+  Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
-    List<?> fetchDslExecutionsList(String dslQueryId);
+  List<?> fetchDslExecutionsList(String dslQueryId);
 
-    ExecutionResponse fetchExecutionsData(String executionId);
+  ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer size);
 
-    ExecutionResponse fetchLastExecutionsData(String dslQueryId);
+  ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer size);
 }
