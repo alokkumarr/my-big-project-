@@ -37,7 +37,7 @@ const GUARDS = [IsUserNotLoggedInGuard];
     FlexLayoutModule,
     CommonModuleTs
   ],
-  declarations: [COMPONENTS],
+  declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   providers: [...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
