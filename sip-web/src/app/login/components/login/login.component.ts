@@ -13,7 +13,6 @@ import {
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  public showPassword: boolean;
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
@@ -33,7 +32,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.states.error = '';
-    this.showPassword = false;
     this._route.queryParams.subscribe(({ changePassMsg }) => {
       if (changePassMsg) {
         this.states.error = changePassMsg;
@@ -74,7 +72,7 @@ export class LoginComponent implements OnInit {
     this._router.navigate(['login', 'preResetPwd']);
   }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
+  passwordChanged(event) {
+    this.dataHolder.password = event.target.value;
   }
 }

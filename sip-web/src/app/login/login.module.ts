@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { CommonModuleTs } from '../common';
 
 import { MaterialModule } from '../material.module';
 import { IsUserNotLoggedInGuard } from './guards';
@@ -33,9 +34,10 @@ const GUARDS = [IsUserNotLoggedInGuard];
     HttpClientModule,
     FormsModule,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    CommonModuleTs
   ],
-  declarations: COMPONENTS,
+  declarations: [COMPONENTS],
   entryComponents: COMPONENTS,
   providers: [...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

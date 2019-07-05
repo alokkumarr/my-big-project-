@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
@@ -7,15 +7,18 @@ import { JwtService, UserService } from '../../../common/services';
   templateUrl: 'password-change.component.html',
   styleUrls: ['./password-change.component.scss']
 })
-export class PasswordChangeComponent implements OnInit {
-  public showOldPassword: boolean;
-  public showNewPassword: boolean;
-  public showNewConfirmPassword: boolean;
+export class PasswordChangeComponent {
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
     public _router: Router
   ) {}
+
+  public passwordType = {
+    OLDPASSWORD: 'Old Password',
+    NEWPASSWORD: 'New Password',
+    CONFIRMPASSWORD: 'Confirm Password'
+  };
 
   public formData = {
     oldPwd: null,
@@ -26,12 +29,6 @@ export class PasswordChangeComponent implements OnInit {
   public errorMsg;
 
   public formState: boolean;
-
-  ngOnInit() {
-    this.showOldPassword = false;
-    this.showNewPassword = false;
-    this.showNewConfirmPassword = false;
-  }
 
   changePwd() {
     const token = this._JwtService.get();
@@ -58,15 +55,19 @@ export class PasswordChangeComponent implements OnInit {
     this._router.navigate(['login']);
   }
 
-  toggleOldPassword() {
-    this.showOldPassword = !this.showOldPassword;
-  }
+  onPasswordChanged(event, type) {
+    switch (type) {
+      case this.passwordType.OLDPASSWORD:
+        this.formData.oldPwd = event.target.value;
+        break;
 
-  toggleNewPassword() {
-    this.showNewPassword = !this.showNewPassword;
-  }
+      case this.passwordType.NEWPASSWORD:
+        this.formData.newPwd = event.target.value;
+        break;
 
-  toggleNewConfirmPassword() {
-    this.showNewConfirmPassword = !this.showNewConfirmPassword;
+      case this.passwordType.CONFIRMPASSWORD:
+        this.formData.confNewPwd = event.target.value;
+        break;
+    }
   }
 }
