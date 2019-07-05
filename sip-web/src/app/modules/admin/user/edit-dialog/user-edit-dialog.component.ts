@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { combineLatest } from 'rxjs';
@@ -14,16 +14,9 @@ const dummyPassword = '*********';
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss']
 })
-export class UserEditDialogComponent extends BaseDialogComponent
-  implements OnInit {
+export class UserEditDialogComponent extends BaseDialogComponent {
   formGroup: FormGroup;
   formIsValid = false;
-  public showEditUserPassword: boolean;
-  public showPassword: boolean;
-
-  public showCreateUserPassword: boolean;
-
-  public userPassword: String = dummyPassword;
   statuses = [
     {
       id: 1,
@@ -57,11 +50,6 @@ export class UserEditDialogComponent extends BaseDialogComponent
     this.createForm(this.data.model);
   }
 
-  ngOnInit() {
-    this.showEditUserPassword = false;
-    this.showPassword = false;
-    this.showCreateUserPassword = false;
-  }
   create() {
     const formValues = this.formGroup.getRawValue();
     // if the password wasn't changed, set it to null
@@ -89,24 +77,6 @@ export class UserEditDialogComponent extends BaseDialogComponent
           this._dialogRef.close(rows);
         }
       });
-  }
-
-  onPasswordFocus(event) {
-    if (this.data.mode === 'edit' && event.target.value === dummyPassword) {
-      const password = '';
-      this.formGroup.patchValue({ password });
-      this.userPassword = '';
-    }
-  }
-
-  onPasswordBlur(event) {
-    if (this.data.mode === 'edit' && event.target.value === '') {
-      this.showEditUserPassword = false;
-      this.showPassword = false;
-      const password = dummyPassword;
-      this.formGroup.patchValue({ password });
-      this.userPassword = dummyPassword;
-    }
   }
 
   createForm(model) {
@@ -172,24 +142,9 @@ export class UserEditDialogComponent extends BaseDialogComponent
     });
   }
 
-  passwordChange(event) {
-    if (
-      event.target.value === '' ||
-      event.target.value === undefined ||
-      this.userPassword === dummyPassword
-    ) {
-      this.showEditUserPassword = false;
-      this.showPassword = false;
-    } else {
-      this.showEditUserPassword = true;
-    }
-  }
-
-  togglePassword() {
-    if (this.data.mode === 'create') {
-      this.showCreateUserPassword = !this.showCreateUserPassword;
-    } else {
-      this.showPassword = !this.showPassword;
-    }
+  createUserPasswordChange(event) {
+    const password =
+      event.target.value === '' ? dummyPassword : event.target.value;
+    this.formGroup.patchValue({ password });
   }
 }

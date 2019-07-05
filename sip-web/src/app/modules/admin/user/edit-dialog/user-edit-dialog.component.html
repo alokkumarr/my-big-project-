@@ -62,106 +62,11 @@
       />
     </mat-form-field>
 
-    <mat-form-field *ngIf="data.mode === 'create'">
-      <input
-        matInput
-        *ngIf="!showCreateUserPassword"
-        [required]="data.mode === 'create'"
-        type="password"
-        (focus)="onPasswordFocus($event)"
-        (blur)="onPasswordBlur($event)"
-        formControlName="password"
-        placeholder="Password"
-      />
-
-      <input
-        matInput
-        *ngIf="showCreateUserPassword"
-        [required]="data.mode === 'create'"
-        type="text"
-        (focus)="onPasswordFocus($event)"
-        (blur)="onPasswordBlur($event)"
-        formControlName="password"
-        placeholder="Password"
-      />
-
-      <button
-        tabindex="-1"
-        e2e="show-password-login"
-        color="primary"
-        mat-button
-        matSuffix
-        mat-icon-button
-        aria-label="show"
-        (click)="togglePassword()"
-      >
-        <mat-icon
-          matTooltip="Show Password"
-          *ngIf="!showCreateUserPassword"
-          fontIcon="icon-show"
-          e2e="show-password"
-        ></mat-icon>
-        <mat-icon
-          matTooltip="Hide Password"
-          *ngIf="showCreateUserPassword"
-          fontIcon="icon-hide"
-          e2e="hide-password"
-        ></mat-icon>
-      </button>
-    </mat-form-field>
-
-    <mat-form-field *ngIf="data.mode === 'edit'">
-      <input
-        matInput
-        *ngIf="!showPassword"
-        type="password"
-        [(ngModel)]="userPassword"
-        (focus)="onPasswordFocus($event)"
-        (blur)="onPasswordBlur($event)"
-        formControlName="password"
-        placeholder="Password"
-        (keyup)="passwordChange($event)"
-        (change)="passwordChange($event)"
-      />
-
-      <input
-        matInput
-        *ngIf="showPassword && showEditUserPassword"
-        type="text"
-        [(ngModel)]="userPassword"
-        (focus)="onPasswordFocus($event)"
-        (blur)="onPasswordBlur($event)"
-        formControlName="password"
-        placeholder="Password"
-        (keyup)="passwordChange($event)"
-        (change)="passwordChange($event)"
-      />
-
-      <button
-        *ngIf="showEditUserPassword"
-        tabindex="-1"
-        e2e="show-password-login"
-        color="primary"
-        mat-button
-        matSuffix
-        mat-icon-button
-        aria-label="show"
-        (click)="togglePassword()"
-      >
-        <mat-icon
-          matTooltip="Show Password"
-          *ngIf="!showPassword && showEditUserPassword"
-          fontIcon="icon-show"
-          e2e="show-password"
-        ></mat-icon>
-        <mat-icon
-          matTooltip="Hide Password"
-          *ngIf="showPassword && showEditUserPassword"
-          fontIcon="icon-hide"
-          e2e="hide-password"
-        ></mat-icon>
-      </button>
-    </mat-form-field>
+    <password-toggle
+      [placeholder]="'Password'"
+      [isUserEditMode]="data.mode === 'edit'"
+      (change)="createUserPasswordChange($event)"
+    ></password-toggle>
 
     <mat-form-field>
       <input
