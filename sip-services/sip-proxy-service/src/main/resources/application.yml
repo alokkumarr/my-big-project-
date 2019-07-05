@@ -37,15 +37,8 @@ metastore:
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
-{% if sip_secure %}
-
-connector : https
-
-{% else %}
 
 connector : http
-
-{% endif %}
 
 metadata:
   service:
@@ -54,10 +47,5 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-{% if sip_secure %}
-  ssl:
-    enable : true
-{% else %}
   ssl:
     enable: false
-{% endif %}
