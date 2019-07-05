@@ -1121,8 +1121,6 @@ public class BatchIngestionIT extends BaseIT {
     assertTrue(listOfRoutes.size() > 0);
 
     String jobUriByChannelType = BATCH_PATH + JOB_PATH + "/" + "channelTypes/" + bisChannelSysId;
-    String jobUriByChannelId = BATCH_PATH + JOB_PATH + "/" + "channels/" + bisChannelSysId;
-    String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + bisChannelSysId + "/" + routeId;
 
     Object listJobByChannelType =
         given(authSpec)
@@ -1143,6 +1141,7 @@ public class BatchIngestionIT extends BaseIT {
     assertTrue(fetchByType.has("numOfPages"));
     assertTrue(fetchByType.has("jobDetails"));
 
+    String jobUriByChannelId = BATCH_PATH + JOB_PATH + "/" + "channels/" + bisChannelSysId;
     Object listJobByChannelId =
         given(authSpec)
             .when()
@@ -1161,6 +1160,7 @@ public class BatchIngestionIT extends BaseIT {
     assertTrue(fetchById.has("numOfPages"));
     assertTrue(fetchById.has("jobDetails"));
 
+    String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + bisChannelSysId + "/" + routeId;
     Object listJobByChannelRouteId =
         given(authSpec)
             .when()
