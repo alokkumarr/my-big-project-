@@ -1,7 +1,6 @@
 package com.synchronoss.saw.storage.proxy.model;
 
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.model.SipQuery;
 
 public class ExecutionResponse {
 

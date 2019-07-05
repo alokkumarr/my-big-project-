@@ -102,14 +102,14 @@ public class MaprConnection {
     try {
       // pagination logic
       int startIndex, endIndex;
-      if (page != 0 && page > 1) {
+      if (page > 1) {
         startIndex = (page - 1) * size;
         endIndex = startIndex + size;
       } else {
-        startIndex = (page - 1);
+        startIndex = page > 0 ? (page - 1) : 0;
         endIndex = startIndex + size;
       }
-      LOGGER.info("Start Index : " + startIndex + " End Index :" + endIndex);
+      LOGGER.trace("Start Index : " + startIndex + " End Index :" + endIndex);
 
       String[] select = new String[size];
       for (int i = 0; startIndex < endIndex; i++) {
@@ -124,10 +124,10 @@ public class MaprConnection {
 
       // build execution data query
       final Query query = connection.newQuery().select(select).where(node.toString()).build();
-      LOGGER.info("Query for the paginating data :" + query.asJsonString());
+      LOGGER.trace("Query for the paginating data :" + query.asJsonString());
       return query;
     } catch (Exception ex) {
-      LOGGER.error("Error while building execution data query :" + ex);
+      LOGGER.error("Error while building execution data query : {}", ex);
     }
     return null;
   }
