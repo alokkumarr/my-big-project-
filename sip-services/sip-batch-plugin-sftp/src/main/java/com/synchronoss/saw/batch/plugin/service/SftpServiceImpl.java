@@ -506,10 +506,14 @@ public class SftpServiceImpl extends SipPluginContract {
   @Override
   public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
-    BisJobEntity jobEntity = this.executeSipJob(Long.valueOf(payload.getChannelId()),
-        Long.valueOf(payload.getRouteId()), payload.getFilePattern(), payload.getChannelType().value());
-    Preconditions.checkNotNull(payload.getChannelId() != null,
-        "payload.getChannelId() cannot be null");
+    BisJobEntity jobEntity =
+        this.executeSipJob(
+            Long.valueOf(payload.getChannelId()),
+            Long.valueOf(payload.getRouteId()),
+            payload.getFilePattern(),
+            payload.getChannelType().value());
+    Preconditions.checkNotNull(
+        payload.getChannelId() != null, "payload.getChannelId() cannot be null");
     Preconditions.checkNotNull(payload.getRouteId() != null, "payload.getRouteId() cannot be null");
     logger.trace("Immediate Transfer file starts here with the channel id " + payload.getChannelId()
         + "& route Id " + payload.getRouteId());
