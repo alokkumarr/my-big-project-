@@ -207,7 +207,7 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testSipDslExecute() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(sipQuery.toString());
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
     String testStringFilter = "string 1";
     Response response =
         given(spec)

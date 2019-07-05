@@ -30,6 +30,7 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     R CMD build --no-build-vignettes --no-manual .
     
     # Check package
+    # R CMD check  --ignore-vignettes --no-vignettes --no-tests -no-manual *.tar.gz
     R CMD check  --ignore-vignettes --no-vignettes --no-tests -no-manual *.tar.gz
     
     # Copy the R package build artifacts into the target directory,
