@@ -251,7 +251,7 @@ export class AnalyzeService {
           ? firstDataPoint
           : fpGet(`data`, resp) || [];
         const queryBuilder = options.isDSL
-          ? fpGet(`sipQuery`, resp)
+          ? fpGet(`analysis`, resp)
           : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
@@ -298,7 +298,7 @@ export class AnalyzeService {
           ? firstDataPoint
           : fpGet(`data`, resp) || [];
         const queryBuilder = options.isDSL
-          ? fpGet(`sipQuery`, resp)
+          ? fpGet(`analysis`, resp)
           : fpGet(`queryBuilder`, resp);
         const executedBy = fpGet(`executedBy`, resp);
         const count = fpGet(`totalRows`, resp) || data.length;
@@ -538,7 +538,7 @@ export class AnalyzeService {
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
         }&ExecutionType=${mode}`,
-        model.sipQuery
+        model
       )
       .pipe(
         map((resp: any) => {

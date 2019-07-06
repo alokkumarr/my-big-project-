@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
@@ -234,13 +235,10 @@ public class AnalysisServiceImpl implements AnalysisService {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId;
     logger.info("URL for SIP Query :" + dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
-
-    logger.info("Analysis body :" + analysisResponse.getAnalysis());
-    SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
-    logger.info("SIP Query :" + analysisResponse.getAnalysis());
-
+      Analysis analysisObj =  analysisResponse.getAnalysis();
+    logger.info("Analysis body :" + analysisObj);
     String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
-    HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysisObj);
 
     restTemplate.postForObject(url, requestEntity, String.class);
   }

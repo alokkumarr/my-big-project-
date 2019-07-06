@@ -270,15 +270,15 @@ function parseLeafChart(node, dataObj) {
   return assign(dataFields, dataObj);
 }
 
-  /**
-   * Includes a new property to chart options for the chart engine.
-   * reversed instucts the highchart engine to plot the chart in descending order
-   * which is needed when desc is applied for a field in x-axis.
-   *
-   * @param {*} chartOptions
-   * @param {*} sipQuery
-   * @returns {chartOptions}
-   */
+/**
+ * Includes a new property to chart options for the chart engine.
+ * reversed instucts the highchart engine to plot the chart in descending order
+ * which is needed when desc is applied for a field in x-axis.
+ *
+ * @param {*} chartOptions
+ * @param {*} sipQuery
+ * @returns {chartOptions}
+ */
 
 export function setReverseProperty(chartOptions, sipQuery) {
   const xAxisFields = [
@@ -289,7 +289,9 @@ export function setReverseProperty(chartOptions, sipQuery) {
   }
   if (!isEmpty(sipQuery.sorts)) {
     forEach(sipQuery.sorts, sort => {
-      chartOptions.xAxis.reversed = false;
+      chartOptions.xAxis = {
+        reversed: false
+      };
       if (
         sort.order === 'desc' &&
         sort.columnName === xAxisFields[0].columnName
