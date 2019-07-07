@@ -85,7 +85,7 @@ public class XlsxExporterTest {
         .forEach(
             line -> {
               try {
-                xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
+                xlsxExporter.addXlsxRow(exportBean, workBook, sheet, line);
 
               } catch (Exception e) {
                 logger.error(
