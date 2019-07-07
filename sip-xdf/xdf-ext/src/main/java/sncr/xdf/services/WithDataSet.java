@@ -146,8 +146,8 @@ public interface WithDataSet {
 //            .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
         DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
-
-        if (!HFileOperations.exists(sb.toString())) {
+        DataSetHelper.logger.debug("is running in pipeline::"+ aux.ctx.runningPipeLine);
+        if (!aux.ctx.runningPipeLine && !HFileOperations.exists(sb.toString())) {
             //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
             throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
         } else {

@@ -484,11 +484,21 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
         for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputDataSets.entrySet()) {
             Map<String, Object> desc = entry.getValue();
+            logger.debug("Name:: "+ desc.get("Name"));
             String loc = (String)desc.get(DataSetProperties.PhysicalLocation.name());
             String format = (String)desc.get(DataSetProperties.Format.name());
+            
             logger.debug("Physical location = + " + loc + ". Format = " + format);
-            Dataset ds = null;
-            switch (format.toLowerCase()) {
+            logger.debug("Data"+ ngctx.datafileDFmap);
+            logger.debug("TEst data"+ ngctx.datafileDFmap.get(desc.get("Name")));
+            String datasetName = (String)desc.get("Name");
+            Dataset ds = ngctx.datafileDFmap.get(datasetName);
+            logger.debug("is running in pipeline ::"+ ngctx.runningPipeLine);
+            
+            if(ngctx.runningPipeLine) {
+            	ds = ngctx.datafileDFmap.get(datasetName);
+            } else {
+            	switch (format.toLowerCase()) {
                 case "json":
                     ds = ctx.sparkSession.read().json(loc); break;
                 case "parquet":
@@ -498,6 +508,20 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                     logger.error(error);
                     throw new FatalXDFException(XDFException.ErrorCodes.UnsupportedDataFormat, -1);
             }
+            
+            }
+            
+            logger.debug("Dataset = " + ds);
+            /*switch (format.toLowerCase()) {
+                case "json":
+                    ds = ctx.sparkSession.read().json(loc); break;
+                case "parquet":
+                    ds = ctx.sparkSession.read().parquet(loc); break;
+                default:
+                    error = "Unsupported data format: " + format;
+                    logger.error(error);
+                    throw new FatalXDFException(XDFException.ErrorCodes.UnsupportedDataFormat, -1);
+            }*/
             dataSetmap.put(entry.getKey(), ds);
         }
 
