@@ -10,7 +10,7 @@
 #
 
 # Use CentOS base image
-FROM centos:7.4.1708
+FROM centos:7.5.1804
 
 # Install the EPEL repository to make the R package available for
 # installation

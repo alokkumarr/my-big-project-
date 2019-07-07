@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SIPDSL;
@@ -273,7 +274,7 @@ public class StorageProxyController {
               required = true)
           @Valid
           @RequestBody
-          SipQuery sipQuery,
+          Analysis analysis,
       @RequestParam(name = "id", required = false) String queryId,
       @RequestParam(name = "size", required = false) Integer size,
       @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
@@ -281,8 +282,8 @@ public class StorageProxyController {
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException {
-    logger.debug("Request Body:{}", sipQuery);
-    if (sipQuery == null) {
+    logger.debug("Request Body:{}", analysis);
+    if (analysis == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
 
@@ -296,7 +297,7 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
-    SipQuery savedQuery = getSipQuery(sipQuery, metaDataServiceExport, request);
+    SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -310,15 +311,15 @@ public class StorageProxyController {
       // "contents");
       Long startTime = new Date().getTime();
       logger.trace(
-          "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipQuery));
-      responseObjectFuture = proxyService.execute(sipQuery, size, dataSecurityKeyNode);
+          "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
+      responseObjectFuture = proxyService.execute(analysis.getSipQuery(), size, dataSecurityKeyNode);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
         ExecutionResult executionResult = new ExecutionResult();
         executionResult.setExecutionId(UUID.randomUUID().toString());
         executionResult.setDslQueryId(queryId);
-        executionResult.setSipQuery(sipQuery);
+        executionResult.setAnalysis(analysis);
         executionResult.setStartTime(startTime);
         executionResult.setFinishedTime(new Date().getTime());
         executionResult.setData(responseObjectFuture);

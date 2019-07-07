@@ -1,5 +1,3 @@
 {
-    "actions" : [
-        { "add" : { "index" : "sample", "alias" : "sampleAlias" } }
-    ]
+  "actions": [{ "add": { "index": "sample", "alias": "sampleAlias" } }]
 }

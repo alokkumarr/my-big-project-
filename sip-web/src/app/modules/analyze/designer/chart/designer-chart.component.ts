@@ -18,6 +18,7 @@ import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { QueryDSL } from 'src/app/models';
+import { setReverseProperty } from './../../../../common/utils/dataFlattener';
 
 @Component({
   selector: 'designer-chart',
@@ -79,7 +80,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
         chartType: this.chartType
       })
     });
-
+    this.chartOptions = setReverseProperty(this.chartOptions, this.sipQuery);
     if (!this.updater) {
       this.updater = new BehaviorSubject([]);
     }
