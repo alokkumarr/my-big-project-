@@ -74,7 +74,8 @@ export class JobsPageComponent implements OnInit {
     this.jobsPath$.subscribe(path => {
       this.data = new CustomStore({
         load: ({ skip, take }) => {
-          const pagination = `offset=${skip}&size=${take}`;
+          const offset = Math.ceil(skip / take);
+          const pagination = `offset=${offset}&size=${take}`;
           const jobsRequestPath = `${path}?${pagination}`;
           return this._datasourceService
             .getJobs(jobsRequestPath)

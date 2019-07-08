@@ -5,7 +5,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
 import {
-  LoadJobLogs,
   LoadChannelList,
   LoadRouteList,
   SelectChannelTypeId,
@@ -142,16 +141,6 @@ export class WorkbenchState {
     { routeId }: SelectRouteId
   ) {
     return patchState({ selectedRouteId: routeId });
-  }
-
-  @Action(LoadJobLogs)
-  loadJobLogs() // { patchState }: StateContext<WorkbenchStateModel>,
-  // { jobId }: LoadJobLogs
-  {
-    // return this._datasourceService
-    //   .getJobLogs(jobId)
-    //   .toPromise()
-    //   .then(jobLogs => patchState({ jobLogs }));
   }
 
   @Action(SetJobLogs)

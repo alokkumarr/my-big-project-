@@ -8,11 +8,7 @@ import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import CustomStore from 'devextreme/data/custom_store';
 
-import {
-  LoadJobLogs,
-  SetJobLogs,
-  LoadJobByJobId
-} from '../../../state/workbench.actions';
+import { SetJobLogs, LoadJobByJobId } from '../../../state/workbench.actions';
 import { JobLog, Job } from '../../../models/workbench.interface';
 import { DatasourceService } from '../../../services/datasource.service';
 
@@ -77,10 +73,10 @@ export class JobLogsPageComponent implements OnInit {
     this.loadJobsIfNeeded();
 
     this._route.params.subscribe(({ jobId }) => {
-      this._store.dispatch(new LoadJobLogs(jobId));
       this.data = new CustomStore({
         load: ({ skip, take }) => {
-          const pagination = `offset=${skip}&size=${take}`;
+          const offset = Math.ceil(skip / take);
+          const pagination = `offset=${offset}&size=${take}`;
           return this._datasourceService
             .getJobLogs(jobId, pagination)
             .toPromise()

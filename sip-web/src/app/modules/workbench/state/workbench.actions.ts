@@ -24,11 +24,6 @@ export class SetJobLogs {
   constructor(public jobLogs: JobLog[]) {}
 }
 
-export class LoadJobLogs {
-  static readonly type = '[Workbench] Load job logs';
-  constructor(public jobId: number) {}
-}
-
 export class LoadChannelList {
   static readonly type = '[Workbench] Load channel list';
   constructor() {}
