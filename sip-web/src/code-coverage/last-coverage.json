@@ -43,10 +43,10 @@
     "lines": 45.45
   },
   "src/app/common/components/chart-grid": {
-    "statements": 22.43,
+    "statements": 22.22,
     "branches": 2.99,
     "functions": 14.29,
-    "lines": 22.77
+    "lines": 22.55
   },
   "src/app/common/components/charts": {
     "statements": 60.62,
@@ -247,10 +247,10 @@
     "lines": 25.81
   },
   "src/app/common/utils": {
-    "statements": 29.6,
-    "branches": 22.73,
-    "functions": 26.56,
-    "lines": 29.77
+    "statements": 29.91,
+    "branches": 22.03,
+    "functions": 28.36,
+    "lines": 30.09
   },
   "src/app/common/validators": {
     "statements": 92.31,
@@ -397,10 +397,10 @@
     "lines": 75.68
   },
   "src/app/modules/analyze/designer/chart": {
-    "statements": 45.76,
+    "statements": 45,
     "branches": 19.44,
     "functions": 31.25,
-    "lines": 45.61
+    "lines": 44.83
   },
   "src/app/modules/analyze/designer/filter": {
     "statements": 100,
