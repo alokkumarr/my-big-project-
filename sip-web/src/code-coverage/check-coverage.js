@@ -67,7 +67,7 @@ function getPropMessages(mergedCovereges) {
 
 function getPropMessage(prop, mergedCoverege) {
   const { old, new: newCoverage } = mergedCoverege;
-  const coverageDecreased = newCoverage - old < 0;
+  const coverageDecreased = newCoverage < old;
   if (coverageDecreased) {
     return `  - ${prop} coverage decreased from ${old}% to ${newCoverage}%`;
   }
