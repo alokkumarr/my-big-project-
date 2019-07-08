@@ -282,7 +282,9 @@ export function setReverseProperty(chartOptions, sipQuery) {
   }
   if (!isEmpty(sipQuery.sorts)) {
     forEach(sipQuery.sorts, sort => {
-      chartOptions.xAxis.reversed = false;
+      chartOptions.xAxis = {
+        reversed: false
+      };
       if (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) {
         chartOptions.xAxis.reversed = true;
         return false;
