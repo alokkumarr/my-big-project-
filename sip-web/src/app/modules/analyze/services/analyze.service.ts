@@ -281,15 +281,16 @@ export class AnalyzeService {
         ? '&executionType=onetime'
         : '';
 
+    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }${onetimeExecution}`;
+
     let url = '';
     if (options.isDSL) {
       const path = `internal/proxy/storage/${executionId}/executions/data`;
-      url = `${path}`;
+      url = `${path}${queryParams}`;
     } else {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
-      const queryParams = `?page=${page}&pageSize=${
-        options.take
-      }&analysisType=${options.analysisType}${onetimeExecution}`;
       url = `${path}${queryParams}`;
     }
     return this.getRequest(url)
@@ -540,11 +541,15 @@ export class AnalyzeService {
   ) {
     // This addition is a part of SIP-7145 as this is required for DSK implementation. This is a request from BE.
     model.sipQuery.semanticId = model.semanticId;
+    options.skip = options.skip || 0;
+    options.take = options.take || 10;
+    const page = floor(options.skip / options.take) + 1;
+
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}`,
+        }&ExecutionType=${mode}&page=${page}&pageSize=${options.take}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(

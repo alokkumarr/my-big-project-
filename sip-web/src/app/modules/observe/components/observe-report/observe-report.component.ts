@@ -70,7 +70,8 @@ export class ObserveReportComponent implements OnDestroy {
           .getExecutionData(this.analysis.id, this.executionId, {
             ...options,
             executionType: 'onetime',
-            analysisType: this.analysis.type
+            analysisType: this.analysis.type,
+            isDSL: isDSLAnalysis(this.analysis)
           })
           .then(({ data, count }) => ({ data, totalCount: count }));
       } else {
