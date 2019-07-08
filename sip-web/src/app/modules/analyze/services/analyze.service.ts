@@ -14,6 +14,7 @@ import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
+import * as omit from 'lodash/omit';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
@@ -40,6 +41,7 @@ import * as isArray from 'lodash/isArray';
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
 const PROJECT_CODE = 'workbench';
+const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts'];
 
 interface ExecutionRequestOptions {
   take?: number;
@@ -509,10 +511,15 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(
-        first(),
-        map((res: { analysis: AnalysisDSL }) => res.analysis)
-      )
+      this._http
+        .put(
+          `${apiUrl}/dslanalysis/${model.id}`,
+          omit(model, LEGACY_PROPERTIES)
+        )
+        .pipe(
+          first(),
+          map((res: { analysis: AnalysisDSL }) => res.analysis)
+        )
     );
   }
 
@@ -538,7 +545,7 @@ export class AnalyzeService {
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
         }&ExecutionType=${mode}`,
-        model
+        omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
         map((resp: any) => {
