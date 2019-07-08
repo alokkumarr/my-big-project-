@@ -435,7 +435,7 @@ public interface WithDataSet {
                 Map<String, Object> res = new HashMap();
 
                 FileStatus[] fst = HFileOperations.getFilesStatus(location);
-                boolean dsEmpty = (fst == null && fst.length == 0);
+                boolean dsEmpty = (fst == null ||  fst.length == 0);
                 if (!dsEmpty) {
 
                     // Check type of source partition - we need proper path which can read all parquet data files
