@@ -307,6 +307,7 @@
             [rowAlternationEnabled]="true"
             keyExpr="bisRouteSysId"
             [width]="'100%'"
+            [wordWrapEnabled]="true"
             [allowColumnResizing]="true"
             e2e="routes-container"
           >
@@ -335,12 +336,6 @@
               alignment="left"
             ></dxi-column>
             <dxi-column
-              caption="Last Modified"
-              dataField="createdDate"
-              alignment="left"
-              cellTemplate="dateTemplate"
-            ></dxi-column>
-            <dxi-column
               caption="File Pattern"
               dataField="filePattern"
               alignment="left"
@@ -350,6 +345,18 @@
               dataField="schedulerExpression"
               alignment="left"
               [calculateCellValue]="calculateScheduleCellValue"
+            ></dxi-column>
+            <dxi-column
+              caption="Next Fire Time"
+              dataField="nextFireTime"
+              alignment="left"
+              cellTemplate="dateTemplate"
+            ></dxi-column>
+            <dxi-column
+              caption="Last Fire Time"
+              dataField="lastFireTime"
+              alignment="left"
+              cellTemplate="dateTemplate"
             ></dxi-column>
             <dxi-column
               caption="Source Location"
@@ -365,6 +372,12 @@
               caption="Description"
               dataField="description"
               alignment="left"
+            ></dxi-column>
+            <dxi-column
+              caption="Last Modified"
+              dataField="createdDate"
+              alignment="left"
+              cellTemplate="dateTemplate"
             ></dxi-column>
             <dxi-column
               caption="Actions"

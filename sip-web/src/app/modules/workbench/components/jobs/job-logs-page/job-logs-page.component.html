@@ -34,16 +34,19 @@
   e2e="job-logs-container"
   [allowColumnResizing]="true"
   [columnMinWidth]="50"
-  [dataSource]="jobLogs$ | async"
+  [dataSource]="data"
   [showBorders]="false"
   [columnAutoWidth]="true"
   [showRowLines]="false"
   [showColumnLines]="false"
+  [paging]="paging"
+  [pager]="pager"
+  [remoteOperations]="remoteOperations"
+  [height]="'calc(100% - 40px)'"
   [rowAlternationEnabled]="true"
   rowTemplate="logTableRowTemplate"
   e2e="job-logs-container"
 >
-  <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
   <dxi-column
     caption="File Pattern"
     dataField="filePattern"

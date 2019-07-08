@@ -6,9 +6,17 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
+import CustomStore from 'devextreme/data/custom_store';
 
-import { LoadJobLogs, LoadJobs } from '../../../state/workbench.actions';
+import {
+  LoadJobLogs,
+  SetJobLogs,
+  LoadJobByJobId
+} from '../../../state/workbench.actions';
 import { JobLog, Job } from '../../../models/workbench.interface';
+import { DatasourceService } from '../../../services/datasource.service';
+
+const DEFAULT_PAGE_SIZE = 25;
 
 @Component({
   selector: 'job-logs-page',
@@ -21,8 +29,15 @@ export class JobLogsPageComponent implements OnInit {
 
   @Select(state => state.workbench.jobs) jobs$: Observable<Job[]>;
 
+  public pager = {
+    showNavigationButtons: true,
+    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
+    showPageSizeSelector: true,
+    visible: true
+  };
+  public paging = { enabled: true, pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
+  public remoteOperations = { paging: true };
   public job: Job;
-
   public jobDetails = [
     [
       { label: 'Job Name', prop: 'jobName' },
@@ -49,11 +64,13 @@ export class JobLogsPageComponent implements OnInit {
       { label: 'Updated by', prop: 'updatedBy' }
     ]
   ];
+  public data;
 
   constructor(
     private _store: Store,
     private _route: ActivatedRoute,
-    private _location: Location
+    private _location: Location,
+    private _datasourceService: DatasourceService
   ) {}
 
   ngOnInit() {
@@ -61,6 +78,18 @@ export class JobLogsPageComponent implements OnInit {
 
     this._route.params.subscribe(({ jobId }) => {
       this._store.dispatch(new LoadJobLogs(jobId));
+      this.data = new CustomStore({
+        load: ({ skip, take }) => {
+          const pagination = `offset=${skip}&size=${take}`;
+          return this._datasourceService
+            .getJobLogs(jobId, pagination)
+            .toPromise()
+            .then(({ bisFileLogs, totalRows }) => {
+              this._store.dispatch(new SetJobLogs(bisFileLogs));
+              return { data: bisFileLogs, totalCount: totalRows };
+            });
+        }
+      });
     });
 
     combineLatest(this._route.params, this.jobs$).subscribe(
@@ -73,8 +102,10 @@ export class JobLogsPageComponent implements OnInit {
 
   loadJobsIfNeeded() {
     const jobs = this._store.selectSnapshot(state => state.workbench.jobs);
+    const { jobId } = this._route.snapshot.params;
+
     if (isEmpty(jobs)) {
-      this._store.dispatch(new LoadJobs());
+      this._store.dispatch(new LoadJobByJobId(jobId));
     }
   }
 

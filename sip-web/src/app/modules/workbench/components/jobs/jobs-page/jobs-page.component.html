@@ -29,21 +29,19 @@
 
       <dx-data-grid
         class="jobs-grid"
-        [dataSource]="jobs$ | async"
+        [dataSource]="data"
         [showBorders]="false"
         [columnAutoWidth]="false"
         [showColumnLines]="false"
         [rowAlternationEnabled]="true"
         [width]="'100%'"
+        [height]="'calc(100% - 40px)'"
         [allowColumnResizing]="true"
+        [paging]="paging"
+        [pager]="pager"
+        [remoteOperations]="remoteOperations"
         e2e="jobs-container"
       >
-        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
-        <dxo-scrolling
-          mode="virtual"
-          showScrollbar="always"
-          [useNative]="false"
-        ></dxo-scrolling>
         <dxi-column
           caption="Job name"
           dataField="jobName"
@@ -73,6 +71,11 @@
           cellTemplate="dateTemplate"
         ></dxi-column>
         <dxi-column
+          caption="Duration"
+          dataField="duration"
+          alignment="left"
+        ></dxi-column>
+        <dxi-column
           caption="Job status"
           dataField="jobStatus"
           alignment="left"
@@ -93,8 +96,8 @@
           alignment="left"
         ></dxi-column>
         <dxi-column
-          caption="Job type"
-          dataField="jobType"
+          caption="Source type"
+          dataField="sourceType"
           alignment="left"
         ></dxi-column>
 

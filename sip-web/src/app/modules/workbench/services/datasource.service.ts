@@ -13,6 +13,18 @@ import {
   JobLog
 } from '../models/workbench.interface';
 
+interface JobsResponse {
+  jobDetails: Job[];
+  numOfPages: number;
+  totalRows: number;
+}
+
+interface JobLogsResponse {
+  bisFileLogs: JobLog[];
+  numOfPages: number;
+  totalRows: number;
+}
+
 const userProject = 'workbench';
 
 @Injectable({
@@ -330,29 +342,19 @@ export class DatasourceService {
     };
   }
 
-  public getJobLogs(jobId) {
-    const url = `${this.api}/ingestion/batch/logs/job/${jobId}?offset=0`;
-    return this.http.get<JobLog[]>(url);
+  public getJobLogs(jobId, pagination) {
+    const url = `${this.api}/ingestion/batch/logs/job/${jobId}?${pagination}`;
+    return this.http.get<JobLogsResponse>(url);
   }
 
-  public getJobsForChannelType(channelTypeId) {
-    const path = `channelTypes/${channelTypeId}`;
-    return this.getJobs(path);
+  public getJobs(path) {
+    const url = `${this.api}/ingestion/batch/logs/jobs/${path}`;
+    return this.http.get<JobsResponse>(url).toPromise();
   }
 
-  public getJobsForChannel(channelId) {
-    const path = `channels/${channelId}`;
-    return this.getJobs(path);
-  }
-
-  public getJobsForRoute(channelId, routeId) {
-    const path = `${channelId}/${routeId}`;
-    return this.getJobs(path);
-  }
-
-  getJobs(path) {
-    const url = `${this.api}/ingestion/batch/logs/jobs/${path}?offset=0`;
-    return this.http.get<Job[]>(url).toPromise();
+  public getJobById(id: string) {
+    const url = `${this.api}/ingestion/batch/logs/jobs/${id}`;
+    return this.http.get<Job>(url).toPromise();
   }
 
   public getJobsByChannelId(channelId) {

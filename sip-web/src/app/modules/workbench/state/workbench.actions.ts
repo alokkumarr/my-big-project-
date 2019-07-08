@@ -1,6 +1,27 @@
+import { Job, JobLog } from '../models/workbench.interface';
+
 export class LoadJobs {
   static readonly type = '[Workbench] Load jobs';
   constructor() {}
+}
+
+export class LoadJobByJobId {
+  static readonly type = '[Workbench] Load job';
+  constructor(public jobId: string) {}
+}
+
+export class SetLastJobsPath {
+  static readonly type = '[Workbench] Set last jobs request path';
+  constructor(public lastJobsPath: string) {}
+}
+export class SetJobs {
+  static readonly type = '[Workbench] Set jobs';
+  constructor(public jobs: Job[]) {}
+}
+
+export class SetJobLogs {
+  static readonly type = '[Workbench] Set job logs';
+  constructor(public jobLogs: JobLog[]) {}
 }
 
 export class LoadJobLogs {

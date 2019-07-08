@@ -71,6 +71,7 @@ export interface WorkbenchStateModel {
   selectedChannelId: number;
   routeList: RouteForJobs[];
   selectedRouteId: number;
+  lastJobsPath: string;
   jobs: Job[];
   jobLogs: JobLog[];
 }

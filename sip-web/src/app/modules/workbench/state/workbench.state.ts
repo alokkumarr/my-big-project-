@@ -5,13 +5,17 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
 import {
-  LoadJobs,
   LoadJobLogs,
   LoadChannelList,
   LoadRouteList,
   SelectChannelTypeId,
   SelectChannelId,
-  SelectRouteId
+  SelectRouteId,
+  SetJobs,
+  LoadJobs,
+  SetJobLogs,
+  SetLastJobsPath,
+  LoadJobByJobId
 } from './workbench.actions';
 import { DatasourceService } from '../services/datasource.service';
 import { WorkbenchStateModel } from '../models/workbench.interface';
@@ -24,6 +28,7 @@ const defaultWorkbenchState: WorkbenchStateModel = {
   selectedChannelId: null,
   routeList: [],
   selectedRouteId: null,
+  lastJobsPath: null,
   jobs: [],
   jobLogs: []
 };
@@ -38,6 +43,21 @@ export class WorkbenchState {
   @Selector()
   static jobs(state: WorkbenchStateModel) {
     return state.jobs;
+  }
+
+  @Selector()
+  static jobsPath(state: WorkbenchStateModel) {
+    const { selectedChannelTypeId, selectedChannelId, selectedRouteId } = state;
+
+    if (selectedRouteId && selectedChannelId) {
+      return `${selectedChannelId}/${selectedRouteId}`;
+    }
+    if (selectedChannelId) {
+      return `channels/${selectedChannelId}`;
+    }
+    if (selectedChannelTypeId) {
+      return `channelTypes/${selectedChannelTypeId}`;
+    }
   }
 
   @Selector()
@@ -124,40 +144,22 @@ export class WorkbenchState {
     return patchState({ selectedRouteId: routeId });
   }
 
-  @Action(LoadJobs)
-  loadJobs({ getState, patchState }: StateContext<WorkbenchStateModel>) {
-    const {
-      selectedChannelTypeId,
-      selectedChannelId,
-      selectedRouteId
-    } = getState();
-
-    if (selectedRouteId && selectedChannelId) {
-      return this._datasourceService
-        .getJobsForRoute(selectedChannelId, selectedRouteId)
-        .then(jobs => patchState({ jobs }));
-    }
-    if (selectedChannelId) {
-      return this._datasourceService
-        .getJobsForChannel(selectedChannelId)
-        .then(jobs => patchState({ jobs }));
-    }
-    if (selectedChannelTypeId) {
-      return this._datasourceService
-        .getJobsForChannelType(selectedChannelTypeId)
-        .then(jobs => patchState({ jobs }));
-    }
+  @Action(LoadJobLogs)
+  loadJobLogs() // { patchState }: StateContext<WorkbenchStateModel>,
+  // { jobId }: LoadJobLogs
+  {
+    // return this._datasourceService
+    //   .getJobLogs(jobId)
+    //   .toPromise()
+    //   .then(jobLogs => patchState({ jobLogs }));
   }
 
-  @Action(LoadJobLogs)
-  loadJobLogs(
+  @Action(SetJobLogs)
+  setJobLogs(
     { patchState }: StateContext<WorkbenchStateModel>,
-    { jobId }: LoadJobLogs
+    { jobLogs }: SetJobLogs
   ) {
-    return this._datasourceService
-      .getJobLogs(jobId)
-      .toPromise()
-      .then(jobLogs => patchState({ jobLogs }));
+    return patchState({ jobLogs });
   }
 
   @Action(LoadChannelList)
@@ -177,5 +179,39 @@ export class WorkbenchState {
       .getRouteListForJobs(channelId)
       .toPromise()
       .then(routeList => patchState({ routeList }));
+  }
+
+  @Action(LoadJobs)
+  loadJobs({ getState, patchState }: StateContext<WorkbenchStateModel>) {
+    const { lastJobsPath } = getState();
+    return this._datasourceService
+      .getJobs(lastJobsPath)
+      .then(({ jobDetails }) => patchState({ jobs: jobDetails }));
+  }
+
+  @Action(LoadJobByJobId)
+  loadJobByJobId(
+    { patchState }: StateContext<WorkbenchStateModel>,
+    { jobId }: LoadJobByJobId
+  ) {
+    return this._datasourceService
+      .getJobById(jobId)
+      .then(job => patchState({ jobs: [job] }));
+  }
+
+  @Action(SetJobs)
+  setJobs(
+    { patchState }: StateContext<WorkbenchStateModel>,
+    { jobs }: SetJobs
+  ) {
+    return patchState({ jobs });
+  }
+
+  @Action(SetLastJobsPath)
+  setLastJobsPath(
+    { patchState }: StateContext<WorkbenchStateModel>,
+    { lastJobsPath }: SetLastJobsPath
+  ) {
+    return patchState({ lastJobsPath });
   }
 }
