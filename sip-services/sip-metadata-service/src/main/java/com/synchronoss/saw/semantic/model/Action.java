@@ -62,6 +62,7 @@ public class Action {
     CREATE("create"),
     READ("read"),
     UPDATE("update"),
+    INIT("init"),
     DELETE("delete");
     private static final Map<String, Action.Verb> CONSTANTS = new HashMap<String, Action.Verb>();
 

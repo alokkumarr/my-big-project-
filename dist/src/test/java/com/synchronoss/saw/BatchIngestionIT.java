@@ -8,7 +8,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -19,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,8 @@ public class BatchIngestionIT extends BaseIT {
 
   private static final int WAIT_RETRIES = 30;
   private static final int WAIT_SLEEP_SECONDS = 8;
+
+  private static final String JOB_PATH = "/logs/jobs";
 
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -1074,5 +1077,109 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownLogs();
   }
 
+  @Test
+  public void testJobLogController() throws JsonProcessingException {
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
+    log.debug("bisChannelSysId : " + bisChannelSysId);
+    assertFalse(bisChannelSysId <= 0);
+    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    given(authSpec)
+        .body(prepareRouteDataSet("/root/saw-batch-samples"))
+        .when()
+        .post(routeUri)
+        .then()
+        .assertThat()
+        .statusCode(200);
+    assertFalse(bisChannelSysId <= 0);
+    List<?> listOfRoutes =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getList("$");
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode arrayNode = mapper.valueToTree(listOfRoutes);
+    Long routeId = arrayNode.get(0).get("bisRouteSysId").longValue();
+    log.debug("readRoute :" + routeId);
+    assertTrue(listOfRoutes.size() > 0);
 
+    String jobUriByChannelType = BATCH_PATH + JOB_PATH + "/" + "channelTypes/" + bisChannelSysId;
+
+    Object listJobByChannelType =
+        given(authSpec)
+            .when()
+            .get(jobUriByChannelType)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .get();
+    JsonNode fetchByType = mapper.valueToTree(listJobByChannelType);
+
+    log.debug("Reading jobs retrieval api's :");
+    log.debug("listJobByChannelType :" + fetchByType);
+    assertTrue(fetchByType.has("totalRows"));
+    assertTrue(fetchByType.has("numOfPages"));
+    assertTrue(fetchByType.has("jobDetails"));
+
+    String jobUriByChannelId = BATCH_PATH + JOB_PATH + "/" + "channels/" + bisChannelSysId;
+    Object listJobByChannelId =
+        given(authSpec)
+            .when()
+            .get(jobUriByChannelId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .get();
+    JsonNode fetchById = mapper.valueToTree(listJobByChannelId);
+
+    log.debug("listJobByChannelId :" + fetchById);
+    assertTrue(fetchById.has("totalRows"));
+    assertTrue(fetchById.has("numOfPages"));
+    assertTrue(fetchById.has("jobDetails"));
+
+    String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + bisChannelSysId + "/" + routeId;
+    Object listJobByChannelRouteId =
+        given(authSpec)
+            .when()
+            .get(jobUriByChannelRouteId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .get();
+    JsonNode fetchByRouteChannel = mapper.valueToTree(listJobByChannelRouteId);
+
+    log.debug("listJobByChannelRouteId :" + fetchByRouteChannel);
+    assertTrue(fetchByRouteChannel.has("totalRows"));
+    assertTrue(fetchByRouteChannel.has("numOfPages"));
+    assertTrue(fetchByRouteChannel.has("jobDetails"));
+
+    this.tearDownRoute();
+    this.tearDownChannel();
+  }
 }
