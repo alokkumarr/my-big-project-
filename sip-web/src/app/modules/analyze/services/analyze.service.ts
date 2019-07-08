@@ -686,8 +686,10 @@ export class AnalyzeService {
       switchMap(semanticData => {
         /* Set the store details from semantic data */
         const repo = semanticData.esRepository;
-        model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
-        model.sipQuery.store.storageType = repo.storageType;
+        if (repo) {
+          model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
+          model.sipQuery.store.storageType = repo.storageType;
+        }
 
         return <Observable<AnalysisDSL>>(
           this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(

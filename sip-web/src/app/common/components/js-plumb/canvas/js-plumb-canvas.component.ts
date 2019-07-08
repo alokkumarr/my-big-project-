@@ -26,7 +26,12 @@ import {
   JsPlumbCanvasChangeEvent
 } from '../types';
 import { Observable, Subscription } from 'rxjs';
-import { AnalysisDSL, ArtifactDSL } from 'src/app/models';
+import {
+  AnalysisDSL,
+  ArtifactDSL,
+  ArtifactColumnDSL,
+  ArtifactColumnReport
+} from 'src/app/models';
 
 @Component({
   selector: 'js-plumb-canvas-u',
@@ -71,17 +76,20 @@ export class JsPlumbCanvasComponent
         }
 
         /* For each column in artifact, find corresponding column in sipQuery */
-        metricArtifact.columns.forEach(metricField => {
-          const analysisField = find(
-            analysisArtifact.fields,
-            col => metricField.columnName === col.columnName
-          );
+        (<ArtifactColumnReport[]>metricArtifact.columns).forEach(
+          metricField => {
+            const analysisField = find(
+              analysisArtifact.fields,
+              (col: ArtifactColumnDSL) =>
+                metricField.columnName === col.columnName
+            );
 
-          /* If column not found in sipQuery, it's not selected.
+            /* If column not found in sipQuery, it's not selected.
              Mark it unchecked.
           */
-          metricField.checked = Boolean(analysisField);
-        });
+            metricField.checked = Boolean(analysisField);
+          }
+        );
       });
       this.artifacts = [...this.artifacts];
     })
