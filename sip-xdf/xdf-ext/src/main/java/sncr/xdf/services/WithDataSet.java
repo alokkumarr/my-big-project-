@@ -154,7 +154,7 @@ public interface WithDataSet {
             DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
 
-            Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
+            Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null, aux);
 
             res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
             res.put(DataSetProperties.Name.name(), in.getDataSet());
@@ -206,7 +206,7 @@ public interface WithDataSet {
                 String sampling = system.has(DataSetProperties.Sample.name()) ?
                     system.get(DataSetProperties.Sample.name()).getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
 
-                Map<String, Object> res = aux.discoverAndValidateInputDS(dataset, location, system);
+                Map<String, Object> res = aux.discoverAndValidateInputDS(dataset, location, system, aux);
 
                 res.put(DataSetProperties.PhysicalLocation.name(), location);
                 res.put(DataSetProperties.Name.name(), datasetName);
@@ -428,8 +428,8 @@ public interface WithDataSet {
 
 
 
-        private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system) throws Exception {
-            if (!HFileOperations.exists(location)) {
+        private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system, DataSetHelper aux) throws Exception {
+            if (!aux.ctx.runningPipeLine && !HFileOperations.exists(location)) {
                 throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
             } else {
                 Map<String, Object> res = new HashMap();

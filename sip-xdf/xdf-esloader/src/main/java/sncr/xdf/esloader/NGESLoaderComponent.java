@@ -155,7 +155,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
             JsonElement inputDsConfig =
                 new WithDataSet.DataSetHelper(ngctx, services.md).dl.getDSStore().read(ngctx.applicationID + "::" + ESLOADER_DATASET);
-            logger.debug("Input DS config = " + inputDsConfig);
 
             Tuple2<Integer, Map<String, String>> ret =
                 loader.loadSingleObject(this.dataSetName, inputDataset, inputDataFormat);
