@@ -18,7 +18,7 @@ public interface StorageProxyService {
 
   List<?> fetchDslExecutionsList(String dslQueryId);
 
-  ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer size);
+  ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer pageSize);
 
-  ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer size);
+  ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer pageSize);
 }

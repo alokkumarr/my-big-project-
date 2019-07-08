@@ -508,7 +508,11 @@ public class ExportServiceImpl implements ExportService {
           || ((ftp != null && ftp != ""))) {
 
         String url =
-            storageProxyUrl + "/internal/proxy/storage/" + executionId + "/executions/data";
+            storageProxyUrl
+                + "/internal/proxy/storage/"
+                + executionId
+                + "/executions/data&?page=1&pageSize="
+                + emailExportSize;
 
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
             asyncRestTemplate.getForEntity(url, JsonNode.class);
@@ -631,7 +635,12 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       SipQuery sipQuery) {
     if (ftp != null && !ftp.equals("")) {
-      String url = storageProxyUrl + "/internal/proxy/storage/" + executionId + "/executions/data";
+      String url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + executionId
+              + "/executions/data?page=1&pageSize="
+              + ftpExportSize;
       ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
           asyncRestTemplate.getForEntity(url, JsonNode.class);
 

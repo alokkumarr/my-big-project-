@@ -374,12 +374,12 @@ public class StorageProxyController {
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse executionsData(
       @RequestParam(name = "page", required = false) Integer page,
-      @RequestParam(name = "size", required = false) Integer size,
+      @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchExecutionsData(executionId, page, size);
+      return proxyService.fetchExecutionsData(executionId, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -399,12 +399,12 @@ public class StorageProxyController {
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse lastExecutionsData(
       @RequestParam(name = "page", required = false) Integer page,
-      @RequestParam(name = "size", required = false) Integer size,
+      @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(executionId, page, size);
+      return proxyService.fetchLastExecutionsData(executionId, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

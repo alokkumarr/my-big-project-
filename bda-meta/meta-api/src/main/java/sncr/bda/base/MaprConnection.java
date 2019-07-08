@@ -24,16 +24,26 @@ public class MaprConnection {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
 
-  DocumentStore store;
-  Connection connection;
+  private DocumentStore store;
+  private Connection connection;
+  private static final String OJAI_MAPR = "ojai:mapr:";
   protected static final String METASTORE = "services/metadata";
 
   public MaprConnection(String basePath, String tableName) {
     // Create an OJAI connection to MapR cluster
-    connection = DriverManager.getConnection("ojai:mapr:");
+    connection = DriverManager.getConnection(OJAI_MAPR);
     store = connection.getStore(basePath + File.separator + METASTORE + File.separator + tableName);
   }
 
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param select
+   * @param filter
+   * @param orderBy
+   * @param limit
+   * @return list
+   */
   public List<JsonNode> runMaprDBQuery(
       String[] select, String filter, String orderBy, Integer limit) {
     final Query query =
@@ -63,14 +73,14 @@ public class MaprConnection {
    *
    * @param executionId
    * @param page
-   * @param size
+   * @param pageSize
    * @return Object
    */
-  public Object fetchPagingData(String executionId, Integer page, Integer size) {
-    if ((page != null && page > 0) && (size != null && size > 0)) {
+  public Object fetchPagingData(String executionId, Integer page, Integer pageSize) {
+    if (pageSize != null && pageSize > 0) {
       try {
         ObjectMapper objectMapper = new ObjectMapper();
-        Query query = getExecutionDataQuery(executionId, page, size);
+        Query query = buildDataQuery(executionId, page, pageSize);
         if (query != null) {
           final DocumentStream stream = store.find(query);
           for (final Document document : stream) {
@@ -83,7 +93,7 @@ public class MaprConnection {
           }
         }
       } catch (Exception ex) {
-        LOGGER.error("Error while fetching paginated data :" + ex.getMessage());
+        LOGGER.error("Error while fetching paginated data : {} ", ex);
       }
     }
     return null;
@@ -95,23 +105,23 @@ public class MaprConnection {
    *
    * @param executionId
    * @param page
-   * @param size
+   * @param pageSize
    * @return query
    */
-  public Query getExecutionDataQuery(String executionId, Integer page, Integer size) {
+  public Query buildDataQuery(String executionId, Integer page, Integer pageSize) {
     try {
       // pagination logic
       int startIndex, endIndex;
-      if (page > 1) {
-        startIndex = (page - 1) * size;
-        endIndex = startIndex + size;
+      if (page != null && page > 1) {
+        startIndex = (page - 1) * pageSize;
+        endIndex = startIndex + pageSize;
       } else {
-        startIndex = page > 0 ? (page - 1) : 0;
-        endIndex = startIndex + size;
+        startIndex = page != null && page > 0 ? (page - 1) : 0;
+        endIndex = startIndex + pageSize;
       }
-      LOGGER.trace("Start Index : " + startIndex + " End Index :" + endIndex);
+      LOGGER.trace(String.format("Start Index : %s  End Index : %s", startIndex, endIndex));
 
-      String[] select = new String[size];
+      String[] select = new String[pageSize];
       for (int i = 0; startIndex < endIndex; i++) {
         select[i] = String.format("data[%s]", startIndex);
         ++startIndex;
@@ -124,11 +134,18 @@ public class MaprConnection {
 
       // build execution data query
       final Query query = connection.newQuery().select(select).where(node.toString()).build();
-      LOGGER.trace("Query for the paginating data :" + query.asJsonString());
+      LOGGER.trace(String.format("Query for the paginating data : %s", query.asJsonString()));
       return query;
     } catch (Exception ex) {
       LOGGER.error("Error while building execution data query : {}", ex);
     }
     return null;
+  }
+
+  @Override
+  protected void finalize() {
+    store.flush();
+    store.close();
+    connection.close();
   }
 }

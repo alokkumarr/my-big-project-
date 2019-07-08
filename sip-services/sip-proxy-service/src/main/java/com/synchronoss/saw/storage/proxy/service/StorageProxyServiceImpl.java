@@ -495,7 +495,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<?> fetchDslExecutionsList(String dslQueryId) {
     try {
       // Create executionResult table if doesn't exists.
-      new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
       String fields[] = {
         "executionId",
@@ -518,12 +517,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer size) {
+  public ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     ObjectMapper objectMapper = new ObjectMapper();
-    ExecutionResultStore executionResultStore;
     try {
-      executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
+      ExecutionResultStore executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
       Document doc = executionResultStore.readDocumet(executionId);
       logger.info("Doc : " + doc.asJsonString());
@@ -532,7 +530,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, size);
+      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(doc, null));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -544,7 +542,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer size) {
+  public ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     try {
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
@@ -574,7 +572,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, size);
+      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
