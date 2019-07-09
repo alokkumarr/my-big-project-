@@ -1,5 +1,6 @@
 package com.sncr.saw.security.common.util;
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.io.IOException;
 import java.util.Iterator;
@@ -12,6 +13,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import io.jsonwebtoken.Claims;
@@ -20,7 +23,11 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 
+@Component
 public class JwtFilter extends GenericFilterBean {
+
+    @Autowired
+    private NSSOProperties nSSOProperties;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -41,7 +48,7 @@ public class JwtFilter extends GenericFilterBean {
 			Claims claims = null;
 
 			try {
-				claims = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(token).getBody();
+				claims = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(token).getBody();
 				request.setAttribute("claims", claims);
 			} catch (final SignatureException e) {
 				throw new ServletException("Invalid token.");
