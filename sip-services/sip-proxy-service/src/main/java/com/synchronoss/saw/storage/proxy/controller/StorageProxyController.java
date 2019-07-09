@@ -322,14 +322,9 @@ public class StorageProxyController {
 
       String analysisType = analysis.getType();
 
-      if (analysisType.equalsIgnoreCase("report")) {
-        // Prepare mock data
-        List<ColumnType> colTypes = prepareColumnTypes(analysis.getSipQuery());
-        responseObjectFuture = prepareMockData(colTypes);
-      } else {
-        responseObjectFuture =
-            proxyService.execute(analysis, size, dataSecurityKeyNode, executionType);
-      }
+      responseObjectFuture =
+          proxyService.execute(analysis, size, dataSecurityKeyNode, executionType);
+
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
