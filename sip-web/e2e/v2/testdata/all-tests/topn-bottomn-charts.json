@@ -1,0 +1,20 @@
+{
+  "TOP_N_BOTTOM_N": {
+    "charts_topn": {
+      "TOPNC001": {
+        "suites": ["critical", "development"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add top n values"
+      }
+    },
+    "charts_bottomn": {
+      "BTMNC001": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add top n values"
+      }
+    }
+  }
+}
