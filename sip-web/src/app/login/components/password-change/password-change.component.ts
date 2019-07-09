@@ -14,6 +14,12 @@ export class PasswordChangeComponent {
     public _router: Router
   ) {}
 
+  public passwordType = {
+    OLDPASSWORD: 'Old Password',
+    NEWPASSWORD: 'New Password',
+    CONFIRMPASSWORD: 'Confirm Password'
+  };
+
   public formData = {
     oldPwd: null,
     newPwd: null,
@@ -47,5 +53,21 @@ export class PasswordChangeComponent {
 
   cancel() {
     this._router.navigate(['login']);
+  }
+
+  onPasswordChanged(event, type) {
+    switch (type) {
+      case this.passwordType.OLDPASSWORD:
+        this.formData.oldPwd = event.target.value;
+        break;
+
+      case this.passwordType.NEWPASSWORD:
+        this.formData.newPwd = event.target.value;
+        break;
+
+      case this.passwordType.CONFIRMPASSWORD:
+        this.formData.confNewPwd = event.target.value;
+        break;
+    }
   }
 }
