@@ -82,7 +82,7 @@ class BaseController extends Controller {
           val token = value.substring(head.length)
           val ticket = TokenParser.retrieveTicket(token)
           Some(Ticket(
-            ticket.getUserId.asInstanceOf[Integer],
+            ticket.getUserId.asInstanceOf[Long].intValue(),
             ticket.getUserFullName,
             ticket.getDataSecurityKey.asInstanceOf[java.util.List[Object]],
             ticket.getRoleType(),
