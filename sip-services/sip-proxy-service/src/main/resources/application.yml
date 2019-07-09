@@ -52,3 +52,11 @@ metadata:
 sip:
   ssl:
     enable: false
+
+sql-executor:
+  wait-time: 120
+  output-location : /var/sip/services/transport/executor/output
+  preview-rows-limit: 10000
+report:
+  executor:
+    path: /var/sip

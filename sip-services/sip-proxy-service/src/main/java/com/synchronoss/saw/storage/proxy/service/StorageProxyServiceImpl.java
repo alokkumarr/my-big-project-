@@ -30,6 +30,11 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +43,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.FileStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -47,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sncr.bda.base.MaprConnection;
+import sncr.bda.core.file.HFileOperations;
 
 @Service
 public class StorageProxyServiceImpl implements StorageProxyService {
@@ -64,6 +72,19 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Value("${executor.streamPath}")
   @NotNull
   private String streamBasePath;
+
+  @Value("${sql-executor.wait-time}")
+  private Integer dlReportWaitTime;
+
+  @Value("${report.executor.path}")
+  private String executorResultPath;
+
+  @Value("${sql-executor.output-location}")
+  @NotNull
+  private String dlOutputLocation ;
+
+  @Value("${sql-executor.preview-rows-limit}")
+  private Long dlPreviewRowLimit;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
@@ -617,5 +638,110 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   public void setSize(int size) {
     this.size = size;
+  }
+
+  private void waitForResult(String resultId, Integer retries) {
+    retries = retries == null ? 60 : retries;
+    if (!executionCompleted(resultId)) {
+      waitForResultRetry(resultId, retries);
+    }
+  }
+
+  private Boolean executionCompleted(String resultId) {
+    String mainPath = executorResultPath != null ? executorResultPath : "/main";
+    String path = mainPath + File.separator + "sip-transport-executor-result-" + resultId;
+    try {
+      HFileOperations.readFile(path);
+    } catch (FileNotFoundException e) {
+      return false;
+    }
+    try {
+      HFileOperations.deleteEnt(path);
+    } catch (Exception e) {
+      logger.error("cannot get the file in path" + path);
+    }
+    return true;
+  }
+
+  private void waitForResultRetry(String resultId, Integer retries) {
+    if (retries == 0) {
+      throw new RuntimeException("Timed out waiting for result: " + resultId);
+    }
+    logger.info("Waiting for result: {}", resultId);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      logger.error("error occurred during thread sleep ");
+    }
+    waitForResult(resultId, retries - 1);
+  }
+
+  public List<Object> getDLExecutionData(
+      String executionId,
+      String fileNameEndsWith,
+      Integer pageNo,
+      Integer pageSize,
+      ExecutionType executionType) {
+    logger.debug("Inside getting executionData for executionId {}", executionId);
+    try {
+      List list = new ArrayList<String>();
+      Stream resultStream = list.stream();
+      String outputLocation = null;
+      if (executionType == (ExecutionType.onetime)
+          || executionType == (ExecutionType.preview)
+          || executionType == (ExecutionType.regularExecution)) {
+        outputLocation = dlOutputLocation + File.separator + "preview-" + executionId;
+      }
+      FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
+      for (FileStatus fs : files) {
+        if (fs.getPath().getName().endsWith(fileNameEndsWith)) {
+          String path = outputLocation + File.separator + fs.getPath().getName();
+          InputStream stream = HFileOperations.readFileToInputStream(path);
+          BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+          resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
+        }
+      }
+      return prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
+    } catch (Exception e) {
+      logger.debug("Exception while reading results: {}", e.getMessage());
+    }
+    return null;
+  }
+
+  private List<JsonNode> prepareDataFromStream(
+      Stream<String> dataStream, Long limit, Integer pageNo, Integer pageSize) {
+    List<JsonNode> data = new ArrayList<>();
+    ObjectMapper mapper = new ObjectMapper();
+    if (pageNo == null || pageSize == null) {
+      limit = limit != null ? limit : 1000L;
+      dataStream
+          .limit(limit)
+          .forEach(
+              (element) -> {
+                try {
+                  JsonNode jsonNode = mapper.readTree(element);
+                  data.add((jsonNode));
+                } catch (Exception e) {
+                  logger.error("error occured while parsing element to json node");
+                }
+              });
+      return data;
+    } else {
+      int startIndex = pageNo * pageSize;
+      dataStream
+          .skip(startIndex)
+          .limit(pageSize)
+          .forEach(
+              (element) -> {
+                try {
+                  JsonNode jsonNode = mapper.readTree(element);
+                  data.add((jsonNode));
+                } catch (Exception e) {
+                  logger.info("error occured while parsing element to json node");
+                }
+              });
+      logger.debug("Data from the stream  " + data);
+      return data;
+    }
   }
 }
