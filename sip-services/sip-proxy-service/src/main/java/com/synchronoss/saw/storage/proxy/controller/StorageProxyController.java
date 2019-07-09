@@ -24,6 +24,7 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -276,7 +277,7 @@ public class StorageProxyController {
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<?> executeAnalysis(
+  public ExecuteAnalysisResponse executeAnalysis(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
               required = true)
@@ -295,12 +296,14 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
 
+    ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
-      return Collections.singletonList("Invalid authentication token");
+      executeResponse.setData(Collections.singletonList("Invalid authentication token"));
+      return executeResponse;
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
@@ -334,10 +337,15 @@ public class StorageProxyController {
               designerEdit);
 
       // Execution result will one be stored, if execution type is publish or Scheduled.
-      if (executionType.equals(ExecutionType.publish)
-          || executionType.equals(ExecutionType.scheduled)) {
+      boolean validExecutionType =
+          executionType.equals(ExecutionType.publish)
+              || executionType.equals(ExecutionType.scheduled);
+
+      final String uuidId = UUID.randomUUID().toString();
+      executeResponse.setExecutionId(uuidId);
+      if (validExecutionType) {
         ExecutionResult executionResult = new ExecutionResult();
-        executionResult.setExecutionId(UUID.randomUUID().toString());
+        executionResult.setExecutionId(uuidId);
         executionResult.setDslQueryId(queryId);
         executionResult.setAnalysis(analysis);
         executionResult.setStartTime(startTime);
@@ -366,7 +374,8 @@ public class StorageProxyController {
       //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     }
     logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
-    return responseObjectFuture;
+    executeResponse.setData(responseObjectFuture);
+    return executeResponse;
   }
 
   /**
