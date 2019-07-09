@@ -56,16 +56,20 @@ class Designer extends SaveDialog {
   }
   clickOnTopNButton() {
     commonFunctions.clickOnElement(this._topNBtn);
+    browser.sleep(2000); // this need because protarctor is too fast and application is not operating as expected
   }
   clickOnBottomNButton() {
     commonFunctions.clickOnElement(this._bottomNBtn);
+    browser.sleep(2000); // this need because protarctor is too fast and application is not operating as expected
   }
   fillLimitValue(value) {
     commonFunctions.fillInput(this._limitValue, value);
+    this._limitValue.click();
+    browser.sleep(2000); // this need because protarctor is too fast and application is not operating as expected
   }
 
-  fillAliasInput(value) {
-    commonFunctions.fillInput(this._aliasInput(), value);
+  fillAliasInput(attr, value) {
+    commonFunctions.fillInput(this._aliasInput(attr), value);
   }
 }
 module.exports = Designer;

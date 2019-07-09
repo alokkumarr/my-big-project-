@@ -20,7 +20,7 @@ const Header = require('../../pages/components/Header');
 /**
  * LIMIT does't work with group by and more than one metric field
  */
-describe('Executing topN and BottomN chart tests from charts/topNBottomNForCharts.test.js', () => {
+describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
   let analysisId;
   let host;
   let token;
@@ -30,7 +30,7 @@ describe('Executing topN and BottomN chart tests from charts/topNBottomNForChart
   const groupName = 'String';
   const sizeByName = 'Float';
   beforeAll(() => {
-    logger.info('Starting charts/topNBottomNForCharts.test.js.....');
+    logger.info('Starting charts/topNForCharts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -96,9 +96,8 @@ describe('Executing topN and BottomN chart tests from charts/topNBottomNForChart
         // Apply limit section starts, if more than one metrics field selected then no LIMIT
         chartDesignerPage.clickOnDataOptionsTab();
         chartDesignerPage.clickOnFieldsByName(metrics);
-        chartDesignerPage.clickOnTopNButton();
         chartDesignerPage.fillLimitValue(2);
-        chartDesignerPage.fillAliasInput(`alias-${id}`);
+        chartDesignerPage.clickOnTopNButton();
         // Apply limit section ends
         //Save
         chartDesignerPage.clickOnSave();
@@ -119,18 +118,18 @@ describe('Executing topN and BottomN chart tests from charts/topNBottomNForChart
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        // analysisId = executePage.getAnalysisId();
-        //
-        // executePage.clickOnActionLink();
-        // executePage.clickOnDetails();
-        // executePage.verifyDescription(chartDescription);
-        // executePage.closeActionMenu();
-        // // Delete the analysis
-        // executePage.clickOnActionLink();
-        // executePage.clickOnDelete();
-        // executePage.confirmDelete();
-        // analyzePage.verifyToastMessagePresent('Analysis deleted.');
-        // analyzePage.verifyAnalysisDeleted();
+        analysisId = executePage.getAnalysisId();
+
+        executePage.clickOnActionLink();
+        executePage.clickOnDetails();
+        executePage.verifyDescription(chartDescription);
+        executePage.closeActionMenu();
+        // Delete the analysis
+        executePage.clickOnActionLink();
+        executePage.clickOnDelete();
+        executePage.confirmDelete();
+        analyzePage.verifyToastMessagePresent('Analysis deleted.');
+        analyzePage.verifyAnalysisDeleted();
       }).result.testInfo = {
         testId: id,
         data: data,
