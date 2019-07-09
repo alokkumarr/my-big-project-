@@ -1,5 +1,6 @@
 package com.sncr.saw.security.app.properties;
 
+import com.sncr.saw.security.common.util.Ccode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -136,7 +137,7 @@ public class NSSOProperties {
    * @return value of jwtSecretKey
    */
   public String getJwtSecretKey() {
-    return jwtSecretKey;
+    return Ccode.cencode(jwtSecretKey);
   }
 
   /** Sets jwtSecretKey */

@@ -3,6 +3,8 @@
  */
 package com.sncr.saw.security.app;
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -23,7 +25,8 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
     /**
      * TomcatServletWebServerFactory has been overridden.
      */
-
+    @Autowired
+    private NSSOProperties nSSOProperties;
     @Bean
     public TomcatServletWebServerFactory tomcatEmbedded() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
@@ -45,7 +48,7 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
 	@Bean
 	public FilterRegistrationBean jwtFilter() {
 		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-		registrationBean.setFilter(new JwtFilter());
+		registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey()));
 		registrationBean.addUrlPatterns("/auth/*");
 
 		return registrationBean;
