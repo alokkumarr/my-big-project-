@@ -12,9 +12,9 @@ public class SipBisJobs implements Serializable {
   /** serialization id. */
   private static final long serialVersionUID = -3249526977895533260L;
 
-  @ApiModelProperty(value = "Returns list of jobs")
+  @ApiModelProperty(value = "Returns List of jobs")
   @JsonProperty("jobDetails")
-  List<JobDetails> jobDetails;
+  List<SipJobDetails> jobDetails;
 
   @ApiModelProperty(value = "Returns total rows", dataType = "Long")
   @JsonProperty("totalRows")
@@ -52,12 +52,12 @@ public class SipBisJobs implements Serializable {
   }
 
   @JsonProperty("jobDetails")
-  public List<JobDetails> getJobDetails() {
+  public List<SipJobDetails> getJobDetails() {
     return jobDetails;
   }
 
   @JsonProperty("jobDetails")
-  public void setJobDetails(List<JobDetails> jobDetails) {
+  public void setJobDetails(List<SipJobDetails> jobDetails) {
     this.jobDetails = jobDetails;
   }
 }
