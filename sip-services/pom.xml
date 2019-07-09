@@ -54,6 +54,7 @@
     <mapr.db.version>${mapr.core.version}-mapr</mapr.db.version>
     <mapr.streams.version>${mapr.core.version}-mapr</mapr.streams.version>
     <kafka.client.version>1.1.1-mapr-1808</kafka.client.version>
+    <kafka.driver.version>2.1.1</kafka.driver.version>
 		<scala.major.version>2.11</scala.major.version>
 		<scala.version>2.11.8</scala.version>
 		<scala.compat.version>2.11</scala.compat.version>

@@ -328,7 +328,7 @@ public class StorageProxyController {
         responseObjectFuture = prepareMockData(colTypes);
       } else {
         responseObjectFuture =
-            proxyService.execute(analysis.getSipQuery(), size, dataSecurityKeyNode);
+            proxyService.execute(analysis, size, dataSecurityKeyNode, executionType);
       }
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)

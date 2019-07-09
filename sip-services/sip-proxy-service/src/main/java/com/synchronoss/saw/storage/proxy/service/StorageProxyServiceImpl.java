@@ -6,16 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
+import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
+import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
@@ -56,13 +61,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private String basePath;
 
+  @Value("${executor.streamPath}")
+  @NotNull
+  private String streamBasePath;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   @Autowired private StorageConnectorService storageConnectorService;
-
-  // @Autowired
-  // private StorageProxyMetaDataService storageProxyMetaDataService;
 
   private int size;
 
@@ -424,15 +430,63 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+  public List<Object> execute(Analysis analysis, Integer size, DataSecurityKey dataSecurityKey,
+      ExecutionType executionType) throws Exception {
+    List<Object> result = null;
+    SipQuery sipQuery = analysis.getSipQuery();
+
+    if (analysis.getType().equalsIgnoreCase("report")) {
+      result = executeDLReport(analysis, size, dataSecurityKey, executionType);
+    } else {
+      result = executeESQueries(sipQuery, size, dataSecurityKey);
+    }
+
+    return result;
+  }
+
+  private List<Object> executeDLReport(
+      Analysis analysis, Integer size, DataSecurityKey dataSecurityKey, ExecutionType executionType)
+      throws Exception {
+    List<Object> result = null;
+    SipQuery sipQuery = analysis.getSipQuery();
+
+    boolean designerEdit = analysis.getDesignerEdit();
+
+    String query = null;
+
+    if (designerEdit == true) {
+      DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
+      query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
+    } else {
+      query = analysis.getSipQuery().getQuery();
+    }
+
+    // Required parameters
+    String executionId = UUID.randomUUID().toString();
+    String semanticId = sipQuery.getSemanticId();
+
+    int limit = size;
+
+    ExecutorQueueManager queueManager =
+        new ExecutorQueueManager(executionType, streamBasePath);
+    queueManager.sendMessageToStream(semanticId, executionId, limit, query);
+
+    // call Ramesh's method and fetch the result
+
+    return result;
+  }
+
+  private List<Object> executeESQueries(
+      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+    List<Object> result = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
-      if (dataSecurityKey == null) {
-          logger.info("DataSecurity key is not set !!");
-      } else {
-          logger.info("DataSecurityKey : " + dataSecurityKey.toString());
-      }
-      boolean isPercentage =
+    if (dataSecurityKey == null) {
+      logger.info("DataSecurity key is not set !!");
+    } else {
+      logger.info("DataSecurityKey : " + dataSecurityKey.toString());
+    }
+    boolean isPercentage =
         dataFields.stream()
             .anyMatch(
                 dataField ->
@@ -442,8 +496,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .value()
                             .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
-        SearchSourceBuilder searchSourceBuilder =
-            elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
+      SearchSourceBuilder searchSourceBuilder =
+          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
       JsonNode percentageData =
           storageConnectorService.ExecuteESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
@@ -452,8 +506,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     String query;
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
-    logger.trace("ES -Query {} "+query);
-    List<Object> result = null;
+    logger.trace("ES -Query {} " + query);
+
     JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);

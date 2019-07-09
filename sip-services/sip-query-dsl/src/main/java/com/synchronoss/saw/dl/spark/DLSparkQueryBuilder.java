@@ -41,8 +41,7 @@ public class DLSparkQueryBuilder {
 
   List<String> groupByColumns = new ArrayList<>();
 
-  public String buildDataQuery(SIPDSL sipdsl) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDataQuery(SipQuery sipQuery) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
@@ -52,9 +51,9 @@ public class DLSparkQueryBuilder {
             " FROM " + buildFrom(sipQuery) + buildFilter(sipQuery.getFilters()) + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**
@@ -220,8 +219,7 @@ public class DLSparkQueryBuilder {
    * @param dataSecurityKey DataSecurityKey Object
    * @return String dsk included query
    */
-  public String buildDskDataQuery(SIPDSL sipdsl, DataSecurityKey dataSecurityKey) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDskDataQuery(SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
@@ -235,9 +233,9 @@ public class DLSparkQueryBuilder {
                 + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**

@@ -269,6 +269,12 @@
       <version>${revision}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${kafka.driver.version}</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 	<build>
 		<pluginManagement>

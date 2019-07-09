@@ -75,6 +75,9 @@ metastore:
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
+executor:
+  streamPath: /var/sip/services/transport/executor
+
 metadata:
   service:
     host: ${connector}://localhost:9501
