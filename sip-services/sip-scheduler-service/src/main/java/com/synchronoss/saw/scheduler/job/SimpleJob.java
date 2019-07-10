@@ -34,8 +34,8 @@ public class SimpleJob extends QuartzJobBean implements InterruptableJob {
             + Thread.currentThread().getName());
 
     SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
-    boolean isDslScheduled =  job.getType() != null && (job.getType().equalsIgnoreCase("pivot")
-        || job.getType().equalsIgnoreCase("chart") || job.getType().equalsIgnoreCase("map"));
+    String jobType = job.getType();
+    boolean isDslScheduled = jobType != null && jobType.matches("pivot|chart|map|esReport");
     if (isDslScheduled) {
       analysisService.executeDslAnalysis(job.getAnalysisID());
     } else {
