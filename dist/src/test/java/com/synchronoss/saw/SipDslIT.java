@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.response.ResponseBody;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -226,7 +226,7 @@ public class SipDslIT extends BaseIT {
             .response();
     Assert.assertNotNull(response);
     ResponseBody responseBody = response.getBody();
-    List<Map> dataNode = responseBody.path("data");
+    List<Map<String, String>> dataNode = responseBody.path("data");
     Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
