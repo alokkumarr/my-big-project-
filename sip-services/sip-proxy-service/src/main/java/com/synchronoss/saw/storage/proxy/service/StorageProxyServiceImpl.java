@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import org.apache.hadoop.fs.FileStatus;
@@ -489,9 +490,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         new ExecutorQueueManager(executionType, streamBasePath);
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
-    // call Ramesh's method and fetch the result
-
-    return result;
+      waitForResult(executionId,dlReportWaitTime);
+      return getDLExecutionData(executionId,null,null,ExecutionType.preview);
   }
 
   private List<Object> executeESQueries(
@@ -646,7 +646,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   private Boolean executionCompleted(String resultId) {
     String mainPath = executorResultPath != null ? executorResultPath : "/main";
-    String path = mainPath + File.separator + "sip-transport-executor-result-" + resultId;
+    String path = mainPath + File.separator + "saw-transport-executor-result-" + resultId;
     try {
       HFileOperations.readFile(path);
     } catch (FileNotFoundException e) {
@@ -673,9 +673,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     waitForResult(resultId, retries - 1);
   }
 
+
   public List<Object> getDLExecutionData(
       String executionId,
-      String fileNameEndsWith,
       Integer pageNo,
       Integer pageSize,
       ExecutionType executionType) {
@@ -691,14 +691,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       }
       FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
       for (FileStatus fs : files) {
-        if (fs.getPath().getName().endsWith(fileNameEndsWith)) {
+        if (fs.getPath().getName().endsWith(".json")) {
           String path = outputLocation + File.separator + fs.getPath().getName();
           InputStream stream = HFileOperations.readFileToInputStream(path);
           BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
           resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
         }
       }
-      return prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
+        return prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
+        //logger.info("files: {}"+files);
+       // Long recordCount=getRecordCount(outputLocation);
+        //objList.add(recordCount);
     } catch (Exception e) {
       logger.debug("Exception while reading results: {}", e.getMessage());
     }
