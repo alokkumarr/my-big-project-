@@ -451,13 +451,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(Analysis analysis, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType) throws Exception {
+  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
+      ExecutionType executionType, String analysisType, boolean designerEdit) throws Exception {
     List<Object> result = null;
-    SipQuery sipQuery = analysis.getSipQuery();
 
-    if (analysis.getType().equalsIgnoreCase("report")) {
-      result = executeDLReport(analysis, size, dataSecurityKey, executionType);
+    if (analysisType != null && analysisType.equalsIgnoreCase("r, deeport")) {
+      result = executeDLReport(sipQuery, size, dataSecurityKey, executionType, designerEdit);
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
     }
@@ -466,12 +465,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   private List<Object> executeDLReport(
-      Analysis analysis, Integer size, DataSecurityKey dataSecurityKey, ExecutionType executionType)
+      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
+      ExecutionType executionType, boolean designerEdit)
       throws Exception {
     List<Object> result = null;
-    SipQuery sipQuery = analysis.getSipQuery();
-
-    boolean designerEdit = analysis.getDesignerEdit();
 
     String query = null;
 
@@ -479,7 +476,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
     } else {
-      query = analysis.getSipQuery().getQuery();
+      query = sipQuery.getQuery();
     }
 
     // Required parameters

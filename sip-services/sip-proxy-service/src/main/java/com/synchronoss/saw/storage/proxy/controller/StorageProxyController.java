@@ -244,12 +244,13 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    String analysisType = sipdsl.getType();
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey);
+      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey, ExecutionType.onetime, analysisType, false);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -321,9 +322,16 @@ public class StorageProxyController {
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
 
       String analysisType = analysis.getType();
+      boolean designerEdit = analysis.getDesignerEdit();
 
       responseObjectFuture =
-          proxyService.execute(analysis, size, dataSecurityKeyNode, executionType);
+          proxyService.execute(
+              analysis.getSipQuery(),
+              size,
+              dataSecurityKeyNode,
+              executionType,
+              analysisType,
+              designerEdit);
 
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)

@@ -1,7 +1,7 @@
 package com.synchronoss.saw.storage.proxy.service;
 
-import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -12,8 +12,8 @@ public interface StorageProxyService {
 
   public StorageProxy execute(StorageProxy proxy) throws Exception;
 
-  List<Object> execute(Analysis analysis, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType) throws Exception;
+  List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
+      ExecutionType executionType, String analysisType, boolean designerEdit) throws Exception;
 
     Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
