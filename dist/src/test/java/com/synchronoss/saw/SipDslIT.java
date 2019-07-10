@@ -10,6 +10,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.restassured.response.Response;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import io.restassured.response.ResponseBody;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -221,8 +225,9 @@ public class SipDslIT extends BaseIT {
             .extract()
             .response();
     Assert.assertNotNull(response);
-    ArrayNode root = response.getBody().as(ArrayNode.class);
-    Assert.assertEquals(root.get(0).get("string").asText(), testStringFilter);
+    ResponseBody responseBody = response.getBody();
+    List<Map> dataNode = responseBody.path("data");
+    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
   @Test

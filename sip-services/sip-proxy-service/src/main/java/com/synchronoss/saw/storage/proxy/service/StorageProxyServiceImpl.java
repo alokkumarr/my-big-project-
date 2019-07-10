@@ -530,7 +530,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, pageSize);
+      Object data = maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(doc, null));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -572,7 +572,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData(executionResult.getExecutionId(), page, pageSize);
+      Object data = maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
