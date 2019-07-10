@@ -453,7 +453,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, String analysisType, boolean designerEdit) throws Exception {
+      ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception {
     List<Object> result = null;
 
     if (analysisType != null && analysisType.equalsIgnoreCase("r, deeport")) {
@@ -467,7 +467,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   private List<Object> executeDLReport(
       SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, boolean designerEdit)
+      ExecutionType executionType, Boolean designerEdit)
       throws Exception {
     List<Object> result = null;
 

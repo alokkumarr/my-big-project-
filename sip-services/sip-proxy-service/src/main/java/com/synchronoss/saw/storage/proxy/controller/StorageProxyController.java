@@ -322,7 +322,7 @@ public class StorageProxyController {
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
 
       String analysisType = analysis.getType();
-      boolean designerEdit = analysis.getDesignerEdit();
+      Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
 
       responseObjectFuture =
           proxyService.execute(

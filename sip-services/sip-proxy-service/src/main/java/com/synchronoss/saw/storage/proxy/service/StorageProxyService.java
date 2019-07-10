@@ -13,7 +13,7 @@ public interface StorageProxyService {
   public StorageProxy execute(StorageProxy proxy) throws Exception;
 
   List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, String analysisType, boolean designerEdit) throws Exception;
+      ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception;
 
     Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
