@@ -549,20 +549,21 @@ export class AnalyzeService {
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}&page=${page}&pageSize=${options.take}`,
+        }&executionType=${mode}&page=${page}&pageSize=${options.take}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
         map((resp: any) => {
+          const data = resp.data ? resp.data : resp;
           return {
-            data: resp,
+            data: data,
             executionId: resp.executionId || (model.sipQuery ? '123456' : null),
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
             queryBuilder: { ...model.sipQuery },
-            count: fpGet(`totalRows`, resp) || resp.length
+            count: fpGet(`totalRows`, resp) || data.length
           };
         })
       )
