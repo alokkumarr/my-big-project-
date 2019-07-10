@@ -688,6 +688,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           || executionType == (ExecutionType.preview)
           || executionType == (ExecutionType.regularExecution)) {
         outputLocation = dlOutputLocation + File.separator + "preview-" + executionId;
+          logger.debug("output location for Dl report:{}",outputLocation);
       }
       FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
       for (FileStatus fs : files) {
@@ -698,10 +699,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
         }
       }
-        return prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
-        //logger.info("files: {}"+files);
-       // Long recordCount=getRecordCount(outputLocation);
+        List<Object> objList= prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
+       Long recordCount=getRecordCount(outputLocation);
         //objList.add(recordCount);
+        //ExecuteAnalysisResponse response=new ExecuteAnalysisResponse();
+        //response.setData(objList);
+        //response.setTotalRows(recordCount);
+        //response.setExecutionId(executionId);
+        return objList;
+
     } catch (Exception e) {
       logger.debug("Exception while reading results: {}", e.getMessage());
     }
@@ -743,5 +749,29 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       logger.debug("Data from the stream  " + data);
       return data;
     }
+  }
+
+  private Long getRecordCount(String outputLocation) throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    InputStream inputStream = null;
+    Long count = null;
+    FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
+    logger.debug("inside getRecordCount for DL report");
+    for (FileStatus fs : files) {
+      if (fs.getPath().getName().endsWith("recordCount")) {
+        String path = outputLocation + File.separator + fs.getPath().getName();
+        inputStream = HFileOperations.readFileToInputStream(path);
+        break;
+      }
+    }
+    BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
+    List<String> list = bufferReader.lines().collect(Collectors.toList());
+    if (list.size() > 0) {
+      String countString = list.get(0);
+      JsonNode jsonNode = mapper.readTree(countString);
+      count = jsonNode.get("recordCount").asLong();
+      logger.debug("count of the record : {}", count);
+    }
+    return count;
   }
 }
