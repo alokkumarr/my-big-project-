@@ -307,7 +307,7 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
+    List<Object> responseObjectFuture;
     SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -375,6 +375,7 @@ public class StorageProxyController {
     }
     logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
     executeResponse.setData(responseObjectFuture);
+    executeResponse.setTotalRows(responseObjectFuture != null ? responseObjectFuture.size() : 0l);
     return executeResponse;
   }
 
