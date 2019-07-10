@@ -147,11 +147,4 @@ public class MaprConnection {
     }
     return null;
   }
-
-  @Override
-  protected void finalize() {
-    store.flush();
-    store.close();
-    connection.close();
-  }
 }
