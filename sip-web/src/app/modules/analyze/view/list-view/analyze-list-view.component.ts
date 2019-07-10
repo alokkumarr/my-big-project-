@@ -44,9 +44,12 @@ export class AnalyzeListViewComponent implements OnInit {
   @Input() analysisType: string;
   @Input() searchTerm: string;
   @Input('cronJobs') set _cronJobs(value) {
+    if (isEmpty(value)) {
+      return;
+    }
     this.cronJobs = value;
     if (this.analysesGrid && this.analysesGrid.instance && this.analyses) {
-      this.analyses = [...this.analyses];
+      // this.analyses = [...this.analyses];
       this.analysesGrid.instance.refresh();
     }
   }
