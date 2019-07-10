@@ -495,6 +495,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<?> fetchDslExecutionsList(String dslQueryId) {
     try {
       // Create executionResult table if doesn't exists.
+      new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
       String fields[] = {
         "executionId",
