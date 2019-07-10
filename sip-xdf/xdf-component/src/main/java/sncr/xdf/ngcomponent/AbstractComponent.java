@@ -116,9 +116,7 @@ public abstract class AbstractComponent implements WithContext{
         }
         int ret = execute();
         if (ngctx.runningPipeLine) {
-            if (ngctx.persistMode) {
-                ret = moveAndArchive(ret);
-            }
+              ret = moveAndArchiveForPipeline(ret);
         }
         else
         {
@@ -149,6 +147,36 @@ public abstract class AbstractComponent implements WithContext{
 
         return ret;
     }
+    
+    public int moveAndArchiveForPipeline(int ret)
+	{
+		if (ret == 0) {
+			if (ngctx.persistMode) {
+				ret = move();
+			}
+			if (ret == 0) {
+				if (ngctx.persistMode) {
+					ret = archive();
+				}
+				if (ret == 0) {
+					
+					/**
+					 * Finalize will update mapr db status and other information.
+					 * This needs to be executed irrespective of persistence flag
+					 */
+					ret = Finalize(ret);
+				} else {
+				}
+			} else {
+				logger.error("Could not complete move phase!");
+			}
+
+		} else {
+			logger.error("Could not complete execution phase!");
+		}
+
+		return ret;
+	}
 
     /**
      * In asynchronous execution this method updates output dataset with next status: IN-PROGRESS
