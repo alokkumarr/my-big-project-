@@ -87,21 +87,18 @@ public class SSORequestHandler {
             ticket.setError(de.getMessage());
             atoken =
                     Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-                            .setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+                            .setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact();
             ssoResponse.setaToken(atoken);
             return ssoResponse;
         } catch (Exception e) {
             logger.error("Exception occurred creating ticket ", e, null);
             return null;
         }
-        /*
-           To Do : Currently secret key for saw token is hardcoded as "sncrsaw2" in all places,
-           this needs to be changed and make as configurable properties.
-         */
+
         atoken = Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-                        .signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+                        .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact();
         rToken = Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+                .signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact();
       ssoResponse.setaToken(atoken);
       ssoResponse.setrToken(rToken);
       return ssoResponse;
