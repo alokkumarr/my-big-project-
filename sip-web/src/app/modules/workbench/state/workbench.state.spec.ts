@@ -6,9 +6,9 @@ import { CHANNEL_TYPES } from '../wb-comp-configs';
 import { WorkbenchState } from './workbench.state';
 import { DatasourceService } from '../services/datasource.service';
 import {
-  SelectChannelType,
-  SelectChannel,
-  SelectRoute
+  SelectChannelTypeId,
+  SelectChannelId,
+  SelectRouteId
 } from './workbench.actions';
 
 const channelToSelect = { name: 'channel', id: 1 };
@@ -34,46 +34,46 @@ describe('Workbench State', () => {
 
   it('should have sftp selectedChannelType as default', async(() => {
     store
-      .selectOnce(state => state.workbench.selectedChannelType)
+      .selectOnce(WorkbenchState.selectedChannelTypeId)
       .pipe(
-        tap(selectedChannelType => {
-          expect(selectedChannelType).toEqual(CHANNEL_TYPES[0]);
+        tap(selectedChannelTypeId => {
+          expect(selectedChannelTypeId).toEqual(CHANNEL_TYPES[0].uid);
         })
       )
       .subscribe();
   }));
 
   it('should set selectedChannelType', async(() => {
-    store.dispatch(new SelectChannelType(CHANNEL_TYPES[1]));
+    store.dispatch(new SelectChannelTypeId(CHANNEL_TYPES[1].uid));
     store
-      .selectOnce(state => state.workbench.selectedChannelType)
+      .selectOnce(WorkbenchState.selectedChannelTypeId)
       .pipe(
-        tap(selectedChannelType => {
-          expect(selectedChannelType).toEqual(CHANNEL_TYPES[1]);
+        tap(selectedChannelTypeId => {
+          expect(selectedChannelTypeId).toEqual(CHANNEL_TYPES[1].uid);
         })
       )
       .subscribe();
   }));
 
   it('should set selectedChannel', async(() => {
-    store.dispatch(new SelectChannel(channelToSelect));
+    store.dispatch(new SelectChannelId(channelToSelect.id));
     store
-      .selectOnce(state => state.workbench.selectedChannel)
+      .selectOnce(WorkbenchState.selectedChannelId)
       .pipe(
-        tap(selectedChannel => {
-          expect(selectedChannel).toEqual(channelToSelect);
+        tap(selectedChannelId => {
+          expect(selectedChannelId).toEqual(channelToSelect.id);
         })
       )
       .subscribe();
   }));
 
   it('should set selectedRoute', async(() => {
-    store.dispatch(new SelectRoute(routeToSelect));
+    store.dispatch(new SelectRouteId(routeToSelect.id));
     store
-      .selectOnce(state => state.workbench.selectedRoute)
+      .selectOnce(WorkbenchState.selectedRouteId)
       .pipe(
-        tap(selectedRoute => {
-          expect(selectedRoute).toEqual(routeToSelect);
+        tap(selectedRouteId => {
+          expect(selectedRouteId).toEqual(routeToSelect.id);
         })
       )
       .subscribe();
