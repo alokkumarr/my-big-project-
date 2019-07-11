@@ -25,9 +25,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Batch Ingestion Service integration tests. CRUD Operation both Route & Channel
- */
+/** Batch Ingestion Service integration tests. CRUD Operation both Route & Channel */
 public class BatchIngestionIT extends BaseIT {
   private static final String BATCH_CHANNEL = "channels";
   private static final String BATCH_ROUTE = "routes";
@@ -53,7 +51,7 @@ public class BatchIngestionIT extends BaseIT {
 
   /**
    * This method is used to in test-case where creation of channel is required.
-   * 
+   *
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
    */
@@ -73,13 +71,14 @@ public class BatchIngestionIT extends BaseIT {
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
     root.put("channelType", "sftp");
-    root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
+    root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
+    ;
     return root;
   }
 
   /**
    * This method is used to in test-case where creation of channel is required.
-   * 
+   *
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
    */
@@ -99,13 +98,14 @@ public class BatchIngestionIT extends BaseIT {
     root.put("customerCode", "SNCR");
     root.put("projectCode", "workbench");
     root.put("channelType", "sftp");
-    root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));;
+    root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
+    ;
     return root;
   }
 
   /**
    * This method is used to in test-case where creation of route is required.
-   * 
+   *
    * @param sourcePath parameter to set the sourceLocation.
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
@@ -131,10 +131,9 @@ public class BatchIngestionIT extends BaseIT {
     return route;
   }
 
-
   /**
    * This method is used to in test-case where creation of route is required.
-   * 
+   *
    * @param sourcePath parameter to set the sourceLocation.
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
@@ -162,7 +161,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * This method is used to in test-case where creation of route is required. while duplicate file
    * is allowed
-   * 
+   *
    * @param sourcePath parameter to set the sourceLocation.
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
@@ -190,7 +189,7 @@ public class BatchIngestionIT extends BaseIT {
 
   /**
    * This method is used to in test-case where updating a change is required.
-   * 
+   *
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
    */
@@ -219,7 +218,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * This method is used to prepare a schedule node to use it in route meta data node while.
    * scheduling route on monthly basis
-   * 
+   *
    * @return object {@link ObjectNode}
    */
   private ObjectNode prepareSchedulerNode() {
@@ -235,7 +234,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * This method is used to prepare a schedule node to use it in route. meta data node while
    * scheduling route on hourly basis
-   * 
+   *
    * @return object {@link ObjectNode}
    */
   private ObjectNode prepareSchedulerNodeForScheduledTransfer() {
@@ -243,16 +242,17 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("cronexp", "0 0/1 * 1/1 * ? *");
     childNode.put("activeTab", "hourly");
     childNode.put("timezone", "America/New_York");
-    childNode.put("startDate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        .format(DateUtils.addMinutes(new Date(), 1)));
+    childNode.put(
+        "startDate",
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+            .format(DateUtils.addMinutes(new Date(), 1)));
     childNode.put("endDate", "");
     return childNode;
   }
 
-
   /**
    * This method is being used to prepare the route to use it while updating a route.
-   * 
+   *
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
    */
@@ -279,7 +279,7 @@ public class BatchIngestionIT extends BaseIT {
   /**
    * This method is used to prepare a route to use it while scheduling transfer. data on hourly
    * basis
-   * 
+   *
    * @return object {@link ObjectNode}
    * @throws JsonProcessingException exception.
    */
@@ -302,32 +302,43 @@ public class BatchIngestionIT extends BaseIT {
     root.put("status", 1);
     return root;
   }
-  
 
-  /**
-   * This test-case is check the scenario to create a channel.
-   */
+  /** This test-case is check the scenario to create a channel. */
   @Test
   public void createChannel() throws JsonProcessingException {
 
-    ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createChannel () " + response.log());
 
     // delete channel after testing
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario that duplicate channel is not allowed.
-   */
+  /** This test-case is check the scenario that duplicate channel is not allowed. */
   @Test
   public void isDuplicateChannelPositive() throws JsonProcessingException {
-    ValidatableResponse response = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createChannel () isDuplicateChannel " + response.log());
-    Response duplicateResp = given(authSpec).queryParam("channelName", "docker-channel")
-        .body(prepareChannelDataSet()).when().get(BATCH_CHANNEL_PATH + "/duplicate");
+    Response duplicateResp =
+        given(authSpec)
+            .queryParam("channelName", "docker-channel")
+            .body(prepareChannelDataSet())
+            .when()
+            .get(BATCH_CHANNEL_PATH + "/duplicate");
     log.debug("isDuplicateChannel isDuplicateChannel " + duplicateResp.body().prettyPrint());
     assertEquals(duplicateResp.body().asString(), "false");
 
@@ -335,16 +346,24 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario that duplicate channel is not allowed.
-   */
+  /** This test-case is check the scenario that duplicate channel is not allowed. */
   @Test
   public void isDuplicateChannelNegative() throws JsonProcessingException {
-    ValidatableResponse response = given(authSpec).body(prepareChannelDataSetDuplicate()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(prepareChannelDataSetDuplicate())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createChannel () isDuplicateChannel " + response.log());
-    Response duplicateResp = given(authSpec).queryParam("channelName", "docker-channel-duplicate")
-        .body(prepareChannelDataSet()).when().get(BATCH_CHANNEL_PATH + "/duplicate");
+    Response duplicateResp =
+        given(authSpec)
+            .queryParam("channelName", "docker-channel-duplicate")
+            .body(prepareChannelDataSet())
+            .when()
+            .get(BATCH_CHANNEL_PATH + "/duplicate");
     log.debug("isDuplicateChannelNegative " + duplicateResp.body().prettyPrint());
     assertEquals(duplicateResp.body().asString(), "true");
 
@@ -352,20 +371,33 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario to create a route.
-   */
+  /** This test-case is check the scenario to create a route. */
   @Test
   public void createRoute() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId createRoute : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response =
-        given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when().post(routeUri)
-            .then().assertThat().statusCode(200);
+        given(authSpec)
+            .body(prepareRouteDataSet("/root/saw-batch-samples"))
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
 
     // delete route after testing
@@ -373,23 +405,38 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
-
-  /**
-   * This test-case is check the scenario that duplicate route is not allowed.
-   */
+  /** This test-case is check the scenario that duplicate route is not allowed. */
   @Test
   public void isDuplicateRoutePositive() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response =
-        given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when().post(routeUri)
-            .then().assertThat().statusCode(200);
+        given(authSpec)
+            .body(prepareRouteDataSet("/root/saw-batch-samples"))
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
     Response duplicateResp =
-        given(authSpec).queryParam("routeName", "route123").body(prepareChannelDataSet()).when()
+        given(authSpec)
+            .queryParam("routeName", "route123")
+            .body(prepareChannelDataSet())
+            .when()
             .get(BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/duplicate-route");
     log.debug("duplicateResp () " + duplicateResp.body().jsonPath().get("isDuplicate"));
     assertEquals(duplicateResp.body().jsonPath().getBoolean("isDuplicate"), false);
@@ -397,43 +444,65 @@ public class BatchIngestionIT extends BaseIT {
     // delete channel after testing
     this.tearDownRoute();
     this.tearDownChannel();
-
   }
 
-  /**
-   * This test-case is check the scenario that duplicate route is not allowed.
-   */
+  /** This test-case is check the scenario that duplicate route is not allowed. */
   @Test
   public void isDuplicateRouteNegative() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response =
-        given(authSpec).body(prepareRouteDataSetDuplicate("/root/saw-batch-samples")).when()
-            .post(routeUri).then().assertThat().statusCode(200);
+        given(authSpec)
+            .body(prepareRouteDataSetDuplicate("/root/saw-batch-samples"))
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
-    Response duplicateResp = given(authSpec).queryParam("routeName", "docker-route-duplicate")
-        .body(prepareChannelDataSet()).when()
-        .get(BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/duplicate-route");
+    Response duplicateResp =
+        given(authSpec)
+            .queryParam("routeName", "docker-route-duplicate")
+            .body(prepareChannelDataSet())
+            .when()
+            .get(BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/duplicate-route");
     log.debug("isDuplicateRouteNegative () " + duplicateResp.body().jsonPath().get("isDuplicate"));
     assertEquals(duplicateResp.body().jsonPath().getBoolean("isDuplicate"), true);
 
     // delete channel after testing
     this.tearDownRoute();
     this.tearDownChannel();
-
   }
 
-  /**
-   * This test-case is check the scenario that activating & deactivating a channel.
-   */
+  /** This test-case is check the scenario that activating & deactivating a channel. */
   @Test
   public void activateDeactivateChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
 
     String channelDeActivateUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + "deactivate";
@@ -444,146 +513,305 @@ public class BatchIngestionIT extends BaseIT {
 
     // delete channel after testing
     this.tearDownChannel();
-
   }
 
-  /**
-   * This test-case is check the scenario that activating & deactivating a route.
-   */
+  /** This test-case is check the scenario that activating & deactivating a route. */
   @Test
   public void activateDeactivateRoute() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
 
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
     ValidatableResponse response =
-        given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when().post(routeUri)
-            .then().assertThat().statusCode(200);
+        given(authSpec)
+            .body(prepareRouteDataSet("/root/saw-batch-samples"))
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
 
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     log.debug(" updateRoute bisRouteSysId : " + routeId);
-    String activateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/"
-        + routeId + "/activate";
-    String deActivateUrl = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/"
-        + routeId + "/deactivate";
-    given(authSpec).body(prepareUpdateRouteDataSet()).when().put(activateUrl).then().assertThat()
+    String activateUrl =
+        BATCH_CHANNEL_PATH
+            + "/"
+            + bisChannelSysId
+            + "/"
+            + BATCH_ROUTE
+            + "/"
+            + routeId
+            + "/activate";
+    String deActivateUrl =
+        BATCH_CHANNEL_PATH
+            + "/"
+            + bisChannelSysId
+            + "/"
+            + BATCH_ROUTE
+            + "/"
+            + routeId
+            + "/deactivate";
+    given(authSpec)
+        .body(prepareUpdateRouteDataSet())
+        .when()
+        .put(activateUrl)
+        .then()
+        .assertThat()
         .statusCode(200);
-    given(authSpec).body(prepareUpdateRouteDataSet()).when().put(deActivateUrl).then().assertThat()
+    given(authSpec)
+        .body(prepareUpdateRouteDataSet())
+        .when()
+        .put(deActivateUrl)
+        .then()
+        .assertThat()
         .statusCode(200);
     this.tearDownRoute();
     this.tearDownChannel();
-
   }
 
-  /**
-   * This test-case is check the scenario that listing of channels.
-   */
+  /** This test-case is check the scenario that listing of channels. */
   @Test
   public void readChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
-    given(authSpec).body(prepareChannelDataSet()).when().get(BATCH_CHANNEL_PATH).then().assertThat()
+    given(authSpec)
+        .body(prepareChannelDataSet())
+        .when()
+        .get(BATCH_CHANNEL_PATH)
+        .then()
+        .assertThat()
         .statusCode(200);
-    List<?> listOfChannel = given(authSpec).when().get(BATCH_CHANNEL_PATH).then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getList("$");
+    List<?> listOfChannel =
+        given(authSpec)
+            .when()
+            .get(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getList("$");
     log.debug("readChannel :" + listOfChannel);
     assertTrue(listOfChannel.size() > 0);
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario that listing of routes.
-   */
+  /** This test-case is check the scenario that listing of routes. */
   @Test
   public void readRoute() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when().post(routeUri)
-        .then().assertThat().statusCode(200);
+    given(authSpec)
+        .body(prepareRouteDataSet("/root/saw-batch-samples"))
+        .when()
+        .post(routeUri)
+        .then()
+        .assertThat()
+        .statusCode(200);
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
-    List<?> listOfRoutes = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getList("$");
+    List<?> listOfRoutes =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getList("$");
     log.debug("readRoute :" + listOfRoutes);
     assertTrue(listOfRoutes.size() > 0);
 
     this.tearDownRoute();
     this.tearDownChannel();
-
   }
 
-  /**
-   * This test-case is check the scenario to update a channel.
-   */
+  /** This test-case is check the scenario to update a channel. */
   @Test
   public void updateChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
     log.debug("updateChannel urlForThetoUpdate : " + urlForThatoUpdate);
-    String modifiedBy = given(authSpec).body(prepareUpdateChannelDataSet()).when()
-        .put(urlForThatoUpdate).then().assertThat().statusCode(200).extract().response().body()
-        .jsonPath().getJsonObject("modifiedBy");
+    String modifiedBy =
+        given(authSpec)
+            .body(prepareUpdateChannelDataSet())
+            .when()
+            .put(urlForThatoUpdate)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .body()
+            .jsonPath()
+            .getJsonObject("modifiedBy");
     log.debug("updateChannel :" + modifiedBy);
     assertEquals("sncr@synchronoss.com", modifiedBy);
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario to update a route.
-   */
+  /** This test-case is check the scenario to update a route. */
   @Test
   public void updateRoute() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when()
-        .post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
+    given(authSpec)
+        .body(prepareRouteDataSet("/root/saw-batch-samples"))
+        .when()
+        .post(urlForThatRouteUpdate)
+        .then()
+        .assertThat()
+        .statusCode(200);
     log.debug("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
-    Long routeId = given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(urlForThatRouteUpdate)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     log.debug(" updateRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById =
         BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
-    String modifiedBy = given(authSpec).body(prepareUpdateRouteDataSet()).when()
-        .put(urlForThatRouteUpdateById).then().assertThat().statusCode(200).extract().response()
-        .body().jsonPath().getJsonObject("modifiedBy");
+    String modifiedBy =
+        given(authSpec)
+            .body(prepareUpdateRouteDataSet())
+            .when()
+            .put(urlForThatRouteUpdateById)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .body()
+            .jsonPath()
+            .getJsonObject("modifiedBy");
     log.debug("updateRoute :" + modifiedBy);
     assertEquals("dataAdmin@synchronoss.com", modifiedBy);
     this.tearDownRoute();
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario to delete a channel.
-   */
+  /** This test-case is check the scenario to delete a channel. */
   @Test
   public void deleteRoute() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when()
-        .post(urlForThatRouteUpdate).then().assertThat().statusCode(200);
+    given(authSpec)
+        .body(prepareRouteDataSet("/root/saw-batch-samples"))
+        .when()
+        .post(urlForThatRouteUpdate)
+        .then()
+        .assertThat()
+        .statusCode(200);
     log.debug("updateRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
-    Long routeId = given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
-        .statusCode(200).extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(urlForThatRouteUpdate)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     log.debug(" updateRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById =
         BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
@@ -592,14 +820,22 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario to delete a route.
-   */
+  /** This test-case is check the scenario to delete a route. */
   @Test
   public void deleteChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
@@ -607,13 +843,20 @@ public class BatchIngestionIT extends BaseIT {
     given(authSpec).when().delete(urlForThatoUpdate).then().assertThat().statusCode(200);
   }
 
-  /**
-   * This method is used to tear down the channel after each test case executes.
-   */
+  /** This method is used to tear down the channel after each test case executes. */
   public void tearDownChannel() throws JsonProcessingException {
-    Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .path("[0].bisChannelSysId");
+    Integer bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .get(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .path("[0].bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatoUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId;
@@ -623,7 +866,7 @@ public class BatchIngestionIT extends BaseIT {
 
   /**
    * This method is used to tear down the list of log entries after. each test case executes
-   * 
+   *
    * @throws JsonProcessingException exception.
    */
   public void tearDownLogs() throws JsonProcessingException {
@@ -632,114 +875,211 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Removing entries from log ends here.");
   }
 
-  /**
-   * This method is used to tear down the routes after each test case executes.
-   */
+  /** This method is used to tear down the routes after each test case executes. */
   public void tearDownRoute() throws JsonProcessingException {
-    Integer bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .get(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .path("[0].bisChannelSysId");
+    Integer bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .get(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .path("[0].bisChannelSysId");
     log.debug("bisChannelSysId : " + bisChannelSysId);
     assertFalse(bisChannelSysId <= 0);
     String urlForThatRouteUpdate = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
-    given(authSpec).body(prepareRouteDataSet("/root/saw-batch-samples")).when()
-        .get(urlForThatRouteUpdate).then().assertThat().statusCode(200);
+    given(authSpec)
+        .body(prepareRouteDataSet("/root/saw-batch-samples"))
+        .when()
+        .get(urlForThatRouteUpdate)
+        .then()
+        .assertThat()
+        .statusCode(200);
     log.debug("deleteRoute urlForThetoUpdate : " + urlForThatRouteUpdate);
     log.debug(
-        "deleteRoute data " + given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
-            .statusCode(200).extract().response().getBody().jsonPath().getLong("bisRouteSysId[0]"));
-    Long routeId = given(authSpec).when().get(urlForThatRouteUpdate).then().assertThat()
-        .statusCode(200).extract().response().getBody().jsonPath().getLong("bisRouteSysId[0]");
+        "deleteRoute data "
+            + given(authSpec)
+                .when()
+                .get(urlForThatRouteUpdate)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .response()
+                .getBody()
+                .jsonPath()
+                .getLong("bisRouteSysId[0]"));
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(urlForThatRouteUpdate)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     log.debug(" deleteRoute bisRouteSysId : " + routeId);
     String urlForThatRouteUpdateById =
         BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE + "/" + routeId;
     given(authSpec).when().delete(urlForThatRouteUpdateById).then().assertThat().statusCode(200);
   }
 
-  /**
-   * This test-case is check the scenario to test the connectivity of the channel.
-   */
+  /** This test-case is check the scenario to test the connectivity of the channel. */
   @Test
   public void connectChannel() throws JsonProcessingException {
-    Long bisChannelSysId = given(authSpec).body(prepareChannelDataSet()).when()
-        .post(BATCH_CHANNEL_PATH).then().assertThat().statusCode(200).extract().response().getBody()
-        .jsonPath().getLong("bisChannelSysId");
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     log.debug("connectRoute bisChannelSysId : " + bisChannelSysId);
-    String connectRouteUri =
-        BATCH_PATH + "/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
+    String connectRouteUri = BATCH_PATH + "/" + BATCH_CHANNEL + "/" + bisChannelSysId + "/status";
     given(authSpec).when().get(connectRouteUri).then().assertThat().statusCode(200);
     this.tearDownChannel();
   }
 
-  /**
-   * This test-case is check the scenario to test the transfer data with filePattern : *.csv.
-   */
+  /** This test-case is check the scenario to test the transfer data with filePattern : *.csv. */
   @Test
-  public void transferData() throws JsonProcessingException {
-    ObjectNode routeMetadata = prepareRouteDataSetWithDuplicate(
-        "/root/saw-batch-samples/log/small");
+  public void transferData() throws IOException {
+    ObjectNode routeMetadata =
+        prepareRouteDataSetWithDuplicate("/root/saw-batch-samples/log/small");
     routeMetadata.put("disableDuplicate", true);
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(routeMetadata)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    //given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
     //    .statusCode(200);
-    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath path =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Request URL for transferData :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transfer data :" + path.prettyPrint());
     String result = path.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
-    
+
     this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
-    
-    JsonPath afterWaitPath = given(authSpec).when().get(
-        ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+
+    JsonPath afterWaitPath =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     String fileName = afterWaitPath.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName);
     assertNotNull(fileName);
     String afterWaitStatus = afterWaitPath.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result);
-    
+
     assertEquals("SUCCESS", afterWaitStatus);
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   /**
    * This test-case is check the scenario to test the transfer data when duplicate file is not
-   * allowed disableDuplicate :true. filePattern : *.csv
-   * . And to simulate
-   * the scenario, the API has been twice to make sure the file status to return as DUPLICATE
-   * 
+   * allowed disableDuplicate :true. filePattern : *.csv . And to simulate the scenario, the API has
+   * been twice to make sure the file status to return as DUPLICATE
+   *
    * @throws IOException exception.
    */
   @Test
   public void transferDataDuplicateNotAllowed() throws IOException {
     ObjectNode metaData = prepareRouteDataSetForTransferSchedule();
     metaData.put("disableDuplicate", false);
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    
+
     // First call as part this route is immediate transfer
-    ValidatableResponse response = given(authSpec).body(metaData).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec).body(metaData).when().post(routeUri).then().assertThat().statusCode(200);
     log.debug("createRoute () " + response.log());
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
@@ -753,8 +1093,16 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Interrupted");
     }
 
-    JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath caller1 =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
 
     log.debug(
         "Request URL for first transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
@@ -762,15 +1110,15 @@ public class BatchIngestionIT extends BaseIT {
     String status = caller1.getString("logs[0].mflFileStatus");
     String processState = caller1.getString("logs[0].bisProcessState");
     String fileName1 = caller1.getString("logs[0].recdFileName");
-   
+
     log.debug("Name of the downloaded file : " + fileName1);
     assertEquals("FAILED", status);
     assertEquals("DUPLICATE", processState);
-   
-   
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   /**
@@ -783,34 +1131,68 @@ public class BatchIngestionIT extends BaseIT {
   public void transferDataWithExclusion() throws IOException {
     ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/small");
     ObjectMapper mapper = new ObjectMapper();
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(routeMetadata)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug(
         "createRoute () " + response.extract().body().jsonPath().getJsonObject("routeMetadata"));
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
     // given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
     //  .statusCode(200);
     waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
-    JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath caller1 =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transferDataWithExclusion :" + caller1.prettyPrint());
-    
+
     String result1 = caller1.getString("logs[0].mflFileStatus");
     log.debug("Status of download : " + result1);
     String fileName1 = caller1.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file : " + fileName1);
     log.debug("routeMetadata :" + routeMetadata);
-    ObjectNode routeData = (ObjectNode) mapper
-        .readTree(response.extract().body().jsonPath().getString("routeMetadata"));
+    ObjectNode routeData =
+        (ObjectNode)
+            mapper.readTree(response.extract().body().jsonPath().getString("routeMetadata"));
     final String exclusion = routeData.get("fileExclusions").asText();
     String basePath = FilenameUtils.getFullPath(fileName1);
     assertNotEquals("", basePath);
@@ -822,13 +1204,24 @@ public class BatchIngestionIT extends BaseIT {
     ObjectNode testPayload = mapper.createObjectNode();
     testPayload.put("destinationLocation", filePath);
     JsonPath jsonPath =
-        given(authSpec).when().body(testPayload).when().post(PLUGNIN_PATH + "/data/status").then()
-            .assertThat().statusCode(200).extract().response().jsonPath();
+        given(authSpec)
+            .when()
+            .body(testPayload)
+            .when()
+            .post(PLUGNIN_PATH + "/data/status")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Json Path for exclusion :" + jsonPath.prettify());
     assertEquals(jsonPath.getBoolean("status"), false);
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   /**
@@ -842,24 +1235,63 @@ public class BatchIngestionIT extends BaseIT {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode routeMetadata =
         prepareRouteDataSetWithDuplicate("/root/saw-batch-samples/log/small");
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(routeMetadata)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
     // First call
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    given(authSpec)
+        .when()
+        .body(transferNode)
+        .when()
+        .post(TRANSFER_DATA_PATH)
+        .then()
+        .assertThat()
         .statusCode(200);
     this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
-    JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath caller1 =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transferDataWithDisableDuplicate :" + caller1.prettyPrint());
     String result1 = caller1.getString("logs[0].mflFileStatus");
@@ -868,12 +1300,26 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Name of the downloaded file : " + fileName1);
 
     // Second Call to simulate duplicate file
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    given(authSpec)
+        .when()
+        .body(transferNode)
+        .when()
+        .post(TRANSFER_DATA_PATH)
+        .then()
+        .assertThat()
         .statusCode(200);
     this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
-    
-    JsonPath caller2 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+
+    JsonPath caller2 =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
 
     log.debug("Request URL for transfer data :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
     log.debug("Json Path for transferDataWithDisableDuplicate :" + caller2.prettyPrint());
@@ -884,17 +1330,20 @@ public class BatchIngestionIT extends BaseIT {
     log.debug("Status of download : " + result2);
     String fileName2 = caller2.getString("logs[0].recdFileName");
     log.debug("Name of the downloaded file after duplicate check: " + fileName2);
-    ObjectNode routeData = (ObjectNode) mapper
-        .readTree(response.extract().body().jsonPath().getString("routeMetadata"));
+    ObjectNode routeData =
+        (ObjectNode)
+            mapper.readTree(response.extract().body().jsonPath().getString("routeMetadata"));
     final Boolean duplicate = Boolean.valueOf(routeData.get("disableDuplicate").asText());
     String processStatus = caller2.getString("logs[0].bisProcessState");
     assertTrue(duplicate.equals(Boolean.TRUE));
-    
+
     assertEquals("SUCCESS", result2);
     assertEquals("DATA_RECEIVED", processStatus);
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   /**
@@ -903,52 +1352,117 @@ public class BatchIngestionIT extends BaseIT {
    * entries in the log history has been verified that should not be any entry
    */
   @Test
-  public void transferDataNotZeroBytesFile() throws JsonProcessingException {
+  public void transferDataNotZeroBytesFile() throws IOException {
     ObjectNode routeMetadata = prepareRouteDataSet("/root/saw-batch-samples/log/zero");
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(routeMetadata)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.log());
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
-    given(authSpec).when().body(transferNode).when().post(TRANSFER_DATA_PATH).then().assertThat()
+    given(authSpec)
+        .when()
+        .body(transferNode)
+        .when()
+        .post(TRANSFER_DATA_PATH)
+        .then()
+        .assertThat()
         .statusCode(200);
-    JsonPath caller1 = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath caller1 =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Json Path for transferDataNotZeroBytesFile :" + caller1.prettyPrint());
     assertTrue(caller1.getList("logs").size() == 0);
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   /**
    * This test-case is check the scenario to test the transfer data with every minute schedule
    * disableDuplicate :false. filePattern : *.csv. fileExclusions : log. disableDuplicate : false.
    * batchSize:10 And to make sure, it has been triggered & downloaded. wait for the file to be
-   * available has been implemented.
-   * This test case is temporary ignored due to build failures.
-   * It will be reenabled as part of SIP-7169 after investigation
+   * available has been implemented. This test case is temporary ignored due to build failures. It
+   * will be reenabled as part of SIP-7169 after investigation
    */
   @Test
-  public void transferDataSchedule() throws JsonProcessingException {
+  public void transferDataSchedule() throws IOException {
     ObjectNode routeMetadata = prepareRouteDataSetForTransferSchedule();
     log.debug("route metadata used to schedule :" + mapper.writeValueAsString(routeMetadata));
-    Long channelId = given(authSpec).body(prepareChannelDataSet()).when().post(BATCH_CHANNEL_PATH)
-        .then().assertThat().statusCode(200).extract().response().getBody().jsonPath()
-        .getLong("bisChannelSysId");
+    Long channelId =
+        given(authSpec)
+            .body(prepareChannelDataSet())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    ValidatableResponse response = given(authSpec).body(routeMetadata).when().post(routeUri).then()
-        .assertThat().statusCode(200);
+    ValidatableResponse response =
+        given(authSpec)
+            .body(routeMetadata)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
     log.debug("createRoute () " + response.extract().body());
-    Long routeId = given(authSpec).when().get(routeUri).then().assertThat().statusCode(200)
-        .extract().response().jsonPath().getLong("bisRouteSysId[0]");
+    Long routeId =
+        given(authSpec)
+            .when()
+            .get(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .getLong("bisRouteSysId[0]");
     ObjectNode transferNode = mapper.createObjectNode();
     transferNode.put("channelId", channelId);
     transferNode.put("routeId", routeId);
@@ -958,8 +1472,16 @@ public class BatchIngestionIT extends BaseIT {
     this.waitForSuccessFileTobeAvailable(WAIT_RETRIES, channelId, routeId);
     log.debug(
         "Request URL for transferDataSchedule :" + ROUTE_HISTORY_PATH + channelId + "/" + routeId);
-    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath path =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     String result = path.getString("logs[0].mflFileStatus");
     String fileName = null;
     if (result != null) {
@@ -969,22 +1491,40 @@ public class BatchIngestionIT extends BaseIT {
       ObjectNode testPayload = mapper.createObjectNode();
       testPayload.put("destinationLocation", fileName);
       JsonPath jsonPath =
-          given(authSpec).when().body(testPayload).when().post(PLUGNIN_PATH + "/data/status").then()
-              .assertThat().statusCode(200).extract().response().jsonPath();
+          given(authSpec)
+              .when()
+              .body(testPayload)
+              .when()
+              .post(PLUGNIN_PATH + "/data/status")
+              .then()
+              .assertThat()
+              .statusCode(200)
+              .extract()
+              .response()
+              .jsonPath();
       log.debug("Json Path for wait for file to be available :" + jsonPath.prettify());
       assertEquals(true, jsonPath.getBoolean("status"));
     }
-    
+
     assertEquals("SUCCESS", result);
+
+    deleteJob(channelId, routeId);
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
-  
 
   private void waitForFileTobeAvailable(int retries, Long channelId, Long routeId) {
-    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath path =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Json Path for transferDataSchedule :" + path.prettyPrint());
     if (path.getList("logs").size() == 0) {
       if (retries == 0) {
@@ -1001,13 +1541,21 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Data has been downloaded");
     }
   }
-  
+
   private void waitForSuccessFileTobeAvailable(int retries, Long channelId, Long routeId) {
-    JsonPath path = given(authSpec).when().get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
-        .then().assertThat().statusCode(200).extract().response().jsonPath();
+    JsonPath path =
+        given(authSpec)
+            .when()
+            .get(ROUTE_HISTORY_PATH + channelId + "/" + routeId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath();
     log.debug("Json Path for transferDataSchedule :" + path.prettyPrint());
-    if (path.getList("logs").size() == 0 || !path.getString("logs[0].mflFileStatus")
-        .equals("SUCCESS")) {
+    if (path.getList("logs").size() == 0
+        || !path.getString("logs[0].mflFileStatus").equals("SUCCESS")) {
       if (retries == 0) {
         throw new RuntimeException("Timed out waiting while waiting for dataset");
       }
@@ -1022,8 +1570,6 @@ public class BatchIngestionIT extends BaseIT {
       log.debug("Data has been downloaded");
     }
   }
-  
-
 
   /**
    * This test-case is check the scenario to test the transfer data with immediate schedule
@@ -1032,7 +1578,7 @@ public class BatchIngestionIT extends BaseIT {
    * available has been implemented
    */
   @Test
-  public void testImmediateRoute() throws JsonProcessingException {
+  public void testImmediateRoute() throws IOException {
     String name = "test-immediate-" + testId();
     ObjectNode channelMetadata = mapper.createObjectNode();
     channelMetadata.put("channelName", "channel-" + name);
@@ -1049,7 +1595,8 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("customerCode", "SNCR");
     channel.put("projectCode", "workbench");
     channel.put("channelType", "sftp");
-    channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));;
+    channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));
+    ;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route-" + name);
@@ -1064,21 +1611,42 @@ public class BatchIngestionIT extends BaseIT {
     route.put("createdBy", "admin@synchronoss.com");
     route.put("routeMetadata", new ObjectMapper().writeValueAsString(routeMetadata));
     Long channelId =
-        given(authSpec).body(channel).when().post(BATCH_CHANNEL_PATH).then().assertThat()
-            .statusCode(200).extract().response().getBody().jsonPath().getLong("bisChannelSysId");
+        given(authSpec)
+            .body(channel)
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
     String routeUri = BATCH_CHANNEL_PATH + "/" + channelId + "/" + BATCH_ROUTE;
-    JsonPath path = given(authSpec).body(route).when().post(routeUri).then().assertThat()
-        .statusCode(200).extract().body().jsonPath();
+    JsonPath path =
+        given(authSpec)
+            .body(route)
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .body()
+            .jsonPath();
     assertTrue(path.getLong("bisRouteSysId") > 0);
     assertTrue(path.getLong("bisChannelSysId") > 0);
     log.debug("bisChannelSysId" + path.getLong("bisChannelSysId"));
+
+    deleteJob(channelId, path.getLong("bisRouteSysId"));
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
-    this.tearDownLogs();
   }
 
   @Test
-  public void testJobLogController() throws JsonProcessingException {
+  public void testJobLogController() throws IOException {
     Long bisChannelSysId =
         given(authSpec)
             .body(prepareChannelDataSet())
@@ -1161,7 +1729,7 @@ public class BatchIngestionIT extends BaseIT {
     assertTrue(fetchById.has("jobDetails"));
 
     String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + bisChannelSysId + "/" + routeId;
-    Object listJobByChannelRouteId =
+    Response response =
         given(authSpec)
             .when()
             .get(jobUriByChannelRouteId)
@@ -1169,17 +1737,47 @@ public class BatchIngestionIT extends BaseIT {
             .assertThat()
             .statusCode(200)
             .extract()
-            .response()
-            .jsonPath()
-            .get();
-    JsonNode fetchByRouteChannel = mapper.valueToTree(listJobByChannelRouteId);
+            .response();
+    ObjectNode objNode = response.as(ObjectNode.class);
+    JsonNode fetchByRouteChannel = mapper.valueToTree(objNode);
+    System.out.println(fetchByRouteChannel);
 
+    deleteJob(bisChannelSysId, routeId);
     log.debug("listJobByChannelRouteId :" + fetchByRouteChannel);
     assertTrue(fetchByRouteChannel.has("totalRows"));
     assertTrue(fetchByRouteChannel.has("numOfPages"));
     assertTrue(fetchByRouteChannel.has("jobDetails"));
 
+    this.tearDownLogs();
     this.tearDownRoute();
     this.tearDownChannel();
+  }
+
+  /** This method is to tear down each job log after each test executes * */
+  public void deleteJob(Long chId, Long rtId) {
+    String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + chId + "/" + rtId;
+    Response response =
+        given(authSpec)
+            .when()
+            .get(jobUriByChannelRouteId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    ObjectNode objNode = response.as(ObjectNode.class);
+    JsonNode fetchByRouteChannel = mapper.valueToTree(objNode);
+    System.out.println(fetchByRouteChannel);
+
+    ArrayNode arrayNode = (ArrayNode) fetchByRouteChannel.get("jobDetails");
+    for (JsonNode jobObj : arrayNode) {
+      Long jobId = jobObj.get("jobId").asLong();
+      given(authSpec)
+          .when()
+          .delete(BATCH_PATH + "/logs/job/" + jobId)
+          .then()
+          .assertThat()
+          .statusCode(200);
+    }
   }
 }

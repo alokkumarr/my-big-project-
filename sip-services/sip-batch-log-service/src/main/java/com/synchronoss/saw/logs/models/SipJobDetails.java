@@ -162,12 +162,12 @@ public class SipJobDetails implements Serializable {
     this.sourceType = sourceType;
   }
 
-  @JsonProperty("createdBy")
+  @JsonProperty("createdDate")
   public Date getCreatedDate() {
     return createdDate;
   }
 
-  @JsonProperty("createdBy")
+  @JsonProperty("createdDate")
   public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }

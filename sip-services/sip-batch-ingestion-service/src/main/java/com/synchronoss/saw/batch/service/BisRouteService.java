@@ -6,16 +6,12 @@ import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.dto.BisRouteDto;
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
-import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisScheduleKeys;
 import com.synchronoss.sip.utils.RestUtil;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-
 import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,21 +223,16 @@ public class BisRouteService {
             if (dataNode.isArray() && dataNode.size() > 0) {
               JsonNode objNode = dataNode.get(0);
               if (!objNode.get("lastFiredTime").isNull()) {
-                logger.info(
-                    "Retreive from Database lastFiredTime :"
-                        + objNode.get("lastFiredTime").asLong());
                 lastFired = objNode.get("lastFiredTime").asLong();
                 route.setLastFireTime(lastFired);
               }
               if (!objNode.get("nextFireTime").isNull()) {
-                logger.info(
-                    "Retreive from Database nextFireTime :" + objNode.get("nextFireTime").asLong());
                 nextFired = objNode.get("nextFireTime").asLong();
                 route.setNextFireTime(nextFired);
               }
 
-              logger.info("latFired from response after parsing in long" + lastFired);
-              logger.info("nextFired from response after parsing in long" + nextFired);
+              logger.debug("latFired from response after parsing in long" + lastFired);
+              logger.debug("nextFired from response after parsing in long" + nextFired);
             }
           } catch (IOException exception) {
             logger.error(exception.getMessage());

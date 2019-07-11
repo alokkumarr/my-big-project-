@@ -27,10 +27,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Api(
@@ -268,6 +270,37 @@ public class SipJobsLogController {
     sipBisJobs.setJobDetails(logs);
 
     return new ResponseEntity<SipBisJobs>(sipBisJobs, HttpStatus.OK);
+  }
+
+  /** This API provides an ability to delete a source. */
+  @ApiOperation(
+      value = "Deleting an existing job",
+      nickname = "deleteByJobId",
+      notes = "",
+      response = Object.class)
+  @RequestMapping(
+      value = "/logs/job/{jobId}",
+      method = RequestMethod.DELETE,
+      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  @ApiResponses(
+      value = {
+        @ApiResponse(code = 200, message = "Request has been " + "succeeded without any error"),
+        @ApiResponse(
+            code = 404,
+            message = "The resource " + "you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Server is down. " + "Contact System adminstrator"),
+        @ApiResponse(code = 400, message = "Bad request"),
+        @ApiResponse(code = 401, message = "Unauthorized"),
+        @ApiResponse(
+            code = 415,
+            message = "Unsupported Type. " + "Representation not supported for the resource")
+      })
+  public ResponseEntity<Boolean> deleteLogByJobId(
+      @ApiParam(value = "Job id needs to be deleted", required = true) @PathVariable Long jobId) {
+    jobRepository.deleteById(jobId);
+    return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
   }
 
   private List<SipJobDetails> copyArrayPropertiesToDto(Page<BisJobEntity> jobLogs) {
