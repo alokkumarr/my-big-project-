@@ -270,7 +270,7 @@ public class StorageProxyController {
           Analysis analysis,
       @RequestParam(name = "id", required = false) String queryId,
       @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
+      @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
       HttpServletRequest request,
       HttpServletResponse response)
