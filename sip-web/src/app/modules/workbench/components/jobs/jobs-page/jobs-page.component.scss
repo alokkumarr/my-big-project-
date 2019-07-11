@@ -1,0 +1,28 @@
+@import 'src/themes/base/colors';
+
+:host {
+  mat-form-field {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+
+  mat-sidenav-content {
+    height: calc(100vh - 51px - 63px);
+    overflow: hidden;
+  }
+
+  mat-toolbar {
+    background-color: $primary-white;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .mat-chip.mat-standard-chip {
+    border-radius: 10px;
+    padding: 5px;
+  }
+
+  .jobs-grid {
+    padding: 0 10px;
+  }
+}
