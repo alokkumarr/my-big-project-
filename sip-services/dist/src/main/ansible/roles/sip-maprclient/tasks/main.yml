@@ -6,7 +6,7 @@
 - name: Create MapR user
   user:
     name: mapr
-    uid: "{{ saw_mapr_user_id | default('500') }}"
+    uid: "{{ saw_mapr_user_id | default('5000') }}"
     group: mapr
     state: present
 - name: Install MapR client
@@ -24,3 +24,10 @@
 # So install it as a workaround.
 - name: Install which for MapR classpath command
   yum: name=which state=present
+- name: Copy the mapr authentication ticket
+  command : "install -C -o mapr -g mapr /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000"
+  when: sip_secure
+- name: Setup mapr ticket Location
+  lineinfile: dest=/home/mapr/.bashrc line='export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000'
+  when: sip_secure
+
