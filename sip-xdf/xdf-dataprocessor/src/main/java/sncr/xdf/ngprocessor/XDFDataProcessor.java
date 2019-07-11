@@ -434,6 +434,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.trace(id)
             );
+            ngESCtxSvc.registerOutputDataSet();
+            
 
             String dataSetInKey =  config.getInputs().get(0).getDataSet();
 
@@ -448,7 +450,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             if (!esloader.initComponent(null))
                 System.exit(-1);
-
             ret = esloader.run();
 
             if (ret != 0){
