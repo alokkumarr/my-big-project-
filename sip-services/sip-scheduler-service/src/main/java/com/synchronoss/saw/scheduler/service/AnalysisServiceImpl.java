@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
-import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
@@ -44,6 +44,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Value("${saw-dispatch-service-url}")
   private String dispatchUrl;
+
+  @Value("${sip-dispatch-row-limit}")
+  private int dispatchRowLimit;
 
   @Autowired private RestUtil restUtil;
 
@@ -233,15 +236,21 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public void executeDslAnalysis(String analysisId) {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId;
-    logger.info("URL for SIP Query :" + dslUrl);
+    logger.info("URL for request body :" + dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
-    logger.info("Analysis body :" + analysisResponse.getAnalysis());
-    SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
-    logger.info("SIP Query :" + analysisResponse.getAnalysis());
+    Analysis analysis = analysisResponse.getAnalysis();
+    logger.info("Analysis request body :" + analysisResponse.getAnalysis());
 
-    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
-    HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
+    String url =
+        proxyAnalysisUrl
+            + "/execute?id="
+            + analysisId
+            + "&size="
+            + dispatchRowLimit
+            + "&ExecutionType=scheduled";
+    logger.info("Execute URL for dispatch :" + url);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
     restTemplate.postForObject(url, requestEntity, String.class);
   }

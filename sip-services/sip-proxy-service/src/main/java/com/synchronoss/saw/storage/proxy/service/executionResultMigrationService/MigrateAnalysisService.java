@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
@@ -311,11 +312,12 @@ public class MigrateAnalysisService {
     try {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
-
+      Analysis analysis = new Analysis();
+      analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
       executionResult.setDslQueryId(dslQueryId);
-      executionResult.setSipQuery(sipQuery);
+      executionResult.setAnalysis(analysis);
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
       executionResult.setData(objectList);
@@ -324,7 +326,7 @@ public class MigrateAnalysisService {
       executionResult.setStatus(executionStatus);
       executionResult.setExecutedBy(executedBy);
       proxyService.saveDslExecutionResult(executionResult);
-      LOGGER.info("Execution Result Stored successfully in jason Store.");
+      LOGGER.info("Execution Result Stored successfully in json Store.");
     } catch (Exception ex) {
       LOGGER.error(" Stack trace : {}" , ex);
       LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());

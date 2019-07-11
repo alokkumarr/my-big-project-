@@ -120,7 +120,7 @@ public class SipQuery {
     this.semanticId = semanticId;
   }
 
-    @Override
+  @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("artifacts", artifacts)

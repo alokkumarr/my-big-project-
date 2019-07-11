@@ -52,7 +52,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     // This has been added to handle the use case
     // while working on SIP-6061
-    private Table initTable(String tablePath, int retries) {
+    public Table initTable(String tablePath, int retries) {
         Table tableDesc = null;
         if (MapRDB.tableExists(tablePath)) {
             tableDesc = MapRDB.getTable(tablePath);
@@ -79,7 +79,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         return tableDesc;
     }
 
-
+    
     protected void _save(String id, Document doc) throws Exception
     {
         doc.setId(id);
