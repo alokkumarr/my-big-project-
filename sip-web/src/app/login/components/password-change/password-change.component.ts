@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
+import * as isEmpty from 'lodash/isEmpty';
 
 @Component({
   selector: 'password-change',
@@ -29,8 +30,12 @@ export class PasswordChangeComponent {
   public errorMsg;
 
   public formState: boolean;
+  public validationCheck = true;
 
   changePwd() {
+    if (isEmpty(this.formData.oldPwd) || isEmpty(this.formData.newPwd) || isEmpty(this.formData.confNewPwd)) {
+      return;
+    }
     const token = this._JwtService.get();
 
     if (!token) {
