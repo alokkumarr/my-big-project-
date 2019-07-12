@@ -80,13 +80,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     try {
       logger.debug("Delete Analysis called for analysis :{}", analysisId);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
-      String fields[] = {"executionId", "dslQueryId"};
+      String[] fields = {"executionId", "dslQueryId"};
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", analysisId);
       logger.debug("Deleting Execution results for analysisId :{}", analysisId);
-      boolean res = maprConnection.deleteMaprDBQuery(fields, node.toString());
+      boolean res = maprConnection.deleteByMaprDBQuery(fields, node.toString());
       if (res == true) {
         logger.info("Execution results deleted succesfully!!");
       } else {

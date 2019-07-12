@@ -50,7 +50,7 @@ public class MaprConnection {
     return resultSet;
   }
 
-  public Boolean deleteMaprDBQuery(String[] select, String filter) {
+  public Boolean deleteByMaprDBQuery(String[] select, String filter) {
     final Query query = connection.newQuery().select(select).where(filter).build();
     final DocumentStream stream;
     try {
