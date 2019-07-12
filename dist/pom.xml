@@ -112,17 +112,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--<dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <dependency>
       <groupId>com.synchronoss.saw</groupId>
       <artifactId>a2modules</artifactId>
@@ -134,6 +123,18 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!--<dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>com.synchronoss</groupId>
       <artifactId>bda-rtis</artifactId>
