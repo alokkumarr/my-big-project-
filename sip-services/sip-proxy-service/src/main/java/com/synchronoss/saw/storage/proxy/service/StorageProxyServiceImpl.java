@@ -456,7 +456,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception {
     List<Object> result = null;
 
-    if (analysisType != null && analysisType.equalsIgnoreCase("r, deeport")) {
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       result = executeDLReport(sipQuery, size, dataSecurityKey, executionType, designerEdit);
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
@@ -653,7 +653,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       return false;
     }
     try {
-      HFileOperations.deleteEnt(path);
+//      HFileOperations.deleteEnt(path);
     } catch (Exception e) {
       logger.error("cannot get the file in path" + path);
     }

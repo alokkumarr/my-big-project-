@@ -51,6 +51,9 @@ public class ExecutorQueueManager {
     properties.setProperty(
         "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
+      properties.setProperty(
+          "bootstrap.servers", "localhost:9092");
+
     KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
     String recordContent =

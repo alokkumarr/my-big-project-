@@ -99,4 +99,4 @@ sql-executor:
   preview-rows-limit: 10000
 report:
   executor:
-    path: /var/sip
+    path: /var/sip/services/transport/executor
