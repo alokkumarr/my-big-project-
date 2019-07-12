@@ -383,25 +383,10 @@ public class QueryBuilderUtil {
       for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
         String[] col = dsk.getName().split("\\.");
         String dskColName = col.length == 1 ? col[0] : col[1];
-        // Thinking multiple permutation combinations in terms of user while applying DSK,
-        // We have added the above statement. These are the below use cases we considered that we
-        // should extend the support to allow good user interactivity, below scenario's are
-        // supported.
-
-        //          If dsk name given as <TableName.columnName>; then we split for '.' and select
-        // the columnName. [col length will be 2 here]
-        //          If dsk name is just a <columnName>; then split return 1 and we select
+        // If dsk name as <TableName.columnName>; then split for '.' and select columnName.
+        // If dsk name is <columnName>; then return columnName.
+        // If dsk name as <TableName.columnName.keyword>; then split length return 3, select
         // columnName.
-        //          If dsk name given as <TableName.columnName.keyword>; then split length return 3,
-        // and we still select columnName.
-        //              Even though we won't expect the user to insert the DSK's in above such
-        // fashion, supporting all these possible conditions to make it more efficient.
-
-        // [As ES will include '.keyword' in coulmnName and DL include TableName in every select
-        // query we write, just thought of extending support for user input].
-        //          Note : If the DskName does not matches with the columnNames present in our
-        // tables, then data is not filtered out. This is business requirement.., like same as
-        // master.
         TermsQueryBuilder termsQueryBuilder =
             new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX), dsk.getValues());
         List<?> modelValues = QueryBuilderUtil.buildStringTermsfilter(dsk.getValues());
