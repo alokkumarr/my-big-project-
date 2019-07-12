@@ -98,13 +98,23 @@ public class NGSQLExecutor implements Serializable {
                                     DLDataSetOperations.getPartitioningInfo(location);
 
                                 if (loc_desc == null)
-                                    throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                                	return -1;
+                                   // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
 
                                 logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
-
-                                df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+                                
+                                try {
+									df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+								} catch (Exception exception) {
+									logger.error("Could not load data neither in parquet nor in JSON, cancel processing " 
+											+ exception.getMessage() );
+									return -1;
+								}
+                                
                                 if (df == null) {
-                                    throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
+                                	logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
+                                	return -1;
+                                   //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
                                 }
                                 jobDataFrames.put(tn, df);
                                 df.createOrReplaceTempView(tn);

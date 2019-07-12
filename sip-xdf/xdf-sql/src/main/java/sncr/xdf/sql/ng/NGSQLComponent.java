@@ -58,6 +58,9 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 null, null);
             logger.info("tempDir : " +tempDir);
             int rc = executor.start(tempDir);
+            if(rc != 0) {
+            	return -1;
+            }
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();
             logger.error(e.toString());
