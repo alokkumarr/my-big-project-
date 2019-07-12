@@ -49,48 +49,57 @@ export class JobsPageComponent implements OnInit {
   ngOnInit() {
     this.reRouteToDefaultChannelTypeIfNeeded();
     this._route.queryParams.subscribe(params => {
-      const { channelTypeId, channelId, routeId } = params;
-      const paramChannelId = channelId ? parseInt(channelId, 10) : null;
-      const paramRouteId = routeId ? parseInt(routeId, 10) : null;
-      const {
-        selectedChannelTypeId,
-        selectedChannelId,
-        selectedRouteId
-      } = this._store.snapshot().workbench;
-
-      if (selectedChannelTypeId !== channelTypeId) {
-        this._store.dispatch(new SelectChannelTypeId(channelTypeId));
-      }
-      if (selectedChannelId !== paramChannelId) {
-        this._store.dispatch(new SelectChannelId(paramChannelId));
-      }
-      if (selectedRouteId !== paramRouteId) {
-        this._store.dispatch(new SelectRouteId(paramRouteId));
-      }
-
+      this.setFilterParameters(params);
       this.sidenav.close();
     });
 
     this.jobsPath$.subscribe(path => {
-      this.data = new CustomStore({
-        load: ({ skip, take }) => {
-          const offset = Math.ceil(skip / take);
-          const pagination = `offset=${offset}&size=${take}`;
-          const jobsRequestPath = `${path}?${pagination}`;
-          return this._datasourceService
-            .getJobs(jobsRequestPath)
-            .then(({ jobDetails, totalRows }) => {
-              this._store.dispatch(new SetLastJobsPath(jobsRequestPath));
-              this._store.dispatch(new SetJobs(jobDetails));
-              return { data: jobDetails, totalCount: totalRows };
-            });
-        }
-      });
+      this.data = this.getDataLoader(path);
     });
   }
 
+  getDataLoader(path) {
+    return new CustomStore({
+      load: ({ skip, take }) => {
+        const offset = Math.ceil(skip / take);
+        const pagination = `offset=${offset}&size=${take}`;
+        const jobsRequestPath = `${path}?${pagination}`;
+        return this._datasourceService
+          .getJobs(jobsRequestPath)
+          .then(({ jobDetails, totalRows }) => {
+            this._store.dispatch(new SetLastJobsPath(jobsRequestPath));
+            this._store.dispatch(new SetJobs(jobDetails));
+            return { data: jobDetails, totalCount: totalRows };
+          });
+      }
+    });
+  }
+
+  setFilterParameters(params) {
+    const { channelTypeId, channelId, routeId } = params;
+    const paramChannelId = channelId ? parseInt(channelId, 10) : null;
+    const paramRouteId = routeId ? parseInt(routeId, 10) : null;
+    const {
+      selectedChannelTypeId,
+      selectedChannelId,
+      selectedRouteId
+    } = this._store.snapshot().workbench;
+
+    if (selectedChannelTypeId !== channelTypeId) {
+      this._store.dispatch(new SelectChannelTypeId(channelTypeId));
+    }
+    if (selectedChannelId !== paramChannelId) {
+      this._store.dispatch(new SelectChannelId(paramChannelId));
+    }
+    if (selectedRouteId !== paramRouteId) {
+      this._store.dispatch(new SelectRouteId(paramRouteId));
+    }
+  }
+
   reRouteToDefaultChannelTypeIfNeeded() {
-    if (!this._route.snapshot.queryParams.channelTypeId) {
+    const isChannelTypeIdMissing = !this._route.snapshot.queryParams
+      .channelTypeId;
+    if (isChannelTypeIdMissing) {
       const { channelId, routeId } = this._route.snapshot.queryParams;
       const channelIdQueryParam = channelId ? `&channelId=${channelId}` : '';
       const routeIdIdQueryParam = routeId ? `&routeId=${routeId}` : '';

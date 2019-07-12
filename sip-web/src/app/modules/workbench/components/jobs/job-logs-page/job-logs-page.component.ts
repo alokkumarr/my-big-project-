@@ -70,7 +70,7 @@ export class JobLogsPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadJobsIfNeeded();
+    this.loadJobIfNeeded();
 
     this._route.params.subscribe(({ jobId }) => {
       this.data = new CustomStore({
@@ -96,7 +96,7 @@ export class JobLogsPageComponent implements OnInit {
     );
   }
 
-  loadJobsIfNeeded() {
+  loadJobIfNeeded() {
     const jobs = this._store.selectSnapshot(state => state.workbench.jobs);
     const { jobId } = this._route.snapshot.params;
 
