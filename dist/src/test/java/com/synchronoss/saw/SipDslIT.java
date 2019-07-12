@@ -214,7 +214,10 @@ public class SipDslIT extends BaseIT {
             .header("Authorization", "Bearer " + token)
             .body(jsonNode)
             .when()
-            .post("/sip/services/internal/proxy/storage/execute?id="+analysisId+"&ExecutionType=publish")
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&ExecutionType=publish")
             .then()
             .assertThat()
             .statusCode(200)
