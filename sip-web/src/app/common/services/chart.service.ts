@@ -666,8 +666,7 @@ export class ChartService {
           x: data[i].drilldown.xData[j],
 
           /* eslint-disable */
-          color: this._Highcharts
-            .Color(data[i].color)
+          color: new this._Highcharts.Color(data[i].color)
             .brighten(brightness)
             .get()
           /* eslint-enable */
