@@ -1753,7 +1753,12 @@ public class BatchIngestionIT extends BaseIT {
     this.tearDownChannel();
   }
 
-  /** This method is to tear down each job log after each test executes * */
+  /**
+   * This method is to tear down each job log after each test executes.
+   *
+   * @param chId Channel Id
+   * @param rtId Route Id
+   */
   public void deleteJob(Long chId, Long rtId) {
     String jobUriByChannelRouteId = BATCH_PATH + JOB_PATH + "/" + chId + "/" + rtId;
     Response response =
