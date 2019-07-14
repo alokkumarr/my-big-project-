@@ -26,10 +26,10 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
   const savedCategory = 'My Analysis';
   const savedSubCategory = 'DRAFTS';
 
-  let analysisId;
   let host;
   let token;
   let editedAnalysisId;
+  let analyses = [];
   beforeAll(() => {
     logger.info('Starting pivotPrompt.test.js tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -45,12 +45,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
 
   afterEach(done => {
     setTimeout(() => {
-      const analyses = [];
       if (editedAnalysisId) {
         analyses.push(editedAnalysisId);
-      }
-      if (analysisId) {
-        analyses.push(analysisId);
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
@@ -58,7 +54,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           host,
           token,
           protractorConf.config.customerCode,
-          id
+          id,
+          Constants.PIVOT
         );
       });
 
@@ -119,7 +116,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             null
           );
           expect(analysis).toBeTruthy();
-          analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
+          analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
           const header = new Header();
@@ -170,7 +167,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           );
 
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -191,7 +188,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
@@ -208,9 +205,9 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          browser.sleep(2000);// Added because of some issues on bamboo : SIP-7298
+          browser.sleep(2000); // Added because of some issues on bamboo : SIP-7298
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
         } catch (e) {
           console.error(e);
         }

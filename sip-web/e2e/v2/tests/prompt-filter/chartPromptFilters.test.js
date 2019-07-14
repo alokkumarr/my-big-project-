@@ -26,10 +26,10 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
   const savedCategory = 'My Analysis';
   const savedSubCategory = 'DRAFTS';
 
-  let analysisId;
   let host;
   let token;
   let editedAnalysisId;
+  let analyses = [];
   beforeAll(() => {
     logger.info('Starting chartPromptFilters tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -45,12 +45,8 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
 
   afterEach(done => {
     setTimeout(() => {
-      const analyses = [];
       if (editedAnalysisId) {
         analyses.push(editedAnalysisId);
-      }
-      if (analysisId) {
-        analyses.push(analysisId);
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
@@ -58,7 +54,8 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           host,
           token,
           protractorConf.config.customerCode,
-          id
+          id,
+          Constants.CHART
         );
       });
 
@@ -74,7 +71,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
-          logger.info(`Executing test case with id: ${id}`);
+        logger.info(`Executing test case with id: ${id}`);
         try {
           if (!token) {
             logger.error('token cannot be null');
@@ -110,7 +107,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             chartType
           );
           expect(analysis).toBeTruthy();
-          analysisId = analysis.id;
+          analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
           const header = new Header();
@@ -182,7 +179,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-         // executePage.verifyAppliedFilter(filters);
+          // executePage.verifyAppliedFilter(filters);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();

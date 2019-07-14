@@ -26,10 +26,10 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
   const savedCategory = 'My Analysis';
   const savedSubCategory = 'DRAFTS';
 
-  let analysisId;
   let host;
   let token;
   let editedAnalysisId;
+  let analyses = [];
   beforeAll(() => {
     logger.info('Starting esReportPromptFilters tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -45,12 +45,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
 
   afterEach(done => {
     setTimeout(() => {
-      const analyses = [];
       if (editedAnalysisId) {
         analyses.push(editedAnalysisId);
-      }
-      if (analysisId) {
-        analyses.push(analysisId);
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
@@ -58,7 +54,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           host,
           token,
           protractorConf.config.customerCode,
-          id
+          id,
+          Constants.ES_REPORT
         );
       });
 
@@ -112,7 +109,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             null
           );
           expect(analysis).toBeTruthy();
-          analysisId = analysis.id;
+          analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
           const header = new Header();
@@ -163,7 +160,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           );
 
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -184,7 +181,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
@@ -201,7 +198,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters);
+          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
         } catch (e) {
           console.error(e);
         }
