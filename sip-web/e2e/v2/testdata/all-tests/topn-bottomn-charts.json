@@ -1,0 +1,272 @@
+{
+  "TOP_N_BOTTOM_N": {
+    "charts_topn": {
+      "TOPNC001": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add top n values for combo charts"
+      },
+      "TOPNC002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to add top n values for combo charts"
+      },
+      "TOPNC003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to add top n values for column charts"
+      },
+      "TOPNC004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to add top n values for column charts"
+      },
+      "TOPNC005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to add top n values for bar charts"
+      },
+      "TOPNC006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to add top n values for bar charts"
+      },
+      "TOPNC007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to add top n values for stack charts"
+      },
+      "TOPNC008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to add top n values for stack charts"
+      },
+      "TOPNC009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to add top n values for line charts"
+      },
+      "TOPNC010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to add top n values for line charts"
+      },
+      "TOPNC011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to add top n values for area charts"
+      },
+      "TOPNC012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to add top n values for area charts"
+      },
+      "TOPNC013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to add top n values for scatter charts"
+      },
+      "TOPNC014": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to add top n values for scatter charts"
+      },
+      "TOPNC015": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to add top n values for bubble charts"
+      },
+      "TOPNC016": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to add top n values for bubble charts"
+      },
+      "TOPNC017": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to add top n values for pie charts"
+      },
+      "TOPNC018": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to add top n values for pie charts"
+      },
+      "TOPNC019": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to add top n values for tsspline charts"
+      },
+      "TOPNC020": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to add top n values for tsspline charts"
+      },
+      "BTMNC021": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to add top n values for tsPane charts"
+      },
+      "BTMNC022": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to add top n values for tsPane charts"
+      }
+    },
+    "charts_bottomn": {
+      "BTMNC001": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add bottom n values for combo charts"
+      },
+      "BTMNC002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to add bottom n values for combo charts"
+      },
+      "BTMNC003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to add bottom n values for column charts"
+      },
+      "BTMNC004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to add bottom n values for column charts"
+      },
+      "BTMNC005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to add bottom n values for bar charts"
+      },
+      "BTMNC006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to add bottom n values for bar charts"
+      },
+      "BTMNC007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to add bottom n values for stack charts"
+      },
+      "BTMNC008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to add bottom n values for stack charts"
+      },
+      "BTMNC009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to add bottom n values for line charts"
+      },
+      "BTMNC010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to add bottom n values for line charts"
+      },
+      "BTMNC011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to add bottom n values for area charts"
+      },
+      "BTMNC012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to add bottom n values for area charts"
+      },
+      "BTMNC013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to add bottom n values for scatter charts"
+      },
+      "BTMNC014": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to add bottom n values for scatter charts"
+      },
+      "BTMNC015": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to add bottom n values for bubble charts"
+      },
+      "BTMNC016": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to add bottom n values for bubble charts"
+      },
+      "BTMNC017": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to add bottom n values for pie charts"
+      },
+      "BTMNC018": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to add bottom n values for pie charts"
+      },
+      "BTMNC019": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to add bottom n values for tsspline charts"
+      },
+      "BTMNC020": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to add bottom n values for tsspline charts"
+      },
+      "BTMNC021": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to add bottom n values for tsPane charts"
+      },
+      "BTMNC022": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to add bottom n values for tsPane charts"
+      }
+    }
+  }
+}
