@@ -13,7 +13,10 @@ import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 
 import { ObserveService } from '../../../services/observe.service';
-import { GlobalFilterService } from '../../../services/global-filter.service';
+import {
+  GlobalFilterService,
+  isValidDateFilter as isValid
+} from '../../../services/global-filter.service';
 
 import {
   CUSTOM_DATE_PRESET_VALUE,
@@ -79,7 +82,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
     if (data.model) {
       this.cacheFilters();
       this.loadDateRange(true);
-      this.onPresetChange({ value: this.model.preset });
+      // this.onPresetChange({ value: this.model.preset });
     } else {
       this.loadDateRange(false);
     }
@@ -162,20 +165,6 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Checks whether filter value is valid.
-   *
-   * @param {any} filt
-   * @returns {boolean}
-   * @memberof GlobalDateFilterComponent
-   */
-  isValid(filt): boolean {
-    return (
-      filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
-      (filt.model.lte && filt.model.gte)
-    );
-  }
-
-  /**
    * Gets the filter model together and communicates the
    * updated filter to the parent.
    *
@@ -202,6 +191,6 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       delete payload.model.gte;
     }
 
-    this.onModelChange.emit({ data: payload, valid: this.isValid(payload) });
+    this.onModelChange.emit({ data: payload, valid: isValid(payload) });
   }
 }
