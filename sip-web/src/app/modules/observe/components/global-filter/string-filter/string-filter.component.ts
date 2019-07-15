@@ -14,7 +14,10 @@ import { Observable, Subscription } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 
 import { ObserveService } from '../../../services/observe.service';
-import { GlobalFilterService } from '../../../services/global-filter.service';
+import {
+  GlobalFilterService,
+  isValidStringFilter as isValid
+} from '../../../services/global-filter.service';
 
 @Component({
   selector: 'g-string-filter',
@@ -42,9 +45,8 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.filterCtrl = new FormControl();
     this.filteredSuggestions = this.filterCtrl.valueChanges.pipe(
       startWith(''),
-      map(
-        state =>
-          state ? this.filterSuggestions(state) : this.suggestions.slice()
+      map(state =>
+        state ? this.filterSuggestions(state) : this.suggestions.slice()
       )
     );
   }
@@ -169,10 +171,6 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.filterChanged();
   }
 
-  isValid(): boolean {
-    return this.filterCtrl.value || (this.value && this.value.length);
-  }
-
   /**
    * Communicates the filter value to the parent.
    *
@@ -192,6 +190,6 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
         }
       }
     };
-    this.onModelChange.emit({ data: payload, valid: this.isValid() });
+    this.onModelChange.emit({ data: payload, valid: isValid(payload) });
   }
 }
