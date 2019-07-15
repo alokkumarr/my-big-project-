@@ -243,7 +243,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
 
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
@@ -259,7 +258,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-
                 ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             }
@@ -399,6 +397,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        
+        collectAcceptedData(parsedRdd,outputRdd);
         
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
         int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
