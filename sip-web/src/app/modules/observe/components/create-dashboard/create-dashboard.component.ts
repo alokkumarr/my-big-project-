@@ -125,6 +125,21 @@ export class CreateDashboardComponent
 
   onApplyGlobalFilter(data): void {
     if (
+      this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)
+    ) {
+      this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
+      this.globalFilterService.onApplyFilter.next(data.analysisFilters);
+    }
+
+    if (this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+      this.globalFilterService.lastKPIFilter = data.kpiFilters;
+      this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
+    }
+    this.widgetSidenav.close();
+  }
+
+  onClearGlobalFilter(data) {
+    if (
       this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)
     ) {
       this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
