@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.mapr.db.*;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
@@ -15,6 +16,7 @@ import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
+import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
@@ -25,6 +27,8 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.ojai.Document;
@@ -46,7 +51,10 @@ import sncr.bda.base.MaprConnection;
 public class StorageProxyServiceImpl implements StorageProxyService {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyServiceImpl.class);
+
+  private final String tempResultTable = "onetime";
   private final String executionResultTable = "executionResult";
+  private static final String METASTORE = "services/metadata";
 
   @Value("${schema.file}")
   private String schemaFile;
@@ -55,15 +63,33 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private String basePath;
 
+  @Value("${metastore.time-to-live}")
+  private long timeToLive;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   @Autowired private StorageConnectorService storageConnectorService;
 
-  // @Autowired
-  // private StorageProxyMetaDataService storageProxyMetaDataService;
-
   private int size;
+  private String tablePath;
+
+  @PostConstruct
+  public void init() {
+    tablePath = basePath + File.separator + METASTORE + File.separator + tempResultTable;
+    logger.trace("Create Table path :" + tablePath);
+
+    /* Initialize the previews MapR-DB table */
+    try (Admin admin = MapRDB.newAdmin()) {
+      if (!admin.tableExists(tablePath)) {
+        logger.info("Creating previews table: {}", tablePath);
+        TableDescriptor table = MapRDB.newTableDescriptor(tablePath);
+        FamilyDescriptor family = MapRDB.newDefaultFamilyDescriptor().setTTL(timeToLive);
+        table.addFamily(family);
+        admin.createTable(table).close();
+      }
+    }
+  }
 
   @Override
   public StorageProxy execute(StorageProxy proxy) throws Exception {
@@ -518,12 +544,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer pageSize) {
+  public ExecutionResponse fetchExecutionsData(
+      String executionId, ExecutionType executionType, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     ObjectMapper objectMapper = new ObjectMapper();
     try {
-      ExecutionResultStore executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
-      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      String tableName =
+          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
+      ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       Document doc = executionResultStore.readDocumet(executionId);
       logger.info("Doc : " + doc.asJsonString());
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -531,7 +560,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
+      Object data =
+          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(doc, null));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -543,10 +573,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer pageSize) {
+  public ExecutionResponse fetchLastExecutionsData(
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     try {
-      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      String tableName =
+          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       String fields[] = {
         "executionId",
         "dslQueryId",
@@ -568,12 +601,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 1);
       // its last execution for the for Query Id , So consider 0 index.
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-
       ExecutionResult executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
 
       // paginated execution data
-      Object data = maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
+      Object data =
+          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -592,6 +625,42 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     this.size = size;
   }
 
+  @Override
+  public Boolean saveTTLExecutionResult(ExecutionResult executionResult) {
+    try {
+      String tableName =
+          checkTempExecutionType(executionResult.getExecutionType())
+              ? tempResultTable
+              : executionResultTable;
+      ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
+
+      ObjectMapper mapper = new ObjectMapper();
+      /* Locate the ttl data in MapR-DB */
+      Table table = MapRDB.getTable(tablePath);
+      logger.trace("Table created for temporary basis :" + table.getName());
+      executionResultStore.create(
+          table, executionResult.getExecutionId(), mapper.writeValueAsString(executionResult));
+      logger.trace("Record inserted successfully .... " + true);
+      return true;
+    } catch (Exception ex) {
+      logger.error("Error occurred while storing the execution result data", ex);
+    }
+    return false;
+  }
+
+  /**
+   * Check for temp execution type.
+   *
+   * @param executionType
+   * @return boolean
+   */
+  private boolean checkTempExecutionType(ExecutionType executionType) {
+    return executionType != null
+        ? executionType.equals(ExecutionType.onetime)
+            || executionType.equals(ExecutionType.preview)
+            || executionType.equals(ExecutionType.regularExecution)
+        : false;
+  }
   /**
    * Count the total number of rows.
    *

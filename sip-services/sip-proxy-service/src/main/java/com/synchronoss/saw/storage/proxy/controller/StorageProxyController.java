@@ -312,21 +312,36 @@ public class StorageProxyController {
           executionType.equals(ExecutionType.publish)
               || executionType.equals(ExecutionType.scheduled);
 
+      boolean tempExecutionType =
+          executionType.equals(ExecutionType.onetime)
+              || executionType.equals(ExecutionType.preview)
+              || executionType.equals(ExecutionType.regularExecution);
+
       final String uuidId = UUID.randomUUID().toString();
       executeResponse.setExecutionId(uuidId);
+      ExecutionResult executionResult;
       if (validExecutionType) {
-        ExecutionResult executionResult = new ExecutionResult();
-        executionResult.setExecutionId(uuidId);
-        executionResult.setDslQueryId(queryId);
-        executionResult.setAnalysis(analysis);
-        executionResult.setStartTime(startTime);
-        executionResult.setFinishedTime(new Date().getTime());
-        executionResult.setData(responseObjectFuture);
-        executionResult.setExecutionType(executionType);
-        executionResult.setStatus("success");
-        String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
-        executionResult.setExecutedBy(executedBy);
+        executionResult =
+            buildExecutionResult(
+                analysis,
+                queryId,
+                executionType,
+                authTicket,
+                responseObjectFuture,
+                startTime,
+                uuidId);
         proxyService.saveDslExecutionResult(executionResult);
+      } else if (tempExecutionType) {
+        executionResult =
+            buildExecutionResult(
+                analysis,
+                queryId,
+                executionType,
+                authTicket,
+                responseObjectFuture,
+                startTime,
+                uuidId);
+        proxyService.saveTTLExecutionResult(executionResult);
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
@@ -346,6 +361,40 @@ public class StorageProxyController {
     executeResponse.setData(responseObjectFuture);
     executeResponse.setTotalRows(responseObjectFuture != null ? responseObjectFuture.size() : 0l);
     return executeResponse;
+  }
+
+  /**
+   * Build execution result bean.
+   *
+   * @param analysis
+   * @param queryId
+   * @param executionType
+   * @param authTicket
+   * @param responseObjectFuture
+   * @param startTime
+   * @param uuidId
+   * @return executionResult
+   */
+  private ExecutionResult buildExecutionResult(
+      Analysis analysis,
+      String queryId,
+      ExecutionType executionType,
+      Ticket authTicket,
+      List<Object> responseObjectFuture,
+      Long startTime,
+      String uuidId) {
+    ExecutionResult executionResult = new ExecutionResult();
+    executionResult.setExecutionId(uuidId);
+    executionResult.setDslQueryId(queryId);
+    executionResult.setAnalysis(analysis);
+    executionResult.setStartTime(startTime);
+    executionResult.setFinishedTime(new Date().getTime());
+    executionResult.setData(responseObjectFuture);
+    executionResult.setExecutionType(executionType);
+    executionResult.setStatus("success");
+    String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
+    executionResult.setExecutedBy(executedBy);
+    return executionResult;
   }
 
   /**
@@ -385,11 +434,12 @@ public class StorageProxyController {
   public ExecutionResponse executionsData(
       @RequestParam(name = "page", required = false) Integer page,
       @RequestParam(name = "pageSize", required = false) Integer pageSize,
+      @RequestParam(name = "executionType", required = false) ExecutionType executionType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchExecutionsData(executionId, page, pageSize);
+      return proxyService.fetchExecutionsData(executionId, executionType, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -410,11 +460,12 @@ public class StorageProxyController {
   public ExecutionResponse lastExecutionsData(
       @RequestParam(name = "page", required = false) Integer page,
       @RequestParam(name = "pageSize", required = false) Integer pageSize,
+      @RequestParam(name = "executionType", required = false) ExecutionType executionType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
           String executionId) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(executionId, page, pageSize);
+      return proxyService.fetchLastExecutionsData(executionId, executionType, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

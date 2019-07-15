@@ -4,6 +4,7 @@ import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
+import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import java.util.List;
 
@@ -18,7 +19,11 @@ public interface StorageProxyService {
 
   List<?> fetchDslExecutionsList(String dslQueryId);
 
-  ExecutionResponse fetchExecutionsData(String executionId, Integer page, Integer pageSize);
+  ExecutionResponse fetchExecutionsData(
+      String executionId, ExecutionType executionType, Integer page, Integer pageSize);
 
-  ExecutionResponse fetchLastExecutionsData(String dslQueryId, Integer page, Integer pageSize);
+  ExecutionResponse fetchLastExecutionsData(
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
+
+  Boolean saveTTLExecutionResult(ExecutionResult executionResult);
 }

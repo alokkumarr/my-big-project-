@@ -36,16 +36,9 @@ metastore:
     base:  hdfs:///main
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
-
-{% if sip_secure %}
-
-connector : https
-
-{% else %}
+    timeToLive: 1800
 
 connector : http
-
-{% endif %}
 
 metadata:
   service:
