@@ -210,9 +210,10 @@ public class SQLScriptDescriptor {
                         /**
                          * Fix for SIP-7744.  To avoid
                          * splitting queries which has key word 'WITH'
-                         * any where in middle
+                         * any where in middle. Using trim to be 
+                         * safe with leading empty spaces
                          */
-                        if(s.startsWith("with")) {
+                        if(s.trim().startsWith("with")) {
                         	pos = s.indexOf("with");
                         }
                        // pos = s.indexOf("with");
