@@ -1,10 +1,8 @@
 {
   "sipQuery": {
-    "page": 1,
-    "pageSize": 25,
     "artifacts": [
       {
-        "artifactsName": "sample",
+        "artifactsName": "SALES",
         "fields": [
           {
             "dataField": "string",
@@ -58,7 +56,7 @@
             "name": "float",
             "displayName": "Float",
             "type": "double",
-            "aggregate": "avg"
+            "aggregate": "distinctcount"
           }
         ]
       }
@@ -67,7 +65,7 @@
     "filters": [
       {
         "type": "long",
-        "artifactsName": "sample",
+        "artifactsName": "SALES",
         "isOptional": false,
         "columnName": "long",
         "isRuntimeFilter": false,
@@ -76,15 +74,34 @@
           "operator": "EQ",
           "value": 1000
         }
+      },
+      {
+        "type": "Double",
+        "artifactsName": "SALES",
+        "isOptional": false,
+        "columnName": "Double",
+        "isRuntimeFilter": false,
+        "isGlobalFilter": false,
+        "model": {
+          "operator": "EQ",
+          "value": 2000
+        }
       }
     ],
     "sorts": [
       {
-        "artifactsName": "sample",
+        "artifacts": "SALES",
         "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"
+      },
+      {
+        "artifacts": "SALES",
+        "aggregate": "avg",
+        "columnName": "double",
+        "type": "double",
+        "order": "desc"
       }
     ],
     "joins": [
@@ -93,7 +110,7 @@
         "criteria": [
           {
             "joinCondition": {
-              "operator": "EQ",
+              "operator": "=",
               "left": {
                 "artifactsName": "SALES",
                 "columnName": "string"
