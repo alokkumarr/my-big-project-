@@ -2,6 +2,7 @@ package com.synchronoss.saw.analysis.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -17,13 +18,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sncr.bda.base.MaprConnection;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
@@ -37,6 +38,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Value("${metastore.analysis}")
   private String tableName;
+
+  @Value("${metastore.executionResultTable}")
+  private String executionResultTable;
 
   private ObjectMapper objectMapper = new ObjectMapper();
   private AnalysisMetadata analysisMetadataStore;
@@ -74,10 +78,26 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public void deleteAnalysis(String analysisId, Ticket ticket) throws SipDeleteEntityException {
     try {
+      // Create executionResult table if doesn't exists.
+      new AnalysisMetadata(executionResultTable, basePath);
+      logger.debug("Delete Analysis called for analysis :{}", analysisId);
+      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      String[] fields = {"executionId", "dslQueryId"};
+      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectNode node = objectMapper.createObjectNode();
+      ObjectNode objectNode = node.putObject("$eq");
+      objectNode.put("dslQueryId", analysisId);
+      logger.debug("Deleting Execution results for analysisId :{}", analysisId);
+      boolean res = maprConnection.deleteByMaprDBQuery(fields, node.toString());
+      if (res == true) {
+        logger.info("Execution results deleted succesfully!!");
+      } else {
+        logger.debug("Problem deleting exec results");
+      }
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       analysisMetadataStore.delete(analysisId);
     } catch (Exception e) {
-      logger.error("Exception occurred while deleting analysis", e);
+      logger.error("Exception occurred while deleting analysis", e.getStackTrace());
       throw new SipDeleteEntityException("Exception occurred while deleting analysis", e);
     }
   }
