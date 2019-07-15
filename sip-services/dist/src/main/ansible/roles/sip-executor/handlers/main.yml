@@ -1,0 +1,24 @@
+# Workaround: The Ansible systemd module fails with an "Could not find
+# the requested service saw-executor@*" error when working
+# with wildcards, so work around this by enumerating instances for
+# now.
+#- name: restart sip-executor
+#  systemd: name=sip-executor@* state=restarted daemon_reload=true
+- name: restart sip-executor-regular
+  systemd: name=sip-executor@regular-{{ item }} state=stopped daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success
+  delay: 30
+- name: restart sip-executor-fast
+  systemd: name=sip-executor@fast-{{ item }} state=stopped daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
+  # Workaround: Occasionally deployments will fail with "Job for
+  # service canceled".  The root cause is not known, but retry as a
+  # workaround for now.
+  register: result
+  until: result is success
+  delay: 30

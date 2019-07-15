@@ -694,7 +694,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       return false;
     }
     try {
-      HFileOperations.deleteEnt(path);
+//      HFileOperations.deleteEnt(path);
     } catch (Exception e) {
       logger.error("cannot get the file in path" + path);
     }
