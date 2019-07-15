@@ -17,6 +17,7 @@ import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -452,12 +453,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception {
+  public List<Object> execute(
+      SipQuery sipQuery,
+      Integer size,
+      DataSecurityKey dataSecurityKey,
+      ExecutionType executionType,
+      String analysisType,
+      Boolean designerEdit)
+      throws Exception {
     List<Object> result = null;
-
-    if (analysisType != null && analysisType.equalsIgnoreCase("r, deeport")) {
-      result = executeDLReport(sipQuery, size, dataSecurityKey, executionType, designerEdit);
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
+      final String executionId = UUID.randomUUID().toString();
+      ExecuteAnalysisResponse response;
+      response =
+          executeDLReport(
+              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId);
+      result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
     }
@@ -465,9 +476,40 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return result;
   }
 
-  private List<Object> executeDLReport(
+  /**
+   * This Method is used to execute analysis.
+   *
+   * @param analysis Analysis.
+   * @param size Integer.
+   * @param dataSecurityKey DataSecurityKey.
+   * @param executionType ExecutionType.
+   * @return ExecuteAnalysisResponse
+   */
+  @Override
+  public ExecuteAnalysisResponse executeAnalysis(
+      Analysis analysis, Integer size, DataSecurityKey dataSecurityKey, ExecutionType executionType)
+      throws Exception {
+    String analysisType = analysis.getType();
+    Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
+    SipQuery sipQuery = analysis.getSipQuery();
+    final String executionId = UUID.randomUUID().toString();
+    ExecuteAnalysisResponse response;
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
+      response = executeDLReport(sipQuery, size, dataSecurityKey, executionType, designerEdit,executionId);
+    } else {
+      response = new ExecuteAnalysisResponse();
+      List<Object> objList;
+      objList = executeESQueries(sipQuery, size, dataSecurityKey);
+      response.setExecutionId(executionId);
+      response.setData(objList);
+      response.setTotalRows(objList != null ? objList.size() : 0L);
+    }
+    return response;
+  }
+
+  private ExecuteAnalysisResponse executeDLReport(
       SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, Boolean designerEdit)
+      ExecutionType executionType, Boolean designerEdit,String executionId)
       throws Exception {
     List<Object> result = null;
 
@@ -481,7 +523,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
 
     // Required parameters
-    String executionId = UUID.randomUUID().toString();
     String semanticId = sipQuery.getSemanticId();
 
     int limit = size;
@@ -674,7 +715,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
 
-  public List<Object> getDLExecutionData(
+  public ExecuteAnalysisResponse getDLExecutionData(
       String executionId,
       Integer pageNo,
       Integer pageSize,
@@ -701,15 +742,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       }
         List<Object> objList= prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
        Long recordCount=getRecordCount(outputLocation);
-        //objList.add(recordCount);
-        //ExecuteAnalysisResponse response=new ExecuteAnalysisResponse();
-        //response.setData(objList);
-        //response.setTotalRows(recordCount);
-        //response.setExecutionId(executionId);
-        return objList;
+        ExecuteAnalysisResponse response=new ExecuteAnalysisResponse();
+        response.setData(objList);
+        response.setTotalRows(recordCount);
+        response.setExecutionId(executionId);
+        return response;
 
     } catch (Exception e) {
-      logger.debug("Exception while reading results: {}", e.getMessage());
+      logger.debug("Exception while reading results for Dl reports: {}", e.getMessage());
     }
     return null;
   }

@@ -296,7 +296,7 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
 
-    ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
+    ExecuteAnalysisResponse executeResponse =new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
@@ -323,34 +323,27 @@ public class StorageProxyController {
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
-
-      String analysisType = analysis.getType();
-      Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
-
-      responseObjectFuture =
-          proxyService.execute(
-              analysis.getSipQuery(),
+        executeResponse =
+          proxyService.executeAnalysis(
+              analysis,
               size,
               dataSecurityKeyNode,
-              executionType,
-              analysisType,
-              designerEdit);
-
+              executionType);
       // Execution result will one be stored, if execution type is publish or Scheduled.
       boolean validExecutionType =
           executionType.equals(ExecutionType.publish)
               || executionType.equals(ExecutionType.scheduled);
-
-      final String uuidId = UUID.randomUUID().toString();
-      executeResponse.setExecutionId(uuidId);
+      String analysisType = analysis.getType();
       if (validExecutionType) {
         ExecutionResult executionResult = new ExecutionResult();
-        executionResult.setExecutionId(uuidId);
+        executionResult.setExecutionId(executeResponse.getExecutionId());
         executionResult.setDslQueryId(queryId);
         executionResult.setAnalysis(analysis);
         executionResult.setStartTime(startTime);
         executionResult.setFinishedTime(new Date().getTime());
-        executionResult.setData(responseObjectFuture);
+        if(!(analysisType.equalsIgnoreCase("report"))){
+        executionResult.setData(executeResponse.getData());
+        }
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
         executionResult.setExecutedBy(
@@ -373,9 +366,7 @@ public class StorageProxyController {
       throw new RuntimeException("Exception generated while processing incoming json.");
       //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     }
-    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
-    executeResponse.setData(responseObjectFuture);
-    executeResponse.setTotalRows(responseObjectFuture != null ? responseObjectFuture.size() : 0l);
+    logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
     return executeResponse;
   }
 
