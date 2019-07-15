@@ -167,7 +167,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           );
 
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
+          // commented below code because of SIP-7804
+          //executePage.verifyAppliedFilter(filters, Constants.PIVOT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -188,7 +189,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
+          // commented below code because of SIP-7804
+          //executePage.verifyAppliedFilter(filters, Constants.PIVOT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
@@ -207,7 +209,8 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           chartDesignerPage.clickOnApplyFilterButton();
           browser.sleep(2000); // Added because of some issues on bamboo : SIP-7298
           //header.clickOnToastMessage();
-          executePage.verifyAppliedFilter(filters, Constants.PIVOT);
+          // commented below code because of SIP-7804
+          //executePage.verifyAppliedFilter(filters, Constants.PIVOT);
         } catch (e) {
           console.error(e);
         }

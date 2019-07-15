@@ -160,7 +160,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           );
 
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
+          // commented below code because of SIP-7804
+          // executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
             editedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
@@ -181,7 +182,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
+          // commented below code because of SIP-7804
+          // executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
           header.openCategoryMenu();
@@ -198,7 +200,8 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
-          executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
+          // commented below code because of SIP-7804
+          //executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
         } catch (e) {
           console.error(e);
         }

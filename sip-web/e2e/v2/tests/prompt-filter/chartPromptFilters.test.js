@@ -158,6 +158,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           );
 
           chartDesignerPage.clickOnApplyFilterButton();
+          // commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters);
           //get analysis id from current url
           browser.getCurrentUrl().then(url => {
@@ -179,6 +180,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
+          // commented below code because of SIP-7804
           // executePage.verifyAppliedFilter(filters);
           // VerifyPromptFromCardView and by executing from action menu
           commonFunctions.goToHome();
@@ -196,6 +198,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             data.value
           );
           chartDesignerPage.clickOnApplyFilterButton();
+          // commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters);
         } catch (e) {
           console.error(e);
