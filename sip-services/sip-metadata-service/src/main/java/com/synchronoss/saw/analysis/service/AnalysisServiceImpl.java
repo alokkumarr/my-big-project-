@@ -78,6 +78,8 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public void deleteAnalysis(String analysisId, Ticket ticket) throws SipDeleteEntityException {
     try {
+      // Create executionResult table if doesn't exists.
+      new AnalysisMetadata(executionResultTable, basePath);
       logger.debug("Delete Analysis called for analysis :{}", analysisId);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
       String[] fields = {"executionId", "dslQueryId"};
