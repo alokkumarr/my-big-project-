@@ -155,9 +155,9 @@ public abstract class AbstractComponent implements WithContext{
 				ret = move();
 			}
 			if (ret == 0) {
-				if (ngctx.persistMode) {
-					ret = archive();
-				}
+				
+				ret = archive();
+				
 				if (ret == 0) {
 					
 					/**
@@ -737,6 +737,7 @@ public abstract class AbstractComponent implements WithContext{
                     }
                 });
                 logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+                
                 services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID);
                // logger.info("Status updating to:::"+  services.transformationMD.ts.);
 

@@ -209,7 +209,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     scala.collection.Seq<Column> outputColumns =
                         scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
                     Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
-                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS);
+                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
+                    logger.debug("####### count at end of parser after caching "+ outputDS.count());
+                    
                 }
 
                 //Write rejected data
