@@ -42,6 +42,10 @@ connector : http
 
 executor:
   streamPath: /var/sip/services/transport/executor
+  wait-time: 120
+  preview-output-location: /var/sip/services/transport/executor/output
+  publish-schedule-output-location: /var/sip/services/transport/executor
+  preview-rows-limit: 10000
 
 metadata:
   service:
@@ -53,10 +57,4 @@ sip:
   ssl:
     enable: false
 
-sql-executor:
-  wait-time: 120
-  output-location : /var/sip/services/transport/executor/output
-  preview-rows-limit: 10000
-report:
-  executor:
-    path: /var/sip/services/transport/executor
+
