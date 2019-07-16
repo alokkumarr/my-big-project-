@@ -4,14 +4,14 @@ set -eu
 
 declare -r sip_executor_home=/opt/bda/sip-executor/
 # Create ':' separated list of all files in $lib_dir
-declare lib_classpath=
+declare lib_classpath=sip-executor-service-4.jar
 
 for i in `ls ${sip_executor_home}/lib`; do
-lib_classpath=${lib_classpath}:"${i}"
+lib_classpath=${lib_classpath}:"/opt/bda/sip-executor/lib/${i}"
 done
 
 for j in `ls /opt/mapr/spark/spark-2.3.2/jars/*.jar`; do
- lib_classpath=${lib_classpath}:"${j}"
+ lib_classpath=${lib_classpath}:"/opt/mapr/spark/spark-2.3.2/jars/${j}"
 done
 
 lib_classpath=${lib_classpath}:$(mapr classpath):$(hadoop classpath)
@@ -20,7 +20,8 @@ declare -r conf_dir="${sip_executor_home}conf"
 ( cd $conf_dir ) || exit
 
 CMD="exec java -Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf \
-     -cp $lib_classpath com.synchronoss.saw.executor.DlExecutor -Dconfig=$conf_dir"
+     -cp $lib_classpath com.synchronoss.saw.executor.DlExecutor -Dconfig=$conf_dir \
+     -Dlogger.file=$conf_dir/logback.xml "
 
 $CMD
 RETVAL=$?
