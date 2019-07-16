@@ -3,7 +3,11 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
@@ -13,16 +17,14 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
@@ -141,6 +143,8 @@ public class MigrateAnalysisService {
               && content.get("type") != null
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
+          } else if (content.has("outputLocation")) {
+            type = "report";
           }
 
           migrationStatusObject.setAnalysisId(analysisId);
