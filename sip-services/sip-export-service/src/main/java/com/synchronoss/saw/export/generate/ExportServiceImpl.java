@@ -1070,8 +1070,6 @@ public class ExportServiceImpl implements ExportService {
           if (alias.getCustomerCode().equals(finalJobGroup) && aliastemp.equals(alias.getAlias())) {
             logger.debug("Final Obj to be dispatched for S3 : ");
             logger.debug("BucketName : " + alias.getBucketName());
-            logger.debug("AccessKey : " + alias.getAccessKey());
-            logger.debug("SecretKey : " + alias.getSecretKey());
             logger.debug("Region : " + alias.getRegion());
             logger.debug("getOutputLocation : " + alias.getOutputLocation());
             logger.debug("FileName : " + exportBean.getFileName());
