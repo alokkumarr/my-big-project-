@@ -71,7 +71,6 @@ public class AmazonS3Handler {
     String finalFileName = fileName + "_" + timeStampStr + "." + extension;
 
     String s3Key = outputLocation + "/" + finalFileName;
-    logger.debug("S3 key = " + s3Key);
 
     PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
     putObject(s3Client, request);
@@ -85,7 +84,6 @@ public class AmazonS3Handler {
 
   public void putObject(AmazonS3 s3, PutObjectRequest request) {
     try {
-      logger.debug("s3 key in put object " + request.getKey());
       logger.debug("S3 Bucket " + request.getBucketName());
       logger.debug("File = " + request.getFile().getName());
       s3.putObject(request);
