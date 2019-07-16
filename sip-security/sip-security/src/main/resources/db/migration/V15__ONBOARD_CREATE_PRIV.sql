@@ -1,7 +1,7 @@
 /*******************************************************************************
- Filename:  V13__ONBOARD_CUST_DDL.sql
- Purpose:   To on-board new customer.
- Date:      13-02-2019
+ Filename:  V15__ONBOARD_CREATE_PRIV.sql
+ Purpose:   To add create privilege for new customer(Admin).
+ Date:      16-07-2019
 ********************************************************************************/
 
 /*******************************************************************************
