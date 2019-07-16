@@ -18,11 +18,11 @@ echo 'options(repos = c(CRAN = "http://cloud.r-project.org"))' > ~/.Rprofile
 
 # This is workaround until R-3.6 is available on EPEL.
 # This has been added as a apart of SIP-7037.
-Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/quadprog/quadprog_1.5-5.tar.gz", pos=NULL,type="source")'
+Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/quadprog_1.5-7.tar.gz", pos=NULL,type="source")'
 
 Rscript -e 'majorVersion<-R.version$major;minorVersion<-R.version$minor; version <- paste(majorVersion,".",sep="");version <- paste(version,minorVersion,sep=""); version<- paste("R-",version,sep=""); partial<-paste("/usr/share/doc/",version,sep="");partial<-paste(partial,"/html",sep=""); dir.create(partial,showWarnings = TRUE, recursive = TRUE, mode = "0755")'
 
-precache='"testthat","dplyr","magrittr","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
+precache='"testthat","rgl","dplyr","magrittr","quadprog","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
 
 # Install dependencies
 Rscript -e 'install.packages(c("devtools", '"$precache"')); if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'

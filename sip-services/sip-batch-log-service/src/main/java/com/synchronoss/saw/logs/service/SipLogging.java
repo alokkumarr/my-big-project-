@@ -2,6 +2,8 @@ package com.synchronoss.saw.logs.service;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.jcraft.jsch.ChannelSftp;
+import com.synchronoss.saw.batch.entities.BisChannelEntity;
+import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.model.BisComponentState;
@@ -11,7 +13,6 @@ import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
 import com.synchronoss.saw.logs.repository.SipJobDataRepository;
-
 import java.io.File;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -20,10 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +38,20 @@ public class SipLogging {
 
   private static final Logger logger = LoggerFactory.getLogger(SipLogging.class);
 
-  @Autowired
-  private BisFileLogsRepository bisFileLogsRepository;
-  
-  @Autowired
-  private SipJobDataRepository sipJobDataRepository;
+  @Autowired private BisFileLogsRepository bisFileLogsRepository;
 
+  @Autowired private SipJobDataRepository sipJobDataRepository;
 
-  /**
-   * To make an entry to a log table.
-   */
-  @Retryable(value = {RuntimeException.class},
+  /** To make an entry to a log table. */
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
   public void upsert(BisDataMetaInfo entity, String pid) throws SipNestedRuntimeException {
-    logger.trace("Integrate with logging API to update with a status start here : "
-        + entity.getProcessState());
+    logger.trace(
+        "Integrate with logging API to update with a status start here : "
+            + entity.getProcessState());
     BisFileLog bisLog = null;
     if (bisFileLogsRepository.existsById(pid)) {
       logger.trace("updating logs when process Id is found :" + pid);
@@ -96,23 +92,21 @@ public class SipLogging {
       if (entity.getJobId() != null) {
         jobEntity = this.retriveJobById(entity.getJobId());
       }
-      
+
       bisLog.setJob(jobEntity);
       bisFileLogsRepository.save(bisLog);
     }
-    logger.trace("Integrate with logging "
-        + "API to update with a status ends here : "
-        + entity.getProcessState() + " with an process Id " 
-        + bisLog.getPid());
+    logger.trace(
+        "Integrate with logging "
+            + "API to update with a status ends here : "
+            + entity.getProcessState()
+            + " with an process Id "
+            + bisLog.getPid());
   }
-  
-  
-  /**
-   * To make an entry to a log table.
-   */
+
+  /** To make an entry to a log table. */
   @Transactional(TxType.REQUIRED)
-  public void upsertInProgressStatus(String pid, 
-      String recdFilePath, Date startTime)
+  public void upsertInProgressStatus(String pid, String recdFilePath, Date startTime)
       throws SipNestedRuntimeException {
     BisFileLog bisLog = null;
     if (bisFileLogsRepository.existsById(pid)) {
@@ -125,34 +119,23 @@ public class SipLogging {
       this.bisFileLogsRepository.saveAndFlush(bisLog);
     }
   }
-  
-  /**
-   * To make an entry to a log table.
-   */
+
+  /** To make an entry to a log table. */
   @Transactional(TxType.REQUIRED)
-  public void upsertInProgressStatus(String pid)
-      throws SipNestedRuntimeException {
-    updateLogStatus(BisProcessState.INPROGRESS.value(),
-        BisComponentState.DATA_INPROGRESS.value(), pid);
+  public void upsertInProgressStatus(String pid) throws SipNestedRuntimeException {
+    updateLogStatus(
+        BisProcessState.INPROGRESS.value(), BisComponentState.DATA_INPROGRESS.value(), pid);
   }
-    
-  /**
-   * To make an entry to a log table.
-   */
+
+  /** To make an entry to a log table. */
   @Transactional(TxType.REQUIRED)
   public void upsertFailedStatus(String pid) throws SipNestedRuntimeException {
-    updateLogStatus(BisProcessState.FAILED.value(),
-            BisComponentState.FAILED.value(), pid);
-    
-    
+    updateLogStatus(BisProcessState.FAILED.value(), BisComponentState.FAILED.value(), pid);
   }
-  
-  /**
-   * To make an entry to a log table.
-   */
+
+  /** To make an entry to a log table. */
   @Transactional(TxType.REQUIRED)
   public void upsertFailedStatus(String pid, String reason) throws SipNestedRuntimeException {
-    
 
     Optional<BisFileLog> bisFileLog = this.bisFileLogsRepository.findById(pid);
     if (bisFileLog.isPresent()) {
@@ -163,19 +146,15 @@ public class SipLogging {
       log.setReason(reason);
       bisFileLogsRepository.saveAndFlush(log);
     }
-    
-    
   }
-  
-  
-  /**
-   * To make an entry to a log table.
-   */
-  @Retryable(value = {RuntimeException.class},
+
+  /** To make an entry to a log table. */
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
-  public void upsertSuccessStatus(String pid, BisDataMetaInfo metaInfo) 
+  public void upsertSuccessStatus(String pid, BisDataMetaInfo metaInfo)
       throws SipNestedRuntimeException {
     Optional<BisFileLog> bisFileLog = this.bisFileLogsRepository.findById(pid);
     if (bisFileLog.isPresent()) {
@@ -191,7 +170,8 @@ public class SipLogging {
     }
   }
 
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
@@ -200,7 +180,8 @@ public class SipLogging {
     return bisFileLogsRepository.isFileNameExists(fileName);
   }
 
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
@@ -209,12 +190,9 @@ public class SipLogging {
     bisFileLogsRepository.deleteById(pid);
   }
 
-
-  /**
-   * Adds entry to log table with given status.
-   */
+  /** Adds entry to log table with given status. */
   @Transactional(TxType.REQUIRED)
-  public  void updateLogs(Long channelId, Long routeId, String reasonCode) {
+  public void updateLogs(Long channelId, Long routeId, String reasonCode) {
 
     BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
     bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
@@ -228,7 +206,6 @@ public class SipLogging {
     this.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
   }
 
-
   /**
    * verify duplicate check enabled and is duplicate or if duplicate check disabled.
    *
@@ -238,37 +215,35 @@ public class SipLogging {
    * @return true or false
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public boolean duplicateCheck(boolean isDisableDuplicate,
-      String sourcelocation, ChannelSftp.LsEntry entry) {
+  public boolean duplicateCheck(
+      boolean isDisableDuplicate, String sourcelocation, ChannelSftp.LsEntry entry) {
 
     ZonedDateTime duplicateCheckStartTime = ZonedDateTime.now();
     logger.trace("Duplicate check starting now :: ");
-    
-   
 
-    boolean isDuplicate =  (!isDisableDuplicate
-        &&  !checkDuplicateFile(sourcelocation + File.separator
-        + entry.getFilename())) || isDisableDuplicate;
-    
+    boolean isDuplicate =
+        (!isDisableDuplicate
+                && !checkDuplicateFile(sourcelocation + File.separator + entry.getFilename()))
+            || isDisableDuplicate;
+
     ZonedDateTime duplicateCheckEndTime = ZonedDateTime.now();
 
     if (isDisableDuplicate) {
-      logger.trace("Duplicate check disabled. Duration to check flag in milliseconds :: " + Duration
-                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+      logger.trace(
+          "Duplicate check disabled. Duration to check flag in milliseconds :: "
+              + Duration.between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
     } else {
-      logger.trace("Total time for duplicate check in milliseconds :: " + Duration
-                .between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
+      logger.trace(
+          "Total time for duplicate check in milliseconds :: "
+              + Duration.between(duplicateCheckStartTime, duplicateCheckEndTime).toMillis());
     }
 
-
-
     return isDuplicate;
-
   }
-
 
   /**
    * verify the routeId & channelId exists with data received & success.
@@ -278,12 +253,12 @@ public class SipLogging {
    * @return true or false
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public boolean isRouteAndChannelExists(Long routeId, Long channelId) {
     return bisFileLogsRepository.isChannelAndRouteIdExists(routeId, channelId);
-
   }
 
   /**
@@ -296,18 +271,21 @@ public class SipLogging {
    * @return BisFileLog
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public List<BisFileLog> listOfRetryIds(int numberOfMinutes, int pageNumber, int pageSize,
-      String column) {
-    Page<BisFileLog> logs = bisFileLogsRepository.retryIds(numberOfMinutes,
-        PageRequest.of(pageNumber, pageSize, Direction.DESC, column));
+  public List<BisFileLog> listOfRetryIds(
+      int numberOfMinutes, int pageNumber, int pageSize, String column) {
+    Page<BisFileLog> logs =
+        bisFileLogsRepository.retryIds(
+            numberOfMinutes, PageRequest.of(pageNumber, pageSize, Direction.DESC, column));
     return logs.getContent();
   }
 
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public Integer countRetryIds(int numberOfMinutes) {
@@ -316,22 +294,24 @@ public class SipLogging {
   }
 
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void updateStatusFailed(String fileStatus, String processStatus, String pid) {
     updateLogStatus(fileStatus, processStatus, pid);
   }
-  
+
   /**
    * update log status.
-   * 
+   *
    * @param fileStatus file Status
    * @param processStatus process status
    * @param pid process id
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void updateLogStatus(String fileStatus, String processStatus, String pid) {
@@ -340,30 +320,33 @@ public class SipLogging {
       BisFileLog log = bisFileLog.get();
       log.setMflFileStatus(fileStatus);
       log.setBisProcessState(processStatus);
-      if (processStatus.equals(
-          BisComponentState.HOST_NOT_REACHABLE.value())) {
+      if (processStatus.equals(BisComponentState.HOST_NOT_REACHABLE.value())) {
         log.setReason(BisComponentState.HOST_NOT_REACHABLE.value());
       }
       log.setModifiedDate(new Date());
       bisFileLogsRepository.saveAndFlush(log);
     }
-    
   }
 
-  @Retryable(value = {RuntimeException.class},
+  /** Check Status for Process. */
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public Page<BisFileLog> statusExistsForProcess(Long channelId, Long routeId,
-      String processStatus) {
-    return bisFileLogsRepository.isStatusExistsForProcess(processStatus, channelId, routeId,
-        BisChannelType.SFTP.value(), PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
+  public Page<BisFileLog> statusExistsForProcess(
+      Long channelId, Long routeId, String processStatus) {
+    return bisFileLogsRepository.isStatusExistsForProcess(
+        processStatus,
+        channelId,
+        routeId,
+        BisChannelType.SFTP.value(),
+        PageRequest.of(0, 1, Direction.DESC, "modifiedDate"));
   }
 
-  /**
-   * verify pid exists before deleting it.
-   */
+  /** verify pid exists before deleting it. */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public boolean checkAndDeleteLog(String pid) throws Exception {
@@ -382,68 +365,68 @@ public class SipLogging {
   }
 
   /**
-  * check if any long running process exists
-  * and update if any.
-  * @param minutesToCheck maxInProgress minutes
-  * @return number of updated records
-  */
+   * check if any long running process exists and update if any.
+   *
+   * @param minutesToCheck maxInProgress minutes
+   * @return number of updated records
+   */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public Integer updateLongRunningTransfers(Integer minutesToCheck) {
     int updatedRecords = 0;
-    int longCount = bisFileLogsRepository
-        .countOfLongRunningTransfers(minutesToCheck);
-    logger.trace("Long running process count: " +    longCount);
+    int longCount = bisFileLogsRepository.countOfLongRunningTransfers(minutesToCheck);
+    logger.trace("Long running process count: " + longCount);
     if (longCount > 0) {
       logger.trace("Updating long running transfers to failed");
-      List<BisFileLog> inProgLogs = bisFileLogsRepository
-          .selectLongRunningTranfers(minutesToCheck);
+      List<BisFileLog> inProgLogs = bisFileLogsRepository.selectLongRunningTranfers(minutesToCheck);
       logger.trace("long running transfer update completed");
-      
-      inProgLogs.stream().map(bisFileLog -> {
-        bisFileLog.setMflFileStatus("FAILED");
-        bisFileLog.setReason("Long running inProgress transfer");
-        bisFileLog.setBisProcessState("FAILED");
-        return bisFileLog;
-      }).forEach(bisFileLogsRepository::saveAndFlush);
 
-      Map<BisJobEntity, Long> jobs = inProgLogs.stream().collect(
-          Collectors.groupingBy(BisFileLog::getJob, Collectors.counting()));
-      
+      inProgLogs.stream()
+          .map(
+              bisFileLog -> {
+                bisFileLog.setMflFileStatus("FAILED");
+                bisFileLog.setReason("Long running inProgress transfer");
+                bisFileLog.setBisProcessState("FAILED");
+                return bisFileLog;
+              })
+          .forEach(bisFileLogsRepository::saveAndFlush);
+
+      Map<BisJobEntity, Long> jobs =
+          inProgLogs.stream()
+              .collect(Collectors.groupingBy(BisFileLog::getJob, Collectors.counting()));
+
       jobs.forEach((job, count) -> this.updateJobStatus(job.getJobId()));
       updatedRecords = inProgLogs.size();
     }
     return updatedRecords;
   }
-  
-  
+
   /**
-   * check if any long running process exists
-   * and update if any.
+   * check if any long running process exists and update if any.
+   *
    * @param minutesToCheck maxInProgress minutes
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-   public void updateLongRunningJobs(Integer minutesToCheck) {
-    int longCount = bisFileLogsRepository
-         .countOfLongRunningJobs(minutesToCheck);
-    logger.info("Long running process count: " +    longCount);
+  public void updateLongRunningJobs(Integer minutesToCheck) {
+    int longCount = bisFileLogsRepository.countOfLongRunningJobs(minutesToCheck);
+    logger.info("Long running process count: " + longCount);
     if (longCount > 0) {
       logger.info("Updating long running transfers to failed");
-      bisFileLogsRepository
-           .updateBisJob("FAILED", minutesToCheck);
+      bisFileLogsRepository.updateBisJob("FAILED", minutesToCheck);
       logger.info("long running jobs update completed");
-       
     }
   }
-  
+
   /**
    * Update existing log process status.
-   * 
+   *
    * @param channelId channel identifier
    * @param routeId route id entifier
    * @param processStatus status
@@ -451,8 +434,13 @@ public class SipLogging {
    * @param source source
    */
   @Transactional(TxType.REQUIRED)
-  public void upSertLogForExistingProcessStatus(Long channelId, Long routeId, String processStatus,
-      String fileStatus, String source, Long jobId) {
+  public void upSertLogForExistingProcessStatus(
+      Long channelId,
+      Long routeId,
+      String processStatus,
+      String fileStatus,
+      String source,
+      Long jobId) {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
@@ -461,8 +449,10 @@ public class SipLogging {
         && (statuslog.getContent() != null && statuslog.getContent().size() > 0)) {
       // It will have latest one by modifiedDate
       fileLog = statuslog.getContent().get(0);
-      updateStatusFailed(BisProcessState.FAILED.value(),
-          BisComponentState.HOST_NOT_REACHABLE.value(), fileLog.getPid());
+      updateStatusFailed(
+          BisProcessState.FAILED.value(),
+          BisComponentState.HOST_NOT_REACHABLE.value(),
+          fileLog.getPid());
     } else {
       BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
       bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
@@ -487,14 +477,14 @@ public class SipLogging {
    * @return true or false
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public boolean duplicateCheckFilename(boolean isDisableDuplicate, String location) {
     return (!isDisableDuplicate && !checkDuplicateFile(location)) || isDisableDuplicate;
-
   }
-  
+
   /**
    * check if any regular file running for the route.
    *
@@ -502,36 +492,42 @@ public class SipLogging {
    * @return true or false
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public boolean checkIfAlreadyRunning(Long routeId) {
-    boolean isInProgress =   bisFileLogsRepository.countOfInProgress(routeId) > 0;
+    boolean isInProgress = bisFileLogsRepository.countOfInProgress(routeId) > 0;
     logger.info("Any Inprogress regular jobs for  " + routeId + "? :: " + isInProgress);
     return isInProgress;
   }
 
   /**
    * Adds entry to job log.
-   * 
+   *
    * @param channelId channel identifier.
    * @param routeId route identifier
    * @param filePattern pattern expression
    * @return job log created or not
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public BisJobEntity createJobLog(Long channelId, Long routeId, 
-      String filePattern, String channelType) {
+  public BisJobEntity createJobLog(
+      Long channelId, Long routeId, String filePattern, String channelType) {
     BisJobEntity sipJob = new BisJobEntity();
+    BisChannelEntity b = new BisChannelEntity();
+    b.setBisChannelSysId(channelId);
+    BisRouteEntity r = new BisRouteEntity();
+    r.setBisRouteSysId(routeId);
     sipJob.setFilePattern(filePattern);
-    sipJob.setJobName(channelId + "-" +  routeId.toString());
+    sipJob.setJobName(channelId + "-" + routeId.toString());
     sipJob.setJobStatus("OPEN");
     sipJob.setChannelType("SFTP");
-    sipJob.setBisChannelSysId(channelId);
-    sipJob.setBisRouteSysId(routeId);
+    sipJob.setChannelEntity(b);
+    sipJob.setRoutelEntity(r);
     sipJob.setStartTime(new Date());
     sipJob.setTotalCount(0L);
     sipJob.setSuccessCount(0L);
@@ -542,21 +538,21 @@ public class SipLogging {
     sipJob.setChannelType(channelType);
     sipJobDataRepository.save(sipJob);
     return sipJob;
-    
   }
-  
+
   /**
    * Adds entry to job log.
-   * 
+   *
    * @param status job status.
    * @param successCnt number of files succssfully transferred
    * @param totalCnt total number of files to be processed
    */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public void  updateJobLog(long jobId, String status, long successCnt, long totalCnt) {
+  public void updateJobLog(long jobId, String status, long successCnt, long totalCnt) {
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
       BisJobEntity jobEntity = sipJob.get();
@@ -565,23 +561,19 @@ public class SipLogging {
       jobEntity.setSuccessCount(successCnt);
       jobEntity.setCreatedBy("system");
       jobEntity.setUpdatedBy("system");
-      jobEntity.setCreatedDate(new Date()); 
+      jobEntity.setCreatedDate(new Date());
       jobEntity.setUpdatedDate(new Date());
       sipJobDataRepository.saveAndFlush(jobEntity);
     }
-    
-    
   }
-  
-  /**
-   * Adds entry to job log.
-   * 
-   */
+
+  /** Adds entry to job log. */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
-  public void  updateSuccessCnt(long jobId) {
+  public void updateSuccessCnt(long jobId) {
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     if (sipJob.isPresent()) {
       Long successCnt = bisFileLogsRepository.getSuccessCntForJob(jobId);
@@ -591,18 +583,14 @@ public class SipLogging {
       jobEntity.setUpdatedDate(new Date());
       sipJobDataRepository.saveAndFlush(jobEntity);
     }
-    
-    
   }
-  
-  /**
-   * Adds entry to job log.
-   */
+
+  /** Adds entry to job log. */
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {
-      RuntimeException.class }, maxAttemptsExpression = 
-          "#{${sip.service.max.attempts}}", backoff = 
-          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Retryable(
+      value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void updateJobStatus(long jobId) {
     logger.info("Updating job status:: ");
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
@@ -616,12 +604,12 @@ public class SipLogging {
         logger.info("Count matched success");
         jobEntity.setJobStatus("SUCCESS");
         jobEntity.setEndTime(new Date());
-       
-      } else if (!jobEntity.getJobStatus().equals("OPEN") 
+
+      } else if (!jobEntity.getJobStatus().equals("OPEN")
           && isJobPartiallyCompleted(jobId, jobEntity.getTotalCount())) {
         logger.info("Count matched partial");
         jobEntity.setJobStatus("PARTIALLY_COMPLETED");
-      } else if (!jobEntity.getJobStatus().equals("OPEN") 
+      } else if (!jobEntity.getJobStatus().equals("OPEN")
           && isJobFailed(jobId, jobEntity.getTotalCount())) {
         logger.info("Count matched failed");
         jobEntity.setJobStatus("FAILED");
@@ -629,97 +617,80 @@ public class SipLogging {
       } else {
         logger.info("update job status none matched");
       }
-      
-      
+
       jobEntity.setUpdatedDate(new Date());
       sipJobDataRepository.saveAndFlush(jobEntity);
-
     }
-
   }
-  
+
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {
-      RuntimeException.class }, maxAttemptsExpression = 
-          "#{${sip.service.max.attempts}}", backoff = 
-          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Retryable(
+      value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   private boolean isJobFailed(long jobId, Long total) {
-    return bisFileLogsRepository
-        .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
-            "FAILED", jobId) == total;
+    return bisFileLogsRepository.countByMflFileStatusAndBisProcessStateAndJob_JobId(
+            "FAILED", "FAILED", jobId)
+        == total;
   }
 
   @Transactional(TxType.REQUIRED)
-  @Retryable(value = {
-      RuntimeException.class }, maxAttemptsExpression = 
-          "#{${sip.service.max.attempts}}", backoff = 
-          @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
+  @Retryable(
+      value = {RuntimeException.class},
+      maxAttemptsExpression = "#{${sip.service.max.attempts}}",
+      backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   private boolean isJobPartiallyCompleted(Long jobId, Long total) {
-    Long failedCnt = bisFileLogsRepository
-        .countByMflFileStatusAndBisProcessStateAndJob_JobId("FAILED",
-        "FAILED", jobId);
+    Long failedCnt =
+        bisFileLogsRepository.countByMflFileStatusAndBisProcessStateAndJob_JobId(
+            "FAILED", "FAILED", jobId);
     logger.info("failed count" + failedCnt);
-    Long successCnt =  bisFileLogsRepository.getSuccessCntForJob(jobId);
+    Long successCnt = bisFileLogsRepository.getSuccessCntForJob(jobId);
     logger.info("success count" + successCnt);
-    
+
     boolean totalProcessed = (total == (failedCnt + successCnt));
-   
+
     boolean isPartial = (successCnt > 0) && totalProcessed;
     logger.info("is partially complted?::" + isPartial);
-    
-    return (successCnt > 0) && (total == failedCnt + successCnt); 
+
+    return (successCnt > 0) && (total == failedCnt + successCnt);
   }
-  
+
   /**
    * Returns Job entity by Id.
-   * 
+   *
    * @param jobId job identifier
    * @return JobEntity
    */
-  @Retryable(value = {RuntimeException.class},
+  @Retryable(
+      value = {RuntimeException.class},
       maxAttemptsExpression = "#{${sip.service.max.attempts}}",
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   @Transactional(TxType.REQUIRED)
   public BisJobEntity retriveJobById(long jobId) {
-    
+
     Optional<BisJobEntity> sipJob = sipJobDataRepository.findById(jobId);
     BisJobEntity jobEntity = null;
     if (sipJob.isPresent()) {
-      jobEntity =   sipJob.get();
+      jobEntity = sipJob.get();
     }
-    
+
     return jobEntity;
-    
   }
-  
-  
-  
-  
-  
-  /**
-   * Returns Job entity by Id.
-   * 
-   */
+
+  /** Returns Job entity by Id. */
   @Transactional(TxType.REQUIRED)
   public void saveJob(BisJobEntity jobEntity) {
     sipJobDataRepository.saveAndFlush(jobEntity);
-    
   }
-  
-  /**
-   * Returns Job entity by Id.
-   * 
-   */
+
+  /** Returns Job entity by Id. */
   @Transactional(TxType.REQUIRED)
   public BisFileLog retreiveOpenLogs() {
     List<BisFileLog> logs = bisFileLogsRepository.findFirstOpenLog();
     BisFileLog log = null;
     if (!logs.isEmpty()) {
       log = logs.get(0);
-    } 
+    }
     return log;
   }
-  
-
-
 }

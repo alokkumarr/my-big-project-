@@ -524,7 +524,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             ExecutionResult executionResult = objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
             executionResponse.setExecutedBy(executionResult.getExecutedBy());
-            executionResponse.setSipQuery(executionResult.getSipQuery());
+            executionResponse.setAnalysis(executionResult.getAnalysis());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);
         }
@@ -539,18 +539,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         JsonElement element = null;
         try {
             MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
-            String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType","data","sipQuery"};
+            String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType","data","analysis"};
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode node = objectMapper.createObjectNode();
             ObjectNode objectNode =  node.putObject("$eq");
-            objectNode.put("dslQueryId",dslQueryId);
+                objectNode.put("dslQueryId",dslQueryId);
             List<JsonNode> elements = maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",1);
             // its last execution for the for Query Id , So consider 0 index.
             objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             executionResponse.setData(executionResult.getData());
             executionResponse.setExecutedBy(executionResult.getExecutedBy());
-            executionResponse.setSipQuery(executionResult.getSipQuery());
+            executionResponse.setAnalysis(executionResult.getAnalysis());
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data" , e);
         }

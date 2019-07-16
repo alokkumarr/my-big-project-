@@ -136,12 +136,8 @@
       <modules>
         <module>bda-meta</module>
         <module>sip-xdf</module>
-      <!--
-        SIP-7525 : Task has been created to enable this one
-        It has been commented to unblock team members
         <module>a2</module>
         <module>a2sipr/inst/json</module>
-      -->
         <module>sip-rtis</module>
         <module>sip-rtps</module>
         <module>sip-security</module>
