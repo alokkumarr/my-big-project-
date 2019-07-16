@@ -53,6 +53,7 @@
       <global-filter
         [style.display]="sidebarWidget !== 'filter' ? 'none' : ''"
         (onApplyFilter)="onApplyGlobalFilter($event)"
+        (onClearFilter)="onClearGlobalFilter($event)"
       ></global-filter>
     </mat-sidenav>
 

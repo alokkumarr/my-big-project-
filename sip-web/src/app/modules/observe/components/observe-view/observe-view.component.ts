@@ -279,17 +279,25 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    * @memberof ObserveViewComponent
    */
   onApplyGlobalFilter(data): void {
-    if (!data) {
-      this.sidenav.close();
-      return;
-    }
-
-    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters)) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)) {
       this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
 
-    if (this.filters.hasKPIFilterChanged(data.kpiFilters)) {
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
+      this.filters.onApplyKPIFilter.next(data.kpiFilters);
+    }
+    this.sidenav.close();
+  }
+
+  onClearGlobalFilter(data) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
+      this.filters.onApplyFilter.next(data.analysisFilters);
+    }
+
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
       this.filters.lastKPIFilter = data.kpiFilters;
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
