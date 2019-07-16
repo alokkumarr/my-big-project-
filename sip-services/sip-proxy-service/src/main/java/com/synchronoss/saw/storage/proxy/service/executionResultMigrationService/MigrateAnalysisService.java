@@ -172,6 +172,10 @@ public class MigrateAnalysisService {
                     ? executionResultElement.getAsString()
                     : null;
 
+            if (executionStatus == null && !content.get("exec-msg").isJsonNull()) {
+              executionStatus = content.get("exec-msg").getAsString();
+            }
+
             JsonElement executionFinishTsElement = content.get("execution_finish_ts");
 
             String executionFinishTs =
