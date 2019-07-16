@@ -28,12 +28,10 @@
   </pivot-grid>
   <report-grid-upgraded
     *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
-    [artifacts]="
-      analysis.edit ? null : (analysis.artifacts | checkedArtifactColumnFilter)
-    "
+    [artifacts]="analysisArtifacts | checkedArtifactColumnFilter"
     [query]="analysis.queryManual"
     [analysis]="analysis"
-    [sorts]="analysis.sqlBuilder.sorts"
+    [sorts]="analysisSorts"
     [dataLoader]="dataLoader"
     [isEditable]="false"
   >
