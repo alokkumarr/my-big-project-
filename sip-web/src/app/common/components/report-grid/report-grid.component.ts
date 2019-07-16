@@ -41,6 +41,7 @@ import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';
+import { ArtifactDSL } from 'src/app/models';
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -198,11 +199,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
-  public pager = {
-    showNavigationButtons: true,
-    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
-    showPageSizeSelector: true
-  };
+  public pager;
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
@@ -229,6 +226,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
+
+    this.pager = {
+      showNavigationButtons: true,
+      allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
+      showPageSizeSelector: true,
+      visible: !this.isEditable
+    };
+
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
@@ -378,10 +383,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
     this.getNewDataThroughDialog(
       component,
-      { format: payload.format, type },
+      { format: payload.format || payload.dateFormat, type },
       format => {
         changeColumnProp('format', format);
-        this.change.emit({ subject: 'format' });
+        this.change.emit({
+          subject: 'format',
+          column: {
+            ...payload,
+            ...(payload.type === 'date' ? { dateFormat: format } : { format })
+          }
+        });
       }
     );
   }
@@ -403,7 +414,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
+      fpFlatMap(
+        (artifact: Artifact | ArtifactDSL) =>
+          (<ArtifactDSL>artifact).fields ||
+          (<Artifact>artifact).columns || [artifact]
+      ),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
@@ -429,7 +444,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         );
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
-          : column.format;
+          : column.format || column.dateFormat;
         const field: ReportGridField = {
           caption: column.alias || column.displayName,
           dataField: this.getDataField(column),
@@ -449,6 +464,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         if (
           DATE_TYPES.includes(column.type) &&
           isUndefined(column.format) &&
+          isUndefined(column.dateFormat) &&
           !aggregate
         ) {
           field.format = 'yyyy-MM-dd';
@@ -493,7 +509,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   fetchColumsUponCheck() {
-    return map(this.analysis.artifacts, artifact => {
+    const artifacts = this.analysis.sipQuery
+      ? this.analysis.sipQuery.artifacts
+      : this.analysis.artifacts;
+    return map(artifacts, artifact => {
+      if (this.analysis.sipQuery) {
+        return artifact;
+      }
+
       const columns = filter(artifact.columns, 'checked');
       return {
         ...artifact,

@@ -8,7 +8,7 @@ import * as get from 'lodash/get';
 import { Artifact, DesignerChangeEvent, Sort, Filter } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
-import { QueryDSL, SqlBuilderChart } from 'src/app/models';
+import { QueryDSL } from 'src/app/models';
 
 // the delay needed to animate opening and closing the sidemenus
 const SIDEMENU_ANIMATION_TIME = 300;
@@ -28,7 +28,6 @@ export class SingleTableDesignerLayoutComponent {
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
   @Input() sipQuery: QueryDSL;
-  @Input() sqlBuilder: SqlBuilderChart;
   @Input() designerState: DesignerStates;
   @Input() chartTitle: string;
 
