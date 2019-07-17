@@ -37,15 +37,11 @@ metastore:
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
 
-{% if sip_secure %}
-
-connector : https
-
-{% else %}
 
 connector : http
 
-{% endif %}
+executor:
+  streamPath: /var/sip/services/transport/executor
 
 metadata:
   service:
@@ -54,10 +50,13 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-{% if sip_secure %}
-  ssl:
-    enable : true
-{% else %}
   ssl:
     enable: false
-{% endif %}
+
+sql-executor:
+  wait-time: 120
+  output-location : /var/sip/services/transport/executor/output
+  preview-rows-limit: 10000
+report:
+  executor:
+    path: /var/sip/services/transport/executor

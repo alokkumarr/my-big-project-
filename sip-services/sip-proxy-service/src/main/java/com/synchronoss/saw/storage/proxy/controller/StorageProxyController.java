@@ -7,13 +7,17 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTick
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -36,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +74,8 @@ public class StorageProxyController {
 
   @Value("${metadata.service.host}")
   private String metaDataServiceExport;
+
+  private Random random = new Random();
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -237,12 +244,13 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    String analysisType = sipdsl.getType();
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey);
+      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey, ExecutionType.onetime, analysisType, false);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -312,7 +320,19 @@ public class StorageProxyController {
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
-      responseObjectFuture = proxyService.execute(analysis.getSipQuery(), size, dataSecurityKeyNode);
+
+      String analysisType = analysis.getType();
+      Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
+
+      responseObjectFuture =
+          proxyService.execute(
+              analysis.getSipQuery(),
+              size,
+              dataSecurityKeyNode,
+              executionType,
+              analysisType,
+              designerEdit);
+
       // Execution result will one be stored, if execution type is publish or Scheduled.
       if (executionType.equals(ExecutionType.publish)
           || executionType.equals(ExecutionType.scheduled)) {
@@ -325,7 +345,8 @@ public class StorageProxyController {
         executionResult.setData(responseObjectFuture);
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
-        executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+        executionResult.setExecutedBy(
+            authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
         proxyService.saveDslExecutionResult(executionResult);
       }
     } catch (IOException e) {
@@ -415,5 +436,119 @@ public class StorageProxyController {
       logger.error("error occurred while fetching execution data", e);
     }
     return null;
+  }
+
+
+  // TODO: Mock data preparation. Should be removed
+  private class ColumnType {
+    public String columnName;
+    public Type dataType;
+    public String format;
+  }
+
+  private List<ColumnType> prepareColumnTypes(SipQuery query) {
+    List<ColumnType> columnTypes = new ArrayList<>();
+
+    List<Field> fields = query.getArtifacts().get(0).getFields();
+
+    if (fields != null && fields.size() != 0) {
+      for (Field field : fields) {
+        ColumnType colType = new ColumnType();
+
+        String columnName = null;
+
+        if (field.getDataField() != null) {
+          columnName = field.getDataField();
+        } else if (field.getColumnName() != null) {
+          columnName = field.getColumnName();
+        }
+
+        colType.columnName = columnName;
+
+        colType.dataType = field.getType();
+
+        if (field.getType() == Type.DATE) {
+          colType.format = field.getDateFormat();
+        }
+
+        columnTypes.add(colType);
+      }
+    }
+
+    return columnTypes;
+  }
+
+  private List<Object> prepareMockData(List<ColumnType> columnTypes) {
+    List<Object> data = new ArrayList<>();
+
+    int noOfRows = new Random().nextInt(100);
+
+    for (int i = 0; i < noOfRows; i++) {
+      data.add(generateDataObject(columnTypes));
+    }
+
+    return data;
+  }
+
+  private JsonNode generateDataObject(List<ColumnType> columnTypes) {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode node = mapper.createObjectNode();
+
+    for (ColumnType ct : columnTypes) {
+      if (ct.dataType == Type.INTEGER) {
+        node.put(ct.columnName, generateRandomInteger());
+      } else if (ct.dataType == Type.LONG) {
+        node.put(ct.columnName, generateRandomLong());
+      } else if (ct.dataType == Type.FLOAT) {
+        node.put(ct.columnName, generateRandomFloat());
+      } else if (ct.dataType == Type.DOUBLE) {
+        node.put(ct.columnName, generateRandomDouble());
+      } else if (ct.dataType == Type.STRING) {
+        node.put(ct.columnName, generateRandomString());
+      } else if (ct.dataType == Type.DATE || ct.dataType == Type.TIMESTAMP) {
+        node.put(ct.columnName, generateRandomDate(ct.format));
+      }
+    }
+
+    return node;
+  }
+
+  private Double generateRandomDouble() {
+    double d = random.nextDouble();
+
+    return d;
+  }
+
+  private Float generateRandomFloat() {
+    float f = random.nextFloat();
+
+    return f;
+  }
+
+  private Long generateRandomLong() {
+    long l = random.nextLong();
+
+    return l;
+  }
+
+  private String generateRandomDate(String format) {
+    Random r = new Random();
+    long t1 = System.currentTimeMillis() + r.nextInt();
+
+    DateTime d1 = new DateTime(t1);
+
+    return d1.toString(format);
+  }
+
+  private Integer generateRandomInteger() {
+    int i = random.nextInt();
+
+    return i;
+  }
+
+  private String generateRandomString() {
+    String s = UUID.randomUUID().toString();
+
+    return s;
   }
 }
