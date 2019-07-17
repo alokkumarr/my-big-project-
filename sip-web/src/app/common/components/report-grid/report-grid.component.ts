@@ -29,7 +29,11 @@ import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as isEqual from 'lodash/isEqual';
 
-import { AGGREGATE_TYPES, AGGREGATE_TYPES_OBJ } from '../../consts';
+import {
+  AGGREGATE_TYPES,
+  AGGREGATE_TYPES_OBJ,
+  ES_REPORTS_DATE_FORMATS
+} from '../../consts';
 
 import {
   ArtifactColumnReport,
@@ -383,7 +387,13 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
     this.getNewDataThroughDialog(
       component,
-      { format: payload.format || payload.dateFormat, type },
+      {
+        format: payload.format || payload.dateFormat,
+        type,
+        ...(this.analysis.type === 'esReport'
+          ? { availableFormats: ES_REPORTS_DATE_FORMATS }
+          : {})
+      },
       format => {
         changeColumnProp('format', format);
         this.change.emit({
