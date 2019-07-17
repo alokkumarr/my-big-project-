@@ -1,7 +1,7 @@
 - name: Create MapR group
   group:
     name: mapr
-    gid: "{{ saw_mapr_group_id | default('5000') }}"
+    gid: "{{ saw_mapr_group_id | default('500') }}"
     state: present
 - name: Create MapR user
   user:
@@ -27,7 +27,9 @@
 - name: Copy the mapr authentication ticket
   command : "install -C -o mapr -g mapr /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000"
   when: sip_secure
+  ignore_errors: yes
 - name: Setup mapr ticket Location
   lineinfile: dest=/home/mapr/.bashrc line='export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000'
   when: sip_secure
+  ignore_errors: yes
 
