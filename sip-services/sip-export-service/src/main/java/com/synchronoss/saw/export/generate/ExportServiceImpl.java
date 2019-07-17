@@ -1509,7 +1509,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   /**
-   * // TODO: 7/17/2019 - This should be removed Build. (SIP-5897) the SIP DSL migration has been
+   * // TODO: 7/17/2019 - This should be removed after the SIP DSL migration for es report(SIP-5897)
    * taken cared es-report response is not having consistent structure in case of Columns are
    * missing in Elastic-search documents. In the SIP-DSL implementation this issue has been fixed ,
    * but not fixed with old query.
