@@ -32,13 +32,13 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_${scala.major.version}</artifactId>
       <version>${spark.version}</version>
-      <scope>provided</scope>
+     <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_${scala.major.version}</artifactId>
       <version>${spark.version}</version>
-      <scope>provided</scope>
+     <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.mapr.hadoop</groupId>
@@ -163,6 +163,32 @@
           <!-- Assembly plugin 3: end -->
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.18</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <configuration>
+              <configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml
+              </configLocation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <violationSeverity>warning</violationSeverity>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Assembly plugin 2: end -->
       <plugin>
         <groupId>de.dentrassi.maven</groupId>
@@ -204,6 +230,7 @@
                 <entry>
                   <name>/opt/bda/sip-executor/bin/run-executor</name>
                   <file>src/main/scripts/run-executor</file>
+                  <mode>0755</mode>
                 </entry>
               </entries>
               <afterInstallation>

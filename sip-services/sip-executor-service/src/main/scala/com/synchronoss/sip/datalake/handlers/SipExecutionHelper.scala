@@ -82,7 +82,7 @@ class SipExecutionHelper(sqlRuntime: String, cacheIt: Boolean = false, var resId
   var lastSQLExecMessage: String = null
 
   def semanticNodeHelper(semanticId: String): JObject = {
-    val semanticHost = SipExecutorsConfig.semanticService.getString("host")
+    val semanticHost = SipExecutorsConfig.semanticService.resolve().getString("host")
     val semanticEndpoint = SipExecutorsConfig.semanticService.getString("endpoint")
     val client: InternalServiceClient = new InternalServiceClient(semanticHost + semanticEndpoint)
 

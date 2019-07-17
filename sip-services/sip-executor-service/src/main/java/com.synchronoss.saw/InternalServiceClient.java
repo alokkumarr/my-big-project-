@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This generic class can be used as to access internal services
+ * This generic class can be used as to access internal services.
  *
  * @author spau0004
  */
@@ -43,7 +43,8 @@ public class InternalServiceClient {
     super();
     this.url = url;
   }
-  /** Default Constructor */
+
+  /** Default Constructor. */
   public InternalServiceClient() {}
 
   private static RequestConfig setRequestConfig(int timeOut) {
@@ -95,10 +96,10 @@ public class InternalServiceClient {
 
   /**
    * This method will be used to access the semantic service to get the details of semantic a
-   * particular semantic node
+   * particular semantic node.
    *
-   * @param semanticId
-   * @return String
+   * @param semanticId semantic Id
+   * @return String object
    */
   public String retrieveObject(String semanticId) throws Exception {
     Object node = null;
@@ -149,6 +150,7 @@ public class InternalServiceClient {
     return sslContext;
   }
 
+  /** set the parameter. */
   public void setParameters() {
     Boolean sipSslEnable = SipExecutorsConfig.sipSsl().getBoolean("enable");
     setSslEnabled(sipSslEnable);
