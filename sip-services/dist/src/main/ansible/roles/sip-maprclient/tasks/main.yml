@@ -1,12 +1,12 @@
 - name: Create MapR group
   group:
     name: mapr
-    gid: "{{ saw_mapr_group_id | default('500') }}"
+    gid: "{{ saw_mapr_group_id | default('5000') }}"
     state: present
 - name: Create MapR user
   user:
     name: mapr
-    uid: "{{ saw_mapr_user_id | default('5000') }}"
+    uid: "{{ saw_mapr_user_id | default('500') }}"
     group: mapr
     state: present
 - name: Install MapR client

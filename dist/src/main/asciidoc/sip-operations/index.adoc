@@ -446,11 +446,11 @@ sip-nodes gracefully if exists , in case mapr ticket setting require to setup
 with respect to any chnages in mapr cluster below steps can be follow for `mapr`
 user .
 
-      # copy the ticket for mapr user
+     # copy the ticket for mapr user
       cp /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000
-      # provide permission to mapr user
+     # provide permission to mapr user
       chown mapr:mapr /opt/mapr/conf/maprticket_5000
-      # set the mapr ticket location for mapr user.
+     # set the mapr ticket location in enviroment variable for mapr user .
       export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000
 
 === Elasticsearch SSL configuration
