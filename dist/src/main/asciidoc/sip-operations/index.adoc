@@ -440,11 +440,11 @@ transparently.
 
 === Mapr secured custer authentication ticket
 
-MapR uses authentication with tickets to access the mapr cluster file system
-in secure mode, sip-deployment configured for setting the mapr ticket in
-sip-nodes gracefully if exists , in case mapr ticket setting require to setup
-with respect to any chnages in mapr cluster below steps can be follow for `mapr`
-user .
+MapR uses authentication with tickets to access the mapr cluster, file system
+in secure mode. sip-deployment configured for setting the mapr ticket in
+sip-nodes gracefully if exists, in case mapr ticket require to setup
+with respect to any changes in mapr cluster below steps can be followed for `mapr`
+user.
 
      # copy the ticket for mapr user
       cp /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000
