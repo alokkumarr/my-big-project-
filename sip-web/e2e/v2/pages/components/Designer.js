@@ -2,7 +2,7 @@
 
 const commonFunctions = require('../utils/commonFunctions');
 const SaveDialog = require('./SaveDialog');
-
+const Utils = require('../utils/Utils');
 class Designer extends SaveDialog {
   constructor() {
     super();
@@ -23,6 +23,16 @@ class Designer extends SaveDialog {
     this._bottomNBtn = element(by.css(`[e2e='bottom-btn']`));
     this._limitValue = element(by.css(`[e2e='limit-value']`));
     this._aliasInput = field => element(by.css(`[e2e='alias-input-${field}]`));
+    this._sortField = field => element(by.css(`[e2e='sort-field-${field}']`));
+    this._ascSortBtnByField = field =>
+      this._sortField(field).element(by.css(`[e2e='sort-asc']`));
+    this._descSortBtnByField = field =>
+      this._sortField(field).element(by.css(`[e2e='sort-desc']`));
+    this._applySortBtn = element(
+      by.xpath(`//span[contains(text(),'Apply Sort')]/parent::button`)
+    );
+    this._addSortFieldBtn = field =>
+      element(by.css(`[e2e='sort-add-btn-${field}']`));
   }
 
   clickOnDesignerButton() {
@@ -70,6 +80,45 @@ class Designer extends SaveDialog {
 
   fillAliasInput(attr, value) {
     commonFunctions.fillInput(this._aliasInput(attr), value);
+  }
+
+  clickOnAscSortButtonByField(field) {
+    let _self = this;
+    browser.sleep(2000);
+    commonFunctions.clickOnElement(this._ascSortBtnByField(field));
+  }
+
+  clickOnDescSortButtonByField(field) {
+    let _self = this;
+    browser.sleep(2000);
+    commonFunctions.clickOnElement(this._descSortBtnByField(field));
+  }
+
+  clickOnApplySortButton() {
+    commonFunctions.clickOnElement(this._applySortBtn);
+  }
+
+  clickOnAddToSortButton(field) {
+    commonFunctions.clickOnElement(this._addSortFieldBtn(field));
+  }
+  verifySortOptionsApplied(sorts, type) {
+    sorts.forEach(sort => {
+      if (type === 'asc') {
+        expect(
+          Utils.hasClass(
+            this._ascSortBtnByField(sort),
+            'mat-button-toggle-checked'
+          )
+        ).toBeTruthy();
+      } else if (type == 'desc') {
+        expect(
+          Utils.hasClass(
+            this._descSortBtnByField(sort),
+            'mat-button-toggle-checked'
+          )
+        ).toBeTruthy();
+      }
+    });
   }
 }
 module.exports = Designer;
