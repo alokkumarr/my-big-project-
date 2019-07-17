@@ -24,6 +24,7 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -276,7 +277,7 @@ public class StorageProxyController {
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<?> executeAnalysis(
+  public ExecuteAnalysisResponse executeAnalysis(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
               required = true)
@@ -295,16 +296,18 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
 
+    ExecuteAnalysisResponse executeResponse =new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
-      return Collections.singletonList("Invalid authentication token");
+      executeResponse.setData(Collections.singletonList("Invalid authentication token"));
+      return executeResponse;
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
+    List<Object> responseObjectFuture;
     SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -320,29 +323,27 @@ public class StorageProxyController {
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
-
-      String analysisType = analysis.getType();
-      Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
-
-      responseObjectFuture =
-          proxyService.execute(
-              analysis.getSipQuery(),
+        executeResponse =
+          proxyService.executeAnalysis(
+              analysis,
               size,
               dataSecurityKeyNode,
-              executionType,
-              analysisType,
-              designerEdit);
-
+              executionType);
       // Execution result will one be stored, if execution type is publish or Scheduled.
-      if (executionType.equals(ExecutionType.publish)
-          || executionType.equals(ExecutionType.scheduled)) {
+      boolean validExecutionType =
+          executionType.equals(ExecutionType.publish)
+              || executionType.equals(ExecutionType.scheduled);
+      String analysisType = analysis.getType();
+      if (validExecutionType) {
         ExecutionResult executionResult = new ExecutionResult();
-        executionResult.setExecutionId(UUID.randomUUID().toString());
+        executionResult.setExecutionId(executeResponse.getExecutionId());
         executionResult.setDslQueryId(queryId);
         executionResult.setAnalysis(analysis);
         executionResult.setStartTime(startTime);
         executionResult.setFinishedTime(new Date().getTime());
-        executionResult.setData(responseObjectFuture);
+        if(!(analysisType.equalsIgnoreCase("report"))){
+        executionResult.setData(executeResponse.getData());
+        }
         executionResult.setExecutionType(executionType);
         executionResult.setStatus("success");
         executionResult.setExecutedBy(
@@ -365,8 +366,8 @@ public class StorageProxyController {
       throw new RuntimeException("Exception generated while processing incoming json.");
       //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     }
-    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
-    return responseObjectFuture;
+    logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
+    return executeResponse;
   }
 
   /**

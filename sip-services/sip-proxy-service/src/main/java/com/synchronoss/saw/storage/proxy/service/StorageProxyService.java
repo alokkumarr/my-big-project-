@@ -1,7 +1,9 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -22,4 +24,6 @@ public interface StorageProxyService {
     ExecutionResponse fetchExecutionsData(String executionId);
 
     ExecutionResponse fetchLastExecutionsData(String dslQueryId);
+    ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, DataSecurityKey dataSecurityKey,
+        ExecutionType executionType) throws Exception;
 }

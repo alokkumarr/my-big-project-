@@ -7,16 +7,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
-import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -30,11 +29,6 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,10 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
-import org.apache.hadoop.fs.FileStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -55,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sncr.bda.base.MaprConnection;
-import sncr.bda.core.file.HFileOperations;
 
 @Service
 public class StorageProxyServiceImpl implements StorageProxyService {
@@ -70,27 +60,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private String basePath;
 
-  @Value("${executor.streamPath}")
-  @NotNull
-  private String streamBasePath;
-
-  @Value("${sql-executor.wait-time}")
-  private Integer dlReportWaitTime;
-
-  @Value("${report.executor.path}")
-  private String executorResultPath;
-
-  @Value("${sql-executor.output-location}")
-  @NotNull
-  private String dlOutputLocation ;
-
-  @Value("${sql-executor.preview-rows-limit}")
-  private Long dlPreviewRowLimit;
-
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   @Autowired private StorageConnectorService storageConnectorService;
+  @Autowired private DataLakeExecutionService dataLakeExecutionService;
 
   private int size;
 
@@ -452,12 +426,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception {
+  public List<Object> execute(
+      SipQuery sipQuery,
+      Integer size,
+      DataSecurityKey dataSecurityKey,
+      ExecutionType executionType,
+      String analysisType,
+      Boolean designerEdit)
+      throws Exception {
     List<Object> result = null;
-
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
-      result = executeDLReport(sipQuery, size, dataSecurityKey, executionType, designerEdit);
+      final String executionId = UUID.randomUUID().toString();
+      ExecuteAnalysisResponse response;
+      response =
+          dataLakeExecutionService.executeDataLakeReport(
+              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId);
+      result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
     }
@@ -465,34 +449,37 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return result;
   }
 
-  private List<Object> executeDLReport(
-      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      ExecutionType executionType, Boolean designerEdit)
+  /**
+   * This Method is used to execute analysis.
+   *
+   * @param analysis Analysis.
+   * @param size Integer.
+   * @param dataSecurityKey DataSecurityKey.
+   * @param executionType ExecutionType.
+   * @return ExecuteAnalysisResponse
+   */
+  @Override
+  public ExecuteAnalysisResponse executeAnalysis(
+      Analysis analysis, Integer size, DataSecurityKey dataSecurityKey, ExecutionType executionType)
       throws Exception {
-    List<Object> result = null;
-
-    String query = null;
-
-    if (designerEdit == true) {
-      DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
-      query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
+    String analysisType = analysis.getType();
+    Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
+    SipQuery sipQuery = analysis.getSipQuery();
+    final String executionId = UUID.randomUUID().toString();
+    ExecuteAnalysisResponse response;
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
+      response = dataLakeExecutionService.executeDataLakeReport(sipQuery, size, dataSecurityKey, executionType, designerEdit,executionId);
     } else {
-      query = sipQuery.getQuery();
+      response = new ExecuteAnalysisResponse();
+      List<Object> objList;
+      objList = executeESQueries(sipQuery, size, dataSecurityKey);
+      response.setExecutionId(executionId);
+      response.setData(objList);
+      response.setTotalRows(objList != null ? objList.size() : 0L);
     }
-
-    // Required parameters
-    String executionId = UUID.randomUUID().toString();
-    String semanticId = sipQuery.getSemanticId();
-
-    int limit = size;
-
-    ExecutorQueueManager queueManager =
-        new ExecutorQueueManager(executionType, streamBasePath);
-    queueManager.sendMessageToStream(semanticId, executionId, limit, query);
-
-      waitForResult(executionId,dlReportWaitTime);
-      return getDLExecutionData(executionId,null,null,ExecutionType.preview);
+    return response;
   }
+
 
   private List<Object> executeESQueries(
       SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
@@ -635,143 +622,5 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   public void setSize(int size) {
     this.size = size;
-  }
-
-  private void waitForResult(String resultId, Integer retries) {
-    retries = retries == null ? 60 : retries;
-    if (!executionCompleted(resultId)) {
-      waitForResultRetry(resultId, retries);
-    }
-  }
-
-  private Boolean executionCompleted(String resultId) {
-    String mainPath = executorResultPath != null ? executorResultPath : "/main";
-    String path = mainPath + File.separator + "saw-transport-executor-result-" + resultId;
-    try {
-      HFileOperations.readFile(path);
-    } catch (FileNotFoundException e) {
-      return false;
-    }
-    try {
-//      HFileOperations.deleteEnt(path);
-    } catch (Exception e) {
-      logger.error("cannot get the file in path" + path);
-    }
-    return true;
-  }
-
-  private void waitForResultRetry(String resultId, Integer retries) {
-    if (retries == 0) {
-      throw new RuntimeException("Timed out waiting for result: " + resultId);
-    }
-    logger.info("Waiting for result: {}", resultId);
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      logger.error("error occurred during thread sleep ");
-    }
-    waitForResult(resultId, retries - 1);
-  }
-
-
-  public List<Object> getDLExecutionData(
-      String executionId,
-      Integer pageNo,
-      Integer pageSize,
-      ExecutionType executionType) {
-    logger.debug("Inside getting executionData for executionId {}", executionId);
-    try {
-      List list = new ArrayList<String>();
-      Stream resultStream = list.stream();
-      String outputLocation = null;
-      if (executionType == (ExecutionType.onetime)
-          || executionType == (ExecutionType.preview)
-          || executionType == (ExecutionType.regularExecution)) {
-        outputLocation = dlOutputLocation + File.separator + "preview-" + executionId;
-          logger.debug("output location for Dl report:{}",outputLocation);
-      }
-      FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
-      for (FileStatus fs : files) {
-        if (fs.getPath().getName().endsWith(".json")) {
-          String path = outputLocation + File.separator + fs.getPath().getName();
-          InputStream stream = HFileOperations.readFileToInputStream(path);
-          BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-          resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
-        }
-      }
-        List<Object> objList= prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
-       Long recordCount=getRecordCount(outputLocation);
-        //objList.add(recordCount);
-        //ExecuteAnalysisResponse response=new ExecuteAnalysisResponse();
-        //response.setData(objList);
-        //response.setTotalRows(recordCount);
-        //response.setExecutionId(executionId);
-        return objList;
-
-    } catch (Exception e) {
-      logger.debug("Exception while reading results: {}", e.getMessage());
-    }
-    return null;
-  }
-
-  private List<JsonNode> prepareDataFromStream(
-      Stream<String> dataStream, Long limit, Integer pageNo, Integer pageSize) {
-    List<JsonNode> data = new ArrayList<>();
-    ObjectMapper mapper = new ObjectMapper();
-    if (pageNo == null || pageSize == null) {
-      limit = limit != null ? limit : 1000L;
-      dataStream
-          .limit(limit)
-          .forEach(
-              (element) -> {
-                try {
-                  JsonNode jsonNode = mapper.readTree(element);
-                  data.add((jsonNode));
-                } catch (Exception e) {
-                  logger.error("error occured while parsing element to json node");
-                }
-              });
-      return data;
-    } else {
-      int startIndex = pageNo * pageSize;
-      dataStream
-          .skip(startIndex)
-          .limit(pageSize)
-          .forEach(
-              (element) -> {
-                try {
-                  JsonNode jsonNode = mapper.readTree(element);
-                  data.add((jsonNode));
-                } catch (Exception e) {
-                  logger.info("error occured while parsing element to json node");
-                }
-              });
-      logger.debug("Data from the stream  " + data);
-      return data;
-    }
-  }
-
-  private Long getRecordCount(String outputLocation) throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    InputStream inputStream = null;
-    Long count = null;
-    FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
-    logger.debug("inside getRecordCount for DL report");
-    for (FileStatus fs : files) {
-      if (fs.getPath().getName().endsWith("recordCount")) {
-        String path = outputLocation + File.separator + fs.getPath().getName();
-        inputStream = HFileOperations.readFileToInputStream(path);
-        break;
-      }
-    }
-    BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
-    List<String> list = bufferReader.lines().collect(Collectors.toList());
-    if (list.size() > 0) {
-      String countString = list.get(0);
-      JsonNode jsonNode = mapper.readTree(countString);
-      count = jsonNode.get("recordCount").asLong();
-      logger.debug("count of the record : {}", count);
-    }
-    return count;
   }
 }
