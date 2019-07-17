@@ -45,6 +45,7 @@ export class AnalyzeViewComponent implements OnInit {
   public LIST_VIEW = 'list';
   public CARD_VIEW = 'card';
   public analysisId: string;
+  public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
   public privileges = {
     create: false
@@ -102,6 +103,9 @@ export class AnalyzeViewComponent implements OnInit {
 
   onParamsChange(params) {
     this.analysisId = params.id;
+    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
+      subCategoryId: this.analysisId
+    });
 
     this.categoryName = this._analyzeService
       .getCategory(this.analysisId)
@@ -175,16 +179,14 @@ export class AnalyzeViewComponent implements OnInit {
 
   afterPublish(analysis) {
     const categroyID = isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId;
-    // Wait till cron job and schedule is created or updated or deleted successfully.
-    setTimeout(() => {
+    this.getCronJobs(categroyID).then(() => {
       // Wait till cron job and schedule is created or updated or deleted successfully.
-      this.getCronJobs(categroyID);
       /* Update the new analysis in the current list */
       this._router.navigate([
         'analyze',
         categroyID
       ]);
-    }, 100);
+    });
   }
 
   spliceAnalyses(analysis, replace) {
