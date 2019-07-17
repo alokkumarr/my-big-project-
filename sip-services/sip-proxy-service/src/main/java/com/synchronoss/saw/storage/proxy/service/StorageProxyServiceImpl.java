@@ -480,6 +480,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       query = sipQuery.getQuery();
     }
 
+    logger.debug("Query = " + query);
+    logger.debug("Execution Type = " + executionType);
+    logger.debug("Stream Base path = " + streamBasePath);
+
     // Required parameters
     String executionId = UUID.randomUUID().toString();
     String semanticId = sipQuery.getSemanticId();

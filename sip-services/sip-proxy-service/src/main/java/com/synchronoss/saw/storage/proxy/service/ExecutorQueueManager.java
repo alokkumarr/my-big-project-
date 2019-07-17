@@ -15,7 +15,7 @@ import sncr.bda.core.file.HFileOperations;
 
 public class ExecutorQueueManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorQueueManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExecutorQueueManager.class);
   private ExecutionType executionType;
   private String streamBasePath;
 
@@ -108,8 +108,11 @@ public class ExecutorQueueManager {
     String recordContent =
         String.format("%s,%s,%s,%d,%s", this.executionType, semanticId, executionId, limit, query);
 
+    logger.debug("Record content = " + recordContent);
+
     ProducerRecord<String, String> record = new ProducerRecord<>(this.executorTopic, recordContent);
 
+    logger.debug("Writing data to stream " + record);
     producer.send(record);
     producer.flush();
     producer.close();
