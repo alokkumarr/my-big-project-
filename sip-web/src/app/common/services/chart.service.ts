@@ -636,12 +636,12 @@ export class ChartService {
       const drilldown = {
         color: colors[i],
         categories: map(s.data, d => get(categories, `x.${d.x}`)),
-        data: map(s.data, d => d.y),
-        xData: map(s.data, d => d.x)
+        xData: map(s.data, d => d.x),
+        yData: map(s.data, d => d.y)
       };
       return {
         drilldown,
-        y: sum(drilldown.data),
+        y: sum(drilldown.yData),
         x: sum(drilldown.xData)
       };
     });
@@ -651,19 +651,22 @@ export class ChartService {
     const dataLen = data.length;
 
     for (let i = 0; i < dataLen; i += 1) {
+      const name = gCategories[i];
+      const { y, x, color } = data[i];
       innerData.push({
-        name: gCategories[i],
-        y: data[i].y,
-        x: data[i].x,
-        color: data[i].color
+        name,
+        y,
+        x,
+        color
       });
-      const drillDataLen = data[i].drilldown.data.length;
+      const drillDataLen = data[i].drilldown.yData.length;
       for (let j = 0; j < drillDataLen; j += 1) {
         const brightness = 0.2 - j / drillDataLen;
+        const { categories, yData, xData } = data[i].drilldown;
         outerData.push({
-          name: data[i].drilldown.categories[j],
-          y: data[i].drilldown.data[j],
-          x: data[i].drilldown.xData[j],
+          name: categories[j],
+          y: yData[j],
+          x: xData[j],
 
           /* eslint-disable */
           color: this._Highcharts
