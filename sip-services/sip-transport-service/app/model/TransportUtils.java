@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.DynamicConvertor;
+import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
+import com.synchronoss.bda.sip.jwt.token.ProductModules;
+import com.synchronoss.bda.sip.jwt.token.Products;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.threeten.extra.YearQuarter;
 
 import java.io.IOException;
@@ -13,11 +18,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 public class TransportUtils {
+  private static final Logger logger = LoggerFactory.getLogger(TransportUtils.class);
 
     public static String buildDSK (String dataSecurityKey)throws JsonProcessingException, IOException
     {
@@ -164,54 +168,37 @@ public class TransportUtils {
         return dynamicConvertor;
     }
 
-    /**
-     * extract the my analysis code from the token and if category Id belongs to my Analysis return true
-     * @param products
-     * @param categoryId
-     * @return
-     */
-    public static boolean checkIfPrivateAnalysis(List<Object> products , String categoryId)
-    {
-        String myAnalysisCode = null;
-        for (Object obj : products)
-        {
-            if (obj instanceof LinkedHashMap) {
-                List<Object> modules = ObjectTolist(((LinkedHashMap) obj).get("productModules"));
-                for (Object obj1 : modules) {
-                    if (obj1 instanceof LinkedHashMap) {
-                        List<Object> feature = ObjectTolist(((LinkedHashMap) obj1).get("prodModFeature"));
-                        for (Object obj2 : feature) {
-                            if (obj2 instanceof LinkedHashMap) {
-                                if (String.valueOf(((LinkedHashMap) obj2).
-                                        get("prodModFeatureName")).equalsIgnoreCase("My Analysis")) {
-                                    List<Object> subfeature = ObjectTolist(((LinkedHashMap) obj2).get("productModuleSubFeatures"));
-                                    for (Object obj3 : subfeature) {
-                                        if (String.valueOf(((LinkedHashMap) obj3).
-                                                get("prodModFeatureID")).equalsIgnoreCase(categoryId)) {
-                                            myAnalysisCode = String.valueOf(((LinkedHashMap) obj3).get("prodModFeatureType"));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+  /**
+   * extract the my analysis code from the token and if category Id belongs to my Analysis return
+   * true
+   *
+   * @param products
+   * @param categoryId
+   * @return
+   */
+  public static boolean checkIfPrivateAnalysis(List<Object> products, String categoryId) {
+    logger.debug("checking category is private for cateory id:{}", categoryId);
+    for (Object prod : products) {
+      Products product = (Products) prod;
+      List<ProductModules> productModules = product.getProductModules();
+      for (ProductModules prodMod : productModules) {
+        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
+        for (ProductModuleFeature prodModFeat : productModuleFeature) {
+          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
+            List<ProductModuleFeature> productModuleSubfeatures =
+                prodModFeat.getProductModuleSubFeatures();
+            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
+              String cat = String.valueOf(prodModSubFeat.getProdModFeatureID());
+              if (categoryId.equalsIgnoreCase(cat)) {
+                logger.debug("Category id {} is a private category", categoryId);
+                return true;
+              }
             }
+          }
         }
-        if (myAnalysisCode==null)
-        return false;
-        else
-            return true;
+      }
     }
-
-    @SuppressWarnings("unchecked")
-    private static List<Object> ObjectTolist(Object object)
-    {
-        if (object instanceof List)
-        {
-            return (List<Object>) object;
-        }
-        return new ArrayList<>();
-    }
-
+    logger.debug("Category id {}  is not a private category", categoryId);
+    return false;
+  }
 }

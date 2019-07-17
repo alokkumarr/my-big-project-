@@ -10,7 +10,10 @@ import {
 } from '@angular/core';
 import { DxRangeSliderComponent } from 'devextreme-angular/ui/range-slider';
 import { ObserveService } from '../../../services/observe.service';
-import { GlobalFilterService } from '../../../services/global-filter.service';
+import {
+  GlobalFilterService,
+  isValidNumberFilter as isValid
+} from '../../../services/global-filter.service';
 
 import { Subscription } from 'rxjs';
 import * as round from 'lodash/round';
@@ -172,6 +175,6 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.onModelChange.emit({ data: payload, valid: true });
+    this.onModelChange.emit({ data: payload, valid: isValid(payload) });
   }
 }
