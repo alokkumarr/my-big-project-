@@ -43,6 +43,13 @@
     dest: "/etc/bda/security.env"
   when: not sip_secure
 
+# Generate the random secret key to make key unique per SIP enviroment.
+- name: Generate sip-security jwt secret key
+  set_fact:
+    saw_security_jwt_secret: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-security-jwt-secret chars=ascii_letters,digits') }}
+
 - name: Create SAW Security variables file
   template: src=saw-security.vars dest=/etc/bda/saw-security.vars
 - name: Copy SAW Security package
