@@ -112,7 +112,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf</artifactId>
       <version>${project.version}</version>
@@ -122,8 +122,8 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <!--dependency>
+    </dependency> -->
+    <dependency>
       <groupId>com.synchronoss.saw</groupId>
       <artifactId>a2modules</artifactId>
       <version>${project.version}</version>
@@ -133,8 +133,8 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency-->
-    <dependency>
+    </dependency>
+    <!--<dependency>
       <groupId>com.synchronoss</groupId>
       <artifactId>bda-rtis</artifactId>
       <version>${project.version}</version>
@@ -155,7 +155,7 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>  
+    </dependency> --> 
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
