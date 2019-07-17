@@ -9,7 +9,7 @@
     *ngIf="isInQueryMode"
     [analysis]="analysis"
     [artifacts]="artifacts"
-    (change)="onQueryChange()"
+    (change)="onQueryChange($event)"
     (save)="onSaveQuery($event)"
   ></designer-settings-query>
   <designer-settings-multi-table

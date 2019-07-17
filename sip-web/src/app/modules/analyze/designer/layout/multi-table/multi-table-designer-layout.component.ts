@@ -40,8 +40,8 @@ export class MultiTableDesignerLayoutComponent {
     this.isGridPanelExpanded = !this.isGridPanelExpanded;
   }
 
-  onQueryChange() {
-    this.change.emit({ subject: 'changeQuery' });
+  onQueryChange(query) {
+    this.change.emit({ subject: 'changeQuery', data: { query } });
   }
 
   onSaveQuery(evt) {

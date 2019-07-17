@@ -49,7 +49,9 @@ import {
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerUpdateEditMode,
+  DesignerUpdateQuery
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -396,6 +398,30 @@ export class DesignerState {
     const analysis = getState().analysis;
     return patchState({
       analysis: { ...analysis, ...metadata }
+    });
+  }
+
+  @Action(DesignerUpdateEditMode)
+  updateDesignerEdit(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { designerEdit }: DesignerUpdateEditMode
+  ) {
+    const analysis = getState().analysis;
+    return patchState({
+      analysis: { ...analysis, designerEdit }
+    });
+  }
+
+  @Action(DesignerUpdateQuery)
+  updateQuery(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { query }: DesignerUpdateQuery
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, query } }
     });
   }
 

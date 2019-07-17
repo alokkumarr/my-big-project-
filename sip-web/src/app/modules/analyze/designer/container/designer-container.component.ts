@@ -11,6 +11,7 @@ import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
+import * as flatMap from 'lodash/flatMap';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as forOwn from 'lodash/forOwn';
@@ -34,7 +35,6 @@ import {
   AnalysisChart,
   AnalysisType,
   SqlBuilder,
-  SqlBuilderReport,
   SqlBuilderPivot,
   SqlBuilderChart,
   Artifact,
@@ -44,7 +44,6 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   DesignerSaveEvent,
-  AnalysisReport,
   isDSLAnalysis
 } from '../types';
 import {
@@ -88,7 +87,9 @@ import {
   DesignerResetState,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
-  DesignerUpdateArtifactColumn
+  DesignerUpdateArtifactColumn,
+  DesignerUpdateEditMode,
+  DesignerUpdateQuery
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
@@ -301,6 +302,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.dispatch(
             new DesignerUpdateAnalysisSubType(this.analysisStarter.chartType)
           );
+        } else if (this.analysis.type === 'report') {
+          this._store.dispatch(new DesignerUpdateEditMode(false));
         }
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
@@ -334,7 +337,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       : queryBuilder.filters;
     this.sorts = queryBuilder.sorts || queryBuilder.orderByColumns;
     this.booleanCriteria = queryBuilder.booleanCriteria;
-    this.isInQueryMode = this.analysis.edit;
+    this.isInQueryMode = this._store.selectSnapshot(
+      DesignerState
+    ).analysis.designerEdit;
 
     this.initAuxSettings();
 
@@ -435,15 +440,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
 
     case 'report':
+      const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
+
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
-          forEach((<Analysis>this.analysis).sqlBuilder.dataFields, fields => {
-            forEach(fields.columns, field => {
+            forEach(fields, field => {
               if (field.columnName === column.columnName) {
                 column.checked = true;
               }
             });
-          });
           return column;
         });
       });
@@ -453,8 +458,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (isDSLAnalysis(this.analysis)) {
         forEach(artifacts, table => {
           table.columns = map(table.columns, column => {
-            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, fields => {
-              forEach(fields.fields, field => {
+            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => {
+              forEach(artifact.fields, field => {
                 if (field.columnName === column.columnName) {
                   column.format = field.format;
                   column.aliasName = field.aliasName;
@@ -700,12 +705,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
           if (this.analysis.type === 'report' && response.designerQuery) {
-            if (this.isInQueryMode) {
-              (this.analysis as AnalysisReport).queryManual =
-                response.designerQuery;
+            if (!this.isInQueryMode) {
+              this._store.dispatch(
+                new DesignerUpdateQuery(response.designerQuery)
+              );
             }
-
-            (this.analysis as AnalysisReport).query = response.designerQuery;
           }
         }
       },
@@ -808,7 +812,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   openSaveDialogIfNeeded(): Promise<any> {
     return new Promise(resolve => {
-      if (this.isInQueryMode && !this.analysis.edit) {
+      const designerEdit = this._store.selectSnapshot(DesignerState).analysis
+        .designerEdit;
+      if (this.isInQueryMode && !designerEdit) {
         this._analyzeDialogService
           .openQueryConfirmationDialog()
           .afterClosed()
@@ -856,7 +862,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
     if (!this.isInQueryMode) {
-      delete (this.analysis as AnalysisReport).queryManual;
+      this._store.dispatch(new DesignerUpdateQuery(null));
     }
   }
 
@@ -884,7 +890,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'report':
       partialSqlBuilder = {
         dataFields: this._designerService.generateReportDataField(this.artifacts),
-        joins: ((<Analysis>this.analysis).sqlBuilder as SqlBuilderReport).joins
+        joins: ((<AnalysisDSL>this.analysis).sipQuery).joins
       };
       sortProp = 'orderByColumns';
       break;
@@ -1017,8 +1023,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
+      if (typeof event.data.query !== 'string') {
+        break;
+      }
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this._store.dispatch(new DesignerUpdateQuery(event.data.query));
       break;
     case 'submitQuery':
       this.changeToQueryModePermanently();
@@ -1054,7 +1064,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   changeToQueryModePermanently() {
-    this.analysis.edit = true;
+    this._store.dispatch(new DesignerUpdateEditMode(true));
     this.filters = [];
     this.sorts = [];
   }
@@ -1258,8 +1268,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   canRequestReport(artifacts) {
-    if (this.analysis.edit) {
-      return Boolean((<AnalysisReport>this.analysis).queryManual);
+    const analysis: AnalysisDSL = this._store.selectSnapshot(DesignerState)
+      .analysis;
+    if (analysis.designerEdit) {
+      return Boolean(analysis.sipQuery.query);
     }
 
     let atLeastOneIsChecked = false;
@@ -1278,8 +1290,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   updateAnalysis() {
-    const { edit, type, artifacts } = this.analysis;
-    if (type === 'report' && edit) {
+    const designerEdit = this._store.selectSnapshot(DesignerState).analysis
+      .designerEdit;
+    const { type, artifacts } = this.analysis;
+    if (type === 'report' && designerEdit) {
       // reset checked fields, sorts, and filters for query mode report analysis
       this.filters = [];
       this.sorts = [];
