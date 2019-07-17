@@ -279,6 +279,10 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    * @memberof ObserveViewComponent
    */
   onApplyGlobalFilter(data): void {
+    if (data === false) {
+      this.sidenav.close();
+      return;
+    }
     if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)) {
       this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
