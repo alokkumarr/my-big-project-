@@ -42,6 +42,14 @@
         [remoteOperations]="remoteOperations"
         e2e="jobs-container"
       >
+        <dxo-pager
+          [showPageSizeSelector]="true"
+          [showNavigationButtons]="true"
+          [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 50, 75, 100]"
+          [showInfo]="true"
+          [visible]="pagingEnabled"
+        >
+        </dxo-pager>
         <dxi-column
           caption="Job name"
           dataField="jobName"

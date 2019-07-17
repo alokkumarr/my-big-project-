@@ -40,13 +40,20 @@
   [showRowLines]="false"
   [showColumnLines]="false"
   [paging]="paging"
-  [pager]="pager"
   [remoteOperations]="remoteOperations"
   [height]="'calc(100% - 40px)'"
   [rowAlternationEnabled]="true"
   rowTemplate="logTableRowTemplate"
   e2e="job-logs-container"
 >
+  <dxo-pager
+    [showPageSizeSelector]="true"
+    [showNavigationButtons]="true"
+    [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 50, 75, 100]"
+    [showInfo]="true"
+    [visible]="pagingEnabled"
+  >
+  </dxo-pager>
   <dxi-column
     caption="File Pattern"
     dataField="filePattern"

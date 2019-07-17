@@ -36,6 +36,8 @@ export class JobsPageComponent implements OnInit {
   };
   public paging = { enabled: true, pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
   public remoteOperations = { paging: true };
+  public pagingEnabled = false;
+  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   public data;
 
@@ -69,6 +71,7 @@ export class JobsPageComponent implements OnInit {
           .then(({ jobDetails, totalRows }) => {
             this._store.dispatch(new SetLastJobsPath(jobsRequestPath));
             this._store.dispatch(new SetJobs(jobDetails));
+            this.pagingEnabled = totalRows > DEFAULT_PAGE_SIZE;
             return { data: jobDetails, totalCount: totalRows };
           });
       }

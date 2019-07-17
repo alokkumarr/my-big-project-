@@ -25,15 +25,11 @@ export class JobLogsPageComponent implements OnInit {
 
   @Select(state => state.workbench.jobs) jobs$: Observable<Job[]>;
 
-  public pager = {
-    showNavigationButtons: true,
-    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
-    showPageSizeSelector: true,
-    visible: true
-  };
   public paging = { enabled: true, pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
   public remoteOperations = { paging: true };
   public job: Job;
+  public pagingEnabled = false;
+  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
   public jobDetails = [
     [
       { label: 'Job Name', prop: 'jobName' },
@@ -82,6 +78,7 @@ export class JobLogsPageComponent implements OnInit {
             .toPromise()
             .then(({ bisFileLogs, totalRows }) => {
               this._store.dispatch(new SetJobLogs(bisFileLogs));
+              this.pagingEnabled = totalRows > DEFAULT_PAGE_SIZE;
               return { data: bisFileLogs, totalCount: totalRows };
             });
         }
