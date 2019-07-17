@@ -245,7 +245,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
+            ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
 
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
@@ -260,7 +260,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset);
+                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             }
 
@@ -507,6 +507,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else {
                 acceptedDataCollector = acceptedDataCollector.union(acceptedRdd);
             }
+            
+            
             logger.debug(" ********  Parser Data Records Count *******  = " + acceptedDataCollector.count() + "\n");
 
         } catch (Exception exception) {
