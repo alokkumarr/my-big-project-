@@ -300,10 +300,11 @@ public class UserRepositoryImplTest {
         rToken.setValidUpto(System.currentTimeMillis() + (20 * 60 * 1000));
 		String token =
 		Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=").compact();
         NSSOProperties nssoProperties = new NSSOProperties();
         nssoProperties.setRefreshTokenValidityMins("20");
-        nssoProperties.setSsoSecretKey("sncrsaw2");
+        nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
+        nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
         nssoProperties.setValidityMins("10");
         SSORequestHandler ssoRequestHandler = new SSORequestHandler(userRepositoryDAO,nssoProperties);
         SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.

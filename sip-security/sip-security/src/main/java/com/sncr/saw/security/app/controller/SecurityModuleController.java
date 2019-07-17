@@ -1,5 +1,6 @@
 package com.sncr.saw.security.app.controller;
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.common.bean.repo.ModulePrivileges;
 import com.sncr.saw.security.common.bean.repo.PrivilegesForModule;
@@ -31,6 +32,9 @@ public class SecurityModuleController {
     @Autowired
     ModulePrivilegeRepository modulePrivilegeRepository;
 
+    @Autowired
+    NSSOProperties nssoProperties;
+
     private final String AdminRole = "ADMIN";
 
     /**
@@ -53,7 +57,7 @@ public class SecurityModuleController {
     @Transactional
     public List<ModulePrivileges> getModulePrivilegeList(HttpServletRequest request, HttpServletResponse response)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nssoProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         logger.trace("Extracted Role type :"+ roleType);
         if (!roleType.equalsIgnoreCase(AdminRole)) {
@@ -91,7 +95,7 @@ public class SecurityModuleController {
     @Transactional
     public PrivilegesForModule getModulePrivileges(HttpServletRequest request, HttpServletResponse response, @PathVariable(name = "moduleSysId", required = true) Long moduleSysId)    {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nssoProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         logger.trace("Extracted Role type :"+ roleType);
         logger.trace("Module Sys Id :"+moduleSysId );

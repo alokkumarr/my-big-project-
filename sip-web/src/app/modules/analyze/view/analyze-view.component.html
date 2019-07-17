@@ -55,6 +55,7 @@
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
     <button
+      *ngIf="canUserCreate"
       (click)="openNewAnalysisModal()"
       mat-raised-button
       e2e="open-new-analysis-modal"
