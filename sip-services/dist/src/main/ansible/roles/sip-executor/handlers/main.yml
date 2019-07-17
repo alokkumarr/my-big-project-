@@ -2,8 +2,6 @@
 # the requested service saw-executor@*" error when working
 # with wildcards, so work around this by enumerating instances for
 # now.
-#- name: restart sip-executor
-#  systemd: name=sip-executor@* state=restarted daemon_reload=true
 - name: restart sip-executor-regular
   systemd: name=sip-executor@regular-{{ item }} state=stopped daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}

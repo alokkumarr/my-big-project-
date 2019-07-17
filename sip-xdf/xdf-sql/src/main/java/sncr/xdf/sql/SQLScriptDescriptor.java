@@ -206,7 +206,17 @@ public class SQLScriptDescriptor {
                         if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
                         String s = stmt.toString().toLowerCase();
                         int pos = -1;
-                        pos = s.indexOf("with");
+                        
+                        /**
+                         * Fix for SIP-7744.  To avoid
+                         * splitting queries which has key word 'WITH'
+                         * any where in middle. Using trim to be 
+                         * safe with leading empty spaces
+                         */
+                        if(s.trim().startsWith("with")) {
+                        	pos = s.indexOf("with");
+                        }
+                       // pos = s.indexOf("with");
                         if(pos < 0)
                             pos = s.indexOf("select");
                         if (pos < 0)

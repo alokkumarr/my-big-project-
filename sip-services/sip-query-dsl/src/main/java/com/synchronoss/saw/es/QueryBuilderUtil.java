@@ -381,8 +381,12 @@ public class QueryBuilderUtil {
       DataSecurityKey dataSecurityKeyNode, List<QueryBuilder> builder) {
     if (dataSecurityKeyNode != null) {
       for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
-          String[] col = dsk.getName().split("\\.");
-          String dskColName = col.length == 1 ? col[0] : col[1];
+        String[] col = dsk.getName().split("\\.");
+        String dskColName = col.length == 1 ? col[0] : col[1];
+        // If dsk name as <TableName.columnName>; then split for '.' and select columnName.
+        // If dsk name is <columnName>; then return columnName.
+        // If dsk name as <TableName.columnName.keyword>; then split length return 3, select
+        // columnName.
         TermsQueryBuilder termsQueryBuilder =
             new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX), dsk.getValues());
         List<?> modelValues = QueryBuilderUtil.buildStringTermsfilter(dsk.getValues());
@@ -418,9 +422,9 @@ public class QueryBuilderUtil {
         List<Field> fieldList = artifact.getFields();
         for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
           if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-              String dskColName = dataSecurityKeyDef.getName();
-              dataSecurityKeyDef.setName(artifactName + "." + dskColName);
-              dataSecurityKeyDefs.add(dataSecurityKeyDef);
+            String dskColName = dataSecurityKeyDef.getName();
+            dataSecurityKeyDef.setName(artifactName + "." + dskColName);
+            dataSecurityKeyDefs.add(dataSecurityKeyDef);
           }
         }
       }
