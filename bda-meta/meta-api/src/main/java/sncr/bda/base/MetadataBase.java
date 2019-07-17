@@ -44,10 +44,12 @@ public abstract class MetadataBase {
 
     public final static PathFilter METADATA_DIR_FILTER = file ->
             ((file.getName().startsWith(FILE_DESCRIPTOR)));
+            
+    private final static int FILE_SYSTEM_RETRY_TIMES = 10;
 
 
     public MetadataBase(String fsr) throws Exception {
-        HFileOperations.init(10);
+        HFileOperations.init(FILE_SYSTEM_RETRY_TIMES);
         setXDFDataRoot(fsr);
         this.fs = HFileOperations.fs;
     }

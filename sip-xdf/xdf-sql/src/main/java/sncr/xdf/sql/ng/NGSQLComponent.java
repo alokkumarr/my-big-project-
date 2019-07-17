@@ -94,7 +94,12 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         }
 
         Map<String, SQLDescriptor> resultDataSets = executor.getResultDataSets();
-
+        
+        /**
+         * Below logs at warn level as livy is displaying
+         * only warn level. This will be fixed as part of 
+         * SIP-7838
+         */
         logger.warn("Move descriptors " + resultDataSets);
         logger.warn("Output datasets" + ngctx.outputDataSets);
 
@@ -196,8 +201,8 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
 
             System.exit(rc);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+        	logger.error("Exception while running SQL component"+ exception.getMessage());
             System.exit(-1);
         }
     }

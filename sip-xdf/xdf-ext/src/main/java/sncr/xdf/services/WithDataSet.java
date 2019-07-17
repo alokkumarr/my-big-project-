@@ -30,6 +30,8 @@ import java.util.*;
  *
  */
 public interface WithDataSet {
+	
+	static final String SQL_COMPONENT  = "sql";
 
     /**
      * The method creates Map of Input/Output parameter name to Map of data object attributes
@@ -78,7 +80,7 @@ public interface WithDataSet {
 
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
         List<Input> input = aux.ctx.componentConfiguration.getInputs();
-        if (aux.ctx.runningPipeLine && "sql".equalsIgnoreCase(aux.ctx.pipeComponentName))
+        if (aux.ctx.runningPipeLine && SQL_COMPONENT.equalsIgnoreCase(aux.ctx.pipeComponentName))
         {
            if (input.size() > 0 )
             {

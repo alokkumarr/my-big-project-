@@ -120,8 +120,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             logger.info("ESLoader total time " + difference );
 
             System.exit(rc);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            logger.error("Exception while running ESLoader component"+ exception.getMessage());
             System.exit(-1);
         }
     }

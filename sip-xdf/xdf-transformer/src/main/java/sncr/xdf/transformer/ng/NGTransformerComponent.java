@@ -310,8 +310,8 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             logger.info("Transformer total time " + difference );
 
             System.exit(rc);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            logger.error("Exception while running transformer component"+ exception.getMessage());
             System.exit(-1);
         }
     }
