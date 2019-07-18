@@ -221,8 +221,11 @@ public class SipDslIT extends BaseIT {
             .extract()
             .response();
     Assert.assertNotNull(response);
-    ArrayNode root = response.getBody().as(ArrayNode.class);
-    Assert.assertEquals(root.get(0).get("string").asText(), testStringFilter);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    ArrayNode data = a.withArray("data");
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows > 0);
+    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
   }
 
   @Test
