@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
-import { Artifact, AnalysisReport } from '../../types';
+import { Artifact, AnalysisDSL } from '../../types';
 
 @Component({
   selector: 'designer-settings-query',
@@ -12,7 +12,7 @@ export class DesignerSettingsQueryComponent implements OnInit {
   @Output() save = new EventEmitter<any>();
   @Output() change = new EventEmitter<string>();
   @Output() submit = new EventEmitter<any>();
-  @Input() analysis: AnalysisReport;
+  @Input() analysis: AnalysisDSL;
   @Input() artifacts: Artifact[];
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
@@ -22,23 +22,16 @@ export class DesignerSettingsQueryComponent implements OnInit {
     }
   }
 
-  onQueryChange(query) {
-    this.analysis.queryManual = query;
+  onQueryChange(query: string) {
     this.change.emit(query);
   }
 
   doSubmit() {
-    const analysis = this.analysis;
-    if (analysis.queryManual) {
-      analysis.query = analysis.queryManual;
-    } else {
-      analysis.queryManual = analysis.query;
-    }
     this.save.emit();
   }
 
   submitQuery() {
-    if (!this.analysis.edit) {
+    if (!this.analysis.designerEdit) {
       this._analyzeDialogService
         .openQueryConfirmationDialog()
         .afterClosed()

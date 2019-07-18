@@ -6,7 +6,11 @@ import {
   OnDestroy
 } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
-import { AnalysisReport } from '../../../analyze/types';
+import {
+  AnalysisReport,
+  AnalysisDSL,
+  isDSLAnalysis
+} from '../../../analyze/types';
 
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
@@ -21,7 +25,7 @@ import {
 })
 export class ObserveReportComponent implements OnDestroy {
   @Input() item: GridsterItem;
-  @Input() analysis: AnalysisReport;
+  @Input() analysis: AnalysisReport | AnalysisDSL;
   @Input() updater: BehaviorSubject<any>;
 
   @Output() onRefresh = new EventEmitter();
@@ -39,6 +43,26 @@ export class ObserveReportComponent implements OnDestroy {
     this.listeners.forEach(sub => sub.unsubscribe());
   }
 
+  get analysisArtifacts() {
+    if ((<AnalysisDSL>this.analysis).designerEdit) {
+      return null;
+    }
+
+    if (isDSLAnalysis(this.analysis)) {
+      return this.analysis.sipQuery.artifacts;
+    } else {
+      return this.analysis.artifacts;
+    }
+  }
+
+  get analysisSorts() {
+    if (isDSLAnalysis(this.analysis)) {
+      return this.analysis.sipQuery.sorts;
+    } else {
+      return this.analysis.sqlBuilder.sorts;
+    }
+  }
+
   loadData(options = {}) {
     if ((this.analysis as any)._executeTile) {
       if (this.executionId) {
@@ -46,7 +70,8 @@ export class ObserveReportComponent implements OnDestroy {
           .getExecutionData(this.analysis.id, this.executionId, {
             ...options,
             executionType: 'onetime',
-            analysisType: this.analysis.type
+            analysisType: this.analysis.type,
+            isDSL: isDSLAnalysis(this.analysis)
           })
           .then(({ data, count }) => ({ data, totalCount: count }));
       } else {

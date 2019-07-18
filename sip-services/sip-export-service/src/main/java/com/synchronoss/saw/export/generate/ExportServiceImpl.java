@@ -111,8 +111,12 @@ public class ExportServiceImpl implements ExportService {
   @Autowired private ServiceUtils serviceUtils;
   @Autowired private ApplicationContext appContext;
 
+<<<<<<< HEAD
   private static final String DELIMITER = ".";
   private static final String DEFAULT_FILE_TYPE = "csv";
+=======
+  @Autowired private RestUtil restUtil;
+>>>>>>> aead67e13c793b436afc4a3722ce073797cadbe1
 
   @Override
   public DataResponse dataToBeExportedSync(
@@ -163,53 +167,63 @@ public class ExportServiceImpl implements ExportService {
     String url;
     sizOfExport =
         ((sizOfExport = request.getParameter("pageSize")) != null) ? sizOfExport : uiExportSize;
-    if (executionType != null
-        && !executionType.isEmpty()
-        && executionType.equalsIgnoreCase("onetime")
-        && executionId == null)
-      url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/data?page=1&pageSize="
-              + sizOfExport
-              + "&analysisType="
-              + analysisType
-              + "&executionType=onetime";
-    else if (executionType != null
-        && !executionType.isEmpty()
-        && executionType.equalsIgnoreCase("onetime"))
-      url =
-          apiExportOtherProperties
-              + "/"
-              + executionId
-              + "/executions/"
-              + analysisId
-              + "/data?page=1&pageSize="
-              + sizOfExport
-              + "&analysisType="
-              + analysisType
-              + "&executionType=onetime";
-    else if (executionId == null)
-      url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/data?page=1&pageSize="
-              + sizOfExport
-              + "&analysisType="
-              + analysisType;
-    else
-      url =
-          apiExportOtherProperties
-              + "/"
-              + executionId
-              + "/executions/"
-              + analysisId
-              + "/data?page=1&pageSize="
-              + sizOfExport
-              + "&analysisType="
-              + analysisType;
+    if (analysisType.equalsIgnoreCase("report")) {
+      if (executionType != null
+          && !executionType.isEmpty()
+          && executionType.equalsIgnoreCase("onetime")
+          && executionId == null)
+        url =
+            apiExportOtherProperties
+                + "/"
+                + analysisId
+                + "/executions/data?page=1&pageSize="
+                + sizOfExport
+                + "&analysisType="
+                + analysisType
+                + "&executionType=onetime";
+      else if (executionType != null
+          && !executionType.isEmpty()
+          && executionType.equalsIgnoreCase("onetime"))
+        url =
+            apiExportOtherProperties
+                + "/"
+                + executionId
+                + "/executions/"
+                + analysisId
+                + "/data?page=1&pageSize="
+                + sizOfExport
+                + "&analysisType="
+                + analysisType
+                + "&executionType=onetime";
+      else if (executionId == null)
+        url =
+            apiExportOtherProperties
+                + "/"
+                + analysisId
+                + "/executions/data?page=1&pageSize="
+                + sizOfExport
+                + "&analysisType="
+                + analysisType;
+      else
+        url =
+            apiExportOtherProperties
+                + "/"
+                + executionId
+                + "/executions/"
+                + analysisId
+                + "/data?page=1&pageSize="
+                + sizOfExport
+                + "&analysisType="
+                + analysisType;
+    } else {
+      if ((executionType != null && executionType.equalsIgnoreCase("onetime"))) {
+        url = storageProxyUrl + "/internal/proxy/storage/" + executionId + "/lastExecutions/data";
+      } else if (executionId == null) {
+        url = storageProxyUrl + "/internal/proxy/storage/" + analysisId + "/lastExecutions/data";
+      } else {
+        url = storageProxyUrl + "/internal/proxy/storage/" + analysisId + "/executions/data";
+      }
+    }
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
@@ -779,7 +793,17 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
+<<<<<<< HEAD
   public void s3DispatcherPivot(String s3, String jobGroup, ExportBean exportBean, boolean isZip) {
+=======
+  public void s3DispatcherPivot(
+      String s3,
+      AsyncRestTemplate asyncRestTemplate,
+      Object dispatchBean,
+      String jobGroup,
+      ExportBean exportBean,
+      boolean isZip) {
+>>>>>>> aead67e13c793b436afc4a3722ce073797cadbe1
     logger.info("Inside S3 dispatch Pivot");
     String finalS3 = s3;
     String finalJobGroup = jobGroup;
@@ -1119,16 +1143,14 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
+
     String url =
-        apiExportOtherProperties
-            + "/"
-            + analysisId
-            + "/executions/"
+        storageProxyUrl
+            + "/internal/proxy/storage/"
             + executionId
-            + "/data?page=1&pageSize="
-            + exportSize
-            + "&analysisType="
-            + analysisType;
+            + "/executions/data?page=1&pageSize="
+            + exportSize;
+
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.getForEntity(url, DataResponse.class);
     responseStringFuture.addCallback(
@@ -1210,18 +1232,28 @@ public class ExportServiceImpl implements ExportService {
       // This page number will make sure that we process the last bit of info
       page = i;
       // Paginated URL for limitPerPage records till the end of the file.
+      /*String url =
+      apiExportOtherProperties
+          + "/"
+          + analysisId
+          + "/executions/"
+          + executionId
+          + "/data?page="
+          + page
+          + "&pageSize="
+          + limitPerPage
+          + "&analysisType="
+          + analysisType;*/
+
       String url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/"
+          storageProxyUrl
+              + "/internal/proxy/storage/"
               + executionId
-              + "/data?page="
+              + "/executions/data?page="
               + page
               + "&pageSize="
-              + limitPerPage
-              + "&analysisType="
-              + analysisType;
+              + limitPerPage;
+
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
@@ -1247,18 +1279,26 @@ public class ExportServiceImpl implements ExportService {
     page += 1;
     if (leftOutRows > 0) {
       // Paginated URL for limitPerPage records till the end of the file.
+      /*String url =
+      apiExportOtherProperties
+          + "/"
+          + analysisId
+          + "/executions/"
+          + executionId
+          + "/data?page="
+          + page
+          + "&pageSize="
+          + leftOutRows
+          + "&analysisType="
+          + analysisType;*/
       String url =
-          apiExportOtherProperties
-              + "/"
-              + analysisId
-              + "/executions/"
+          storageProxyUrl
+              + "/internal/proxy/storage/"
               + executionId
-              + "/data?page="
+              + "/executions/data?page="
               + page
               + "&pageSize="
-              + leftOutRows
-              + "&analysisType="
-              + analysisType;
+              + leftOutRows;
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
@@ -1507,6 +1547,7 @@ public class ExportServiceImpl implements ExportService {
     }
     return fieldList;
   }
+<<<<<<< HEAD
 
   /**
    * // TODO: 7/17/2019 - This should be removed after the SIP DSL migration for es report(SIP-5897)
@@ -1566,4 +1607,6 @@ public class ExportServiceImpl implements ExportService {
       exportBean.setColumnDataType(columnDataType);
     }
   }
+=======
+>>>>>>> aead67e13c793b436afc4a3722ce073797cadbe1
 }

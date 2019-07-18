@@ -80,6 +80,20 @@ export class DesignerPreviewDialogComponent implements OnInit {
     return this._store.select(state => state.designerState.metric.metricName);
   }
 
+  get analysisSorts() {
+    return isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.sorts
+      : this.analysis.sqlBuilder.sorts;
+  }
+
+  get analysisArtifacts() {
+    return (<AnalysisDSL>this.analysis).designerEdit
+      ? null
+      : isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.artifacts
+      : this.analysis.artifacts;
+  }
+
   ngOnInit() {
     const analysis = this.data.analysis;
     /* prettier-ignore */

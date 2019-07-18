@@ -82,10 +82,20 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-{% if sip_secure %}
+    {% if sip_secure %}
+
   ssl:
     enable : true
-{% else %}
+
+  trust:
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
+  key:
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+    {% else %}
+
   ssl:
-    enable: false
-{% endif %}
+    enable : false
+
+    {% endif %}

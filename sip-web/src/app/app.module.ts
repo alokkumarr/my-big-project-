@@ -15,6 +15,7 @@ import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
 
 import {
@@ -41,6 +42,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     // NgxsModule.forRoot([], { developmentMode: !environment.production }),
     NgxsModule.forRoot([], { developmentMode: false }),
     NgxsLoggerPluginModule.forRoot({ disabled: environment.production }),
+    NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production }),
     AppRoutingModule,
     NgIdleModule.forRoot(),
     CommonModuleTs,
