@@ -148,6 +148,25 @@ public class MaprConnection {
     return null;
   }
 
+  /**
+   * Delete the object based upon custom query.
+   *
+   * @param select
+   * @param filter
+   * @return boolean
+   */
+  public Boolean deleteByMaprDBQuery(String[] select, String filter) {
+    final Query query = connection.newQuery().select(select).where(filter).build();
+    final DocumentStream stream;
+    try {
+      stream = store.find(query);
+      store.delete(stream);
+      return true;
+    } catch (Exception e) {
+      throw new RuntimeException("Exception occurred while deleting execution results!!", e);
+    }
+  }
+
   @Override
   protected void finalize() {
     store.flush();

@@ -82,6 +82,7 @@ connector : http
 metastore:
   base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
   analysis: analysisMetadata
+  executionResultTable: executionResult
   migration: analysisMigration
   metadataTable: semanticDataStore
 
