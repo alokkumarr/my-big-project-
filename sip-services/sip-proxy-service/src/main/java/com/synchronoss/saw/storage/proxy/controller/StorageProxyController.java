@@ -375,6 +375,7 @@ public class StorageProxyController {
    * @return
    */
   private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
+    logger.trace("Page :" + page + " pageSize :" + pageSize);
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
       int startIndex, endIndex;
@@ -385,7 +386,8 @@ public class StorageProxyController {
         startIndex = page != null && page > 0 ? (page - 1) : 0;
         endIndex = startIndex + pageSize;
       }
-      return startIndex > 0 && endIndex > 0 ? dataObj.subList(startIndex, endIndex) : null;
+      logger.trace("Start Index :" + startIndex + " Endindex :" + endIndex);
+      return dataObj.subList(startIndex, endIndex);
     }
     return null;
   }
