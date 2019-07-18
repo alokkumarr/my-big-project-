@@ -169,9 +169,9 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       return response;
 
     } catch (Exception e) {
-      logger.info("Exception while reading results for Dl reports: {}", e.getMessage());
+      logger.error("Exception while reading results for Dl reports: {}", e);
+      throw new RuntimeException("Exception while reading results for Dl reports" + e);
     }
-    return null;
   }
 
   private List<JsonNode> prepareDataFromStream(
