@@ -43,7 +43,7 @@ public class XlsxExporter implements IFileExporter {
 
     // Create instance here to optimize apache POI cell style
     CellStyle cellStyle = workBook.createCellStyle();
-		String[] header = null;
+    String[] header = null;
     for (int rowNum = 0; rowNum < recordRowList.size(); rowNum++) {
       XSSFRow excelRow = workSheet.createRow(rowNum + 1);
       Object data = recordRowList.get(rowNum);
@@ -72,7 +72,9 @@ public class XlsxExporter implements IFileExporter {
   private void addXlsxCell(
       String value, Cell cell, String specialType, Workbook workBook, CellStyle cellStyle) {
 
-    if (StringUtils.isEmpty(value) || value.equalsIgnoreCase("EMPTY") || value.equalsIgnoreCase("null")) {
+    if (StringUtils.isEmpty(value)
+        || value.equalsIgnoreCase("EMPTY")
+        || value.equalsIgnoreCase("null")) {
       cell.setCellValue("");
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
@@ -171,8 +173,7 @@ public class XlsxExporter implements IFileExporter {
 
         exportBean.setColumnDataType(columnDataType);
         addHeaderRow(exportBean, workBook, workSheet);
-      }
-      if (header == null || header.length <= 0) {
+      } else if (header == null || header.length <= 0) {
         header = exportBean.getColumnHeader();
         addHeaderRow(exportBean, workBook, workSheet);
       }
@@ -205,10 +206,12 @@ public class XlsxExporter implements IFileExporter {
         DataField.Type[] types = exportBean.getColumnDataType();
         XSSFCell cell = excelRow.createCell(colNum);
         if (types != null && types.length > 0) {
-          String dataType = exportBean.getColumnDataType()[colNum].value();
+          DataField.Type colType = exportBean.getColumnDataType()[colNum];
+          String dataType = colType != null ? colType.value() : null;
           addXlsxCell(value, cell, dataType, workBook, cellStyle);
         } else {
-          String dataType = exportBean.getColumnFieldDataType()[colNum].value();
+          Field.Type colType = exportBean.getColumnFieldDataType()[colNum];
+          String dataType = colType != null ? colType.value() : null;
           addXlsxCell(value, cell, dataType, workBook, cellStyle);
         }
         colNum++;
