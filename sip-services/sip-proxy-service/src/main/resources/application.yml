@@ -36,9 +36,8 @@ metastore:
     base:  hdfs:///main
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
+    timeToLive: 1800
 
-
-connector : http
 
 executor:
   streamPath: /var/sip/services/transport/executor
@@ -46,6 +45,9 @@ executor:
   preview-output-location: /var/sip/services/transport/executor/output
   publish-schedule-output-location: /var/sip/services/transport/executor
   preview-rows-limit: 10000
+
+
+connector : http
 
 metadata:
   service:
@@ -58,3 +60,16 @@ sip:
     enable: false
 
 
+{% if sip_secure %}
+  ssl:
+    enable : true
+  trust:
+    store: /Users/spau0004/Desktop/keystore/truststore.jks
+    password: sip@123
+  key:
+    store: /Users/spau0004/Desktop/keystore/keystore.jks
+     password: sip@123
+{% else %}
+  ssl:
+    enable: false
+{% endif %}

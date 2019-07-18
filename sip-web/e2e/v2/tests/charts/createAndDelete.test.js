@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const Constants = require('../../helpers/Constants');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
   let analysisId;
@@ -44,7 +45,8 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
           host,
           token,
           protractorConf.config.customerCode,
-          analysisId
+          analysisId,
+          Constants.CHART
         );
       }
       // Logout by clearing the storage
