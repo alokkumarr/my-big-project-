@@ -375,7 +375,7 @@ public class ExportServiceImpl implements ExportService {
       long LimittoExport,
       ExportBean exportBean,
       OutputStreamWriter osw) {
-    buildReportHeader(limitToExport, exportBean, entity.getBody().getData());
+    buildReportHeader(LimittoExport, exportBean, entity.getBody().getData());
     entity.getBody().getData().stream()
         .limit(LimittoExport)
         .forEach(
@@ -443,7 +443,7 @@ public class ExportServiceImpl implements ExportService {
     workBook.getSpreadsheetVersion();
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      buildReportHeader(limitToExport, exportBean, response.getData());
+      buildReportHeader(LimittoExport, exportBean, response.getData());
       response.getData().stream()
           .limit(LimittoExport)
           .forEach(

@@ -376,7 +376,7 @@ public class StorageProxyController {
   }
 
   /**
-   * Build execution result.
+   * Build execution result bean.
    *
    * @param executionId
    * @param analysis

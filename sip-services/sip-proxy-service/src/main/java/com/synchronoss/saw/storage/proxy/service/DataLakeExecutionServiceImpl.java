@@ -45,7 +45,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   private String pubSchOutputLocation;
 
   @Value("${executor.preview-rows-limit}")
-  private Long dlPreviewRowLimit;
+  private Integer dlPreviewRowLimit;
 
   /**
    * This Method is used to execute data lake report.
@@ -175,11 +175,11 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private List<JsonNode> prepareDataFromStream(
-      Stream<String> dataStream, Long limit, Integer pageNo, Integer pageSize) {
+      Stream<String> dataStream, Integer limit, Integer pageNo, Integer pageSize) {
     List<JsonNode> data = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper();
     if (pageNo == null || pageSize == null) {
-      limit = limit != null ? limit : 1000L;
+      limit = limit != null ? limit : 1000;
       dataStream
           .limit(limit)
           .forEach(
