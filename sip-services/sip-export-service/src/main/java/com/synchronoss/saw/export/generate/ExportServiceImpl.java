@@ -111,12 +111,9 @@ public class ExportServiceImpl implements ExportService {
   @Autowired private ServiceUtils serviceUtils;
   @Autowired private ApplicationContext appContext;
 
-<<<<<<< HEAD
   private static final String DELIMITER = ".";
   private static final String DEFAULT_FILE_TYPE = "csv";
-=======
   @Autowired private RestUtil restUtil;
->>>>>>> aead67e13c793b436afc4a3722ce073797cadbe1
 
   @Override
   public DataResponse dataToBeExportedSync(
