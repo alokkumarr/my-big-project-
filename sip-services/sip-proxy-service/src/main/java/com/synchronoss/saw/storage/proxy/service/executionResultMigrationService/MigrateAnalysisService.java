@@ -78,6 +78,8 @@ public class MigrateAnalysisService {
 
   MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
 
+  String analysisType = null;
+
   /** Call this method to start the migration event based */
   public void startExecutionResult() {
     if (migrationFlag) {
@@ -143,8 +145,10 @@ public class MigrateAnalysisService {
               && content.get("type") != null
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
+            analysisType = type;
           } else if (content.has("outputLocation")) {
             type = "report";
+            analysisType = type;
           }
 
           migrationStatusObject.setAnalysisId(analysisId);
@@ -333,6 +337,7 @@ public class MigrateAnalysisService {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
       Analysis analysis = new Analysis();
+      analysis.setType(analysisType);
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
