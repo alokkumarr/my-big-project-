@@ -86,7 +86,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, null, null, ExecutionType.preview);
+    return getDataLakeExecutionData(executionId, null, null, executionType);
   }
 
   private void waitForResult(String resultId, Integer retries) {

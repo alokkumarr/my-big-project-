@@ -245,7 +245,8 @@ public class DLSparkQueryBuilder {
    */
   private String queryDskBuilder(DataSecurityKey dataSecurityKeyObj, SipQuery sipQuery) {
     String dskFilter = "";
-    if (dataSecurityKeyObj != null) {
+    if (dataSecurityKeyObj.getDataSecuritykey() != null
+        && dataSecurityKeyObj.getDataSecuritykey().size()!=0) {
       if (buildFilter(sipQuery.getFilters()).trim().isEmpty()) {
         dskFilter = " WHERE ";
       } else {

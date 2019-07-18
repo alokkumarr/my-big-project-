@@ -463,7 +463,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Analysis analysis, Integer size, DataSecurityKey dataSecurityKey, ExecutionType executionType)
       throws Exception {
     String analysisType = analysis.getType();
-    Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
+    Boolean designerEdit = analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
     SipQuery sipQuery = analysis.getSipQuery();
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;

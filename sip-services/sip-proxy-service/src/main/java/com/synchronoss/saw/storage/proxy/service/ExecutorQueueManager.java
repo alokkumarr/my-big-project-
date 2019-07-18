@@ -32,6 +32,7 @@ public class ExecutorQueueManager {
         || this.executionType == ExecutionType.preview) {
       executorQueue = "fast";
     } else if (this.executionType == ExecutionType.scheduled
+        || this.executionType == ExecutionType.publish
         || this.executionType == ExecutionType.regularExecution) {
       executorQueue = "regular";
     }
