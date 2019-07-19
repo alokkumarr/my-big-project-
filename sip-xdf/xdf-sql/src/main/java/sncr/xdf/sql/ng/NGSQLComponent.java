@@ -1,6 +1,7 @@
 package sncr.xdf.sql.ng;
 
 import org.apache.log4j.LogManager;
+import org.apache.spark.sql.Dataset;
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
@@ -43,6 +45,12 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
     public NGSQLComponent() {  super(); }
 
+	@Override
+	protected int execute(Dataset df) {
+		return ErrorCodes.IncorrectCall.ordinal();
+	}
+	
+    @Override
     protected int execute(){
         /* Workaround: If executed through Apache Livy the logging
          * level will be WARN by default and at the moment no way to

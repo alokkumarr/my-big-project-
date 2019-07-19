@@ -14,6 +14,7 @@ import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
@@ -61,6 +62,11 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         return sqlScript;
     }
 
+	@Override
+	protected int execute(Dataset df) {
+		return ErrorCodes.IncorrectCall.ordinal();
+	}
+    
     @Override
     protected int execute(){
 

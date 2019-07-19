@@ -7,6 +7,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.conf.ComponentConfiguration;
@@ -643,6 +644,9 @@ public abstract class AbstractComponent implements WithContext{
     //dev
     protected abstract int execute();
 
+    //overridden method to support dataset as a input
+    // This has been added as a part of SIP-7758
+    protected abstract int execute(Dataset df);
 
     protected int move(){
         int ret = 0;
