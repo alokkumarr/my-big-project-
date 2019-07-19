@@ -31,4 +31,9 @@ public interface StorageProxyService {
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
 
   Boolean saveTTLExecutionResult(ExecutionResult executionResult);
+
+  ExecutionResponse fetchDataLakeExecutionData(
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
+
+
 }

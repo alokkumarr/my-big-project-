@@ -64,7 +64,9 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       Boolean designerEdit,
-      String executionId)
+      String executionId,
+      Integer page,
+      Integer pageSize)
       throws Exception {
     List<Object> result = null;
 
@@ -86,7 +88,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, null, null, executionType);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType);
   }
 
   private void waitForResult(String resultId, Integer retries) {
@@ -145,11 +147,10 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           || executionType == (ExecutionType.preview)
           || executionType == (ExecutionType.regularExecution)) {
         outputLocation = previewOutputLocation + File.separator + "preview-" + executionId;
-        logger.info("output location for Dl report:{}", outputLocation);
       } else {
         outputLocation = pubSchOutputLocation + File.separator + "output-" + executionId;
       }
-      logger.info("output location for dfDl report:{}", outputLocation);
+      logger.debug("output location for dfDl report:{}", outputLocation);
       FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
       for (FileStatus fs : files) {
         if (fs.getPath().getName().endsWith(".json")) {
@@ -193,7 +194,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               });
       return data;
     } else {
-      int startIndex = pageNo * pageSize;
+      int startIndex = (pageNo-1) * pageSize;
       dataStream
           .skip(startIndex)
           .limit(pageSize)
@@ -212,7 +213,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private Long getRecordCount(String outputLocation) throws Exception {
-      logger.info("Egetting record count reading results for Dl reports: {}");
+      logger.info("Getting record count reading results for Dl reports: {}");
     ObjectMapper mapper = new ObjectMapper();
     InputStream inputStream = null;
     Long count = null;

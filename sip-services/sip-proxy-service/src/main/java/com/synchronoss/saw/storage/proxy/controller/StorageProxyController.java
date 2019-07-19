@@ -447,8 +447,13 @@ public class StorageProxyController {
       @RequestParam(name = "page", required = false) Integer page,
       @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @RequestParam(name = "executionType", required = false) ExecutionType executionType,
+      @RequestParam(name = "analysisType", required = false) String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
+    if (analysisType != null && analysisType.equals("report")) {
+      return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
+    }
+
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       return proxyService.fetchExecutionsData(executionId, executionType, page, pageSize);
@@ -461,7 +466,7 @@ public class StorageProxyController {
   /**
    * API to fetch the execution Data.
    *
-   * @param executionId
+   * @param analysisId
    * @return ExecutionResponse
    */
   @RequestMapping(
@@ -474,10 +479,11 @@ public class StorageProxyController {
       @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @RequestParam(name = "executionType", required = false) ExecutionType executionType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
-          String executionId) {
+          String analysisId) {
+
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(executionId, executionType, page, pageSize);
+      return proxyService.fetchLastExecutionsData(analysisId, executionType, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

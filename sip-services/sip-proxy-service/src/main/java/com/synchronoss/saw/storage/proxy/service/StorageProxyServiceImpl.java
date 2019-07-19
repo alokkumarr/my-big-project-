@@ -70,6 +70,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Value("${metastore.time-to-live}")
   private long timeToLive;
 
+  @Value("${executor.preview-rows-limit}")
+  private Integer previewRowLimit;
+
+  @Value("${executor.publish-rows-limit}")
+  private Integer publishRowLimit;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
@@ -468,7 +474,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecuteAnalysisResponse response;
       response =
           dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId);
+              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,null,null);
       result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
@@ -503,8 +509,24 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       response =
           dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId);
+              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,page,pageSize);
     } else {
+      if (size == null) {
+        switch (executionType) {
+          case onetime:
+            size = previewRowLimit;
+            break;
+          case regularExecution:
+            size = publishRowLimit;
+            break;
+          case preview:
+            size = previewRowLimit;
+            break;
+          case publish:
+            size = publishRowLimit;
+            break;
+        }
+      }
       response = new ExecuteAnalysisResponse();
       List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
       response.setExecutionId(executionId);
@@ -657,7 +679,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         "executedBy",
         "executionType",
         "data",
-        "sipQuery"
+        "analysis"
       };
 
       ObjectMapper objectMapper = new ObjectMapper();
@@ -684,6 +706,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     return executionResponse;
   }
+
 
   public int getSize() {
     return size;
@@ -775,5 +798,33 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       return dataObj.subList(startIndex, endIndex);
     }
     return null;
+  }
+
+  @Override
+  public ExecutionResponse fetchDataLakeExecutionData(
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
+    ExecutionResponse executionResponse;
+
+    logger.info("Fetch Execution Data for Data Lake report");
+    ExecuteAnalysisResponse excuteResp;
+    if ((executionType == ExecutionType.onetime
+        || executionType == ExecutionType.preview
+        || executionType == ExecutionType.regularExecution)) {
+      executionResponse = new ExecutionResponse();
+      excuteResp =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              executionId, pageNo, pageSize, executionType);
+    } else {
+      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
+      /*here for schedule and publish we are reading data from the same location in DL, so directly
+      I am sending publish  as Ui is sending information for only oneTimeExecution,we can send
+      schedule as well as */
+      excuteResp =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              executionId, pageNo, pageSize, ExecutionType.publish);
+    }
+    executionResponse.setData(excuteResp.getData());
+    executionResponse.setTotalRows(excuteResp.getTotalRows());
+    return executionResponse;
   }
 }
