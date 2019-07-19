@@ -67,19 +67,7 @@ public class MaprConnection {
     }
     return resultSet;
   }
-
-  public Boolean deleteByMaprDBQuery(String[] select, String filter) {
-    final Query query = connection.newQuery().select(select).where(filter).build();
-    final DocumentStream stream;
-    try {
-      stream = store.find(query);
-      store.delete(stream);
-      return true;
-    } catch (Exception e) {
-      throw new RuntimeException("Exception occurred while deleting execution results!!", e);
-    }
-  }
-
+  
   /**
    * Fetch paginated data from MapR db.
    *
@@ -158,6 +146,25 @@ public class MaprConnection {
       LOGGER.error("Error while building execution data query : {}", ex);
     }
     return null;
+  }
+
+  /**
+   * Delete the object based upon custom query.
+   *
+   * @param select
+   * @param filter
+   * @return boolean
+   */
+  public Boolean deleteByMaprDBQuery(String[] select, String filter) {
+    final Query query = connection.newQuery().select(select).where(filter).build();
+    final DocumentStream stream;
+    try {
+      stream = store.find(query);
+      store.delete(stream);
+      return true;
+    } catch (Exception e) {
+      throw new RuntimeException("Exception occurred while deleting execution results!!", e);
+    }
   }
 
   @Override

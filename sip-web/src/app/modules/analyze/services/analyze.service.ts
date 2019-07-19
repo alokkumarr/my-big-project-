@@ -545,11 +545,16 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
 
+    /* Use pagination options only when executing reports */
+    const paginationParams = ['report', 'esReport'].includes(model.type)
+      ? `&page=${page}&pageSize=${options.take}`
+      : '';
+
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&executionType=${mode}&page=${page}&pageSize=${options.take}`,
+        }&executionType=${mode}${paginationParams}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
