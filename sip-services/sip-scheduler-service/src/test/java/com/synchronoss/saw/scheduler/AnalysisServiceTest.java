@@ -54,6 +54,6 @@ public class AnalysisServiceTest {
     server.expect(requestTo(analysisUrl + "/123/executions"));
     // .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
     /* Execute analysis */
-    service.executeAnalysis(ANALYSIS_ID);
+    service.executeDslAnalysis(ANALYSIS_ID);
   }
 }

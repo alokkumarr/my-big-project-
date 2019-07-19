@@ -22,12 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
 
@@ -57,15 +51,6 @@ public class AnalysisServiceImpl implements AnalysisService {
   @PostConstruct
   public void init() throws Exception {
     restTemplate = restUtil.restTemplate();
-  }
-
-  public void executeAnalysis(String analysisId) {
-    AnalysisExecution execution = ImmutableAnalysisExecution.builder().type("scheduled").build();
-    String url = analysisUrl + "/{analysisId}/executions";
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<AnalysisExecution> entity = new HttpEntity<>(execution, headers);
-    restTemplate.postForObject(url, entity, String.class, analysisId);
   }
 
   public void scheduleDispatch(SchedulerJobDetail analysis) {
