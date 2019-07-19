@@ -124,6 +124,10 @@ export class CreateDashboardComponent
   }
 
   onApplyGlobalFilter(data): void {
+    if (data === false) {
+      this.widgetSidenav.close();
+      return;
+    }
     if (
       this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)
     ) {

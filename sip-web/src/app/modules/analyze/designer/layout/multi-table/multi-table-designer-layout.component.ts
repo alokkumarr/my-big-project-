@@ -8,6 +8,7 @@ import {
   Analysis,
   Filter
 } from '../../types';
+import { QueryDSL } from 'src/app/models';
 import { DesignerStates } from '../../consts';
 
 @Component({
@@ -22,7 +23,7 @@ export class MultiTableDesignerLayoutComponent {
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
   @Input() isInQueryMode: boolean;
-  @Input() sqlBuilder: SqlBuilder;
+  @Input() sqlBuilder: QueryDSL | SqlBuilder;
   @Input() designerState: DesignerStates;
   @Input() dataCount: number;
   @Input('data')

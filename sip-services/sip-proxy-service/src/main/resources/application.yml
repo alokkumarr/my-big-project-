@@ -36,16 +36,9 @@ metastore:
     base:  hdfs:///main
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
-
-{% if sip_secure %}
-
-connector : https
-
-{% else %}
+    timeToLive: 1800
 
 connector : http
-
-{% endif %}
 
 metadata:
   service:
@@ -57,6 +50,12 @@ sip:
 {% if sip_secure %}
   ssl:
     enable : true
+  trust:
+    store: /Users/spau0004/Desktop/keystore/truststore.jks
+    password: sip@123
+  key:
+    store: /Users/spau0004/Desktop/keystore/keystore.jks
+     password: sip@123
 {% else %}
   ssl:
     enable: false
