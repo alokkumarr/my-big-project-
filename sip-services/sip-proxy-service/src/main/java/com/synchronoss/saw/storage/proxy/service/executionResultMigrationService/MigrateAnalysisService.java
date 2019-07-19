@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.service.HBaseUtils;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
@@ -26,6 +27,8 @@ import com.synchronoss.sip.utils.RestUtil;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.ojai.Document;
@@ -64,7 +67,7 @@ public class MigrateAnalysisService {
 
   @Autowired private RestUtil restUtil;
 
-  @Autowired private HBaseUtil hBaseUtil;
+  @Autowired private HBaseUtils hBaseUtil;
 
   @Autowired private StorageProxyService proxyService;
 
@@ -429,5 +432,33 @@ public class MigrateAnalysisService {
       LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
     }
     return executionIds;
+  }
+
+  public String getAllExecutions(String analysisId) {
+      HBaseUtils utils = new HBaseUtils();
+      JsonElement executionIds = null;
+      try{
+          Connection connection = utils.getConnection();
+          String tablePath = basePath + binaryTablePath;
+          LOGGER.info("Binary store table path : " + tablePath);
+          Table table = utils.getTable(connection, tablePath);
+
+          // Instantiating the Scan class
+          Scan scan = new Scan();
+          scan.addColumn(Bytes.toBytes("_search"), Bytes.toBytes("id"));
+          scan.setMaxResultSize(5);
+          ResultScanner results = table.getScanner(scan);
+
+      for (Result result = results.next(); result != null; result = results.next()) {
+        byte[] contentBinary = result.getValue("_search".getBytes(), "id".getBytes());
+        JsonParser parser = new JsonParser();
+         executionIds =  parser.parse(String.valueOf(contentBinary));
+          LOGGER.info("Content binary store data....!!" + executionIds);
+      }
+
+      } catch (Exception e) {
+          LOGGER.error(e.getMessage());
+      }
+      return executionIds.getAsString();
   }
 }
