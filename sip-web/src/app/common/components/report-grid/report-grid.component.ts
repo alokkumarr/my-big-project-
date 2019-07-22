@@ -234,8 +234,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     this.pager = {
       showNavigationButtons: true,
       allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
-      showPageSizeSelector: true,
-      visible: !this.isEditable
+      showPageSizeSelector: true
     };
 
     // disable editing if needed
