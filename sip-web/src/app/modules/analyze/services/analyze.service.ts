@@ -233,15 +233,19 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     let url = '';
+    const page = floor(options.skip / options.take) + 1;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }`;
     if (options.isDSL) {
-      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
-      url = `${path}`;
+      url = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
-      const page = floor(options.skip / options.take) + 1;
       const path = `analysis/${analysisId}/executions/data`;
-      const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-        options.analysisType
-      }`;
       url = `${path}?${queryParams}`;
     }
 

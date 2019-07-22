@@ -300,7 +300,7 @@ public class WorkbenchIT extends BaseIT {
     String id = "workbench::" + name;
     waitForDataset(id, WAIT_RETRIES);
   }
-
+  
   @Test
   public void testSqlDataset() throws IOException {
     String name = "test-sql-" + testId();
