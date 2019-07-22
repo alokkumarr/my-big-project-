@@ -343,7 +343,7 @@ public class StorageProxyController {
                 responseObjectFuture,
                 startTime,
                 uuidId);
-        proxyService.saveTTLExecutionResult(executionResult);
+        proxyService.saveTtlExecutionResult(executionResult);
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
