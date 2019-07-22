@@ -558,12 +558,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
+      Long totalCount = getTotalRows(doc, null);
+      executionResponse.setTotalRows(totalCount);
 
       // paginated execution data
       Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
+          maprConnection.fetchPagingData(
+              "data", executionResult.getExecutionId(), page, pageSize, totalCount.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(doc, null));
+
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -603,12 +606,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       ExecutionResult executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+      Long totalRows = getTotalRows(null, elements.get(0));
+      executionResponse.setTotalRows(totalRows);
 
       // paginated execution data
       Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
+          maprConnection.fetchPagingData(
+              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
