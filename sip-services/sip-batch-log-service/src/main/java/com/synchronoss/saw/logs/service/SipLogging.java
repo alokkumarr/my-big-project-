@@ -416,7 +416,7 @@ public class SipLogging {
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public void updateLongRunningJobs(Integer minutesToCheck) {
     int longCount = bisFileLogsRepository.countOfLongRunningJobs(minutesToCheck);
-    logger.info("Long running process count: " + longCount);
+    logger.trace("Long running process count: " + longCount);
     if (longCount > 0) {
       logger.info("Updating long running transfers to failed");
       bisFileLogsRepository.updateBisJob("FAILED", minutesToCheck);
@@ -444,27 +444,38 @@ public class SipLogging {
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "starts here");
     Page<BisFileLog> statuslog = statusExistsForProcess(channelId, routeId, processStatus);
+    
+    
     BisFileLog fileLog = null;
-    if (statuslog != null
-        && (statuslog.getContent() != null && statuslog.getContent().size() > 0)) {
+    
+    /**
+     * If there is one host not reachable entry exists for the channel id and
+     * route id then it should be marked as obsolete before making a fresh entry
+     * for host not reachable.
+     */
+    if (statuslog != null && (statuslog.getContent() != null
+        && statuslog.getContent().size() > 0)) {
       // It will have latest one by modifiedDate
       fileLog = statuslog.getContent().get(0);
-      updateStatusFailed(
-          BisProcessState.FAILED.value(),
-          BisComponentState.HOST_NOT_REACHABLE.value(),
+      updateStatusFailed(BisProcessState.FAILED.value(),
+          BisComponentState.HOST_NOT_REACHABLE_OBSOLETE.value(),
           fileLog.getPid());
-    } else {
-      BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-      bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-      bisDataMetaInfo.setChannelId(channelId);
-      bisDataMetaInfo.setRouteId(routeId);
-      bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
-      bisDataMetaInfo.setComponentState(processStatus);
-      bisDataMetaInfo.setProcessState(fileStatus);
-      bisDataMetaInfo.setSource(source);
-      bisDataMetaInfo.setJobId(jobId);
-      upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     }
+
+    /**
+     * Insert new host not reachable record for the job.
+     */
+    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+    bisDataMetaInfo.setProcessId(
+        new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    bisDataMetaInfo.setChannelType(BisChannelType.SFTP);
+    bisDataMetaInfo.setComponentState(processStatus);
+    bisDataMetaInfo.setProcessState(fileStatus);
+    bisDataMetaInfo.setSource(source);
+    bisDataMetaInfo.setJobId(jobId);
+    upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
     logger.trace(
         "upSertLogForExistingProcessStatus :" + channelId + " routeId " + routeId + "ends here");
   }
