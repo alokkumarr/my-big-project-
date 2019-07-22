@@ -7,11 +7,8 @@ import com.synchronoss.saw.export.AmazonS3Handler;
 import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
-import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
-import com.synchronoss.saw.export.model.AnalysisMetaData;
-import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.model.DataResponse;
 import com.synchronoss.saw.export.model.S3.S3Customer;
 import com.synchronoss.saw.export.model.S3.S3Details;
@@ -32,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -43,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
-import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -71,8 +66,8 @@ public class ExportServiceImpl implements ExportService {
 
   private static final Logger logger = LoggerFactory.getLogger(ExportServiceImpl.class);
 
-  @Value("${analysis.service.host}")
-  private String apiExportOtherProperties;
+  //  @Value("${analysis.service.host}")
+  //  private String apiExportOtherProperties;
 
   @Value("${analysis.uiExportSize}")
   private String uiExportSize;
@@ -116,32 +111,6 @@ public class ExportServiceImpl implements ExportService {
 
   @Autowired private RestUtil restUtil;
 
-  @Override
-  public DataResponse dataToBeExportedSync(
-      String executionId, HttpServletRequest request, String analysisId)
-      throws JSONValidationSAWException {
-    HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
-    RestTemplate restTemplate = restUtil.restTemplate();
-    // During report extraction time, this parameter will not be passed.
-    // Hence we should use uiExportSize configuration parameter.
-    String sizOfExport;
-    sizOfExport =
-        ((sizOfExport = request.getParameter("pageSize")) != null) ? sizOfExport : uiExportSize;
-    String url =
-        apiExportOtherProperties
-            + "/"
-            + executionId
-            + "/executions/"
-            + analysisId
-            + "/data?page=1&pageSize="
-            + sizOfExport
-            + "&analysisType=report";
-    logger.debug("Transport Service URL: {}", url);
-    ResponseEntity<DataResponse> transportResponse =
-        restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
-    return transportResponse.getBody();
-  }
-
   private HttpHeaders setRequestHeader(HttpServletRequest request) {
     HttpHeaders requestHeaders = new HttpHeaders();
     requestHeaders.set("Host", request.getHeader("Host"));
@@ -165,77 +134,27 @@ public class ExportServiceImpl implements ExportService {
     String url;
     sizOfExport =
         ((sizOfExport = request.getParameter("pageSize")) != null) ? sizOfExport : uiExportSize;
-    if (analysisType.equalsIgnoreCase("report")) {
-      if (executionType != null
-          && !executionType.isEmpty()
-          && executionType.equalsIgnoreCase("onetime")
-          && executionId == null)
-        url =
-            apiExportOtherProperties
-                + "/"
-                + analysisId
-                + "/executions/data?page=1&pageSize="
-                + sizOfExport
-                + "&analysisType="
-                + analysisType
-                + "&executionType=onetime";
-      else if (executionType != null
-          && !executionType.isEmpty()
-          && executionType.equalsIgnoreCase("onetime"))
-        url =
-            apiExportOtherProperties
-                + "/"
-                + executionId
-                + "/executions/"
-                + analysisId
-                + "/data?page=1&pageSize="
-                + sizOfExport
-                + "&analysisType="
-                + analysisType
-                + "&executionType=onetime";
-      else if (executionId == null)
-        url =
-            apiExportOtherProperties
-                + "/"
-                + analysisId
-                + "/executions/data?page=1&pageSize="
-                + sizOfExport
-                + "&analysisType="
-                + analysisType;
-      else
-        url =
-            apiExportOtherProperties
-                + "/"
-                + executionId
-                + "/executions/"
-                + analysisId
-                + "/data?page=1&pageSize="
-                + sizOfExport
-                + "&analysisType="
-                + analysisType;
+    if ((executionType != null && executionType.equalsIgnoreCase("onetime"))) {
+      url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + executionId
+              + "/lastExecutions/data?page=1&pageSize="
+              + sizOfExport;
+    } else if (executionId == null) {
+      url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + analysisId
+              + "/lastExecutions/data?page=1&pageSize="
+              + sizOfExport;
     } else {
-      if ((executionType != null && executionType.equalsIgnoreCase("onetime"))) {
-        url =
-            storageProxyUrl
-                + "/internal/proxy/storage/"
-                + executionId
-                + "/lastExecutions/data?page=1&pageSize="
-                + sizOfExport;
-      } else if (executionId == null) {
-        url =
-            storageProxyUrl
-                + "/internal/proxy/storage/"
-                + analysisId
-                + "/lastExecutions/data?page=1&pageSize="
-                + sizOfExport;
-      } else {
-        url =
-            storageProxyUrl
-                + "/internal/proxy/storage/"
-                + analysisId
-                + "/executions/data?page=1&pageSize="
-                + sizOfExport;
-      }
+      url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + analysisId
+              + "/executions/data?page=1&pageSize="
+              + sizOfExport;
     }
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
@@ -375,7 +294,6 @@ public class ExportServiceImpl implements ExportService {
       long LimittoExport,
       ExportBean exportBean,
       OutputStreamWriter osw) {
-    buildReportHeader(LimittoExport, exportBean, entity.getBody().getData());
     entity.getBody().getData().stream()
         .limit(LimittoExport)
         .forEach(
@@ -383,9 +301,8 @@ public class ExportServiceImpl implements ExportService {
               try {
                 if (line instanceof LinkedHashMap) {
                   String[] header = null;
-                  if ((exportBean.getColumnHeader() == null
-                          || exportBean.getColumnHeader().length == 0)
-                      || exportBean.getColumnDataType() != null) {
+                  if (exportBean.getColumnHeader() == null
+                          || exportBean.getColumnHeader().length == 0) {
                     Object[] obj = ((LinkedHashMap) line).keySet().toArray();
                     if (exportBean.getColumnDataType() != null
                         && exportBean.getColumnDataType().length > 0) {
@@ -405,7 +322,6 @@ public class ExportServiceImpl implements ExportService {
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: " + header);
-                    exportBean.setColumnDataType(null);
                   } else {
                     // ideally we shouldn't be using collectors but it's a single row so it
                     // won't hamper memory consumption
@@ -443,7 +359,6 @@ public class ExportServiceImpl implements ExportService {
     workBook.getSpreadsheetVersion();
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      buildReportHeader(LimittoExport, exportBean, response.getData());
       response.getData().stream()
           .limit(LimittoExport)
           .forEach(
@@ -821,16 +736,6 @@ public class ExportServiceImpl implements ExportService {
       s3DispatchExecutor(finalS3, finalJobGroup, cfile, exportBean);
       logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
     }
-  }
-
-  @Override
-  public AnalysisMetaData getAnalysisMetadata(String analysisId) {
-
-    RestTemplate restTemplate = restUtil.restTemplate();
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    String url = apiExportOtherProperties + "/md?analysisId=" + analysisId;
-    return restTemplate.getForObject(url, AnalysisMetaData.class);
   }
 
   @Override
@@ -1532,64 +1437,5 @@ public class ExportServiceImpl implements ExportService {
       }
     }
     return fieldList;
-  }
-
-  /**
-   * // TODO: 7/17/2019 - This should be removed after the SIP DSL migration for es report(SIP-5897)
-   * taken cared es-report response is not having consistent structure in case of Columns are
-   * missing in Elastic-search documents. In the SIP-DSL implementation this issue has been fixed ,
-   * but not fixed with old query.
-   *
-   * @param limitToExport
-   * @param exportBean
-   * @param dataList
-   */
-  private void buildReportHeader(long limitToExport, ExportBean exportBean, List<Object> dataList) {
-    DataField.Type[] columnDataType = null;
-    String[] recordRow = null;
-    int limitCount = 0;
-    if (limitCount < limitToExport) {
-      for (Object dataObject : dataList) {
-        Object data = dataObject;
-        Object[] obj = ((LinkedHashMap) data).keySet().toArray();
-        boolean haveValidRows = recordRow == null || recordRow.length < obj.length;
-        if (haveValidRows) {
-          recordRow = Arrays.copyOf(obj, obj.length, String[].class);
-          columnDataType = new DataField.Type[recordRow.length];
-        }
-
-        if (data instanceof LinkedHashMap && haveValidRows) {
-          int i = 0;
-          for (String val : recordRow) {
-            if (i < recordRow.length) {
-              Object obj1 = ((LinkedHashMap) data).get(val);
-              if (obj1 instanceof Date) {
-                columnDataType[i] = DataField.Type.DATE;
-              } else if (obj1 instanceof Float) {
-                columnDataType[i] = DataField.Type.FLOAT;
-              } else if (obj1 instanceof Double) {
-                columnDataType[i] = DataField.Type.DOUBLE;
-              } else if (obj1 instanceof Integer) {
-                columnDataType[i] = DataField.Type.INT;
-              } else if (obj1 instanceof Long) {
-                columnDataType[i] = DataField.Type.LONG;
-              } else if (obj1 instanceof String) {
-                columnDataType[i] = DataField.Type.STRING;
-              } else if (obj1 instanceof TimeStamp) {
-                columnDataType[i] = DataField.Type.TIMESTAMP;
-              }
-              i++;
-            }
-          }
-        }
-        limitCount++;
-      }
-    }
-    if (recordRow != null && recordRow.length > 0) {
-      exportBean.setColumnHeader(recordRow);
-    }
-    if (columnDataType != null && columnDataType.length > 0) {
-      exportBean.setColumnDataType(columnDataType);
-    }
   }
 }
