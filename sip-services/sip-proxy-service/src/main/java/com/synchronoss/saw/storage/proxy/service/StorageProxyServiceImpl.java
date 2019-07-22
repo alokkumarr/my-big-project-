@@ -1,15 +1,21 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SIPDSL;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
+import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
+import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
@@ -27,25 +33,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sncr.bda.base.MaprConnection;
 
 @Service
 public class StorageProxyServiceImpl implements StorageProxyService {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyServiceImpl.class);
+  private final String executionResultTable = "executionResult";
 
   @Value("${schema.file}")
   private String schemaFile;
 
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
-
   @Autowired private StorageConnectorService storageConnectorService;
 
   // @Autowired
@@ -411,10 +424,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SIPDSL sipdsl, Integer size) throws Exception {
+  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-    List<Field> dataFields = sipdsl.getSipQuery().getArtifacts().get(0).getFields();
-    boolean isPercentage =
+    List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
+      if (dataSecurityKey == null) {
+          logger.info("DataSecurity key is not set !!");
+      } else {
+          logger.info("DataSecurityKey : " + dataSecurityKey.toString());
+      }
+      boolean isPercentage =
         dataFields.stream()
             .anyMatch(
                 dataField ->
@@ -425,18 +443,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
         SearchSourceBuilder searchSourceBuilder =
-            elasticSearchQueryBuilder.percentagePriorQuery(sipdsl.getSipQuery());
+            elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
       JsonNode percentageData =
           storageConnectorService.ExecuteESQuery(
-              searchSourceBuilder.toString(), sipdsl.getSipQuery().getStore());
+              searchSourceBuilder.toString(), sipQuery.getStore());
       elasticSearchQueryBuilder.setPriorPercentages(
-          sipdsl.getSipQuery().getArtifacts().get(0).getFields(), percentageData);
+          sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
     String query;
-    query = elasticSearchQueryBuilder.buildDataQuery(sipdsl, size);
+    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
+    logger.trace("ES -Query {} "+query);
     List<Object> result = null;
-    JsonNode response =
-        storageConnectorService.ExecuteESQuery(query, sipdsl.getSipQuery().getStore());
+    JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
     if (response.get("aggregations") != null)
@@ -444,6 +462,100 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     else result = QueryBuilderUtil.buildReportData(response, dataFields);
     return result;
   }
+
+  /**
+   * This Method is used to save the ExecutionResult.
+   *
+   * @param executionResult Execution Result.
+   * @return boolean
+   */
+  @Override
+  public Boolean saveDslExecutionResult(ExecutionResult executionResult) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      ExecutionResultStore executionResultStore =
+          new ExecutionResultStore(executionResultTable, basePath);
+      executionResultStore.create(executionResult.getExecutionId(), objectMapper.writeValueAsString(executionResult));
+      return true;
+    } catch (Exception e) {
+
+      logger.error("Error occurred while storing the execution result data");
+      logger.error(e.getMessage());
+    }
+    return false;
+  }
+
+  /**
+   * This Method is used to save the ExecutionResult.
+   *
+   * @param dslQueryId query Id.
+   * @return boolean
+   */
+  @Override
+  public List<?> fetchDslExecutionsList(String dslQueryId) {
+    try {
+      // Create executionResult table if doesn't exists.
+          new ExecutionResultStore(executionResultTable, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+      String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType"};
+      ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+       ObjectNode objectNode =  node.putObject("$eq");
+        objectNode.put("dslQueryId",dslQueryId);
+      return maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",5);
+    } catch (Exception e) {
+      logger.error("Error occurred while storing the execution result data" , e);
+    }
+    return null;
+  }
+
+    @Override
+    public ExecutionResponse fetchExecutionsData(String executionId)
+    {
+        ExecutionResponse executionResponse = new ExecutionResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ExecutionResultStore executionResultStore =
+            null;
+        try {
+            executionResultStore = new ExecutionResultStore(executionResultTable, basePath);
+            Document doc = executionResultStore.readDocumet(executionId);
+            logger.info("Doc : "+doc.asJsonString());
+            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            ExecutionResult executionResult = objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
+            executionResponse.setData(executionResult.getData());
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
+            executionResponse.setAnalysis(executionResult.getAnalysis());
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching the execution result data" , e);
+        }
+        return executionResponse;
+    }
+
+
+    @Override
+    public ExecutionResponse fetchLastExecutionsData(String dslQueryId)
+    {
+        ExecutionResponse executionResponse = new ExecutionResponse();
+        JsonElement element = null;
+        try {
+            MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
+            String fields[] = {"executionId","dslQueryId","status","startTime","finishedTime", "executedBy", "executionType","data","analysis"};
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode node = objectMapper.createObjectNode();
+            ObjectNode objectNode =  node.putObject("$eq");
+                objectNode.put("dslQueryId",dslQueryId);
+            List<JsonNode> elements = maprConnection.runMaprDBQuery(fields,node.toString(),"finishedTime",1);
+            // its last execution for the for Query Id , So consider 0 index.
+            objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+            ExecutionResult executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+            executionResponse.setData(executionResult.getData());
+            executionResponse.setExecutedBy(executionResult.getExecutedBy());
+            executionResponse.setAnalysis(executionResult.getAnalysis());
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching the execution result data" , e);
+        }
+        return executionResponse;
+    }
 
   public int getSize() {
     return size;

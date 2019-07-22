@@ -1,0 +1,256 @@
+{
+  "contents": {
+    "keys": [{
+      "customerCode": "SYNCHRONOSS",
+      "module": "ANALYZE",
+      "id": "d33cf56e-a8ca-4e2a-8c4a-d55e0add6096",
+      "type": "chart"
+    }],
+    "action": "execute",
+    "executedBy": "sawadmin@synchronoss.com",
+    "page": 1,
+    "pageSize": 25,
+    "analyze": [{
+      "metricName": "sample-elasticsearch",
+      "semanticId": "6623ce60-7fb4-437a-a3b2-2d48c43f9928",
+      "type": "chart",
+      "chartType": "column",
+      "name": "DSL-Tes",
+      "description": "dsl migration test",
+      "scheduled": null,
+      "statusMessage": "Entity has retrieved successfully",
+      "id": "d33cf56e-a8ca-4e2a-8c4a-d55e0add6096",
+      "createdBy": "sawadmin@synchronoss.com",
+      "customerCode": "SYNCHRONOSS",
+      "projectCode": "workbench",
+      "saved": true,
+      "username": "sawadmin@synchronoss.com",
+      "module": "ANALYZE",
+      "artifacts": [{
+        "artifactName": "sample",
+        "columns": [{
+          "aliasName": "Rename string",
+          "columnName": "string.keyword",
+          "displayName": "String",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "string",
+          "table": "sample",
+          "type": "string",
+          "area": "g",
+          "checked": true,
+          "areaIndex": 0
+        }, {
+          "aliasName": "",
+          "columnName": "long",
+          "displayName": "Long",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "long",
+          "table": "sample",
+          "type": "long"
+        }, {
+          "aliasName": "",
+          "columnName": "float",
+          "displayName": "Float",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "float",
+          "table": "sample",
+          "type": "float"
+        }, {
+          "aliasName": "Reame Dt",
+          "columnName": "date",
+          "displayName": "Date",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "date",
+          "table": "sample",
+          "type": "date",
+          "area": "x",
+          "checked": true,
+          "dateFormat": "MMM d YYYY",
+          "areaIndex": 0,
+          "format": "MMM YYYY"
+        }, {
+          "aliasName": "",
+          "columnName": "integer",
+          "displayName": "Integer",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "integer",
+          "table": "sample",
+          "type": "integer"
+        }, {
+          "aliasName": "Rename Du",
+          "columnName": "double",
+          "displayName": "Double",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "double",
+          "table": "sales",
+          "type": "double",
+          "area": "y",
+          "checked": true,
+          "aggregate": "count",
+          "comboType": "column",
+          "areaIndex": 0,
+          "limitValue": "2",
+          "limitType": "top"
+        }]
+      }],
+      "esRepository": {
+        "indexName": "sampleAlias",
+        "storageType": "ES",
+        "type": "sample"
+      },
+      "modifiedTime": 1545924107,
+      "createdTime": 1545924107,
+      "createdTimestamp": 1554286773707,
+      "userId": 1,
+      "userFullName": "system sncr admin",
+      "sqlBuilder": {
+        "booleanCriteria": "AND",
+        "filters": [{
+          "type": "date",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "date",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "preset": "NA",
+            "lte": "2017-06-13",
+            "gte": "2017-06-01"
+          }
+        }, {
+          "type": "string",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "string.keyword",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "modelValues": ["1"],
+            "operator": "CONTAINS"
+          }
+        }, {
+          "type": "double",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "double",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "operator": "LT",
+            "value": 100000
+          }
+        }, {
+          "type": "double",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "double",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "operator": "BTW",
+            "otherValue": 10,
+            "value": 10000000
+          }
+        }, {
+          "type": "integer",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "integer",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "operator": "GTE",
+            "value": 100
+          }
+        }, {
+          "type": "long",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "long",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "operator": "LTE",
+            "value": 10000
+          }
+        }, {
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": false,
+          "model": {
+            "operator": "GT",
+            "value": 1000
+          }
+        }],
+        "sorts": [{
+          "order": "asc",
+          "columnName": "date",
+          "type": "date"
+        }, {
+          "order": "asc",
+          "columnName": "string.keyword",
+          "type": "string"
+        }],
+        "dataFields": [{
+          "aggregate": "count",
+          "alias": "Rename Du",
+          "checked": "y",
+          "columnName": "double",
+          "name": "double",
+          "comboType": "column",
+          "displayName": "Double",
+          "table": "sales",
+          "tableName": "sales",
+          "type": "double",
+          "limitValue": "2",
+          "limitType": "top"
+        }],
+        "nodeFields": [{
+          "alias": "Reame Dt",
+          "checked": "x",
+          "columnName": "date",
+          "name": "date",
+          "displayName": "Date",
+          "table": "sample",
+          "tableName": "sample",
+          "type": "date",
+          "dateFormat": "MMM d YYYY"
+        }, {
+          "alias": "Rename string",
+          "checked": "g",
+          "columnName": "string.keyword",
+          "name": "string.keyword",
+          "displayName": "String",
+          "table": "sample",
+          "tableName": "sample",
+          "type": "string"
+        }]
+      },
+      "isInverted": true,
+      "edit": false,
+      "legend": {
+        "align": "bottom",
+        "layout": "horizontal"
+      },
+      "chartTitle": "Testing-dsl",
+      "categoryId": 5,
+      "updatedTimestamp": 1554378145402,
+      "updatedUserName": "system sncr admin",
+      "executionType": "regularExecution"
+    }]
+  }
+}

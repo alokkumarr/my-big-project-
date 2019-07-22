@@ -1,385 +1,500 @@
-
 package com.synchronoss.saw.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.synchronoss.saw.model.geomap.GeoRegion;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({
-    "dataField",
-    "area",
-    "alias",
-    "columnName",
-    "displayName",
-    "type",
-    "aggregate",
-    "groupInterval"
+  "dataField",
+  "area",
+  "alias",
+  "columnName",
+  "displayName",
+  "type",
+  "aggregate",
+  "groupInterval"
 })
 public class Field {
 
-    @JsonProperty("dataField")
-    private String dataField;
-    @JsonProperty("area")
-    private String area;
-    @JsonProperty("alias")
-    private String alias;
-    @JsonProperty("columnName")
-    private String columnName;
-    @JsonProperty("displayName")
-    private String displayName;
-    @JsonProperty("type")
-    private Type type;
-    @JsonProperty("aggregate")
-    private Aggregate aggregate;
+  @JsonProperty("dataField")
+  private String dataField;
 
-    /**
-     * Gets limitType
-     *
-     * @return value of limitType
-     */
-    public LimitType getLimitType() {
-        return limitType;
-    }
+  @JsonProperty("area")
+  private String area;
 
-    /**
-     * Sets limitType
-     */
-    public void setLimitType(LimitType limitType) {
-        this.limitType = limitType;
-    }
+  @JsonProperty("alias")
+  private String alias;
 
-    /**
-     * Gets limitValue
-     *
-     * @return value of limitValue
-     */
-    public Integer getLimitValue() {
-        return limitValue;
-    }
+  @JsonProperty("columnName")
+  private String columnName;
 
-    public void setLimitValue(Integer limitValue) {
-        this.limitValue = limitValue;
-    }
+  @JsonProperty("displayName")
+  private String displayName;
 
-    @JsonProperty("groupInterval")
-    private GroupInterval groupInterval;
-    @JsonProperty("limitType")
-    private Field.LimitType limitType;
-    @JsonProperty("limitValue")
-    private Integer limitValue;
-    @JsonProperty("dateFormat")
-    private String dateFormat;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonProperty("type")
+  private Type type;
 
-    @JsonProperty("dataField")
-    public String getDataField() {
-        return dataField;
-    }
+  @JsonProperty("aggregate")
+  private Aggregate aggregate;
 
-    @JsonProperty("dataField")
-    public void setDataField(String dataField) {
-        this.dataField = dataField;
-    }
+  @JsonProperty("groupInterval")
+  private GroupInterval groupInterval;
 
-    @JsonProperty("area")
-    public String getArea() {
-        return area;
-    }
+  @JsonProperty("dateFormat")
+  private String dateFormat;
 
-    @JsonProperty("area")
-    public void setArea(String area) {
-        this.area = area;
-    }
+  @JsonProperty("format")
+  private Format format;
 
-    @JsonProperty("alias")
-    public String getAlias() {
-        return alias;
-    }
+  @JsonProperty("limitType")
+  private LimitType limitType;
 
-    @JsonProperty("alias")
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+  @JsonProperty("limitValue")
+  private Integer limitValue;
 
-    @JsonProperty("columnName")
-    public String getColumnName() {
-        return columnName;
-    }
+  @JsonProperty("displayType")
+  private String displayType;
 
-    @JsonProperty("columnName")
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
-    }
+  @JsonProperty("geoRegion")
+  private GeoRegion geoRegion;
+  
+  @JsonProperty("min_doc_count")
+  private Integer minDocCount;
 
-    @JsonProperty("displayName")
-    public String getDisplayName() {
-        return displayName;
-    }
+  @JsonProperty("areaIndex")
+  private Integer areaIndex;
 
-    @JsonProperty("displayName")
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("type")
-    public Type getType() {
-        return type;
-    }
+  @JsonProperty("dataField")
+  public String getDataField() {
+    return dataField;
+  }
 
-    @JsonProperty("type")
-    public void setType(Type type) {
-        this.type = type;
-    }
+  @JsonProperty("dataField")
+  public void setDataField(String dataField) {
+    this.dataField = dataField;
+  }
 
-    @JsonProperty("aggregate")
-    public Aggregate getAggregate() {
-        return aggregate;
-    }
+  @JsonProperty("area")
+  public String getArea() {
+    return area;
+  }
 
-    @JsonProperty("aggregate")
-    public void setAggregate(Aggregate aggregate) {
-        this.aggregate = aggregate;
-    }
+  @JsonProperty("area")
+  public void setArea(String area) {
+    this.area = area;
+  }
 
-    @JsonProperty("groupInterval")
-    public GroupInterval getGroupInterval() {
-        return groupInterval;
-    }
+  @JsonProperty("alias")
+  public String getAlias() {
+    return alias;
+  }
 
-    @JsonProperty("groupInterval")
-    public void setGroupInterval(GroupInterval groupInterval) {
-        this.groupInterval = groupInterval;
-    }
+  @JsonProperty("alias")
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
 
-    /**
-     * Gets dateFormat
-     *
-     * @return value of dateFormat
-     */
-    public String getDateFormat() {
-        return dateFormat;
-    }
+  @JsonProperty("columnName")
+  public String getColumnName() {
+    return columnName;
+  }
 
-    /**
-     * Sets dateFormat
-     */
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
+  @JsonProperty("columnName")
+  public void setColumnName(String columnName) {
+    this.columnName = columnName;
+  }
+
+  @JsonProperty("displayName")
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  @JsonProperty("displayName")
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
+  @JsonProperty("type")
+  public Type getType() {
+    return type;
+  }
+
+  @JsonProperty("type")
+  public void setType(Type type) {
+    this.type = type;
+  }
+
+  @JsonProperty("aggregate")
+  public Aggregate getAggregate() {
+    return aggregate;
+  }
+
+  @JsonProperty("aggregate")
+  public void setAggregate(Aggregate aggregate) {
+    this.aggregate = aggregate;
+  }
+
+  @JsonProperty("groupInterval")
+  public GroupInterval getGroupInterval() {
+    return groupInterval;
+  }
+
+  @JsonProperty("groupInterval")
+  public void setGroupInterval(GroupInterval groupInterval) {
+    this.groupInterval = groupInterval;
+  }
+
+  @JsonProperty("format")
+  public Format getFormat() {
+    return this.format;
+  }
+
+  @JsonProperty("format")
+  public void setFormat(Format format) {
+    this.format = format;
+  }
+
+  @JsonProperty("geoRegion")
+  public GeoRegion getGeoRegion() {
+    return geoRegion;
+  }
+
+  @JsonProperty("geoRegion")
+  public void setGeoRegion(GeoRegion geoRegion) {
+    this.geoRegion = geoRegion;
+  }
+
+  /**
+   * Gets dateFormat.
+   *
+   * @return value of dateFormat
+   */
+  public String getDateFormat() {
+    return dateFormat;
+  }
+
+  /** Sets dateFormat */
+  public void setDateFormat(String dateFormat) {
+    this.dateFormat = dateFormat;
+  }
+
+  /**
+   * Gets limitType
+   *
+   * @return value of limitType
+   */
+  public LimitType getLimitType() {
+    return limitType;
+  }
+
+  /** Sets limitType */
+  public void setLimitType(LimitType limitType) {
+    this.limitType = limitType;
+  }
+
+  public String getDisplayType() {
+    return displayType;
+  }
+
+  public void setDisplayType(String displayType) {
+    this.displayType = displayType;
+  }
+
+  /**
+   * document count to response by filling gaps in the histogram empty buckets.
+   *
+   * @return
+   */
+  @JsonProperty("min_doc_count")
+  public Integer getMinDocCount() {
+    return minDocCount;
+  }
+
+  /**
+   * Sets document count to be used to control response by filling gaps in the histogram empty
+   * buckets *
+   */
+  @JsonProperty("min_doc_count")
+  public void setMinDocCount(Integer minDocCount) {
+    this.minDocCount = minDocCount;
+  }
+
+  /**
+   * Used in UI to rearrange field positions.
+   *
+   * @return index number
+   */
+  @JsonProperty("areaIndex")
+  public Integer getAreaIndex() {
+    return areaIndex;
+  }
+
+  @JsonProperty("areaIndex")
+  public void setAreaIndex(Integer areaIndex) {
+    this.areaIndex = areaIndex;
+  }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
+
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+    this.additionalProperties.put(name, value);
+  }
+
+  /** Used to nullify additionalProperties field, so that it won't appear in the output json */
+  public void nullifyAdditionalProperties() {
+    this.additionalProperties = null;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("dataField", dataField)
+        .append("area", area)
+        .append("alias", alias)
+        .append("columnName", columnName)
+        .append("displayName", displayName)
+        .append("type", type)
+        .append("aggregate", aggregate)
+        .append("groupInterval", groupInterval)
+        .append("additionalProperties", additionalProperties)
+        .append("format", format)
+        .toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder()
+        .append(aggregate)
+        .append(area)
+        .append(alias)
+        .append(additionalProperties)
+        .append(columnName)
+        .append(dataField)
+        .append(type)
+        .append(displayName)
+        .append(groupInterval)
+        .append(format)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if ((other instanceof Field) == false) {
+      return false;
+    }
+    Field rhs = ((Field) other);
+
+    return new EqualsBuilder()
+        .append(aggregate, rhs.aggregate)
+        .append(area, rhs.area)
+        .append(alias, rhs.alias)
+        .append(additionalProperties, rhs.additionalProperties)
+        .append(columnName, rhs.columnName)
+        .append(dataField, rhs.dataField)
+        .append(type, rhs.type)
+        .append(displayName, rhs.displayName)
+        .append(groupInterval, rhs.groupInterval)
+        .append(format, rhs.format)
+        .isEquals();
+  }
+
+  public Integer getLimitValue() {
+    return limitValue;
+  }
+
+  public void setLimitValue(Integer limitValue) {
+    this.limitValue = limitValue;
+  }
+
+  public enum GroupInterval {
+    ALL("all"),
+    YEAR("year"),
+    MONTH("month"),
+    DAY("day"),
+    QUARTER("quarter"),
+    WEEK("week"),
+    HOUR("hour");
+    private static final Map<String, GroupInterval> CONSTANTS =
+        new HashMap<String, GroupInterval>();
+
+    static {
+      for (GroupInterval c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
     }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    private final String value;
+
+    private GroupInterval(String value) {
+      this.value = value;
     }
 
-    public enum GroupInterval {
-
-        YEAR("year"),
-        MONTH("month"),
-        DAY("day"),
-        QUARTER("quarter"),
-        HOUR("hour"),
-        WEEK("week");
-        private final String value;
-        private final static Map<String, Field.GroupInterval> CONSTANTS = new HashMap<String, Field.GroupInterval>();
-
-        static {
-            for (Field.GroupInterval c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private GroupInterval(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Field.GroupInterval fromValue(String value) {
-            Field.GroupInterval constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-
-    public enum Aggregate {
-
-        AVG("avg"),
-        SUM("sum"),
-        MIN("min"),
-        MAX("max"),
-        COUNT("count"),
-        DISTINCT_COUNT("distinctCount"),
-        PERCENTAGE("percentage");
-        private final String value;
-        private final static Map<String, Field.Aggregate> CONSTANTS = new HashMap<>();
-
-        static {
-            for (Field.Aggregate c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Aggregate(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Field.Aggregate fromValue(String value) {
-            Field.Aggregate constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    public enum LimitType {
-        TOP("top"),
-        BOTTOM("bottom");
-        private final String value;
-        private final static Map<String, Field.LimitType> CONSTANTS = new HashMap<>();
-
-        static {
-            for (Field.LimitType c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-        private LimitType(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Field.LimitType fromValue(String value) {
-            Field.LimitType constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-    }
-
-
-    public enum Type {
-
-        DATE("date"),
-        TIMESTAMP("timestamp"),
-        LONG("long"),
-        DOUBLE("double"),
-        FLOAT("float"),
-        INTEGER("integer"),
-        STRING("string");
-        private final String value;
-        private final static Map<String, Field.Type> CONSTANTS = new HashMap<>();
-
-        static {
-            for (Field.Type c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Type(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Field.Type fromValue(String value) {
-            Field.Type constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
+    @JsonCreator
+    public static GroupInterval fromValue(String value) {
+      GroupInterval constant = CONSTANTS.get(value.toLowerCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("dataField", dataField).append("area", area)
-        		.append("alias", alias).append("columnName", columnName).append("displayName", displayName)
-        		.append("type", type).append("aggregate", aggregate).append("groupInterval", groupInterval)
-        		.append("additionalProperties", additionalProperties).toString();
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+  }
+
+  public enum Aggregate {
+    AVG("avg"),
+    SUM("sum"),
+    MIN("min"),
+    MAX("max"),
+    COUNT("count"),
+    PERCENTAGE("percentage"),
+    PERCENTAGE_BY_ROW("percentagebyrow"),
+    DISTINCTCOUNT("distinctcount");
+
+    private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Aggregate c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private final String value;
+
+    private Aggregate(String value) {
+      this.value = value;
+    }
+
+    @JsonCreator
+    public static Aggregate fromValue(String value) {
+      Aggregate constant = CONSTANTS.get(value.toLowerCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(aggregate).append(area).append(alias).append(additionalProperties)
-        		.append(columnName).append(dataField).append(type).append(displayName).append(groupInterval)
-        		.toHashCode();
+    public String toString() {
+      return this.value.toLowerCase();
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value.toLowerCase();
+    }
+  }
+
+  public enum Type {
+    DATE("date"),
+    TIMESTAMP("timestamp"),
+    LONG("long"),
+    DOUBLE("double"),
+    FLOAT("float"),
+    INTEGER("integer"),
+    STRING("string");
+    private static final Map<String, Type> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Type c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private final String value;
+
+    private Type(String value) {
+      this.value = value;
+    }
+
+    @JsonCreator
+    public static Type fromValue(String value) {
+      Type constant = CONSTANTS.get(value.toLowerCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if ((other instanceof Field) == false) {
-            return false;
-        }
-        Field rhs = ((Field) other);
-        return new EqualsBuilder().append(aggregate, rhs.aggregate).append(area, rhs.area)
-        		.append(alias, rhs.alias).append(additionalProperties, rhs.additionalProperties)
-        		.append(columnName, rhs.columnName).append(dataField, rhs.dataField).append(type, rhs.type)
-        		.append(displayName, rhs.displayName).append(groupInterval, rhs.groupInterval).isEquals();
+    public String toString() {
+      return this.value;
     }
 
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+  }
+
+  public enum LimitType {
+    TOP("top"),
+    BOTTOM("bottom");
+    private static final Map<String, LimitType> CONSTANTS = new HashMap<>();
+
+    static {
+      for (LimitType c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private final String value;
+
+    private LimitType(String value) {
+      this.value = value;
+    }
+
+    @JsonCreator
+    public static LimitType fromValue(String value) {
+      LimitType constant = CONSTANTS.get(value.toLowerCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+  }
 }

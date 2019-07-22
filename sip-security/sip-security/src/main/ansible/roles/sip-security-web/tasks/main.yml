@@ -18,11 +18,14 @@
   group: name=saw
 - name: Create SAW Security user
   user: name=saw group=saw
-- name: Create BDA directory
-  file: path=/etc/bda state=directory
+
+#- name: Create BDA directory
+#  file: 
+#    path: /etc/bda state=directory
+#    mode: 0777
 
  # Creating env file to hold the connector streaming
-- name: Create the /etc/bda directory
+- name: Create the /etc/bda/security.env file
   file:
     path: /etc/bda/security.env
     state: touch
@@ -39,6 +42,13 @@
     content: "SECURE=false"
     dest: "/etc/bda/security.env"
   when: not sip_secure
+
+# Generate the random secret key to make key unique per SIP enviroment.
+- name: Generate sip-security jwt secret key
+  set_fact:
+    saw_security_jwt_secret: >-
+      {{ lookup('password', inventory_dir
+        + '/sip-security-jwt-secret chars=ascii_letters,digits') }}
 
 - name: Create SAW Security variables file
   template: src=saw-security.vars dest=/etc/bda/saw-security.vars
@@ -61,24 +71,38 @@
   command: /opt/bda/saw-security/db/setup/init
   # Note: Run database initialization only on one of the nodes
   when: "groups['saw-security'].index(inventory_hostname) == 0"
+
 - name: Fetch mariadb database password from existing
   fetch:
     src: /etc/bda/mariadb-root-password
     dest: "{{ inventory_dir + '/mariadb-root-password' }}"
     flat: yes
     fail_on_missing: no
+
 - name: Look up mariadb database password
   set_fact:
     saw_mariadb_db_password: >-
       {{ lookup('password', inventory_dir+'/mariadb-root-password chars=ascii_letters,digits') }}
+
 - name: create MariaDB user for saw_security to other sip-nodes
   command: >
     mysql -u root -e "CREATE USER IF NOT EXISTS 'saw_security'@'{{ hostvars[inventory_hostname]
     ['ansible_default_ipv4']['address'] }}' IDENTIFIED BY '{{ saw_security_db_password }}'"
     -p{{ saw_mariadb_db_password }}
+    
 - name: GRANT PRIVILEGES for saw_security to other sip-nodes
   command: >
     mysql -u root -e "GRANT ALL PRIVILEGES ON saw_security.* TO 'saw_security'@'{{ hostvars[inventory_hostname]
     ['ansible_default_ipv4']['address'] }}'" -p{{ saw_mariadb_db_password }}
+    
+- name: create MariaDB SSL user other sip-nodes
+  command: >
+    mysql -u root -e "CREATE USER IF NOT EXISTS 'sstssl'@'%' IDENTIFIED BY 'sstssl'" -p{{ saw_mariadb_db_password }}
+    
+- name: GRANT PRIVILEGES for SSL to other sip-nodes
+  command: >
+    mysql -u root -e "GRANT ALL ON *.* TO 'sstssl'@'%' IDENTIFIED BY 'sstssl' REQUIRE SSL" -p{{ saw_mariadb_db_password }}
+ 
+    
 - name: Enable SIP Security service
   systemd: name=sip-security enabled=true daemon_reload=true

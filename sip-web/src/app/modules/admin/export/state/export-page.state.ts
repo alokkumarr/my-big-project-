@@ -10,7 +10,8 @@ import {
   ResetExportPageState,
   ClearExport,
   AddAllAnalysesToExport,
-  RemoveAllAnalysesFromExport
+  RemoveAllAnalysesFromExport,
+  ExportLoadMetrics
 } from '../actions/export-page.actions';
 import { ExportPageModel } from './export-page.model';
 import { ExportService } from '../export.service';
@@ -21,6 +22,7 @@ const defaultExportPageState: ExportPageModel = {
   selectedModule: null,
   selectedCategory: null,
   shouldExportMetric: false,
+  metrics: {},
   categoryAnalyses: [],
   categoryDashboards: [],
   exportData: {
@@ -39,7 +41,31 @@ export class ExportPageState {
 
   @Selector()
   static exportList(state: ExportPageModel): any[] {
-    return [...state.exportData.analyses, ...state.exportData.dashboards];
+    const analyses = state.exportData.analyses.map(analysis => ({
+      ...analysis,
+      metricName: (state.metrics[analysis.semanticId] || {}).name
+    }));
+    return [...analyses, ...state.exportData.dashboards];
+  }
+
+  @Selector()
+  static categoryAnalyses(state: ExportPageModel): any[] {
+    const analyses = state.categoryAnalyses.map(analysis => ({
+      ...analysis,
+      metricName: (state.metrics[analysis.semanticId] || {}).name
+    }));
+    return analyses;
+  }
+
+  @Selector()
+  static exportData(state: ExportPageModel): ExportPageModel['exportData'] {
+    return {
+      ...state.exportData,
+      analyses: state.exportData.analyses.map(analysis => ({
+        ...analysis,
+        metricName: (state.metrics[analysis.semanticId] || {}).name
+      }))
+    };
   }
 
   @Action(ExportSelectTreeItem)
@@ -63,13 +89,33 @@ export class ExportPageState {
 
   @Action(ExportLoadAnalyses)
   loadAnalyses(
-    { patchState }: StateContext<ExportPageModel>,
+    { patchState, dispatch }: StateContext<ExportPageModel>,
     { categoryId }: ExportLoadAnalyses
   ) {
     return this.exportService.getAnalysesByCategoryId(categoryId).pipe(
       tap(analyses => {
-        return patchState({
+        patchState({
           categoryAnalyses: analyses
+        });
+        return dispatch(new ExportLoadMetrics());
+      })
+    );
+  }
+
+  @Action(ExportLoadMetrics)
+  loadMetrics(
+    { patchState, getState }: StateContext<ExportPageModel>,
+    { categoryId }: ExportLoadAnalyses
+  ) {
+    const metrics = getState().metrics;
+    const newMetrics = {};
+    return this.exportService.getMetricList$().pipe(
+      tap(list => {
+        list.forEach(metric => {
+          newMetrics[metric.id] = { name: metric.metricName };
+        });
+        patchState({
+          metrics: { ...metrics, ...newMetrics }
         });
       })
     );
@@ -79,15 +125,7 @@ export class ExportPageState {
   loadDashboards(
     { patchState }: StateContext<ExportPageModel>,
     { categoryId }: ExportLoadDashboards
-  ) {
-    return this.exportService.getDashboardsForCategory(categoryId).pipe(
-      tap(dashboards => {
-        return patchState({
-          categoryDashboards: dashboards
-        });
-      })
-    );
-  }
+  ) {}
 
   @Action(AddAnalysisToExport)
   addAnalysisToExport(

@@ -1,0 +1,27 @@
+#This configuration would provide the following at-rest protection:
+#an encrypted file that contains the main encryption key
+#innodb_encrypt_tables: automatic InnoDB tablespace encryption, Can be enabled enforce encryption
+#innodb_encrypt_log: binary log encryption
+#innodb_encryption_threads: 4 parallel encryption threads
+#encrypt_tmp_disk_tables & encrypt_tmp_files: encryption of temporary files and tables
+#encryption of Aria tables
+
+
+[mariadb]
+
+# File Key Management
+plugin_load_add = file_key_management
+file_key_management_filename = /etc/my.cnf.d/sip_mariadb_dare_key.enc
+file_key_management_filekey  = "{{ sip_mariadb_dare_key_password.stdout }}"
+file_key_management_encryption_algorithm = AES_CTR
+
+# InnoDB Encryption
+innodb_encrypt_tables = ON
+innodb_encrypt_log = ON
+innodb_encryption_threads = 4
+encrypt_binlog = ON
+encrypt_tmp_disk_tables = ON
+encrypt_tmp_files = ON
+aria_encrypt_tables = ON
+
+

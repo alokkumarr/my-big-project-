@@ -17,8 +17,9 @@
           type="text"
           maxlength="20"
           autocomplete="off"
+          [attr.e2e]="'alias-input-' + artifactColumn.displayName"
           (input)="onAliasChange($event.target.value)"
-          [value]="artifactColumn.aliasName || ''"
+          [value]="artifactColumn.alias || artifactColumn.aliasName || ''"
         />
       </mat-form-field>
     </div>
@@ -34,10 +35,10 @@
         [columnType]="artifactColumn.type"
         [analysisType]="analysisType"
         [aggregate]="artifactColumn.aggregate"
-        [sqlBuilder]="sqlBuilder"
+        [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
         [enablePercentByRow]="
-          asChartColumn(artifactColumn).comboType === 'column'
+          asChartColumn(artifactColumn).displayType === 'column'
         "
         fxFlex="75"
       >
@@ -45,13 +46,11 @@
     </div>
 
     <div
-      *ngIf="
-        analysisType === 'chart' && asChartColumn(artifactColumn).comboType
-      "
+      *ngIf="analysisType === 'chart' && chartDisplayType"
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Chart type :</label>
+      <label fxFlex i18n>Chart type:</label>
       <designer-combo-type-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -92,13 +91,12 @@
       >
       </designer-date-interval-selector>
     </div>
-
     <div
       *ngIf="
         (analysisType !== 'pivot' && hasDateInterval) ||
         (analysisType === 'pivot' &&
           hasDateInterval &&
-          asPivotColumn(artifactColumn).dateInterval === 'day')
+          asPivotColumn(artifactColumn).groupInterval === 'day')
       "
       fxLayout="row"
       fxLayoutAlign="start center"

@@ -10,6 +10,8 @@ import { BehaviorSubject } from 'rxjs';
 import { ChartGridComponent } from './chart-grid.component';
 import { UChartModule } from '../../components/charts';
 import { ChartService } from '../../services';
+import { HeaderProgressService } from './../../../common/services';
+import { setReverseProperty } from './../../../common/utils/dataFlattener';
 
 @Component({
   selector: 'dx-data-grid',
@@ -42,14 +44,32 @@ class ChartStubService {
   getChartConfigFor = () => ({});
 }
 
+class HeaderProgressStubService {
+  show = () => (true);
+}
+
 describe('Chart Grid Component', () => {
   let fixture: ComponentFixture<ChartGridComponent>;
   let component;
+  const reversePropertyTrue = {
+    chartType: 'map',
+    xAxis: {
+      reversed: true
+    }
+  };
+
+  const reversePropertyFalse = {
+    chartType: 'map',
+    xAxis: {
+      reversed: false
+    }
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [UChartModule],
-      providers: [{ provide: ChartService, useClass: ChartStubService }],
+      providers: [{ provide: ChartService, useClass: ChartStubService },
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService }],
       declarations: [ChartGridComponent, DxDataGridStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -57,7 +77,52 @@ describe('Chart Grid Component', () => {
       .then(() => {
         fixture = TestBed.createComponent(ChartGridComponent);
         component = fixture.componentInstance;
-        component.analysis = { chartType: 'map', type: 'chart' };
+        component.analysis = {
+          chartOptions: {
+            chartType: 'map',
+            xAxis: {
+              reversed: false
+            }
+          },
+          chartType: 'map',
+          type: 'chart',
+          mapOptions: {mapType: 'map'},
+          sipQuery: {
+            artifacts: [
+              {
+                artifactsName: 'sample',
+                fields: [
+                  {
+                    dataField: 'string',
+                    area: 'x',
+                    alias: 'String',
+                    columnName: 'string.keyword',
+                    displayName: 'String',
+                    type: 'string'
+                  },
+                  {
+                    dataField: 'integer',
+                    area: 'y',
+                    columnName: 'integer',
+                    displayName: 'Integer',
+                    type: 'integer',
+                    aggregate: 'avg'
+                  }
+                ]
+              }
+            ],
+            booleanCriteria: 'AND',
+            filters: [],
+            sorts: [
+              {
+                artifacts: 'sample',
+                columnName: 'string.keyword',
+                type: 'integer',
+                order: 'desc'
+              }
+            ]
+          }
+        };
         component.updater = new BehaviorSubject<Object[]>([]);
         fixture.detectChanges();
       });
@@ -82,5 +147,16 @@ describe('Chart Grid Component', () => {
       'map-box'
     );
     expect(mapElement).toBeTruthy();
+  });
+
+  it('should update chart options based on sorts applied in sipquery', () => {
+    expect(setReverseProperty(component.analysis.chartOptions, component.analysis.sipQuery))
+    .toBeTruthy(reversePropertyTrue.xAxis.reversed);
+  });
+
+  it('should update chart options based on sorts applied in sipquery', () => {
+    component.analysis.sipQuery.sorts[0].order = 'asc';
+    expect(setReverseProperty(component.analysis.chartOptions, component.analysis.sipQuery))
+    .toBeTruthy(reversePropertyFalse.xAxis.reversed);
   });
 });

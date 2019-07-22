@@ -20,10 +20,8 @@ import sncr.xdf.context.NGContext;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 
 /**
@@ -32,6 +30,8 @@ import java.util.Map;
  *
  */
 public interface WithDataSet {
+	
+	static final String SQL_COMPONENT  = "sql";
 
     /**
      * The method creates Map of Input/Output parameter name to Map of data object attributes
@@ -77,9 +77,24 @@ public interface WithDataSet {
      * - indicates if it is Exists ???
      */
     default Map<String, Map<String, Object>> discoverInputDataSetsWithInput(DataSetHelper aux) throws Exception {
-        Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
 
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) {
+        Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
+        List<Input> input = aux.ctx.componentConfiguration.getInputs();
+        if (aux.ctx.runningPipeLine && SQL_COMPONENT.equalsIgnoreCase(aux.ctx.pipeComponentName))
+        {
+           if (input.size() > 0 )
+            {
+                Iterator itr = input.iterator();
+                while (itr.hasNext())
+                {
+                    Input dsInput = (Input) itr.next();
+                    if (dsInput.getDataSet().equalsIgnoreCase(aux.ctx.dataSetName))
+                        itr.remove();
+                }
+            }
+        }
+
+        for (Input in: input) {
             if (in.getDataSet() == null)
                 throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
             retval.put(in.getDataSet(), discoverDataSetWithInput(aux, in));
@@ -92,6 +107,7 @@ public interface WithDataSet {
 
         String project = aux.ctx.applicationID;
         DataSetHelper.logger.debug("Set projects " + project);
+
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
@@ -113,31 +129,44 @@ public interface WithDataSet {
      * - indicates if it is Exists ???
      */
     default Map<String, Object> discoverDataSetWithInput(DataSetHelper aux, Input in) throws Exception {
+
         String prj = ((in.getProject() != null && !in.getProject().isEmpty())?
-                Path.SEPARATOR + in.getProject():
-                Path.SEPARATOR + aux.ctx.applicationID);
+            Path.SEPARATOR + in.getProject():
+            Path.SEPARATOR + aux.ctx.applicationID);
 
         StringBuilder sb = new StringBuilder(aux.dl.getRoot());
         sb.append(prj + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-                .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
-                .append(Path.SEPARATOR + in.getCatalog());
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
+            .append(Path.SEPARATOR + in.getCatalog());
 
         sb.append(Path.SEPARATOR + in.getDataSet()).append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
+//        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+//            sb.append(Path.SEPARATOR + in.getCatalog());
+//        sb
+//            .append(Path.SEPARATOR + in.getDataSet())
+//            .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+
         DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
+        DataSetHelper.logger.debug("is running in pipeline::"+ aux.ctx.runningPipeLine);
+        if (!aux.ctx.runningPipeLine && !HFileOperations.exists(sb.toString())) {
+            //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
+            throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
+        } else {
+            DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
 
-        Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
+            Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null, aux);
 
-        res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-        res.put(DataSetProperties.Name.name(), in.getDataSet());
-        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
-            res.put(DataSetProperties.Catalog.name(), in.getCatalog());
-        res.put(DataSetProperties.Type.name(), in.getDstype().toString());
-        //TODO:: Get actual format reading data descriptor
-        res.put(DataSetProperties.Format.name(), in.getFormat().name());
-        return res;
-
+            res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+            res.put(DataSetProperties.Name.name(), in.getDataSet());
+            if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+                res.put(DataSetProperties.Catalog.name(), in.getCatalog());
+            res.put(DataSetProperties.Type.name(), in.getDstype().toString());
+            //TODO:: Get actual format reading data descriptor
+            res.put(DataSetProperties.Format.name(), in.getFormat().name());
+            return res;
+        }
 
     }
 
@@ -153,35 +182,33 @@ public interface WithDataSet {
                 String dataLakeRoot = aux.dl.getRoot();
 
                 String projectId = (system.has(DataSetProperties.Project.toString()))?
-                        system.get(DataSetProperties.Project.toString()).getAsString() : projectName;
+                    system.get(DataSetProperties.Project.toString()).getAsString() : projectName;
 
                 String dlDir = MetadataBase.PREDEF_DL_DIR;
 
                 String dataSource = system.has(DataSetProperties.Type.toString()) ?
-                        system.get(DataSetProperties.Type.toString()).getAsString(): Input.Dstype.BASE.toString();
+                    system.get(DataSetProperties.Type.toString()).getAsString(): Input.Dstype.BASE.toString();
 
                 String catalog = system.has(DataSetProperties.Catalog.toString()) ?
-                        system.get(DataSetProperties.Catalog.toString()).getAsString() : MetadataBase.DEFAULT_CATALOG;
+                    system.get(DataSetProperties.Catalog.toString()).getAsString() : MetadataBase.DEFAULT_CATALOG;
 
                 String datasetName = system.has(DataSetProperties.Name.toString()) ?
-                        system.get(DataSetProperties.Name.toString()).getAsString() : dataset;
+                    system.get(DataSetProperties.Name.toString()).getAsString() : dataset;
 
                 String dataDir = MetadataBase.PREDEF_DATA_DIR;
                 String format = system.has(DataSetProperties.Format.toString()) ?
-                        system.get(DataSetProperties.Format.toString()).getAsString() : null;
-
+                    system.get(DataSetProperties.Format.toString()).getAsString() : null;
 
                 String location = dataLakeRoot + Path.SEPARATOR + projectId + Path.SEPARATOR + dlDir
-                        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR + catalog
-                        + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
+                    + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR + catalog
+                    + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
 
                 DataSetHelper.logger.debug("Dataset location = " + location);
 
                 String sampling = system.has(DataSetProperties.Sample.name()) ?
-                        system.get(DataSetProperties.Sample.name()).getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
+                    system.get(DataSetProperties.Sample.name()).getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
 
-
-                Map<String, Object> res = aux.discoverAndValidateInputDS(dataset, location, system);
+                Map<String, Object> res = aux.discoverAndValidateInputDS(dataset, location, system, aux);
 
                 res.put(DataSetProperties.PhysicalLocation.name(), location);
                 res.put(DataSetProperties.Name.name(), datasetName);
@@ -205,9 +232,8 @@ public interface WithDataSet {
         }
     }
 
-
-
     default boolean discoverAndvalidateOutputDataSet(Map<String, Object> outDS){
+
         // We will need list of partitions created in order to rename and move files to final destination
         // Get information about newly created partitions - we need proper glob
 
@@ -223,14 +249,17 @@ public interface WithDataSet {
             DataSetHelper.logger.warn("Could not check output data object: " + dataset);
         }
         outDS.put(DataSetProperties.Exists.name(), exists);
+
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
 
             Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
-                    DLDataSetOperations.getPartitioningInfo(location);
+                DLDataSetOperations.getPartitioningInfo(location);
+
+            DataSetHelper.logger.debug("Dataset partitioning = " + trgDSPartitioning);
 
             //Check partitioning structure and match it with metadata/input
             if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
-                    trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
+                trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
                 throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
             }
 
@@ -274,27 +303,47 @@ public interface WithDataSet {
     }
 */
 
-    default String  generateTempLocation(DataSetHelper aux, String batchID, String componentName, String tempDS, String tempCatalog) {
-        StringBuilder sb = new StringBuilder(aux.ctx.xdfDataRootSys);
-        sb.append(Path.SEPARATOR + aux.ctx.applicationID)
-                .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
-                .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
-                .append(Path.SEPARATOR + batchID)
-                .append(Path.SEPARATOR + componentName);
+    default String  generateTempLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+        StringBuilder tempLocationBuilder = new StringBuilder(aux.ctx.xdfDataRootSys);
 
-        DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
-        return sb.toString();
+        tempLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
+            .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName)
+
+            /* Creating a dynamic directory, so that components running is parallel will not
+             * run into conflicts
+             */
+            .append(Path.SEPARATOR + Instant.now().toEpochMilli());
+
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s",
+            tempLocationBuilder.toString()));
+        return tempLocationBuilder.toString();
+    }
+
+    default String generateArchiveLocation(DataSetHelper aux) {
+        StringBuilder archiveLocationBuilder = new StringBuilder(aux.ctx.xdfDataRootSys);
+
+        archiveLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_SYSTEM_DIR)
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_ARCHIVE_DIR)
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName);
+
+        return archiveLocationBuilder.toString();
     }
 
 
 //TODO:: Move to separate interface/class: WithOutputDataSet
 
-// WithOutputDataSet -- start
+    // WithOutputDataSet -- start
     default Map<String,Map<String, Object>> ngBuildPathForOutputs(DataSetHelper dsaux){
         return dsaux.ngBuildDataSetMap(DSMapKey.parameter);
     }
 
     default Map<String, Map<String, Object>> ngBuildPathForOutputDataSets(DataSetHelper aux){
+
         return aux.ngBuildDataSetMap(DSMapKey.dataset);
     }
 // WithOutputDataSet -- end
@@ -302,7 +351,7 @@ public interface WithDataSet {
     class DataSetHelper {
         private static final Logger logger = Logger.getLogger(WithDataSet.class);
         NGContext ctx;
-        DLDataSetService dl;
+        public DLDataSetService dl;
 
         public DataSetHelper(NGContext c, DLDataSetService dl){
             ctx = c;
@@ -311,7 +360,7 @@ public interface WithDataSet {
 
         private Map<String, Map<String, Object>> ngBuildDataSetMap( DSMapKey ktype)
         {
-            Map<String, Map<String, Object>> resMap = new HashMap();
+            Map<String, Map<String, Object>> resMap = new TreeMap<>();
             for( Output output: this.ctx.componentConfiguration.getOutputs()){
                 Map<String, Object> resOutput = new HashMap<>();
                 String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
@@ -320,18 +369,17 @@ public interface WithDataSet {
 
                 String description = (output.getDescription() != null) ? output.getDescription() : "";
 
-
                 StringBuilder sb = new StringBuilder(ctx.xdfDataRootSys);
                 sb.append(Path.SEPARATOR + this.ctx.applicationID)
-                        .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-                        .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
-                        .append(Path.SEPARATOR + catalog)
-                        .append(Path.SEPARATOR + output.getDataSet())
-                        .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+                    .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
+                    .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
+                    .append(Path.SEPARATOR + catalog)
+                    .append(Path.SEPARATOR + output.getDataSet())
+                    .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
                 logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
                 resOutput.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-                logger.debug("Phyical location : " + sb.toString());
+                logger.debug("Physical location : " + sb.toString());
                 resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
@@ -365,7 +413,7 @@ public interface WithDataSet {
                 logger.debug( m);
                 resOutput.put(DataSetProperties.PartitionKeys.name(), kl);
 
-                DataSetHelper.logger.debug("Output DS result Map = " + resOutput);
+                DataSetHelper.logger.debug("Output resOutput = " + resOutput);
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)
@@ -374,6 +422,7 @@ public interface WithDataSet {
                         if (output.getDataSet() != null)
                             resMap.put(output.getDataSet(), resOutput); break;
                 }
+
             }
             logger.debug("ngBuildDataSetMap : " + resMap);
             return resMap;
@@ -381,25 +430,25 @@ public interface WithDataSet {
 
 
 
-        private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system) throws Exception {
-            if (!HFileOperations.exists(location)) {
+        private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system, DataSetHelper aux) throws Exception {
+            if (!aux.ctx.runningPipeLine && !HFileOperations.exists(location)) {
                 throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
             } else {
                 Map<String, Object> res = new HashMap();
 
                 FileStatus[] fst = HFileOperations.getFilesStatus(location);
-                boolean dsEmpty = (fst == null && fst.length == 0);
+                boolean dsEmpty = (fst == null ||  fst.length == 0);
                 if (!dsEmpty) {
 
                     // Check type of source partition - we need proper path which can read all parquet data files
                     Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> srcPartitioning =
-                            DLDataSetOperations.getPartitioningInfo(location);
+                        DLDataSetOperations.getPartitioningInfo(location);
 
                     logger.debug(String.format("Check partition layout of input dataset %s --> type: %s, final location: %s", dataset, srcPartitioning._4(), srcPartitioning._1() ));
                     //TODO::Potentially we can add DRILL support to read from DRILL partitions.
                     //Check partitioning structure and match it with metadata/input
                     if (srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
-                            srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
+                        srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
                         throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, srcPartitioning._4().toString(), dataset);
                     }
 

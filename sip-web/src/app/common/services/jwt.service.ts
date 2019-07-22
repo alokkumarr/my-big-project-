@@ -206,6 +206,7 @@ export class JwtService {
     // }
     // tslint:enable
     // parsedJwt.ticket.products[0].productModules.push(insightsModule);
+
     return parsedJwt;
   }
 
@@ -328,15 +329,13 @@ export class JwtService {
       return this._isSet(code, PRIVILEGE_INDEX.FORK);
     case 'EDIT':
       return (
-        this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin())
+        this._isSet(code, PRIVILEGE_INDEX.EDIT)
       );
     case 'EXPORT':
       return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
     case 'DELETE':
       return (
-        this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin())
+        this._isSet(code, PRIVILEGE_INDEX.DELETE)
       );
     default:
       return false;

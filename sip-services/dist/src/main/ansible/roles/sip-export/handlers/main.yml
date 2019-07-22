@@ -1,4 +1,4 @@
-- name: restart saw-export
+- name: restart sip-export
   # Stop service, to trigger restart by socket activation
   systemd: name=sip-export state=stopped daemon_reload=true
   # Workaround: Occasionally deployments will fail with "Job for

@@ -3,6 +3,10 @@
 :host {
   height: calc(100% - 20px);
   width: calc(100% - 20px);
+
+  pivot-grid {
+    position: absolute;
+  }
 }
 
 filter-chips-u + designer-pivot {

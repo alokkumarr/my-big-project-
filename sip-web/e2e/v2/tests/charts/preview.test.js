@@ -16,6 +16,7 @@ describe('Executing preview tests cases from charts/preview.test.js', () => {
   const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
+  const yAxisName2 = 'Long';
   beforeAll(() => {
     logger.info('Starting charts/preview.test.js.....');
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -54,22 +55,25 @@ describe('Executing preview tests cases from charts/preview.test.js', () => {
         analyzePage.clickOnCreateButton();
 
         const chartDesignerPage = new ChartDesignerPage();
-        // Dimension section.
-        chartDesignerPage.clickOnAttribute(xAxisName);
-        // Group by section. i.e. Color by
-        chartDesignerPage.clickOnAttribute(groupName);
-        // Metric section.
-        chartDesignerPage.clickOnAttribute(yAxisName);
-        // Size section.
+        chartDesignerPage.searchInputPresent();
+        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
+        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
+
         if (data.chartType === 'chart:bubble') {
-          chartDesignerPage.clickOnAttribute(sizeByName);
+          chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
+          chartDesignerPage.clickOnAttribute(groupName, 'Color By');
+        }
+        // If Combo then add one more metric field
+        if (data.chartType === 'chart:combo') {
+          chartDesignerPage.clickOnAttribute(yAxisName2, 'Metrics');
+        } else if (data.chartType !== 'chart:bubble') {
+          chartDesignerPage.clickOnAttribute(groupName, 'Group By');
         }
         // Click on Preview
         chartDesignerPage.clickOnPreviewButton();
         const previewPage = new PreviewPage();
         previewPage.verifyAxisTitle(chartType, yAxisName, 'yaxis');
         previewPage.verifyAxisTitle(chartType, xAxisName, 'xaxis');
-
       }).result.testInfo = {
         testId: id,
         data: data,

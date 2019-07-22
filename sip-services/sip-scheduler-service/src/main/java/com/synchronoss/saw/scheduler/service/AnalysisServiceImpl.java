@@ -1,13 +1,17 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
+import com.synchronoss.sip.utils.RestUtil;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import javax.annotation.PostConstruct;
-import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
-import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,160 +21,237 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
-import com.synchronoss.sip.utils.RestUtil;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
 
-    @Value("${saw-analysis-service-url}")
-    private String analysisUrl;
+  @Value("${saw-analysis-service-url}")
+  private String analysisUrl;
 
-    @Value("${saw-dispatch-service-url}")
-    private String dispatchUrl;
+  @Value("${sip-analysis-proxy-url}")
+  private String proxyAnalysisUrl;
 
-    @Autowired
-    private RestUtil restUtil;
+  @Value("${sip-metadata-service-url}")
+  private String metadataAnalysisUrl;
 
-    private RestTemplate restTemplate;
+  @Value("${saw-dispatch-service-url}")
+  private String dispatchUrl;
 
-    private final Logger log = LoggerFactory.getLogger(getClass().getName());
+  @Value("${sip-dispatch-row-limit}")
+  private int dispatchRowLimit;
 
+  @Autowired private RestUtil restUtil;
 
-    @PostConstruct
-    public void init() throws Exception {
-      restTemplate = restUtil.restTemplate();
+  private RestTemplate restTemplate;
+
+  private final Logger log = LoggerFactory.getLogger(getClass().getName());
+
+  @PostConstruct
+  public void init() throws Exception {
+    restTemplate = restUtil.restTemplate();
+  }
+
+  public void executeAnalysis(String analysisId) {
+    AnalysisExecution execution = ImmutableAnalysisExecution.builder().type("scheduled").build();
+    String url = analysisUrl + "/{analysisId}/executions";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<AnalysisExecution> entity = new HttpEntity<>(execution, headers);
+    restTemplate.postForObject(url, entity, String.class, analysisId);
+  }
+
+  public void scheduleDispatch(SchedulerJobDetail analysis) {
+    if (analysis.getDescription() == null) analysis.setDescription("");
+
+    // in case if reading recipients list raises exception. Don't skip the scheduler processing
+    String recipients = null;
+    try {
+      recipients = prepareStringFromList(analysis.getEmailList());
+    } catch (Exception e) {
+      logger.error("Error reading recipients list: " + e.getMessage());
+      recipients = "";
     }
 
-
-    public void executeAnalysis(String analysisId) {
-        AnalysisExecution execution = ImmutableAnalysisExecution.builder()
-            .type("scheduled").build();
-        String url = analysisUrl + "/{analysisId}/executions";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<AnalysisExecution> entity = new HttpEntity<>(
-            execution, headers);
-        restTemplate.postForObject(url, entity, String.class, analysisId);
+    // in case if reading of ftp servers raises exception. Don't skip the scheduler processing
+    String ftpServers = null;
+    try {
+      ftpServers = prepareStringFromList(analysis.getFtp());
+    } catch (Exception e) {
+      logger.error("Error reading ftp servers list: " + e.getMessage());
+      ftpServers = "";
     }
 
-    public void scheduleDispatch(SchedulerJobDetail analysis) {
-        if (analysis.getDescription() == null) analysis.setDescription("");
+    String s3List = null;
+    try {
+      s3List = prepareStringFromList(analysis.getS3());
+    } catch (Exception e) {
+      logger.error("Error reading s3 List: " + e.getMessage());
+      s3List = "";
+    }
+    Boolean isZipRequired = analysis.getZip();
+    String[] latestExecution;
+    boolean isDslScheduled =
+        analysis.getType() != null
+            && (analysis.getType().equalsIgnoreCase("pivot")
+                || analysis.getType().equalsIgnoreCase("chart"));
+    if (isDslScheduled) {
+      latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
+    } else {
+      ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
+      latestExecution = findLatestExecution(executionBeans);
+    }
 
-        // in case if reading recipients list raises exception. Don't skip the scheduler processing
-        String recipients = null;
-        try {
-            recipients = prepareStringFromList(analysis.getEmailList());
-        } catch (Exception e) {
-            logger.error("Error reading recipients list: "+ e.getMessage());
-            recipients = "";
-        }
+    logger.debug("latestExecution : " + latestExecution[1]);
+    Date date = latestExecution != null ? new Date(Long.parseLong(latestExecution[1])) : new Date();
+    DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ssZ");
+    format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+    String formatted = format.format(date);
+    DispatchBean execution;
 
-        // in case if reading of ftp servers raises exception. Don't skip the scheduler processing
-        String ftpServers = null;
-        try {
-            ftpServers = prepareStringFromList(analysis.getFtp());
-        } catch (Exception e) {
-            logger.error("Error reading ftp servers list: "+ e.getMessage());
-            ftpServers = "";
-        }
-
-        String s3List = null;
-        try {
-            s3List = prepareStringFromList(analysis.getS3());
-        } catch (Exception e) {
-            logger.error("Error reading s3 List: "+ e.getMessage());
-            s3List = "";
-        }
-
-        ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-        String[] latestexection = findLatestExecution(executionBeans);
-        Date date = new Date(Long.parseLong(latestexection[1]));
-        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ssZ");
-        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-        String formatted = format.format(date);
-        DispatchBean execution;
-        Builder executionBuilder = ImmutableDispatchBean.builder()
+    Builder executionBuilder =
+        ImmutableDispatchBean.builder()
             .description(analysis.getDescription())
             .fileType(analysis.getFileType())
             .name(analysis.getAnalysisName())
             .userFullName(analysis.getUserFullName())
             .metricName(analysis.getMetricName())
             .jobGroup(analysis.getJobGroup())
-            .publishedTime(formatted);
+            .publishedTime(formatted)
+            .zip(isZipRequired);
 
-        if (!recipients.equals("")) {
-            executionBuilder
-                .emailList(recipients).fileType(analysis.getFileType());
-        }
-
-        if (!ftpServers.equals("")) {
-            executionBuilder
-                .ftp(ftpServers);
-        }
-
-        if (!s3List.equals("")) {
-            executionBuilder
-                .s3(s3List);
-        }
-
-        execution = executionBuilder.build();
-        String[] param = new String[3];
-        param[0] = analysis.getAnalysisID();
-        param[1] = latestexection[0];
-        param[2] = analysis.getType();
-        String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<DispatchBean> entity = new HttpEntity<>(
-                execution, headers);
-
-        if (latestexection[0] != null) {
-            restTemplate.postForObject(url, entity, String.class, param);
-        }
+    if (!recipients.equals("")) {
+      executionBuilder.emailList(recipients).fileType(analysis.getFileType());
     }
 
-    private ExecutionBean[] fetchExecutionID(String analysisId)
-    {
-        String url = analysisUrl + "/{analysisId}/executions";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-       return restTemplate.getForObject(url, ExecutionResponse.class, analysisId).executions();
-
+    if (!ftpServers.equals("")) {
+      executionBuilder.ftp(ftpServers);
     }
 
-    private String[] findLatestExecution(ExecutionBean[] executionBeans)
-    {
-        String latestExecutionID = null;
-        String latestFinish =null;
+    if (!s3List.equals("")) {
+      executionBuilder.s3(s3List);
+    }
 
-        /** TO DO : pivot Analysis does not contains execution status , It may bug in system
-         *   consider status by-default as success if execution doesn't contains status
-         */
+    execution = executionBuilder.build();
 
-        if (executionBeans.length>0) {
-            // Initialize latestExecution.
-            latestExecutionID = executionBeans[0].id();
-            latestFinish = executionBeans[0].finished();
-            for (ExecutionBean executionBean : executionBeans) {
-               if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
-                       && (executionBean.status()==null || executionBean.status().equalsIgnoreCase("Success")))
-               {
-                   latestExecutionID = executionBean.id();
-                   latestFinish = executionBean.finished();
-               }
-            }
+    String[] param = new String[3];
+    param[0] = analysis.getAnalysisID();
+    param[1] = latestExecution != null && latestExecution.length > 0 ? latestExecution[0] : null;
+    param[2] = analysis.getType();
+    String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<DispatchBean> entity = new HttpEntity<>(execution, headers);
+
+    if (latestExecution.length > 0 && latestExecution[0] != null) {
+      restTemplate.postForObject(url, entity, String.class, param);
+    }
+  }
+
+  private ExecutionBean[] fetchExecutionID(String analysisId) {
+    String url = analysisUrl + "/{analysisId}/executions";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return restTemplate.getForObject(url, ExecutionResponse.class, analysisId).executions();
+  }
+
+  private String[] findLatestExecution(ExecutionBean[] executionBeans) {
+    String latestExecutionID = null;
+    String latestFinish = null;
+
+    /**
+     * TO DO : pivot Analysis does not contains execution status , It may bug in system consider
+     * status by-default as success if execution doesn't contains status
+     */
+    if (executionBeans.length > 0) {
+      // Initialize latestExecution.
+      latestExecutionID = executionBeans[0].id();
+      latestFinish = executionBeans[0].finished();
+      for (ExecutionBean executionBean : executionBeans) {
+        if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
+            && (executionBean.status() == null
+                || executionBean.status().equalsIgnoreCase("Success"))) {
+          latestExecutionID = executionBean.id();
+          latestFinish = executionBean.finished();
         }
-         String[] val = new String [2];
-        val[0] = latestExecutionID;
-        val[1] = latestFinish;
-        return val;
+      }
     }
+    String[] val = new String[2];
+    val[0] = latestExecutionID;
+    val[1] = latestFinish;
+    return val;
+  }
 
-    private String prepareStringFromList(List<String> source) {
-        return String.join(",", source);
+  private String prepareStringFromList(List<String> source) {
+    return String.join(",", source);
+  }
+
+  private String[] fetchLatestFinishedTime(String analysisId) {
+    logger.debug("New dsl analysis start here..");
+    String url = proxyAnalysisUrl + "/{analysisId}/executions";
+    logger.debug("proxyAnalysisUrl :" + proxyAnalysisUrl);
+    try {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+      DSLExecutionBean[] dslExecutionBeans =
+          restTemplate.getForObject(url, DSLExecutionBean[].class, analysisId);
+      logger.debug("DSLExecutionBean response :" + dslExecutionBeans.length);
+
+      String latestExecutionID = null;
+      String latestFinish = null;
+      if (dslExecutionBeans != null && dslExecutionBeans.length > 0) {
+        // Initialize latestExecution.
+        latestExecutionID = dslExecutionBeans[0].getExecutionId();
+        logger.debug("latestExecutionID :" + latestExecutionID);
+        latestFinish = dslExecutionBeans[0].getFinishedTime();
+        logger.debug("latestFinish :" + latestFinish);
+        for (DSLExecutionBean executionBean : dslExecutionBeans) {
+          if (Long.parseLong(executionBean.getFinishedTime()) > Long.parseLong(latestFinish)
+              && (executionBean.getStatus() == null
+                  || executionBean.getStatus().equalsIgnoreCase("Success"))) {
+            latestExecutionID = executionBean.getExecutionId();
+            latestFinish = executionBean.getFinishedTime();
+          }
+        }
+      }
+      String[] val = new String[2];
+      logger.debug("latestExecutionID :" + latestExecutionID);
+      logger.debug("latestFinish :" + latestFinish);
+      val[0] = latestExecutionID;
+      val[1] = latestFinish;
+      return val;
+    } catch (Exception ex) {
+      logger.debug(ex.getMessage());
     }
+    return null;
+  }
 
+  @Override
+  public void executeDslAnalysis(String analysisId) {
+    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+    logger.info("URL for request body :" + dslUrl);
+    AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
+
+    Analysis analysis = analysisResponse.getAnalysis();
+    logger.info("Analysis request body :" + analysisResponse.getAnalysis());
+
+    String url =
+        proxyAnalysisUrl
+            + "/execute?id="
+            + analysisId
+            + "&size="
+            + dispatchRowLimit
+            + "&ExecutionType=scheduled";
+    logger.info("Execute URL for dispatch :" + url);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
+
+    restTemplate.postForObject(url, requestEntity, String.class);
+  }
 }

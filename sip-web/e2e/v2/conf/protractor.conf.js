@@ -6,6 +6,7 @@ var argv = require('yargs').argv;
 const SuiteSetup = require('../helpers/SuiteSetup');
 const logger = require('./logger')(__filename);
 const testSuites = require('./testSuites');
+const Constants = require('../helpers/Constants');
 /**
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
@@ -153,7 +154,7 @@ exports.config = {
 
     // Get failed test data
     jasmine.getEnv().addReporter(
-      new function() {
+      new (function() {
         this.specDone = function(result) {
           if (result.status !== 'passed') {
             logger.debug('Test is failed: ' + JSON.stringify(result.testInfo));
@@ -163,8 +164,12 @@ exports.config = {
           // This fill be used for converting to junit xml so that e2e results can display under test status in bamboo
           new SuiteSetup().addToExecutedTests(result);
         };
-      }()
+      })()
     );
+
+    browser.baseUrl = JSON.parse(
+      fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', 'utf8')
+    ).baseUrl;
 
     browser.get(browser.baseUrl);
     browser.waitForAngular();
@@ -175,6 +180,7 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: () => {
+    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
     if (!run.localRun || (run.localRun && run.firstRun)) {
       logger.info('Doing cleanup and setting up test data for e2e tests....');
       // Generate test data
@@ -192,7 +198,6 @@ exports.config = {
         logger.info('Generating test for this run...');
 
         let APICommonHelpers = require('../helpers/api/APICommonHelpers');
-
 
         let apiBaseUrl = APICommonHelpers.getApiUrl(appUrl);
         let token = APICommonHelpers.generateToken(apiBaseUrl);
@@ -218,6 +223,7 @@ exports.config = {
     }
   },
   afterLaunch: () => {
+    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     // Delete old e2e unique id.
     if (!run.localRun) {
       if (fs.existsSync('target/e2e/e2eId.json')) {

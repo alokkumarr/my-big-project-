@@ -67,11 +67,8 @@ export class DesignerDateFilterComponent implements OnInit {
 
   onPresetChange(change) {
     this.tempModel.preset = change.value;
-    if (change.value !== CUSTOM_DATE_PRESET_VALUE) {
-      this.tempModel.gte = null;
-      this.tempModel.lte = null;
-    }
-
+    this.tempModel.gte = null;
+    this.tempModel.lte = null;
     this.showDateFields = change.value === CUSTOM_DATE_PRESET_VALUE;
     this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
   }

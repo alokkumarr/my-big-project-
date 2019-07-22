@@ -122,15 +122,15 @@ public class SecurityController {
 			ticket.setValidityReason("Database error. Please contact server Administrator.");
 			ticket.setError(de.getMessage());
 			return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
-					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 		} catch (Exception e) {
 			logger.error("Exception occured creating ticket ", e, null);
 			return null;
 		}
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
@@ -138,7 +138,7 @@ public class SecurityController {
 	        logger.info("Authenticating & getting the customerDetails starts here");
 	        token = token.replaceAll("Bearer", "").trim();
 	        UserCustomerMetaData userRelatedMetaData = new UserCustomerMetaData();
-	        Claims body = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(token).getBody();
+	        Claims body = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(token).getBody();
 	        ObjectMapper objectMapper = new ObjectMapper();
 	        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 	        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -179,7 +179,7 @@ public class SecurityController {
 	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
 	public LoginResponse accessToken(@RequestBody String rToken) throws ServletException {
 
-		Claims refreshToken = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(rToken).getBody();
+		Claims refreshToken = Jwts.parser().setSigningKey(nSSOProperties.getJwtSecretKey()).parseClaimsJws(rToken).getBody();
 		// Check if the refresh Token is valid
 		Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
 		Boolean validity = false;
@@ -225,7 +225,7 @@ public class SecurityController {
 				ticket.setValidityReason("Database error. Please contact server Administrator.");
 				ticket.setError(de.getMessage());
 				return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 			} catch (Exception e) {
 				logger.error("Exception occured creating ticket ", e, null);
 				return null;
@@ -233,9 +233,9 @@ public class SecurityController {
 
 			return new LoginResponse(
 					Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),
+							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
 					Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
-							.signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 		}
 	}
 
@@ -267,15 +267,15 @@ public class SecurityController {
 			ticket.setValidityReason("Database error. Please contact server Administrator.");
 			ticket.setError(de.getMessage());
 			return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
-					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 		} catch (Exception e) {
 			logger.error("Exception occured creating ticket ", e, null);
 			return null;
 		}
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("rToken", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("rToken", rToken)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 	}
 
 	/**
@@ -758,7 +758,7 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.GET)
         public List<SecurityGroups> getSecurityGroups(HttpServletRequest request,HttpServletResponse response) {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
         Long custId = Long.valueOf(extractValuesFromToken[1]);
 	    List<SecurityGroups> groupNames = dataSecurityKeyRepository.fetchSecurityGroupNames(custId);
 	    return groupNames;
@@ -772,7 +772,7 @@ public class SecurityController {
     @RequestMapping(value = "/auth/admin/security-groups",method = RequestMethod.POST)
     public Object addSecurityGroups(HttpServletRequest request, HttpServletResponse response,@RequestBody SecurityGroups securityGroups)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         String createdBy = extractValuesFromToken[2];
         String roleType = extractValuesFromToken[3];
         Long custId = Long.valueOf(extractValuesFromToken[1]);
@@ -808,7 +808,7 @@ public class SecurityController {
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}/name",method = RequestMethod.PUT)
     public Object updateSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody List<String> oldNewGroups) {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         Long custId = Long.valueOf(extractValuesFromToken[1]);
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
@@ -841,7 +841,7 @@ public class SecurityController {
     @RequestMapping(value = "/auth/admin/security-groups/{securityGroupId}",method = RequestMethod.DELETE)
     public Valid deleteSecurityGroups(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -869,7 +869,7 @@ public class SecurityController {
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.POST)
     public Valid addSecurityGroupDskAttributeValues(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -898,7 +898,7 @@ public class SecurityController {
     @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method =  RequestMethod.PUT)
     public Valid updateAttributeValues(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId, @RequestBody AttributeValues attributeValues)    {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -936,7 +936,7 @@ public class SecurityController {
     @RequestMapping (value = "/auth/admin/security-groups/{securityGroupId}/dsk-attributes/{attributeName}", method = RequestMethod.DELETE)
     public Valid deleteSecurityGroupDskAttribute(HttpServletRequest request, HttpServletResponse response,@PathVariable(name = "securityGroupId", required = true) Long securityGroupId,@PathVariable(name = "attributeName", required = true) String attributeName)   {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
             Valid valid = new Valid();
@@ -967,7 +967,7 @@ public class SecurityController {
     @RequestMapping ( value = "/auth/admin/users/{userSysId}/security-group", method = RequestMethod.PUT)
     public Valid updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable (name = "userSysId", required = true) Long userSysId, @RequestBody String securityGroupName)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         Long custId = Long.valueOf(extractValuesFromToken[1]);
         String roleType = extractValuesFromToken[3];
         if (!roleType.equalsIgnoreCase(AdminRole)) {
@@ -1005,7 +1005,7 @@ public class SecurityController {
     @RequestMapping ( value = "/auth/admin/user-assignments", method = RequestMethod.GET)
     public List<UserAssignment> getAllUserAssignments(HttpServletRequest request, HttpServletResponse response)  {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         Long custId = Long.valueOf(extractValuesFromToken[1]);
 	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
@@ -1763,7 +1763,7 @@ public class SecurityController {
     public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
 	    String jwtToken = JWTUtils.getToken(request);
-	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         userPreferences.setUserID(extractValuesFromToken[0]);
         userPreferences.setCustomerID(extractValuesFromToken[1]);
         userPreferences.setPreferences(preferenceList);
@@ -1780,7 +1780,7 @@ public class SecurityController {
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
         UserPreferences userPreferences = new UserPreferences();
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         userPreferences.setUserID(extractValuesFromToken[0]);
         userPreferences.setCustomerID(extractValuesFromToken[1]);
         userPreferences.setPreferences(preferenceList);
@@ -1797,7 +1797,7 @@ public class SecurityController {
     @RequestMapping(value= "/auth/admin/user/preferences/fetch", method = RequestMethod.GET)
     public Object fetchUserPreferences(HttpServletRequest request, HttpServletResponse response) {
         String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
 }

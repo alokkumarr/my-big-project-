@@ -79,17 +79,50 @@ public interface BisFileLogsRepository extends JpaRepository<BisFileLog, String>
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
   Integer countOfLongRunningTransfers(@Param("minutesForLongProc") Integer minutesForLongProc);
   
+  @Query("SELECT COUNT(jobId) from BisJobEntity job  where job.jobStatus = 'INPROGRESS' " 
+      + "and ( (TIMEDIFF(NOW(), job.updatedDate)/60)> :minutesForLongJob )")
+  Integer countOfLongRunningJobs(@Param("minutesForLongJob") Integer minutesForLongJob);
+  
   @Modifying
-  @Query("UPDATE  BisFileLog Logs set Logs.mflFileStatus = 'FAILED', "
-      + "Logs.bisProcessState = 'FAILED' where (Logs.mflFileStatus = 'INPROGRESS' " 
+  @Query("SELECT  Logs from BisFileLog Logs  where (Logs.mflFileStatus = 'INPROGRESS' " 
       + "and Logs.bisProcessState = 'DATA_INPROGRESS') and "
       + "(TIMEDIFF(NOW(), Logs.checkpointDate)/60)> :minutesForLongProc  ")
-  Integer updateLongRunningTranfers(@Param("minutesForLongProc") Integer minutesForLongProc);
+  List<BisFileLog> selectLongRunningTranfers(@Param("minutesForLongProc") 
+      Integer minutesForLongProc);
   
-  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( Logs.source = 'REGULAR' "
-        + "and Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = "
-        + "'DATA_INPROGRESS' and Logs.routeSysId = :routeId )")
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE BisJobEntity job SET job.jobStatus = :jobStatus, "
+      + "job.updatedDate = NOW() WHERE  job.jobStatus = 'INPROGRESS' and "
+      + "(TIMEDIFF(NOW(), job.updatedDate)/60)> :minutesForLongJob")
+  Integer updateBisJob(@Param("jobStatus") String jobStatus, 
+      @Param("minutesForLongJob") Integer minutesForLongJob);
+  
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where  Logs.source = 'REGULAR' "
+        + "and ((Logs.mflFileStatus = 'INPROGRESS' and Logs.bisProcessState = 'DATA_INPROGRESS') "
+        + " or (Logs.mflFileStatus = 'OPEN' and Logs.bisProcessState = 'OPEN'))"
+        + " and Logs.routeSysId = :routeId ")
         Integer countOfInProgress(@Param("routeId") Long routeId);
+  
+  @Query("SELECT COUNT(pid) from BisFileLog Logs where ( "
+      + " (Logs.mflFileStatus = 'SUCCESS' and Logs.bisProcessState = "
+      + "'DATA_RECEIVED') or (Logs.mflFileStatus = 'FAILED' and Logs.bisProcessState = "
+      + "'DUPLICATE')) and (Logs.job.jobId = :jobId )")
+      Long getSuccessCntForJob(@Param("jobId") Long jobId);
+  
+  @Query("SELECT Logs FROM BisFileLog Logs  JOIN Logs.job BisJobEntity  "
+      + "WHERE Logs.mflFileStatus = 'OPEN' and Logs.job.jobStatus = 'INPROGRESS'")
+  List<BisFileLog> findFirstOpenLog();
+  
+  
+  Long countByMflFileStatusAndBisProcessStateAndJob_JobId(
+      String name, String processState, Long jobId);
+  
+  Long countByJob_JobId(Long jobId);
+  
+  List<BisFileLog> findByJob_JobId(Long jobId, Pageable pageable);
+  
+  List<BisFileLog> findByChannelSysIdAndRouteSysId(Long channelId, Long routeId);
 
+  List<BisFileLog> findByChannelSysId(Long channelId);
 
 }

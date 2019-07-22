@@ -6,19 +6,22 @@ import {
   ElementRef
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
-import * as html2pdf from 'html2pdf.js';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import * as Bowser from 'bowser';
 
-import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { FirstDashboardGuard } from '../../guards';
-import { JwtService, ConfigService } from '../../../../common/services';
+import {
+  JwtService,
+  ConfigService,
+  ToastService,
+  HtmlDownloadService
+} from '../../../../common/services';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
-import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
 import { map, catchError, flatMap } from 'rxjs/operators';
@@ -26,10 +29,10 @@ import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
 
-function downloadDataUrlFromJavascript(filename, dataUrl) {
-  const blob = dataURItoBlob(dataUrl);
-  saveAs(blob, filename);
-}
+const browser = get(
+  Bowser.getParser(window.navigator.userAgent).getBrowser(),
+  'name'
+);
 
 @Component({
   selector: 'observe-view',
@@ -59,13 +62,15 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private _downloadService: HtmlDownloadService,
     private guard: FirstDashboardGuard,
     private dashboardService: DashboardService,
     private router: Router,
     private filters: GlobalFilterService,
     private configService: ConfigService,
     private jwt: JwtService,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    public _toastMessage: ToastService
   ) {
     const navigationListener = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -227,42 +232,23 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   downloadDashboard() {
-    const FILE_NAME = this.dashboard.name;
-    const elem = this.downloadContainer.nativeElement.getElementsByTagName(
-      'gridster'
-    )[0];
+    const nativeElement = this.downloadContainer.nativeElement;
+    const fileName = this.dashboard.name;
+    const mapBoxComponents = Array.from(
+      nativeElement.getElementsByTagName('map-box')
+    );
 
-    /* Set overflow to visible manually to fix safari's bug. Without this,
-     * safari downloads a blank image */
-    const overflow = elem.style.overflow;
-    elem.style.overflow = 'visible';
+    if (browser !== 'Chrome' && !isEmpty(mapBoxComponents)) {
+      const title = 'Browser not supported.';
+      const msg =
+        'Downloading dashboard with map analyses only works with Chrome browser at the moment.';
+      this._toastMessage.warn(msg, title);
+      return;
+    }
 
-    html2pdf()
-      .from(elem)
-      .set({
-        margin: 1,
-        filename: `${FILE_NAME}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-          backgroundColor: '#f4f5f4',
-          scale: 2,
-          width: elem.scrollWidth,
-          height: elem.scrollHeight,
-          windowWidth: elem.scrollWidth,
-          windowHeight: elem.scrollHeight
-        },
-        jsPDF: {
-          unit: 'px',
-          orientation: 'landscape',
-          format: [elem.scrollHeight + 50, elem.scrollWidth]
-        }
-      })
-      // .save(); // comment this and uncomment following lines if png is needed instead of pdf
-      .outputImg('datauristring')
-      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
-      .then(() => {
-        elem.style.overflow = overflow;
-      });
+    const elemToDownload = nativeElement.getElementsByTagName('gridster')[0];
+
+    this._downloadService.downloadDashboard(elemToDownload, fileName);
   }
 
   editDashboard(): void {
@@ -293,20 +279,38 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    * @memberof ObserveViewComponent
    */
   onApplyGlobalFilter(data): void {
-    if (!data) {
+    if (data === false) {
       this.sidenav.close();
       return;
     }
-    if (!isEmpty(data.analysisFilters)) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
-    if (!isEmpty(data.kpiFilters)) {
+
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
+      this.filters.onApplyKPIFilter.next(data.kpiFilters);
+    }
+    this.sidenav.close();
+  }
+
+  onClearGlobalFilter(data) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
+      this.filters.onApplyFilter.next(data.analysisFilters);
+    }
+
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
     this.sidenav.close();
   }
 
   loadDashboard(): Observable<Dashboard> {
+    this.filters.resetLastKPIFilterApplied();
+    this.filters.resetLastAnalysisFiltersApplied();
     return this.observe.getDashboard(this.dashboardId).pipe(
       map((data: Dashboard) => {
         this.dashboard = data;

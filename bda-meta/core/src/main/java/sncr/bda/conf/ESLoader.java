@@ -97,6 +97,30 @@ public class ESLoader {
     private String esPass;
 
     /**
+     * Is SSL enabled for ElasticSearch
+     *
+     */
+    @SerializedName("esSslEnabled")
+    @Expose
+    private Boolean esSslEnabled;
+
+    /**
+     * Key store path for the ElasticSearch
+     *
+     */
+    @SerializedName("keyStorePath")
+    @Expose
+    private String keyStorePath;
+
+    /**
+     * Store password for the ElasticSearch
+     *
+     */
+    @SerializedName("storePassword")
+    @Expose
+    private String storePassword;
+
+    /**
      * No args constructor for use in serialization
      *
      */
@@ -313,6 +337,54 @@ public class ESLoader {
      */
     public void setEsPass(String esPass) {
         this.esPass = esPass;
+    }
+
+    /**
+     * Gets esSslEnabled
+     *
+     * @return value of esSslEnabled
+     */
+    public Boolean getEsSslEnabled() {
+        return esSslEnabled;
+    }
+
+    /**
+     * Sets esSslEnabled
+     */
+    public void setEsSslEnabled(Boolean esSslEnabled) {
+        this.esSslEnabled = esSslEnabled;
+    }
+
+    /**
+     * Gets keyStorePath
+     *
+     * @return value of keyStorePath
+     */
+    public String getKeyStorePath() {
+        return keyStorePath;
+    }
+
+    /**
+     * Sets keyStorePath
+     */
+    public void setKeyStorePath(String keyStorePath) {
+        this.keyStorePath = keyStorePath;
+    }
+
+    /**
+     * Gets storePassword
+     *
+     * @return value of storePassword
+     */
+    public String getStorePassword() {
+        return storePassword;
+    }
+
+    /**
+     * Sets storePassword
+     */
+    public void setStorePassword(String storePassword) {
+        this.storePassword = storePassword;
     }
 
     @Override

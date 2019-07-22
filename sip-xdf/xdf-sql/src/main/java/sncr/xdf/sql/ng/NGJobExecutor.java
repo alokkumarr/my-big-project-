@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.sql.*;
 
@@ -68,9 +68,8 @@ public class NGJobExecutor {
     }
 
 
-    public Long start(String tempDir) throws XDFException {
-
-        Long rc = 0L;
+    public int start(String tempDir) throws XDFException {
+        int rc = 0;
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
@@ -79,7 +78,10 @@ public class NGJobExecutor {
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
             scriptDescriptor.parseSQLScript();
-            scriptDescriptor.resolveTableNames();
+
+            if (parent.getNgctx().inputDataSets.size() > 0) {
+                scriptDescriptor.resolveTableNames();
+            }
             scriptDescriptor.resultIntegrityCheck();
 
             if (HFileOperations.exists(tempDir)) {
@@ -88,11 +90,15 @@ public class NGJobExecutor {
             }
             HFileOperations.createDir(tempDir);
             logger.trace("NGJobExecutor:start :"+tempDir);
+
+            HFileOperations.exists(tempDir);
+
             List<Statement> statements = scriptDescriptor.getParsedStatements().getStatements();
 
             for (int i = 0; i < statements.size(); i++) {
 
                 SQLDescriptor descriptor = scriptDescriptor.getSQLDescriptor(i);
+
                 if (descriptor.statementType == StatementType.UNKNOWN) continue;
                 if (descriptor.statementType  == StatementType.CREATE) {
 
@@ -102,16 +108,15 @@ public class NGJobExecutor {
                         descriptor.result =(rc != 0)?"failed":"success";
                         if (rc != 0){
                             logger.error("Could not execute SQL statement: " + i );
-                            return -1L;
+                            return -1;
                         }
                         report.add(descriptor);
 
                     } catch (Exception e) {
-                        logger.error("Cannot execute SQL: " + descriptor.SQL + " reason: ", e);
-                        logger.error("Remove temporary directory and cancel batch processing.");
+                        logger.error("************** Cannot execute SQL: " + descriptor.SQL + " reason: ", e);
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
-                        return -1L;
+                        return -1;
                     }
                 }
 
@@ -144,7 +149,7 @@ public class NGJobExecutor {
                         logger.error("DROP TABLE statement cannot be executed: source data location for table: " + descriptor.tableDescriptor.tableName + " is Empty or null");
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
-                        return -1L;
+                        return -1;
                     }
                 }
                 logger.debug("SQL statement was successfully processed: " + descriptor.tableDescriptor.toString());
@@ -153,18 +158,17 @@ public class NGJobExecutor {
             for( SQLDescriptor sqlDescriptor: report) {
                 //Remove temporary tables/objects
                 if (sqlDescriptor.isTemporaryTable) {
+                    //Don't add descriptor for temp table in the result
                     logger.debug("Do not process temporary table: " + sqlDescriptor.targetTableName);
-                    if (HFileOperations.exists(sqlDescriptor.targetTransactionalLocation))
-                        HFileOperations.deleteEnt(sqlDescriptor.targetTransactionalLocation);
+                    if (HFileOperations.exists(sqlDescriptor.transactionalLocation+Path.SEPARATOR+sqlDescriptor.targetTableName))
+                        HFileOperations.deleteEnt(sqlDescriptor.transactionalLocation+Path.SEPARATOR+sqlDescriptor.targetTableName);
                     continue;
                 }
                 else{
-                    logger.trace("Add result table: " + sqlDescriptor.targetTableName );
+                    logger.debug("Add result table: " + sqlDescriptor.targetTableName );
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
-/*
                     Map<String, Object> ods = parent.getNgctx().outputDataSets.get(sqlDescriptor.targetTableName);
                     ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
-*/
                 }
             }
 

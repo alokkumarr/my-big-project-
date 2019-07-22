@@ -49,9 +49,9 @@
     <app.user>mapr</app.user>
     <app.group>mapr</app.group>
     <!-- deps versions -->
-    <spark-version>2.2.1</spark-version>
+    <spark-version>2.3.1</spark-version>
     <scala.version>2.11</scala.version>
-    <mapr.client>6.0.1-mapr</mapr.client>
+    <mapr.client>6.1.0-mapr</mapr.client>
     <es.version>6.3.0</es.version>
 
     <junit.version>4.11</junit.version>
@@ -97,9 +97,10 @@
 
     <!-- MapR specifics -->
     <dependency>
+      <!-- TODO: Check on this version -->
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-streaming-kafka-0-9_2.11</artifactId>
-      <version>${spark-version}-mapr-1803</version>
+      <artifactId>spark-streaming-kafka-0-10_${scala.version}</artifactId>
+      <version>2.3.2.0-mapr-1901</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -137,4 +138,20 @@
   <build>
     <defaultGoal>package</defaultGoal>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>

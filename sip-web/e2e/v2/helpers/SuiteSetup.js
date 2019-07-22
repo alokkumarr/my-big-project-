@@ -171,7 +171,6 @@ class SuiteSetup {
       completeTestData = Object.assign(data, completeTestData);
     });
     // Filter the data based on suite
-    console.log('completeTestData---' + JSON.stringify(completeTestData));
     if (currentSuite) {
       completeTestData = this.filterDataBySuite(completeTestData, currentSuite);
     }
@@ -225,6 +224,11 @@ class SuiteSetup {
           Constants.E2E_OUTPUT_BASE_DIR +
           '/retry/failedTestDataForRetry.json'
       );
+    } else if (
+      !fs.existsSync(Constants.E2E_OUTPUT_BASE_DIR + '/result/testResult.json')
+    ) {
+      // if result is not created then it means something is wrong.
+      logger.error('oopps....!!! There are unexpected failures!');
     } else {
       logger.info('Yahooo....!!! There are no failures!');
     }
@@ -245,6 +249,7 @@ class SuiteSetup {
 
   static getSawWebUrl() {
     let url;
+    let isHttps;
 
     if (!fs.existsSync('target')) {
       fs.mkdirSync('target');
@@ -259,11 +264,19 @@ class SuiteSetup {
       ).baseUrl;
     } else {
       process.argv.forEach(function(val) {
+        if (val.includes('--isHttps')) {
+          isHttps = val.split('=')[1];
+          return;
+        }
+      });
+
+      process.argv.forEach(function(val) {
         if (val.includes('--baseUrl')) {
           url = val.split('=')[1];
           let urlObject = {
-            baseUrl: url
+            baseUrl: Utils.getUrl(url, isHttps)
           };
+          url = urlObject.baseUrl;
           fs.writeFileSync(
             Constants.E2E_OUTPUT_BASE_DIR + '/url.json',
             JSON.stringify(urlObject),
@@ -391,14 +404,13 @@ class SuiteSetup {
           }
         });
       }
-      if (suiteName !== undefined && suiteName === 'critical') {
-        logger.warn('Executing with critical suite test data set.....');
-        return SuiteSetup.readAllData(null, 'critical');
+      if (suiteName) {
+        const suite = suiteName.trim().toLowerCase();
+        logger.warn(`Executing with ${suite} suite test data set.....`);
+        return SuiteSetup.readAllData(null, suite);
       } else {
-        logger.warn('Executing with full suite test data set....');
-        //let data = JSON.parse(fs.readFileSync('../saw-web/e2e/v2/testdata/data.json', 'utf8'));
-        let data = SuiteSetup.readAllData(null, null);
-        return data;
+        logger.warn('Executing with critical suite test data set....');
+        return SuiteSetup.readAllData(null, 'critical');
       }
     }
   }

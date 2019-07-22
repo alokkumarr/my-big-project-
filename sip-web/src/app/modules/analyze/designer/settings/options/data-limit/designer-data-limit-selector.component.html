@@ -13,10 +13,10 @@
       class="designer-data-limit__type"
       appearance="legacy"
     >
-      <mat-button-toggle value="top">
+      <mat-button-toggle (click)="onToggleClicked('top')" value="top" e2e="top-btn">
         Top
       </mat-button-toggle>
-      <mat-button-toggle value="bottom">
+      <mat-button-toggle (click)="onToggleClicked('bottom')" value="bottom" e2e="bottom-btn">
         Bottom
       </mat-button-toggle>
     </mat-button-toggle-group>
@@ -29,6 +29,7 @@
   >
     <mat-label>Value</mat-label>
     <input
+      e2e="limit-value"
       matInput
       type="number"
       min="0"

@@ -124,14 +124,34 @@ export class CreateDashboardComponent
   }
 
   onApplyGlobalFilter(data): void {
-    if (!data) {
+    if (data === false) {
       this.widgetSidenav.close();
       return;
     }
-    if (!isEmpty(data.analysisFilters)) {
+    if (
+      this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)
+    ) {
+      this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
       this.globalFilterService.onApplyFilter.next(data.analysisFilters);
     }
-    if (!isEmpty(data.kpiFilters)) {
+
+    if (this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+      this.globalFilterService.lastKPIFilter = data.kpiFilters;
+      this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
+    }
+    this.widgetSidenav.close();
+  }
+
+  onClearGlobalFilter(data) {
+    if (
+      this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)
+    ) {
+      this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
+      this.globalFilterService.onApplyFilter.next(data.analysisFilters);
+    }
+
+    if (this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
+      this.globalFilterService.lastKPIFilter = data.kpiFilters;
       this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
     }
     this.widgetSidenav.close();
@@ -147,6 +167,8 @@ export class CreateDashboardComponent
   }
 
   exitCreator() {
+    this.globalFilterService.resetLastKPIFilterApplied();
+    this.globalFilterService.resetLastAnalysisFiltersApplied();
     this.locationService.back();
   }
 
@@ -238,6 +260,8 @@ export class CreateDashboardComponent
     dialogRef.afterClosed().subscribe((result: Dashboard) => {
       if (result) {
         this.updateSideMenu(result);
+        this.globalFilterService.resetLastKPIFilterApplied();
+        this.globalFilterService.resetLastAnalysisFiltersApplied();
         this.router.navigate(['observe', result.categoryId], {
           queryParams: { dashboard: result.entityId }
         });

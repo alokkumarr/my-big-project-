@@ -6,10 +6,10 @@ import java.util.List;
 
 import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.pivot.DataField;
+import org.apache.http.client.HttpClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -35,32 +35,69 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     String jsonString;
     String dataSecurityString;
     SearchSourceBuilder searchSourceBuilder;
+    HttpClient client;
+    private String trustStore;
+    private String trustPassWord;
+    private String keyStore;
+    private String keyPassword;
+    private boolean sslEnabled;
 
   private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     private final static String VALUE = "value";
     private final static String SUM ="_sum";
     Integer timeOut = 3;
 
-  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut) {
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut, HttpClient client) {
     super();
     this.jsonString = jsonString;
     this.timeOut = timeOut;
+    this.client = client;
+
   }
 
-  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut) {
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut, HttpClient client) {
 	    super();
 	    this.dataSecurityString = dataSecurityKey;
 	    this.jsonString = jsonString;
 	    this.timeOut = timeOut;
+	    this.client = client;
 }
 
-  public String getDataSecurityString() {
-	return dataSecurityString;
-}
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut,
+      String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+    super();
+    this.jsonString = jsonString;
+    this.timeOut = timeOut;
+    this.keyPassword = keyPassword;
+    this.keyStore = keyStore;
+    this.trustPassWord = trustPassWord;
+    this.trustStore = trustStore;
+    this.sslEnabled = sslEnabled;
 
-public String getJsonString() {
-    return jsonString;
   }
+
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,
+      Integer timeOut, String trustStore, String trustPassWord, String keyStore, String keyPassword,
+      boolean sslEnabled) {
+        super();
+        this.dataSecurityString = dataSecurityKey;
+        this.jsonString = jsonString;
+        this.timeOut = timeOut;
+        this.keyPassword = keyPassword;
+        this.keyStore = keyStore;
+        this.trustPassWord = trustPassWord;
+        this.trustStore = trustStore;
+        this.sslEnabled = sslEnabled;
+}
+
+    public String getDataSecurityString() {
+    	return dataSecurityString;
+    }
+
+    public String getJsonString() {
+        return jsonString;
+      }
 
   /**
    * This method is used to generate the query to build elastic search query for<br/>
@@ -75,6 +112,7 @@ public String getJsonString() {
     String query = null;
     SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(getJsonString(), "sqlBuilder");
     int size = 0;
+    HttpEsUtils client = new HttpEsUtils();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
     if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
@@ -210,7 +248,7 @@ public String getJsonString() {
           preSearchSourceBuilder.query(boolQueryBuilder);
           QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
           String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                  "system","analyse", timeOut);
+                  "system","analyse", timeOut, client.getHttpClient(trustStore, trustPassWord, keyStore, keyPassword, sslEnabled));
           // Set total sum for dataFields will be used for percentage calculation.
           objectMapper = new ObjectMapper();
           JsonNode objectNode = objectMapper.readTree(result);

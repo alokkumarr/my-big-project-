@@ -12,9 +12,10 @@ spring:
       file-size-threshold: 2KB
 logging:
   level:
-    org.springframework: WARN
+    org.springframework: INFO
     com.synchronoss.saw.workbench: INFO
     com.synchronoss.bda: INFO
+    org.apache.http.client: INFO
 server:
   address: localhost
   port: 9701

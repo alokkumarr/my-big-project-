@@ -1,17 +1,25 @@
-import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  OnInit,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
+import { Router } from '@angular/router';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import {
   ExecuteService,
   EXECUTION_STATES
 } from '../../services/execute.service';
-import { DesignerSaveEvent } from '../../designer/types';
-import { Analysis, AnalyzeViewActionEvent } from '../types';
+import { DesignerSaveEvent, isDSLAnalysis } from '../../designer/types';
+import { Analysis, AnalysisDSL, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
-import * as isUndefined from 'lodash/isUndefined';
 
 @Component({
   selector: 'analyze-list-view',
@@ -19,23 +27,37 @@ import * as isUndefined from 'lodash/isUndefined';
   styleUrls: ['./analyze-list-view.component.scss']
 })
 export class AnalyzeListViewComponent implements OnInit {
+  @ViewChild('analysesGrid') analysesGrid: DxDataGridComponent;
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input('analyses')
-  set setAnalyses(analyses: Analysis[]) {
+  set setAnalyses(analyses: Array<Analysis | AnalysisDSL>) {
     this.analyses = analyses;
     if (!isEmpty(analyses)) {
+      const firstAnalysis = analyses[0];
       this.canUserFork = this._jwt.hasPrivilege('FORK', {
-        subCategoryId: analyses[0].categoryId
+        subCategoryId: isDSLAnalysis(firstAnalysis)
+          ? firstAnalysis.category
+          : firstAnalysis.categoryId
       });
     }
   }
   @Input() analysisType: string;
   @Input() searchTerm: string;
-  @Input() cronJobs: any;
+  @Input('cronJobs') set _cronJobs(value) {
+    if (isEmpty(value)) {
+      return;
+    }
+    this.cronJobs = value;
+    if (this.analysesGrid && this.analysesGrid.instance && this.analyses) {
+      // this.analyses = [...this.analyses];
+      this.analysesGrid.instance.refresh();
+    }
+  }
 
+  cronJobs: any;
   public config: any;
   public canUserFork = false;
-  public analyses: Analysis[];
+  public analyses: (Analysis | AnalysisDSL)[];
   public executions = {};
   public executingState = EXECUTION_STATES.EXECUTING;
 
@@ -43,13 +65,20 @@ export class AnalyzeListViewComponent implements OnInit {
     public _DxDataGridService: DxDataGridService,
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
-    public _executeService: ExecuteService
+    public _executeService: ExecuteService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.config = this.getGridConfig();
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this._executeService.subscribeToAllExecuting(this.onExecutionEvent);
+  }
+
+  navigate(data) {
+    this.router.navigate([`/analyze/analysis/${data.id}/executed`], {
+      queryParams: { isDSL: !!data.sipQuery }
+    });
   }
 
   onExecutionEvent(e) {
@@ -117,9 +146,7 @@ export class AnalyzeListViewComponent implements OnInit {
       {
         caption: 'SCHEDULED',
         calculateCellValue: rowData => {
-          const cron = isUndefined(this.cronJobs)
-            ? ''
-            : this.cronJobs[rowData.id];
+          const cron = this.cronJobs ? this.cronJobs[rowData.id] : '';
           if (!cron) {
             return '';
           }
@@ -139,14 +166,26 @@ export class AnalyzeListViewComponent implements OnInit {
         caption: 'LAST MODIFIED BY',
         width: '20%',
         calculateCellValue: rowData =>
-          (rowData.updatedUserName || rowData.userFullName || '').toUpperCase(),
+          (
+            rowData.updatedUserName ||
+            rowData.modifiedBy ||
+            rowData.createdBy ||
+            rowData.userFullName ||
+            ''
+          ).toUpperCase(),
         cellTemplate: 'highlightCellTemplate'
       },
       {
         caption: 'LAST MODIFIED ON',
         width: '10%',
         calculateCellValue: rowData =>
-          rowData.updatedTimestamp || rowData.createdTimestamp || null,
+          this.secondsToMillis(
+            rowData.updatedTimestamp ||
+              rowData.modifiedTime ||
+              rowData.createdTimestamp ||
+              rowData.createdTime ||
+              null
+          ),
         cellTemplate: 'dateCellTemplate'
       },
       {
@@ -178,5 +217,18 @@ export class AnalyzeListViewComponent implements OnInit {
         });
       }
     });
+  }
+
+  secondsToMillis(timestamp: string | number): number | string {
+    const secondsOrMillis = parseInt((timestamp || '').toString(), 10);
+    if (!secondsOrMillis) {
+      // NaN condition
+      return timestamp;
+    }
+
+    // Millisecond timestamp consists of 13 digits.
+    return secondsOrMillis.toString().length < 13
+      ? secondsOrMillis * 1000
+      : secondsOrMillis;
   }
 }

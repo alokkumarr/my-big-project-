@@ -260,10 +260,18 @@ module.  Entity BIS_ROUTE is used to hold the details of route i.e it
 holds the details of destination, frequency etc etc.  Entity
 BIS_CHANNEL is used to hold the details of channel i.e it holds the
 details of data channel.  Entity BIS_FILE_LOGS is used to log details
-related to the files or data retrieved from the custom.
+related to the files or data retrieved from the custom. Entity BIS_JOB 
+holds job level info. Job status will be updated based on all transfers 
+executed in the schedule for the route. 
 
 .Figure: SIP Batch Ingestion Component Diagram
 plantuml::sip-design/figure-batch-component-diagram.pum[format=svg]
+
+SIP Batch Ingestion Service implementation is provided as part of
+batch plugin implementation based on channel type. 
+Ex: sip-batch-plugin-sftp, sip-batch-plugin-s3. Each of plugin
+has implementation for file transfer and retry logic for corresponding
+channel type.
 
 High Availability & Resiliency
 
@@ -609,3 +617,16 @@ The SIP platform additionally supports so called _product modules_.
 They are independently developed and released modules providing
 product-specific analytics functionality, that are deployed on top
 of SIP.  They build on the capabilities provided by the SIP REST API.
+
+== XDF-NG
+
+SIP comes with the pipeline component XDF-NG. Data which is ingested
+either batch or real time  gets processed through various components 
+such as parser, sql, transformer, esloader. Processed data will be
+ready for further analysis by a2 module and other reports. 
+
+XDF-NG pipeline can be ran either file based or in memory. Any component
+can be ran individually as well. In memory pipeline also has option to
+persist output file using configuration.
+
+plantuml::sip-design/figure-xdfng.pum[]
