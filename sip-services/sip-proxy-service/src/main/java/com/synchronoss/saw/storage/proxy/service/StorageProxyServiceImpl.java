@@ -592,7 +592,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         "executedBy",
         "executionType",
         "data",
-        "sipQuery"
+        "analysis"
       };
 
       ObjectMapper objectMapper = new ObjectMapper();

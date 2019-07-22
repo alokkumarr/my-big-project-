@@ -1130,12 +1130,25 @@ public class ExportServiceImpl implements ExportService {
     String userFileName = exportBean.getFileName();
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
 
-    String url =
-        storageProxyUrl
-            + "/internal/proxy/storage/"
-            + executionId
-            + "/executions/data?page=1&pageSize="
-            + exportSize;
+    String url;
+    if (analysisType.equalsIgnoreCase("report")) {
+      url =
+          apiExportOtherProperties
+              + "/"
+              + analysisId
+              + "/executions/data?page=1&pageSize="
+              + exportSize
+              + "&analysisType="
+              + analysisType
+              + "&executionType=report";
+    } else {
+      url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + executionId
+              + "/executions/data?page=1&pageSize="
+              + exportSize;
+    }
 
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.getForEntity(url, DataResponse.class);
