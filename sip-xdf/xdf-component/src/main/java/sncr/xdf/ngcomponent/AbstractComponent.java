@@ -59,6 +59,7 @@ public abstract class AbstractComponent implements WithContext{
     protected InternalContext ctx;
     protected String componentName = "unnamed";
     protected final Services services = new Services();
+    protected Dataset inputDataFrame;
 
     protected DLBatchReader reader;
 
@@ -115,7 +116,8 @@ public abstract class AbstractComponent implements WithContext{
             logger.error(error);
             return -1;
         }
-        int ret = execute();
+        
+        int ret = inputDataFrame !=null ? execute(inputDataFrame) : execute();
         if (ngctx.runningPipeLine) {
               ret = moveAndArchiveForPipeline(ret);
         }

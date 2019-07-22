@@ -36,7 +36,6 @@ import sncr.xdf.parser.spark.HeaderFilter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +62,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private String outputDataSetLocation;
     private String outputFormat;
     private String outputDataSetMode;
-
-    private Dataset inputDataFrame;
 
     private String rejectedDatasetName;
     private String rejectedDatasetLocation;
@@ -108,7 +105,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		return execute();
 	}
 	
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected int execute(){
         int retval = 0;
 
@@ -179,8 +177,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     + " with format " + rejectedDataFormat);
             }
 
-            //TODO: If data set exists and flag is not append - error
-            // This is good for UI what about pipeline? Talk to Suren
+            // TODO: If data set exists and flag is not append - error
+            // TODO: This is good for UI what about pipeline? Talk to Suren
 
             // Check what sourcePath referring
             FileSystem fs = HFileOperations.getFileSystem();
@@ -190,34 +188,35 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 if (ctx.fs.exists(new Path(tempDir)))
                     HFileOperations.deleteEnt(tempDir);
 
-                if(headerSize >= 1) {
-                    logger.debug("Header present");
-                    FileStatus[] files = fs.globStatus(new Path(sourcePath));
-                    
-                    if(files != null) {
-                    	logger.debug("Total number of files in the directory = " + files.length);
-                    }
-                    
-                    // Check if directory has been given
-                    if(files.length == 1 && files[0].isDirectory()){
-                        logger.debug("Files length = 1 and is a directory");
-                        // If so - we have to process all the files inside - create the mask
-                        sourcePath += Path.SEPARATOR + "*";
-                        // ... and query content
-                        files = fs.globStatus(new Path(sourcePath));
-                    }
-                    
-                    if (inputDataFrame !=null) {
-                    	this.recCounter.setValue(inputDataFrame.count());
-                     retval = parseDataFrame(inputDataFrame, new Path(tempDir));
-                    }
-                    else {
-                    retval = parseFiles(files,  outputDataSetMode);
-                    }
-                } else {
-                    logger.debug("No Header");
-                    retval = parse(outputDataSetMode);
+                
+                if (inputDataFrame !=null) {
+                 this.recCounter.setValue(inputDataFrame.count());
+                 retval = parseDataFrame(inputDataFrame, new Path(tempDir));
                 }
+                // This block has been added to support DF in Parser
+                // SIP-7758
+				else {
+					if (headerSize >= 1) {
+						logger.debug("Header present");
+						FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+						if (files != null) {
+							logger.debug("Total number of files in the directory = " + files.length);
+						}
+						// Check if directory has been given
+						if (files.length == 1 && files[0].isDirectory()) {
+							logger.debug("Files length = 1 and is a directory");
+							// If so - we have to process all the files inside - create the mask
+							sourcePath += Path.SEPARATOR + "*";
+							// ... and query content
+							files = fs.globStatus(new Path(sourcePath));
+						}
+						retval = parseFiles(files, outputDataSetMode);
+					} else {
+						logger.debug("No Header");
+						retval = parse(outputDataSetMode);
+					}
+				}
 
                 //Write Consolidated Accepted data
                 if (this.acceptedDataCollector != null) {
@@ -262,7 +261,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             
             this.recCounter.setValue(inputDataset.count());
 
-            commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
+            commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
@@ -426,7 +425,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         collectAcceptedData(parsedRdd,outputRdd);
         
         logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
-        int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), Output.Mode.APPEND.toString());
+        int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), Output.Mode.APPEND.name());
         
         if (status != 0) {
             return -1;
@@ -518,7 +517,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     
     private int parseDataFrame(Dataset<String> dataFrame, Path destDir){
     	JavaRDD<String> rdd = dataFrame.rdd().toJavaRDD();
-        
+        logger.debug("parsing dataframe starts here");
+        logger.debug("Headersize is: " + headerSize);
     	JavaRDD<Row> parseRdd = null;
     	if (headerSize >= 1) {
 			parseRdd = rdd
@@ -538,18 +538,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             scala.collection.JavaConversions.asScalaBuffer(
                 createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
-        logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
+        logger.debug("Rejected rdd count in data frame :: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         Dataset<Row> localDataFrame = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         collectAcceptedData(parseRdd,outputRdd);
-        logger.debug("Output rdd length = " + recCounter.value() +"\n");
-        logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
-        logger.debug("Dest dir for file  = " + destDir +"\n");
+        logger.debug("Output rdd length in data frame = " + recCounter.value() +"\n");
+        logger.debug("Rejected rdd length in data frame = " + errCounter.value() +"\n");
+        logger.debug("Dest dir for file in data frame = " + destDir +"\n");
         int rc = 0;
         rc = commitDataSetFromDSMap(ngctx, localDataFrame, outputDataSetName, destDir.toString(), Output.Mode.APPEND.toString());
         logger.debug("Write dataset status = " + rc);
         //Filter out Rejected Data
         collectRejectedData(parseRdd, outputRdd);
+        logger.debug("parsing dataframe ends here");
         return rc;
     }
 

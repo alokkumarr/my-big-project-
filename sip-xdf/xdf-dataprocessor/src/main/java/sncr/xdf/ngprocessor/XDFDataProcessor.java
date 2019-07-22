@@ -200,7 +200,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName));
             dataSetName = parserKey;
-
             logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
