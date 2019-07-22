@@ -22,7 +22,7 @@ Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/quadprog_1.
 
 Rscript -e 'majorVersion<-R.version$major;minorVersion<-R.version$minor; version <- paste(majorVersion,".",sep="");version <- paste(version,minorVersion,sep=""); version<- paste("R-",version,sep=""); partial<-paste("/usr/share/doc/",version,sep="");partial<-paste(partial,"/html",sep=""); dir.create(partial,showWarnings = TRUE, recursive = TRUE, mode = "0755")'
 
-precache='"testthat","rgl","dplyr","magrittr","checkmate", "ellipsis", "processx",  "quadprog","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
+precache='"testthat","rgl","curl","dplyr","magrittr","checkmate", "ellipsis", "processx",  "quadprog","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
 
 # Install dependencies
 Rscript -e 'install.packages(c("devtools", '"$precache"')); if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
