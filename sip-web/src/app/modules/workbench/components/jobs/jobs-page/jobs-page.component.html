@@ -9,13 +9,13 @@
           <div fxFlex fxLayout="row" fxLayoutAlign="start space-between">
             <span i18n>Jobs</span>
           </div>
-          <div fxFlex>
+          <mat-chip-list fxFlex>
             <mat-chip
               class="tag-chip"
               *ngFor="let jobFilter of jobFilters$ | async"
               >{{ jobFilter }}</mat-chip
             >
-          </div>
+          </mat-chip-list>
           <button
             mat-icon-button
             color="secondary"
@@ -51,8 +51,8 @@
         >
         </dxo-pager>
         <dxi-column
-          caption="Job name"
-          dataField="jobName"
+          caption="Job Id"
+          dataField="jobId"
           alignment="left"
           cellTemplate="linkCellTemplate"
         ></dxi-column>
