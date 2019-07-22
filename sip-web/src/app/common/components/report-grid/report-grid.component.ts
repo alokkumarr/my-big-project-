@@ -519,6 +519,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   fetchColumsUponCheck() {
+    console.log(this.analysis.sipQuery);
     const artifacts = this.analysis.sipQuery
       ? this.analysis.sipQuery.artifacts
       : this.analysis.artifacts;

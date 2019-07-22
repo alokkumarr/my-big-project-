@@ -10,6 +10,7 @@ import {
 } from '../../types';
 import { QueryDSL } from 'src/app/models';
 import { DesignerStates } from '../../consts';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'multi-table-designer-layout',
@@ -19,7 +20,6 @@ import { DesignerStates } from '../../consts';
 export class MultiTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
-  @Input() analysis: Analysis;
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
   @Input() isInQueryMode: boolean;
@@ -28,6 +28,7 @@ export class MultiTableDesignerLayoutComponent {
   @Input() dataCount: number;
   @Input('data')
   set setData(data) {
+    this.analysis = this._store.selectSnapshot(state => state.designerState.analysis);
     if (!isEmpty(data)) {
       this.data = data;
       this.isGridPanelExpanded = true;
@@ -35,6 +36,11 @@ export class MultiTableDesignerLayoutComponent {
   }
   public data;
   public isGridPanelExpanded = false;
+  public analysis: Analysis;
+
+  constructor(
+    private _store: Store
+  ) {}
 
   toggleGridPanel() {
     this.isGridPanelExpanded = !this.isGridPanelExpanded;

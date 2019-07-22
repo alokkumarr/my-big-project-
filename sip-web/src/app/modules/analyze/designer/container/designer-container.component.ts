@@ -1023,9 +1023,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
-      if (typeof event.data.query !== 'string') {
-        break;
-      }
+      // console.log(event);
+      // if (typeof event.data.query !== 'string') {
+      //   break;
+      // }
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this._store.dispatch(new DesignerUpdateQuery(event.data.query));

@@ -17,7 +17,7 @@
     (change)="change.emit($event)"
     [artifacts]="artifacts"
     [useAggregate]="analysis.type === 'esReport'"
-    [sqlBuilder]="sqlBuilder"
+    [sqlBuilder]="analysis.sipQuery"
   >
   </designer-settings-multi-table>
   <button

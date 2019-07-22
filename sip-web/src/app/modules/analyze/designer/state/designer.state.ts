@@ -217,7 +217,6 @@ export class DesignerState {
           }
         : { format: artifactColumn.format })
     };
-
     if (artifactIndex < 0) {
       artifacts = [
         ...artifacts,
@@ -229,14 +228,15 @@ export class DesignerState {
         artifactColumnToBeAdded
       ];
     }
-
     // cleanup empty artifacts
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
 
+    sipQuery.artifacts = artifacts;
+
     patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: { ...analysis, sipQuery: { ...sipQuery} }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
