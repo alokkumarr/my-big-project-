@@ -247,7 +247,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             + analysisId
             + "&size="
             + dispatchRowLimit
-            + "&ExecutionType=scheduled";
+            + "&executionType=scheduled";
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
