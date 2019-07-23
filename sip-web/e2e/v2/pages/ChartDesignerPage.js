@@ -53,11 +53,18 @@ class ChartsDesignerPage extends Designer {
       element(by.css(`button[e2e=${aggregateName}]`));
 
     this._openChartSettings = element(
-      by.css('button[matTooltip="Open Settings"]')
+      by.xpath('//button[contains(@class,"options-panel-toggle__btn")]')
     );
 
     this._aggregateDataOptions = text =>
-      element(by.xpath(`//mat-panel-title[contains(text(),"${text}")]`));
+      // element(by.xpath(`//mat-panel-title[contains(text(),"${text}")]`));
+      // element(
+      //by.xpath(
+      // `//*span[contains(@class, "mat-content")]/descendant::*[contains(text(), "${text}")]`
+      //)
+      //);
+
+      element(by.xpath(`mat-panel-title[contains(text(),"${text}")]`));
 
     this._verifyMetricAggregate = (metric, text) =>
       element(
@@ -168,6 +175,7 @@ class ChartsDesignerPage extends Designer {
   }
 
   clickOnOpenChartSettings() {
+    browser.sleep(1500);
     commonFunctions.clickOnElement(this._openChartSettings);
   }
 
