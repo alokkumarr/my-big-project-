@@ -58,6 +58,8 @@ public abstract class Component {
   private Map<String, JsonElement> mdOutputDataSetMap;
   private Map<String, JsonElement> mdInputDataSetMap;
   private String transformationId;
+  
+  private static final int FILE_SYSTEM_RETRIES = 10;
 
     public enum DATASET {
         input,
@@ -231,7 +233,7 @@ public abstract class Component {
   public final int collectCommandLineParameters(String[] args) throws Exception {
     CliHandler cli = new CliHandler();
     try {
-      HFileOperations.init();
+      HFileOperations.init(FILE_SYSTEM_RETRIES);
 
       Map<String, Object> parameters = cli.parse(args);
       String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());

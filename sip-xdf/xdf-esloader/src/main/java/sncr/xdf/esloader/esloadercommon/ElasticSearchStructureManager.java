@@ -32,8 +32,7 @@ public class ElasticSearchStructureManager {
     public final static String PARTITION = "$PARTITION";
 
     public ElasticSearchStructureManager(ESLoader configuration){
-        //this.objectName = objectName;
-        //this.configuration = configuration;
+
         this.now = new DateTime();
         this.aliases = new HashMap<>();
 
