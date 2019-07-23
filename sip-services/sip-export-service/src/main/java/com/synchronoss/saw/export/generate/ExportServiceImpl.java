@@ -1246,6 +1246,7 @@ public class ExportServiceImpl implements ExportService {
                 + limitPerPage
                 + "&analysisType="
                 + analysisType;
+
       } else {
         url =
             storageProxyUrl
