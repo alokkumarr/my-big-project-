@@ -6,6 +6,16 @@
     <mat-sidenav-content>
       <mat-toolbar>
         <mat-toolbar-row fxLayoutGap="5px">
+          <button
+            (click)="goBack()"
+            mat-icon-button
+            style="margin-right: 10px;"
+          >
+            <mat-icon
+              class="back-button-icon"
+              fontIcon="icon-arrow-left"
+            ></mat-icon>
+          </button>
           <div fxFlex fxLayout="row" fxLayoutAlign="start space-between">
             <span i18n>Jobs</span>
           </div>

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import CustomStore from 'devextreme/data/custom_store';
 
@@ -45,6 +46,7 @@ export class JobsPageComponent implements OnInit {
     private _store: Store,
     private _route: ActivatedRoute,
     private _router: Router,
+    private _location: Location,
     private _datasourceService: DatasourceService
   ) {}
 
@@ -110,5 +112,9 @@ export class JobsPageComponent implements OnInit {
       const url = `${baseUrl}${defaultChannelTypeId}${channelIdQueryParam}${routeIdIdQueryParam}`;
       this._router.navigateByUrl(url);
     }
+  }
+
+  goBack() {
+    this._location.back();
   }
 }

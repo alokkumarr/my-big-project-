@@ -377,7 +377,7 @@
               caption="Last Modified"
               dataField="createdDate"
               alignment="left"
-              cellTemplate="dateTemplate"
+              cellTemplate="modifiedCreatedTemplate"
             ></dxi-column>
             <dxi-column
               caption="Actions"
@@ -398,13 +398,17 @@
               </div>
             </div>
 
-            <div *dxTemplate="let data of 'dateTemplate'">
+            <div *dxTemplate="let data of 'modifiedCreatedTemplate'">
               <span *ngIf="data.data.modifiedDate; else defDate">{{
                 data.data.modifiedDate | date: 'short'
               }}</span>
               <ng-template #defDate>{{
                 data.data.createdDate | date: 'short'
               }}</ng-template>
+            </div>
+
+            <div *dxTemplate="let data of 'dateTemplate'">
+              {{ data.value | date: 'short' }}
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
