@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import CustomStore from 'devextreme/data/custom_store';
 
+import moment from 'moment';
 import { DEFAULT_CHANNEL_TYPE } from '../../../wb-comp-configs';
 import {
   SelectChannelTypeId,
@@ -39,7 +40,7 @@ export class JobsPageComponent implements OnInit {
   public remoteOperations = { paging: true };
   public pagingEnabled = false;
   public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
-
+  public moment = moment;
   public data;
 
   constructor(

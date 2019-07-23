@@ -92,6 +92,7 @@
           caption="Duration"
           dataField="duration"
           alignment="left"
+          cellTemplate="durationTemplate"
         ></dxi-column>
         <dxi-column
           caption="Job status"
@@ -124,9 +125,19 @@
             {{ cell.data.jobId }}
           </a>
         </div>
+        <div *dxTemplate="let cell of 'durationTemplate'">
+          <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
+            {{
+              moment(cell.data.startTime).to(moment(cell.data.endTime), true)
+            }}
+          </ng-container>
+          <ng-template #defaultTemplate>
+            N/A
+          </ng-template>
+        </div>
 
         <div *dxTemplate="let cell of 'dateTemplate'">
-          {{ cell.text | date: 'short' }}
+          {{ cell.text ? (cell.text | date: 'short') : 'N/A' }}
         </div>
       </dx-data-grid>
     </mat-sidenav-content>
