@@ -408,7 +408,11 @@
             </div>
 
             <div *dxTemplate="let data of 'dateTemplate'">
-              {{ data.value ? (data.value | date: 'short') : 'N/A' }}
+              {{
+                (data.value || data.value) < 0
+                  ? (data.value | date: 'short')
+                  : 'N/A'
+              }}
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">
