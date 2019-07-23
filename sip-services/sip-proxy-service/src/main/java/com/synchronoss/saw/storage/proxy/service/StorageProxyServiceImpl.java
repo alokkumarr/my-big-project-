@@ -662,14 +662,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return executionResponse;
   }
 
-  @Override
-  public ExecutionResponse fetchLastExecutionsData(
-      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
-    ExecutionResponse executionResponse = new ExecutionResponse();
+  ExecutionResult fetchLastExecutionResult(String dslQueryId, MaprConnection maprConnection) {
     try {
-      String tableName =
-          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
-      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       String fields[] = {
         "executionId",
         "dslQueryId",
@@ -681,7 +675,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         "data",
         "analysis"
       };
-
+      if (maprConnection == null) {
+        maprConnection = new MaprConnection(basePath, executionResultTable);
+      }
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
@@ -693,12 +689,28 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       ExecutionResult executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+      return executionResult;
+    } catch (Exception e) {
+      logger.error("Error occurred while fetching the execution result data", e);
+    }
+    return null;
+  }
 
+  @Override
+  public ExecutionResponse fetchLastExecutionsData(
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    try {
+      String tableName =
+          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
+      List<Object> objList=(List<Object>)executionResult.getData();
       // paginated execution data
       Object data =
           maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
+      executionResponse.setTotalRows(getTotalRows(null, objList));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -756,18 +768,18 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * Count the total number of rows.
    *
    * @param doc
-   * @param jsonNode
+   * @param objList
    * @return long number of row count.
    */
-  private long getTotalRows(Document doc, JsonNode jsonNode) {
+  private long getTotalRows(Document doc, List<Object> objList) {
     try {
       if (doc != null) {
         List<Object> totalRows = doc.getList("data");
         logger.debug("Total number of rows :" + totalRows.size());
         return totalRows.size() > 0 ? totalRows.size() : 0l;
-      } else if (jsonNode != null && jsonNode.size() > 0) {
-        logger.debug("Total number of rows :" + jsonNode.get("data").size());
-        return jsonNode.get("data").size();
+      } else if (objList != null && objList.size() > 0) {
+        logger.debug("Total number of rows :" + objList.size());
+        return objList.size();
       }
     } catch (Exception ex) {
       logger.error("Error while count the total rows : {}", ex);
@@ -825,6 +837,25 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     executionResponse.setData(excuteResp.getData());
     executionResponse.setTotalRows(excuteResp.getTotalRows());
+    return executionResponse;
+  }
+
+  @Override
+  public ExecutionResponse fetchLastExecutionsDataForDL(
+      String analysisId, Integer pageNo, Integer pageSize) {
+    logger.info("Fetching last execution data for DL report");
+    ExecutionResult result = fetchLastExecutionResult(analysisId, null);
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    if (result != null) {
+      ExecuteAnalysisResponse executionData =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              result.getExecutionId(), pageNo, pageSize, result.getExecutionType());
+      executionResponse.setData(executionData.getData());
+      executionResponse.setTotalRows(executionData.getTotalRows());
+      executionResponse.setAnalysis(result.getAnalysis());
+      executionResponse.setExecutedBy(result.getExecutedBy());
+    }
+
     return executionResponse;
   }
 }

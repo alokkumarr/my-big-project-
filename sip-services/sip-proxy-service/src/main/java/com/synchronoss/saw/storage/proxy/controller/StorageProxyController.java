@@ -281,11 +281,20 @@ public class StorageProxyController {
           @Valid
           @RequestBody
           Analysis analysis,
-      @RequestParam(name = "id", required = false) String queryId,
-      @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "page", required = false) Integer page,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize,
-      @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
+      @ApiParam(value = "analysis id", required = false)
+          @RequestParam(name = "id", required = false)
+          String queryId,
+      @ApiParam(value = "size of execution", required = false)
+          @RequestParam(name = "size", required = false)
+          Integer size,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
       HttpServletRequest request,
       HttpServletResponse response)
@@ -444,10 +453,18 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse executionsData(
-      @RequestParam(name = "page", required = false) Integer page,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize,
-      @RequestParam(name = "executionType", required = false) ExecutionType executionType,
-      @RequestParam(name = "analysisType", required = false) String analysisType,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false)
+          ExecutionType executionType,
+      @ApiParam(value = "analysis type", required = false)
+          @RequestParam(name = "analysisType", required = false)
+          String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
     if (analysisType != null && analysisType.equals("report")) {
@@ -475,12 +492,24 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse lastExecutionsData(
-      @RequestParam(name = "page", required = false) Integer page,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize,
-      @RequestParam(name = "executionType", required = false) ExecutionType executionType,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false)
+          ExecutionType executionType,
+      @ApiParam(value = "analysis type", required = false)
+          @RequestParam(name = "analysisType", required = false)
+          String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
           String analysisId) {
 
+    if (analysisType != null && analysisType.equals("report")) {
+      return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);
+    }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       return proxyService.fetchLastExecutionsData(analysisId, executionType, page, pageSize);
