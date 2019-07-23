@@ -160,7 +160,13 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (isFunction(dataLoader)) {
       this.dataLoader = dataLoader;
       this.data = new CustomStore({
-        load: options => this.dataLoader(options)
+        load: options =>
+          this.dataLoader(options).then(value => {
+            return {
+              data: flattenReportData(value.data, this.analysis),
+              totalCount: value.totalCount
+            };
+          })
       });
       this.remoteOperations = { paging: true };
       /* Reset pager after a new dataLoader is set */
