@@ -191,6 +191,10 @@ export class ObserveKPIBulletComponent
         this.item.bullet.target
       );
 
+      const serie = {
+        data: seriesData
+      };
+
       changes.push(
         {
           path: 'title.text',
@@ -209,8 +213,8 @@ export class ObserveKPIBulletComponent
           data: plotBands
         },
         {
-          path: 'series[0].data',
-          data: seriesData
+          path: 'series[0]',
+          data: serie
         }
       );
 
