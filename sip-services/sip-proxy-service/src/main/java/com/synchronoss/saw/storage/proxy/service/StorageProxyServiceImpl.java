@@ -507,10 +507,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
-      response =
-          dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,page,pageSize);
-    } else {
       if (size == null) {
         switch (executionType) {
           case onetime:
@@ -527,6 +523,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             break;
         }
       }
+      response =
+          dataLakeExecutionService.executeDataLakeReport(
+              sipQuery,
+              size,
+              dataSecurityKey,
+              executionType,
+              designerEdit,
+              executionId,
+              page,
+              pageSize);
+    } else {
       response = new ExecuteAnalysisResponse();
       List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
       response.setExecutionId(executionId);
