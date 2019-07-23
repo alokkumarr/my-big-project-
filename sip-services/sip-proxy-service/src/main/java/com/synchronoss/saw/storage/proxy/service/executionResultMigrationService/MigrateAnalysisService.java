@@ -3,6 +3,8 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,11 +26,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FilterList.Operator;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
+import org.apache.hadoop.hbase.filter.ValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -103,7 +114,7 @@ public class MigrateAnalysisService {
           String analysisId = entry.getKey();
           if (analysisId != null && !flag) {
             LOGGER.debug("Fetch execution Ids for migration.!");
-            Set<String> executionIds = getExecutionIds(analysisId);
+            Set<String> executionIds = getAllExecutions(analysisId);
             LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
             if (!executionIds.isEmpty()) {
               readExecutionResultFromBinaryStore(executionIds, analysisId, connection);
@@ -454,5 +465,40 @@ public class MigrateAnalysisService {
       LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
     }
     return executionIds;
+  }
+
+  public Set<String> getAllExecutions(String analysisId) {
+    HBaseUtil utils = new HBaseUtil();
+    List<String> executionIds = new ArrayList<>();
+    try {
+      Connection connection = utils.getConnection();
+      String tablePath = basePath + binaryTablePath;
+
+      LOGGER.info("Binary store table path : " + tablePath);
+      Table table = utils.getTable(connection, tablePath);
+
+      // Instantiating the Scan class
+      Scan scan = new Scan();
+      scan.addColumn(Bytes.toBytes("_search"), Bytes.toBytes("analysisId"));
+      scan.setMaxResultsPerColumnFamily(1);
+      Filter filter = new ValueFilter(CompareOp.EQUAL, new SubstringComparator(analysisId));
+      FilterList list = new FilterList(Operator.MUST_PASS_ONE, filter);
+      scan.setFilter(list);
+
+      ResultScanner results = table.getScanner(scan);
+
+      for (Result result : results) {
+        byte[] id = result.getRow();
+        LOGGER.debug("Execution id for analysis (" + analysisId + ") = " + Bytes.toString(id));
+        executionIds.add(Bytes.toString(id));
+      }
+      LOGGER.info("List of executions for analysis id : " + analysisId + " = " + executionIds);
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage());
+    }
+    executionIds = Lists.reverse(executionIds);
+    executionIds = executionIds.stream().limit(5).collect(Collectors.toList());
+    Set<String> set = ImmutableSet.copyOf(executionIds);
+    return set;
   }
 }
