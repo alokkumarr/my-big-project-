@@ -53,6 +53,11 @@
       <artifactId>xdf-esloader</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-dataprocessor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 

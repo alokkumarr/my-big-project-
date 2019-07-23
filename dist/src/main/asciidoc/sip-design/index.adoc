@@ -617,3 +617,16 @@ The SIP platform additionally supports so called _product modules_.
 They are independently developed and released modules providing
 product-specific analytics functionality, that are deployed on top
 of SIP.  They build on the capabilities provided by the SIP REST API.
+
+== XDF-NG
+
+SIP comes with the pipeline component XDF-NG. Data which is ingested
+either batch or real time  gets processed through various components 
+such as parser, sql, transformer, esloader. Processed data will be
+ready for further analysis by a2 module and other reports. 
+
+XDF-NG pipeline can be ran either file based or in memory. Any component
+can be ran individually as well. In memory pipeline also has option to
+persist output file using configuration.
+
+plantuml::sip-design/figure-xdfng.pum[]
