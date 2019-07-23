@@ -3,6 +3,7 @@ import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxsModule } from '@ngxs/store';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Location } from '@angular/common';
 import { of } from 'rxjs';
 import { WorkbenchState } from '../../../state/workbench.state';
 import {
@@ -25,6 +26,7 @@ class ActivatedRouteServiceStub {
 class JwtServiceStub {}
 class MenuServiceStub {}
 class CommonSemanticServiceStub {}
+class LocationStub {}
 
 describe('Jobs page', () => {
   let fixture: ComponentFixture<JobsPageComponent>;
@@ -40,7 +42,8 @@ describe('Jobs page', () => {
         { provide: ActivatedRoute, useClass: ActivatedRouteServiceStub },
         { provide: JwtService, useClass: JwtServiceStub },
         { provide: MenuService, useClass: MenuServiceStub },
-        { provide: CommonSemanticService, useClass: CommonSemanticServiceStub }
+        { provide: CommonSemanticService, useClass: CommonSemanticServiceStub },
+        { provide: Location, useClass: LocationStub }
       ]
     })
       .compileComponents()
