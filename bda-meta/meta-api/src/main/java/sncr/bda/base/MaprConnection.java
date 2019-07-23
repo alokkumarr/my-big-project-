@@ -67,7 +67,7 @@ public class MaprConnection {
     }
     return resultSet;
   }
-  
+
   /**
    * Fetch paginated data from MapR db.
    *
