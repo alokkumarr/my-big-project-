@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.mapr.db.*;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -14,6 +16,7 @@ import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -34,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -66,10 +70,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Value("${metastore.time-to-live}")
   private long timeToLive;
 
+  @Value("${executor.preview-rows-limit}")
+  private Integer previewRowLimit;
+
+  @Value("${executor.publish-rows-limit}")
+  private Integer publishRowLimit;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   @Autowired private StorageConnectorService storageConnectorService;
+  @Autowired private DataLakeExecutionService dataLakeExecutionService;
 
   private int size;
   private String tablePath;
@@ -449,8 +460,95 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
+  public List<Object> execute(
+      SipQuery sipQuery,
+      Integer size,
+      DataSecurityKey dataSecurityKey,
+      ExecutionType executionType,
+      String analysisType,
+      Boolean designerEdit)
       throws Exception {
+    List<Object> result = null;
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
+      final String executionId = UUID.randomUUID().toString();
+      ExecuteAnalysisResponse response;
+      response =
+          dataLakeExecutionService.executeDataLakeReport(
+              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,null,null);
+      result = (List<Object>) (response.getData());
+    } else {
+      result = executeESQueries(sipQuery, size, dataSecurityKey);
+    }
+
+    return result;
+  }
+
+  /**
+   * This Method is used to execute analysis.
+   *
+   * @param analysis Analysis.
+   * @param size Integer.
+   * @param dataSecurityKey DataSecurityKey.
+   * @param executionType ExecutionType.
+   * @return ExecuteAnalysisResponse
+   */
+  @Override
+  public ExecuteAnalysisResponse executeAnalysis(
+      Analysis analysis,
+      Integer size,
+      Integer page,
+      Integer pageSize,
+      DataSecurityKey dataSecurityKey,
+      ExecutionType executionType)
+      throws Exception {
+    String analysisType = analysis.getType();
+    Boolean designerEdit = analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+    SipQuery sipQuery = analysis.getSipQuery();
+    final String executionId = UUID.randomUUID().toString();
+    ExecuteAnalysisResponse response;
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
+      if (size == null) {
+        switch (executionType) {
+          case onetime:
+            size = previewRowLimit;
+            break;
+          case regularExecution:
+            size = publishRowLimit;
+            break;
+          case preview:
+            size = previewRowLimit;
+            break;
+          case publish:
+            size = publishRowLimit;
+            break;
+        }
+      }
+      response =
+          dataLakeExecutionService.executeDataLakeReport(
+              sipQuery,
+              size,
+              dataSecurityKey,
+              executionType,
+              designerEdit,
+              executionId,
+              page,
+              pageSize);
+    } else {
+      response = new ExecuteAnalysisResponse();
+      List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
+      response.setExecutionId(executionId);
+
+      // return only requested data, only for FE
+      List<Object> pagingData = pagingData(page, pageSize, objList);
+      response.setData(pagingData != null && pagingData.size() > 0 ? pagingData : objList);
+      response.setTotalRows(objList != null ? objList.size() : 0L);
+    }
+    return response;
+  }
+
+  private List<Object> executeESQueries(
+      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+    List<Object> result = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     if (dataSecurityKey == null) {
@@ -479,7 +577,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     String query;
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
     logger.trace("ES -Query {} " + query);
-    List<Object> result = null;
     JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
@@ -572,14 +669,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return executionResponse;
   }
 
-  @Override
-  public ExecutionResponse fetchLastExecutionsData(
-      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
-    ExecutionResponse executionResponse = new ExecutionResponse();
+  ExecutionResult fetchLastExecutionResult(String dslQueryId, MaprConnection maprConnection) {
     try {
-      String tableName =
-          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
-      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       String fields[] = {
         "executionId",
         "dslQueryId",
@@ -589,9 +680,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         "executedBy",
         "executionType",
         "data",
-        "sipQuery"
+        "analysis"
       };
-
+      if (maprConnection == null) {
+        maprConnection = new MaprConnection(basePath, executionResultTable);
+      }
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
@@ -603,12 +696,28 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       ExecutionResult executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+      return executionResult;
+    } catch (Exception e) {
+      logger.error("Error occurred while fetching the execution result data", e);
+    }
+    return null;
+  }
 
+  @Override
+  public ExecutionResponse fetchLastExecutionsData(
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    try {
+      String tableName =
+          checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
+      List<Object> objList=(List<Object>)executionResult.getData();
       // paginated execution data
       Object data =
           maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(null, elements.get(0)));
+      executionResponse.setTotalRows(getTotalRows(null, objList));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -616,6 +725,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     return executionResponse;
   }
+
 
   public int getSize() {
     return size;
@@ -665,22 +775,94 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * Count the total number of rows.
    *
    * @param doc
-   * @param jsonNode
+   * @param objList
    * @return long number of row count.
    */
-  private long getTotalRows(Document doc, JsonNode jsonNode) {
+  private long getTotalRows(Document doc, List<Object> objList) {
     try {
       if (doc != null) {
         List<Object> totalRows = doc.getList("data");
         logger.debug("Total number of rows :" + totalRows.size());
         return totalRows.size() > 0 ? totalRows.size() : 0l;
-      } else if (jsonNode != null && jsonNode.size() > 0) {
-        logger.debug("Total number of rows :" + jsonNode.get("data").size());
-        return jsonNode.get("data").size();
+      } else if (objList != null && objList.size() > 0) {
+        logger.debug("Total number of rows :" + objList.size());
+        return objList.size();
       }
     } catch (Exception ex) {
       logger.error("Error while count the total rows : {}", ex);
     }
     return 0l;
+  }
+
+  /**
+   * Return List<Object> of paginated data object.
+   *
+   * @param page
+   * @param pageSize
+   * @return
+   */
+  private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
+    logger.trace("Page :" + page + " pageSize :" + pageSize);
+    // pagination logic
+    if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
+      int startIndex, endIndex;
+      if (page != null && page > 1) {
+        startIndex = (page - 1) * pageSize;
+        endIndex = startIndex + pageSize;
+      } else {
+        startIndex = page != null && page > 0 ? (page - 1) : 0;
+        endIndex = startIndex + pageSize;
+      }
+      logger.trace("Start Index :" + startIndex + " Endindex :" + endIndex);
+      return dataObj.subList(startIndex, endIndex);
+    }
+    return null;
+  }
+
+  @Override
+  public ExecutionResponse fetchDataLakeExecutionData(
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
+    ExecutionResponse executionResponse;
+
+    logger.info("Fetch Execution Data for Data Lake report");
+    ExecuteAnalysisResponse excuteResp;
+    if ((executionType == ExecutionType.onetime
+        || executionType == ExecutionType.preview
+        || executionType == ExecutionType.regularExecution)) {
+      executionResponse = new ExecutionResponse();
+      excuteResp =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              executionId, pageNo, pageSize, executionType);
+    } else {
+      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
+      /*here for schedule and publish we are reading data from the same location in DL, so directly
+      I am sending publish  as Ui is sending information for only oneTimeExecution,we can send
+      schedule as well as */
+      excuteResp =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              executionId, pageNo, pageSize, ExecutionType.publish);
+    }
+    executionResponse.setData(excuteResp.getData());
+    executionResponse.setTotalRows(excuteResp.getTotalRows());
+    return executionResponse;
+  }
+
+  @Override
+  public ExecutionResponse fetchLastExecutionsDataForDL(
+      String analysisId, Integer pageNo, Integer pageSize) {
+    logger.info("Fetching last execution data for DL report");
+    ExecutionResult result = fetchLastExecutionResult(analysisId, null);
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    if (result != null) {
+      ExecuteAnalysisResponse executionData =
+          dataLakeExecutionService.getDataLakeExecutionData(
+              result.getExecutionId(), pageNo, pageSize, result.getExecutionType());
+      executionResponse.setData(executionData.getData());
+      executionResponse.setTotalRows(executionData.getTotalRows());
+      executionResponse.setAnalysis(result.getAnalysis());
+      executionResponse.setExecutedBy(result.getExecutedBy());
+    }
+
+    return executionResponse;
   }
 }

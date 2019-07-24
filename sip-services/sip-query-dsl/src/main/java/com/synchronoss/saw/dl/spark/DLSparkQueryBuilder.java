@@ -41,8 +41,7 @@ public class DLSparkQueryBuilder {
 
   List<String> groupByColumns = new ArrayList<>();
 
-  public String buildDataQuery(SIPDSL sipdsl) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDataQuery(SipQuery sipQuery) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
@@ -52,9 +51,9 @@ public class DLSparkQueryBuilder {
             " FROM " + buildFrom(sipQuery) + buildFilter(sipQuery.getFilters()) + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**
@@ -216,12 +215,11 @@ public class DLSparkQueryBuilder {
   /**
    * Build Actual query to be ran over background (DSK Included).
    *
-   * @param sipdsl SIPDSL Object
+   * @param sipQuery SipQuery Object
    * @param dataSecurityKey DataSecurityKey Object
    * @return String dsk included query
    */
-  public String buildDskDataQuery(SIPDSL sipdsl, DataSecurityKey dataSecurityKey) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDskDataQuery(SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
@@ -235,9 +233,9 @@ public class DLSparkQueryBuilder {
                 + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**
@@ -247,7 +245,8 @@ public class DLSparkQueryBuilder {
    */
   private String queryDskBuilder(DataSecurityKey dataSecurityKeyObj, SipQuery sipQuery) {
     String dskFilter = "";
-    if (dataSecurityKeyObj != null) {
+    if (dataSecurityKeyObj.getDataSecuritykey() != null
+        && dataSecurityKeyObj.getDataSecuritykey().size() != 0) {
       if (buildFilter(sipQuery.getFilters()).trim().isEmpty()) {
         dskFilter = " WHERE ";
       } else {
@@ -283,8 +282,16 @@ public class DLSparkQueryBuilder {
    */
   private String buildDateTimestampFilter(Filter filter) {
     String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
-    Operator op = filter.getModel().getOperator();
-    String dateFormat = filter.getModel().getFormat();
+
+    String dateFormat = null;
+    if ((filter.getModel() != null)
+        && (filter.getModel().getFormat() != null
+            || filter.getModel().getGte() != null
+            || filter.getModel().getLte() != null
+            || filter.getModel().getPreset() != null)) {
+      dateFormat = filter.getModel().getFormat();
+      dateFormat = dateFormat != null ? dateFormat : DATE_WITH_HOUR_MINUTES;
+    }
     if (dateFormat != null) {
       switch (dateFormat) {
         case DATE_ONLY_FORMAT:
@@ -371,7 +378,7 @@ public class DLSparkQueryBuilder {
     Operator operator = filter.getModel().getOperator();
     String gte = filter.getModel().getGte();
     String lte = filter.getModel().getLte();
-    if (preset != null || preset.value().equals(Model.Preset.NA.toString())) {
+    if (preset != null && !preset.value().equals(Model.Preset.NA.toString())) {
       DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
@@ -425,11 +432,13 @@ public class DLSparkQueryBuilder {
         break;
       case BTW:
         whereClause =
-            whereClause.concat(
-                " >= "
-                    + filter.getModel().getValue()
-                    + " AND <= "
-                    + filter.getModel().getOtherValue());
+            whereClause.concat(" >= " + filter.getModel().getOtherValue())
+                + " AND "
+                + filter.getArtifactsName()
+                + "."
+                + filter.getColumnName()
+                + " <= "
+                + filter.getModel().getValue();
         break;
     }
 
@@ -437,7 +446,7 @@ public class DLSparkQueryBuilder {
   }
 
   private String buildStringFilter(Filter filter) {
-    String whereClause = "upper(" + filter.getArtifactsName() + "." + filter.getColumnName() + ")";
+    String whereClause = filter.getArtifactsName() + "." + filter.getColumnName();
 
     Operator op = filter.getModel().getOperator();
 
@@ -452,7 +461,7 @@ public class DLSparkQueryBuilder {
         break;
       case ISIN:
         whereClause =
-            whereClause.concat(" like '%" + filter.getModel().getModelValues().get(0) + "%' ");
+            whereClause.concat(" IN ('" + filter.getModel().getModelValues().get(0) + "') ");
         break;
       case ISNOTIN:
         whereClause =
@@ -460,7 +469,7 @@ public class DLSparkQueryBuilder {
         break;
       case CONTAINS:
         whereClause =
-            whereClause.concat(" IN ('" + filter.getModel().getModelValues().get(0) + "') ");
+            whereClause.concat(" like '%" + filter.getModel().getModelValues().get(0) + "%' ");
         break;
       case EQ:
         whereClause = whereClause.concat(" = '" + filter.getModel().getModelValues().get(0) + "' ");

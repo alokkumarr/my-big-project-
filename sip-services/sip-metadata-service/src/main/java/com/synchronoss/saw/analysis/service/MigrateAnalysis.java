@@ -14,6 +14,7 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
@@ -209,7 +210,8 @@ public class MigrateAnalysis {
         converter = new EsReportConverter();
         break;
       case "report":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
+        converter = new DlReportConverter();
+        break;
       case "map":
         converter = new GeoMapConverter();
         break;
