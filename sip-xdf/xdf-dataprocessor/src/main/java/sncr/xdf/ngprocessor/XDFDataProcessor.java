@@ -309,7 +309,7 @@ public class XDFDataProcessor  {
             }
 
             datafileDFmap =  new HashMap<>();
-            datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName));
+            datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
             dataSetName = parserKey;
 
             logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
@@ -375,6 +375,7 @@ public class XDFDataProcessor  {
             ngTransformerCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
             ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey,datafileDFmap.get(dataSetName));
+            logger.debug("dataset count in transformer ::"+ datafileDFmap.get(dataSetName).count());
             ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
