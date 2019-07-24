@@ -409,7 +409,7 @@
 
             <div *dxTemplate="let data of 'dateTemplate'">
               {{
-                (data.value || data.value) < 0
+                data.value && data.value < 1
                   ? (data.value | date: 'short')
                   : 'N/A'
               }}
