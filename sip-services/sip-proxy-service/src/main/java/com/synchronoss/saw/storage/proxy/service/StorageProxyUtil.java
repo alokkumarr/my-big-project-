@@ -12,6 +12,7 @@ import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class StorageProxyUtil {
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      SipQuery sipQuery, String metaDataServiceExport, HttpServletRequest request) {
+      SipQuery sipQuery, String metaDataServiceExport, HttpServletRequest request, RestUtil restUtil) {
     String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
@@ -105,7 +106,7 @@ public class StorageProxyUtil {
     SipQuery semanticSipQuery = new SipQuery();
     if (semanticId != null) {
       try {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = restUtil.restTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
