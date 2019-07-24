@@ -14,7 +14,7 @@ if (environment.production) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost
-  apiUrl = 'http://54.146.207.66';
+  apiUrl = 'http://34.236.152.51';
   // apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net';
   // apiUrl = 'http://saw-rd602.ana.dev.vaste.sncrcorp.net';
   // apiUrl = 'https://saw-pac-sip-vaste.sncrcorp.net';
