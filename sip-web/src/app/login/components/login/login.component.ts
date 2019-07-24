@@ -40,7 +40,10 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    if (isEmpty(this.dataHolder.username) || isEmpty(this.dataHolder.password)) {
+    if (
+      isEmpty(this.dataHolder.username) ||
+      isEmpty(this.dataHolder.password)
+    ) {
       this.states.error = 'Please enter a valid Username and Password';
       return false;
     }
@@ -67,5 +70,9 @@ export class LoginComponent implements OnInit {
 
   reset() {
     this._router.navigate(['login', 'preResetPwd']);
+  }
+
+  passwordChanged(event) {
+    this.dataHolder.password = event.target.value;
   }
 }

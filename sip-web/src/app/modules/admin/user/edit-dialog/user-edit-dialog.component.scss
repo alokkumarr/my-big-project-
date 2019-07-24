@@ -1,9 +1,12 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   max-width: 500px;
 }
 
+password-toggle {
+  width: 100%; // Somehow password-toggle component is not taking 100% width. So set the width here.
+}
 .base-dialog__content {
   padding: 10px 50px !important;
   width: 400px;
