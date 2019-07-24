@@ -32,7 +32,7 @@ export class JobLogsPageComponent implements OnInit {
   public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
   public jobDetails = [
     [
-      { label: 'Job Name', prop: 'jobName' },
+      { label: 'Job Id', prop: 'jobId' },
       { label: 'Job Status', prop: 'jobStatus' }
     ],
     [
