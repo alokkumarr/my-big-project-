@@ -13,7 +13,6 @@ import com.synchronoss.saw.model.JoinCondition;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.Model.Preset;
-import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
@@ -490,13 +489,13 @@ public class DLSparkQueryBuilder {
         order =
             sort.getAggregate()
                 + "("
-                + sort.getArtifacts()
+                + sort.getArtifactsName()
                 + "."
                 + sort.getColumnName()
                 + ") "
                 + sort.getOrder();
       } else {
-        order = sort.getArtifacts() + "." + sort.getColumnName() + " " + sort.getOrder();
+        order = sort.getArtifactsName() + "." + sort.getColumnName() + " " + sort.getOrder();
       }
       sortsList.add(order);
     }

@@ -176,7 +176,7 @@ public class SIPDSLTest {
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
 
     Sort sort = new Sort();
-    sort.setArtifacts("SALES");
+    sort.setArtifactsName("SALES");
     sort.setColumnName("integer");
     sort.setOrder(Order.DESC);
     sort.setType(Sort.Type.INTEGER);
@@ -193,7 +193,7 @@ public class SIPDSLTest {
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
 
     Sort sort = new Sort();
-    sort.setArtifacts("SALES");
+    sort.setArtifactsName("SALES");
     sort.setColumnName("integer");
     sort.setOrder(Order.DESC);
     sort.setType(Sort.Type.INTEGER);

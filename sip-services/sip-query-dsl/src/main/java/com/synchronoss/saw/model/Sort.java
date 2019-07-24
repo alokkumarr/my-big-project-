@@ -12,11 +12,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"artifacts", "columnName", "type", "order", "aggregate"})
+@JsonPropertyOrder({"artifactsName", "columnName", "type", "order", "aggregate"})
 public class Sort {
 
-  @JsonProperty("artifacts")
-  private String artifacts;
+  @JsonProperty("artifactsName")
+  private String artifactsName;
 
   @JsonProperty("columnName")
   private String columnName;
@@ -30,14 +30,14 @@ public class Sort {
   @JsonProperty("aggregate")
   private Aggregate aggregate;
 
-  @JsonProperty("artifacts")
-  public String getArtifacts() {
-    return artifacts;
+  @JsonProperty("artifactsName")
+  public String getArtifactsName() {
+    return artifactsName;
   }
 
-  @JsonProperty("artifacts")
-  public void setArtifacts(String artifacts) {
-    this.artifacts = artifacts;
+  @JsonProperty("artifactsName")
+  public void setArtifactsName(String artifactsName) {
+    this.artifactsName = artifactsName;
   }
 
   @JsonProperty("columnName")
@@ -83,7 +83,7 @@ public class Sort {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
-        .append("artifacts", artifacts)
+        .append("artifactsName", artifactsName)
         .append("columnName", columnName)
         .append("type", type)
         .append("order", order)
@@ -97,7 +97,7 @@ public class Sort {
         .append(order)
         .append(columnName)
         .append(type)
-        .append(artifacts)
+        .append(artifactsName)
         .append(aggregate)
         .toHashCode();
   }
@@ -115,7 +115,7 @@ public class Sort {
         .append(order, rhs.order)
         .append(columnName, rhs.columnName)
         .append(type, rhs.type)
-        .append(artifacts, rhs.artifacts)
+        .append(artifactsName, rhs.artifactsName)
         .append(aggregate, rhs.aggregate)
         .isEquals();
   }
