@@ -84,6 +84,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private JavaRDD<Row> rejectedDataCollector;
     private JavaRDD<Row> acceptedDataCollector;
+    
+    private boolean isRealTime;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
@@ -95,6 +97,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     public NGParser(NGContext ngctx) {
         super(ngctx);
+    }
+    
+    public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealtime) {
+    	
+        super(ngctx);
+        logger.debug("************ Inside Parser with real time ***********");
     }
 
     public NGParser() {  super(); }

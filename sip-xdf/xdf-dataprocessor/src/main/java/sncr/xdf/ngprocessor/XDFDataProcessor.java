@@ -21,13 +21,12 @@ import java.util.Map;
 
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.parser.NGParser;
+import sncr.xdf.rtps.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
 
-public class XDFDataProcessor  extends AbstractComponent {
-    {
-        componentName = "pipeline";
-    }
+public class XDFDataProcessor  {
+   
 
     public XDFDataProcessor()
     {
@@ -45,6 +44,8 @@ public class XDFDataProcessor  extends AbstractComponent {
     private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
     Map<String, Dataset> datafileDFmap = new HashMap<>();
     String dataSetName = "";
+    String error;
+    boolean isRealTime = false;
 
     public static void main(String[] args)  {
 
@@ -88,8 +89,16 @@ public class XDFDataProcessor  extends AbstractComponent {
                 logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
                 switch(component)
                 {
+                
+                
+                	case "rtps" :
+                	isRealTime = true;
+                    ret = processRtps(parameters,pipeObj.get("configuration").toString(),persist);
+                    break;
+                
+                
                     case "parser" :
-                    ret = processParser(parameters,pipeObj.get("configuration").toString(),persist);
+                    ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,isRealTime);
                     break;
 
                     case "transformer" :
@@ -113,7 +122,89 @@ public class XDFDataProcessor  extends AbstractComponent {
     }
 
 
-    public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
+    private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
+
+        int ret = 0;
+        try {
+            String configAsStr = ConfigLoader.loadConfiguration(configPath);
+
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
+
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices pcs[] = {
+                ComponentServices.OutputDSMetadata,
+                ComponentServices.Project,
+                ComponentServices.TransformationMetadata,
+                ComponentServices.Spark
+            };
+
+            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            NGContextServices ngRtpsCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
+            ngRtpsCtxSvc.initContext();
+            ngRtpsCtxSvc.registerOutputDataSet();
+
+            logger.warn("Output datasets:");
+
+            ngRtpsCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.warn(id)
+            );
+
+            logger.warn(ngRtpsCtxSvc.getNgctx().toString());
+
+            logger.debug("Parser Input dataset size is : " + datafileDFmap.size() );
+
+            ngRtpsCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
+            String rtpsKey =  cfg.getOutputs().get(0).getDataSet().toString();
+          
+            ngRtpsCtxSvc.getNgctx().dataSetName = rtpsKey;
+            ngRtpsCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngRtpsCtxSvc.getNgctx().persistMode = persistFlag;
+
+            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx());
+
+            if (!component.initComponent(null))
+                System.exit(-1);
+
+            ret = component.run();
+
+            if (ret != 0){
+                error = "Could not complete Parser component " + "entry";
+                throw new Exception(error);
+            }
+
+            datafileDFmap =  new HashMap<>();
+            logger.debug("###RTPS Dataset name::" +ngRtpsCtxSvc.getNgctx().dataSetName);
+           
+            datafileDFmap.put(rtpsKey,ngRtpsCtxSvc.getNgctx().datafileDFmap.get(ngRtpsCtxSvc.getNgctx().dataSetName));
+            logger.debug("###RTPS Dataset count ::" +datafileDFmap.get(rtpsKey).count());
+            dataSetName = rtpsKey;
+
+            logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
+        } catch (Exception e) {
+            logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
+            System.exit(-1);
+        }
+        return ret;
+    
+	}
+
+	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
     {
         ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
         logger.debug("ComponentConfiguration: " + config + "\n");
@@ -134,7 +225,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         return pipelineObj;
     }
 
-    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
+    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag, boolean isRealTime)
     {
         int ret = 0;
         try {
@@ -182,12 +273,30 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.debug("Parser Input dataset size is : " + datafileDFmap.size() );
 
             ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
-            String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+            String parserKey = null;
+            
+            if(isRealTime) {
+            	parserKey = dataSetName;
+            } else {
+            	parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+            }
+            
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
             ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
-            NGParser component = new NGParser(ngParserCtxSvc.getNgctx());
+            NGParser component = null;
+            
+    		if(isRealTime) {
+    			Dataset dataset = ngParserCtxSvc.getNgctx().datafileDFmap.get(parserKey);
+    			component  =  	new NGParser(ngParserCtxSvc.getNgctx(), dataset, true);
+            } else {
+            	
+            	component  =  	new NGParser(ngParserCtxSvc.getNgctx());
+            
+            }
+    		
+            		
 
             if (!component.initComponent(null))
                 System.exit(-1);
