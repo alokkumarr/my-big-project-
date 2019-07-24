@@ -57,14 +57,7 @@ class ChartsDesignerPage extends Designer {
     );
 
     this._aggregateDataOptions = text =>
-      // element(by.xpath(`//mat-panel-title[contains(text(),"${text}")]`));
-      // element(
-      //by.xpath(
-      // `//*span[contains(@class, "mat-content")]/descendant::*[contains(text(), "${text}")]`
-      //)
-      //);
-
-      element(by.xpath(`mat-panel-title[contains(text(),"${text}")]`));
+      element(by.cssContainingText('.data-option__display-name', `${text}`));
 
     this._verifyMetricAggregate = (metric, text) =>
       element(
@@ -175,11 +168,18 @@ class ChartsDesignerPage extends Designer {
   }
 
   clickOnOpenChartSettings() {
-    browser.sleep(1500);
+    browser.sleep(200);
     commonFunctions.clickOnElement(this._openChartSettings);
   }
 
   clickOnAggregateDataOptions(text) {
+    browser.sleep(1000);
+    commonFunctions.waitFor.elementToBePresent(
+      this._aggregateDataOptions(text)
+    );
+    commonFunctions.waitFor.elementToBeVisible(
+      this._aggregateDataOptions(text)
+    );
     commonFunctions.clickOnElement(this._aggregateDataOptions(text));
   }
 
