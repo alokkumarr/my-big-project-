@@ -19,6 +19,9 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggregationParser;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,9 +43,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SipQuery;
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -61,6 +61,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
@@ -537,7 +538,13 @@ public class ExportServiceImpl implements ExportService {
               @Override
               public void onSuccess(ResponseEntity<JsonNode> entity) {
                 JsonNode jsonDataNode = entity.getBody().get("data");
-                if (finalRecipients != null && !finalRecipients.equals("")) {
+                boolean isDispatchValid =
+                    !StringUtils.isEmpty(finalRecipients)
+                        || !StringUtils.isEmpty(s3bucket)
+                        || !StringUtils.isEmpty(finalFtp);
+
+                logger.debug("isDispatchValid = " + isDispatchValid);
+                if (isDispatchValid) {
                   logger.debug(
                       "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
                   IFileExporter iFileExporter = new XlsxExporter();
