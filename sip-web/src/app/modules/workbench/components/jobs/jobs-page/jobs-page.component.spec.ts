@@ -9,6 +9,7 @@ import { WorkbenchState } from '../../../state/workbench.state';
 import {
   JwtService,
   MenuService,
+  ToastService,
   CommonSemanticService
 } from '../../../../../common/services';
 import { WorkbenchModule } from '../../../workbench.module';
@@ -27,6 +28,7 @@ class JwtServiceStub {}
 class MenuServiceStub {}
 class CommonSemanticServiceStub {}
 class LocationStub {}
+class ToastServiceStub {}
 
 describe('Jobs page', () => {
   let fixture: ComponentFixture<JobsPageComponent>;
@@ -43,7 +45,8 @@ describe('Jobs page', () => {
         { provide: JwtService, useClass: JwtServiceStub },
         { provide: MenuService, useClass: MenuServiceStub },
         { provide: CommonSemanticService, useClass: CommonSemanticServiceStub },
-        { provide: Location, useClass: LocationStub }
+        { provide: Location, useClass: LocationStub },
+        { provide: ToastService, useClass: ToastServiceStub }
       ]
     })
       .compileComponents()
