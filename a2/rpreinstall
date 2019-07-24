@@ -29,5 +29,3 @@ Rscript -e 'install.packages(c("devtools", '"$precache"')); if (!all(c("devtools
 
 # Install Local Spark
 Rscript -e 'sparklyr::spark_install(version = "2.3.0")'
-
-
