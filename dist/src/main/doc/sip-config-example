@@ -150,7 +150,7 @@ sip_bis_duplicate_entry=true
 # FTP JSON config
 # (Do not split this into multiple lines)
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
-# s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"US_EAST_1", "outputLocation": "Analysis", "accessKey": "AKIAJMRWBPAZY4AECBVQ", "secretKey": "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", "type": "s3"}]}'
+# s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJMRWBPAZY4AECBVQ", "secretKey": "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", "type": "s3"}]}'
 
 
 #

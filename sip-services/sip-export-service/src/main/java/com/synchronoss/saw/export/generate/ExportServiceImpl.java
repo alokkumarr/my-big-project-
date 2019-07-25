@@ -596,6 +596,8 @@ public class ExportServiceImpl implements ExportService {
                             + this.getClass().getName()
                             + "  method dataToBeDispatchedAsync()");
                   }
+                } else {
+                  logger.error("Either one of the dispatcher(S3, ftp, email) must be present!!.");
                 }
 
                 logger.debug("S3 details = " + s3bucket);
