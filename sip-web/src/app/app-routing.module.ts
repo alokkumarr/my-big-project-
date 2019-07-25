@@ -19,6 +19,10 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'alerts',
+    loadChildren: './modules/alerts/alerts.module#AlertsModule'
+  },
+  {
     path: 'workbench',
     loadChildren: './modules/workbench/workbench.module#WorkbenchModule'
   },
@@ -55,7 +59,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       useHash: true,
-      onSameUrlNavigation: 'reload'
+      onSameUrlNavigation: 'reload',
+      enableTracing: false
     })
   ],
   exports: [RouterModule]

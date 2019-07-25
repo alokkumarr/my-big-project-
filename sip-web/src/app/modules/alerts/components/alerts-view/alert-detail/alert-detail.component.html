@@ -1,0 +1,74 @@
+<div fxFlex fxLayout="row" fxLayoutGap="9px" class="alert-detail">
+  <div
+    fxFlex="50"
+    fxLayout="column"
+    fxLayoutGap="5px"
+    class="alert-detail__info"
+  >
+    <div
+      fxFlex="30"
+      fxLayout="column"
+      fxLayoutGap="5px"
+      fxLayoutAlign="start start"
+    >
+      <strong>Alert Description: </strong>
+      <span e2e="alert-description">{{
+        alertRuleDetails?.alertDescription
+      }}</span>
+    </div>
+
+    <div fxFlex="30" fxLayout="row">
+      <div
+        fxFlex="50"
+        fxLayout="column"
+        fxLayoutGap="5px"
+        fxLayoutAlign="start start"
+      >
+        <strong>Monitoring Metric: </strong>
+        <span e2e="alert-monitoringEntity">{{
+          alertRuleDetails?.monitoringEntity
+        }}</span>
+      </div>
+      <div
+        fxFlex="50"
+        fxLayout="column"
+        fxLayoutGap="5px"
+        fxLayoutAlign="start start"
+      >
+        <strong>Datapod Name: </strong>
+        <span e2e="alert-datapodName">{{ alertRuleDetails?.datapodName }}</span>
+      </div>
+    </div>
+
+    <div fxFlex="30" fxLayout="row">
+      <div
+        fxFlex="50"
+        fxLayout="column"
+        fxLayoutGap="5px"
+        fxLayoutAlign="start start"
+      >
+        <strong>Operator: </strong>
+        <span e2e="alert-operator">{{ alertRuleDetails?.operator }}</span>
+      </div>
+      <div
+        fxFlex="50"
+        fxLayout="column"
+        fxLayoutGap="5px"
+        fxLayoutAlign="start start"
+      >
+        <strong>Aggregation: </strong>
+        <span e2e="alert-aggregation">{{ alertRuleDetails?.aggregation }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div fxFlex="50" fxLayoutAlign="center center">
+    <alert-chart
+      style="height: 200px; width: 100%"
+      title="Frequency"
+      [dateFilter]="filterString$ | async"
+      [additionalOptions]="additionalCountChartOptions"
+      [chartData]="selectedAlertCountChartData$ | async"
+    ></alert-chart>
+  </div>
+</div>
