@@ -128,7 +128,7 @@
         ></dxi-column>
 
         <div
-          e2e="job-{{ cell.column.dataField }}-{{ cell.text }}"
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
           *dxTemplate="let cell of 'linkCellTemplate'"
         >
           <a routerLink="../joblogs/{{ cell.data.jobId }}">
@@ -136,9 +136,12 @@
           </a>
         </div>
         <div
-          e2e="job-{{ cell.column.dataField }}-{{
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
             moment(cell.data.startTime).to(moment(cell.data.endTime), true)
-          }}"
+          "
           *dxTemplate="let cell of 'durationTemplate'"
         >
           <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
@@ -152,16 +155,19 @@
         </div>
 
         <div
-          e2e="job-{{ cell.column.dataField }}-{{ cell.text }}"
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
           *dxTemplate="let cell of 'e2eTemplate'"
         >
           {{ cell.text }}
         </div>
 
         <div
-          e2e="job-{{ cell.column.dataField }}-{{
-            cell.text ? (cell.text | date: 'short') : 'N/A'
-          }}"
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
+            (cell.text ? (cell.text | date: 'short') : 'N/A')
+          "
           *dxTemplate="let cell of 'dateTemplate'"
         >
           {{ cell.text ? (cell.text | date: 'short') : 'N/A' }}

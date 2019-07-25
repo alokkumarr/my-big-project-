@@ -406,11 +406,11 @@
             </div>
 
             <div
-              e2e="route-{{ cell.column.dataField }}-{{
-                cell.data.modifiedDate
+              [attr.e2e]="
+                'route-' + cell.column.dataField + '-' + cell.data.modifiedDate
                   ? (cell.data.modifiedDate | date: 'short')
                   : (cell.data.createdDate | date: 'short')
-              }}"
+              "
               *dxTemplate="let cell of 'modifiedCreatedTemplate'"
             >
               <span *ngIf="cell.data.modifiedDate; else defDate">{{
@@ -422,9 +422,14 @@
             </div>
 
             <div
-              e2e="route-{{ cell.column.dataField }}-{{ cell.value && cell.value > 1
-                ? (cell.value | date: 'short')
-                : 'N/A' }}"
+              [attr.e2e]="
+                'route-' +
+                cell.column.dataField +
+                '-' +
+                (cell.value && cell.value > 1
+                  ? (cell.value | date: 'short')
+                  : 'N/A')
+              "
               *dxTemplate="let cell of 'dateTemplate'"
             >
               {{
@@ -435,7 +440,7 @@
             </div>
 
             <div
-              e2e="route-{{ cell.column.dataField }}-{{ cell.text }}"
+              [attr.e2e]="'route-' + cell.column.dataField + '-' + cell.text"
               *dxTemplate="let cell of 'e2eTemplate'"
             >
               {{ cell.text }}
