@@ -233,15 +233,19 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     let url = '';
+    const page = floor(options.skip / options.take) + 1;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }`;
     if (options.isDSL) {
-      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
-      url = `${path}`;
+      url = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
-      const page = floor(options.skip / options.take) + 1;
       const path = `analysis/${analysisId}/executions/data`;
-      const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-        options.analysisType
-      }`;
       url = `${path}?${queryParams}`;
     }
 
@@ -545,11 +549,16 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
 
+    /* Use pagination options only when executing reports */
+    const paginationParams = ['report', 'esReport'].includes(model.type)
+      ? `&page=${page}&pageSize=${options.take}`
+      : '';
+
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&executionType=${mode}&page=${page}&pageSize=${options.take}`,
+        }&executionType=${mode}${paginationParams}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(

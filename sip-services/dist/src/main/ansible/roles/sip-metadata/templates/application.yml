@@ -85,6 +85,7 @@ metastore:
   executionResultTable: executionResult
   migration: analysisMigration
   metadataTable: semanticDataStore
+  analysis-metadata-path:  /services/metadata/analysis_metadata
 
 semantic:
   workbench-url:  ${connector}://localhost:9700

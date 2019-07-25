@@ -3,9 +3,15 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.service.HBaseUtils;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
@@ -13,20 +19,26 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
 import com.synchronoss.saw.util.SipMetadataUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
-
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FilterList.Operator;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
+import org.apache.hadoop.hbase.filter.ValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -34,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Alok.KumarR
@@ -62,9 +73,7 @@ public class MigrateAnalysisService {
   @Value("${metadata.service.execution-migration-flag}")
   private boolean migrationFlag;
 
-  @Autowired private RestUtil restUtil;
-
-  @Autowired private HBaseUtil hBaseUtil;
+  private HBaseUtils hBaseUtil;
 
   @Autowired private StorageProxyService proxyService;
 
@@ -75,6 +84,8 @@ public class MigrateAnalysisService {
   private AnalysisMetadata analysisMetadataStore = null;
 
   MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
+
+  String analysisType = null;
 
   /** Call this method to start the migration event based */
   public void startExecutionResult() {
@@ -93,13 +104,14 @@ public class MigrateAnalysisService {
     if (analysisIds != null && !analysisIds.isEmpty()) {
       try {
         // base check - open Hbase connection
+        hBaseUtil = new HBaseUtils();
         Connection connection = hBaseUtil.getConnection();
         for (Map.Entry<String, Boolean> entry : analysisIds.entrySet()) {
           Boolean flag = entry.getValue();
           String analysisId = entry.getKey();
           if (analysisId != null && !flag) {
             LOGGER.debug("Fetch execution Ids for migration.!");
-            Set<String> executionIds = getExecutionIds(analysisId);
+            Set<String> executionIds = getAllExecutions(analysisId, connection);
             LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
             if (!executionIds.isEmpty()) {
               readExecutionResultFromBinaryStore(executionIds, analysisId, connection);
@@ -141,6 +153,10 @@ public class MigrateAnalysisService {
               && content.get("type") != null
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
+            analysisType = type;
+          } else if (content.has("outputLocation")) {
+            type = "report";
+            analysisType = type;
           }
 
           migrationStatusObject.setAnalysisId(analysisId);
@@ -148,7 +164,7 @@ public class MigrateAnalysisService {
           migrationStatusObject.setType(type);
           LOGGER.debug(
               "Contents from Binary Store : " + content.toString() + " and Type : " + type);
-          if (type != null && type.matches("pivot|chart|esReport")) {
+          if (type != null && type.matches("pivot|chart|esReport|report")) {
             analysisId = analysisId != null ? analysisId : content.get("id").getAsString();
             JsonElement executedByElement = content.get("executedBy");
             String executedBy =
@@ -168,6 +184,10 @@ public class MigrateAnalysisService {
                     ? executionResultElement.getAsString()
                     : null;
 
+            if (executionStatus == null && !content.get("exec-msg").isJsonNull()) {
+              executionStatus = content.get("exec-msg").getAsString();
+            }
+
             JsonElement executionFinishTsElement = content.get("execution_finish_ts");
 
             String executionFinishTs =
@@ -186,20 +206,31 @@ public class MigrateAnalysisService {
                 queryBuilder != null ? migrateExecutions.migrate(queryBuilder) : null;
             LOGGER.debug("SIP query for pivot/chart/esReport : {}", sipQuery);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode dataNode = null, queryNode = null;
-            byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
-            if (dataObject != null && dataObject.length > 0) {
-              dataNode = objectMapper.readTree(new String(dataObject));
-              LOGGER.debug("Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
+            String query = null;
+            if (content.has("sql")) {
+              query = content.get("sql").getAsString();
+              sipQuery.setQuery(query);
             }
 
-            byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
-            if (contentObject != null && contentObject.length > 0) {
-              JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
-              queryNode =
-                  jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
-              LOGGER.debug("Query Node which need to parsed for pivot/chart/esReport : {}", queryNode);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode dataNode = null, queryNode = null;
+            if (type.matches("pivot|chart|esReport")) {
+              // For DL reports only metadata will be stored in maprDB but data for execution result
+              // will be physical data lake location provided in configuration.
+              byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
+              if (dataObject != null && dataObject.length > 0) {
+                dataNode = objectMapper.readTree(new String(dataObject));
+                LOGGER.debug(
+                    "Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
+              }
+
+              byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
+              if (contentObject != null && contentObject.length > 0) {
+                JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
+                queryNode =
+                    jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
+                LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
+              }
             }
 
             Object dslExecutionResult = null;
@@ -222,8 +253,8 @@ public class MigrateAnalysisService {
             migrationStatusObject.setMessage("Success");
             if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
               LOGGER.info(
-                  "Migration result saved successfully !! : {}"
-                      , migrationStatusObject.isExecutionsMigrated());
+                  "Migration result saved successfully !! : {}",
+                  migrationStatusObject.isExecutionsMigrated());
             } else {
               LOGGER.error("Unable to write update AnalysisMigration table!!");
             }
@@ -275,7 +306,7 @@ public class MigrateAnalysisService {
         case "esReport":
           return dataNode;
         case "report":
-          throw new UnsupportedOperationException("DL Report migration not supported yet");
+          return dataNode;
         case "map":
           throw new UnsupportedOperationException("DL Report migration not supported yet");
         default:
@@ -313,6 +344,7 @@ public class MigrateAnalysisService {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
       Analysis analysis = new Analysis();
+      analysis.setType(analysisType);
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
@@ -328,8 +360,8 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in json Store.");
     } catch (Exception ex) {
-      LOGGER.error(" Stack trace : {}" , ex);
-      LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());
+      LOGGER.error(" Stack trace : {}", ex);
+      LOGGER.error("Error occurred during saving Execution Result : {}", ex.getMessage());
     }
   }
 
@@ -406,28 +438,34 @@ public class MigrateAnalysisService {
     return status;
   }
 
-  /**
-   * Returns all executions for the analysis Id
-   *
-   * @param analysisId
-   * @return
-   */
-  private Set<String> getExecutionIds(String analysisId) {
-    RestTemplate restTemplate = restUtil.restTemplate();
-    Set<String> executionIds = new HashSet<>();
-    String url = proxyAnalysisUrl + "/{analysisId}/executions";
+  public Set<String> getAllExecutions(String analysisId, Connection connection) {
+    HBaseUtils utils = new HBaseUtils();
+    List<String> executionIds = new ArrayList<>();
+    try {
+      Table table = utils.getTable(connection, basePath + binaryTablePath);
 
-    String executionResult = restTemplate.getForObject(url, String.class, analysisId);
-    Gson gson = new Gson();
-    JsonObject executions = gson.fromJson(executionResult, JsonObject.class);
-    if (executions != null && !executions.isJsonNull()) {
-      JsonArray executionList = executions.getAsJsonArray("executions");
-      if (executionList != null) {
-        executionList.forEach(
-            (JsonObject -> executionIds.add(JsonObject.getAsJsonObject().get("id").getAsString())));
+      // Instantiating the Scan class
+      Scan scan = new Scan();
+      scan.addColumn(Bytes.toBytes("_search"), Bytes.toBytes("analysisId"));
+      scan.setMaxResultsPerColumnFamily(1);
+      Filter filter = new ValueFilter(CompareOp.EQUAL, new SubstringComparator(analysisId));
+      FilterList list = new FilterList(Operator.MUST_PASS_ONE, filter);
+      scan.setFilter(list);
+
+      ResultScanner results = table.getScanner(scan);
+
+      for (Result result : results) {
+        byte[] id = result.getRow();
+        LOGGER.debug("Execution id for analysis (" + analysisId + ") = " + Bytes.toString(id));
+        executionIds.add(Bytes.toString(id));
       }
-      LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
+      LOGGER.info("List of executions for analysis id : " + analysisId + " = " + executionIds);
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage());
     }
-    return executionIds;
+    executionIds = Lists.reverse(executionIds);
+    executionIds = executionIds.stream().limit(5).collect(Collectors.toList());
+    Set<String> set = ImmutableSet.copyOf(executionIds);
+    return set;
   }
 }
