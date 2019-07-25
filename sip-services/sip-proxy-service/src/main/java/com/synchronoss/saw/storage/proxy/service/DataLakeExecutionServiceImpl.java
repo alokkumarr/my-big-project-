@@ -45,7 +45,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   private String pubSchOutputLocation;
 
   @Value("${executor.preview-rows-limit}")
-  private Long dlPreviewRowLimit;
+  private Integer dlPreviewRowLimit;
 
   /**
    * This Method is used to execute data lake report.
@@ -64,19 +64,23 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       Boolean designerEdit,
-      String executionId)
+      String executionId,
+      Integer page,
+      Integer pageSize)
       throws Exception {
     List<Object> result = null;
 
     String query = null;
 
-    if (designerEdit == true) {
+    if (designerEdit) {
+      query = sipQuery.getQuery();
+    } else {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
-    } else {
-      query = sipQuery.getQuery();
     }
-
+    if (query == null) {
+      throw new RuntimeException("Query cannot be null");
+    }
     // Required parameters
     String semanticId = sipQuery.getSemanticId();
 
@@ -86,7 +90,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, null, null, ExecutionType.preview);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType);
   }
 
   private void waitForResult(String resultId, Integer retries) {
@@ -137,6 +141,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   public ExecuteAnalysisResponse getDataLakeExecutionData(
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
     logger.info("Inside getting executionData for executionId {}", executionId);
+    ExecuteAnalysisResponse response = new ExecuteAnalysisResponse();
     try {
       List list = new ArrayList<String>();
       Stream resultStream = list.stream();
@@ -145,41 +150,44 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           || executionType == (ExecutionType.preview)
           || executionType == (ExecutionType.regularExecution)) {
         outputLocation = previewOutputLocation + File.separator + "preview-" + executionId;
-        logger.info("output location for Dl report:{}", outputLocation);
       } else {
         outputLocation = pubSchOutputLocation + File.separator + "output-" + executionId;
       }
-      logger.info("output location for dfDl report:{}", outputLocation);
+      logger.debug("output location for dfDl report:{}", outputLocation);
       FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
-      for (FileStatus fs : files) {
-        if (fs.getPath().getName().endsWith(".json")) {
-          String path = outputLocation + File.separator + fs.getPath().getName();
-          InputStream stream = HFileOperations.readFileToInputStream(path);
-          BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-          resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
+      if (files != null) {
+        for (FileStatus fs : files) {
+          if (fs.getPath().getName().endsWith(".json")) {
+            String path = outputLocation + File.separator + fs.getPath().getName();
+            InputStream stream = HFileOperations.readFileToInputStream(path);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            resultStream = java.util.stream.Stream.concat(resultStream, reader.lines());
+          }
         }
+      }
+      else{
+         return response;
       }
       List<Object> objList =
           prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
       Long recordCount = getRecordCount(outputLocation);
-      ExecuteAnalysisResponse response = new ExecuteAnalysisResponse();
       response.setData(objList);
       response.setTotalRows(recordCount);
       response.setExecutionId(executionId);
       return response;
 
     } catch (Exception e) {
-      logger.info("Exception while reading results for Dl reports: {}", e.getMessage());
+      logger.error("Exception while reading results for Dl reports: {}", e);
+      throw new RuntimeException("Exception while reading results for Dl reports " + e);
     }
-    return null;
   }
 
   private List<JsonNode> prepareDataFromStream(
-      Stream<String> dataStream, Long limit, Integer pageNo, Integer pageSize) {
+      Stream<String> dataStream, Integer limit, Integer pageNo, Integer pageSize) {
     List<JsonNode> data = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper();
     if (pageNo == null || pageSize == null) {
-      limit = limit != null ? limit : 1000L;
+      limit = limit != null ? limit : 1000;
       dataStream
           .limit(limit)
           .forEach(
@@ -193,7 +201,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               });
       return data;
     } else {
-      int startIndex = pageNo * pageSize;
+      int startIndex = (pageNo-1) * pageSize;
       dataStream
           .skip(startIndex)
           .limit(pageSize)
@@ -212,7 +220,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private Long getRecordCount(String outputLocation) throws Exception {
-      logger.info("Egetting record count reading results for Dl reports: {}");
+      logger.info("Getting record count reading results for Dl reports: {}");
     ObjectMapper mapper = new ObjectMapper();
     InputStream inputStream = null;
     Long count = null;

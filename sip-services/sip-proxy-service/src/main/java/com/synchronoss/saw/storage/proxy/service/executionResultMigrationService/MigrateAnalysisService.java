@@ -3,7 +3,11 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
@@ -13,16 +17,14 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
@@ -75,6 +77,8 @@ public class MigrateAnalysisService {
   private AnalysisMetadata analysisMetadataStore = null;
 
   MigrationStatusObject migrationStatusObject = new MigrationStatusObject();
+
+  String analysisType = null;
 
   /** Call this method to start the migration event based */
   public void startExecutionResult() {
@@ -141,6 +145,10 @@ public class MigrateAnalysisService {
               && content.get("type") != null
               && !content.get("type").isJsonNull()) {
             type = content.get("type").getAsString();
+            analysisType = type;
+          } else if (content.has("outputLocation")) {
+            type = "report";
+            analysisType = type;
           }
 
           migrationStatusObject.setAnalysisId(analysisId);
@@ -148,7 +156,7 @@ public class MigrateAnalysisService {
           migrationStatusObject.setType(type);
           LOGGER.debug(
               "Contents from Binary Store : " + content.toString() + " and Type : " + type);
-          if (type != null && type.matches("pivot|chart")) {
+          if (type != null && type.matches("pivot|chart|esReport|report")) {
             analysisId = analysisId != null ? analysisId : content.get("id").getAsString();
             JsonElement executedByElement = content.get("executedBy");
             String executedBy =
@@ -168,6 +176,10 @@ public class MigrateAnalysisService {
                     ? executionResultElement.getAsString()
                     : null;
 
+            if (executionStatus == null && !content.get("exec-msg").isJsonNull()) {
+              executionStatus = content.get("exec-msg").getAsString();
+            }
+
             JsonElement executionFinishTsElement = content.get("execution_finish_ts");
 
             String executionFinishTs =
@@ -184,22 +196,34 @@ public class MigrateAnalysisService {
             }
             SipQuery sipQuery =
                 queryBuilder != null ? migrateExecutions.migrate(queryBuilder) : null;
-            LOGGER.debug("SIP query for pivot/chart : {}", sipQuery);
+            LOGGER.debug("SIP query for pivot/chart/esReport : {}", sipQuery);
+
+            String query = null;
+            if (content.has("sql")) {
+              query = content.get("sql").getAsString();
+              sipQuery.setQuery(query);
+            }
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode dataNode = null, queryNode = null;
-            byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
-            if (dataObject != null && dataObject.length > 0) {
-              dataNode = objectMapper.readTree(new String(dataObject));
-              LOGGER.debug("Data Json Node which need to parsed for pivot/chart : {}", dataNode);
-            }
+            if (type.matches("pivot|chart|esReport")) {
+              // For DL reports only metadata will be stored in maprDB but data for execution result
+              // will be physical data lake location provided in configuration.
+              byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
+              if (dataObject != null && dataObject.length > 0) {
+                dataNode = objectMapper.readTree(new String(dataObject));
+                LOGGER.debug(
+                    "Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
+              }
 
-            byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
-            if (contentObject != null && contentObject.length > 0) {
-              JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
-              queryNode =
-                  jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
-              LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
+              byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
+              if (contentObject != null && contentObject.length > 0) {
+                JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
+                queryNode =
+                    jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
+                LOGGER.debug(
+                    "Query Node which need to parsed for pivot/chart : {}", queryNode);
+              }
             }
 
             Object dslExecutionResult = null;
@@ -273,9 +297,9 @@ public class MigrateAnalysisService {
           objectList = ((PivotResultMigration) dataConverter).parseData(dataNode, queryNode);
           break;
         case "esReport":
-          throw new UnsupportedOperationException("ES Report migration not supported yet");
+          return dataNode;
         case "report":
-          throw new UnsupportedOperationException("DL Report migration not supported yet");
+          return dataNode;
         case "map":
           throw new UnsupportedOperationException("DL Report migration not supported yet");
         default:
@@ -313,6 +337,7 @@ public class MigrateAnalysisService {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
       Analysis analysis = new Analysis();
+      analysis.setType(analysisType);
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
@@ -320,7 +345,7 @@ public class MigrateAnalysisService {
       executionResult.setAnalysis(analysis);
       executionResult.setStartTime(finishedTime);
       executionResult.setFinishedTime(finishedTime);
-      executionResult.setData(objectList);
+      executionResult.setData(dslExecutionResult);
       executionResult.setExecutionType(
           executionType != null ? ExecutionType.valueOf(executionType) : null);
       executionResult.setStatus(executionStatus);

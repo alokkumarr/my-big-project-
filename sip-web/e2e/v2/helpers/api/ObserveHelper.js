@@ -35,7 +35,9 @@ class ObserveHelper {
         return null;
       }
       const analysisId =
-        analysisType === Constants.CHART || analysisType == Constants.PIVOT
+        analysisType === Constants.CHART ||
+        analysisType == Constants.PIVOT ||
+        analysisType == Constants.ES_REPORT
           ? createdAnalysis.analysis.id
           : createdAnalysis.contents.analyze[0].executionId.split('::')[0];
 

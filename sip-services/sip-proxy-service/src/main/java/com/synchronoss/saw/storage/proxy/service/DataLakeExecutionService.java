@@ -13,7 +13,9 @@ public interface DataLakeExecutionService {
       DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       Boolean designerEdit,
-      String executionId)
+      String executionId,
+      Integer page,
+      Integer pageSize)
       throws Exception;
 
   ExecuteAnalysisResponse getDataLakeExecutionData(

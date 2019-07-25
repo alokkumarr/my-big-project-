@@ -12,18 +12,29 @@ import java.util.List;
 
 public interface StorageProxyService {
 
-  public StorageProxy execute(StorageProxy proxy) throws Exception;
+  StorageProxy execute(StorageProxy proxy) throws Exception;
 
   List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
       ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception;
 
-    Boolean saveDslExecutionResult(ExecutionResult executionResult);
+  Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
-    List<?> fetchDslExecutionsList(String dslQueryId);
+  List<?> fetchDslExecutionsList(String dslQueryId);
 
-    ExecutionResponse fetchExecutionsData(String executionId);
+  ExecutionResponse fetchExecutionsData(
+      String executionId, ExecutionType executionType, Integer page, Integer pageSize);
 
-    ExecutionResponse fetchLastExecutionsData(String dslQueryId);
-    ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, DataSecurityKey dataSecurityKey,
+
+    ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, Integer page, Integer pageSize, DataSecurityKey dataSecurityKey,
         ExecutionType executionType) throws Exception;
+  ExecutionResponse fetchLastExecutionsData(
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
+
+  Boolean saveTTLExecutionResult(ExecutionResult executionResult);
+
+  ExecutionResponse fetchDataLakeExecutionData(
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
+
+    ExecutionResponse fetchLastExecutionsDataForDL(
+        String analysisId, Integer pageNo, Integer pageSize);
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.net.ftp.FTPClient;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -63,6 +64,7 @@ public class AnalyzeIT extends BaseIT {
   }
 
   @Test(timeout = 300000)
+  @Ignore
   public void exportData() throws JsonProcessingException, IOException {
 
     // create and save analysis

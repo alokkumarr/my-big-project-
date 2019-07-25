@@ -9,7 +9,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -226,6 +230,9 @@ public class SipDslIT extends BaseIT {
     Long countOfRows = a.get("totalRows").asLong();
     Assert.assertTrue(countOfRows > 0);
     Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
+    ResponseBody responseBody = response.getBody();
+    List<Map<String, String>> dataNode = responseBody.path("data");
+    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
   @Test
