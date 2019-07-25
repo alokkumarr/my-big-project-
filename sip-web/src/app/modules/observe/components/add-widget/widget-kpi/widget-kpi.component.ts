@@ -96,8 +96,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       primAggregate: [this.aggregations[0].value, Validators.required],
       secAggregates: this.fb.group(secAggregateControls),
       target: [0, [Validators.required, nonEmpty()]],
-      measure1: [''],
-      measure2: [''],
+      measure1: ['', Validators.required],
+      measure2: ['', Validators.required],
       kpiBgColor: ['blue', Validators.required]
     });
 
