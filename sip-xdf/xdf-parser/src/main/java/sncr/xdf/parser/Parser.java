@@ -134,7 +134,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }catch(Exception e)
         {
             logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-            logger.error(ExceptionUtils.getStackTrace(e));
+            logger.error(e.getMessage());
         }
 
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
