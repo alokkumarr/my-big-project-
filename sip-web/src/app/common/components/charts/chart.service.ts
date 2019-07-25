@@ -1,5 +1,5 @@
 import * as Highcharts from 'highcharts/highcharts';
-import {ExportingOptions} from 'highcharts/highcharts';
+import { ExportingOptions } from 'highcharts/highcharts';
 import { Injectable } from '@angular/core';
 
 @Injectable()
@@ -80,7 +80,7 @@ export class ChartService {
         function() {
           throw new Error('Failed to export on client side');
         },
-        null
+        () => {}
       );
     });
   }
