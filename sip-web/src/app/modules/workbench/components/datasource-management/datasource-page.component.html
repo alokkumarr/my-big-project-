@@ -329,21 +329,25 @@
               caption="Route Name"
               dataField="routeName"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="Created By"
               dataField="createdBy"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="File Pattern"
               dataField="filePattern"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="Schedule"
               dataField="schedulerExpression"
               alignment="left"
+              cellTemplate="e2eTemplate"
               [calculateCellValue]="calculateScheduleCellValue"
             ></dxi-column>
             <dxi-column
@@ -362,16 +366,19 @@
               caption="Source Location"
               dataField="sourceLocation"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="Destination Location"
               dataField="destinationLocation"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="Description"
               dataField="description"
               alignment="left"
+              cellTemplate="e2eTemplate"
             ></dxi-column>
             <dxi-column
               caption="Last Modified"
@@ -398,21 +405,40 @@
               </div>
             </div>
 
-            <div *dxTemplate="let data of 'modifiedCreatedTemplate'">
-              <span *ngIf="data.data.modifiedDate; else defDate">{{
-                data.data.modifiedDate | date: 'short'
+            <div
+              e2e="route-{{ cell.column.dataField }}-{{
+                cell.data.modifiedDate
+                  ? (cell.data.modifiedDate | date: 'short')
+                  : (cell.data.createdDate | date: 'short')
+              }}"
+              *dxTemplate="let cell of 'modifiedCreatedTemplate'"
+            >
+              <span *ngIf="cell.data.modifiedDate; else defDate">{{
+                cell.data.modifiedDate | date: 'short'
               }}</span>
               <ng-template #defDate>{{
-                data.data.createdDate | date: 'short'
+                cell.data.createdDate | date: 'short'
               }}</ng-template>
             </div>
 
-            <div *dxTemplate="let data of 'dateTemplate'">
+            <div
+              e2e="route-{{ cell.column.dataField }}-{{ cell.value && cell.value > 1
+                ? (cell.value | date: 'short')
+                : 'N/A' }}"
+              *dxTemplate="let cell of 'dateTemplate'"
+            >
               {{
-                data.value && data.value > 1
-                  ? (data.value | date: 'short')
+                cell.value && cell.value > 1
+                  ? (cell.value | date: 'short')
                   : 'N/A'
               }}
+            </div>
+
+            <div
+              e2e="route-{{ cell.column.dataField }}-{{ cell.text }}"
+              *dxTemplate="let cell of 'e2eTemplate'"
+            >
+              {{ cell.text }}
             </div>
 
             <div *dxTemplate="let data of 'actionsTemplate'">

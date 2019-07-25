@@ -70,11 +70,13 @@
           caption="Channel name"
           dataField="channelName"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Route name"
           dataField="routeName"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Start time"
@@ -98,34 +100,47 @@
           caption="Job status"
           dataField="jobStatus"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Total count"
           dataField="totalCount"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Success count"
           dataField="successCount"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="File pattern"
           dataField="filePattern"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Source type"
           dataField="sourceType"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
 
-        <div *dxTemplate="let cell of 'linkCellTemplate'">
+        <div
+          e2e="job-{{ cell.column.dataField }}-{{ cell.text }}"
+          *dxTemplate="let cell of 'linkCellTemplate'"
+        >
           <a routerLink="../joblogs/{{ cell.data.jobId }}">
             {{ cell.data.jobId }}
           </a>
         </div>
-        <div *dxTemplate="let cell of 'durationTemplate'">
+        <div
+          e2e="job-{{ cell.column.dataField }}-{{
+            moment(cell.data.startTime).to(moment(cell.data.endTime), true)
+          }}"
+          *dxTemplate="let cell of 'durationTemplate'"
+        >
           <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
             {{
               moment(cell.data.startTime).to(moment(cell.data.endTime), true)
@@ -136,7 +151,19 @@
           </ng-template>
         </div>
 
-        <div *dxTemplate="let cell of 'dateTemplate'">
+        <div
+          e2e="job-{{ cell.column.dataField }}-{{ cell.text }}"
+          *dxTemplate="let cell of 'e2eTemplate'"
+        >
+          {{ cell.text }}
+        </div>
+
+        <div
+          e2e="job-{{ cell.column.dataField }}-{{
+            cell.text ? (cell.text | date: 'short') : 'N/A'
+          }}"
+          *dxTemplate="let cell of 'dateTemplate'"
+        >
           {{ cell.text ? (cell.text | date: 'short') : 'N/A' }}
         </div>
       </dx-data-grid>
