@@ -24,7 +24,7 @@ export class DesignerReportComponent {
     this.currentDataCount = Math.min(this.totalDataCount, (val || []).length);
   }
 
-  constructor(private store: Store) {}
+  constructor(public store: Store) {}
 
   get analysisArtifacts() {
     return this.analysis.edit
