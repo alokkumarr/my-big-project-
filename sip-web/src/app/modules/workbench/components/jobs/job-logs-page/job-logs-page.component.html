@@ -122,35 +122,65 @@
     *dxTemplate="let logRow of 'logTableRowTemplate'"
   >
     <tr class="tr-row" e2e="job-log-row-tr">
-      <td e2e="job-log-filePattern">{{ logRow.data.filePattern }}</td>
-      <td e2e="job-log-fileName" [matTooltip]="logRow.data.fileName">
+      <td e2e="job-log-filePattern-{{ logRow.data.filePattern }}">
+        {{ logRow.data.filePattern }}
+      </td>
+      <td
+        e2e="job-log-fileName-{{ logRow.data.fileName }}"
+        [matTooltip]="logRow.data.fileName"
+      >
         {{ logRow.data.fileName }}
       </td>
-      <td e2e="job-log-actualFileRecDate">
+      <td
+        e2e="job-log-actualFileRecDate-{{
+          logRow.data.actualFileRecDate | date: 'short'
+        }}"
+      >
         {{ logRow.data.actualFileRecDate | date: 'short' }}
       </td>
-      <td e2e="job-log-recdFileName" [matTooltip]="logRow.data.recdFileName">
+      <td
+        e2e="job-log-recdFileName-{{ logRow.data.recdFileName }}"
+        [matTooltip]="logRow.data.recdFileName"
+      >
         {{ logRow.data.recdFileName }}
       </td>
-      <td e2e="job-log-recdFileSize">{{ logRow.data.recdFileSize }}</td>
-      <td e2e="job-log-mflFileStatus">{{ logRow.data.mflFileStatus }}</td>
-      <td e2e="job-log-bisProcessState">
+      <td e2e="job-log-recdFileSize-{{ logRow.data.recdFileSize }}">
+        {{ logRow.data.recdFileSize }}
+      </td>
+      <td e2e="job-log-mflFileStatus-{{ logRow.data.mflFileStatus }}">
+        {{ logRow.data.mflFileStatus }}
+      </td>
+      <td e2e="job-log-bisProcessState-{{ logRow.data.bisProcessState }}">
         {{ logRow.data.bisProcessState }}
       </td>
-      <td e2e="job-log-transferStartTime">
+      <td
+        e2e="job-log-transferStartTime-{{
+          logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS'
+        }}"
+      >
         {{ logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
       </td>
-      <td e2e="job-log-transferEndTime">
+      <td
+        e2e="job-log-transferEndTime-{{
+          logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS'
+        }}"
+      >
         {{ logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
       </td>
 
-      <td e2e="job-log-transferDuration">
+      <td e2e="job-log-transferDuration-{{ logRow.data.transferDuration }}">
         {{ logRow.data.transferDuration }}
       </td>
-      <td e2e="job-log-modifiedDate">
+      <td
+        e2e="job-log-modifiedDate-{{
+          logRow.data.modifiedDate | date: 'short'
+        }}"
+      >
         {{ logRow.data.modifiedDate | date: 'short' }}
       </td>
-      <td e2e="job-log-createdDate">
+      <td
+        e2e="job-log-createdDate-{{ logRow.data.createdDate | date: 'short' }}"
+      >
         {{ logRow.data.createdDate | date: 'short' }}
       </td>
     </tr>
