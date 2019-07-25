@@ -18,7 +18,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   let host;
   let token;
   const metricName = dataSets.pivotChart;
-  const metrics = 'Integer';
+  const metrics = 'Float';
   const dimension = 'Date';
   const groupName = 'String';
   const sizeByName = 'Float';

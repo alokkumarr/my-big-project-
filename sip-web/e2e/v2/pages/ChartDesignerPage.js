@@ -57,7 +57,9 @@ class ChartsDesignerPage extends Designer {
     );
 
     this._aggregateDataOptions = text =>
-      element(by.cssContainingText('.data-option__display-name', `${text}`));
+      element(
+        by.css(`mat-expansion-panel[e2e="designer-data-option-${text}"]`)
+      );
 
     this._verifyMetricAggregate = (metric, text) =>
       element(
@@ -164,23 +166,26 @@ class ChartsDesignerPage extends Designer {
 
   clickOnSelectAndChooseAggregate(name) {
     browser.sleep(1000); // Somehow aggregate button was not able to load the aggregate list. So put the browser to sleep.
-    commonFunctions.clickOnElement(this._selectAndChooseAggregate(name));
+    // For aggregate chooser component commonfunction is not able to make the element visible. So using the browser to identify the.
+    browser
+      .actions()
+      .mouseMove(this._selectAndChooseAggregate(name))
+      .click()
+      .perform();
   }
 
   clickOnOpenChartSettings() {
-    browser.sleep(200);
+    browser.sleep(200); // Chart setting arrows were not able to load. So putting browser to sleep.
     commonFunctions.clickOnElement(this._openChartSettings);
   }
 
   clickOnAggregateDataOptions(text) {
-    browser.sleep(1000);
-    commonFunctions.waitFor.elementToBePresent(
-      this._aggregateDataOptions(text)
-    );
-    commonFunctions.waitFor.elementToBeVisible(
-      this._aggregateDataOptions(text)
-    );
-    commonFunctions.clickOnElement(this._aggregateDataOptions(text));
+    // Commonfunction is not able to make `mat-expansion-panel` comopnent visible to using browser to identify the element.
+    browser
+      .actions()
+      .mouseMove(this._aggregateDataOptions(text))
+      .click()
+      .perform();
   }
 
   validateSelectedAggregate(metric, designerLabelText, buttonText) {
