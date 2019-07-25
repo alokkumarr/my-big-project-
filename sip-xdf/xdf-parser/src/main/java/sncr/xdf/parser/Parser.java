@@ -116,7 +116,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputDataSetLocation = outputDataset.get(DataSetProperties.PhysicalLocation.name()).toString();
 
         outputDataSetMode = outputDataset.get(DataSetProperties.Mode.name()).toString();
-        logger.debug("Output dataset mode = " + outputDataSetMode);
+        logger.debug("Output dataset mode  is = " + outputDataSetMode);
 
         outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
         outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
@@ -125,6 +125,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
+
+        try {
+           if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation))
+                HFileOperations.deleteEnt(outputDataSetLocation);
+        }catch(Exception e)
+        {
+            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
 
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
             headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
