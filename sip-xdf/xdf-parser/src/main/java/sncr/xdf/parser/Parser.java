@@ -127,8 +127,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.debug("Input file format = " + this.parserInputFileFormat);
 
         try {
-           if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation))
-                HFileOperations.deleteEnt(outputDataSetLocation);
+           if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation)) {
+               logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for " + outputDataSetMode);
+               HFileOperations.deleteEnt(outputDataSetLocation);
+           }
         }catch(Exception e)
         {
             logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
