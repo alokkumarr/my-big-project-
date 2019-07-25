@@ -20,6 +20,10 @@ export class PasswordResetComponent implements OnInit {
   public confNewPwd;
   public rhcToken;
   public newPwd;
+  public passwordType = {
+    NEWPASSWORD: 'New Password',
+    CONFIRMPASSWORD: 'Confirm Password'
+  };
 
   ngOnInit() {
     this.errorMsg = '';
@@ -49,5 +53,17 @@ export class PasswordResetComponent implements OnInit {
 
   login() {
     this._router.navigate(['/#/login']);
+  }
+
+  passwordChanged(event, type) {
+    switch (type) {
+      case this.passwordType.NEWPASSWORD:
+        this.newPwd = event.target.value;
+        break;
+
+      case this.passwordType.CONFIRMPASSWORD:
+        this.confNewPwd = event.target.value;
+        break;
+    }
   }
 }
