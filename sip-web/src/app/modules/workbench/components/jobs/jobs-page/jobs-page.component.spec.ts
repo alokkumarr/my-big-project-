@@ -1,18 +1,28 @@
-// import { Component } from '@angular/core';
 import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxsModule } from '@ngxs/store';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Location } from '@angular/common';
+import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
+import {
+  DxTextBoxModule,
+  DxButtonModule,
+  DxSliderModule,
+  DxTooltipModule
+} from 'devextreme-angular';
+import { DxTemplateModule } from 'devextreme-angular/core/template';
+import { RouterModule } from '@angular/router';
+import { JobFiltersComponent } from '../filters';
+import { MaterialModule } from '../../../../../material.module';
 import { of } from 'rxjs';
 import { WorkbenchState } from '../../../state/workbench.state';
+import { DatasourceService } from '../../../services/datasource.service';
 import {
   JwtService,
   MenuService,
   ToastService,
   CommonSemanticService
 } from '../../../../../common/services';
-import { WorkbenchModule } from '../../../workbench.module';
 import { JobsPageComponent } from './jobs-page.component';
 
 const queryParams = { channelTypeId: '' };
@@ -29,6 +39,10 @@ class MenuServiceStub {}
 class CommonSemanticServiceStub {}
 class LocationStub {}
 class ToastServiceStub {}
+class DatasourceServiceStub {
+  getJobs = () => of({ jobDetails: [], totalRows: 1 }).toPromise();
+  getChannelListForJobs = () => of([]);
+}
 
 describe('Jobs page', () => {
   let fixture: ComponentFixture<JobsPageComponent>;
@@ -37,8 +51,16 @@ describe('Jobs page', () => {
       imports: [
         NoopAnimationsModule,
         NgxsModule.forRoot([WorkbenchState], { developmentMode: true }),
-        WorkbenchModule
+        MaterialModule,
+        DxDataGridModule,
+        DxTextBoxModule,
+        DxButtonModule,
+        DxSliderModule,
+        DxTooltipModule,
+        DxTemplateModule,
+        RouterModule
       ],
+      declarations: [JobsPageComponent, JobFiltersComponent],
       providers: [
         { provide: Router, useClass: RouterServiceStub },
         { provide: ActivatedRoute, useClass: ActivatedRouteServiceStub },
@@ -46,6 +68,7 @@ describe('Jobs page', () => {
         { provide: MenuService, useClass: MenuServiceStub },
         { provide: CommonSemanticService, useClass: CommonSemanticServiceStub },
         { provide: Location, useClass: LocationStub },
+        { provide: DatasourceService, useClass: DatasourceServiceStub },
         { provide: ToastService, useClass: ToastServiceStub }
       ]
     })
