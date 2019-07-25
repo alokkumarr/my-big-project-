@@ -6,7 +6,12 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ValidatorFn
+} from '@angular/forms';
 
 import { nonEmpty } from '../../../validators/non-empty.validator';
 
@@ -80,26 +85,37 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregateControls[ag.value] = [false];
     });
 
-    this.kpiForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
-      dateField: ['', Validators.required],
-      gte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      lte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      filter: [this.dateFilters[0].value, Validators.required],
-      kpiDisplay: [this.chartTypes[0]],
-      primAggregate: [this.aggregations[0].value, Validators.required],
-      secAggregates: this.fb.group(secAggregateControls),
-      target: [0, [Validators.required, nonEmpty()]],
-      measure1: ['', Validators.required],
-      measure2: ['', Validators.required],
-      kpiBgColor: ['blue', Validators.required]
-    });
+    const measureRangeValidator: ValidatorFn = (fg: FormGroup) => {
+      const start = fg.get('measure1').value;
+      const end = fg.get('measure2').value;
+      return start !== null && end !== null && start < end
+        ? null
+        : { range: true };
+    };
+
+    this.kpiForm = this.fb.group(
+      {
+        name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
+        dateField: ['', Validators.required],
+        gte: [
+          moment(),
+          [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+        ],
+        lte: [
+          moment(),
+          [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+        ],
+        filter: [this.dateFilters[0].value, Validators.required],
+        kpiDisplay: [this.chartTypes[0]],
+        primAggregate: [this.aggregations[0].value, Validators.required],
+        secAggregates: this.fb.group(secAggregateControls),
+        target: [0, [Validators.required, nonEmpty()]],
+        measure1: ['', Validators.required],
+        measure2: ['', Validators.required],
+        kpiBgColor: ['blue', Validators.required]
+      },
+      { validators: [measureRangeValidator] }
+    );
 
     /* Only show date inputs if custom filter is selected */
     this.datePresetSubscription = this.kpiForm

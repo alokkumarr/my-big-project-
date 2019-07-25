@@ -162,6 +162,15 @@
         />
       </mat-form-field>
     </div>
+    <mat-error
+      *ngIf="
+        kpiForm.get('measure1').dirty &&
+        kpiForm.get('measure2').dirty &&
+        kpiForm.errors?.range
+      "
+    >
+      Measure 1 should be greater then measure 2
+    </mat-error>
     <mat-form-field class="target">
       <input
         matInput
