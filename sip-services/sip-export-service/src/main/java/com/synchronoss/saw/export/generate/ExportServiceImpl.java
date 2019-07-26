@@ -61,7 +61,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
@@ -538,66 +537,57 @@ public class ExportServiceImpl implements ExportService {
               @Override
               public void onSuccess(ResponseEntity<JsonNode> entity) {
                 JsonNode jsonDataNode = entity.getBody().get("data");
-                boolean isDispatchValid =
-                    !StringUtils.isEmpty(finalRecipients)
-                        || !StringUtils.isEmpty(s3bucket)
-                        || !StringUtils.isEmpty(finalFtp);
 
-                logger.debug("isDispatchValid = " + isDispatchValid);
-                if (isDispatchValid) {
-                  logger.debug(
-                      "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
-                  IFileExporter iFileExporter = new XlsxExporter();
-                  String dir = UUID.randomUUID().toString();
-                  MailSenderUtil MailSender =
-                      new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-                  exportBean.setFileType(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-                  exportBean.setFileName(
-                      publishedPath
-                          + File.separator
-                          + dir
-                          + File.separator
-                          + ((LinkedHashMap) dispatchBean).get("name")
-                          + DELIMITER
-                          + exportBean.getFileType());
-                  exportBean.setReportDesc(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-                  exportBean.setReportName(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-                  exportBean.setPublishDate(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-                  exportBean.setCreatedBy(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-                  try {
-                    // create a directory with unique name in published location to avoid file
-                    // conflict for dispatch.
-                    File file = new File(exportBean.getFileName());
-                    file.getParentFile().mkdir();
+                IFileExporter iFileExporter = new XlsxExporter();
+                String dir = UUID.randomUUID().toString();
+                MailSenderUtil MailSender =
+                    new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+                exportBean.setFileType(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+                exportBean.setFileName(
+                    publishedPath
+                        + File.separator
+                        + dir
+                        + File.separator
+                        + ((LinkedHashMap) dispatchBean).get("name")
+                        + DELIMITER
+                        + exportBean.getFileType());
+                exportBean.setReportDesc(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+                exportBean.setReportName(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+                exportBean.setPublishDate(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+                exportBean.setCreatedBy(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+                try {
+                  // create a directory with unique name in published location to avoid file
+                  // conflict for dispatch.
+                  File file = new File(exportBean.getFileName());
+                  file.getParentFile().mkdir();
 
-                    List<Field> fieldList = getPivotFields(sipQuery);
-                    ElasticSearchAggregationParser responseParser =
-                        new ElasticSearchAggregationParser(fieldList);
-                    responseParser.setColumnDataType(exportBean);
+                  List<Field> fieldList = getPivotFields(sipQuery);
+                  ElasticSearchAggregationParser responseParser =
+                      new ElasticSearchAggregationParser(fieldList);
+                  responseParser.setColumnDataType(exportBean);
 
-                    List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-                    logger.trace("Parse data for workbook writing : " + dataObj);
+                  List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
+                  logger.trace("Parse data for workbook writing : " + dataObj);
 
-                    Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-                    logger.debug("workbook created with DSL : " + workbook);
-                    CreatePivotTable createPivotTable = new CreatePivotTable();
-                    createPivotTable.createPivot(workbook, file, fieldList);
-                    if (finalRecipients != null && !finalRecipients.equals("")) {
-                      dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
-                    }
-                  } catch (IOException e) {
-                    logger.error(
-                        "Exception occurred while dispatching pivot :"
-                            + this.getClass().getName()
-                            + "  method dataToBeDispatchedAsync()");
+                  Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                  logger.debug("workbook created with DSL : " + workbook);
+                  CreatePivotTable createPivotTable = new CreatePivotTable();
+                  createPivotTable.createPivot(workbook, file, fieldList);
+                  if (finalRecipients != null && !finalRecipients.equals("")) {
+                    logger.debug(
+                        "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
+                    dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
                   }
-                } else {
-                  logger.error("Either one of the dispatcher(S3, ftp, email) must be present!!.");
+                } catch (IOException e) {
+                  logger.error(
+                      "Exception occurred while dispatching pivot :"
+                          + this.getClass().getName()
+                          + "  method dataToBeDispatchedAsync()");
                 }
 
                 logger.debug("S3 details = " + s3bucket);

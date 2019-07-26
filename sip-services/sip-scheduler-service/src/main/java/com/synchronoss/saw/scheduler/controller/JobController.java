@@ -38,8 +38,9 @@ public class JobController extends BaseJobController{
         !CollectionUtils.isEmpty(jobDetail.getFtp())
             || !CollectionUtils.isEmpty(jobDetail.getEmailList())
             || !CollectionUtils.isEmpty(jobDetail.getS3());
-    if (isValidDispatch) {
-        return getServerResponse(ServerResponseCode.ATLEAST_ONE_DISPATCHER_IS_MUST, false);
+
+    if (!isValidDispatch) {
+      return getServerResponse(ServerResponseCode.ATLEAST_ONE_DISPATCHER_IS_MUST, false);
     }
 
         ScheduleKeys scheduleKeys = new ScheduleKeys();
