@@ -85,13 +85,25 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregateControls[ag.value] = [false];
     });
 
-    const measureRangeValidator: ValidatorFn = (fg: FormGroup) => {
-      const start = fg.get('measure1').value;
-      const end = fg.get('measure2').value;
+    const getRangeValidator = (errorProp: string, from: string, to: string) => (
+      fg: FormGroup
+    ) => {
+      const start = fg.get(from).value;
+      const end = fg.get(to).value;
       return start !== null && end !== null && start < end
         ? null
-        : { range: true };
+        : { [errorProp]: true };
     };
+    const measureRangeValidator: ValidatorFn = getRangeValidator(
+      'measureRange',
+      'measure1',
+      'measure2'
+    );
+    const targetRangeValidator: ValidatorFn = getRangeValidator(
+      'targetRange',
+      'measure2',
+      'target'
+    );
 
     this.kpiForm = this.fb.group(
       {
@@ -109,12 +121,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         kpiDisplay: [this.chartTypes[0]],
         primAggregate: [this.aggregations[0].value, Validators.required],
         secAggregates: this.fb.group(secAggregateControls),
-        target: [0, [Validators.required, nonEmpty()]],
+        target: [1, [Validators.required, nonEmpty(), Validators.min(1)]],
         measure1: ['', Validators.required],
         measure2: ['', Validators.required],
         kpiBgColor: ['blue', Validators.required]
       },
-      { validators: [measureRangeValidator] }
+      { validators: [measureRangeValidator, targetRangeValidator] }
     );
 
     /* Only show date inputs if custom filter is selected */

@@ -164,12 +164,11 @@
     </div>
     <mat-error
       *ngIf="
-        kpiForm.get('measure1').dirty &&
-        kpiForm.get('measure2').dirty &&
-        kpiForm.errors?.range
+        (kpiForm.get('measure1').dirty || kpiForm.get('measure2').dirty) &&
+        kpiForm.errors?.measureRange
       "
     >
-      Measure 1 should be greater then measure 2
+      Measure 2 should be greater than measure 1
     </mat-error>
     <mat-form-field class="target">
       <input
@@ -181,6 +180,19 @@
         formControlName="target"
       />
     </mat-form-field>
+    <mat-error
+      *ngIf="
+        (kpiForm.get('measure2').dirty || kpiForm.get('target').dirty) &&
+        kpiForm.errors?.targetRange
+      "
+    >
+      Target should be greater than measure 1
+    </mat-error>
+    <mat-error
+      *ngIf="kpiForm.get('target').dirty && kpiForm.get('target').errors?.min"
+    >
+      Target should be greater than 0
+    </mat-error>
 
     <div class="bullet-bands">
       <strong>Select Band Color Palette : </strong>
