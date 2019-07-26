@@ -10,6 +10,9 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import scala.Tuple2;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
@@ -31,8 +34,14 @@ public class NGRTPSComponent extends AbstractComponent
 		implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 	
 	  private static final Logger logger = Logger.getLogger(NGRTPSComponent.class);
-
+	  
+	  String configPath;
 	
+	 public NGRTPSComponent(NGContext ngctx, String configPath) {
+	        super(ngctx);
+	        this.configPath = configPath;
+	    }
+	 
 	 public NGRTPSComponent(NGContext ngctx) {
 	        super(ngctx);
 	    }
@@ -40,7 +49,7 @@ public class NGRTPSComponent extends AbstractComponent
 	@Override
 	protected int execute() {
 		logger.debug("########rtps execute started#######");
-		 SparkSession spark = SparkSession
+		/*SparkSession spark = SparkSession
 	                .builder()
 	                .appName("SparkSample")
 	                .master("local[*]")
@@ -51,7 +60,23 @@ public class NGRTPSComponent extends AbstractComponent
         inputList.add(new Tuple2<String,String[]>("link297",new String[]{"link999","link942"}));
         Dataset<Row> dataset = spark.createDataset(inputList, Encoders.tuple(Encoders.STRING(), 
         		spark.implicits().newStringArrayEncoder())).toDF();
-        ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
+        ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());*/
+        
+        
+        EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
+        String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
+        ComponentConfiguration config = null;
+        try {
+        	config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+		} catch (Exception ex) {
+			// TODO Auto-generated catch block
+			logger.error(ex.getMessage());
+		}
+        Config defaultConfig = ConfigFactory.parseResources("defaults.conf");
+		Rtps rtpsProps = config.getRtps();
+        driver.run(rtpsProps.getConfFilePath(), ctx);
+        
+        
 		logger.debug("########rtps execute completed#######");
 		return 0;
 	}

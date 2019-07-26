@@ -19,9 +19,20 @@ public class Rtps {
 	
 	String definitionFile;
 	
+	String confFilePath;
 	
 	
 	
+
+	
+
+	public String getConfFilePath() {
+		return confFilePath;
+	}
+
+	public void setConfFilePath(String confFilePath) {
+		this.confFilePath = confFilePath;
+	}
 
 	public String getTopic() {
 		return topic;

@@ -176,7 +176,7 @@ public class XDFDataProcessor  {
             ngRtpsCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngRtpsCtxSvc.getNgctx().persistMode = persistFlag;
 
-            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx());
+            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx(),configPath);
 
             if (!component.initComponent(null))
                 System.exit(-1);
