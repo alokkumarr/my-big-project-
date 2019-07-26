@@ -296,9 +296,13 @@ public class DLDataSetService {
     }
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
-
-      if (schema == null || ds == null)
-          throw new IllegalArgumentException("Schema/DS descriptor must not be null");
+      
+      /**
+       * Commented below code as this block is stopping 
+       * some entries in updating status to maprDB
+       */
+      /*if (schema == null || ds == null)
+          throw new IllegalArgumentException("Schema/DS descriptor must not be null");*/
 
       JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
 

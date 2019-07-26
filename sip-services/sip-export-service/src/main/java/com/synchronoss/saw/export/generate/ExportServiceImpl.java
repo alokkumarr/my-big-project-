@@ -11,6 +11,7 @@ import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.AnalysisMetaData;
+import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.model.DataResponse;
 import com.synchronoss.saw.export.model.S3.S3Customer;
 import com.synchronoss.saw.export.model.S3.S3Details;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -385,6 +388,7 @@ public class ExportServiceImpl implements ExportService {
       long limitToExport,
       ExportBean exportBean,
       OutputStreamWriter osw) {
+    buildReportHeader(limitToExport, exportBean, entity.getBody().getData());
     entity.getBody().getData().stream()
         .limit(limitToExport)
         .forEach(
@@ -392,10 +396,16 @@ public class ExportServiceImpl implements ExportService {
               try {
                 if (line instanceof LinkedHashMap) {
                   String[] header = null;
-                  if (exportBean.getColumnHeader() == null
-                      || exportBean.getColumnHeader().length == 0) {
+                  if ((exportBean.getColumnHeader() == null
+                          || exportBean.getColumnHeader().length == 0)
+                      || exportBean.getColumnDataType() != null) {
                     Object[] obj = ((LinkedHashMap) line).keySet().toArray();
-                    header = Arrays.copyOf(obj, obj.length, String[].class);
+                    if (exportBean.getColumnDataType() != null
+                        && exportBean.getColumnDataType().length > 0) {
+                      header = exportBean.getColumnHeader();
+                    } else {
+                      header = Arrays.copyOf(obj, obj.length, String[].class);
+                    }
                     exportBean.setColumnHeader(header);
                     osw.write(
                         Arrays.stream(header)
@@ -408,6 +418,7 @@ public class ExportServiceImpl implements ExportService {
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: " + header);
+                    exportBean.setColumnDataType(null);
                   } else {
                     // ideally we shouldn't be using collectors but it's a single row so it
                     // won't hamper memory consumption
@@ -446,6 +457,7 @@ public class ExportServiceImpl implements ExportService {
     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
 
     try {
+      buildReportHeader(limitToExport, exportBean, response.getData());
       response.getData().stream()
           .limit(limitToExport)
           .forEach(
@@ -1070,8 +1082,6 @@ public class ExportServiceImpl implements ExportService {
           if (alias.getCustomerCode().equals(finalJobGroup) && aliastemp.equals(alias.getAlias())) {
             logger.debug("Final Obj to be dispatched for S3 : ");
             logger.debug("BucketName : " + alias.getBucketName());
-            logger.debug("AccessKey : " + alias.getAccessKey());
-            logger.debug("SecretKey : " + alias.getSecretKey());
             logger.debug("Region : " + alias.getRegion());
             logger.debug("getOutputLocation : " + alias.getOutputLocation());
             logger.debug("FileName : " + exportBean.getFileName());
@@ -1496,5 +1506,64 @@ public class ExportServiceImpl implements ExportService {
       }
     }
     return fieldList;
+  }
+
+  /**
+   * // TODO: 7/17/2019 - This should be removed after the SIP DSL migration for es report(SIP-5897)
+   * taken cared es-report response is not having consistent structure in case of Columns are
+   * missing in Elastic-search documents. In the SIP-DSL implementation this issue has been fixed ,
+   * but not fixed with old query.
+   *
+   * @param limitToExport
+   * @param exportBean
+   * @param dataList
+   */
+  private void buildReportHeader(long limitToExport, ExportBean exportBean, List<Object> dataList) {
+    DataField.Type[] columnDataType = null;
+    String[] recordRow = null;
+    int limitCount = 0;
+    if (limitCount < limitToExport) {
+      for (Object dataObject : dataList) {
+        Object data = dataObject;
+        Object[] obj = ((LinkedHashMap) data).keySet().toArray();
+        boolean haveValidRows = recordRow == null || recordRow.length < obj.length;
+        if (haveValidRows) {
+          recordRow = Arrays.copyOf(obj, obj.length, String[].class);
+          columnDataType = new DataField.Type[recordRow.length];
+        }
+
+        if (data instanceof LinkedHashMap && haveValidRows) {
+          int i = 0;
+          for (String val : recordRow) {
+            if (i < recordRow.length) {
+              Object obj1 = ((LinkedHashMap) data).get(val);
+              if (obj1 instanceof Date) {
+                columnDataType[i] = DataField.Type.DATE;
+              } else if (obj1 instanceof Float) {
+                columnDataType[i] = DataField.Type.FLOAT;
+              } else if (obj1 instanceof Double) {
+                columnDataType[i] = DataField.Type.DOUBLE;
+              } else if (obj1 instanceof Integer) {
+                columnDataType[i] = DataField.Type.INT;
+              } else if (obj1 instanceof Long) {
+                columnDataType[i] = DataField.Type.LONG;
+              } else if (obj1 instanceof String) {
+                columnDataType[i] = DataField.Type.STRING;
+              } else if (obj1 instanceof TimeStamp) {
+                columnDataType[i] = DataField.Type.TIMESTAMP;
+              }
+              i++;
+            }
+          }
+        }
+        limitCount++;
+      }
+    }
+    if (recordRow != null && recordRow.length > 0) {
+      exportBean.setColumnHeader(recordRow);
+    }
+    if (columnDataType != null && columnDataType.length > 0) {
+      exportBean.setColumnDataType(columnDataType);
+    }
   }
 }
