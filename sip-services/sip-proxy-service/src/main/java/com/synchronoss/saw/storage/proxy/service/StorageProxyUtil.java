@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -207,7 +208,8 @@ public class StorageProxyUtil {
 
         String tablePath = basePath + File.separator + METASTORE + File.separator + tableName;
         Table table = MapRDB.getTable(tablePath);
-        resultStore.bulkDelete(table, junkList);
+        // method call to be asynch.
+        CompletableFuture.runAsync(() -> resultStore.bulkDelete(table, junkList));
       }
     } catch (Exception e) {
       logger.error("Error occurred while purging execution result the execution Ids : {}", e);
