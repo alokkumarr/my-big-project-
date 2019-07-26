@@ -166,7 +166,7 @@ class ChartsDesignerPage extends Designer {
 
   clickOnSelectAndChooseAggregate(name) {
     browser.sleep(1000); // Somehow aggregate button was not able to load the aggregate list. So put the browser to sleep.
-    // For aggregate chooser component commonfunction is not able to make the element visible. So using the browser to identify the.
+    // For aggregate chooser component commonfunction is not able to make the element visible. So using the browser to identify.
     browser
       .actions()
       .mouseMove(this._selectAndChooseAggregate(name))

@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const moment = require('moment');
 
 describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.test.js', () => {
   let analysisId;
@@ -21,7 +22,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   const metrics = 'Float';
   const dimension = 'Date';
   const groupName = 'String';
-  const sizeByName = 'Float';
+  const sizeByName = 'Integer';
   const selectedAggregate = 'sum';
   beforeAll(() => {
     logger.info('Starting charts/AggregateWithCharts.test.js.....');
@@ -58,9 +59,9 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
-
+        const now = moment().format();
+        const chartName = `e2e chart ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
 
