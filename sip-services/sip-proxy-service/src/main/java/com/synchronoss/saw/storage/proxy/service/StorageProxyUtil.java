@@ -178,7 +178,7 @@ public class StorageProxyUtil {
       // Create executionResult table if doesn't exists.
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       ExecutionResultStore resultStore = new ExecutionResultStore(tableName, basePath);
-      String fields[] = {"executionId", "data"};
+      String fields[] = {"executionId", "analysis.type"};
 
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
@@ -190,6 +190,8 @@ public class StorageProxyUtil {
       List<JsonNode> elements =
           maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5000);
 
+      logger.debug("List of execution ids needs to be cleaned ...!" + elements);
+
       configExecution = configExecution < elements.size() ? configExecution : elements.size();
       if (elements != null && elements.size() > 0) {
         List<String> junkList =
@@ -198,18 +200,19 @@ public class StorageProxyUtil {
                 .map(jsonNode -> jsonNode.get("executionId").asText())
                 .collect(Collectors.toList());
 
-        logger.debug("List of execution ids needs to be cleaned ...!" + junkList);
+        logger.debug("List of execution ids needs to be cleaned from es ...!" + junkList);
         dataLakeJunkIds =
             elements.stream()
-                .skip(configExecution.longValue())
-                .filter(jsonNode -> jsonNode.get("data") == null)
+                .skip(configExecution)
+                .filter(jsonNode -> jsonNode.get("analysis").get("type").equals("report"))
                 .map(jsonNode -> jsonNode.get("executionId").asText())
                 .collect(Collectors.toList());
 
+        logger.debug("List of execution ids needs to be cleaned from data lake...!" + dataLakeJunkIds);
+
         String tablePath = basePath + File.separator + METASTORE + File.separator + tableName;
         Table table = MapRDB.getTable(tablePath);
-        // method call to be asynch.
-        CompletableFuture.runAsync(() -> resultStore.bulkDelete(table, junkList));
+        resultStore.bulkDelete(table, junkList);
       }
     } catch (Exception e) {
       logger.error("Error occurred while purging execution result the execution Ids : {}", e);

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -545,11 +546,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
 
-      List<?> executionList =
-          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
-      StorageProxyUtil.deleteJunkExecutionResult(
-          dslQueryId, configExecutionLimit, basePath, executionResultTable);
-      return executionList;
+      // method call to be asynchronossly
+      CompletableFuture.runAsync(
+          () -> {
+            StorageProxyUtil.deleteJunkExecutionResult(
+                dslQueryId, configExecutionLimit, basePath, executionResultTable);
+          });
+      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
