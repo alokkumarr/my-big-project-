@@ -546,13 +546,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
 
+      List<?> executionLists =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
       // method call to be asynchronossly
       CompletableFuture.runAsync(
           () -> {
             StorageProxyUtil.deleteJunkExecutionResult(
                 dslQueryId, configExecutionLimit, basePath, executionResultTable);
           });
-      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+      return executionLists;
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
