@@ -66,9 +66,6 @@ public class ExportServiceImpl implements ExportService {
 
   private static final Logger logger = LoggerFactory.getLogger(ExportServiceImpl.class);
 
-  //  @Value("${analysis.service.host}")
-  //  private String apiExportOtherProperties;
-
   @Value("${analysis.uiExportSize}")
   private String uiExportSize;
 
