@@ -24,6 +24,7 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -56,11 +57,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author spau0004 This class is used to perform CRUD operation by storage The requests are JSON
- *     documents in the following formats "{ "contents": { "proxy" : [ { "storage" : "ES", "action"
- *     : "search", "query" : "", "requestBy" :"admin@sycnchrnoss.com", "objectType" : "",
- *     "indexName": "", "tableName": "", "objectName":"", "requestedTime":"", "productCode": "",
- *     "moduleName":"", "dataSecurityKey":[], "resultFormat":"", "data": [] } ] } }"
+ * This class is used to perform all kind of operation by JSON store
+ *
+ * @author spau0004
  */
 @RestController
 @Api(
@@ -69,13 +68,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
-
   @Autowired private StorageProxyService proxyService;
 
   @Value("${metadata.service.host}")
   private String metaDataServiceExport;
-
-  private Random random = new Random();
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -99,8 +95,6 @@ public class StorageProxyController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      // StorageProxyNode proxyNode =
-      // StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
       logger.trace(
           "Storage Proxy async request object : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture =
@@ -187,8 +181,6 @@ public class StorageProxyController {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     try {
-      // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
-      // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(requestBody));
       responseObjectFuture = proxyService.execute(requestBody);
@@ -250,7 +242,14 @@ public class StorageProxyController {
       // "contents");
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(sipdsl));
-      responseObjectFuture = proxyService.execute(sipdsl.getSipQuery(), size, dataSecurityKey, ExecutionType.onetime, analysisType, false);
+      responseObjectFuture =
+          proxyService.execute(
+              sipdsl.getSipQuery(),
+              size,
+              dataSecurityKey,
+              ExecutionType.onetime,
+              analysisType,
+              false);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -261,7 +260,6 @@ public class StorageProxyController {
       logger.error("Exception generated while validating incoming json against schema.", e);
       throw new JSONProcessingSAWException(
           "Exception generated while validating incoming json against schema.");
-      // responseObjectFuture = StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
@@ -276,16 +274,27 @@ public class StorageProxyController {
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<?> executeAnalysis(
+  public ExecuteAnalysisResponse executeAnalysis(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
               required = true)
           @Valid
           @RequestBody
           Analysis analysis,
-      @RequestParam(name = "id", required = false) String queryId,
-      @RequestParam(name = "size", required = false) Integer size,
-      @RequestParam(name = "ExecutionType", required = false, defaultValue = "onetime")
+      @ApiParam(value = "analysis id", required = false)
+          @RequestParam(name = "id", required = false)
+          String queryId,
+      @ApiParam(value = "size of execution", required = false)
+          @RequestParam(name = "size", required = false)
+          Integer size,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
       HttpServletRequest request,
       HttpServletResponse response)
@@ -295,16 +304,18 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
 
+    ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
-      return Collections.singletonList("Invalid authentication token");
+      executeResponse.setData(Collections.singletonList("Invalid authentication token"));
+      return executeResponse;
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
+    List<Object> responseObjectFuture;
     SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -315,39 +326,47 @@ public class StorageProxyController {
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
 
     try {
-      // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
-      // "contents");
       Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
-
-      String analysisType = analysis.getType();
-      Boolean designerEdit = analysis.getDesignerEdit() == null ? false : true;
-
-      responseObjectFuture =
-          proxyService.execute(
-              analysis.getSipQuery(),
-              size,
-              dataSecurityKeyNode,
-              executionType,
-              analysisType,
-              designerEdit);
+      executeResponse =
+          proxyService.executeAnalysis(
+              analysis, size, page, pageSize, dataSecurityKeyNode, executionType);
 
       // Execution result will one be stored, if execution type is publish or Scheduled.
-      if (executionType.equals(ExecutionType.publish)
-          || executionType.equals(ExecutionType.scheduled)) {
-        ExecutionResult executionResult = new ExecutionResult();
-        executionResult.setExecutionId(UUID.randomUUID().toString());
-        executionResult.setDslQueryId(queryId);
-        executionResult.setAnalysis(analysis);
-        executionResult.setStartTime(startTime);
-        executionResult.setFinishedTime(new Date().getTime());
-        executionResult.setData(responseObjectFuture);
-        executionResult.setExecutionType(executionType);
-        executionResult.setStatus("success");
-        executionResult.setExecutedBy(
-            authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+      boolean validExecutionType =
+          executionType.equals(ExecutionType.publish)
+              || executionType.equals(ExecutionType.scheduled);
+
+      boolean tempExecutionType =
+          executionType.equals(ExecutionType.onetime)
+              || executionType.equals(ExecutionType.preview)
+              || executionType.equals(ExecutionType.regularExecution);
+
+      if (validExecutionType) {
+        ExecutionResult executionResult =
+            buildExecutionResult(
+                executeResponse.getExecutionId(),
+                analysis,
+                queryId,
+                startTime,
+                authTicket,
+                executionType,
+                (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
+      } else if (tempExecutionType) {
+        if (!analysis.getType().equalsIgnoreCase("report")) {
+          ExecutionResult executionResult =
+              buildExecutionResult(
+                  executeResponse.getExecutionId(),
+                  analysis,
+                  queryId,
+                  startTime,
+                  authTicket,
+                  executionType,
+                  (List<Object>) executeResponse.getData());
+          proxyService.saveTTLExecutionResult(executionResult);
+        }
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
@@ -359,14 +378,46 @@ public class StorageProxyController {
       logger.error("Exception generated while validating incoming json against schema.", e);
       throw new JSONProcessingSAWException(
           "Exception generated while validating incoming json against schema.");
-      // responseObjectFuture = StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
-      //  responseObjectFuture= StorageProxyUtils.prepareResponse(sipdsl, e.getCause().toString());
     }
-    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
-    return responseObjectFuture;
+    logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
+    return executeResponse;
+  }
+
+  /**
+   * Build execution result bean.
+   *
+   * @param executionId
+   * @param analysis
+   * @param queryId
+   * @param startTime
+   * @param authTicket
+   * @param executionType
+   * @param data
+   * @return execution
+   */
+  private ExecutionResult buildExecutionResult(
+      String executionId,
+      Analysis analysis,
+      String queryId,
+      Long startTime,
+      Ticket authTicket,
+      ExecutionType executionType,
+      List<Object> data) {
+    ExecutionResult executionResult = new ExecutionResult();
+    String type = analysis.getType();
+    executionResult.setExecutionId(executionId);
+    executionResult.setDslQueryId(queryId);
+    executionResult.setAnalysis(analysis);
+    executionResult.setStartTime(startTime);
+    executionResult.setFinishedTime(new Date().getTime());
+    executionResult.setExecutionType(executionType);
+    executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
+    executionResult.setStatus("success");
+    executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    return executionResult;
   }
 
   /**
@@ -404,11 +455,27 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse executionsData(
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false)
+          ExecutionType executionType,
+      @ApiParam(value = "analysis type", required = false)
+          @RequestParam(name = "analysisType", required = false)
+          String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId) {
+    if (analysisType != null && analysisType.equals("report")) {
+      return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
+    }
+
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchExecutionsData(executionId);
+      return proxyService.fetchExecutionsData(executionId, executionType, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -418,7 +485,7 @@ public class StorageProxyController {
   /**
    * API to fetch the execution Data.
    *
-   * @param executionId
+   * @param analysisId
    * @return ExecutionResponse
    */
   @RequestMapping(
@@ -427,128 +494,30 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ExecutionResponse lastExecutionsData(
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "page", required = false)
+          Integer page,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
+      @ApiParam(value = "execution type", required = false)
+          @RequestParam(name = "executionType", required = false)
+          ExecutionType executionType,
+      @ApiParam(value = "analysis type", required = false)
+          @RequestParam(name = "analysisType", required = false)
+          String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
-          String executionId) {
+          String analysisId) {
+
+    if (analysisType != null && analysisType.equals("report")) {
+      return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);
+    }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(executionId);
+      return proxyService.fetchLastExecutionsData(analysisId, executionType, page, pageSize);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
     return null;
-  }
-
-
-  // TODO: Mock data preparation. Should be removed
-  private class ColumnType {
-    public String columnName;
-    public Type dataType;
-    public String format;
-  }
-
-  private List<ColumnType> prepareColumnTypes(SipQuery query) {
-    List<ColumnType> columnTypes = new ArrayList<>();
-
-    List<Field> fields = query.getArtifacts().get(0).getFields();
-
-    if (fields != null && fields.size() != 0) {
-      for (Field field : fields) {
-        ColumnType colType = new ColumnType();
-
-        String columnName = null;
-
-        if (field.getDataField() != null) {
-          columnName = field.getDataField();
-        } else if (field.getColumnName() != null) {
-          columnName = field.getColumnName();
-        }
-
-        colType.columnName = columnName;
-
-        colType.dataType = field.getType();
-
-        if (field.getType() == Type.DATE) {
-          colType.format = field.getDateFormat();
-        }
-
-        columnTypes.add(colType);
-      }
-    }
-
-    return columnTypes;
-  }
-
-  private List<Object> prepareMockData(List<ColumnType> columnTypes) {
-    List<Object> data = new ArrayList<>();
-
-    int noOfRows = new Random().nextInt(100);
-
-    for (int i = 0; i < noOfRows; i++) {
-      data.add(generateDataObject(columnTypes));
-    }
-
-    return data;
-  }
-
-  private JsonNode generateDataObject(List<ColumnType> columnTypes) {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node = mapper.createObjectNode();
-
-    for (ColumnType ct : columnTypes) {
-      if (ct.dataType == Type.INTEGER) {
-        node.put(ct.columnName, generateRandomInteger());
-      } else if (ct.dataType == Type.LONG) {
-        node.put(ct.columnName, generateRandomLong());
-      } else if (ct.dataType == Type.FLOAT) {
-        node.put(ct.columnName, generateRandomFloat());
-      } else if (ct.dataType == Type.DOUBLE) {
-        node.put(ct.columnName, generateRandomDouble());
-      } else if (ct.dataType == Type.STRING) {
-        node.put(ct.columnName, generateRandomString());
-      } else if (ct.dataType == Type.DATE || ct.dataType == Type.TIMESTAMP) {
-        node.put(ct.columnName, generateRandomDate(ct.format));
-      }
-    }
-
-    return node;
-  }
-
-  private Double generateRandomDouble() {
-    double d = random.nextDouble();
-
-    return d;
-  }
-
-  private Float generateRandomFloat() {
-    float f = random.nextFloat();
-
-    return f;
-  }
-
-  private Long generateRandomLong() {
-    long l = random.nextLong();
-
-    return l;
-  }
-
-  private String generateRandomDate(String format) {
-    Random r = new Random();
-    long t1 = System.currentTimeMillis() + r.nextInt();
-
-    DateTime d1 = new DateTime(t1);
-
-    return d1.toString(format);
-  }
-
-  private Integer generateRandomInteger() {
-    int i = random.nextInt();
-
-    return i;
-  }
-
-  private String generateRandomString() {
-    String s = UUID.randomUUID().toString();
-
-    return s;
   }
 }

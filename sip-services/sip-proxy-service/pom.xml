@@ -275,14 +275,19 @@
       <groupId>com.mapr.streams</groupId>
       <artifactId>mapr-streams</artifactId>
       <version>${mapr.streams.version}</version>
-      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.apache.kafka</groupId>-->
-      <!--<artifactId>kafka-clients</artifactId>-->
-      <!--<version>${kafka.driver.version}</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${kafka.driver.version}</version>
+    </dependency>
+
   </dependencies>
 	<build>
 		<pluginManagement>

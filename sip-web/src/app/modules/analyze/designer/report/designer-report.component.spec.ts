@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 
 import { DesignerReportComponent } from './designer-report.component';
+import { Store } from '@ngxs/store';
 
 import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
@@ -13,27 +14,27 @@ export class ArtifactMockPipe implements PipeTransform {
   }
 }
 
+class StoreStub {}
+
 describe('Designer Report Component', () => {
   let fixture: ComponentFixture<DesignerReportComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA],
-        declarations: [DesignerReportComponent, ArtifactMockPipe],
-        providers: []
-      })
-        .compileComponents()
-        .then(() => {
-          fixture = TestBed.createComponent(DesignerReportComponent);
-
-          fixture.componentInstance.analysis = {};
-          fixture.componentInstance.filters = [];
-          fixture.detectChanges();
-        });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      declarations: [DesignerReportComponent, ArtifactMockPipe],
+      providers: [{ provide: Store, useValue: StoreStub }]
     })
-  );
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(DesignerReportComponent);
+
+        fixture.componentInstance.analysis = {};
+        fixture.componentInstance.filters = [];
+        fixture.detectChanges();
+      });
+  }));
 
   it('should exist', () => {
     expect(fixture.componentInstance).not.toBeNull;
