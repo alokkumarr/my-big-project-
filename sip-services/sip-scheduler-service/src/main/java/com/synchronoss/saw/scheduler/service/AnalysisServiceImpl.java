@@ -83,15 +83,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     Boolean isZipRequired = analysis.getZip();
     String[] latestExecution;
-    boolean isDslScheduled =
-        analysis.getType() != null && analysis.getType().matches("pivot|chart|map|esReport");
 
-    if (isDslScheduled) {
-      latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
-    } else {
-      ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-      latestExecution = findLatestExecution(executionBeans);
-    }
+    latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
 
     logger.debug("latestExecution : " + latestExecution[1]);
     Date date = latestExecution != null ? new Date(Long.parseLong(latestExecution[1])) : new Date();

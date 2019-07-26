@@ -1040,7 +1040,9 @@ public class ExportServiceImpl implements ExportService {
             + "/internal/proxy/storage/"
             + executionId
             + "/executions/data?page=1&pageSize="
-            + exportSize;
+            + exportSize
+            + "&executionType=scheduled"
+            + "&analysisType=" + analysisType;
 
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.getForEntity(url, DataResponse.class);

@@ -77,11 +77,12 @@ public class MaprConnection {
    * @return Object
    */
   public Object fetchPagingData(
-      String columnName, String executionId, Integer page, Integer pageSize) {
+      String columnName, String executionId, Integer page, Integer pageSize, Integer totalRows) {
     if (pageSize != null && pageSize > 0) {
       try {
         ObjectMapper objectMapper = new ObjectMapper();
-        Query query = buildDataQuery(connection, columnName, executionId, page, pageSize);
+        Query query =
+            buildDataQuery(connection, columnName, executionId, page, pageSize, totalRows);
         if (query != null) {
           final DocumentStream stream = store.find(query);
           for (final Document document : stream) {
@@ -114,10 +115,12 @@ public class MaprConnection {
       String columnName,
       String executionId,
       Integer page,
-      Integer pageSize) {
+      Integer pageSize,
+      Integer totalRows) {
     try {
       // pagination logic
-      int startIndex, endIndex;
+      Integer startIndex, endIndex;
+      pageSize = pageSize > totalRows ? totalRows : pageSize;
       if (page != null && page > 1) {
         startIndex = (page - 1) * pageSize;
         endIndex = startIndex + pageSize;

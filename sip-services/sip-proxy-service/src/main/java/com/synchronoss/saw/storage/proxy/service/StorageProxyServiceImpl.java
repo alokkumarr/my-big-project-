@@ -474,7 +474,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecuteAnalysisResponse response;
       response =
           dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,null,null);
+              sipQuery,
+              size,
+              dataSecurityKey,
+              executionType,
+              designerEdit,
+              executionId,
+              null,
+              null);
       result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
@@ -651,16 +658,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       Document doc = executionResultStore.readDocumet(executionId);
-      logger.info("Doc : " + doc.asJsonString());
+      logger.debug("Doc : " + doc.asJsonString());
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
 
-      // paginated execution data
-      Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
-      executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(doc, null));
+      if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
+        Long totalRows = getTotalRows(doc, null);
+        // paginated execution data
+        Object data =
+            maprConnection.fetchPagingData(
+                "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+        executionResponse.setData(data != null ? data : executionResult.getData());
+        executionResponse.setTotalRows(totalRows);
+      }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -711,11 +722,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
-      List<Object> objList=(List<Object>)executionResult.getData();
+      ExecutionResult executionResult = fetchLastExecutionResult(dslQueryId, maprConnection);
+      List<Object> objList = (List<Object>) executionResult.getData();
       // paginated execution data
+      Long totalRows = getTotalRows(null, objList);
+
       Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
+          maprConnection.fetchPagingData(
+              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setTotalRows(getTotalRows(null, objList));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -725,7 +739,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     return executionResponse;
   }
-
 
   public int getSize() {
     return size;
@@ -781,6 +794,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private long getTotalRows(Document doc, List<Object> objList) {
     try {
       if (doc != null) {
+        logger.debug("Data = " + doc.getValue("data"));
+
+        if (doc.getValue("data").getType() == org.ojai.Value.Type.NULL) {
+          return 0l;
+        }
+
         List<Object> totalRows = doc.getList("data");
         logger.debug("Total number of rows :" + totalRows.size());
         return totalRows.size() > 0 ? totalRows.size() : 0l;
