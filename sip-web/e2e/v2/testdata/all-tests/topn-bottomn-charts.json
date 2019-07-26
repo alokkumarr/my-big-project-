@@ -121,13 +121,13 @@
         "chartType": "chart:tsspline",
         "description": "Admin should be able to add top n values for tsspline charts"
       },
-      "BTMNC021": {
+      "TOPNC021": {
         "suites": ["regression"],
         "user": "userOne",
         "chartType": "chart:tsPane",
         "description": "User should be able to add top n values for tsPane charts"
       },
-      "BTMNC022": {
+      "TOPNC022": {
         "suites": ["regression"],
         "user": "admin",
         "chartType": "chart:tsPane",

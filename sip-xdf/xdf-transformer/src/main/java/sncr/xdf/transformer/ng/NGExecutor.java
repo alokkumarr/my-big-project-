@@ -1,5 +1,6 @@
 package sncr.xdf.transformer.ng;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -11,13 +12,16 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.context.DSMapKey;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.xdf.context.NGContext;
 
 import java.util.*;
 
-import static sncr.xdf.transformer.TransformerComponent.*;
+import static sncr.xdf.transformer.ng.NGTransformerComponent.*;
 
 public abstract class NGExecutor {
 
@@ -39,10 +43,12 @@ public abstract class NGExecutor {
 
     protected WithContext parent;
 
+
     private static final Logger logger = Logger.getLogger(NGExecutor.class);
 
 
     public NGExecutor(WithContext parent, String script, int threshold, String tLoc, StructType st){
+        logger.trace("Inside Executor");
         this.script = script;
         session_ctx = parent.getICtx().sparkSession;
         this.threshold = threshold;
@@ -75,15 +81,22 @@ public abstract class NGExecutor {
     }
 
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
+
         WithDLBatchWriter pres = (WithDLBatchWriter) parent;
-        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location, "replace");
+
+        Map<String, Object> outputDS = parent.getNgctx().outputs.get(resType);
+        String name = (String) outputDS.get(DataSetProperties.Name.name());
+        String loc = location + Path.SEPARATOR + name;
+        logger.debug("writeResults keySet is : " + outputDS.keySet());
+        logger.debug("writeResults name is : " + name);
+        logger.debug("writeResults location is : " + loc);
+        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, loc, "replace");
     }
 
     public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
 
 
     protected void prepareRefData(Map<String, Dataset> dsMap){
-
         if (refDataSets != null && refDataSets.size() > 0) {
             JavaSparkContext jsc = new JavaSparkContext(session_ctx.sparkContext());
             for (String refDataSetName: refDataSets) {
@@ -109,18 +122,53 @@ public abstract class NGExecutor {
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
         Column trRC = ds.col(RECORD_COUNTER);
         outputResult = ds.filter( trRes.geq(0))
-                .drop(trRes)
-                .drop(trMsg)
-                .drop(trRC);
+            .drop(trRes)
+            .drop(trMsg)
+            .drop(trRC);
+        if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
+            rejectedRecords = ds.filter( trRes.lt(0));
+
+        logger.debug("Final DS: " + successTransformationsCount.value());
+        logger.debug("Rejected DS: " + failedTransformationsCount.value());
+
+        writeResults(outputResult, outDataSetName, tempLoc);
+        
+        logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
+        if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        }
+        
+
+    }
+
+
+    protected void createFinalDS(Dataset<Row> ds, NGContext ngctx) throws Exception {
+
+        ds.schema();
+        //getOutputDatasetDetails();
+        Column trRes = ds.col(TRANSFORMATION_RESULT);
+        Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
+        Column trRC = ds.col(RECORD_COUNTER);
+        outputResult = ds.filter( trRes.geq(0))
+            .drop(trRes)
+            .drop(trMsg)
+            .drop(trRC);
+
+        ds.toDF().show(4);
+
+        ngctx.datafileDFmap.put(ngctx.dataSetName,outputResult);
+
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
         logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+        //logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
 
         writeResults(outputResult, outDataSetName, tempLoc);
-        writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
-
+        logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
+        if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
+        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+        }
     }
 
 }
