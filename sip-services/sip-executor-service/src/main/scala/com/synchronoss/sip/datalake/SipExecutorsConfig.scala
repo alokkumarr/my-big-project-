@@ -15,7 +15,7 @@ object SipExecutorsConfig {
   }
   else {
     val confFileName = confFileLocation + "/application.conf"
-    conf = ConfigFactory.parseFile(new File(confFileName))
+    conf = ConfigFactory.parseFile(new File(confFileName)).resolve()
   }
 
   lazy val semanticService: Config = conf.getConfig("semantic")

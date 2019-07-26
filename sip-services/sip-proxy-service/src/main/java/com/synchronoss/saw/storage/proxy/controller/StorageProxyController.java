@@ -355,16 +355,18 @@ public class StorageProxyController {
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
       } else if (tempExecutionType) {
-        ExecutionResult executionResult =
-            buildExecutionResult(
-                executeResponse.getExecutionId(),
-                analysis,
-                queryId,
-                startTime,
-                authTicket,
-                executionType,
-                (List<Object>) executeResponse.getData());
-        proxyService.saveTTLExecutionResult(executionResult);
+        if (!analysis.getType().equalsIgnoreCase("report")) {
+          ExecutionResult executionResult =
+              buildExecutionResult(
+                  executeResponse.getExecutionId(),
+                  analysis,
+                  queryId,
+                  startTime,
+                  authTicket,
+                  executionType,
+                  (List<Object>) executeResponse.getData());
+          proxyService.saveTTLExecutionResult(executionResult);
+        }
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

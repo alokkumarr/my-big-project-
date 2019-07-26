@@ -78,13 +78,23 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
     }
-    if (query == null) {
-      throw new RuntimeException("Query cannot be null");
-    }
+
     // Required parameters
     String semanticId = sipQuery.getSemanticId();
 
     int limit = size;
+
+    if (query == null) {
+      throw new RuntimeException("Query cannot be null");
+    }
+
+    if (semanticId == null) {
+      throw new RuntimeException("semanticId cannot be null");
+    }
+
+    if (executionId == null) {
+      throw new RuntimeException("executionId ID  cannot be null");
+    }
 
     ExecutorQueueManager queueManager = new ExecutorQueueManager(executionType, streamBasePath);
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
@@ -109,7 +119,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       return false;
     }
     try {
-      //      HFileOperations.deleteEnt(path);
+      HFileOperations.deleteEnt(path);
     } catch (Exception e) {
       logger.error("cannot get the file in path" + path);
     }
@@ -153,7 +163,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       } else {
         outputLocation = pubSchOutputLocation + File.separator + "output-" + executionId;
       }
-      logger.debug("output location for dfDl report:{}", outputLocation);
+      logger.debug("output location for Dl report:{}", outputLocation);
       FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
       if (files != null) {
         for (FileStatus fs : files) {
@@ -166,7 +176,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
         }
       }
       else{
-         return response;
+          throw new RuntimeException("Unable to fetch the data");
       }
       List<Object> objList =
           prepareDataFromStream(resultStream, dlPreviewRowLimit, pageNo, pageSize);
@@ -220,18 +230,22 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   }
 
   private Long getRecordCount(String outputLocation) throws Exception {
-      logger.info("Getting record count reading results for Dl reports: {}");
+    logger.info("Getting record count reading results for Dl reports: {}");
     ObjectMapper mapper = new ObjectMapper();
     InputStream inputStream = null;
     Long count = null;
     FileStatus[] files = HFileOperations.getFilesStatus(outputLocation);
     logger.debug("inside getRecordCount for DL report");
-    for (FileStatus fs : files) {
-      if (fs.getPath().getName().endsWith("recordCount")) {
-        String path = outputLocation + File.separator + fs.getPath().getName();
-        inputStream = HFileOperations.readFileToInputStream(path);
-        break;
+    if (files != null) {
+      for (FileStatus fs : files) {
+        if (fs.getPath().getName().endsWith("recordCount")) {
+          String path = outputLocation + File.separator + fs.getPath().getName();
+          inputStream = HFileOperations.readFileToInputStream(path);
+          break;
+        }
       }
+    } else {
+      throw new RuntimeException("Unable to fetch the recordCount");
     }
     BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
     List<String> list = bufferReader.lines().collect(Collectors.toList());
