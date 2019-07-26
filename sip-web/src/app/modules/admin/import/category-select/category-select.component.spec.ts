@@ -17,10 +17,17 @@ describe('CategorySelectComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AdminImportCategorySelectComponent);
     component = fixture.componentInstance;
+    component.change = { emit: () => {} } as any;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should emit change on category change', () => {
+    const spy = spyOn(component.change, 'emit');
+    component.onCategoryChange('');
+    expect(spy).toHaveBeenCalled();
   });
 });

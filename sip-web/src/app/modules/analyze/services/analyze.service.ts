@@ -16,6 +16,7 @@ import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
 import { Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Analysis,
@@ -31,7 +32,7 @@ import {
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
-import { zip, Observable } from 'rxjs';
+import { zip, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
@@ -88,7 +89,8 @@ export class AnalyzeService {
     public _http: HttpClient,
     public _jwtService: JwtService,
     public _toastMessage: ToastService,
-    public _menu: MenuService
+    public _menu: MenuService,
+    private store: Store
   ) {
     window['analysisService'] = this;
   }
@@ -668,6 +670,10 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (metrics && metrics[semanticId] && metrics[semanticId].artifacts) {
+      return of(metrics[semanticId]);
+    }
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
