@@ -1,0 +1,272 @@
+{
+  "SORTING_CHARTS": {
+    "sort_asc": {
+      "SORTA001": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add sort by asc order for combo charts"
+      },
+      "SORTA002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to add sort by asc order for combo charts"
+      },
+      "SORTA003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to add sort by asc order for column charts"
+      },
+      "SORTA004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to add sort by asc order for column charts"
+      },
+      "SORTA005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to add sort by asc order for bar charts"
+      },
+      "SORTA006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to add sort by asc order for bar charts"
+      },
+      "SORTA007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to add sort by asc order for stack charts"
+      },
+      "SORTA008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to add sort by asc order for stack charts"
+      },
+      "SORTA009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to add sort by asc order for line charts"
+      },
+      "SORTA010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to add sort by asc order for line charts"
+      },
+      "SORTA011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to add sort by asc order for area charts"
+      },
+      "SORTA012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to add sort by asc order for area charts"
+      },
+      "SORTA013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to add sort by asc order for scatter charts"
+      },
+      "SORTA014": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to add sort by asc order for scatter charts"
+      },
+      "SORTA015": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to add sort by asc order for bubble charts"
+      },
+      "SORTA016": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to add sort by asc order for bubble charts"
+      },
+      "SORTA017": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to add sort by asc order for pie charts"
+      },
+      "SORTA018": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to add sort by asc order for pie charts"
+      },
+      "SORTA019": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to add sort by asc order for tsspline charts"
+      },
+      "SORTA020": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to add sort by asc order for tsspline charts"
+      },
+      "SORTA021": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to add sort by asc order for tsPane charts"
+      },
+      "SORTA022": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to add sort by asc order for tsPane charts"
+      }
+    },
+    "sort_desc": {
+      "SORTD001": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to add sort by desc order for combo charts"
+      },
+      "SORTD002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to add sort by desc order for combo charts"
+      },
+      "SORTD003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to add sort by desc order for column charts"
+      },
+      "SORTD004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to add sort by desc order for column charts"
+      },
+      "SORTD005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to add sort by desc order for bar charts"
+      },
+      "SORTD006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to add sort by desc order for bar charts"
+      },
+      "SORTD007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to add sort by desc order for stack charts"
+      },
+      "SORTD008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to add sort by desc order for stack charts"
+      },
+      "SORTD009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to add sort by desc order for line charts"
+      },
+      "SORTD010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to add sort by desc order for line charts"
+      },
+      "SORTD011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to add sort by desc order for area charts"
+      },
+      "SORTD012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to add sort by desc order for area charts"
+      },
+      "SORTD013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to add sort by desc order for scatter charts"
+      },
+      "SORTD014": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to add sort by desc order for scatter charts"
+      },
+      "SORTD015": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to add sort by desc order for bubble charts"
+      },
+      "SORTD016": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to add sort by desc order for bubble charts"
+      },
+      "SORTD017": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to add sort by desc order for pie charts"
+      },
+      "SORTD018": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to add sort by desc order for pie charts"
+      },
+      "SORTD019": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to add sort by desc order for tsspline charts"
+      },
+      "SORTD020": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to add sort by desc order for tsspline charts"
+      },
+      "SORTD021": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to add sort by desc order for tsPane charts"
+      },
+      "SORTD022": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to add sort by desc order for tsPane charts"
+      }
+    }
+  }
+}

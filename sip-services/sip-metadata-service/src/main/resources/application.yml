@@ -37,6 +37,7 @@ application:
 metastore:
   base:  hdfs:///main/
   analysis: analysisMetadata
+  executionResultTable: executionResult
   migration: analysisMigration
   metadataTable: semanticDataStore
 
