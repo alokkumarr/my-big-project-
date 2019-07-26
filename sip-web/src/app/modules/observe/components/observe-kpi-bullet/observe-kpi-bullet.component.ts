@@ -14,6 +14,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as toNumber from 'lodash/toNumber';
 import * as round from 'lodash/round';
 import * as find from 'lodash/find';
+import * as some from 'lodash/some';
 import * as debounce from 'lodash/debounce';
 
 import * as defaults from 'lodash/defaults';
@@ -25,9 +26,21 @@ import { ChartComponent } from '../../../../common/components/charts/chart.compo
 
 import { Subscription, BehaviorSubject } from 'rxjs';
 
+export const ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS = {
+  gauge: {
+    cols: 12,
+    rows: 12
+  },
+  bullet: {
+    cols: 20,
+    rows: 6
+  }
+};
+
 @Component({
   selector: 'observe-kpi-bullet',
-  templateUrl: 'observe-kpi-bullet.component.html'
+  templateUrl: 'observe-kpi-bullet.component.html',
+  styleUrls: ['observe-kpi-bullet.component.scss']
 })
 export class ObserveKPIBulletComponent
   implements OnInit, OnDestroy, AfterViewInit {
@@ -45,6 +58,8 @@ export class ObserveKPIBulletComponent
   public kpiColorPalette: string[] = [];
   public kpiTitle = '';
   public kpiSubTitle = '';
+
+  public isTileSizeOk = false;
 
   @Input()
   set bulletKpi(data) {
@@ -82,10 +97,30 @@ export class ObserveKPIBulletComponent
 
   subscribeToRequester() {
     this.requesterSubscription = this.updater.subscribe(data => {
+      const tileSizeChanged = some(data, ({ path }) => path === 'chart.height');
+      if (tileSizeChanged) {
+        const { rows, cols, bullet } = this.item;
+        this.isTileSizeOk = this.areTileDimensionsOk(
+          bullet.kpiDisplay,
+          cols,
+          rows
+        );
+      }
       if (!isEmpty(data)) {
         this.reloadChart(data);
       }
     });
+  }
+
+  areTileDimensionsOk(kpiDisplay, cols, rows) {
+    const {
+      cols: minCols,
+      rows: minRows
+    } = ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS[kpiDisplay];
+    if (minCols > cols || minRows > rows) {
+      return false;
+    }
+    return true;
   }
 
   ngAfterViewInit() {

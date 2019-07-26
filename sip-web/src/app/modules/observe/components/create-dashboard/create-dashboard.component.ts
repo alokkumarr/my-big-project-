@@ -21,6 +21,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import { GlobalFilterService } from '../../services/global-filter.service';
+import { ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS } from '../observe-kpi-bullet/observe-kpi-bullet.component';
 
 @Component({
   selector: 'create-dashboard',
@@ -229,22 +230,13 @@ export class CreateDashboardComponent
 
   onBulletAction(action, data) {
     /* prettier-ignore */
-    const kpiDisplayDimensions = {
-      'gauge': {
-        cols: 12,
-        rows: 12,
-      },
-      'bullet': {
-        cols: 20,
-        rows: 6,
-      }};
     switch (action) {
       case WIDGET_ACTIONS.ADD:
         if (!data) {
           return;
         }
 
-        const dimensions = kpiDisplayDimensions[data.kpiDisplay];
+        const dimensions = ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS[data.kpiDisplay];
         const item = {
           ...dimensions,
           bullet: data,

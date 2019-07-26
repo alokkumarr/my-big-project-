@@ -217,7 +217,7 @@ export class DashboardGridComponent
     if (!item.kpi && !item.bullet) {
       return;
     }
-
+    console.log('edit Tile');
     this.dashboardService.onEditItem.next(item);
   }
 
@@ -238,6 +238,8 @@ export class DashboardGridComponent
       item.dimensions = dimensions;
       return;
     }
+
+    console.log('refresh tile');
 
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
