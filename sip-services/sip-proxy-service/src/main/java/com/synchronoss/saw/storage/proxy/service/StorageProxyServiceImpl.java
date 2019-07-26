@@ -70,6 +70,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Value("${metastore.ttl-for-onetime}")
   private long timeToLive;
 
+  @Value("${metastore.execution-result-limit}")
+  @NotNull
+  private long configExecutionLimit;
+
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
@@ -540,7 +544,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
-      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+
+      List<?> executionList =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+      StorageProxyUtil.deleteJunkExecutionResult(
+          dslQueryId, configExecutionLimit, basePath, executionResultTable);
+      return executionList;
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
@@ -558,7 +567,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       Document doc = executionResultStore.readDocumet(executionId);
-      logger.info("Doc : " + doc.asJsonString());
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);

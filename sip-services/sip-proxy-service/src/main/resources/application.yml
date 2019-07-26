@@ -38,6 +38,7 @@ metastore:
     migration: analysisMigration
     ttl-for-onetime: 1800
     analysis: analysisMetadata
+    execution-result-limit: 5
 
 connector : http
 
