@@ -11,7 +11,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
-import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -712,18 +711,10 @@ export class DesignerState {
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
         filter.model = {
-          operator: 'BTW',
-          otherValue: filter.model.lte
-            ? moment(filter.model.lte)
-                .endOf('day')
-                .valueOf()
-            : null,
-          value: filter.model.gte
-            ? moment(filter.model.gte)
-                .startOf('day')
-                .valueOf()
-            : null,
-          format: 'epoch_millis'
+          gte: filter.model.gte,
+          lte: filter.model.lte,
+          format: 'yyyy-MM-dd',
+          preset: CUSTOM_DATE_PRESET_VALUE
         };
       }
     });
