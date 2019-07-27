@@ -1,7 +1,9 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -12,8 +14,8 @@ public interface StorageProxyService {
 
   StorageProxy execute(StorageProxy proxy) throws Exception;
 
-  List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
-      throws Exception;
+  List<Object> execute(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
+      ExecutionType executionType, String analysisType, Boolean designerEdit) throws Exception;
 
   Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
@@ -22,8 +24,17 @@ public interface StorageProxyService {
   ExecutionResponse fetchExecutionsData(
       String executionId, ExecutionType executionType, Integer page, Integer pageSize);
 
+
+    ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, Integer page, Integer pageSize, DataSecurityKey dataSecurityKey,
+        ExecutionType executionType) throws Exception;
   ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
 
   Boolean saveTTLExecutionResult(ExecutionResult executionResult);
+
+  ExecutionResponse fetchDataLakeExecutionData(
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
+
+    ExecutionResponse fetchLastExecutionsDataForDL(
+        String analysisId, Integer pageNo, Integer pageSize);
 }

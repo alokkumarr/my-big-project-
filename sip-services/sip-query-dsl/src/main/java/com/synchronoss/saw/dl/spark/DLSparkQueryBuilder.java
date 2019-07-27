@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +43,7 @@ public class DLSparkQueryBuilder {
 
   List<String> groupByColumns = new ArrayList<>();
 
-  public String buildDataQuery(SIPDSL sipdsl) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDataQuery(SipQuery sipQuery) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
@@ -52,9 +53,9 @@ public class DLSparkQueryBuilder {
             " FROM " + buildFrom(sipQuery) + buildFilter(sipQuery.getFilters()) + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**
@@ -216,12 +217,11 @@ public class DLSparkQueryBuilder {
   /**
    * Build Actual query to be ran over background (DSK Included).
    *
-   * @param sipdsl SIPDSL Object
+   * @param sipQuery SipQuery Object
    * @param dataSecurityKey DataSecurityKey Object
    * @return String dsk included query
    */
-  public String buildDskDataQuery(SIPDSL sipdsl, DataSecurityKey dataSecurityKey) {
-    SipQuery sipQuery = sipdsl.getSipQuery();
+  public String buildDskDataQuery(SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
@@ -235,9 +235,9 @@ public class DLSparkQueryBuilder {
                 + buildGroupBy());
 
     return select.concat(
-        buildSort(sipdsl.getSipQuery().getSorts()).trim().isEmpty() == true
+        buildSort(sipQuery.getSorts()).trim().isEmpty() == true
             ? ""
-            : " ORDER BY " + buildSort(sipdsl.getSipQuery().getSorts()));
+            : " ORDER BY " + buildSort(sipQuery.getSorts()));
   }
 
   /**
@@ -333,15 +333,15 @@ public class DLSparkQueryBuilder {
     String lte = filter.getModel().getLte();
     Double value = filter.getModel().getValue();
     Double otherValue = filter.getModel().getOtherValue();
-    if (preset != null || preset.value().equals(Model.Preset.NA.toString())) {
+    if (preset != null && !preset.value().equals(Model.Preset.NA.toString())) {
       DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
       whereCond = setGteLteForDate(gte, lte, filter);
     } else if ((preset.value().equals(Model.Preset.NA.toString())
             || (operator.equals(Operator.BTW)))
-        && gte != null
-        && lte != null) {
+        && (gte != null|| value != null)
+        && (lte != null|| otherValue != null)) {
       long gteInEpoch;
       long lteInEpoch;
       if (value == null && otherValue == null) {
@@ -355,8 +355,8 @@ public class DLSparkQueryBuilder {
                 : Long.parseLong(gte);
         lteInEpoch = isMilli == true ? Long.parseLong(lte) / 1000 : Long.parseLong(lte);
       } else {
-        gteInEpoch = isMilli == true ? value.longValue() / 1000 : value.longValue();
-        lteInEpoch = isMilli == true ? otherValue.longValue() / 1000 : otherValue.longValue();
+        gteInEpoch = isMilli == true ? value.longValue()  : value.longValue();
+        lteInEpoch = isMilli == true ? otherValue.longValue()  : otherValue.longValue();
       }
       Date date = new Date(gteInEpoch);
       DateFormat dateFormat = new SimpleDateFormat(DATE_WITH_HOUR_MINUTES);
@@ -463,11 +463,11 @@ public class DLSparkQueryBuilder {
         break;
       case ISIN:
         whereClause =
-            whereClause.concat(" IN ('" + filter.getModel().getModelValues().get(0) + "') ");
+            whereClause.concat(" IN (" + joinString(filter.getModel().getModelValues()) + ") ");
         break;
       case ISNOTIN:
         whereClause =
-            whereClause.concat(" NOT IN ('" + filter.getModel().getModelValues().get(0) + "') ");
+            whereClause.concat(" NOT IN (" + joinString(filter.getModel().getModelValues()) + ") ");
         break;
       case CONTAINS:
         whereClause =
@@ -583,5 +583,10 @@ public class DLSparkQueryBuilder {
     }
 
     return groupBy;
+  }
+
+  String joinString(List<Object> strList) {
+    Function<Object, String> addQuotes = s -> "\'" + s + "\'";
+    return strList.stream().map(addQuotes).collect(Collectors.joining(", "));
   }
 }

@@ -38,6 +38,16 @@ metastore:
     migration: analysisMigration
     timeToLive: 1800
 
+
+executor:
+  streamPath: /var/sip/services/transport/executor
+  wait-time: 120
+  preview-output-location: /var/sip/services/transport/executor/output
+  publish-schedule-output-location: /var/sip/services/transport/executor
+  preview-rows-limit: 10000
+  publish-rows-limit: 100000
+
+
 connector : http
 
 metadata:
@@ -47,6 +57,10 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+  ssl:
+    enable: false
+
+
 {% if sip_secure %}
   ssl:
     enable : true
