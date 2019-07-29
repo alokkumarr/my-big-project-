@@ -100,11 +100,14 @@ export class ObserveKPIBulletComponent
       const tileSizeChanged = some(data, ({ path }) => path === 'chart.height');
       if (tileSizeChanged) {
         const { rows, cols, bullet } = this.item;
-        this.isTileSizeOk = this.areTileDimensionsOk(
+        const isTileSizeOk = this.areTileDimensionsOk(
           bullet.kpiDisplay,
           cols,
           rows
         );
+        setTimeout(() => {
+          this.isTileSizeOk = isTileSizeOk;
+        });
       }
       if (!isEmpty(data)) {
         this.reloadChart(data);
