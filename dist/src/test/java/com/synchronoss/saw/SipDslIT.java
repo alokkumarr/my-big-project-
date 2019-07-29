@@ -9,13 +9,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class SipDslIT extends BaseIT {
-  String analysisId;
+  String analysisId = "f37cde24-b833-46ba-ae2d-42e286c3fc39";
   protected JsonObject testData = null;
   protected JsonObject sipQuery = null;
 
@@ -25,7 +29,7 @@ public class SipDslIT extends BaseIT {
     testData.addProperty("type", "chart");
     testData.addProperty("type", "chart");
     testData.addProperty("semanticId", "d23c6142-2c10-459e-b1f6-29edd1b2ccfe");
-    testData.addProperty("id", "f37cde24-b833-46ba-ae2d-42e286c3fc39");
+    testData.addProperty("id", analysisId);
     testData.addProperty("customerCode", "SYNCHRONOSS");
     testData.addProperty("projectCode", "sip-sample");
     testData.addProperty("module", "productSpecific/ANALYZE");
@@ -214,15 +218,16 @@ public class SipDslIT extends BaseIT {
             .header("Authorization", "Bearer " + token)
             .body(jsonNode)
             .when()
-            .post("/sip/services/internal/proxy/storage/execute")
+            .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
             .then()
             .assertThat()
             .statusCode(200)
             .extract()
             .response();
     Assert.assertNotNull(response);
-    ArrayNode root = response.getBody().as(ArrayNode.class);
-    Assert.assertEquals(root.get(0).get("string").asText(), testStringFilter);
+    ResponseBody responseBody = response.getBody();
+    List<Map<String, String>> dataNode = responseBody.path("data");
+    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
   @Test
@@ -243,6 +248,13 @@ public class SipDslIT extends BaseIT {
     Assert.assertNotNull(response);
     ObjectNode root = response.getBody().as(ObjectNode.class);
     analysisId = root.get("analysisId").asText();
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
   }
 
   @Test
@@ -254,6 +266,13 @@ public class SipDslIT extends BaseIT {
         .body(jsonNode)
         .when()
         .put("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
         .statusCode(200);

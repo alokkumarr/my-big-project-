@@ -9,6 +9,7 @@
     <global-filter
       [showKPIFilter]="hasKPIs"
       (onApplyFilter)="onApplyGlobalFilter($event)"
+      (onClearFilter)="onClearGlobalFilter($event)"
     ></global-filter>
   </mat-sidenav>
   <mat-sidenav-content class="dashboard-container">

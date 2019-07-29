@@ -3,26 +3,29 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
@@ -61,6 +64,9 @@ public class MigrateAnalysisService {
 
   @Value("${metadata.service.execution-migration-flag}")
   private boolean migrationFlag;
+
+  @Value("${metastore.analysis}")
+  private String analysisTable;
 
   @Autowired private RestUtil restUtil;
 
@@ -191,7 +197,8 @@ public class MigrateAnalysisService {
             byte[] dataObject = result.getValue("_objects".getBytes(), "data".getBytes());
             if (dataObject != null && dataObject.length > 0) {
               dataNode = objectMapper.readTree(new String(dataObject));
-              LOGGER.debug("Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
+              LOGGER.debug(
+                  "Data Json Node which need to parsed for pivot/chart/esReport : {}", dataNode);
             }
 
             byte[] contentObject = result.getValue("_source".getBytes(), "content".getBytes());
@@ -199,7 +206,8 @@ public class MigrateAnalysisService {
               JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
               queryNode =
                   jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
-              LOGGER.debug("Query Node which need to parsed for pivot/chart/esReport : {}", queryNode);
+              LOGGER.debug(
+                  "Query Node which need to parsed for pivot/chart/esReport : {}", queryNode);
             }
 
             Object dslExecutionResult = null;
@@ -222,8 +230,8 @@ public class MigrateAnalysisService {
             migrationStatusObject.setMessage("Success");
             if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
               LOGGER.info(
-                  "Migration result saved successfully !! : {}"
-                      , migrationStatusObject.isExecutionsMigrated());
+                  "Migration result saved successfully !! : {}",
+                  migrationStatusObject.isExecutionsMigrated());
             } else {
               LOGGER.error("Unable to write update AnalysisMigration table!!");
             }
@@ -312,7 +320,7 @@ public class MigrateAnalysisService {
     try {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
-      Analysis analysis = new Analysis();
+      Analysis analysis = getAnalysis(dslQueryId);
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
@@ -328,8 +336,8 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in json Store.");
     } catch (Exception ex) {
-      LOGGER.error(" Stack trace : {}" , ex);
-      LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());
+      LOGGER.error(" Stack trace : {}", ex);
+      LOGGER.error("Error occurred during saving Execution Result : {}", ex.getMessage());
     }
   }
 
@@ -429,5 +437,33 @@ public class MigrateAnalysisService {
       LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
     }
     return executionIds;
+  }
+
+  /**
+   * Returns the Analysis def.
+   *
+   * @return
+   */
+  public Analysis getAnalysis(String analysisId) {
+    Document doc = null;
+    Analysis analysis;
+    ProductModuleMetaStore productModuleMetaStore = null;
+    LOGGER.debug("Reading Analysis def for id : " + analysisId);
+    LOGGER.debug("Analysis table path : " + basePath + analysisTable);
+    try {
+      productModuleMetaStore = new ProductModuleMetaStore(analysisTable, basePath);
+      doc = productModuleMetaStore.readDocumet(analysisId);
+      if (doc == null) {
+        LOGGER.error("Analysis def not present !!, id = " + analysisId);
+        return null;
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      analysis = mapper.readValue(doc.asJsonString(), Analysis.class);
+    } catch (Exception e) {
+      LOGGER.error("Exception occurred while fetching analysis", e);
+      throw new SipReadEntityException("Exception occurred while fetching analysis", e);
+    }
+    return analysis;
   }
 }

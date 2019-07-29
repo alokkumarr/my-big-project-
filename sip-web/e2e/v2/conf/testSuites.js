@@ -38,7 +38,10 @@ const CRITICAL = [
   TEST_BASE_DIR + 'prompt-filter/esReportPromptFilters.test.js',
   TEST_BASE_DIR + 'prompt-filter/pivotPrompt.test.js',
   TEST_BASE_DIR + 'prompt-filter/reportPromptFilters.test.js',
-  TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js'
+  TEST_BASE_DIR + 'reports/createAndDeleteReport.test.js',
+  TEST_BASE_DIR + 'charts/topNForCharts.test.js',
+  TEST_BASE_DIR + 'charts/bottomNForCharts.test.js',
+  TEST_BASE_DIR + 'charts/SortingWithCharts.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [

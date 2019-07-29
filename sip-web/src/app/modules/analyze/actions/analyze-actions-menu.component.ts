@@ -102,10 +102,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
       const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
         subCategoryId: isDSLAnalysis(this.analysis)
           ? this.analysis.category
-          : this.analysis.categoryId,
-        creatorId:
-          (<Analysis>this.analysis).userId ||
-          (<AnalysisDSL>this.analysis).createdBy
+          : this.analysis.categoryId
       });
 
       return notExcluded && hasPriviledge;

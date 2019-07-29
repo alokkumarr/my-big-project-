@@ -7,7 +7,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
-import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.TransformWithSchema;
 
@@ -27,18 +27,18 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
     }
 
     protected JavaRDD     transformation(
-            JavaRDD dataRdd,
-            Map<String, Broadcast<List<Row>>> referenceData,
-            Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor) {
+        JavaRDD dataRdd,
+        Map<String, Broadcast<List<Row>>> referenceData,
+        Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor) {
         JavaRDD rdd = dataRdd.map(
-                new TransformWithSchema(
-                        script,
-                        schema,
-                        referenceData,
-                        refDataDescriptor,
-                        successTransformationsCount,
-                        failedTransformationsCount,
-                        threshold)).cache();
+            new TransformWithSchema(
+                script,
+                schema,
+                referenceData,
+                refDataDescriptor,
+                successTransformationsCount,
+                failedTransformationsCount,
+                threshold)).cache();
         return rdd;
     }
 
@@ -52,6 +52,26 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         //df.schema().prettyJson();
         logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
         createFinalDS(df.cache());
+    }
+
+    public void executeSingleProcessor(NGContext ngctx) throws Exception {
+        Map<String, Dataset> dsMap = ngctx.datafileDFmap;
+
+        Dataset ds = dsMap.get(ngctx.dataSetName);
+
+        prepareRefData(dsMap);
+
+        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+
+        Long c = transformationResult.count();
+
+        // Using structAccumulator do second pass to align schema
+        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+
+        //df.schema().prettyJson();
+        logger.trace("Transformation completed: " + c   + " Schema: " + df.schema().prettyJson());
+
+        createFinalDS(df.cache(),ngctx);
     }
 
 

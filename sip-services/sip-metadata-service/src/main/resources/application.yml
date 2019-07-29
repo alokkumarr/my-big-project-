@@ -37,8 +37,10 @@ application:
 metastore:
   base:  hdfs:///main/
   analysis: analysisMetadata
+  executionResultTable: executionResult
   migration: analysisMigration
   metadataTable: semanticDataStore
+  analysis-metadata-path:  /services/metadata/analysis_metadata
 
 connector: https
 semantic:

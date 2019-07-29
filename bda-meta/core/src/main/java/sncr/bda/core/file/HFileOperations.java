@@ -23,7 +23,7 @@ public class HFileOperations {
     private static boolean initialized = false;
 
     // Initialize File System
-    public static void init() throws Exception {
+    public static void init(int retries) throws Exception {
         if (initialized) return;
         Configuration fsConfig = new Configuration();
         try {
@@ -32,6 +32,11 @@ public class HFileOperations {
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new Exception("Cannot initialize FileSystem", e);
+        }
+        // Retry the file system object creation if previous attempt fails
+        if ((fs==null || fc == null) && retries >0 ) {
+            logger.trace("Number of retry left:  "+ retries);
+            init(retries-1);
         }
         initialized = true;
     }
@@ -55,7 +60,6 @@ public class HFileOperations {
 
             String data = new String(IOUtils.toByteArray(stream));
             stream.close();
-            fs.close();
             return data;
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
@@ -151,7 +155,7 @@ public class HFileOperations {
         }
         return files;
       }
-   
+
     public static void deleteEnt(String file) throws Exception {
         FileSystem fs;
         try {
@@ -220,7 +224,7 @@ public class HFileOperations {
 
     public static FileSystem getFileSystem() {
         try {
-            init();
+            init(10);
         } catch(Exception e){
             logger.error(e.getMessage());
             return null;

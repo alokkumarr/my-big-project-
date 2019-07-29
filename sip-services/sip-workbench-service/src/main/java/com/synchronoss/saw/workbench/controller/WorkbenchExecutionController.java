@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 import io.jsonwebtoken.Claims;
@@ -79,14 +81,9 @@ public class WorkbenchExecutionController {
     final String description = body.path("description").asText();
     String input = body.path("input").asText();
 
-    //TODO: Remove the hardcoded key
-    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
-        .parseClaimsJws(authToken).getBody();
+     Ticket ticket = TokenParser.retrieveTicket(authToken);
 
-    Map<String, Object> ticket =
-        ((Map<String, Object>) ssoToken.get("ticket"));
-    String userName = (String) ticket.get("userFullName");
-    log.info(userName);
+    log.info(ticket.getUserFullName());
 
     String component = body.path("component").asText();
     JsonNode configNode = body.path("configuration");
@@ -127,7 +124,7 @@ public class WorkbenchExecutionController {
     xdfOutput.put("desc", description);
 
     ObjectNode userData = mapper.createObjectNode();
-    userData.put(DataSetProperties.createdBy.toString(), userName);
+    userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
 
 
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);
@@ -187,7 +184,7 @@ public class WorkbenchExecutionController {
   /**
    * This method is to preview the data.
    * @param project is of type String.
-   * @param previewId is of type String.
+   * @param name is of type String.
    * @return ObjectNode is of type Object.
    * @throws JsonProcessingException when this exceptional condition happens.
    * @throws Exception when this exceptional condition happens.

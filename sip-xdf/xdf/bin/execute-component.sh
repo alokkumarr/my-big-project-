@@ -17,12 +17,13 @@ SPARK_HOME=/opt/mapr/spark/spark-current
 
 # Component -> main class table
 declare -A COMP_MC=(
-    [sql]=sncr.xdf.sql.SQLComponent
-    [spark-sql]=sncr.xdf.sql.SQLComponent
-    [es-loader]=sncr.xdf.esloader.ESLoaderComponent
+    [sql]=sncr.xdf.sql.ng.NGSQLComponent
+    [spark-sql]=sncr.xdf.sql.ng.NGSQLComponent
+    [es-loader]=sncr.xdf.esloader.NGESLoaderComponent
     [zero]=sncr.xdf.component.ZeroComponent
-    [parser]=sncr.xdf.parser.Parser
-	[transformer]=sncr.xdf.transformer.TransformerComponent
+    [parser]=sncr.xdf.parser.NGParser
+    [pipeline]=sncr.xdf.ngprocessor.XDFDataProcessor
+    [transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
 )
 
 function usage()
