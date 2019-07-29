@@ -37,6 +37,8 @@ public class XDFDataProcessor  extends AbstractComponent {
     private boolean runningMode  = true;
     private Map<String, Dataset> datafileDFmap = new HashMap<>();
     private String dataSetName = "";
+    String error;
+    boolean isRealTime = false;
 
 
 	public XDFDataProcessor(String [] args) {
@@ -48,14 +50,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 	public XDFDataProcessor(Dataset dataset) {
 		this.datafileDFmap.put("DATA_STREAM", dataset);
 	}
-
-    private  String PIPELINE_CONFIG;
-    private boolean RUNNING_MODE  = true;
-    private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
-    Map<String, Dataset> datafileDFmap = new HashMap<>();
-    String dataSetName = "";
-    String error;
-    boolean isRealTime = false;
 
     public static void main(String[] args)  {
         long startTime = System.currentTimeMillis();
@@ -178,7 +172,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             String rtpsKey =  cfg.getOutputs().get(0).getDataSet().toString();
 
             ngRtpsCtxSvc.getNgctx().dataSetName = rtpsKey;
-            ngRtpsCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngRtpsCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngRtpsCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx());
