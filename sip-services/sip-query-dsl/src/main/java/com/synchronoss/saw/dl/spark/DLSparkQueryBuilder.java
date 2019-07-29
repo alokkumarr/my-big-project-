@@ -14,6 +14,7 @@ import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.Model.Preset;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
@@ -39,10 +40,12 @@ public class DLSparkQueryBuilder {
   private static final String ONLY_YEAR_FORMAT = "YYYY";
   private static final String EPOCH_SECOND = "epoch_second";
   private static final String EPOCH_MILLIS = "epoch_millis";
+  private BooleanCriteria booleanCriteria;
 
   List<String> groupByColumns = new ArrayList<>();
 
   public String buildDataQuery(SipQuery sipQuery) {
+    booleanCriteria = sipQuery.getBooleanCriteria();
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
@@ -210,7 +213,7 @@ public class DLSparkQueryBuilder {
       whereFilters.remove(0);
       whereFilters.add(0, " WHERE " + firstFilter);
     }
-    return StringUtils.join(whereFilters, " AND ");
+    return StringUtils.join(whereFilters, " " + booleanCriteria.value() + " ");
   }
 
   /**
@@ -221,6 +224,7 @@ public class DLSparkQueryBuilder {
    * @return String dsk included query
    */
   public String buildDskDataQuery(SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
+    booleanCriteria = sipQuery.getBooleanCriteria();
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
@@ -339,8 +343,8 @@ public class DLSparkQueryBuilder {
       whereCond = setGteLteForDate(gte, lte, filter);
     } else if ((preset.value().equals(Model.Preset.NA.toString())
             || (operator.equals(Operator.BTW)))
-        && (gte != null|| value != null)
-        && (lte != null|| otherValue != null)) {
+        && (gte != null || value != null)
+        && (lte != null || otherValue != null)) {
       long gteInEpoch;
       long lteInEpoch;
       if (value == null && otherValue == null) {
@@ -354,8 +358,8 @@ public class DLSparkQueryBuilder {
                 : Long.parseLong(gte);
         lteInEpoch = isMilli == true ? Long.parseLong(lte) / 1000 : Long.parseLong(lte);
       } else {
-        gteInEpoch = isMilli == true ? value.longValue()  : value.longValue();
-        lteInEpoch = isMilli == true ? otherValue.longValue()  : otherValue.longValue();
+        gteInEpoch = isMilli == true ? value.longValue() : value.longValue();
+        lteInEpoch = isMilli == true ? otherValue.longValue() : otherValue.longValue();
       }
       Date date = new Date(gteInEpoch);
       DateFormat dateFormat = new SimpleDateFormat(DATE_WITH_HOUR_MINUTES);
@@ -488,14 +492,23 @@ public class DLSparkQueryBuilder {
     String order;
     for (Sort sort : sorts) {
       if (sort.getAggregate() != null) {
-        order =
-            sort.getAggregate()
-                + "("
-                + sort.getArtifactsName()
-                + "."
-                + sort.getColumnName()
-                + ") "
-                + sort.getOrder();
+        switch (sort.getAggregate()) {
+          case DISTINCTCOUNT:
+            order = "`distinctCount(" + sort.getColumnName() + ")`";
+            break;
+          case PERCENTAGE:
+            order = "`percentage(" + sort.getColumnName() + ")`";
+            break;
+          default:
+            order =
+                sort.getAggregate()
+                    + "("
+                    + sort.getArtifactsName()
+                    + "."
+                    + sort.getColumnName()
+                    + ") "
+                    + sort.getOrder();
+        }
       } else {
         order = sort.getArtifactsName() + "." + sort.getColumnName() + " " + sort.getOrder();
       }
