@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -69,6 +70,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Value("${metastore.time-to-live}")
   private long timeToLive;
+
+	@Value("${metastore.execution-result-limit}")
+	@NotNull
+	private long configExecutionLimit;
 
   @Value("${executor.preview-rows-limit}")
   private Integer previewRowLimit;
@@ -633,7 +638,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
-      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+
+			List<?> executionLists =
+					maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+			// method call to be asynchronossly
+			CompletableFuture.runAsync(
+					() -> {
+						StorageProxyUtil.deleteJunkExecutionResult(
+								dslQueryId, configExecutionLimit, basePath, executionResultTable);
+						dataLakeExecutionService.cleanDataLakeData();
+					});
+			return executionLists;
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
