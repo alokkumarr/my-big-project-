@@ -282,6 +282,7 @@
     <module>xdf-esloader</module>
     <module>xdf</module>
     <module>xdf-dataprocessor</module>
+    <module>xdf-rtps</module>
   </modules>
   <build>
     <defaultGoal>package</defaultGoal>
