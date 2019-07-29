@@ -625,7 +625,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
-          data = clone(flattenReportData(data, this.analysis));
+          const requestAnalysis = {...this.analysis, artifacts: get(this.analysis, 'sipQuery.artifacts')};
+          data = clone(flattenReportData(data, requestAnalysis));
         }
 
         this.setExecutedBy(executedBy);

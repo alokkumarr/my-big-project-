@@ -233,12 +233,12 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     let url = '';
-    if (options.isDSL) {
+    if (options.analysisType !== 'report') {
       const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
       url = `${path}`;
     } else {
       const page = floor(options.skip / options.take) + 1;
-      const path = `analysis/${analysisId}/executions/data`;
+      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
       const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
         options.analysisType
       }`;

@@ -14,6 +14,9 @@ import * as isNumber from 'lodash/isNumber';
 import * as flatMap from 'lodash/flatMap';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
@@ -947,7 +950,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const query = isDSLAnalysis(this.analysis)
       ? this.analysis.sipQuery
       : this.analysis.sqlBuilder;
-    forEach(query.orderByColumns, field => {
+    forEach(query.sorts, field => {
       if (event.column.columnName === field.columnName) {
         field.aggregate = event.column.aggregate;
       }
@@ -992,7 +995,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      console.log(this.artifacts);
+      this.artifacts = this.removeColumn(event.column);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
@@ -1070,6 +1074,19 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'artifactPosition':
     case 'visibleIndex':
     }
+  }
+
+  removeColumn(data) {
+    const removeColumnFromAtrifacts = fpPipe(
+      fpFlatMap(artifact => artifact.columns),
+      fpReduce((acc, column) => {
+        if (column.columnName === data.columnName && column.table === data.table) {
+          delete column.checked;
+        }
+      }, {})
+    )(this.artifacts);
+    console.log(removeColumnFromAtrifacts);
+    return this.artifacts;
   }
 
   changeToQueryModePermanently() {

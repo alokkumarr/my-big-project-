@@ -206,7 +206,7 @@ export function flattenReportData(data, analysis) {
     return data;
   }
   const columnMap = fpPipe(
-    fpFlatMap(artifact => artifact.columns),
+    fpFlatMap(artifact => artifact.columns || artifact.fields),
     fpReduce((accumulator, column) => {
       const { columnName, aggregate } = column;
       const key = `${columnName}-${aggregate}`;
@@ -224,7 +224,7 @@ export function flattenReportData(data, analysis) {
       }
       const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
-      const columnMapKey = `${columnName}-${aggregate}`;
+      const columnMapKey = `${columnName.split(')')[0]}-${aggregate}`;
       const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
 
       if (isInArtifactColumn) {
