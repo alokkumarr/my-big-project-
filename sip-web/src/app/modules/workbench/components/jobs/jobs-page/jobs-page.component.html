@@ -140,14 +140,12 @@
             'job-' +
             cell.column.dataField +
             '-' +
-            moment(cell.data.startTime).to(moment(cell.data.endTime), true)
+            (cell.data.endTime - cell.data.startTime) / 1000
           "
           *dxTemplate="let cell of 'durationTemplate'"
         >
           <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
-            {{
-              moment(cell.data.startTime).to(moment(cell.data.endTime), true)
-            }}
+            {{ (cell.data.endTime - cell.data.startTime) / 1000 }}
           </ng-container>
           <ng-template #defaultTemplate>
             N/A
