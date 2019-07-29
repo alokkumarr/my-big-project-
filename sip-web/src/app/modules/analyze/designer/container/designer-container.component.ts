@@ -207,6 +207,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.forkAnalysis().then(() => {
         this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
         this.initExistingAnalysis();
+        this._store.dispatch(new ConstructDesignerJoins(this.analysis));
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.layoutConfiguration = this.getLayoutConfiguration(
           this.analysis
