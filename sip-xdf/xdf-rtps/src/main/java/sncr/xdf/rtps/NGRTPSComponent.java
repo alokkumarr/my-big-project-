@@ -45,7 +45,6 @@ public class NGRTPSComponent extends AbstractComponent
 	 public NGRTPSComponent(NGContext ngctx) {
 	        super(ngctx);
 	    }
-
 	@Override
 	protected int execute() {
 		logger.debug("########rtps execute started#######");
@@ -72,9 +71,8 @@ public class NGRTPSComponent extends AbstractComponent
 			// TODO Auto-generated catch block
 			logger.error(ex.getMessage());
 		}
-        Config defaultConfig = ConfigFactory.parseResources("defaults.conf");
 		Rtps rtpsProps = config.getRtps();
-        driver.run(rtpsProps.getConfFilePath(), ctx);
+        driver.run(rtpsProps, ctx);
         
         
 		logger.debug("########rtps execute completed#######");
@@ -129,7 +127,7 @@ public class NGRTPSComponent extends AbstractComponent
 					ComponentServices.TransformationMetadata, ComponentServices.Spark, };
 			ComponentConfiguration cfg = NGRTPSComponent.analyzeAndValidate(configAsStr);
 			
-			logger.debug("Analyze and validation completed");
+			logger.debug("Analyze and validation completed" + cfg);
 			
 			
 			ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
@@ -169,12 +167,16 @@ public class NGRTPSComponent extends AbstractComponent
 	public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
 		ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
+		
+		
 		Rtps parserProps = compConf.getRtps();
+		
+		logger.debug("after parsing ::"+ parserProps);
 		if (parserProps == null) {
 			throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
 		}
 
-		
+		logger.debug("parsed config::"+parserProps);
 
 		return compConf;
 	}

@@ -27,13 +27,13 @@ public class AppMonitoringInfo {
     public static int store(SparkContext sc,
                             String instanceName,
                             String controlFilePath,
-                            com.typesafe.config.Config appConfig) {
+                            String topic) {
 
         try {
             // Should be local FS, not HDFS
             FileSystem fs = FileSystem.getLocal(fsConf);
             // Extract process topic
-            String stream = appConfig.getString("streams.topic").split(":")[0];
+            String stream = topic.split(":")[0];
             String fullPath = controlFilePath; //+ File.separator + instanceName + ".pid";
             logger.info("Writing application monitoring data into " + fullPath);
 

@@ -2,6 +2,7 @@ package sncr.xdf.rtps;
 
 import com.typesafe.config.ConfigFactory;
 import info.faljse.SDNotify.SDNotify;
+import sncr.bda.conf.Rtps;
 import sncr.xdf.context.InternalContext;
 
 import org.apache.log4j.Logger;
@@ -34,30 +35,68 @@ public class RealTimeApplicationDriver {
             {"monitoring.interval", "Monitoring interval is not configured (%s). Please correct configuration file."}
     };
 
-    protected void run(String configurationFilePath, InternalContext ctx) {
+    protected void run(Rtps rtpsProps, InternalContext ctx) {
         int exit_code;
 
         // Read configuration file
-        logger.info("Configuration file : " + configurationFilePath);
-        final com.typesafe.config.Config appConfig = ConfigFactory.parseFile(new File(configurationFilePath));
+       
+        String configPath = rtpsProps.getConfigFilePath();
+        logger.info("Configuration file : " + configPath);
+        
+        String controlFilePath = null;
+        long interval = 0;
+        String topic;
+        
+        JavaStreamingContext jssc = null;
+        
+        if(configPath == null  || "".equals(configPath)) {
+        	appName = rtpsProps.getSpark().getAppName();
+        	controlFilePath = rtpsProps.getMonitoring().getControlfilePath();
+        	interval = Long.valueOf(rtpsProps.getMonitoring().getInterval());
+        	topic = rtpsProps.getStreams().getTopic();
+        	
+        	if(!checkConfiguration(rtpsProps)){
+                System.exit(-3);
+            }
+        	logger.debug("##### About to start Create Context JSON #######");
+        	 jssc = createContext(appName, rtpsProps, ctx);
+        	
+        } else {
+        	logger.debug("##### Before parsing config file name:: #######"+ configPath);
+        	
+        	com.typesafe.config.Config appConfig = ConfigFactory.parseFile(new File(configPath));
+        	
+        	logger.debug("##### After parsing #######");
+        	
+        	appName = appConfig.getString("spark.app.name");
+        	controlFilePath = appConfig.getString("monitoring.controlfile.path");
+        	interval = appConfig.getLong("monitoring.interval");
+        	topic = appConfig.getString("streams.topic");
+        	
+        	logger.debug("##### Reading values completed #######");
 
-        // Check configuration parameters
-        if(!checkConfiguration(appConfig)){
-            System.exit(-3);
+            // Check configuration parameters
+        	if(!checkConfiguration(appConfig)){
+                System.exit(-3);
+            }
+        	
+        	// Extract configuration options
+            
+
+            // Create Streaming context
+        	logger.debug("##### About to start Create Context type safe config #######");
+        	jssc = createContext(appName, appConfig, ctx);
+         
+
         }
+        
 
-        // Extract configuration options
-        appName = appConfig.getString("spark.app.name");
-        String controlFilePath = appConfig.getString("monitoring.controlfile.path");
-        long interval = appConfig.getLong("monitoring.interval");
-
-        // Create Streaming context
-        JavaStreamingContext jssc = createContext(appName, appConfig, ctx);
+        
 
         if(jssc != null) {
             // In order to connect to other systems (e.g. monitoring) we have to write
             // process information to dedicated file
-            if (AppMonitoringInfo.store(jssc.sparkContext().sc(), appName, controlFilePath, appConfig) < 0) {
+            if (AppMonitoringInfo.store(jssc.sparkContext().sc(), appName, controlFilePath, topic) < 0) {
                 logger.error("Can't write application monitoring data - exiting application");
                 System.exit(-1);
             }
@@ -90,6 +129,12 @@ public class RealTimeApplicationDriver {
         logger.error("createContext() method should be redefined on application level.");
         return null;
     }
+    
+    
+    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros, InternalContext ctx) {
+    	 logger.error("createContext() method should be redefined on application level.");
+         return null;
+    }
 
     protected void monitor(JavaStreamingContext jssc, long timeout,
                            String instanceName, String controlFilePath) throws Exception {
@@ -120,4 +165,21 @@ public class RealTimeApplicationDriver {
         }
         return true;
     }
+    
+    
+	private boolean checkConfiguration(Rtps rtpsProps) {
+
+		boolean isMaprfsPath = rtpsProps.getMaprfs().getPath() == null || rtpsProps.getMaprfs().getPath().isEmpty();
+
+		boolean isFieldsModel = rtpsProps.getFields().getModel() == null || rtpsProps.getFields().getModel().isEmpty();
+
+		boolean isStreamsTopic = rtpsProps.getStreams().getTopic() == null
+				|| rtpsProps.getStreams().getTopic().isEmpty();
+
+		boolean isSparkBatchInterval = rtpsProps.getSpark().getBatchInterval() == null
+				|| rtpsProps.getSpark().getBatchInterval().isEmpty();
+
+		return !(isMaprfsPath || isFieldsModel || isStreamsTopic || isSparkBatchInterval);
+
+	}
 }

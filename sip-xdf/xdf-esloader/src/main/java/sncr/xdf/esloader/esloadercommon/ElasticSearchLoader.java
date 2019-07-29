@@ -101,6 +101,7 @@ public class ElasticSearchLoader {
         configMap.put(ES_NODE_DISCOVERY, String.valueOf(false));
         configMap.put(ES_PARAM_NODES, esHosts);
         configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
+        configMap.put("es.index.auto.create", "false");
 
         if(config.getEsUser() != null && config.getEsPassword() != null) {
             configMap.put(ES_PARAM_USER, config.getEsUser());

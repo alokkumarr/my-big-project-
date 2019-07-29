@@ -93,6 +93,7 @@ public class XDFDataProcessor  {
                 
                 	case "rtps" :
                 	isRealTime = true;
+                	 logger.debug("Switch case rtps   ---> " );
                     ret = processRtps(parameters,pipeObj.get("configuration").toString(),persist);
                     break;
                 
@@ -123,10 +124,11 @@ public class XDFDataProcessor  {
 
 
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
-
+    	 logger.debug("###### Starting RTPS #####"  );
         int ret = 0;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
+            logger.debug("###### Config as string retrived #####"  );
 
             if (configAsStr == null || configAsStr.isEmpty()) {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
@@ -153,8 +155,9 @@ public class XDFDataProcessor  {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-
+            logger.debug("###### Analize and validate...#####" + configAsStr  );
             ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            logger.debug("###### Analize and validate completed ...#####"  );
             NGContextServices ngRtpsCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
             ngRtpsCtxSvc.initContext();
             ngRtpsCtxSvc.registerOutputDataSet();

@@ -1,93 +1,89 @@
 package sncr.bda.conf;
 
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Rtps {
-	
-	String topic;
-	
-	String groupId;
-	
-	String clientId;
-	
-	String outputType;
-	
-	/**
-	 * Stream path
-	 */
-	String maprfsPath;
-	
-	String model;
-	
-	String definitionFile;
-	
-	String confFilePath;
-	
-	
-	
 
-	
+	@SerializedName("fields")
+	@Expose
+	private Field fields = null;
+	@SerializedName("spark")
+	@Expose
+	private Spark spark;
+	@SerializedName("maprfs")
+	@Expose
+	private Maprfs maprfs;
+	@SerializedName("streams")
+	@Expose
+	private Streams streams;
+	@SerializedName("monitoring")
+	@Expose
+	private Monitoring monitoring;
 
-	public String getConfFilePath() {
-		return confFilePath;
+	@Expose
+	private String configFilePath;
+
+	@SerializedName("es")
+	@Expose
+	private Es es;
+
+	public String getConfigFilePath() {
+		return configFilePath;
 	}
 
-	public void setConfFilePath(String confFilePath) {
-		this.confFilePath = confFilePath;
+	public void setConfigFilePath(String configFilePath) {
+		this.configFilePath = configFilePath;
 	}
 
-	public String getTopic() {
-		return topic;
+	public Field getFields() {
+		return fields;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setFields(Field fields) {
+		this.fields = fields;
 	}
 
-	public String getGroupId() {
-		return groupId;
+	public Spark getSpark() {
+		return spark;
 	}
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
+	public void setSpark(Spark spark) {
+		this.spark = spark;
 	}
 
-	public String getClientId() {
-		return clientId;
+	public Maprfs getMaprfs() {
+		return maprfs;
 	}
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setMaprfs(Maprfs maprfs) {
+		this.maprfs = maprfs;
 	}
 
-	public String getOutputType() {
-		return outputType;
+	public Streams getStreams() {
+		return streams;
 	}
 
-	public void setOutputType(String outputType) {
-		this.outputType = outputType;
+	public void setStreams(Streams streams) {
+		this.streams = streams;
 	}
 
-	public String getMaprfsPath() {
-		return maprfsPath;
+	public Monitoring getMonitoring() {
+		return monitoring;
 	}
 
-	public void setMaprfsPath(String maprfsPath) {
-		this.maprfsPath = maprfsPath;
+	public void setMonitoring(Monitoring monitoring) {
+		this.monitoring = monitoring;
 	}
 
-	public String getModel() {
-		return model;
+	public Es getEs() {
+		return es;
 	}
 
-	public void setModel(String model) {
-		this.model = model;
-	}
-
-	public String getDefinitionFile() {
-		return definitionFile;
-	}
-
-	public void setDefinitionFile(String definitionFile) {
-		this.definitionFile = definitionFile;
+	public void setEs(Es es) {
+		this.es = es;
 	}
 
 }

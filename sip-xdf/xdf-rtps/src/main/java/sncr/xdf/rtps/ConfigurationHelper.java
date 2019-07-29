@@ -2,15 +2,24 @@ package sncr.xdf.rtps;
 
 
 import com.typesafe.config.ConfigValue;
+
+import sncr.bda.conf.Rtps;
+import org.apache.log4j.Logger;
+
 import org.apache.spark.SparkConf;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
- * Created by asor0002 on 7/21/2016.
  */
 public class ConfigurationHelper {
+	
+	 private static final Logger logger = Logger.getLogger(ConfigurationHelper.class);
+	
     public static int initConfig(SparkConf sparkConf, com.typesafe.config.Config appConfig, String prefix, boolean removePrefixFromName){
         int counter = 0;
         Set<Map.Entry<String, ConfigValue>> entrySet = appConfig.entrySet();
@@ -90,6 +99,59 @@ public class ConfigurationHelper {
         }
         return counter;
     }
+    
+ public static void initConfigForSpark(SparkConf sparkConf,  Object obj) {
+    	
+    	for (Field field: obj.getClass().getFields()) {
+    		try {
+    			sparkConf.set(field.getName(), field.get(field).toString());
+			} catch (IllegalArgumentException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			} catch (IllegalAccessException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			}
+        }
+    	
+    	
+    }
+    
+    
+    
+    public static void initConfig(Map<String, Object> kafkaParams,  Object obj) {
+    	
+    	for (Field field: obj.getClass().getFields()) {
+    		try {
+    			
+				kafkaParams.put( field.getName().replace('!', '.'), field.get(field).toString());
+			} catch (IllegalArgumentException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			} catch (IllegalAccessException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			}
+        }
+    	
+    	
+    }
+    
+ public static void initConfigForEs(Map<String, String> kafkaParams,  Object obj, Optional prefix) {
+	 logger.info("starting reflection:: " );
+    	for (Field field: obj.getClass().getFields()) {
+    		try {
+    			String prefixVal = "";
+    			if(prefix.isPresent()) {
+    				prefixVal = (String) prefix.get();
+    			}
+				kafkaParams.put(prefixVal + field.getName().replace('!', '.'), field.get(field).toString());
+			} catch (IllegalArgumentException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			} catch (IllegalAccessException e) {
+				logger.error("Exception during initialization of config:: " + e.getMessage());
+			}
+        }
+   	 logger.info("reflection completed:: " );
+    	
+    }
+    
 
     private static String getValue(ConfigValue cfv){
         String value = null;
