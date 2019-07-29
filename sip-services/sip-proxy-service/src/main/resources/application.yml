@@ -53,11 +53,12 @@ sip:
   ssl:
     enable : true
   trust:
-    store: /Users/spau0004/Desktop/keystore/truststore.jks
-    password: sip@123
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
   key:
-    store: /Users/spau0004/Desktop/keystore/keystore.jks
-     password: sip@123
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+
 {% else %}
   ssl:
     enable: false

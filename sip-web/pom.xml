@@ -278,7 +278,7 @@
                 </goals>
                 <configuration>
                   <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.1</npmVersion>
+                  <npmVersion>5.6.0</npmVersion>
                 </configuration>
               </execution>
 

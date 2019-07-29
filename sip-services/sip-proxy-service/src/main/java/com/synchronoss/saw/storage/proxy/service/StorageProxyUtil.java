@@ -17,6 +17,7 @@ import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
+import com.synchronoss.sip.utils.RestUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +28,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.base.MaprConnection;
 
@@ -103,7 +99,10 @@ public class StorageProxyUtil {
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      SipQuery sipQuery, String metaDataServiceExport, HttpServletRequest request) {
+      SipQuery sipQuery,
+      String metaDataServiceExport,
+      HttpServletRequest request,
+      RestUtil restUtil) {
     String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
@@ -113,24 +112,14 @@ public class StorageProxyUtil {
     SipQuery semanticSipQuery = new SipQuery();
     if (semanticId != null) {
       try {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        RestTemplate restTemplate = restUtil.restTemplate();
 
         String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
         logger.debug("SIP query url for analysis fetch : " + url);
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.set("Host", request.getHeader("Host"));
-        requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
-        requestHeaders.set("Authorization", request.getHeader("Authorization"));
 
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        ResponseEntity<SemanticNode> analysisResponse =
-            restTemplate.exchange(url, HttpMethod.GET, requestEntity, SemanticNode.class);
-
-        List<Object> artifactList = analysisResponse.getBody().getArtifacts();
+        SemanticNode semanticNode = restTemplate.getForObject(url, SemanticNode.class);
+        List<Object> artifactList = semanticNode.getArtifacts();
+        logger.info("artifact List: " + artifactList);
 
         List<Artifact> artifacts = new ArrayList<>();
         List<Field> fields = new ArrayList<>();
@@ -159,7 +148,7 @@ public class StorageProxyUtil {
 
         logger.debug("Fetched SIP query for analysis : " + semanticSipQuery.toString());
       } catch (Exception ex) {
-        logger.error("Sip query not fetched from semantic");
+        logger.error("Sip query not fetched from semantic" + ex.getMessage());
       }
     }
     return semanticSipQuery;

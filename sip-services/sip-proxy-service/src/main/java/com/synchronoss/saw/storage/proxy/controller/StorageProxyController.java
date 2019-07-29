@@ -26,13 +26,18 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
+import com.synchronoss.sip.utils.RestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +72,8 @@ public class StorageProxyController {
 
   @Value("${metadata.service.host}")
   private String metaDataServiceExport;
+
+  @Autowired private RestUtil restUtil;
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -294,7 +301,7 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture;
-    SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request);
+    SipQuery savedQuery = getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
