@@ -100,7 +100,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, page, pageSize, executionType);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType,query);
   }
 
   private void waitForResult(String resultId, Integer retries) {
@@ -149,7 +149,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
    * @return ExecuteAnalysisResponse
    */
   public ExecuteAnalysisResponse getDataLakeExecutionData(
-      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,String query) {
     logger.info("Inside getting executionData for executionId {}", executionId);
     ExecuteAnalysisResponse response = new ExecuteAnalysisResponse();
     try {
@@ -184,6 +184,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       response.setData(objList);
       response.setTotalRows(recordCount);
       response.setExecutionId(executionId);
+      response.setQuery(query);
       return response;
 
     } catch (Exception e) {
