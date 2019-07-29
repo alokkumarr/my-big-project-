@@ -50,7 +50,9 @@ import {
   DesignerLoadMetric,
   DesignerResetState,
   DesignerUpdateEditMode,
-  DesignerUpdateQuery
+  DesignerUpdateQuery,
+  DesignerJoinsArray,
+  ConstructDesignerJoins
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -739,4 +741,89 @@ export class DesignerState {
   resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
   }
+
+  @Action(DesignerJoinsArray)
+  updateJoins(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { joins }: DesignerJoinsArray
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sipJoins = [];
+    if (isEmpty(joins)) {
+      return;
+    }
+    joins.forEach(join => {
+      let leftJoin = {};
+      let rightJoin = {};
+      join.criteria.forEach(crt => {
+        if (crt.side === 'left') {
+          leftJoin = {
+            artifactsName: crt.tableName,
+            columnName: crt.columnName
+          };
+        }
+
+        if (crt.side === 'right') {
+          rightJoin = {
+            artifactsName: crt.tableName,
+            columnName: crt.columnName
+          };
+        }
+      });
+      const joinCondition = {
+        operator: 'EQ',
+        left: leftJoin,
+        right: rightJoin
+      }
+      const sipJoin = {
+        join: join.type,
+        criteria: [{
+          joinCondition
+        }]
+      };
+      sipJoins.push(sipJoin);
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: sipJoins } }
+    });
+  }
+
+  @Action(ConstructDesignerJoins)
+  updateDesignerJoins(
+    { patchState }: StateContext<ConstructDesignerJoins>,
+    { analysis }
+  ) {
+    const sipQuery = analysis.sipQuery;
+    const analysisJoins = [];
+    if (isEmpty(analysis.sipQuery.joins)) {
+      return;
+    }
+    analysis.sipQuery.joins.forEach(join => {
+      const DSLCriteria = [];
+      join.criteria.forEach(dslCRT => {
+        DSLCriteria.push({
+          tableName: dslCRT.joinCondition['left'].artifactsName,
+          columnName: dslCRT.joinCondition['left'].columnName,
+          side: 'left'
+        });
+        DSLCriteria.push({
+          tableName: dslCRT.joinCondition['right'].artifactsName,
+          columnName: dslCRT.joinCondition['right'].columnName,
+          side: 'right'
+        });
+
+      });
+      const dslJoin = {
+        type: join.join,
+        criteria: DSLCriteria
+      };
+      analysisJoins.push(dslJoin);
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: analysisJoins } }
+    });
+  }
 }
+
+

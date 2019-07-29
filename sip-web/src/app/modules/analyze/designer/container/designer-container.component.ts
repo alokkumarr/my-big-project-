@@ -89,7 +89,9 @@ import {
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
   DesignerUpdateEditMode,
-  DesignerUpdateQuery
+  DesignerUpdateQuery,
+  DesignerJoinsArray,
+  ConstructDesignerJoins
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
@@ -185,6 +187,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.analysis = isDSLAnalysis(this.analysis) ? this.mapTableWithFields(this.analysis) : this.analysis;
       isDSLAnalysis(this.analysis) &&
         this._store.dispatch(new DesignerInitEditAnalysis(this.analysis));
+      this._store.dispatch(new ConstructDesignerJoins(this.analysis));
       this.initExistingAnalysis();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.layoutConfiguration = this.getLayoutConfiguration(
@@ -1022,6 +1025,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'filterRemove':
     case 'joins':
+      this._store.dispatch(new DesignerJoinsArray(event.data));
+      this.areMinRequirmentsMet = this.canRequestData();
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      break;
     case 'changeQuery':
       // console.log(event);
       // if (typeof event.data.query !== 'string') {

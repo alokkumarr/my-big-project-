@@ -192,3 +192,13 @@ export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
   constructor() {}
 }
+
+export class DesignerJoinsArray {
+  static readonly type = '[Designer] joins from analysis';
+  constructor(public joins: any) {}
+}
+
+export class ConstructDesignerJoins {
+  static readonly type = '[Designer] construct desinger joins';
+  constructor(public analysis: any) {}
+}
