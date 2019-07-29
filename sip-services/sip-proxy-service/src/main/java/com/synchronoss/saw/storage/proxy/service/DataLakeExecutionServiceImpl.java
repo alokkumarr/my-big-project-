@@ -258,4 +258,25 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     }
     return count;
   }
+
+
+	/**
+	 * Cleanup data lake of execution result data.
+	 */
+	@Override
+	public void cleanDataLakeData() {
+		List<String> dlJunkExecutionList = null;
+		// TODO: 7/29/2019 - get the datalake junk id from storage Utils when es branch merge to master
+		//StorageProxyUtil.getDataLakeJunkIds();
+		if (dlJunkExecutionList != null && dlJunkExecutionList.size() > 0) {
+			dlJunkExecutionList.forEach(junkId -> {
+				try {
+					String outputLocation = pubSchOutputLocation + File.separator + "output-" + junkId;
+					HFileOperations.deleteEnt(outputLocation);
+				} catch (Exception ex) {
+					logger.error("Error occurred while deleting data lake data : {}", ex);
+				}
+			});
+		}
+	}
 }
