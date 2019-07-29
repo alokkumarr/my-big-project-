@@ -71,12 +71,15 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     List<Object> result = null;
 
     String query = null;
+    String queryShownTOUser=null;
 
     if (designerEdit) {
       query = sipQuery.getQuery();
+      queryShownTOUser = query;
     } else {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
+      queryShownTOUser = dlQueryBuilder.buildDataQuery(sipQuery);
     }
 
     // Required parameters
@@ -100,7 +103,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, page, pageSize, executionType,query);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType,queryShownTOUser);
   }
 
   private void waitForResult(String resultId, Integer retries) {

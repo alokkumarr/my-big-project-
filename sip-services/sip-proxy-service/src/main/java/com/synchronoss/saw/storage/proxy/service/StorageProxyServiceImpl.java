@@ -664,12 +664,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
-
-      // paginated execution data
-      Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
-      executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(doc, null));
+      if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
+        // paginated execution data
+        Object data =
+            maprConnection.fetchPagingData(
+                "data", executionResult.getExecutionId(), page, pageSize);
+        executionResponse.setData(data != null ? data : executionResult.getData());
+        executionResponse.setTotalRows(getTotalRows(doc, null));
+      }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
