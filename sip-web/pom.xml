@@ -37,7 +37,7 @@
     <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
     <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
     <app.varDir>/var/bda/${app.nameVer}</app.varDir>
-    <npm.install>install --prefer-offline</npm.install>
+    <npm.install>install</npm.install>
   </properties>
   <dependencies>
 	<dependency>
