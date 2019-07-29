@@ -32,7 +32,7 @@
     <app.group>nobody</app.group>
     <!-- must be first 2 digits from ${project.version} -->
     <app.version>${rpm.version}.${rpm.release}</app.version>
-    <app.name>saw-web</aphttps://www.networkworld.com/article/2693414/setting-limits-with-ulimit.htmlp.name>
+    <app.name>saw-web</app.name>
     <app.nameVer>${app.name}-${app.version}</app.nameVer>
     <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
     <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
