@@ -73,7 +73,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Value("${metastore.execution-result-limit}")
   @NotNull
-  private long configExecutionLimit;
+  private Long configExecutionLimit;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
@@ -547,7 +547,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectNode.put("dslQueryId", dslQueryId);
 
       List<?> executionLists =
-          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", configExecutionLimit.intValue());
       // method call to be asynchronossly
       CompletableFuture.runAsync(
           () -> {
