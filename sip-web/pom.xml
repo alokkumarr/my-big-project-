@@ -191,8 +191,8 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v8.10.0</nodeVersion>
-              <npmVersion>5.6.0</npmVersion>
+              <nodeVersion>v10.16.0</nodeVersion>
+              <npmVersion>6.10.2</npmVersion>
             </configuration>
           </execution>
           <execution>
@@ -277,8 +277,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.0</npmVersion>
+                  <nodeVersion>v10.16.0</nodeVersion>
+                  <npmVersion>6.10.2</npmVersion>
                 </configuration>
               </execution>
 
@@ -382,8 +382,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.0</npmVersion>
+                  <nodeVersion>v10.16.0</nodeVersion>
+                  <npmVersion>6.10.2</npmVersion>
                 </configuration>
               </execution>
 
@@ -471,8 +471,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.0</npmVersion>
+                  <nodeVersion>v10.16.0</nodeVersion>
+                  <npmVersion>6.10.2</npmVersion>
                 </configuration>
               </execution>
 
@@ -590,8 +590,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.0</npmVersion>
+                  <nodeVersion>v10.16.0</nodeVersion>
+                  <npmVersion>6.10.2</npmVersion>
                 </configuration>
               </execution>
 
