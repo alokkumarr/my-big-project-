@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
+import com.mapr.db.Admin;
+import com.mapr.db.FamilyDescriptor;
+import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
+import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.mapr.db.*;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
@@ -30,7 +33,6 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,9 +73,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Value("${metastore.time-to-live}")
   private long timeToLive;
 
-	@Value("${metastore.execution-result-limit}")
-	@NotNull
-	private long configExecutionLimit;
+  @Value("${metastore.execution-result-limit}")
+  @NotNull
+  private Long configExecutionLimit;
 
   @Value("${executor.preview-rows-limit}")
   private Integer previewRowLimit;
@@ -479,7 +481,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecuteAnalysisResponse response;
       response =
           dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,null,null);
+              sipQuery,
+              size,
+              dataSecurityKey,
+              executionType,
+              designerEdit,
+              executionId,
+              null,
+              null);
       result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
@@ -639,16 +648,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
 
-			List<?> executionLists =
-					maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
-			// method call to be asynchronossly
-			CompletableFuture.runAsync(
-					() -> {
-						StorageProxyUtil.deleteJunkExecutionResult(
-								dslQueryId, configExecutionLimit, basePath, executionResultTable);
-						dataLakeExecutionService.cleanDataLakeData();
-					});
-			return executionLists;
+      List<?> executionLists =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", configExecutionLimit.intValue());
+      // method call to be asynchronossly
+      CompletableFuture.runAsync(
+          () -> {
+            StorageProxyUtil.deleteJunkExecutionResult(
+                dslQueryId, configExecutionLimit, basePath, executionResultTable);
+            dataLakeExecutionService.cleanDataLakeData();
+          });
+      return executionLists;
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
@@ -669,12 +678,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
-			Long totalRows = getTotalRows(doc, null);
-			executionResponse.setTotalRows(totalRows);
+      Long totalRows = getTotalRows(doc, null);
+      executionResponse.setTotalRows(totalRows);
 
       // paginated execution data
       Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+          maprConnection.fetchPagingData(
+              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
@@ -823,6 +833,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
       int startIndex, endIndex;
+      pageSize = pageSize > dataObj.size() ? dataObj.size() : pageSize;
       if (page != null && page > 1) {
         startIndex = (page - 1) * pageSize;
         endIndex = startIndex + pageSize;
