@@ -13,7 +13,6 @@ import com.synchronoss.saw.model.JoinCondition;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.Model.Preset;
-import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
@@ -402,9 +401,9 @@ public class DLSparkQueryBuilder {
             + filter.getArtifactsName()
             + "."
             + filter.getColumnName()
-            + " <= TO_DATE('"
+            + " <= TO_DATE(date_add('"
             + lte
-            + "')";
+            + "',1))";
     return whereCond;
   }
 

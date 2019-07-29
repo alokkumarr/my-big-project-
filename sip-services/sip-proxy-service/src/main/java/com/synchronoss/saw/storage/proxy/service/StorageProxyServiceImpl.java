@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
+import com.mapr.db.Admin;
+import com.mapr.db.FamilyDescriptor;
+import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
+import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.mapr.db.*;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.QueryBuilderUtil;
@@ -30,7 +33,6 @@ import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -474,7 +476,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecuteAnalysisResponse response;
       response =
           dataLakeExecutionService.executeDataLakeReport(
-              sipQuery, size, dataSecurityKey, executionType, designerEdit, executionId,null,null);
+              sipQuery,
+              size,
+              dataSecurityKey,
+              executionType,
+              designerEdit,
+              executionId,
+              null,
+              null);
       result = (List<Object>) (response.getData());
     } else {
       result = executeESQueries(sipQuery, size, dataSecurityKey);
@@ -711,8 +720,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
-      List<Object> objList=(List<Object>)executionResult.getData();
+      ExecutionResult executionResult = fetchLastExecutionResult(dslQueryId, maprConnection);
+      List<Object> objList = (List<Object>) executionResult.getData();
       // paginated execution data
       Object data =
           maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize);
@@ -725,7 +734,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     return executionResponse;
   }
-
 
   public int getSize() {
     return size;
@@ -832,7 +840,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       executionResponse = new ExecutionResponse();
       excuteResp =
           dataLakeExecutionService.getDataLakeExecutionData(
-              executionId, pageNo, pageSize, executionType,null);
+              executionId, pageNo, pageSize, executionType, null);
     } else {
       executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
       /*here for schedule and publish we are reading data from the same location in DL, so directly
@@ -840,7 +848,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       schedule as well as */
       excuteResp =
           dataLakeExecutionService.getDataLakeExecutionData(
-              executionId, pageNo, pageSize, ExecutionType.publish,null);
+              executionId, pageNo, pageSize, ExecutionType.publish, null);
     }
     executionResponse.setData(excuteResp.getData());
     executionResponse.setTotalRows(excuteResp.getTotalRows());
@@ -856,7 +864,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (result != null) {
       ExecuteAnalysisResponse executionData =
           dataLakeExecutionService.getDataLakeExecutionData(
-              result.getExecutionId(), pageNo, pageSize, result.getExecutionType(),null);
+              result.getExecutionId(), pageNo, pageSize, result.getExecutionType(), null);
       executionResponse.setData(executionData.getData());
       executionResponse.setTotalRows(executionData.getTotalRows());
       executionResponse.setAnalysis(result.getAnalysis());
