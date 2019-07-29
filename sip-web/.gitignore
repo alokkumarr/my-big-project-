@@ -69,6 +69,7 @@ local.log
 npm-debug.log*
 testem.log
 /typings
+yarn.lock
 /target/*
 /target
 *~
