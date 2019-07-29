@@ -361,7 +361,7 @@ public interface AnalysisSipDslConverter {
    */
   default Sort generateSortObject(String artifactName, JsonObject sortObject) {
     Sort sort = new Sort();
-    sort.setArtifacts(artifactName);
+    sort.setArtifactsName(artifactName);
 
     if (sortObject.has(FieldNames.TYPE)) {
       String typeVal = sortObject.get(FieldNames.TYPE).getAsString();

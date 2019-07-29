@@ -491,13 +491,13 @@ public class DLSparkQueryBuilder {
         order =
             sort.getAggregate()
                 + "("
-                + sort.getArtifacts()
+                + sort.getArtifactsName()
                 + "."
                 + sort.getColumnName()
                 + ") "
                 + sort.getOrder();
       } else {
-        order = sort.getArtifacts() + "." + sort.getColumnName() + " " + sort.getOrder();
+        order = sort.getArtifactsName() + "." + sort.getColumnName() + " " + sort.getOrder();
       }
       sortsList.add(order);
     }
