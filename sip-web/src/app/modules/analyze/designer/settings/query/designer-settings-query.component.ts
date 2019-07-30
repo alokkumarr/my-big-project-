@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import * as isUndefined from 'lodash/isUndefined';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { Artifact, AnalysisDSL } from '../../types';
 
@@ -16,11 +15,7 @@ export class DesignerSettingsQueryComponent implements OnInit {
   @Input() artifacts: Artifact[];
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
-  ngOnInit() {
-    if (isUndefined(this.analysis.queryManual)) {
-      this.analysis.queryManual = this.analysis.query;
-    }
-  }
+  ngOnInit() {}
 
   onQueryChange(query: string) {
     this.change.emit(query);

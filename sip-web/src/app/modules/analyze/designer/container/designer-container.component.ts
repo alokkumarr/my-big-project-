@@ -631,9 +631,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (isDSLAnalysis(this.analysis)) {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         const subscription = this._store
-          .select(DesignerState.artifactFields)
+          .select(DesignerState.canRequestData)
           .pipe(
-            takeWhile(fields => isEmpty(fields)),
+            takeWhile(canRequestData => !canRequestData),
             finalize(() => {
               this.requestData();
             })

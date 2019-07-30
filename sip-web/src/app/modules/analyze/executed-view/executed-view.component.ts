@@ -480,23 +480,29 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
         executeResponse.data = clone(
-          flattenReportData(executeResponse.data, this.executedAnalysis)
+          flattenReportData(
+            executeResponse.data,
+            this.executedAnalysis || this.analysis
+          )
         );
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          ...(isDSLAnalysis(this.executedAnalysis)
+          ...(isDSLAnalysis(this.executedAnalysis || this.analysis)
             ? {
                 sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                   get(this.metric, 'artifacts.0.columns', []),
-                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                  executeResponse.queryBuilder ||
+                    (<AnalysisDSL>(this.executedAnalysis || this.analysis))
+                      .sipQuery
                 )
               }
             : {
                 sqlBuilder:
                   executeResponse.queryBuilder ||
-                  this.executedAnalysis.sqlBuilder
+                  (<Analysis>(this.executedAnalysis || this.analysis))
+                    .sqlBuilder
               })
         };
         this.fetchFilters(this.executedAnalysis);

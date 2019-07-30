@@ -30,11 +30,11 @@ public interface StorageProxyService {
   ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
 
-  Boolean saveTTLExecutionResult(ExecutionResult executionResult);
 
   ExecutionResponse fetchDataLakeExecutionData(
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
 
     ExecutionResponse fetchLastExecutionsDataForDL(
         String analysisId, Integer pageNo, Integer pageSize);
+  Boolean saveTtlExecutionResult(ExecutionResult executionResult);
 }

@@ -33,6 +33,7 @@
     *ngSwitchCase="'multi'"
     (change)="onSettingsChange($event)"
     [isInQueryMode]="isInQueryMode"
+    [analysis]="dslAnalysis$ | async"
     [artifacts]="artifacts"
     [data]="data"
     [dataCount]="dataCount"

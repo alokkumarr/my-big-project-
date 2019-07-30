@@ -217,11 +217,13 @@ export function flattenReportData(data, analysis) {
   data = checkNullinReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
+      /* If the column has aggregation, preserve the aggregate name when removing keyword */
       const hasAggregateFunction = key.includes('(') && key.includes(')');
 
       if (!hasAggregateFunction) {
         return removeKeyword(key);
       }
+
       const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
       const columnMapKey = `${columnName.split(')')[0]}-${aggregate}`;

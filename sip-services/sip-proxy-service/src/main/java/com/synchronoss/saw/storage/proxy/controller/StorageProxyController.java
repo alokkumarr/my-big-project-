@@ -365,7 +365,7 @@ public class StorageProxyController {
                   authTicket,
                   executionType,
                   (List<Object>) executeResponse.getData());
-          proxyService.saveTTLExecutionResult(executionResult);
+          proxyService.saveTtlExecutionResult(executionResult);
         }
       }
     } catch (IOException e) {

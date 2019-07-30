@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
+import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -63,6 +64,9 @@ public class MigrateAnalysisService {
 
   @Value("${metadata.service.execution-migration-flag}")
   private boolean migrationFlag;
+
+  @Value("${metastore.analysis}")
+  private String analysisTable;
 
   @Autowired private RestUtil restUtil;
 
@@ -336,8 +340,7 @@ public class MigrateAnalysisService {
     try {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
-      Analysis analysis = new Analysis();
-      analysis.setType(analysisType);
+      Analysis analysis = getAnalysis(dslQueryId);
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);
@@ -353,8 +356,8 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in json Store.");
     } catch (Exception ex) {
-      LOGGER.error(" Stack trace : {}" , ex);
-      LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());
+      LOGGER.error(" Stack trace : {}", ex);
+      LOGGER.error("Error occurred during saving Execution Result : {}", ex.getMessage());
     }
   }
 
@@ -454,5 +457,33 @@ public class MigrateAnalysisService {
       LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
     }
     return executionIds;
+  }
+
+  /**
+   * Returns the Analysis def.
+   *
+   * @return
+   */
+  public Analysis getAnalysis(String analysisId) {
+    Document doc = null;
+    Analysis analysis;
+    ProductModuleMetaStore productModuleMetaStore = null;
+    LOGGER.debug("Reading Analysis def for id : " + analysisId);
+    LOGGER.debug("Analysis table path : " + basePath + analysisTable);
+    try {
+      productModuleMetaStore = new ProductModuleMetaStore(analysisTable, basePath);
+      doc = productModuleMetaStore.readDocumet(analysisId);
+      if (doc == null) {
+        LOGGER.error("Analysis def not present !!, id = " + analysisId);
+        return null;
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      analysis = mapper.readValue(doc.asJsonString(), Analysis.class);
+    } catch (Exception e) {
+      LOGGER.error("Exception occurred while fetching analysis", e);
+      throw new SipReadEntityException("Exception occurred while fetching analysis", e);
+    }
+    return analysis;
   }
 }

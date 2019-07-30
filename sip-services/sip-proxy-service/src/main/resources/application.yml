@@ -36,7 +36,8 @@ metastore:
     base:  hdfs:///main
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
-    timeToLive: 1800
+    ttl-for-onetime: 1800
+    analysis: analysisMetadata
 
 
 executor:

@@ -16,6 +16,7 @@ import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
 import { Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Analysis,
@@ -31,7 +32,7 @@ import {
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
-import { zip, Observable } from 'rxjs';
+import { zip, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
@@ -88,7 +89,8 @@ export class AnalyzeService {
     public _http: HttpClient,
     public _jwtService: JwtService,
     public _toastMessage: ToastService,
-    public _menu: MenuService
+    public _menu: MenuService,
+    private store: Store
   ) {
     window['analysisService'] = this;
   }
@@ -233,15 +235,19 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     let url = '';
-    if (options.analysisType !== 'report') {
-      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
-      url = `${path}`;
+    const page = floor(options.skip / options.take) + 1;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }`;
+    if (options.isDSL) {
+      url = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
-      const page = floor(options.skip / options.take) + 1;
-      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
-      const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-        options.analysisType
-      }`;
+      const path = `analysis/${analysisId}/executions/data`;
       url = `${path}?${queryParams}`;
     }
 
@@ -545,11 +551,16 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
 
+    /* Use pagination options only when executing reports */
+    const paginationParams = ['report', 'esReport'].includes(model.type)
+      ? `&page=${page}&pageSize=${options.take}`
+      : '';
+
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&executionType=${mode}&page=${page}&pageSize=${options.take}`,
+        }&executionType=${mode}${paginationParams}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
@@ -659,6 +670,10 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (metrics && metrics[semanticId] && metrics[semanticId].artifacts) {
+      return of(metrics[semanticId]);
+    }
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 

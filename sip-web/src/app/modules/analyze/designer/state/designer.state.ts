@@ -62,6 +62,7 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
+import { AnalysisDSL } from 'src/app/models';
 
 // setAutoFreeze(false);
 
@@ -107,6 +108,30 @@ export class DesignerState {
   }
 
   @Selector()
+  static canRequestData(state: DesignerStateModel): boolean {
+    const analysis: AnalysisDSL = state.analysis;
+    const sipQuery = analysis && analysis.sipQuery;
+    if (!sipQuery) {
+      return false;
+    }
+
+    /* If this is a report, and query is present, we can request data */
+    if (analysis.type === 'report' && !!sipQuery.query) {
+      return true;
+    } else {
+      /* Else, there should be at least one field selected in artifacts */
+      return (
+        (
+          fpFlatMap(
+            artifact => artifact.fields,
+            get(state, 'analysis.sipQuery.artifacts')
+          ) || []
+        ).length > 0
+      );
+    }
+
+    return false;
+  }
   static artifactFields(state: DesignerStateModel) {
     return fpFlatMap(
       artifact => artifact.fields,
