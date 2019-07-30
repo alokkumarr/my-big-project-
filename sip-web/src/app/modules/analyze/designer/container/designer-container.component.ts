@@ -868,9 +868,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
-    if (!this.isInQueryMode) {
-      this._store.dispatch(new DesignerUpdateQuery(null));
-    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -1079,7 +1076,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const removeColumnFromAtrifacts = fpPipe(
       fpFlatMap(artifact => artifact.columns),
       fpReduce((acc, column) => {
-        if (column.columnName === data.columnName && column.table === data.table) {
+        if (
+          column.columnName === data.columnName &&
+          column.table === data.table
+        ) {
           delete column.checked;
         }
       }, {})
