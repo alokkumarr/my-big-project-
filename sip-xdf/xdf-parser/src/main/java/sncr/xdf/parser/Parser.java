@@ -140,6 +140,20 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             logger.error(e.getMessage());
         }
 
+        try {
+            FileSystem fs = HFileOperations.getFileSystem();
+            FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+            if (files.length <= 0 ) {
+                logger.debug("Total number of files in the directory = " + files.length);
+                return 0;
+            }
+        }catch(Exception e)
+        {
+            logger.trace("Input source directory is empty " + e.getMessage());
+        }
+
+
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
             headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
 
