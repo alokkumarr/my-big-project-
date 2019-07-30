@@ -74,6 +74,8 @@ metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
+    ttl-for-onetime: 1800
+    analysis: analysisMetadata
 
 metadata:
   service:

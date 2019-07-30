@@ -29,7 +29,7 @@ export class ExecutedReportViewComponent {
           ))
         : (containsArtifacts = <String>dataFields[0].tableName);
 
-      //const containsArtifacts = <any>dataFields[0].tableName;
+      // const containsArtifacts = <any>dataFields[0].tableName;
       if (containsArtifacts) {
         this.artifacts = dataFields;
       } else {

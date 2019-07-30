@@ -8,16 +8,36 @@ import * as isEqual from 'lodash/isEqual';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
+import * as has from 'lodash/has';
 
 import { Subject, BehaviorSubject } from 'rxjs';
 
-import { CUSTOM_DATE_PRESET_VALUE } from '../../analyze/consts';
+import {
+  CUSTOM_DATE_PRESET_VALUE,
+  NUMBER_TYPES,
+  DATE_TYPES
+} from '../../analyze/consts';
 
 interface KPIFilter {
   preset: string;
   gte?: string;
   lte?: string;
 }
+
+export const isValidDateFilter: (Filter) => boolean = filt => {
+  return (
+    filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
+    (filt.model.lte && filt.model.gte)
+  );
+};
+
+export const isValidNumberFilter: (Filter) => boolean = filt =>
+  has(filt, 'model.value') &&
+  has(filt, 'model.otherValue') &&
+  has(filt, 'model.operator');
+
+export const isValidStringFilter: (Filter) => boolean = filt =>
+  has(filt, 'model.modelValues') && filt.model.modelValues.length > 0;
 
 @Injectable()
 export class GlobalFilterService {
@@ -143,12 +163,26 @@ export class GlobalFilterService {
 
       if (!(exists >= 0)) {
         this.rawFilters.push(f);
+        if (this.isValid(f)) {
+          this.updatedFilters.push(f);
+        }
         validFilter.push(f);
       }
     });
     if (validFilter.length) {
       this.onFilterChange.next(validFilter);
     }
+  }
+
+  isValid(filt): boolean {
+    if (NUMBER_TYPES.includes(filt.type)) {
+      return isValidNumberFilter(filt);
+    } else if (DATE_TYPES.includes(filt)) {
+      return isValidDateFilter(filt);
+    } else if (filt.type === 'string') {
+      return isValidStringFilter(filt);
+    }
+    return false;
   }
 
   removeInvalidFilters(filt: Array<any>) {

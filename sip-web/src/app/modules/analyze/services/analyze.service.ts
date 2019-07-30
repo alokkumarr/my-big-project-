@@ -16,8 +16,8 @@ import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
 import * as omit from 'lodash/omit';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Store } from '@ngxs/store';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Analysis,
   AnalysisDSL,
@@ -673,6 +673,10 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (metrics && metrics[semanticId] && metrics[semanticId].artifacts) {
+      return of(metrics[semanticId]);
+    }
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 

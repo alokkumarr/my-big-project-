@@ -1,5 +1,6 @@
 package sncr.xdf.sql.ng;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -39,8 +40,9 @@ public class NGSQLExecutor implements Serializable {
         return descriptor.SQL;
     }
 
-    public Long run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
+    public int run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
+
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
         switch (descriptor.statementType) {
@@ -50,58 +52,82 @@ public class NGSQLExecutor implements Serializable {
             case SELECT:
                 long st = System.currentTimeMillis();
                 descriptor.startTime =  st;
+                Dataset<Row> df = null;
 
-                for ( String tn: allTables.keySet()){
+                if (parent.getNgctx().inputDataSets.size() > 0) {
 
-                    TableDescriptor tb = allTables.get(tn);
-                    if (tb.isTargetTable){
-                        logger.trace("Do not load data of target table: " + tn);
-                        continue;
+                    for (String tn : allTables.keySet()) {
+
+                        TableDescriptor tb = allTables.get(tn);
+                        if (tb.isTargetTable) {
+                            logger.trace("Do not load data of target table: " + tn);
+                            continue;
+                        }
+
+                        if (!tb.asReference.contains(descriptor.index)) {
+                            logger.trace("Do not load data not needed for this statement: " + tn);
+                            continue;
+                        }
+
+                        logger.debug("Attempt to load data for table: " + tn);
+                        String location;
+
+                        if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        {
+
+                            if (allTables.get(tn) != null) {
+                                location = allTables.get(tn).getLocation();
+                            } else {
+                                logger.error("Could not get data location from table descriptor, cancel processing");
+                                return -1;
+                            }
+
+                            if (location == null || location.isEmpty()) {
+                                logger.error("Data location is Empty, cancel processing");
+                                return -1;
+                            }
+
+                                logger.debug("Load data from: " + location + ", registered table name: " + tn);
+
+                                if (jobDataFrames.get(tn) != null) {
+                                    continue;
+                                }
+
+                                //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                                Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                                    DLDataSetOperations.getPartitioningInfo(location);
+
+                                if (loc_desc == null)
+                                	return -1;
+                                   // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+
+                                logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
+                                
+                                try {
+									df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+								} catch (Exception exception) {
+									logger.error("Could not load data neither in parquet nor in JSON, cancel processing " 
+											+ exception.getMessage() );
+									return -1;
+								}
+                                
+                                if (df == null) {
+                                	logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
+                                	return -1;
+                                   //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
+                                }
+                                jobDataFrames.put(tn, df);
+                                df.createOrReplaceTempView(tn);
+
+                        }
                     }
+                }
 
-                    if (!tb.asReference.contains(descriptor.index)){
-                        logger.trace("Do not load data not needed for this statement: " + tn);
-                        continue;
-                    }
-
-                    logger.debug ("Attempt to load data for table: " + tn);
-                    String location;
-                    if (allTables.get(tn) != null){
-                        location = allTables.get(tn).getLocation();
-                    }
-                    else
-                    {
-                        logger.error("Could not get data location from table descriptor, cancel processing");
-                        return -1L;
-                    }
-
-                    if (location == null || location.isEmpty())
-                    {
-                        logger.error("Data location is Empty, cancel processing");
-                        return -1L;
-                    }
-
-                    if (jobDataFrames.get(tn) != null){
-                        continue;
-                    }
-
-                    logger.debug("Load data from: " + location  + ", registered table name: " + tn );
-
-                    //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
-                    Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
-                            DLDataSetOperations.getPartitioningInfo(location);
-
-                    if (loc_desc == null)
-                        throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
-
-                    logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
-                    Dataset<Row> df = null;
-                    df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
-                    if (df == null){
-                        throw new Exception( "Could not load data neither in parquet nor in JSON, cancel processing");
-                    }
-                    jobDataFrames.put(tn, df);
-                    df.createOrReplaceTempView(tn);
+                if (parent.getNgctx().runningPipeLine)
+                {
+                    //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
+                    df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);
+                    df.createOrReplaceTempView(parent.getNgctx().dataSetName);
                 }
 
                 long lt = System.currentTimeMillis();
@@ -119,21 +145,25 @@ public class NGSQLExecutor implements Serializable {
                 long exet  = System.currentTimeMillis();
                 descriptor.executionTime =  (int) ((exet-lt)/1000);
 
-                logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
+                logger.debug(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.transactionalLocation);
 
-                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation, "replace");
+                String loc = descriptor.transactionalLocation + Path.SEPARATOR +  descriptor.targetTableName;
 
-                long wt = System.currentTimeMillis();
-                descriptor.writeTime = (int) ((wt - exet) / 1000);
-                logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt-st)/1000, (lt-st)/1000, (exet -lt)/1000, (wt-exet)/1000));
-                return 0L;
+                if(!descriptor.isTemporaryTable) {
+                    pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
+
+                    long wt = System.currentTimeMillis();
+                    descriptor.writeTime = (int) ((wt - exet) / 1000);
+                    logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt - st) / 1000, (lt - st) / 1000, (exet - lt) / 1000, (wt - exet) / 1000));
+                }
+                return 0;
             case DROP_TABLE:
                 HFileOperations.deleteEnt(descriptor.tableDescriptor.getLocation());
                 logger.error("Removed data set: " + descriptor.SQL);
-                return 0L;
+                return 0;
             default:
         }
-        return 0L;
+        return 0;
     }
 
 }

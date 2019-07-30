@@ -25,6 +25,7 @@ import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();
+  @Output() onClearFilter = new EventEmitter();
   @Input() showKPIFilter: boolean;
   public globalFilters = [];
   public kpiFilter;
@@ -124,7 +125,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   onClearFilters() {
-    this.onApplyFilter.emit({ analysisFilters: {}, kpiFilters: {} });
+    this.onClearFilter.emit({ analysisFilters: {}, kpiFilters: {} });
     this.filters.onClearAllFilters.next(true);
   }
 }

@@ -8,6 +8,7 @@ import org.apache.spark.sql.types.StructType;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.JaninoTransform;
+import sncr.xdf.context.NGContext;
 
 import java.util.Map;
 
@@ -32,12 +33,12 @@ public class NGJaninoExecutor extends NGExecutor{
     protected JavaRDD transformation(JavaRDD dataRDD) throws Exception {
 
         JavaRDD rdd = dataRDD.map(
-                new JaninoTransform( session_ctx,
-                        script,
-                        schema,
-                        successTransformationsCount,
-                        failedTransformationsCount,
-                        threshold, odi)).cache();
+            new JaninoTransform( session_ctx,
+                script,
+                schema,
+                successTransformationsCount,
+                failedTransformationsCount,
+                threshold, odi)).cache();
         return rdd;
     }
 
@@ -52,5 +53,19 @@ public class NGJaninoExecutor extends NGExecutor{
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         createFinalDS(df.cache());
     }
+
+    public void executeSingleProcessor(NGContext ngctx) throws Exception {
+
+        Map<String, Dataset> dsMap = ngctx.datafileDFmap;
+        Dataset ds = dsMap.get(ngctx.dataSetName);
+
+        JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
+        logger.debug("Intermediate result, transformation count  = " + transformationResult.count());
+
+        // Using structAccumulator do second pass to align schema
+        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+        createFinalDS(df.cache());
+    }
+
 
 }
