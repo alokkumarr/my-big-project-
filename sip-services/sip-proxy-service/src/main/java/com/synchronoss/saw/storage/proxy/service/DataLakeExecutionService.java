@@ -24,4 +24,6 @@ public interface DataLakeExecutionService {
       Integer pageSize,
       ExecutionType executionType,
       String query);
+
+  void cleanDataLakeData();
 }
