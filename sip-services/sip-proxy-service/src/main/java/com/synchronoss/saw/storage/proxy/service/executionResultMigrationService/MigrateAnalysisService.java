@@ -258,8 +258,8 @@ public class MigrateAnalysisService {
             migrationStatusObject.setMessage("Success");
             if (saveMigrationStatus(migrationStatusObject, migrationStatusTable, basePath)) {
               LOGGER.info(
-                  "Migration result saved successfully !! : {}",
-                  migrationStatusObject.isExecutionsMigrated());
+                  "Migration result saved successfully !! : {}"
+                      , migrationStatusObject.isExecutionsMigrated());
             } else {
               LOGGER.error("Unable to write update AnalysisMigration table!!");
             }

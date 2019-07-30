@@ -81,6 +81,17 @@ export class DesignerUpdateAnalysisSubType {
   constructor(public subType: string) {}
 }
 
+export class DesignerUpdateQuery {
+  static readonly type = '[Designer] Update query string';
+  constructor(public query: string) {}
+}
+
+export class DesignerUpdateEditMode {
+  static readonly type =
+    '[Designer] Update designer mode between query/designer mode';
+  constructor(public designerEdit: boolean) {}
+}
+
 export class DesignerUpdateSorts {
   /* Use for only new DSL analyses */
   static readonly type = '[Designer] Update sorts for analysis';
@@ -180,5 +191,20 @@ export class DesignerMergeSupportsIntoAnalysis {
 export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
   constructor() {}
+}
+
+export class DesignerJoinsArray {
+  static readonly type = '[Designer] joins from analysis';
+  constructor(public joins: any) {}
+}
+
+export class ConstructDesignerJoins {
+  static readonly type = '[Designer] construct desinger joins';
+  constructor(public analysis: any) {}
+}
+
+export class DesignerUpdateAggregateInSorts {
+  static readonly type = '[Designer] update aggregate in sorts on change of aggregagte';
+  constructor(public column: any) {}
 }
 

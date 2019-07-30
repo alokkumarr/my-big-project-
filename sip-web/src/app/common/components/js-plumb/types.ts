@@ -25,6 +25,11 @@ export interface ConnectionPayload {
   join: Join;
 }
 
+export interface JoinEventData {
+  subject: 'joins';
+  data: Join[];
+}
+
 export interface JsPlumbCanvasChangeEvent {
   subject: 'joins' | 'artifactPosition' | 'column' | 'aggregate';
   column?: ArtifactColumnReport;

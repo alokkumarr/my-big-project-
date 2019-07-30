@@ -517,6 +517,7 @@ export class AnalyzeService {
   }
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
+    model.sipQuery.semanticId = model.semanticId;
     return <Observable<AnalysisDSL>>(
       this._http
         .put(
@@ -718,7 +719,6 @@ export class AnalyzeService {
           model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
           model.sipQuery.store.storageType = repo.storageType;
         }
-
         return <Observable<AnalysisDSL>>(
           this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
             first(),
@@ -751,7 +751,8 @@ export class AnalyzeService {
         store: {
           dataStore: null, // This is filled up when creating analysis
           storageType: null
-        }
+        },
+        semanticId: ''
       }
     };
   }

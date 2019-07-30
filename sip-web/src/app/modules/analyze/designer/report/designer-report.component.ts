@@ -27,7 +27,7 @@ export class DesignerReportComponent {
   constructor(public store: Store) {}
 
   get analysisArtifacts() {
-    return this.analysis.edit
+    return this.analysis.designerEdit
       ? null
       : this.hasSIPQuery
       ? this.store.selectSnapshot(

@@ -479,6 +479,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        this.executedAnalysis.artifacts = this.metric.artifacts;
         executeResponse.data = clone(
           flattenReportData(
             executeResponse.data,
@@ -614,7 +615,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          if (isDSLAnalysis(this.executedAnalysis)) {
+          if (this.executedAnalysis.type !== 'report') {
             this.executedAnalysis = {
               ...queryBuilder,
               sipQuery: this._analyzeService.copyGeoTypeFromMetric(
@@ -631,7 +632,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
-          data = clone(flattenReportData(data, this.analysis));
+          const requestAnalysis = {...this.analysis, artifacts: get(this.analysis, 'sipQuery.artifacts')};
+          data = clone(flattenReportData(data, requestAnalysis));
         }
 
         this.setExecutedBy(executedBy);
