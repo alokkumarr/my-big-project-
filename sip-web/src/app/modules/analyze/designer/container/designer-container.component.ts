@@ -882,9 +882,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
-    if (!this.isInQueryMode) {
-      this._store.dispatch(new DesignerUpdateQuery(null));
-    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -1036,10 +1033,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'changeQuery':
-      // console.log(event);
-      // if (typeof event.data.query !== 'string') {
-      //   break;
-      // }
+      if (typeof event.data.query !== 'string') {
+        break;
+      }
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this._store.dispatch(new DesignerUpdateQuery(event.data.query));
@@ -1081,7 +1077,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     fpPipe(
       fpFlatMap(artifact => artifact.columns),
       fpReduce((acc, column) => {
-        if (column.columnName === data.columnName && column.table === data.table) {
+        if (
+          column.columnName === data.columnName &&
+          column.table === data.table
+        ) {
           delete column.checked;
         }
       }, {})

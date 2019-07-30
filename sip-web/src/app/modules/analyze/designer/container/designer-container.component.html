@@ -1,6 +1,6 @@
 <designer-header
   class="designer__header"
-  [analysis]="analysis"
+  [analysis]="dslAnalysis$ | async"
   [areMinRequirmentsMet]="areMinRequirmentsMet"
   [isInDraftMode]="isInDraftMode"
   [designerState]="designerState"
