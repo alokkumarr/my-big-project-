@@ -24,4 +24,5 @@ CMD="exec java $JAVA_OPTS -Dconfig=$conf_dir -Dlogger.file=$conf_dir/logback.xml
      -cp $lib_classpath com.synchronoss.saw.executor.DlExecutor"
 
 $CMD
-RETVAL=$?
+
+exit
