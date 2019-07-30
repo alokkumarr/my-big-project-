@@ -832,7 +832,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       executionResponse = new ExecutionResponse();
       excuteResp =
           dataLakeExecutionService.getDataLakeExecutionData(
-              executionId, pageNo, pageSize, executionType);
+              executionId, pageNo, pageSize, executionType,null);
     } else {
       executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
       /*here for schedule and publish we are reading data from the same location in DL, so directly
@@ -840,7 +840,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       schedule as well as */
       excuteResp =
           dataLakeExecutionService.getDataLakeExecutionData(
-              executionId, pageNo, pageSize, ExecutionType.publish);
+              executionId, pageNo, pageSize, ExecutionType.publish,null);
     }
     executionResponse.setData(excuteResp.getData());
     executionResponse.setTotalRows(excuteResp.getTotalRows());
@@ -856,7 +856,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (result != null) {
       ExecuteAnalysisResponse executionData =
           dataLakeExecutionService.getDataLakeExecutionData(
-              result.getExecutionId(), pageNo, pageSize, result.getExecutionType());
+              result.getExecutionId(), pageNo, pageSize, result.getExecutionType(),null);
       executionResponse.setData(executionData.getData());
       executionResponse.setTotalRows(executionData.getTotalRows());
       executionResponse.setAnalysis(result.getAnalysis());
