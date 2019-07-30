@@ -21,6 +21,7 @@ export class MultiTableDesignerLayoutComponent {
   @Input() artifacts: Artifact[];
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
+  @Input() analysis: Analysis;
   @Input() isInQueryMode: boolean;
   @Input() sqlBuilder: QueryDSL | SqlBuilder;
   @Input() designerState: DesignerStates;
@@ -34,7 +35,6 @@ export class MultiTableDesignerLayoutComponent {
   }
   public data;
   public isGridPanelExpanded = false;
-  public analysis: Analysis;
 
   constructor(
   ) {}
