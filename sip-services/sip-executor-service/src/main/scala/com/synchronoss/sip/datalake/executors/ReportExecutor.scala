@@ -5,9 +5,9 @@ import info.faljse.SDNotify.SDNotify
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
- * Report executor for executing queries based on
- * requests received from MapR Streams queue
- */
+  * Report executor for executing queries based on
+  * requests received from MapR Streams queue
+  */
 class ReportExecutor {
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutor].getName)
 
@@ -28,7 +28,6 @@ class ReportExecutor {
   }
 
   private def runExecutor(executorType: String) {
-    SDNotify.sendNotify()
     /* For executor of type fast, preload the Spark context in an attempt
      * to provide faster responses */
     if (executorType.equals("fast")) {
@@ -37,11 +36,14 @@ class ReportExecutor {
 
     try {
       val queue = new ReportExecutorQueue(executorType)
+      SDNotify.sendNotify()
       /* Process one message and let the executor exit so that the system
        * service restarts it to create a fresh new instance to process
        * the next message */
-      (1 to DLConfiguration.executorRestartThreshold).foreach(_ => {queue.receive
-        log.info("Finished")})
+      (1 to DLConfiguration.executorRestartThreshold).foreach(_ => {
+        queue.receive
+        log.info("Finished")
+      })
     } catch {
       case e: Exception => log.error("Exception", e)
     }
