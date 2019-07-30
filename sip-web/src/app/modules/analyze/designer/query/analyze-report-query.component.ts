@@ -127,7 +127,6 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   }
 
   queryUpdated(query) {
-    console.log(query);
     this.queryChange.emit(query);
   }
 }

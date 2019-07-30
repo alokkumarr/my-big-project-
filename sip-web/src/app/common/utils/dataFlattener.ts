@@ -202,7 +202,7 @@ export function checkNullinReportData(data) {
 }
 
 export function flattenReportData(data, analysis) {
-  if (analysis.edit) {
+  if (analysis.designerEdit) {
     return data;
   }
   const columnMap = fpPipe(
