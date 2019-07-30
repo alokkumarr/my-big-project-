@@ -38,7 +38,7 @@ metastore:
     migration: analysisMigration
     ttl-for-onetime: 1800
     analysis: analysisMetadata
-
+    execution-result-limit: 5
 
 executor:
   streamPath: /var/sip/services/transport/executor
@@ -47,7 +47,6 @@ executor:
   publish-schedule-output-location: /var/sip/services/transport/executor
   preview-rows-limit: 10000
   publish-rows-limit: 100000
-
 
 connector : http
 
@@ -60,18 +59,3 @@ metadata:
 sip:
   ssl:
     enable: false
-
-
-{% if sip_secure %}
-  ssl:
-    enable : true
-  trust:
-    store: /Users/spau0004/Desktop/keystore/truststore.jks
-    password: sip@123
-  key:
-    store: /Users/spau0004/Desktop/keystore/keystore.jks
-     password: sip@123
-{% else %}
-  ssl:
-    enable: false
-{% endif %}

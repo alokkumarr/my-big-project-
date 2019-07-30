@@ -19,5 +19,11 @@ public interface DataLakeExecutionService {
       throws Exception;
 
   ExecuteAnalysisResponse getDataLakeExecutionData(
-      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
+      String executionId,
+      Integer pageNo,
+      Integer pageSize,
+      ExecutionType executionType,
+      String query);
+
+  void cleanDataLakeData();
 }

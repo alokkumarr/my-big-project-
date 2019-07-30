@@ -2,6 +2,7 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import com.google.gson.JsonElement;
 import com.mapr.db.MapRDB;
+import java.util.List;
 import java.util.Map;
 
 import com.mapr.db.Table;
@@ -38,5 +39,10 @@ public class ExecutionResultStore extends MetadataStore
     logger.debug("Final document to be saved: " + doc.toString());
     table.insert(doc);
     table.flush();
+  }
+
+  public boolean bulkDelete(Table table, List<String> listId) {
+    listId.forEach(id -> table.delete(id));
+    return true;
   }
 }

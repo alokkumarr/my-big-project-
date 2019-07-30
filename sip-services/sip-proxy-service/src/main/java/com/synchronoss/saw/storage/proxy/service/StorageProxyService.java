@@ -30,7 +30,6 @@ public interface StorageProxyService {
   ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize);
 
-
   ExecutionResponse fetchDataLakeExecutionData(
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType);
 

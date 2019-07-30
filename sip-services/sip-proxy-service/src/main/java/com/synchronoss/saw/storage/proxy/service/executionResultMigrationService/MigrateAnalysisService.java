@@ -3,8 +3,9 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,19 +18,29 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.saw.storage.proxy.service.productSpecificModuleService.ProductModuleMetaStore;
+import com.synchronoss.saw.util.HBaseUtils;
 import com.synchronoss.saw.util.SipMetadataUtils;
-import com.synchronoss.sip.utils.RestUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
+
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FilterList.Operator;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
+import org.apache.hadoop.hbase.filter.ValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -37,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Alok.KumarR
@@ -68,9 +78,7 @@ public class MigrateAnalysisService {
   @Value("${metastore.analysis}")
   private String analysisTable;
 
-  @Autowired private RestUtil restUtil;
-
-  @Autowired private HBaseUtil hBaseUtil;
+  private HBaseUtils hBaseUtil;
 
   @Autowired private StorageProxyService proxyService;
 
@@ -101,13 +109,14 @@ public class MigrateAnalysisService {
     if (analysisIds != null && !analysisIds.isEmpty()) {
       try {
         // base check - open Hbase connection
+        hBaseUtil = new HBaseUtils();
         Connection connection = hBaseUtil.getConnection();
         for (Map.Entry<String, Boolean> entry : analysisIds.entrySet()) {
           Boolean flag = entry.getValue();
           String analysisId = entry.getKey();
           if (analysisId != null && !flag) {
             LOGGER.debug("Fetch execution Ids for migration.!");
-            Set<String> executionIds = getExecutionIds(analysisId);
+            Set<String> executionIds = getAllExecutions(analysisId, connection);
             LOGGER.debug("Total count of execution Ids : {}", executionIds.size());
             if (!executionIds.isEmpty()) {
               readExecutionResultFromBinaryStore(executionIds, analysisId, connection);
@@ -225,8 +234,7 @@ public class MigrateAnalysisService {
                 JsonNode jsonNode = objectMapper.readTree(new String(contentObject));
                 queryNode =
                     jsonNode != null && !jsonNode.isNull() ? jsonNode.get("queryBuilder") : null;
-                LOGGER.debug(
-                    "Query Node which need to parsed for pivot/chart : {}", queryNode);
+                LOGGER.debug("Query Node which need to parsed for pivot/chart : {}", queryNode);
               }
             }
 
@@ -356,8 +364,8 @@ public class MigrateAnalysisService {
       proxyService.saveDslExecutionResult(executionResult);
       LOGGER.info("Execution Result Stored successfully in json Store.");
     } catch (Exception ex) {
-      LOGGER.error(" Stack trace : {}", ex);
-      LOGGER.error("Error occurred during saving Execution Result : {}", ex.getMessage());
+      LOGGER.error(" Stack trace : {}" , ex);
+      LOGGER.error("Error occurred during saving Execution Result : {}" , ex.getMessage());
     }
   }
 
@@ -434,29 +442,35 @@ public class MigrateAnalysisService {
     return status;
   }
 
-  /**
-   * Returns all executions for the analysis Id
-   *
-   * @param analysisId
-   * @return
-   */
-  private Set<String> getExecutionIds(String analysisId) {
-    RestTemplate restTemplate = restUtil.restTemplate();
-    Set<String> executionIds = new HashSet<>();
-    String url = proxyAnalysisUrl + "/{analysisId}/executions";
+  public Set<String> getAllExecutions(String analysisId, Connection connection) {
+    HBaseUtils utils = new HBaseUtils();
+    List<String> executionIds = new ArrayList<>();
+    try {
+      Table table = utils.getTable(connection, basePath + binaryTablePath);
 
-    String executionResult = restTemplate.getForObject(url, String.class, analysisId);
-    Gson gson = new Gson();
-    JsonObject executions = gson.fromJson(executionResult, JsonObject.class);
-    if (executions != null && !executions.isJsonNull()) {
-      JsonArray executionList = executions.getAsJsonArray("executions");
-      if (executionList != null) {
-        executionList.forEach(
-            (JsonObject -> executionIds.add(JsonObject.getAsJsonObject().get("id").getAsString())));
+      // Instantiating the Scan class
+      Scan scan = new Scan();
+      scan.addColumn(Bytes.toBytes("_search"), Bytes.toBytes("analysisId"));
+      scan.setMaxResultsPerColumnFamily(1);
+      Filter filter = new ValueFilter(CompareOp.EQUAL, new SubstringComparator(analysisId));
+      FilterList list = new FilterList(Operator.MUST_PASS_ONE, filter);
+      scan.setFilter(list);
+
+      ResultScanner results = table.getScanner(scan);
+
+      for (Result result : results) {
+        byte[] id = result.getRow();
+        LOGGER.debug("Execution id for analysis (" + analysisId + ") = " + Bytes.toString(id));
+        executionIds.add(Bytes.toString(id));
       }
-      LOGGER.info("Number of execution for analysis Id : {}", executionIds.size());
+      LOGGER.info("List of executions for analysis id : " + analysisId + " = " + executionIds);
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage());
     }
-    return executionIds;
+    executionIds = Lists.reverse(executionIds);
+    executionIds = executionIds.stream().limit(5).collect(Collectors.toList());
+    Set<String> set = ImmutableSet.copyOf(executionIds);
+    return set;
   }
 
   /**
@@ -465,7 +479,7 @@ public class MigrateAnalysisService {
    * @return
    */
   public Analysis getAnalysis(String analysisId) {
-    Document doc = null;
+    Document doc;
     Analysis analysis;
     ProductModuleMetaStore productModuleMetaStore = null;
     LOGGER.debug("Reading Analysis def for id : " + analysisId);
