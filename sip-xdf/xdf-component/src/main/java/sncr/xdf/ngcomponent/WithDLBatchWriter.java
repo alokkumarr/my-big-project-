@@ -45,7 +45,6 @@ public interface WithDLBatchWriter {
                 WithDLBatchWriterHelper.logger.warn("Final file collection is Empty, nothing to move.");
                 return 0;
             }
-
             //TODO:: Open JIRA ticket to prepare rollback artifacts.
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
@@ -63,7 +62,7 @@ public interface WithDLBatchWriter {
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
                     WithDLBatchWriterHelper.logger.debug("Clean up sample for " + moveTask.objectName);
-                    if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
+                    if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName,ngctx) < 0) return -1;
 
                     WithDLBatchWriterHelper.logger.debug("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
@@ -72,27 +71,29 @@ public interface WithDLBatchWriter {
                 else{
                     WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
-
+                
+                WithDLBatchWriterHelper.logger.debug("#############Creating destination if doesnt exists :: ###3 "+ moveTask.dest);
                 helper.createDestDir(moveTask.dest, moveTask.source);
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
-
+                	WithDLBatchWriterHelper.logger.debug("### no partitions exists size 0");
                     //Remove existing data if they are presented
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
-                        if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
+                    	WithDLBatchWriterHelper.logger.debug("### Repace mode clean up existing data if any ######");
+                        if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName, ngctx) < 0) return -1;
                     }
                     WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
                 }
                 else // else - move partitions result
                 {
-
+                	WithDLBatchWriterHelper.logger.debug("### partions exist and size greater than zero");
                     Set<String> partitions = new HashSet<>();
                     Path lp = new Path(moveTask.source);
 
                     String m = "/"; for (String s : moveTask.partitionList) m += s + "*/"; m += "*/";
-                    WithDLBatchWriterHelper.logger.trace("Glob depth: " + m);
+                    WithDLBatchWriterHelper.logger.debug("Glob depth: " + m);
 
 
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
@@ -313,7 +314,8 @@ public interface WithDLBatchWriter {
         }
 
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
-
+        	
+        	logger.debug("#### Move files starting. format ::"+ format );
             //If output files are PARQUET files - clean up temp. directory - remove
             // _metadata and _common_? files.
             if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_PARQUET)) {
@@ -327,6 +329,8 @@ public interface WithDLBatchWriter {
             FileStatus[] files = fs.listStatus(new Path(source));
 
             WithDLBatchWriterHelper.logger.warn("Prepare the list of the files, number of files: " + files.length);
+            
+            logger.debug("######## Existing files count at destination before moving ##############"+dest + "    ####"+  fs.listStatus(new Path(dest)).length);
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
@@ -343,7 +347,10 @@ public interface WithDLBatchWriter {
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
+                    
+                    logger.debug("@@@@@@@@@@Renaming source::"+ src + " to destination  starting:::"+dst + " @@@@@@@@@@@@@@@@@");
                     fc.rename(src, dst, opt);
+                    logger.debug("@@@@@@@@@@Renaming source::"+ src + " to destinationc ompleted  :::"+dst + " @@@@@@@@@@@@@@@@@");
                 }
                 ctx.globalFileCount++;
             }
@@ -354,22 +361,27 @@ public interface WithDLBatchWriter {
             logger.warn("Data Objects were successfully moved from " + source + " into " + dest);
         }
 
-        public int createOrCleanUpDestDir(String dest, String objectName) {
+        public int createOrCleanUpDestDir(String dest, String objectName, NGContext ngctx) {
             Path objOutputPath = new Path(dest);
             try {
                 if (fs.exists(objOutputPath)) {
 
                     FileStatus[] list = fs.listStatus(objOutputPath);
                     for (int i = 0; i < list.length; i++) {
-                        fs.delete(list[i].getPath(), true);
+                    	
+                    	logger.debug("@@@@@@@@@@@ Deleting path"+ list[i].getPath() + "  as part of cleanup  @@@@@@@@@@@@@@@@@");
+                    	if(!list[i].getPath().getName().contains(ngctx.batchID + "." + ngctx.startTs + ".")) {
+                    		fs.delete(list[i].getPath(), true);
+                    	}
+                        
                     }
 
                 } else {
-                    logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
+                    logger.debug("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
                     fs.mkdirs(objOutputPath);
                 }
             } catch (IOException e) {
-                logger.warn("IO exception in attempt to create/clean up: destination directory", e);
+                logger.error("IO exception in attempt to create/clean up: destination directory", e);
                 return -1;
             }
             return 0;
@@ -379,9 +391,9 @@ public interface WithDLBatchWriter {
             Path objOutputPath = new Path(dest);
             try {
                 if (fs.exists(objOutputPath)) {
-
+                	logger.debug("Output directory already exists. Use existing and not creating new" );
                 } else {
-                    logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
+                    logger.debug("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
                     fs.mkdirs(objOutputPath);
                 }
             } catch (IOException e) {
