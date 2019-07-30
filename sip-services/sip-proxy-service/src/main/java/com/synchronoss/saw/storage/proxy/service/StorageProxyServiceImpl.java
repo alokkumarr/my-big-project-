@@ -70,7 +70,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private String basePath;
 
-  @Value("${metastore.time-to-live}")
+  @Value("${metastore.ttl-for-onetime}")
   private long timeToLive;
 
   @Value("${metastore.execution-result-limit}")
