@@ -209,13 +209,14 @@ export function flattenReportData(data, analysis) {
     fpFlatMap(artifact => artifact.columns || artifact.fields),
     fpReduce((accumulator, column) => {
       const { columnName, aggregate } = column;
-      const key = `${columnName}-${aggregate}`;
+      const key = `${columnName}-${isUndefined(aggregate) ? '' : aggregate.toLowerCase()}`;
       accumulator[key] = column;
       return accumulator;
     }, {})
   )(analysis.artifacts);
+
   data = checkNullinReportData(data);
-  return data.map(row => {
+  const sample = data.map(row => {
     return mapKeys(row, (value, key) => {
       /* If the column has aggregation, preserve the aggregate name when removing keyword */
       const hasAggregateFunction = key.includes('(') && key.includes(')');
@@ -225,16 +226,15 @@ export function flattenReportData(data, analysis) {
       }
 
       const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
-
-      const columnMapKey = `${columnName.split(')')[0]}-${aggregate}`;
+      const columnMapKey = `${columnName.split(')')[0]}-${aggregate.toLowerCase()}`;
       const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
-
       if (isInArtifactColumn) {
         return removeKeyword(columnName.split(')')[0]);
       }
       return removeKeyword(key);
     });
   });
+  return sample;
 }
 
 function removeKeyword(key: string) {

@@ -203,3 +203,8 @@ export class ConstructDesignerJoins {
   constructor(public analysis: any) {}
 }
 
+export class DesignerUpdateAggregateInSorts {
+  static readonly type = '[Designer] update aggregate in sorts on change of aggregagte';
+  constructor(public column: any) {}
+}
+

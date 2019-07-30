@@ -52,7 +52,8 @@ import {
   DesignerUpdateEditMode,
   DesignerUpdateQuery,
   DesignerJoinsArray,
-  ConstructDesignerJoins
+  ConstructDesignerJoins,
+  DesignerUpdateAggregateInSorts
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -847,6 +848,25 @@ export class DesignerState {
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, joins: analysisJoins } }
+    });
+  }
+
+
+  @Action(DesignerUpdateAggregateInSorts)
+  updateAggregateInSorts(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { column }: DesignerUpdateAggregateInSorts
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    if (isEmpty(analysis.sipQuery.sorts)) {
+      return;
+    }
+    sipQuery.sorts.forEach(sort => {
+      sort.aggregate = column.aggregate;
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
 }

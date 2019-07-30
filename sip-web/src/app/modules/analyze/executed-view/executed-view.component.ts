@@ -614,7 +614,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          if (isDSLAnalysis(this.executedAnalysis)) {
+          if (this.executedAnalysis.type !== 'report') {
             this.executedAnalysis = {
               ...queryBuilder,
               sipQuery: this._analyzeService.copyGeoTypeFromMetric(

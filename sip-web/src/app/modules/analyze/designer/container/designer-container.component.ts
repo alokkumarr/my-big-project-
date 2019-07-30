@@ -94,7 +94,8 @@ import {
   DesignerUpdateEditMode,
   DesignerUpdateQuery,
   DesignerJoinsArray,
-  ConstructDesignerJoins
+  ConstructDesignerJoins,
+  DesignerUpdateAggregateInSorts
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
@@ -313,10 +314,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.dispatch(new DesignerUpdateEditMode(false));
         }
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+        // Forking an analysis and without saving it and trying to create a new one copies the artifcats
+        // properties of the forked one to the new one. hence the below change.
+        this.resetArtifacts();
         this.initAuxSettings();
         unset(this.analysis, 'categoryId');
       }
     );
+  }
+
+  resetArtifacts() {
+    fpPipe(
+      fpFlatMap(artifact => artifact.columns || artifact.fields),
+      fpReduce((accumulator, column) => {
+        delete column.checked;
+        return accumulator;
+      }, {})
+    )(this.artifacts);
   }
 
   generateDSLDateFilters(filters) {
@@ -946,17 +960,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  checkifSortsApplied(event) {
-    const query = isDSLAnalysis(this.analysis)
-      ? this.analysis.sipQuery
-      : this.analysis.sqlBuilder;
-    forEach(query.sorts, field => {
-      if (event.column.columnName === field.columnName) {
-        field.aggregate = event.column.aggregate;
-      }
-    });
-  }
-
   onSettingsChange(event: DesignerChangeEvent) {
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -995,7 +998,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      console.log(this.artifacts);
       this.artifacts = this.removeColumn(event.column);
       this.loadGridWithoutData(event.column, 'remove');
       break;
@@ -1020,10 +1022,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       }
       this.data = cloneDeep(this.data);
-
       // Need this fucntion to check if aggregation is applied for the same sorted column.
       // Need to remove this function once backend moves all logic of aggrregation to datafields.
-      this.checkifSortsApplied(event);
+      this._store.dispatch(new DesignerUpdateAggregateInSorts(event.column));
 
       this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -1077,7 +1078,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   removeColumn(data) {
-    const removeColumnFromAtrifacts = fpPipe(
+    fpPipe(
       fpFlatMap(artifact => artifact.columns),
       fpReduce((acc, column) => {
         if (column.columnName === data.columnName && column.table === data.table) {
@@ -1085,7 +1086,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
       }, {})
     )(this.artifacts);
-    console.log(removeColumnFromAtrifacts);
     return this.artifacts;
   }
 
