@@ -294,7 +294,7 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     if (sortObject.has(FieldNames.TABLE_NAME)) {
       String tableName = sortObject.get(FieldNames.TABLE_NAME).getAsString();
 
-      sort.setArtifacts(tableName);
+      sort.setArtifactsName(tableName);
     }
 
     return sort;

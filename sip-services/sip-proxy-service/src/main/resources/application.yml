@@ -38,7 +38,6 @@ metastore:
     migration: analysisMigration
     timeToLive: 1800
 
-
 executor:
   streamPath: /var/sip/services/transport/executor
   wait-time: 120
@@ -47,8 +46,15 @@ executor:
   preview-rows-limit: 10000
   publish-rows-limit: 100000
 
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
 
 connector : http
+
+{% endif %}
 
 metadata:
   service:
@@ -57,19 +63,16 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-  ssl:
-    enable: false
-
-
 {% if sip_secure %}
   ssl:
     enable : true
   trust:
-    store: /Users/spau0004/Desktop/keystore/truststore.jks
-    password: sip@123
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
   key:
-    store: /Users/spau0004/Desktop/keystore/keystore.jks
-     password: sip@123
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+
 {% else %}
   ssl:
     enable: false
