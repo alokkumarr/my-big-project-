@@ -1,6 +1,7 @@
 package com.synchronoss.sip.datalake.executors
 
 import com.synchronoss.sip.datalake.DLConfiguration
+import info.faljse.SDNotify.SDNotify
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
@@ -27,6 +28,7 @@ class ReportExecutor {
   }
 
   private def runExecutor(executorType: String) {
+    SDNotify.sendNotify()
     /* For executor of type fast, preload the Spark context in an attempt
      * to provide faster responses */
     if (executorType.equals("fast")) {
