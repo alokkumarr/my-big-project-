@@ -45,6 +45,7 @@ export interface QueryDSL {
   sorts: Sort[];
   orderByColumns?: Sort[]; // this is legacy field. Should be removed after migration
   store: StorageDSL;
+  semanticId: string;
 }
 
 // All fields marked todo have not yet been implemented in

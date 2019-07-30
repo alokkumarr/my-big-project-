@@ -479,6 +479,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        this.executedAnalysis.artifacts = this.metric.artifacts;
         executeResponse.data = clone(
           flattenReportData(
             executeResponse.data,

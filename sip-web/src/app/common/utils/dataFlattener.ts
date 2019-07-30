@@ -216,7 +216,7 @@ export function flattenReportData(data, analysis) {
   )(analysis.artifacts);
 
   data = checkNullinReportData(data);
-  const sample = data.map(row => {
+  return data.map(row => {
     return mapKeys(row, (value, key) => {
       /* If the column has aggregation, preserve the aggregate name when removing keyword */
       const hasAggregateFunction = key.includes('(') && key.includes(')');
@@ -234,7 +234,6 @@ export function flattenReportData(data, analysis) {
       return removeKeyword(key);
     });
   });
-  return sample;
 }
 
 function removeKeyword(key: string) {
