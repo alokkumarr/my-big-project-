@@ -37,6 +37,8 @@ public interface WithDLBatchWriter {
     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
+    	
+    	WithDLBatchWriterHelper.logger.debug("########Starting move data ##########");
 
         try {
 
@@ -132,14 +134,19 @@ public interface WithDLBatchWriter {
                     // Process partition locations - relative paths
                     for(String e : partitions) {
                     	 
-                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);
+                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);;
+                        WithDLBatchWriterHelper.logger.debug("#### Successfully copied files from temp to output ###"+ copiedFiles);
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
+                    
+                    WithDLBatchWriterHelper.logger.debug("Deleting source :: "+ moveTask.source );
                     //Delete temporary data object directory
-                    HFileOperations.fs.delete(new Path(moveTask.source ), true);
+                   // HFileOperations.fs.delete(new Path(moveTask.source ), true);
                 }
             } //<-- for
+            
+            WithDLBatchWriterHelper.logger.debug("########Completed move data ##########");
             return 0;
         }
         catch(IOException e){
@@ -176,8 +183,22 @@ public interface WithDLBatchWriter {
             // If we have to replace partition - just remove directory
             // Will do nothing if directory doesn't exists
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
-                if(HFileOperations.fs.exists(dest))
+            	
+            	logger.debug("s1:: "+ partitionKey.substring(1) );
+            	logger.debug("s2:: "+ dest.getName() );
+            	logger.debug("##########is parititon key exists in desitnation path ??????  ######");
+            	
+            	Boolean isSame = dest.getName().trim().equals(partitionKey.substring(1).trim());
+            	
+            	/**
+            	 * Delete only if it is not part of current partition. 
+            	 * Multiple files partition use case
+            	 */
+                if(HFileOperations.fs.exists(dest) && !isSame) {
+                	logger.debug("###########  Deleting file/folder @@@@@"+ dest);
                     HFileOperations.fs.delete(dest, true);
+                }
+                	
             }
 
             // Check if destination folder exists
@@ -343,7 +364,7 @@ public interface WithDLBatchWriter {
                         "." + format;
 
                     Path fdest = new Path(destFileName);
-                    WithDLBatchWriterHelper.logger.warn(String.format("move from: %s to %s", srcFileName, fdest.toString()));
+                    WithDLBatchWriterHelper.logger.debug(String.format("move from: %s to %s", srcFileName, fdest.toString()));
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
