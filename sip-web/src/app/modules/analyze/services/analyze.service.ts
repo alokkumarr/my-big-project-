@@ -293,8 +293,12 @@ export class AnalyzeService {
 
     let url = '';
     if (options.isDSL) {
-      const path = `internal/proxy/storage/${executionId}/executions/data`;
-      url = `${path}${queryParams}`;
+      url = `internal/proxy/storage/${executionId}/executions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
       url = `${path}${queryParams}`;
