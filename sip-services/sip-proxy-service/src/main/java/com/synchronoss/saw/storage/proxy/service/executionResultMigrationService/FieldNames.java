@@ -17,6 +17,7 @@ public class FieldNames {
   public static final String AREA = "area";
   public static final String DATE_INTERVAL = "dateInterval";
   public static final String COMBO_TYPE = "comboType";
+  public static final String VISIBLE_INDEX = "visibleIndex";
 
   public static final String OPERATOR = "operator";
   public static final String PRECISION = "precision";

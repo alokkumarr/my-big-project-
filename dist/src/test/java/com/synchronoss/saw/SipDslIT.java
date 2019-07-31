@@ -22,6 +22,8 @@ public class SipDslIT extends BaseIT {
   String analysisId = "f37cde24-b833-46ba-ae2d-42e286c3fc39";
   protected JsonObject testData = null;
   protected JsonObject sipQuery = null;
+  protected JsonObject testDataForDl = null;
+  protected JsonObject sipQueryDl = null;
 
   @Before
   public void setUpData() {
@@ -185,6 +187,143 @@ public class SipDslIT extends BaseIT {
     testData.add("sipQuery", sipQuery);
   }
 
+  @Before
+  public void setUpDataForDl() {
+    testDataForDl = new JsonObject();
+    testDataForDl.addProperty("type", "report");
+    testDataForDl.addProperty("semanticId", "workbench::sample-spark");
+    testDataForDl.addProperty("metricName", "sample-spark");
+    testDataForDl.addProperty("id", analysisId);
+    testDataForDl.addProperty("customerCode", "SYNCHRONOSS");
+    testDataForDl.addProperty("projectCode", "sip-sample");
+    testDataForDl.addProperty("module", "productSpecific/ANALYZE");
+    testDataForDl.addProperty("createdTime", 1543921879);
+    testDataForDl.addProperty("createdBy", "sipadmin@synchronoss.com");
+    testDataForDl.addProperty("modifiedTime", 1543921879);
+    testDataForDl.addProperty("modifiedBy", "sipadmin@synchronoss.com");
+    testDataForDl.addProperty("category", "5");
+    testDataForDl.addProperty("userId", 1);
+    testDataForDl.addProperty("designerEdit", false);
+    JsonObject artifact1 = new JsonObject();
+    artifact1.addProperty("artifactsName", "SALES");
+    sipQueryDl = new JsonObject();
+    JsonObject field1 = new JsonObject();
+    field1.addProperty("dataField", "string");
+    field1.addProperty("alias", "String");
+    field1.addProperty("columnName", "string.keyword");
+    field1.addProperty("displayName", "String");
+    field1.addProperty("type", "string");
+    JsonArray artifactFields = new JsonArray();
+    artifactFields.add(field1);
+    JsonObject field2 = new JsonObject();
+    field2.addProperty("dataField", "long");
+    field2.addProperty("columnName", "long");
+    field2.addProperty("displayName", "long");
+    field2.addProperty("type", "long");
+    artifactFields.add(field2);
+    JsonObject field3 = new JsonObject();
+    field3.addProperty("dataField", "float");
+    field3.addProperty("columnName", "float");
+    field3.addProperty("displayName", "Float");
+    field3.addProperty("type", "float");
+    artifactFields.add(field3);
+    JsonObject field4 = new JsonObject();
+    field4.addProperty("dataField", "date");
+    field4.addProperty("columnName", "date");
+    field4.addProperty("displayName", "Date");
+    field4.addProperty("type", "date");
+    artifactFields.add(field4);
+    JsonObject field5 = new JsonObject();
+    field5.addProperty("dataField", "double");
+    field5.addProperty("columnName", "double");
+    field5.addProperty("displayName", "Double");
+    field5.addProperty("type", "double");
+    artifactFields.add(field5);
+    artifact1.add("fields", artifactFields);
+    JsonArray artifacts = new JsonArray();
+    artifacts.add(artifact1);
+    JsonObject artifact2 = new JsonObject();
+    artifact2.addProperty("artifactsName", "PRODUCT");
+    JsonObject field6 = new JsonObject();
+    field6.addProperty("dataField", "string_2");
+    field6.addProperty("columnName", "string_2");
+    field6.addProperty("displayName", "string_2");
+    field6.addProperty("type", "string");
+    JsonArray artifactFields2 = new JsonArray();
+    artifactFields2.add(field6);
+    JsonObject field7 = new JsonObject();
+    field7.addProperty("dataField", "long_2");
+    field7.addProperty("columnName", "long_2");
+    field7.addProperty("displayName", "long_2");
+    field7.addProperty("type", "long");
+    artifactFields2.add(field7);
+    artifact2.add("fields", artifactFields2);
+    artifacts.add(artifact2);
+
+    sipQueryDl.add("artifacts", artifacts);
+    sipQueryDl.addProperty("booleanCriteria", "AND");
+
+    JsonObject filter1 = new JsonObject();
+    filter1.addProperty("type", "double");
+    filter1.addProperty("artifactsName", "SALES");
+    filter1.addProperty("isOptional", false);
+    filter1.addProperty("columnName", "double");
+    filter1.addProperty("isRuntimeFilter", false);
+    filter1.addProperty("isGlobalFilter", false);
+    JsonObject model = new JsonObject();
+    model.addProperty("operator", "GTE");
+    model.addProperty("value", 1000);
+    filter1.add("model", model);
+    JsonArray filters = new JsonArray();
+    filters.add(filter1);
+
+    JsonObject filter2 = new JsonObject();
+    filter2.addProperty("type", "date");
+    filter2.addProperty("artifactsName", "PRODUCT");
+    filter2.addProperty("isOptional", false);
+    filter2.addProperty("columnName", "date_2");
+    filter2.addProperty("isRuntimeFilter", false);
+    filter2.addProperty("isGlobalFilter", false);
+    model = new JsonObject();
+    model.addProperty("preset", "LY");
+    filter2.add("model", model);
+    filters.add(filter2);
+
+    sipQueryDl.add("filters", filters);
+
+    JsonArray sorts = new JsonArray();
+    sipQueryDl.add("sorts", sorts);
+
+    JsonObject join = new JsonObject();
+    join.addProperty("join", "inner");
+
+
+
+    JsonObject leftTable = new JsonObject();
+    leftTable.addProperty("artifactsName", "PRODUCT");
+    leftTable.addProperty("columnName", "string_2");
+    JsonObject rightTable = new JsonObject();
+    rightTable.addProperty("artifactsName", "SALES");
+    rightTable.addProperty("columnName", "string");
+    JsonObject joinTables = new JsonObject();
+    joinTables.addProperty("operator", "EQ");
+    joinTables.add("left", leftTable);
+    joinTables.add("right", rightTable);
+
+    JsonObject criteria1 = new JsonObject();
+    criteria1.add("joinCondition", joinTables);
+    JsonArray criterianArray = new JsonArray();
+
+    criterianArray.add(criteria1);
+    join.add("criteria", criterianArray);
+    JsonArray joinArray = new JsonArray();
+    joinArray.add(join);
+
+    sipQueryDl.add("joins", joinArray);
+    sipQueryDl.addProperty("semanticId", "workbench::sample-spark");
+    testDataForDl.add("sipQuery", sipQueryDl);
+  }
+
   @Test
   public void testSipDsl() throws IOException {
     int testFilterData = 100; // To assert Filter condition.
@@ -225,6 +364,38 @@ public class SipDslIT extends BaseIT {
             .extract()
             .response();
     Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    ArrayNode data = a.withArray("data");
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows > 0);
+    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
+    ResponseBody responseBody = response.getBody();
+    List<Map<String, String>> dataNode = responseBody.path("data");
+    Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
+  }
+
+  @Test
+  public void testSipDslDataLakeExecute() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    String testStringFilter = "string 201";
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(jsonNode)
+            .when()
+            .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    Assert.assertNotNull(response);
+    ObjectNode a = response.getBody().as(ObjectNode.class);
+    ArrayNode data = a.withArray("data");
+    Long countOfRows = a.get("totalRows").asLong();
+    Assert.assertTrue(countOfRows > 0);
+    Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
     ResponseBody responseBody = response.getBody();
     List<Map<String, String>> dataNode = responseBody.path("data");
     Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);

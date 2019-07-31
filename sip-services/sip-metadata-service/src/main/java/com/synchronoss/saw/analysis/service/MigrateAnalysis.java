@@ -1,12 +1,8 @@
 package com.synchronoss.saw.analysis.service;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +10,7 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
@@ -21,34 +18,26 @@ import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObje
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.util.FieldNames;
+import com.synchronoss.saw.util.HBaseUtils;
 import com.synchronoss.saw.util.SipMetadataUtils;
-import com.synchronoss.sip.utils.RestUtil;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.constraints.NotNull;
-import org.ojai.Document;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
-
-  @Autowired private RestUtil restUtil;
-  RestTemplate restTemplate = null;
 
   private AnalysisMetadata analysisMetadataStore = null;
 
@@ -73,7 +62,9 @@ public class MigrateAnalysis {
   @NotNull
   private String listAnalysisUrl;
 
-  private AnalysisMetadata semanticMedatadataStore = null;
+  @Value("${metastore.analysis-metadata-path}")
+  @NotNull
+  private String binaryAnalysisMetadata;
 
   private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -83,26 +74,10 @@ public class MigrateAnalysis {
   public void convertBinaryToJson() throws Exception {
     logger.trace("Migration process will begin here");
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-    HttpHeaders requestHeaders = new HttpHeaders();
-    requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
-    logger.debug("Analysis server URL {}", listAnalysisUrl + "/analysis");
-    String url = listAnalysisUrl + "/analysis";
 
-    restTemplate = restUtil.restTemplate();
-    ResponseEntity analysisBinaryData =
-        restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
-    if (analysisBinaryData.getBody() != null) {
-      JsonNode jsonNode = (JsonNode) analysisBinaryData.getBody();
-      JsonElement jelement = new com.google.gson.JsonParser().parse(jsonNode.toString());
-      JsonObject analysisBinaryObject = jelement.getAsJsonObject();
-      JsonArray analysisList =
-          analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-
-      MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
+    JsonArray jsonArray = getAllAnalysis();
+    if (jsonArray != null && jsonArray.size() > 0) {
+      MigrationStatus migrationStatus = convertAllAnalysis(jsonArray);
       logger.info("Total number of Files for migration : {}", migrationStatus.getTotalAnalysis());
       logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getSuccessCount());
       logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getFailureCount());
@@ -209,7 +184,8 @@ public class MigrateAnalysis {
         converter = new EsReportConverter();
         break;
       case "report":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
+        converter = new DlReportConverter();
+        break;
       case "map":
         converter = new GeoMapConverter();
         break;
@@ -263,66 +239,42 @@ public class MigrateAnalysis {
     return status;
   }
 
-  private String semanticNodeQuery() {
-    return "{\n"
-        + "   \"contents\":{\n"
-        + "      \"keys\":[\n"
-        + "         {\n"
-        + "            \"module\":\"ANALYZE\"\n"
-        + "         }\n"
-        + "      ],\n"
-        + "      \"action\":\"export\"\n"
-        + "   }\n"
-        + "}";
-  }
-
-
   /**
-   * Main function.
+   * Get list of all analysis to remove transport service dependency.
    *
-   * @param args - command line args
-   * @throws IOException - In case of file errors
+   * @return JsonArray
    */
-  public static void main1(String[] args) throws Exception {
-    String analysisFile = args[0];
-    System.out.println("Convert analysis from file = " + analysisFile);
+  public JsonArray getAllAnalysis() {
+    JsonArray arrayElements = new JsonArray();
+    HBaseUtils utils = new HBaseUtils();
+    try {
+      Connection connection = utils.getConnection();
+      String tablePath = basePath + binaryAnalysisMetadata;
+      logger.info("Binary store table path : " + tablePath);
+      Table table = utils.getTable(connection, tablePath);
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    File jsonFile = new File(analysisFile);
-    JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
+      // Instantiating the Scan class
+      Scan scan = new Scan();
+      scan.addColumn(Bytes.toBytes("_source"), Bytes.toBytes("content"));
+      ResultScanner results = table.getScanner(scan);
 
-    JsonObject analyzeObject =
-        jsonObject.getAsJsonObject("contents").getAsJsonArray("analyze").get(0).getAsJsonObject();
-
-    MigrateAnalysis ma = new MigrateAnalysis();
-
-    Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
-
-    System.out.println(gson.toJson(analysis));
-  }
-
-  /**
-   * Main function.
-   *
-   * @param args Command-line args
-   * @throws IOException In-case of file error
-   */
-  public static void main(String[] args) throws IOException {
-    String analysisFile = args[0];
-    System.out.println("Convert analysis from file = " + analysisFile);
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    File jsonFile = new File(analysisFile);
-
-    JsonObject analysisBinaryObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
-
-    JsonArray analysisList =
-        analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-
-    MigrateAnalysis ma = new MigrateAnalysis();
-
-    MigrationStatus migrationStatus = ma.convertAllAnalysis(analysisList);
-    System.out.println(gson.toJson(migrationStatus));
+      // Reading values from scan result
+      for (Result result = results.next(); result != null; result = results.next()) {
+        byte[] contentBinary = result.getValue("_source".getBytes(), "content".getBytes());
+        if (contentBinary != null && contentBinary.length > 0) {
+          com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+          JsonElement element = parser.parse(new String(contentBinary));
+          logger.debug("Content binary store data....!!" + element);
+          arrayElements.add(element);
+        }
+      }
+    } catch (Exception ex) {
+      logger.error("Error while fetch analysis from hbase.", ex);
+    } finally {
+      utils.closeConnection();
+    }
+    logger.info("Array size : " + arrayElements.size());
+    return arrayElements;
   }
 
   /**

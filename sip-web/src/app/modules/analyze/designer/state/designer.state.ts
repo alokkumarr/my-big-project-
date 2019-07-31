@@ -11,7 +11,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
-import moment from 'moment';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -49,7 +48,12 @@ import {
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerUpdateEditMode,
+  DesignerUpdateQuery,
+  DesignerJoinsArray,
+  ConstructDesignerJoins,
+  DesignerUpdateAggregateInSorts
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -59,6 +63,7 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
+import { AnalysisDSL } from 'src/app/models';
 
 // setAutoFreeze(false);
 
@@ -104,6 +109,30 @@ export class DesignerState {
   }
 
   @Selector()
+  static canRequestData(state: DesignerStateModel): boolean {
+    const analysis: AnalysisDSL = state.analysis;
+    const sipQuery = analysis && analysis.sipQuery;
+    if (!sipQuery) {
+      return false;
+    }
+
+    /* If this is a report, and query is present, we can request data */
+    if (analysis.type === 'report' && !!sipQuery.query) {
+      return true;
+    } else {
+      /* Else, there should be at least one field selected in artifacts */
+      return (
+        (
+          fpFlatMap(
+            artifact => artifact.fields,
+            get(state, 'analysis.sipQuery.artifacts')
+          ) || []
+        ).length > 0
+      );
+    }
+
+    return false;
+  }
   static artifactFields(state: DesignerStateModel) {
     return fpFlatMap(
       artifact => artifact.fields,
@@ -215,7 +244,6 @@ export class DesignerState {
           }
         : { format: artifactColumn.format })
     };
-
     if (artifactIndex < 0) {
       artifacts = [
         ...artifacts,
@@ -227,14 +255,15 @@ export class DesignerState {
         artifactColumnToBeAdded
       ];
     }
-
     // cleanup empty artifacts
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
 
+    sipQuery.artifacts = artifacts;
+
     patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: { ...analysis, sipQuery: { ...sipQuery} }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
@@ -396,6 +425,30 @@ export class DesignerState {
     const analysis = getState().analysis;
     return patchState({
       analysis: { ...analysis, ...metadata }
+    });
+  }
+
+  @Action(DesignerUpdateEditMode)
+  updateDesignerEdit(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { designerEdit }: DesignerUpdateEditMode
+  ) {
+    const analysis = getState().analysis;
+    return patchState({
+      analysis: { ...analysis, designerEdit }
+    });
+  }
+
+  @Action(DesignerUpdateQuery)
+  updateQuery(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { query }: DesignerUpdateQuery
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, query } }
     });
   }
 
@@ -686,18 +739,10 @@ export class DesignerState {
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE
       ) {
         filter.model = {
-          operator: 'BTW',
-          otherValue: filter.model.lte
-            ? moment(filter.model.lte)
-                .endOf('day')
-                .valueOf()
-            : null,
-          value: filter.model.gte
-            ? moment(filter.model.gte)
-                .startOf('day')
-                .valueOf()
-            : null,
-          format: 'epoch_millis'
+          gte: filter.model.gte,
+          lte: filter.model.lte,
+          format: 'yyyy-MM-dd',
+          preset: CUSTOM_DATE_PRESET_VALUE
         };
       }
     });
@@ -722,4 +767,108 @@ export class DesignerState {
   resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
   }
+
+  @Action(DesignerJoinsArray)
+  updateJoins(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { joins }: DesignerJoinsArray
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    const sipJoins = [];
+    if (isEmpty(joins)) {
+      return;
+    }
+    joins.forEach(join => {
+      let leftJoin = {};
+      let rightJoin = {};
+      join.criteria.forEach(crt => {
+        if (crt.side === 'left') {
+          leftJoin = {
+            artifactsName: crt.tableName,
+            columnName: crt.columnName
+          };
+        }
+
+        if (crt.side === 'right') {
+          rightJoin = {
+            artifactsName: crt.tableName,
+            columnName: crt.columnName
+          };
+        }
+      });
+      const joinCondition = {
+        operator: 'EQ',
+        left: leftJoin,
+        right: rightJoin
+      }
+      const sipJoin = {
+        join: join.type,
+        criteria: [{
+          joinCondition
+        }]
+      };
+      sipJoins.push(sipJoin);
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: sipJoins } }
+    });
+  }
+
+  @Action(ConstructDesignerJoins)
+  updateDesignerJoins(
+    { patchState }: StateContext<ConstructDesignerJoins>,
+    { analysis }
+  ) {
+    const sipQuery = analysis.sipQuery;
+    const analysisJoins = [];
+    if (isEmpty(analysis.sipQuery.joins)) {
+      return;
+    }
+    analysis.sipQuery.joins.forEach(join => {
+      const DSLCriteria = [];
+      join.criteria.forEach(dslCRT => {
+        DSLCriteria.push({
+          tableName: dslCRT.joinCondition['left'].artifactsName,
+          columnName: dslCRT.joinCondition['left'].columnName,
+          side: 'left'
+        });
+        DSLCriteria.push({
+          tableName: dslCRT.joinCondition['right'].artifactsName,
+          columnName: dslCRT.joinCondition['right'].columnName,
+          side: 'right'
+        });
+
+      });
+      const dslJoin = {
+        type: join.join,
+        criteria: DSLCriteria
+      };
+      analysisJoins.push(dslJoin);
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: analysisJoins } }
+    });
+  }
+
+
+  @Action(DesignerUpdateAggregateInSorts)
+  updateAggregateInSorts(
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { column }: DesignerUpdateAggregateInSorts
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    if (isEmpty(analysis.sipQuery.sorts)) {
+      return;
+    }
+    sipQuery.sorts.forEach(sort => {
+      sort.aggregate = column.aggregate;
+    });
+    return patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
+    });
+  }
 }
+
+

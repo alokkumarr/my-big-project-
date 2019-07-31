@@ -77,11 +77,6 @@ export class DesignerService {
       });
     });
 
-    /* Remove analysis queryManual if not being saved from query mode */
-    if (!analysis.edit) {
-      delete analysis.queryManual;
-    }
-
     return analysis;
   }
 

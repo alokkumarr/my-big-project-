@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import { Store } from '@ngxs/store';
 
 import {
   Artifact,
@@ -20,11 +21,16 @@ export class DesignerSettingsMultiTableComponent {
   @Input() useAggregate: boolean;
   @Input('artifacts')
   set setArtifacts(artifacts: Artifact[]) {
+    const analysis = this._store.selectSnapshot(state => state.designerState.analysis);;
+    this.sqlBuilder = analysis.sipQuery;
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }
   @Input() data;
-  @Input() sqlBuilder: QueryDSL | SqlBuilderReport;
   public artifacts: Artifact[];
+  public sqlBuilder: QueryDSL | SqlBuilderReport;
+  constructor(
+    private _store: Store
+  ) {}
 
   onChange(event: JsPlumbCanvasChangeEvent) {
     this.change.emit(event);

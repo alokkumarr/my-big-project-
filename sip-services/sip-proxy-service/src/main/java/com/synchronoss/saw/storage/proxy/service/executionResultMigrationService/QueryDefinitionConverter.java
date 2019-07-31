@@ -126,8 +126,14 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
       field.setArea(checkedVal);
     }
 
-    if (fieldObject.has(FieldNames.AREA_INDEX)) {
-      int index = fieldObject.get(FieldNames.AREA_INDEX).getAsInt();
+    if (fieldObject.has(FieldNames.AREA_INDEX) || fieldObject.has(FieldNames.VISIBLE_INDEX)) {
+      int index = 0;
+      if ((fieldObject.has(FieldNames.AREA_INDEX)
+          && (!fieldObject.get(FieldNames.AREA_INDEX).isJsonNull()))) {
+        index = fieldObject.get(FieldNames.AREA_INDEX).getAsInt();
+      } else if (!fieldObject.get(FieldNames.VISIBLE_INDEX).isJsonNull()) {
+        index = fieldObject.get(FieldNames.VISIBLE_INDEX).getAsInt();
+      }
 
       field.setAreaIndex(index);
     }
@@ -288,7 +294,7 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     if (sortObject.has(FieldNames.TABLE_NAME)) {
       String tableName = sortObject.get(FieldNames.TABLE_NAME).getAsString();
 
-      sort.setArtifacts(tableName);
+      sort.setArtifactsName(tableName);
     }
 
     return sort;

@@ -1,0 +1,71 @@
+- name: Copy SAW executor Service package
+  copy: src="{{ item }}" dest=/tmp/sip-executor.rpm
+  with_fileglob: ["../rpms/sip-executor-*.rpm"]
+
+- name: Install SIP Executor Service package
+  yum: name=/tmp/sip-executor.rpm state=present
+  notify:
+    - restart sip-executor-regular
+    - restart sip-executor-fast
+- name: Install sip executor Service configuration file
+  template: src=application.conf dest=/opt/bda/sip-executor/conf/
+  notify:
+    - restart sip-executor-regular
+    - restart sip-executor-fast
+
+- name: Create service.env file
+  file:
+    path: /opt/bda/sip-executor/conf/service.env
+    state: touch
+    owner: mapr
+    group: mapr
+    mode: '0644'
+
+- name: Updating a environment variable in /opt/bda/sip-executor/conf/service.env
+  blockinfile:
+    path: /opt/bda/sip-executor/conf/service.env
+    marker: "# {mark} SECURE"
+    block: |
+        SIP_SECURE=true
+  notify:
+    - restart sip-executor-regular
+    - restart sip-executor-fast
+  when: sip_secure
+
+- name: Updating a environment variable in /opt/bda/sip-executor/conf/service.env
+  blockinfile:
+    path: /opt/bda/sip-executor/conf/service.env
+    marker: "# {mark} SECURE"
+    block: |
+        SIP_SECURE=false
+  notify:
+    - restart sip-executor-regular
+    - restart sip-executor-fast
+  when: not sip_secure
+
+- name: Updating a environment variable in /opt/bda/sip-executor/conf/service.env
+  blockinfile:
+    path: /opt/bda/sip-executor/conf/service.env
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+        KEY_STORE_PATH={{ store_path }}/{{ ansible_host }}/keystore.jks
+        KEY_STORE_PASSWORD={{ sip_keystore_password }}
+        HTTP_DISABLED=-Dhttp.port=disabled
+  notify:
+    - restart sip-executor-regular
+    - restart sip-executor-fast
+  when: sip_secure
+
+- name: Create Transport Service environment file
+  file: path=/etc/bda/saw-transport-service-env state=touch
+
+- name: Enable SIP Executor (regular)
+  systemd: name="sip-executor@regular-{{ item }}" state=started enabled=true daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+  notify:
+    - restart sip-executor-regular
+- name: Enable SIP Executor (fast)
+  systemd: name="sip-executor@fast-{{ item }}" state=started enabled=true daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
+  notify:
+    - restart sip-executor-fast

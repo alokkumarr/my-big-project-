@@ -266,7 +266,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     if (sortObject.has("tableName")) {
       String tableName = sortObject.get("tableName").getAsString();
 
-      sort.setArtifacts(tableName);
+      sort.setArtifactsName(tableName);
     }
 
     return sort;
