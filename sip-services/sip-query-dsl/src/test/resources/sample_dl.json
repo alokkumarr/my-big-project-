@@ -90,14 +90,14 @@
     ],
     "sorts": [
       {
-        "artifacts": "SALES",
+        "artifactsName": "SALES",
         "aggregate": "sum",
         "columnName": "long",
         "type": "long",
         "order": "asc"
       },
       {
-        "artifacts": "SALES",
+        "artifactsName": "SALES",
         "aggregate": "avg",
         "columnName": "double",
         "type": "double",

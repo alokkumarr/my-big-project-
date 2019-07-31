@@ -51,6 +51,14 @@ public class RestUtil {
   public RestTemplate restTemplate() {
 
     HttpClient client = null;
+
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -84,6 +92,15 @@ public class RestUtil {
   public RestTemplate restTemplate(
       String keyStore, String keyPassword, String trustStore, String trustPassword) {
     HttpClient client = null;
+
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
+
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -116,6 +133,13 @@ public class RestUtil {
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -148,6 +172,13 @@ public class RestUtil {
 
   /** creating a https client. */
   public HttpClient getHttpClient() throws Exception {
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     HttpClient client = null;
     PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     if (sipSslEnable) {
@@ -167,6 +198,14 @@ public class RestUtil {
       String keyStore, String keyPassword, String trustStore, String trustPassword)
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
           KeyManagementException, UnrecoverableKeyException {
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
+
     SSLContext sslContext =
         SSLContextBuilder.create()
             .loadKeyMaterial(
