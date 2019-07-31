@@ -301,7 +301,7 @@
             class="routes-grid"
             [dataSource]="routesData"
             [showBorders]="false"
-            [columnAutoWidth]="true"
+            [columnAutoWidth]="false"
             [showColumnLines]="false"
             (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
             [rowAlternationEnabled]="true"
@@ -329,7 +329,7 @@
               caption="Route Name"
               dataField="routeName"
               alignment="left"
-              cellTemplate="e2eTemplate"
+              cellTemplate="routeNameTemplate"
             ></dxi-column>
             <dxi-column
               caption="Created By"
@@ -419,6 +419,15 @@
               <ng-template #defDate>{{
                 cell.data.createdDate | date: 'short'
               }}</ng-template>
+            </div>
+
+            <div
+              style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+              [attr.e2e]="'route-' + cell.column.dataField + '-' + cell.value"
+              *dxTemplate="let cell of 'routeNameTemplate'"
+              [matTooltip]="cell.value"
+            >
+              {{ cell.value }}
             </div>
 
             <div
