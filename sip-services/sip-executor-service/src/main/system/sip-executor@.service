@@ -2,6 +2,8 @@
 Description=SIP Executor
 
 [Service]
+Type=notify
+NotifyAccess=all
 ExecStart=/opt/bda/sip-executor/bin/run-executor
 SyslogIdentifier=sip-executor
 User=mapr
@@ -10,3 +12,5 @@ Environment="JAVA_OPTS=-Dsaw.executor=%i"
 
 [Install]
 WantedBy=sip-storage-proxy.service
+
+SuccessExitStatus=143

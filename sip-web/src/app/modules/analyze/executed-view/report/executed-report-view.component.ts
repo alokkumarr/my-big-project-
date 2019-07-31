@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Analysis, Artifact, isDSLAnalysis } from '../../types';
+import { Artifact, isDSLAnalysis } from '../../types';
 import * as get from 'lodash/get';
+import { AnalysisDSL } from '../../models';
 @Component({
   selector: 'executed-report-view',
   templateUrl: 'executed-report-view.component.html'
@@ -9,12 +10,12 @@ export class ExecutedReportViewComponent {
   // public analysisSorts: any;
 
   @Input('analysis')
-  set setAnalysis(analysis: Analysis) {
+  set setAnalysis(analysis: AnalysisDSL) {
     this.analysis = analysis;
     // if in query mode, don't send the artifacts, just use the column names in the data
     // TODO use the columns from the query
     const isEsReport = analysis.type === 'esReport';
-    const isInQueryMode = analysis.edit;
+    const isInQueryMode = analysis.designerEdit;
     const dataFields = isDSLAnalysis(analysis)
       ? get(analysis, 'sipQuery.artifacts')
       : get(analysis, 'sqlBuilder.dataFields');
@@ -29,7 +30,7 @@ export class ExecutedReportViewComponent {
           ))
         : (containsArtifacts = <String>dataFields[0].tableName);
 
-      //const containsArtifacts = <any>dataFields[0].tableName;
+      // const containsArtifacts = <any>dataFields[0].tableName;
       if (containsArtifacts) {
         this.artifacts = dataFields;
       } else {
@@ -46,15 +47,12 @@ export class ExecutedReportViewComponent {
   @Input()
   dataLoader: Function;
 
-  analysis: Analysis;
+  analysis: AnalysisDSL;
   artifacts: Artifact[];
 
   constructor() {}
 
   get analysisSorts() {
-    return isDSLAnalysis(this.analysis)
-      ? this.analysis.sipQuery.sorts
-      : this.analysis.sqlBuilder.sorts ||
-          this.analysis.sqlBuilder.orderByColumns;
+    return this.analysis.sipQuery.sorts;
   }
 }

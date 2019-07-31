@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -69,8 +70,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private String basePath;
 
-  @Value("${metastore.time-to-live}")
+  @Value("${metastore.ttl-for-onetime}")
   private long timeToLive;
+
+  @Value("${metastore.execution-result-limit}")
+  @NotNull
+  private Long configExecutionLimit;
 
   @Value("${executor.preview-rows-limit}")
   private Integer previewRowLimit;
@@ -642,7 +647,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", dslQueryId);
-      return maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5);
+
+      List<?> executionLists =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", configExecutionLimit.intValue());
+      // method call to be asynchronossly
+      CompletableFuture.runAsync(
+          () -> {
+            StorageProxyUtil.deleteJunkExecutionResult(
+                dslQueryId, configExecutionLimit, basePath, executionResultTable);
+            dataLakeExecutionService.cleanDataLakeData();
+          });
+      return executionLists;
     } catch (Exception e) {
       logger.error("Error occurred while storing the execution result data", e);
     }
@@ -660,19 +675,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
       Document doc = executionResultStore.readDocumet(executionId);
-      logger.debug("Doc : " + doc.asJsonString());
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
-
       if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
-        Long totalRows = getTotalRows(doc, null);
-        // paginated execution data
-        Object data =
-            maprConnection.fetchPagingData(
-                "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
-        executionResponse.setData(data != null ? data : executionResult.getData());
-        executionResponse.setTotalRows(totalRows);
+          Long totalRows = getTotalRows(doc, null);
+          executionResponse.setTotalRows(totalRows);
+
+
+          // paginated execution data
+          Object data =
+              maprConnection.fetchPagingData(
+                  "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+          executionResponse.setData(data != null ? data : executionResult.getData());
+
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
@@ -724,16 +740,15 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      ExecutionResult executionResult = fetchLastExecutionResult(dslQueryId, maprConnection);
-      List<Object> objList = (List<Object>) executionResult.getData();
-      // paginated execution data
+      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
+      List<Object> objList=(List<Object>)executionResult.getData();
       Long totalRows = getTotalRows(null, objList);
+			executionResponse.setTotalRows(totalRows);
 
+      // paginated execution data
       Object data =
-          maprConnection.fetchPagingData(
-              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
-      executionResponse.setTotalRows(getTotalRows(null, objList));
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -751,7 +766,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public Boolean saveTTLExecutionResult(ExecutionResult executionResult) {
+  public Boolean saveTtlExecutionResult(ExecutionResult executionResult) {
     try {
       String tableName =
           checkTempExecutionType(executionResult.getExecutionType())
@@ -827,6 +842,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
       int startIndex, endIndex;
+      pageSize = pageSize > dataObj.size() ? dataObj.size() : pageSize;
       if (page != null && page > 1) {
         startIndex = (page - 1) * pageSize;
         endIndex = startIndex + pageSize;

@@ -24,10 +24,10 @@ export class DesignerReportComponent {
     this.currentDataCount = Math.min(this.totalDataCount, (val || []).length);
   }
 
-  constructor(private store: Store) {}
+  constructor(public store: Store) {}
 
   get analysisArtifacts() {
-    return this.analysis.edit
+    return this.analysis.designerEdit
       ? null
       : this.hasSIPQuery
       ? this.store.selectSnapshot(

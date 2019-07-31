@@ -18,6 +18,7 @@ import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObje
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.util.FieldNames;
+import com.synchronoss.saw.util.HBaseUtils;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,7 @@ public class MigrateAnalysis {
   private MigrationStatus convertAllAnalysis(JsonArray analysisList) {
     MigrationStatus migrationStatus = new MigrationStatus();
     List<MigrationStatusObject> analysisStatus = new ArrayList<>();
+
     migrationStatus.setTotalAnalysis(analysisList.size());
 
     AtomicInteger successfulMigration = new AtomicInteger();

@@ -14,7 +14,7 @@ import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 import { NgxsModule } from '@ngxs/store';
-import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
 
 import {
@@ -40,7 +40,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     // because when only partially implemented, freeing objects introduces some conflicts
     // NgxsModule.forRoot([], { developmentMode: !environment.production }),
     NgxsModule.forRoot([], { developmentMode: false }),
-    NgxsLoggerPluginModule.forRoot({ disabled: environment.production }),
+    NgxsReduxDevtoolsPluginModule.forRoot({ disabled: environment.production }),
     AppRoutingModule,
     NgIdleModule.forRoot(),
     CommonModuleTs,

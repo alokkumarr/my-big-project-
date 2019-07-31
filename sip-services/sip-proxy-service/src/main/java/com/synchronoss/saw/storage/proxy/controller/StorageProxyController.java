@@ -367,7 +367,7 @@ public class StorageProxyController {
                   authTicket,
                   executionType,
                   (List<Object>) executeResponse.getData());
-          proxyService.saveTTLExecutionResult(executionResult);
+          proxyService.saveTtlExecutionResult(executionResult);
         }
       }
     } catch (IOException e) {
@@ -385,39 +385,7 @@ public class StorageProxyController {
       throw new RuntimeException("Exception generated while processing incoming json.");
     }
     logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
-
-    List<Object> pagingData = pagingData(page, pageSize, (List<Object>) executeResponse.getData());
-    executeResponse.setData(
-        pagingData != null ? pagingData : (List<Object>) executeResponse.getData());
-    executeResponse.setTotalRows(
-        executeResponse.getData() != null ? ((List<Object>) executeResponse.getData()).size() : 0l);
     return executeResponse;
-  }
-
-  /**
-   * Return List<Object> of paginated data object.
-   *
-   * @param page
-   * @param pageSize
-   * @return
-   */
-  private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
-    logger.trace("Page :" + page + " pageSize :" + pageSize + " Data Size :" + dataObj.size());
-    // pagination logic
-    if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
-      int startIndex, endIndex;
-      pageSize = pageSize > dataObj.size() ? dataObj.size() : pageSize;
-      if (page != null && page > 1) {
-        startIndex = (page - 1) * pageSize;
-        endIndex = startIndex + pageSize;
-      } else {
-        startIndex = page != null && page > 0 ? (page - 1) : 0;
-        endIndex = startIndex + pageSize;
-      }
-      logger.trace("Start Index :" + startIndex + " Endindex :" + endIndex);
-      return dataObj.subList(startIndex, endIndex);
-    }
-    return null;
   }
 
   /**
