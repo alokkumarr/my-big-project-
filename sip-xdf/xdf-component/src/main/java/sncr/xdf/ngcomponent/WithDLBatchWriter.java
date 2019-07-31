@@ -129,7 +129,7 @@ public interface WithDLBatchWriter {
                     // Process partition locations - relative paths
                     for(String e : partitions) {
                     	 
-                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);;
+                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
@@ -177,8 +177,6 @@ public interface WithDLBatchWriter {
             // Will do nothing if directory doesn't exists
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
             	
-            	logger.debug("s1:: "+ partitionKey.substring(1) );
-            	logger.debug("s2:: "+ dest.getName() );
             	
             	Boolean isSame = dest.getName().trim().equals(partitionKey.substring(1).trim());
             	
