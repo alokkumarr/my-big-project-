@@ -135,23 +135,28 @@ public class ExportServiceImpl implements ExportService {
       url =
           storageProxyUrl
               + "/internal/proxy/storage/"
-              + executionId
-              + "/lastExecutions/data?page=1&pageSize="
-              + sizOfExport;
+              + analysisId
+              + "/executions/data?page=1&pageSize="
+              + sizOfExport
+              +"&analysisType="+analysisType
+              +"&executionType="+executionType;
+
     } else if (executionId == null) {
       url =
           storageProxyUrl
               + "/internal/proxy/storage/"
               + analysisId
               + "/lastExecutions/data?page=1&pageSize="
-              + sizOfExport;
+              + sizOfExport
+              +"&analysisType="+analysisType;
     } else {
       url =
           storageProxyUrl
               + "/internal/proxy/storage/"
               + analysisId
               + "/executions/data?page=1&pageSize="
-              + sizOfExport;
+              + sizOfExport
+              +"&analysisType="+analysisType;
     }
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
