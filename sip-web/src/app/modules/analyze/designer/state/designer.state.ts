@@ -863,7 +863,9 @@ export class DesignerState {
       return;
     }
     sipQuery.sorts.forEach(sort => {
-      sort.aggregate = column.aggregate;
+      if (sort.columnName === column.columnName) {
+        sort.aggregate = column.aggregate;
+      }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
