@@ -142,7 +142,7 @@ public interface WithDLBatchWriter {
                     
                     WithDLBatchWriterHelper.logger.debug("Deleting source :: "+ moveTask.source );
                     //Delete temporary data object directory
-                   // HFileOperations.fs.delete(new Path(moveTask.source ), true);
+                    HFileOperations.fs.delete(new Path(moveTask.source ), true);
                 }
             } //<-- for
             
