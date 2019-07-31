@@ -721,7 +721,7 @@ export class AnalyzeService {
         semanticId: ''
       }
     };
-    if (type === 'chart') {
+    if (['chart', 'map'].includes(type)) {
       model = { ...model, ...this.newAnalysisChartModel(model) };
     }
 
