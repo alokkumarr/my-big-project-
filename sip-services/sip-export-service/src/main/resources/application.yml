@@ -32,8 +32,6 @@ server:
     mime-types: text/html,text/css,application/javascript,application/json    
 
 analysis:
-    service:
-        host: http://localhost:9200/analysis
     uiExportSize: 10000
     emailExportSize: 50000
     ftpExportSize: 100000
