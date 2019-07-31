@@ -38,7 +38,6 @@ public interface WithDLBatchWriter {
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
     	
-    	WithDLBatchWriterHelper.logger.debug("########Starting move data ##########");
 
         try {
 
@@ -74,15 +73,12 @@ public interface WithDLBatchWriter {
                     WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
                 
-                WithDLBatchWriterHelper.logger.debug("#############Creating destination if doesnt exists :: ###3 "+ moveTask.dest);
                 helper.createDestDir(moveTask.dest, moveTask.source);
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
-                	WithDLBatchWriterHelper.logger.debug("### no partitions exists size 0");
                     //Remove existing data if they are presented
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
-                    	WithDLBatchWriterHelper.logger.debug("### Repace mode clean up existing data if any ######");
                         if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName, ngctx) < 0) return -1;
                     }
                     WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
@@ -90,7 +86,6 @@ public interface WithDLBatchWriter {
                 }
                 else // else - move partitions result
                 {
-                	WithDLBatchWriterHelper.logger.debug("### partions exist and size greater than zero");
                     Set<String> partitions = new HashSet<>();
                     Path lp = new Path(moveTask.source);
 
@@ -135,7 +130,6 @@ public interface WithDLBatchWriter {
                     for(String e : partitions) {
                     	 
                         Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);;
-                        WithDLBatchWriterHelper.logger.debug("#### Successfully copied files from temp to output ###"+ copiedFiles);
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
@@ -146,7 +140,6 @@ public interface WithDLBatchWriter {
                 }
             } //<-- for
             
-            WithDLBatchWriterHelper.logger.debug("########Completed move data ##########");
             return 0;
         }
         catch(IOException e){
@@ -186,7 +179,6 @@ public interface WithDLBatchWriter {
             	
             	logger.debug("s1:: "+ partitionKey.substring(1) );
             	logger.debug("s2:: "+ dest.getName() );
-            	logger.debug("##########is parititon key exists in desitnation path ??????  ######");
             	
             	Boolean isSame = dest.getName().trim().equals(partitionKey.substring(1).trim());
             	
@@ -195,7 +187,6 @@ public interface WithDLBatchWriter {
             	 * Multiple files partition use case
             	 */
                 if(HFileOperations.fs.exists(dest) && !isSame) {
-                	logger.debug("###########  Deleting file/folder @@@@@"+ dest);
                     HFileOperations.fs.delete(dest, true);
                 }
                 	
@@ -351,7 +342,6 @@ public interface WithDLBatchWriter {
 
             WithDLBatchWriterHelper.logger.warn("Prepare the list of the files, number of files: " + files.length);
             
-            logger.debug("######## Existing files count at destination before moving ##############"+dest + "    ####"+  fs.listStatus(new Path(dest)).length);
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
@@ -369,9 +359,7 @@ public interface WithDLBatchWriter {
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
                     
-                    logger.debug("@@@@@@@@@@Renaming source::"+ src + " to destination  starting:::"+dst + " @@@@@@@@@@@@@@@@@");
                     fc.rename(src, dst, opt);
-                    logger.debug("@@@@@@@@@@Renaming source::"+ src + " to destinationc ompleted  :::"+dst + " @@@@@@@@@@@@@@@@@");
                 }
                 ctx.globalFileCount++;
             }
@@ -390,7 +378,6 @@ public interface WithDLBatchWriter {
                     FileStatus[] list = fs.listStatus(objOutputPath);
                     for (int i = 0; i < list.length; i++) {
                     	
-                    	logger.debug("@@@@@@@@@@@ Deleting path"+ list[i].getPath() + "  as part of cleanup  @@@@@@@@@@@@@@@@@");
                     	if(!list[i].getPath().getName().contains(ngctx.batchID + "." + ngctx.startTs + ".")) {
                     		fs.delete(list[i].getPath(), true);
                     	}
