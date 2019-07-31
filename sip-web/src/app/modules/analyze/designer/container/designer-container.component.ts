@@ -463,14 +463,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'report':
       const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
 
-      forEach(artifacts, table => {
-        table.columns = map(table.columns, column => {
-            forEach(fields, field => {
-              if (field.columnName === column.columnName) {
-                column.checked = true;
-              }
-            });
-          return column;
+      const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
+
+      flatArtifacts.forEach(col => {
+        col.checked  = '';
+        fields.forEach(field => {
+          if (col.table === field.table && col.columnName === field.columnName) {
+            col.checked = true;
+          }
         });
       });
       break;
