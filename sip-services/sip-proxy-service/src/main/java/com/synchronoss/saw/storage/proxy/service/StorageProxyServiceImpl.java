@@ -678,7 +678,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
-
       if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
           Long totalRows = getTotalRows(doc, null);
           executionResponse.setTotalRows(totalRows);
@@ -812,6 +811,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private long getTotalRows(Document doc, List<Object> objList) {
     try {
       if (doc != null) {
+        logger.debug("Data = " + doc.getValue("data"));
+
+        if (doc.getValue("data").getType() == org.ojai.Value.Type.NULL) {
+          return 0l;
+        }
+
         List<Object> totalRows = doc.getList("data");
         logger.debug("Total number of rows :" + totalRows.size());
         return totalRows.size() > 0 ? totalRows.size() : 0l;
