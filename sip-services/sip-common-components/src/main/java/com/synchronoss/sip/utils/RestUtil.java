@@ -51,18 +51,6 @@ public class RestUtil {
   public RestTemplate restTemplate() {
 
     HttpClient client = null;
-
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore
-            + "restTemplate keyStorePassword: "
-            + keyStorePassword
-            + "restTemplate trustStorePassword: "
-            + trustStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -95,15 +83,6 @@ public class RestUtil {
   /** creating rest template using SSL connection. */
   public RestTemplate restTemplate(
       String keyStore, String keyPassword, String trustStore, String trustPassword) {
-    logger.trace(
-        "restTemplate with parameter trustStore: "
-            + trustStore
-            + " restTemplate with parameter keyStore: "
-            + keyStore
-            + " restTemplate with parameter keyStorePassword: "
-            + keyPassword
-            + " restTemplate with parameter trustStorePassword: "
-            + trustPassword);
     HttpClient client = null;
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
@@ -137,16 +116,6 @@ public class RestUtil {
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
-    logger.trace(
-        "asyncRestTemplate trustStore: "
-            + trustStore
-            + "asyncRestTemplate keyStore: "
-            + keyStore
-            + "asyncRestTemplate keyStorePassword: "
-            + keyStorePassword
-            + "asyncRestTemplate trustStorePassword: "
-            + trustStore);
-
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
@@ -160,7 +129,7 @@ public class RestUtil {
                 .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
                 .build();
       } catch (Exception e) {
-        logger.error("Exception :" + e);
+        logger.error("Error occured while building SSL context", e);
       }
 
       CloseableHttpAsyncClient httpclient =
@@ -179,15 +148,6 @@ public class RestUtil {
 
   /** creating a https client. */
   public HttpClient getHttpClient() throws Exception {
-    logger.trace(
-        "getHttpClient trustStore: "
-            + trustStore
-            + "getHttpClient keyStore: "
-            + keyStore
-            + "getHttpClient keyStorePassword: "
-            + keyStorePassword
-            + "getHttpClient trustStorePassword: "
-            + trustStore);
     HttpClient client = null;
     PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     if (sipSslEnable) {
@@ -207,16 +167,6 @@ public class RestUtil {
       String keyStore, String keyPassword, String trustStore, String trustPassword)
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
           KeyManagementException, UnrecoverableKeyException {
-    logger.trace(
-        "getSsLContext trustStore: "
-            + trustStore
-            + "getSsLContext keyStore: "
-            + keyStore
-            + "getSsLContext keyStorePassword: "
-            + keyPassword
-            + "getSsLContext trustStorePassword: "
-            + trustStore);
-
     SSLContext sslContext =
         SSLContextBuilder.create()
             .loadKeyMaterial(
