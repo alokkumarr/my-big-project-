@@ -625,8 +625,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
             };
           } else {
             this.executedAnalysis = {
-              ...this.executedAnalysis,
-              sqlBuilder: queryBuilder
+              ...queryBuilder,
+              sipQuery: queryBuilder.sipQuery
             };
           }
         }
