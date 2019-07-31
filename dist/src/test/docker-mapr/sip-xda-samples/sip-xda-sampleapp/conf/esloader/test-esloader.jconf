@@ -1,0 +1,36 @@
+{
+  "es-loader" :  {
+                "destinationIndexName" : "es_data/es_record",
+                "indexMappingfile" : "file:///home/mapr/sip-xda-sampleapp/conf/esloader/Mapping.mpp",
+                "aliases": [{
+                        "aliasName": "ES_data_latest",
+                        "mode": "replace"
+                }],
+                "esNodes": ["sip-elastic"],
+                "esPort": 9200,
+                "esClusterName": elasticsearch,
+                "esUser": "",
+                "esPass": ""
+        },
+   "inputs" : [
+     {
+        "name":"ESDATASET", // Standard Name
+//      "datasource": "es",
+        "dataSet" : "SQL_OUT",
+        "catalog" : "dout",
+        "format"  : "parquet"
+            }
+        ],
+
+  "parameters" : [
+        {"name": "spark.master","value": "yarn"},
+        {"name": "spark.driver.memory","value": "1g"},
+        {"name": "spark.cores.max","value": "1"},
+        {"name": "spark.executor.memory","value": "1g"},
+        {"name": "spark.executor.cores","value": "1"},
+        {"name": "spark.executor.instances","value": "1"},
+        {"name": "spark.yarn.tags", "value": "XNG-TC"},
+        {"name": "spark.yarn.queue","value":"xdf"}
+
+  ]
+}

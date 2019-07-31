@@ -6,6 +6,9 @@
 ansible_connection=ssh
 ansible_user=root
 ansible_ssh_pass=root
+saw_spark_master_url=local[*]
+sip_var_path=/var/sip
+saw_elasticsearch_host=sip-elastic
 
 # The below parameter should made active if we want to  environment to be active
 sip_secure=${sip.cloud.secure}
@@ -149,25 +152,21 @@ sip-app2
 [saw-security:vars]
 saw_security_email_host=sip-admin
 
-
 [saw-security-arbitrator]
 sip-app3
 
 [sip-xdf]
-sip-app1
-sip-app2
+sip-mapr
 
 [sip-a2]
-sip-app1
-sip-app2
+sip-mapr
 
 [sip-rtis]
 sip-app1
 sip-app2
 
 [sip-rtps]
-sip-app1
-sip-app2
+sip-mapr
 
 [sip-elastic]
 sip-elastic
