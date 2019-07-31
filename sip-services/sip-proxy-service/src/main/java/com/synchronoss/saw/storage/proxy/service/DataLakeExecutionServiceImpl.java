@@ -71,12 +71,15 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     List<Object> result = null;
 
     String query = null;
+    String queryShownTOUser=null;
 
     if (designerEdit) {
       query = sipQuery.getQuery();
+      queryShownTOUser = query;
     } else {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
+      queryShownTOUser = dlQueryBuilder.buildDataQuery(sipQuery);
     }
 
     // Required parameters
@@ -100,7 +103,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, page, pageSize, executionType,query);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType,queryShownTOUser);
   }
 
   private void waitForResult(String resultId, Integer retries) {
@@ -259,24 +262,22 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     return count;
   }
 
+  /**
+   * Cleanup data lake of execution result data.
+   */
+  @Override
+  public void cleanDataLakeData() {
+    List<String> dlJunkExecutionList = StorageProxyUtil.getDataLakeJunkIds();
+    if (dlJunkExecutionList != null && dlJunkExecutionList.size() > 0) {
+      dlJunkExecutionList.forEach(junkId -> {
+        try {
+          String outputLocation = pubSchOutputLocation + File.separator + "output-" + junkId;
+          HFileOperations.deleteEnt(outputLocation);
+        } catch (Exception ex) {
+          logger.error("Error occurred while deleting data lake data : {}", ex);
+        }
+      });
+    }
+  }
 
-	/**
-	 * Cleanup data lake of execution result data.
-	 */
-	@Override
-	public void cleanDataLakeData() {
-		List<String> dlJunkExecutionList = null;
-		// TODO: 7/29/2019 - get the datalake junk id from storage Utils when es branch merge to master
-		//StorageProxyUtil.getDataLakeJunkIds();
-		if (dlJunkExecutionList != null && dlJunkExecutionList.size() > 0) {
-			dlJunkExecutionList.forEach(junkId -> {
-				try {
-					String outputLocation = pubSchOutputLocation + File.separator + "output-" + junkId;
-					HFileOperations.deleteEnt(outputLocation);
-				} catch (Exception ex) {
-					logger.error("Error occurred while deleting data lake data : {}", ex);
-				}
-			});
-		}
-	}
 }

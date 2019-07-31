@@ -21,7 +21,8 @@ public class CliHandler {
 
     public enum OPTIONS {
         BATCH_ID("batch"),
-        CONFIG("config"),
+        //        CONFIG("config"),
+        CONFIG("parser_config"),
         //LOCATIONS("PhysicalLocation"),
         APP_ID("app");
 
@@ -39,7 +40,7 @@ public class CliHandler {
         opt.setArgName("batch id");
         options.addOption(opt);
 
-        opt = new Option("c", OPTIONS.CONFIG.name(), true, " : Full path to component configuration file");
+        opt = new Option("c", OPTIONS.CONFIG.name(), true, " : Full path to Parser component configuration file");
         opt.isRequired();
         opt.setArgName("component configuration file");
         options.addOption(opt);

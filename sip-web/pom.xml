@@ -278,7 +278,7 @@
                 </goals>
                 <configuration>
                   <nodeVersion>v8.10.0</nodeVersion>
-                  <npmVersion>5.6.1</npmVersion>
+                  <npmVersion>5.6.0</npmVersion>
                 </configuration>
               </execution>
 
@@ -299,7 +299,7 @@
                 </goals>
                 <phase>test</phase>
                 <configuration>
-                  <arguments>run test</arguments>
+                  <arguments>run coverage:check</arguments>
                 </configuration>
               </execution>
 
@@ -612,7 +612,7 @@
                 </goals>
                 <phase>test</phase>
                 <configuration>
-                  <arguments>run test</arguments>
+                  <arguments>run coverage:check</arguments>
                 </configuration>
               </execution>
 

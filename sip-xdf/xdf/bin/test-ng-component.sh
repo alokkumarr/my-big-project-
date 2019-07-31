@@ -17,9 +17,9 @@ SPARK_HOME=/opt/mapr/spark/spark-current
 
 # Component -> main class table
 declare -A COMP_MC=(
-    [sql]=sncr.xdf.sql.ng.AsynchNGSQLComponent
-    [parser]=sncr.xdf.parser.AsynchNGParser
-	[transformer]=sncr.xdf.transformer.ng.AsynchNGTransformerComponent
+    [sql]=sncr.xdf.sql.ng.NGSQLComponent
+    [parser]=sncr.xdf.parser.NGParser
+	[transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
     )
 
 function usage()

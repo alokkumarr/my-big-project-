@@ -99,13 +99,13 @@ export class AnalyzeExportService {
 
   getCheckedFieldsForExport(analysis, data) {
     /* If report was using designer mode, find checked columns */
-    if (!analysis.edit && isDSLAnalysis(analysis)) {
+    if (!analysis.designerEdit && isDSLAnalysis(analysis)) {
       return flatMap(analysis.sipQuery.artifacts, artifact =>
         fpPipe(
           fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
         )(artifact.fields)
       );
-    } else if (!analysis.edit) {
+    } else if (!analysis.designerEdit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
         fpPipe(
           fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
