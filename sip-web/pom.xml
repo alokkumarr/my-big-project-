@@ -37,7 +37,7 @@
     <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
     <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
     <app.varDir>/var/bda/${app.nameVer}</app.varDir>
-    <npm.install>install -dd</npm.install>
+    <npm.install>ci</npm.install>
   </properties>
   <dependencies>
 	<dependency>
@@ -179,36 +179,33 @@
 	  <plugin>
         <groupId>com.github.eirslett</groupId>
          <artifactId>frontend-maven-plugin</artifactId>
-         <version>1.3</version>
+         <version>1.7.6</version>
          <configuration>
 	          <installDirectory>${project.build.directory}</installDirectory>
 	          <workingDirectory>${project.basedir}</workingDirectory>
 		 </configuration>
         <executions>
           <execution>
-            <id>install_node_and_npm</id>
+            <id>install_node_and_yarn</id>
             <goals>
-              <goal>install-node-and-npm</goal>
+              <goal>install-node-and-yarn</goal>
             </goals>
             <configuration>
               <nodeVersion>v10.16.0</nodeVersion>
-              <npmVersion>6.10.2</npmVersion>
+              <yarnVersion>v1.17.3</yarnVersion>
             </configuration>
           </execution>
           <execution>
-            <id>npm-install</id>
+            <id>yarn-install</id>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
-            <configuration>
-              <arguments>${npm.install}</arguments>
-            </configuration>
           </execution>
 
            <execution>
-            <id>npm-run-build</id>
+            <id>yarn-run-build</id>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <configuration>
               <arguments>run start</arguments>
@@ -264,7 +261,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.3</version>
+            <version>1.7.6</version>
             <configuration>
               <installDirectory>${project.build.directory}</installDirectory>
               <workingDirectory>${project.basedir}</workingDirectory>
@@ -272,30 +269,27 @@
 
             <executions>
               <execution>
-                <id>install_node_and_npm</id>
+                <id>install_node_and_yarn</id>
                 <goals>
-                  <goal>install-node-and-npm</goal>
+                  <goal>install-node-and-yarn</goal>
                 </goals>
                 <configuration>
                   <nodeVersion>v10.16.0</nodeVersion>
-                  <npmVersion>6.10.2</npmVersion>
+                  <yarnVersion>v1.17.3</yarnVersion>
                 </configuration>
               </execution>
 
               <execution>
-                <id>npm-install</id>
+                <id>yarn-install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
-                <configuration>
-                  <arguments>${npm.install}</arguments>
-                </configuration>
               </execution>
 
               <execution>
-                <id>npm-test</id>
+                <id>yarn-test</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <phase>test</phase>
                 <configuration>
@@ -304,9 +298,9 @@
               </execution>
 
               <execution>
-                <id>npm-run-build</id>
+                <id>yarn-run-build</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <configuration>
                   <arguments>run build</arguments>
@@ -369,7 +363,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.3</version>
+            <version>1.7.6</version>
             <configuration>
               <installDirectory>${project.build.directory}</installDirectory>
               <workingDirectory>${project.basedir}</workingDirectory>
@@ -377,30 +371,27 @@
 
             <executions>
               <execution>
-                <id>install_node_and_npm</id>
+                <id>install_node_and_yarn</id>
                 <goals>
-                  <goal>install-node-and-npm</goal>
+                  <goal>install-node-and-yarn</goal>
                 </goals>
                 <configuration>
                   <nodeVersion>v10.16.0</nodeVersion>
-                  <npmVersion>6.10.2</npmVersion>
+                  <yarnVersion>v1.17.3</yarnVersion>
                 </configuration>
               </execution>
 
               <execution>
-                <id>npm-install</id>
+                <id>yarn-install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
-                <configuration>
-                  <arguments>${npm.install}</arguments>
-                </configuration>
               </execution>
 
               <execution>
-                <id>npm-run-build</id>
+                <id>yarn-run-build</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <configuration>
                   <arguments>run build</arguments>
@@ -458,7 +449,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.3</version>
+            <version>1.7.6</version>
             <configuration>
               <installDirectory>${project.build.directory}</installDirectory>
               <workingDirectory>${project.basedir}</workingDirectory>
@@ -466,30 +457,27 @@
 
             <executions>
               <execution>
-                <id>install_node_and_npm</id>
+                <id>install_node_and_yarn</id>
                 <goals>
-                  <goal>install-node-and-npm</goal>
+                  <goal>install-node-and-yarn</goal>
                 </goals>
                 <configuration>
                   <nodeVersion>v10.16.0</nodeVersion>
-                  <npmVersion>6.10.2</npmVersion>
+                  <yarnVersion>v1.17.3</yarnVersion>
                 </configuration>
               </execution>
 
               <execution>
-                <id>npm-install</id>
+                <id>yarn-install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
-                <configuration>
-                  <arguments>${npm.install}</arguments>
-                </configuration>
               </execution>
 
               <execution>
-                <id>npm-run-build</id>
+                <id>yarn-run-build</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <configuration>
                   <arguments>run build</arguments>
@@ -577,7 +565,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.3</version>
+            <version>1.7.6</version>
             <configuration>
               <installDirectory>${project.build.directory}</installDirectory>
               <workingDirectory>${project.basedir}</workingDirectory>
@@ -585,30 +573,27 @@
 
             <executions>
               <execution>
-                <id>install_node_and_npm</id>
+                <id>install_node_and_yarn</id>
                 <goals>
-                  <goal>install-node-and-npm</goal>
+                  <goal>install-node-and-yarn</goal>
                 </goals>
                 <configuration>
                   <nodeVersion>v10.16.0</nodeVersion>
-                  <npmVersion>6.10.2</npmVersion>
+                  <yarnVersion>v1.17.3</yarnVersion>
                 </configuration>
               </execution>
 
               <execution>
-                <id>npm-install</id>
+                <id>yarn-install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
-                <configuration>
-                  <arguments>${npm.install}</arguments>
-                </configuration>
               </execution>
 
               <execution>
-                <id>npm-test</id>
+                <id>yarn-test</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <phase>test</phase>
                 <configuration>
@@ -617,9 +602,9 @@
               </execution>
 
               <execution>
-                <id>npm-run-build</id>
+                <id>yarn-run-build</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <configuration>
                   <arguments>run build</arguments>
