@@ -13,7 +13,6 @@ import com.synchronoss.saw.model.JoinCondition;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.Model.Preset;
-import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
@@ -180,7 +179,11 @@ public class DLSparkQueryBuilder {
   private String buildFilter(List<Filter> filterList) {
     List<String> whereFilters = new ArrayList<>();
     for (Filter filter : filterList) {
-      if (filter.getType() != null) {
+      Model model = filter.getModel();
+      boolean inValidFilter = model == null ? true : model.isEmpty();
+      if (filter.getType() == null) {
+        throw new SipDslProcessingException("Filter Type is missing");
+      } else if (!inValidFilter) {
         switch (filter.getType()) {
           case DATE:
             whereFilters.add(buildDateTimestampFilter(filter));
@@ -204,8 +207,6 @@ public class DLSparkQueryBuilder {
             whereFilters.add(buildStringFilter(filter));
             break;
         }
-      } else {
-        throw new SipDslProcessingException("Filter Type is missing");
       }
     }
     String firstFilter = null;
