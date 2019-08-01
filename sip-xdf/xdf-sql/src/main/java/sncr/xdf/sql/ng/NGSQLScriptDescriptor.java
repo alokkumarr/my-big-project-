@@ -196,23 +196,34 @@ public class NGSQLScriptDescriptor {
 
                     case CREATE:
 
-                    if (targetTable == null) {
-                        throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, " Target table was not found in table register.");
-                    }
-                    else {
-                        sqlDesc.statementType = StatementType.CREATE;
-                        sqlDesc.isTemporaryTable = targetTable.isTempTable;
-                        if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
-                        String s = stmt.toString().toLowerCase();
-                        int pos = -1;
-                        pos = s.indexOf("with");
-                        if(pos < 0)
-                            pos = s.indexOf("select");
-                        if (pos < 0)
-                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
-                        sqlDesc.SQL = stmt.toString().substring(pos);
-                        sqlDesc.tableDescriptor = targetTable;
-                    }
+                        if (targetTable == null) {
+                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, " Target table was not found in table register.");
+                        }
+                        else {
+                            sqlDesc.statementType = StatementType.CREATE;
+                            sqlDesc.isTemporaryTable = targetTable.isTempTable;
+                            if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
+                            String s = stmt.toString().toLowerCase();
+                            int pos = -1;
+                            
+
+                            /**
+                             * Fix for SIP-7744.  To avoid
+                             * splitting queries which has key word 'WITH'
+                             * any where in middle. Using trim to be
+                             * safe with leading empty spaces
+                             */
+                            if(s.trim().startsWith("with")) {
+                                pos = s.indexOf("with");
+                            }
+                            // pos = s.indexOf("with");
+                            if(pos < 0)
+                                pos = s.indexOf("select");
+                            if (pos < 0)
+                                throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                            sqlDesc.SQL = stmt.toString().substring(pos);
+                            sqlDesc.tableDescriptor = targetTable;
+                        }
                     break;
 
                     case DROP_TABLE:
