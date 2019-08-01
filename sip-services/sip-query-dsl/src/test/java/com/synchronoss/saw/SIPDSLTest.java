@@ -266,7 +266,7 @@ public class SIPDSLTest {
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
     String queryWithoutFilters = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertionQueryWithoutFilters =
-        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 GROUP BY SALES.string, SALES.date, SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(queryWithoutFilters, assertionQueryWithoutFilters);
   }
 
