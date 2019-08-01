@@ -1299,19 +1299,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       return Boolean(analysis.sipQuery.query);
     }
 
-    let atLeastOneIsChecked = false;
-    forEach(artifacts, artifact => {
-      forEach(artifact.columns, column => {
-        if (column.checked) {
-          atLeastOneIsChecked = true;
-          return false;
-        }
-      });
-      if (atLeastOneIsChecked) {
-        return false;
-      }
-    });
-    return atLeastOneIsChecked;
+    const selectedFields = flatMap(
+      analysis.sipQuery.artifacts,
+      artifact => artifact.fields
+    );
+    return selectedFields.length > 0;
   }
 
   updateAnalysis() {
