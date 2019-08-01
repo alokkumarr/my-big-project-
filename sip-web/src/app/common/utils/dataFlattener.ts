@@ -205,17 +205,6 @@ export function flattenReportData(data, analysis) {
   if (analysis.designerEdit) {
     return data;
   }
-  const columnMap = fpPipe(
-    fpFlatMap(artifact => artifact.columns || artifact.fields),
-    fpReduce((accumulator, column) => {
-      const { columnName, aggregate } = column;
-      const key = `${columnName}-${
-        isUndefined(aggregate) ? '' : aggregate.toLowerCase()
-      }`;
-      accumulator[key] = column;
-      return accumulator;
-    }, {})
-  )(analysis.artifacts || analysis.sipQuery.artifacts);
 
   data = checkNullinReportData(data);
   return data.map(row => {
@@ -227,15 +216,8 @@ export function flattenReportData(data, analysis) {
         return removeKeyword(key);
       }
 
-      const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
-      const columnMapKey = `${
-        columnName.split(')')[0]
-      }-${aggregate.toLowerCase()}`;
-      const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
-      if (isInArtifactColumn) {
-        return removeKeyword(columnName.split(')')[0]);
-      }
-      return removeKeyword(key);
+      const [, columnName] = fpPipe(fpSplit('('))(key);
+      return removeKeyword(columnName.split(')')[0]);
     });
   });
 }
