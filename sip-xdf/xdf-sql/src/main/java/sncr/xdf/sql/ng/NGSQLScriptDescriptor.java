@@ -205,7 +205,7 @@ public class NGSQLScriptDescriptor {
                             if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
                             String s = stmt.toString().toLowerCase();
                             int pos = -1;
-                            
+
 
                             /**
                              * Fix for SIP-7744.  To avoid
