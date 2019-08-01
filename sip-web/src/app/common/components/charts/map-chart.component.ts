@@ -88,6 +88,18 @@ export class MapChartComponent {
   onOptionsUpdate(update: IChartUpdate) {
     const chartUpdate = this.transformUpdateIfNeeded(update);
 
+    if (
+      chartUpdate &&
+      chartUpdate.series &&
+      chartUpdate.series[0] &&
+      !chartUpdate.series[0].mapData
+    ) {
+      delete chartUpdate.series;
+
+      // Setting chart height to null allows it to expand to its parent's bounds
+      set(chartUpdate, 'chart.height', null);
+    }
+
     this.delayIfNeeded(
       !this.chart,
       () => {
