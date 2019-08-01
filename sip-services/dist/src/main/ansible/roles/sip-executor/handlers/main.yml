@@ -3,7 +3,7 @@
 # with wildcards, so work around this by enumerating instances for
 # now.
 - name: restart sip-executor-regular
-  systemd: name=sip-executor@regular-{{ item }} state=stopped daemon_reload=true
+  systemd: name=sip-executor@regular-{{ item }} state=restarted daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
   # Workaround: Occasionally deployments will fail with "Job for
   # service canceled".  The root cause is not known, but retry as a
@@ -12,7 +12,7 @@
   until: result is success
   delay: 30
 - name: restart sip-executor-fast
-  systemd: name=sip-executor@fast-{{ item }} state=stopped daemon_reload=true
+  systemd: name=sip-executor@fast-{{ item }} state=restarted daemon_reload=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
   # Workaround: Occasionally deployments will fail with "Job for
   # service canceled".  The root cause is not known, but retry as a
