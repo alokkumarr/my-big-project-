@@ -4,6 +4,7 @@ import { Subject, isObservable } from 'rxjs';
 import * as Highmaps from 'highcharts/highmaps';
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as set from 'lodash/set';
+import * as difference from 'lodash/difference';
 import * as get from 'lodash/get';
 import * as isArray from 'lodash/isArray';
 import * as reduce from 'lodash/reduce';
@@ -98,6 +99,8 @@ export class MapChartComponent {
 
       // Setting chart height to null allows it to expand to its parent's bounds
       set(chartUpdate, 'chart.height', null);
+    } else if (chartUpdate && chartUpdate.series && chartUpdate.series[0]) {
+      this.fillEmptyData(chartUpdate.series[0]);
     }
 
     this.delayIfNeeded(
@@ -108,6 +111,29 @@ export class MapChartComponent {
       },
       0
     );
+  }
+
+  /**
+   * Fills in null data for empty map points. For example, if backend returns data for only 10 states,
+   * we fill in null for remaining 42 states. This allows us to show state names for all states,
+   * and avoid label glitches and problems.
+   *
+   * @param {*} series
+   * @memberof MapChartComponent
+   */
+  fillEmptyData(series) {
+    const pointsWithData = (series.data || []).map(point => point.x);
+    const identifier = series.joinBy[0];
+    const allPoints = series.mapData.features.map(
+      feature => feature.properties[identifier]
+    );
+
+    const missingPoints = difference(allPoints, pointsWithData);
+
+    series.data = [
+      ...series.data,
+      ...missingPoints.map(point => ({ value: null, x: point }))
+    ];
   }
 
   delayIfNeeded(condition, fn, delay) {
