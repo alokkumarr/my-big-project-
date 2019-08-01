@@ -45,6 +45,7 @@ public class DLSparkQueryBuilder {
   List<String> groupByColumns = new ArrayList<>();
 
   public String buildDataQuery(SipQuery sipQuery) {
+    groupByColumns.clear();
     booleanCriteria = sipQuery.getBooleanCriteria();
     String select = "SELECT ";
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
