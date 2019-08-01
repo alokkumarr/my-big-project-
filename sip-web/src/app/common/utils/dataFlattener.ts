@@ -209,7 +209,7 @@ export function flattenReportData(data, analysis) {
     fpFlatMap(artifact => artifact.columns),
     fpReduce((accumulator, column) => {
       const { columnName, aggregate } = column;
-      const key = `${columnName})-${aggregate}`;
+      const key = `${columnName}-${aggregate}`;
       accumulator[key] = column;
       return accumulator;
     }, {})
@@ -217,22 +217,31 @@ export function flattenReportData(data, analysis) {
   data = checkNullinReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
+      /* If the column has aggregation, preserve the aggregate name when removing keyword */
       const hasAggregateFunction = key.includes('(') && key.includes(')');
 
       if (!hasAggregateFunction) {
-        return key;
+        return removeKeyword(key);
       }
+
       const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
       const columnMapKey = `${columnName}-${aggregate}`;
       const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
 
       if (isInArtifactColumn) {
-        return columnName.split(')')[0];
+        return removeKeyword(columnName.split(')')[0]);
       }
-      return key;
+      return removeKeyword(key);
     });
   });
+}
+
+function removeKeyword(key: string) {
+  if (!key) {
+    return key;
+  }
+  return key.replace('.keyword', '');
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
@@ -263,15 +272,15 @@ function parseLeafChart(node, dataObj) {
   return assign(dataFields, dataObj);
 }
 
-  /**
-   * Includes a new property to chart options for the chart engine.
-   * reversed instucts the highchart engine to plot the chart in descending order
-   * which is needed when desc is applied for a field in x-axis.
-   *
-   * @param {*} chartOptions
-   * @param {*} sipQuery
-   * @returns {chartOptions}
-   */
+/**
+ * Includes a new property to chart options for the chart engine.
+ * reversed instucts the highchart engine to plot the chart in descending order
+ * which is needed when desc is applied for a field in x-axis.
+ *
+ * @param {*} chartOptions
+ * @param {*} sipQuery
+ * @returns {chartOptions}
+ */
 
 export function setReverseProperty(chartOptions, sipQuery) {
   const xAxisFields = [
@@ -285,7 +294,10 @@ export function setReverseProperty(chartOptions, sipQuery) {
       chartOptions.xAxis = {
         reversed: false
       };
-      if (sort.order === 'desc' && sort.columnName === xAxisFields[0].columnName) {
+      if (
+        sort.order === 'desc' &&
+        sort.columnName === xAxisFields[0].columnName
+      ) {
         chartOptions.xAxis.reversed = true;
         return false;
       }
