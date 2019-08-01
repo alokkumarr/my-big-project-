@@ -1,23 +1,36 @@
 package sncr.xdf.ngcomponent;
 
-import com.google.gson.JsonElement;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.hadoop.fs.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hadoop.fs.FileContext;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Options;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.sql.Dataset;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonElement;
+
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.adapters.writers.DLBatchWriter;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.file.DLDataSetOperations;
-import sncr.xdf.adapters.writers.*;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by srya0001 on 9/11/2017.
@@ -38,7 +51,7 @@ public interface WithDLBatchWriter {
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
     	
-
+    	Map<String,Integer> partitionKeys = new HashMap<String,Integer>();
         try {
 
             WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
@@ -115,6 +128,7 @@ public interface WithDLBatchWriter {
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
                             WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
                             partitions.add(p);
+                           ;
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
                         }
@@ -125,11 +139,21 @@ public interface WithDLBatchWriter {
                     // Check if configuration asks data to be copied
                     // to final processed location
                     WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
+                    
+                    /*for(String e: partitions) {
+                    	 Path dest = new Path(moveTask.dest +  e);
+                    	 if(HFileOperations.fs.exists(dest) ) {
+                             //	logger.debug(dest.);
+                    		 WithDLBatchWriterHelper.logger.debug("deleting ..."+ dest);
+                                 HFileOperations.fs.delete(dest, true);
+                             }
+                    }*/
+                    
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
                     	 
-                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);
+                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx, partitionKeys);
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
@@ -160,11 +184,11 @@ public interface WithDLBatchWriter {
         public WithDLBatchWriterHelper(NGContext ngctx) {
             super(ngctx);
         }
-
+        
 
         public int copyMergePartition(String partitionKey,
                                       MoveDataDescriptor moveDataDesc,
-                                      InternalContext ctx ) throws Exception {
+                                      InternalContext ctx, Map<String, Integer> partitionKeys ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
             
             
@@ -174,18 +198,26 @@ public interface WithDLBatchWriter {
             String ext = "." + moveDataDesc.format.toLowerCase();
 
             // If we have to replace partition - just remove directory
-            // Will do nothing if directory doesn't exists
+            // Will do nothing if directory doesn't exists`
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
             	
-            	
+            	logger.debug("#####Partiotn key:: ###"+ partitionKey);
             	Boolean isSame = dest.getName().trim().equals(partitionKey.substring(1).trim());
             	
+            	logger.debug("########"+ moveDataDesc + "#########");
+            	logger.debug("########"+ dest + "#########");
             	/**
             	 * Delete only if it is not part of current partition. 
             	 * Multiple files partition use case
             	 */
-                if(HFileOperations.fs.exists(dest) && !isSame) {
-                    HFileOperations.fs.delete(dest, true);
+                if(HFileOperations.fs.exists(dest) ) {
+                 	boolean isOldPartition = (partitionKeys.get(partitionKey) == null || partitionKeys.get(partitionKey) == 0);
+                 	logger.debug("######## Delete check isOldPartition ???? "+ isOldPartition  + "#########");
+                 	if(isOldPartition) {
+                 		logger.debug("######## Deleting "+ dest  + "#########");
+                 		HFileOperations.fs.delete(dest, true);
+                 		partitionKeys.put(partitionKey,1);
+                 	}
                 }
                 	
             }
