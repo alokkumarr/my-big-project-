@@ -803,7 +803,7 @@ export class AnalyzeService {
     forEach(artifacts, artifact => {
       forEach(artifact.fields, column => {
         const metricColumn = metricArtifactMap[column.columnName];
-        if (metricColumn.geoType) {
+        if (metricColumn && metricColumn.geoType) {
           column.geoType = metricColumn.geoType;
         }
       });
