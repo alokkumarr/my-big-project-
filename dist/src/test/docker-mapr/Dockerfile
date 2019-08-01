@@ -126,6 +126,3 @@ COPY sip-xda-samples/sip-xda-run.sh /home/mapr/sip-xda-run.sh
 RUN chmod +x /home/mapr/sip-xda-run.sh
 RUN chown mapr:mapr /home/mapr/sip-xda-run.sh
 
-COPY sip-xda-samples/xda-es-config.sh /home/mapr/xda-es-config.sh
-RUN chmod +x /home/mapr/xda-es-config.sh
-RUN chown mapr:mapr /home/mapr/xda-es-config.sh
