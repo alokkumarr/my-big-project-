@@ -251,7 +251,7 @@ export class AnalyzeService {
         ? '&executionType=onetime'
         : '';
 
-    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
       options.analysisType
     }${onetimeExecution}`;
 
