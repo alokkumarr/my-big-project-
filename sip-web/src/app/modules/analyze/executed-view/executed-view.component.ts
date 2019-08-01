@@ -168,7 +168,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     );
-    console.log(analysisId);
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent
@@ -187,7 +186,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     loadLastExecution,
     executionId
   ) {
-    console.log(awaitingExecution);
     if (awaitingExecution) {
       return;
     }
@@ -198,7 +196,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       isDataLakeReport ||
       !this.canAutoRefresh
     ) {
-      console.log('sindei if');
       this.loadExecutedAnalysesAndExecutionData(
         analysis.id,
         executionId,
@@ -206,7 +203,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         null
       );
     } else {
-      console.log('sindei esle');
       this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
     }
   }
@@ -260,7 +256,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       ? this.generateDSLDateFilters(response.queryBuilder.filters)
       : response.queryBuilder.filters;
     if (isDataLakeReport && thereIsDataLoaded) {
-      console.log('1');
       this._toastMessage.success(
         'Tap this message to reload data.',
         'Execution finished',
@@ -478,7 +473,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     analysisType,
     executeResponse = null
   ) {
-    console.log('loadDataOrSetDataLoader');
     // report type data will be loaded by the report grid, because of the paging mechanism
     const isReportType = ['report', 'esReport'].includes(analysisType);
     if (isReportType) {

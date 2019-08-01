@@ -434,8 +434,13 @@ export class DesignerState {
     { designerEdit }: DesignerUpdateEditMode
   ) {
     const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    if (designerEdit) {
+      sipQuery.filters = [];
+      sipQuery.sorts = [];
+    }
     return patchState({
-      analysis: { ...analysis, designerEdit }
+      analysis: { ...analysis, designerEdit, sipQuery: {...sipQuery} }
     });
   }
 
