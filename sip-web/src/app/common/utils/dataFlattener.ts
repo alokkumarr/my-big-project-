@@ -10,8 +10,6 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
-import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
