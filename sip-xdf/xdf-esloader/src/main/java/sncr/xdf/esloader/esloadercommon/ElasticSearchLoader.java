@@ -100,7 +100,7 @@ public class ElasticSearchLoader {
 
         configMap.put(ES_NODE_DISCOVERY, String.valueOf(false));
         configMap.put(ES_PARAM_NODES, esHosts);
-        configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
+        configMap.put(ES_PARAM_PORT, String.valueOf(config.getEsPort()));
         configMap.put("es.nodes.wan.only","true");
 
         if(config.getEsUser() != null && config.getEsPassword() != null) {

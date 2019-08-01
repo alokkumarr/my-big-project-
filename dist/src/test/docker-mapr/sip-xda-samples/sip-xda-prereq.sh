@@ -11,6 +11,3 @@ su - mapr -c "hadoop fs -put /home/mapr/sip-xda-sampleapp/ hdfs:///opt/bda/apps"
 
 su - mapr -c "/opt/sip/sip-xdf/bin/xdf-mdcli.sh file:///home/mapr/sip-xda-sampleapp/meta/project.json"
 
-# Update ES Configuration
-
-sshpass -p 'root' ssh root@sip-elastic  "bash -s" < xda-es-config.sh
