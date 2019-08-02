@@ -39,8 +39,9 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     // Unlike Analysis definition, we don't have type information in Execution Results,
     // So prepare data with custom logic by identifying based on their structure.
     // Below code is for preparing Artifacts for ES and DL Reports.
-    if (sipQuery.getArtifacts().get(0).getFields().size() == 1
-        || sipQuery.getArtifacts().get(0).getFields().get(0).getColumnName() == null) {
+    if (sipQuery.getArtifacts().get(0).getFields().size() != 0
+        && (sipQuery.getArtifacts().get(0).getFields().size() == 1
+            || sipQuery.getArtifacts().get(0).getFields().get(0).getColumnName() == null)) {
 
       sipQuery.setArtifacts(buildArtifactsList(queryBuilderObject));
 
