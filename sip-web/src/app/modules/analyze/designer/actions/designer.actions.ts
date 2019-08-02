@@ -7,6 +7,11 @@ import {
 import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
+export class DesignerSetData {
+  static readonly type = '[Designer] Set data';
+  constructor(public data: any[]) {}
+}
+
 export class DesignerResetState {
   static readonly type = '[Designer] Reset state on destroy';
   constructor() {}
@@ -181,4 +186,3 @@ export class DesignerRemoveAllArtifactColumns {
   static readonly type = '[Designer] Remove all artifact columns from analysis';
   constructor() {}
 }
-

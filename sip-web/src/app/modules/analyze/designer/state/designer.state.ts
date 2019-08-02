@@ -49,7 +49,8 @@ import {
   DesignerApplyChangesToArtifactColumns,
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
-  DesignerResetState
+  DesignerResetState,
+  DesignerSetData
 } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -65,7 +66,8 @@ import {
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null,
-  metric: null
+  metric: null,
+  data: null
 };
 
 const defaultDSLChartOptions: DSLChartOptionsModel = {
@@ -88,6 +90,8 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   }
 };
 
+const MAX_PACKED_BUBBLE_CHART_DATA = 20;
+
 @State<DesignerStateModel>({
   name: 'designerState',
   defaults: <DesignerStateModel>cloneDeep(defaultDesignerState)
@@ -101,6 +105,40 @@ export class DesignerState {
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
     return state.groupAdapters;
+  }
+
+  @Selector()
+  static analysis(state: DesignerStateModel) {
+    return state.analysis;
+  }
+
+  @Selector()
+  static data(state: DesignerStateModel) {
+    return state.data;
+  }
+
+  @Selector()
+  static metricName(state: DesignerStateModel) {
+    return state.metric.metricName;
+  }
+
+  @Selector()
+  static isDataTooMuchForChart(state: DesignerStateModel) {
+    const chartType = get(state, 'analysis.chartOptions.chartType');
+    return (
+      chartType === 'packedbubble' &&
+      state.data.length > MAX_PACKED_BUBBLE_CHART_DATA
+    );
+  }
+
+  @Action(DesignerSetData)
+  setData(
+    { patchState }: StateContext<DesignerStateModel>,
+    { data }: DesignerSetData
+  ) {
+    return patchState({
+      data
+    });
   }
 
   @Action(DesignerMergeSupportsIntoAnalysis)
