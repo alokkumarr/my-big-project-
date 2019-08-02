@@ -8,6 +8,7 @@ import {
   JsPlumbCanvasChangeEvent,
   DesignerChangeEvent
 } from '../../types';
+import { QueryDSL } from 'src/app/models';
 
 @Component({
   selector: 'designer-settings-multi-table',
@@ -22,7 +23,7 @@ export class DesignerSettingsMultiTableComponent {
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }
   @Input() data;
-  @Input() sqlBuilder: SqlBuilderReport;
+  @Input() sqlBuilder: QueryDSL | SqlBuilderReport;
   public artifacts: Artifact[];
 
   onChange(event: JsPlumbCanvasChangeEvent) {

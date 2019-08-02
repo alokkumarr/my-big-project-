@@ -155,7 +155,7 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency> --> 
+    </dependency> -->
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
@@ -624,54 +624,51 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>1.7.6</version>
         <executions>
           <execution>
-            <id>install-node-and-npm</id>
+            <id>install-node-and-yarn</id>
             <phase>pre-integration-test</phase>
             <goals>
-              <goal>install-node-and-npm</goal>
+              <goal>install-node-and-yarn</goal>
             </goals>
             <configuration>
-              <nodeVersion>v8.10.0</nodeVersion>
-              <npmVersion>5.6.0</npmVersion>
+              <nodeVersion>v10.16.0</nodeVersion>
+              <yarnVersion>v1.17.3</yarnVersion>
             </configuration>
           </execution>
           <execution>
-            <id>npm-install</id>
+            <id>yarn-install</id>
             <phase>pre-integration-test</phase>
             <goals>
-              <goal>npm</goal>
+                <goal>yarn</goal>
             </goals>
-            <configuration>
-              <arguments>install</arguments>
-            </configuration>
           </execution>
           <execution>
-            <id>npm-run-webdriver-manager</id>
+            <id>yarn-run-webdriver-manager</id>
             <phase>pre-integration-test</phase>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <configuration>
               <arguments>run webdriver-manager</arguments>
             </configuration>
           </execution>
           <execution>
-            <id>npm-run-protractor</id>
+            <id>yarn-run-protractor</id>
             <phase>integration-test</phase>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <configuration>
               <arguments>run protractor -- --baseUrl=https://${docker.host.address}/sip/web/ --suite=${saw.e2e.suite} --isHttps=${sip.cloud.secure}</arguments>
             </configuration>
           </execution>
            <execution>
-            <id>npm-run-generate-report</id>
+            <id>yarn-run-generate-report</id>
             <phase>post-integration-test</phase>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
             </goals>
             <configuration>
               <arguments>run generate-report</arguments>

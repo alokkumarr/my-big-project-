@@ -5,6 +5,7 @@ import { Axis } from './axis.model';
 import { Schedule } from './schedule.model';
 import { Filter } from './filter.model';
 import { Sort } from './sort.model';
+import { Join } from './join.model';
 import { Format } from '../modules/analyze/types';
 
 export interface ArtifactColumnDSL {
@@ -39,6 +40,7 @@ export interface QueryDSL {
   artifacts: ArtifactDSL[];
   booleanCriteria: string;
   filters: Filter[];
+  joins: Join[];
   sorts: Sort[];
   orderByColumns?: Sort[]; // this is legacy field. Should be removed after migration
   store: StorageDSL;
