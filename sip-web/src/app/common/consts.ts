@@ -112,6 +112,8 @@ export const PIVOT_DATE_FORMATS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(PIVOT_DATE_FORMATS);
 
+export const ES_REPORTS_DATE_FORMATS = [...PIVOT_DATE_FORMATS];
+
 export const DATE_FORMATS = [
   {
     label: 'Default',

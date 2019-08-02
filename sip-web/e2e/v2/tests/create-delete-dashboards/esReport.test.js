@@ -51,7 +51,8 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId
+            currentAnalysis.analysisId,
+            ES_REPORT
           );
         }
       });

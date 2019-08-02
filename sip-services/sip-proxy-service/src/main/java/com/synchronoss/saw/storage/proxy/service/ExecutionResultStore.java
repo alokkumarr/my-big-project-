@@ -1,8 +1,11 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.google.gson.JsonElement;
 import com.mapr.db.MapRDB;
 import java.util.List;
 import java.util.Map;
+
+import com.mapr.db.Table;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import org.slf4j.Logger;
@@ -25,24 +28,21 @@ public class ExecutionResultStore extends MetadataStore
     return searchAsMap(table, qc);
   }
 
-  public List<Document> searchAll() throws Exception {
-    QueryCondition cond = MapRDB.newCondition();
-    return searchAsList(table, cond);
+  public JsonElement create(Table table, String id, String src) throws Exception {
+    Document ds = MapRDB.newDocument(src);
+    _saveNew(table, id, ds);
+    return toJsonElement(ds);
   }
 
-  public List<Document> searchAll(Map<String, String> keyValues) throws Exception {
-    logger.trace("Search query on search " + keyValues);
-    QueryCondition cond = MapRDB.newCondition();
-    cond.and();
-    if (keyValues != null || keyValues.size() != 0) {
+  protected void _saveNew(Table table, String id, Document doc) {
+    doc.setId(id);
+    logger.debug("Final document to be saved: " + doc.toString());
+    table.insert(doc);
+    table.flush();
+  }
 
-      for (String key : keyValues.keySet()) {
-        cond.is(key, QueryCondition.Op.EQUAL, keyValues.get(key));
-      }
-    }
-
-    cond.close();
-    cond.build();
-    return searchAsList(table, cond);
+  public boolean bulkDelete(Table table, List<String> listId) {
+    listId.forEach(id -> table.delete(id));
+    return true;
   }
 }
