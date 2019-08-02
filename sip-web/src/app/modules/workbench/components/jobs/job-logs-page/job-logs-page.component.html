@@ -128,6 +128,8 @@
       <td
         [attr.e2e]="'job-log-fileName-' + logRow.data.fileName"
         [matTooltip]="logRow.data.fileName"
+        style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+        [matTooltip]="logRow.data.fileName"
       >
         {{ logRow.data.fileName }}
       </td>

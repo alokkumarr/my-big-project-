@@ -70,13 +70,13 @@
           caption="Channel name"
           dataField="channelName"
           alignment="left"
-          cellTemplate="e2eTemplate"
+          cellTemplate="nameTemplate"
         ></dxi-column>
         <dxi-column
           caption="Route name"
           dataField="routeName"
           alignment="left"
-          cellTemplate="e2eTemplate"
+          cellTemplate="nameTemplate"
         ></dxi-column>
         <dxi-column
           caption="Start time"
@@ -157,6 +157,15 @@
           *dxTemplate="let cell of 'e2eTemplate'"
         >
           {{ cell.text }}
+        </div>
+
+        <div
+          style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.value"
+          *dxTemplate="let cell of 'nameTemplate'"
+          [matTooltip]="cell.value"
+        >
+          {{ cell.value }}
         </div>
 
         <div
