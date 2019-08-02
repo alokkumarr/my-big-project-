@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   height: calc(100% - 20px);
@@ -30,4 +30,10 @@ filter-chips-u {
   font-size: 11px;
   float: right;
   color: $primary-grey-g3;
+}
+
+report-grid-upgraded {
+  ::ng-deep .report-dx-grid {
+    height: 100% !important;
+  }
 }
