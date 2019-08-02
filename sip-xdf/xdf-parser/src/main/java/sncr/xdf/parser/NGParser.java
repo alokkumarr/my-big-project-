@@ -133,13 +133,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     HFileOperations.deleteEnt(outputDataSetLocation);
                 }
             }
-        }catch(Exception e)
-        {
-            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-            logger.error(e.getMessage());
-        }
-
-        try {
 
             FileSystem fs = HFileOperations.getFileSystem();
             FileStatus[] files = fs.globStatus(new Path(sourcePath));
@@ -150,10 +143,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         }catch(Exception e)
         {
-            logger.trace("Input source directory is empty " + e.getMessage());
+            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
+            logger.error(e.getMessage());
         }
 
-        
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 
             headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
