@@ -77,6 +77,7 @@ public class DataExportController {
                                 RequestEntity request, HttpServletResponse response){
     logger.debug("executionId in dispatch {}", executionId);
     logger.debug("Request body {}", request.getBody());
+    logger.debug("Analysis type = " + analysisType);
 
     if (analysisType.equalsIgnoreCase("report") || analysisType.equalsIgnoreCase("esReport"))
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId, analysisType);

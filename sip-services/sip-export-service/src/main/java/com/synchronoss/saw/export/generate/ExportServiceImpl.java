@@ -138,8 +138,10 @@ public class ExportServiceImpl implements ExportService {
               + analysisId
               + "/executions/data?page=1&pageSize="
               + sizOfExport
-              +"&analysisType="+analysisType
-              +"&executionType="+executionType;
+              + "&analysisType="
+              + analysisType
+              + "&executionType="
+              + executionType;
 
     } else if (executionId == null) {
       url =
@@ -148,7 +150,8 @@ public class ExportServiceImpl implements ExportService {
               + analysisId
               + "/lastExecutions/data?page=1&pageSize="
               + sizOfExport
-              +"&analysisType="+analysisType;
+              + "&analysisType="
+              + analysisType;
     } else {
       url =
           storageProxyUrl
@@ -156,7 +159,8 @@ public class ExportServiceImpl implements ExportService {
               + analysisId
               + "/executions/data?page=1&pageSize="
               + sizOfExport
-              +"&analysisType="+analysisType;
+              + "&analysisType="
+              + analysisType;
     }
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
@@ -192,7 +196,10 @@ public class ExportServiceImpl implements ExportService {
     RestTemplate restTemplate = restUtil.restTemplate();
     Object dispatchBean = request.getBody();
 
+    logger.debug("Dispatch Bean = " + dispatchBean);
     ExportBean exportBean = setExportBeanProps(dispatchBean);
+    logger.debug("Export Bean = " + exportBean);
+
     String recipients = null;
     String ftp = null;
     String s3 = null;
@@ -205,8 +212,10 @@ public class ExportServiceImpl implements ExportService {
       if (((LinkedHashMap) dispatchBean).get("ftp") != null)
         ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
 
-      if (((LinkedHashMap) dispatchBean).get("s3") != null)
+      if (((LinkedHashMap) dispatchBean).get("s3") != null) {
         s3 = String.valueOf(((LinkedHashMap) dispatchBean).get("s3"));
+        logger.trace("S3 list in reportToBeDispatchedAsync= " + s3);
+      }
       if (((LinkedHashMap) dispatchBean).get("zip") != null)
         zip = (Boolean) ((LinkedHashMap) dispatchBean).get("zip");
 
@@ -264,6 +273,7 @@ public class ExportServiceImpl implements ExportService {
       ExportBean exportBean, long limitPerPage, ResponseEntity<DataResponse> entity) {
     try {
 
+      logger.trace("Inside streamResponseToFile");
       File file = new File(exportBean.getFileName());
       file.getParentFile().mkdirs();
 
@@ -274,6 +284,8 @@ public class ExportServiceImpl implements ExportService {
       OutputStreamWriter osw = new OutputStreamWriter(fos);
       String fileType = exportBean.getFileType();
 
+      logger.debug("Writing to file");
+      logger.debug("Data = " + entity.getBody().getData());
       // stream the page output to file.
       if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
         streamToCSVReport(entity, limitPerPage, exportBean, osw);
@@ -296,7 +308,14 @@ public class ExportServiceImpl implements ExportService {
       long LimittoExport,
       ExportBean exportBean,
       OutputStreamWriter osw) {
-    entity.getBody().getData().stream()
+    List<Object> data = entity.getBody().getData();
+
+    if (data == null || data.size() == 0) {
+      logger.info("No data to export");
+
+      return;
+    }
+    data.stream()
         .limit(LimittoExport)
         .forEach(
             line -> {
@@ -304,7 +323,7 @@ public class ExportServiceImpl implements ExportService {
                 if (line instanceof LinkedHashMap) {
                   String[] header = null;
                   if (exportBean.getColumnHeader() == null
-                          || exportBean.getColumnHeader().length == 0) {
+                      || exportBean.getColumnHeader().length == 0) {
                     Object[] obj = ((LinkedHashMap) line).keySet().toArray();
                     if (exportBean.getColumnDataType() != null
                         && exportBean.getColumnDataType().length > 0) {
@@ -350,6 +369,13 @@ public class ExportServiceImpl implements ExportService {
   public Boolean streamToXlsxReport(
       DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
 
+    List<Object> data = response.getData();
+
+    if (data == null || data.size() == 0) {
+      logger.info("No data to export");
+
+      return false;
+    }
     BufferedOutputStream stream = null;
     File xlsxFile = null;
     xlsxFile = new File(exportBean.getFileName());
@@ -917,8 +943,7 @@ public class ExportServiceImpl implements ExportService {
       String userFileName) {
     logger.trace("Inside S3 dispatcher");
 
-    ExportBean exportBean = new ExportBean();
-    exportBean = bean;
+    ExportBean exportBean = bean;
 
     // create a directory with unique name in published location to avoid file
     // conflict for dispatch.
@@ -929,8 +954,11 @@ public class ExportServiceImpl implements ExportService {
             + generateRandomStringDir()
             + File.separator
             + userFileName;
+    logger.debug("File name = " + mailDispatchFileName);
 
     exportBean.setFileName(mailDispatchFileName);
+
+    logger.debug("Export Bean = " + exportBean);
 
     prepareFileWithSize(
         analysisId,
@@ -942,9 +970,11 @@ public class ExportServiceImpl implements ExportService {
         exportBean);
 
     File cfile = new File(exportBean.getFileName());
-    String zipFileName = cfile.getAbsolutePath().concat(".zip");
+
+    logger.debug("Final S3 = " + finalS3);
 
     if (zip) {
+      String zipFileName = cfile.getAbsolutePath().concat(".zip");
       logger.debug("S3 - zip = true!!");
       try {
         FileOutputStream fos_zip = new FileOutputStream(zipFileName);
@@ -1044,7 +1074,8 @@ public class ExportServiceImpl implements ExportService {
             + "/executions/data?page=1&pageSize="
             + exportSize
             + "&executionType=scheduled"
-            + "&analysisType=" + analysisType;
+            + "&analysisType="
+            + analysisType;
 
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
         asyncRestTemplate.getForEntity(url, DataResponse.class);
@@ -1114,6 +1145,7 @@ public class ExportServiceImpl implements ExportService {
       HttpEntity<?> requestEntity,
       RestTemplate restTemplate,
       ExportBean exportBean) {
+    logger.debug("Preparing file with size = " + exportSize);
     long limitPerPage = Long.parseLong(exportChunkSize);
     long page = 0; // just to keep hold of last not processed data in for loop
 
@@ -1148,12 +1180,23 @@ public class ExportServiceImpl implements ExportService {
               + "/executions/data?page="
               + page
               + "&pageSize="
-              + limitPerPage;
+              + limitPerPage
+              + "&analysisType="
+              + analysisType
+              + "&analysisId="
+              + analysisId;
+
+      logger.debug("URL = " + url);
 
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
+
+      logger.debug("Response = " + entity.getBody());
+
       totalRowCount = entity.getBody().getTotalRows();
+
+      logger.debug("Total row count = " + totalRowCount);
       if (totalRowCount <= Double.parseDouble(exportSize) && flag) {
         noOfPages = Math.ceil(totalRowCount / limitPerPage);
         flag = false;
@@ -1194,12 +1237,21 @@ public class ExportServiceImpl implements ExportService {
               + "/executions/data?page="
               + page
               + "&pageSize="
-              + leftOutRows;
+              + leftOutRows
+              + "&analysisType="
+              + analysisType
+              + "&analysisId="
+              + analysisId;
+      ;
       // we directly get response and start processing this.
       ResponseEntity<DataResponse> entity =
           restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
 
+      logger.debug("Execution response = " + entity);
+
       streamResponseToFile(exportBean, leftOutRows, entity);
+
+      logger.debug("File created");
     }
   }
 
