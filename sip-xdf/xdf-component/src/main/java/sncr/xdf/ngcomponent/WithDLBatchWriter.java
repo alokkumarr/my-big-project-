@@ -201,20 +201,15 @@ public interface WithDLBatchWriter {
             // Will do nothing if directory doesn't exists`
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
             	
-            	logger.debug("#####Partiotn key:: ###"+ partitionKey);
-            	Boolean isSame = dest.getName().trim().equals(partitionKey.substring(1).trim());
+            	logger.debug("Partiotn key:: "+ partitionKey);
             	
-            	logger.debug("########"+ moveDataDesc + "#########");
-            	logger.debug("########"+ dest + "#########");
             	/**
             	 * Delete only if it is not part of current partition. 
             	 * Multiple files partition use case
             	 */
                 if(HFileOperations.fs.exists(dest) ) {
                  	boolean isOldPartition = (partitionKeys.get(partitionKey) == null || partitionKeys.get(partitionKey) == 0);
-                 	logger.debug("######## Delete check isOldPartition ???? "+ isOldPartition  + "#########");
                  	if(isOldPartition) {
-                 		logger.debug("######## Deleting "+ dest  + "#########");
                  		HFileOperations.fs.delete(dest, true);
                  		partitionKeys.put(partitionKey,1);
                  	}
@@ -357,7 +352,6 @@ public interface WithDLBatchWriter {
 
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
         	
-        	logger.debug("#### Move files starting. format ::"+ format );
             //If output files are PARQUET files - clean up temp. directory - remove
             // _metadata and _common_? files.
             if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_PARQUET)) {
