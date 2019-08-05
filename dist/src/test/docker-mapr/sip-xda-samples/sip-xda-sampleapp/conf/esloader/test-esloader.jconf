@@ -1,7 +1,7 @@
 {
   "es-loader" :  {
                 "destinationIndexName" : "es_data/es_record",
-                "indexMappingfile" : "file:///home/mapr/sip-xda-sampleapp/conf/esloader/Mapping.mpp",
+                "indexMappingfile" : "file:///home/mapr/sip-xda-sampleapp/conf/esloader/Mapping.json",
                 "aliases": [{
                         "aliasName": "ES_data_latest",
                         "mode": "replace"

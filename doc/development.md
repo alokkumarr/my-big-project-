@@ -407,6 +407,13 @@ for further details.
 
 This section will describe list of steps to use the XDA Sample application on the Docker environment.
 
+### Fireup Docker environment
+
+`Command`
+
+       mvn clean package -DskipTests=true -Dsip-cloud-secure=False
+       mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
+
 ### Prerequisites Script
 
 This script will register the XDA application on maprdb and create all required folders on MapR FS.
@@ -415,7 +422,6 @@ This script will register the XDA application on maprdb and create all required 
 
        /home/mapr/sip-xda-prereq.sh
 
-
 ### Running XDA Sampleapp
 
 Developer can run each individual XDA Component or complete end-to-end pipeline using this script. Sample configurations and sample input file location will pop up as suggestions once the below shell script is run.
@@ -423,7 +429,6 @@ Developer can run each individual XDA Component or complete end-to-end pipeline 
 `Command`
 
        /home/mapr/sip-xda-run.sh
-
 
 User can then select to run requied individual XDA Component or run end-to-end Pipeline component by providing the input file or input file location. Developer will provide the input and output locations for each component in the configuration files. 
 
@@ -451,6 +456,6 @@ Defalut Raw folder for input files and output files after processing ( this can 
 
 ##### ESLoader output indices can be viewed by using the below CLI command from sip-mapr container using CURL
 
-      curl http://sip-elastic:9200/_cat/indices?pretty
+      curl http://sip-elastic:8200/_cat/indices?pretty
  
 
