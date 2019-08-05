@@ -55,7 +55,7 @@ public class ElasticSearchLoaderTest {
         assertEquals(esHosts.get(0), paramMap.get(ES_PARAM_NODES));
         assertEquals(esUser, paramMap.get(ES_PARAM_USER));
         assertEquals(esPassword, paramMap.get(ES_PARAM_PASSWORD));
-        assertEquals(String.valueOf(esPort), paramMap.get(ES_PARAM_ADMIN_PORT));
+        assertEquals(String.valueOf(esPort), paramMap.get(ES_PARAM_PORT));
         assertEquals(clusterName, paramMap.get(ES_PARAM_CLUSTER));
     }
 
