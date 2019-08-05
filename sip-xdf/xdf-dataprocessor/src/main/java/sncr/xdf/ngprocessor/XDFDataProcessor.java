@@ -116,11 +116,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 	}
 
 
-  @Override
-  protected int execute(Dataset df) {
-    return ErrorCodes.IncorrectCall.ordinal();
-  }
-
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
 
         int ret = 0;

@@ -107,12 +107,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     public NGParser() {  super(); }
 
     
-	@Override
-	protected int execute(Dataset inputDataFrame) {
-		this.inputDataFrame = inputDataFrame;
-		return execute();
-	}
-	
     @SuppressWarnings("unchecked")
 	@Override
     protected int execute(){

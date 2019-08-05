@@ -528,10 +528,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
         return dataSetmap;
     }
 
-	@Override
-	protected int execute(Dataset df) {
-		return ErrorCodes.IncorrectCall.ordinal();
-	}
 }
 
 

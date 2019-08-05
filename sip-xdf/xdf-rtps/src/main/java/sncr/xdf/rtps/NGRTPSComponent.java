@@ -58,12 +58,6 @@ public class NGRTPSComponent extends AbstractComponent
 	}
 
 
-@Override
-  protected int execute(Dataset df) {
-    return ErrorCodes.IncorrectCall.ordinal();
-  }
-
-
 	@Override
 	protected int archive() {
 		// TODO Auto-generated method stub
