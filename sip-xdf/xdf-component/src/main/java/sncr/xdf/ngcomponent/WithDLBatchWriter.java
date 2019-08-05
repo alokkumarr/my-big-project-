@@ -140,15 +140,6 @@ public interface WithDLBatchWriter {
                     // to final processed location
                     WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
                     
-                    /*for(String e: partitions) {
-                    	 Path dest = new Path(moveTask.dest +  e);
-                    	 if(HFileOperations.fs.exists(dest) ) {
-                             //	logger.debug(dest.);
-                    		 WithDLBatchWriterHelper.logger.debug("deleting ..."+ dest);
-                                 HFileOperations.fs.delete(dest, true);
-                             }
-                    }*/
-                    
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
