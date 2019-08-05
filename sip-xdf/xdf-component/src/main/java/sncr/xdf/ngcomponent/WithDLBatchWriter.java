@@ -29,6 +29,7 @@ import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.MapAccumulator;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.file.DLDataSetOperations;
 
@@ -51,7 +52,7 @@ public interface WithDLBatchWriter {
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
     	
-    	Map<String,Integer> partitionKeys = new HashMap<String,Integer>();
+    	MapAccumulator mapAccumulator = new MapAccumulator();
         try {
 
             WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
@@ -140,11 +141,12 @@ public interface WithDLBatchWriter {
                     // to final processed location
                     WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
                     
+                    
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
                     	 
-                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx, partitionKeys);
+                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx, mapAccumulator.value());
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
@@ -179,7 +181,7 @@ public interface WithDLBatchWriter {
 
         public int copyMergePartition(String partitionKey,
                                       MoveDataDescriptor moveDataDesc,
-                                      InternalContext ctx, Map<String, Integer> partitionKeys ) throws Exception {
+                                      InternalContext ctx, Map<String, Long> partitionKeys ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
             
             
@@ -192,7 +194,6 @@ public interface WithDLBatchWriter {
             // Will do nothing if directory doesn't exists`
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
             	
-            	logger.debug("Partiotn key:: "+ partitionKey);
             	
             	/**
             	 * Delete only if it is not part of current partition. 
@@ -200,9 +201,11 @@ public interface WithDLBatchWriter {
             	 */
                 if(HFileOperations.fs.exists(dest) ) {
                  	boolean isOldPartition = (partitionKeys.get(partitionKey) == null || partitionKeys.get(partitionKey) == 0);
+                 	logger.debug("Delete check isOldPartition ???? "+ isOldPartition);
                  	if(isOldPartition) {
+                 		logger.debug("######## Deleting "+ dest  + "#########");
                  		HFileOperations.fs.delete(dest, true);
-                 		partitionKeys.put(partitionKey,1);
+                 		partitionKeys.put(partitionKey,1L);
                  	}
                 }
                 	
@@ -343,6 +346,7 @@ public interface WithDLBatchWriter {
 
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
         	
+        	logger.debug("#### Move files starting. format ::"+ format );
             //If output files are PARQUET files - clean up temp. directory - remove
             // _metadata and _common_? files.
             if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_PARQUET)) {
