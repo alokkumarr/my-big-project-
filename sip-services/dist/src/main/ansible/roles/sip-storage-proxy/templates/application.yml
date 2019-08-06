@@ -74,6 +74,9 @@ metastore:
     base:  {{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip/') }}
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
+    ttl-for-onetime: 1800
+    analysis: analysisMetadata
+    execution-result-limit: 5
 
 metadata:
   service:
@@ -85,6 +88,12 @@ sip:
 {% if sip_secure %}
   ssl:
     enable : true
+  trust:
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
+  key:
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
 {% else %}
   ssl:
     enable: false

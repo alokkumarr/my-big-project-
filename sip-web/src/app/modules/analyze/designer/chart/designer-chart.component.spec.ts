@@ -71,6 +71,7 @@ describe('Designer Chart Component', () => {
       ],
       filters: [],
       sorts: [],
+      joins: [],
       store: {
         dataStore: null,
         storageType: null
