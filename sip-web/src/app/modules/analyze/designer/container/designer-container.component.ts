@@ -687,7 +687,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       response => {
         if (
           this.isDataEmpty(
-            response.data.data,
+            response.data,
             this.analysis.type,
             (<AnalysisDSL>this.analysis).sipQuery ||
               (<Analysis>this.analysis).sqlBuilder
@@ -700,9 +700,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this._store.dispatch(
-            new DesignerSetData(
-              this.flattenData(response.data.data, this.analysis)
-            )
+            new DesignerSetData(this.flattenData(response.data, this.analysis))
           );
           if (this.analysis.type === 'report' && response.designerQuery) {
             if (this.isInQueryMode) {
