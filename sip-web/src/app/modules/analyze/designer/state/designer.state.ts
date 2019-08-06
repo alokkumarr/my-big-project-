@@ -108,6 +108,14 @@ export class DesignerState {
   }
 
   @Selector()
+  static artifactFields(state: DesignerStateModel) {
+    return fpFlatMap(
+      artifact => artifact.fields,
+      get(state, 'analysis.sipQuery.artifacts')
+    );
+  }
+
+  @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
   }
@@ -339,16 +347,20 @@ export class DesignerState {
         adapter.marker ===
         artifacts[artifactIndex].fields[artifactColumnIndex].area
     );
-    const targetAdapter = groupAdapters[targetAdapterIndex];
-    const adapterColumnIndex = findIndex(
-      targetAdapter.artifactColumns,
-      col => col.columnName === artifactColumn.columnName
-    );
-    const adapterColumn = targetAdapter.artifactColumns[adapterColumnIndex];
 
-    forEach(artifactColumn, (value, prop) => {
-      adapterColumn[prop] = value;
-    });
+    // In case of reports, there's no concept of group adapters. Check for that here.
+    if (targetAdapterIndex >= 0) {
+      const targetAdapter = groupAdapters[targetAdapterIndex];
+      const adapterColumnIndex = findIndex(
+        targetAdapter.artifactColumns,
+        col => col.columnName === artifactColumn.columnName
+      );
+      const adapterColumn = targetAdapter.artifactColumns[adapterColumnIndex];
+
+      forEach(artifactColumn, (value, prop) => {
+        adapterColumn[prop] = value;
+      });
+    }
     return patchState({
       analysis: {
         ...analysis,

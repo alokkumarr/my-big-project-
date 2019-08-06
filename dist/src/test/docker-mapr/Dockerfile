@@ -105,3 +105,24 @@ RUN systemctl enable \
   sip-mapr-logger@$(systemd-escape /opt/mapr/logs/warden.log) \
   sip-mapr-logger@$(systemd-escape /opt/mapr/logs/cldb.log) \
   sip-mapr-logger@$(systemd-escape $livy_home/logs/livy-mapr-server.out)
+
+# Providing mapr user root privileges
+
+RUN echo 'mapr    ALL=(ALL)       NOPASSWD: ALL' >> /etc/sudoers
+
+# Uploading XDA Sample-data and Application
+
+COPY sip-xda-samples/sip-xda-sampleapp /home/mapr/sip-xda-sampleapp
+RUN chmod -R 0755 /home/mapr/sip-xda-sampleapp
+RUN chown -R mapr:mapr /home/mapr/sip-xda-sampleapp
+
+# Script to start XDA Application
+
+COPY sip-xda-samples/sip-xda-prereq.sh /home/mapr/sip-xda-prereq.sh
+RUN chmod +x /home/mapr/sip-xda-prereq.sh
+RUN chown mapr:mapr /home/mapr/sip-xda-prereq.sh
+
+COPY sip-xda-samples/sip-xda-run.sh /home/mapr/sip-xda-run.sh
+RUN chmod +x /home/mapr/sip-xda-run.sh
+RUN chown mapr:mapr /home/mapr/sip-xda-run.sh
+

@@ -51,7 +51,8 @@ import {
   AnalysisDSL,
   LabelOptions,
   AnalysisChartDSL,
-  AnalysisMapDSL
+  AnalysisMapDSL,
+  QueryDSL
 } from '../../../../models';
 import {
   DesignerStates,
@@ -85,10 +86,13 @@ import {
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState,
-  DesignerSetData
+  DesignerSetData,
+  DesignerAddArtifactColumn,
+  DesignerRemoveArtifactColumn,
+  DesignerUpdateArtifactColumn
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
-import { CUSTOM_DATE_PRESET_VALUE } from './../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -108,6 +112,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   @Select(DesignerState.analysis) dslAnalysis$: Observable<AnalysisDSL>;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
+  );
+
+  sipQuery$: Observable<QueryDSL> = this.dslAnalysis$.pipe(
+    map$(analysis => analysis.sipQuery)
   );
 
   public isInDraftMode = false;
@@ -209,7 +217,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
     this.data$.subscribe(data => (this.data = data));
     this.dslAnalysis$.subscribe(analysis => {
-      if (!analysis || ['report', 'esReport'].includes(analysisType)) {
+      if (!analysis || ['report'].includes(analysisType)) {
         return;
       }
       this.analysis = analysis;
@@ -606,16 +614,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
-      /* If it's a DSL analysis, since we're depending on group adapters
-         to generate sipQuery, wait until group adapters are loaded before
-         requesting data.
+      /* If it's a DSL analysis, check if there are any fields added before trying
+        to load data.
          */
       if (isDSLAnalysis(this.analysis)) {
         this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
         const subscription = this._store
-          .select(DesignerState.groupAdapters)
+          .select(DesignerState.artifactFields)
           .pipe(
-            takeWhile(adapters => isEmpty(adapters)),
+            takeWhile(fields => isEmpty(fields)),
             finalize(() => {
               this.requestData();
             })
@@ -963,21 +970,32 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     switch (event.subject) {
     // backend data refresh needed
     case 'column':
-      this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
+      if (event.column.checked) {
+        this._store.dispatch(new DesignerAddArtifactColumn(event.column));
+      } else {
+        this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+      }
+      this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.areMinRequirmentsMet = this.canRequestData();
       this.loadGridWithoutData(event.column, 'add');
       break;
     case 'removeColumn':
-      this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
+      this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+      this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
       this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
+      this._store.dispatch(new DesignerUpdateArtifactColumn({
+        columnName: event.column.columnName,
+        table: event.column.table || event.column['tableName'],
+        aggregate: event.column.aggregate
+      }));
       forEach(this.analysis.artifacts, artifactcolumns => {
         forEach(artifactcolumns.columns, col => {
           if (col.name === event.column.name) {
@@ -1022,6 +1040,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       if (isDSLAnalysis(this.analysis)) {
+        this._store.dispatch(new DesignerUpdateArtifactColumn({
+          alias: event.column.alias,
+          columnName: event.column.columnName,
+          table: event.column.table || event.column['tableName'],
+          format: event.column.format,
+          dateFormat: event.column['dateFormat']
+        }));
         this.analysis.sipQuery = {...this.analysis.sipQuery};
       } else {
         this.analysis.sqlBuilder = {...this.analysis.sqlBuilder};
@@ -1041,11 +1066,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   setColumnPropsToDefaultIfNeeded(column) {
     unset(column, 'aggregate');
-    if (FLOAT_TYPES.includes(column.type)) {
+    if (NUMBER_TYPES.includes(column.type)) {
       if (!column.format) {
         column.format = {};
       }
-      if (!column.format.precision) {
+      if (FLOAT_TYPES.includes(column.type) && !column.format.precision) {
         column.format.precision = DEFAULT_PRECISION;
       }
     }

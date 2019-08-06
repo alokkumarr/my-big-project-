@@ -20,454 +20,138 @@ class RequestModel {
     filters = null
   ) {
     let body;
-    let update = {
-      contents: {
-        keys: [
+
+    let dslUpdateBpdy = {
+      type: analysisType,
+      semanticId: semanticId,
+      metricName: dataSetName,
+      name: analysisName,
+      description: analysisDesc,
+      id: id,
+      parentAnalysisId: null,
+      category: subCategoryId,
+      customerCode: customerCode,
+      projectCode: 'workbench',
+      module: 'ANALYZE',
+      createdTime: currentTimeStamp,
+      createdBy: loginId,
+      userId: userId,
+      modifiedTime: currentTimeStamp,
+      modifiedBy: loginId,
+      sipQuery: {
+        artifacts: [
           {
-            customerCode: customerCode,
-            module: 'ANALYZE',
-            id: id,
-            type: analysisType
+            artifactsName: 'sample',
+            fields: [
+              {
+                columnName: 'date',
+                dataField: 'date',
+                displayName: 'Date',
+                groupInterval: null,
+                name: 'date',
+                type: 'date',
+                table: 'sample',
+                dateFormat: 'yyyy-MM-dd',
+                visibleIndex: 0
+              },
+              {
+                columnName: 'double',
+                dataField: 'double',
+                displayName: 'Double',
+                groupInterval: null,
+                name: 'double',
+                type: 'double',
+                table: 'sample',
+                format: {
+                  precision: 2
+                },
+                visibleIndex: 1
+              },
+              {
+                columnName: 'float',
+                dataField: 'float',
+                displayName: 'Float',
+                groupInterval: null,
+                name: 'float',
+                type: 'float',
+                table: 'sample',
+                format: {
+                  precision: 2
+                },
+                visibleIndex: 2
+              },
+              {
+                columnName: 'integer',
+                dataField: 'integer',
+                displayName: 'Integer',
+                groupInterval: null,
+                name: 'integer',
+                type: 'integer',
+                table: 'sample',
+                format: {},
+                visibleIndex: 3
+              },
+              {
+                columnName: 'long',
+                dataField: 'long',
+                displayName: 'Long',
+                groupInterval: null,
+                name: 'long',
+                type: 'long',
+                table: 'sample',
+                format: {},
+                visibleIndex: 4
+              },
+              {
+                columnName: 'string.keyword',
+                dataField: 'string',
+                displayName: 'String',
+                groupInterval: null,
+                name: 'string',
+                type: 'string',
+                table: 'sample',
+                visibleIndex: 5
+              }
+            ]
           }
         ],
-        action: action,
-        analyze: [
-          {
-            type: analysisType,
-            semanticId: semanticId,
-            metricName: dataSetName,
-            name: analysisName,
-            description: analysisDesc,
-            scheduled: null,
-            id: id,
-            dataSecurityKey: '',
-            module: 'ANALYZE',
-            metric: 'sample-elasticsearch',
-            customerCode: customerCode,
-            disabled: 'false',
-            checked: 'false',
-            esRepository: {
-              storageType: 'ES',
-              indexName: 'sample',
-              type: 'sample'
+        booleanCriteria: 'AND',
+        filters: filters ? filters : [],
+        sorts: [],
+        joins: [],
+        store: {
+          dataStore: 'sampleAlias/sample',
+          storageType: 'ES'
+        }
+      },
+      designerEdit: null,
+      scheduled: null,
+      supports: [
+        {
+          category: 'map',
+          children: [
+            {
+              icon: 'icon-geo-chart',
+              label: 'Choropleth map',
+              type: 'map:chart'
             },
-            artifacts: [
-              {
-                artifactName: 'sample',
-                columns: [
-                  {
-                    name: 'string',
-                    type: 'string',
-                    columnName: 'string.keyword',
-                    displayName: 'String',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'long',
-                    type: 'long',
-                    columnName: 'long',
-                    displayName: 'Long',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'float',
-                    type: 'float',
-                    columnName: 'float',
-                    displayName: 'Float',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: {
-                      precision: 2
-                    }
-                  },
-                  {
-                    name: 'date',
-                    type: 'date',
-                    columnName: 'date',
-                    displayName: 'Date',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: 'yyyy-MM-dd'
-                  },
-                  {
-                    name: 'integer',
-                    type: 'integer',
-                    columnName: 'integer',
-                    displayName: 'Integer',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'double',
-                    type: 'double',
-                    columnName: 'double',
-                    displayName: 'Double',
-                    aliasName: '',
-                    table: 'sales',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: {
-                      precision: 2
-                    }
-                  }
-                ],
-                artifactPosition: [20, 4]
-              }
-            ],
-            repository: {
-              storageType: 'DL',
-              objects: [],
-              _number_of_elements: 0
-            },
-            createdTimestamp: currentTimeStamp,
-            userId: userId,
-            userFullName: loginId,
-            sqlBuilder: {
-              booleanCriteria: 'AND',
-              filters: filters ? filters : [],
-              sorts: [],
-              dataFields: [
-                {
-                  name: 'string',
-                  type: 'string',
-                  columnName: 'string.keyword',
-                  displayName: 'String',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'long',
-                  type: 'long',
-                  columnName: 'long',
-                  displayName: 'Long',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'float',
-                  type: 'float',
-                  columnName: 'float',
-                  displayName: 'Float',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: {
-                    precision: 2
-                  }
-                },
-                {
-                  name: 'date',
-                  type: 'date',
-                  columnName: 'date',
-                  displayName: 'Date',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: 'yyyy-MM-dd'
-                },
-                {
-                  name: 'integer',
-                  type: 'integer',
-                  columnName: 'integer',
-                  displayName: 'Integer',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'double',
-                  type: 'double',
-                  columnName: 'double',
-                  displayName: 'Double',
-                  aliasName: '',
-                  table: 'sales',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: {
-                    precision: 2
-                  }
-                }
-              ]
-            },
-            edit: false,
-            categoryId: subCategoryId,
-            saved: true
-          }
-        ]
-      }
+            {
+              icon: 'icon-geo-chart',
+              label: 'Geo Map',
+              type: 'map:map'
+            }
+          ],
+          label: 'Geo Location'
+        }
+      ],
+      categoryId: subCategoryId,
+      saved: true
     };
-
-    let executeBody = {
-      contents: {
-        keys: [
-          {
-            customerCode: customerCode,
-            module: 'ANALYZE',
-            id: id,
-            type: analysisType
-          }
-        ],
-        action: action,
-        executedBy: loginId,
-        page: 1,
-        pageSize: 10,
-        analyze: [
-          {
-            type: analysisType,
-            semanticId: semanticId,
-            metricName: dataSetName,
-            name: analysisName,
-            description: analysisDesc,
-            scheduled: null,
-            id: id,
-            dataSecurityKey: '',
-            module: 'ANALYZE',
-            metric: 'sample-elasticsearch',
-            customerCode: customerCode,
-            disabled: 'false',
-            checked: 'false',
-            esRepository: {
-              storageType: 'ES',
-              indexName: 'sample',
-              type: 'sample'
-            },
-            artifacts: [
-              {
-                artifactName: 'sample',
-                columns: [
-                  {
-                    name: 'string',
-                    type: 'string',
-                    columnName: 'string.keyword',
-                    displayName: 'String',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'long',
-                    type: 'long',
-                    columnName: 'long',
-                    displayName: 'Long',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'float',
-                    type: 'float',
-                    columnName: 'float',
-                    displayName: 'Float',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: {
-                      precision: 2
-                    }
-                  },
-                  {
-                    name: 'date',
-                    type: 'date',
-                    columnName: 'date',
-                    displayName: 'Date',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: 'yyyy-MM-dd'
-                  },
-                  {
-                    name: 'integer',
-                    type: 'integer',
-                    columnName: 'integer',
-                    displayName: 'Integer',
-                    aliasName: '',
-                    table: 'sample',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true
-                  },
-                  {
-                    name: 'double',
-                    type: 'double',
-                    columnName: 'double',
-                    displayName: 'Double',
-                    aliasName: '',
-                    table: 'sales',
-                    joinEligible: false,
-                    kpiEligible: true,
-                    filterEligible: true,
-                    checked: true,
-                    format: {
-                      precision: 2
-                    }
-                  }
-                ],
-                artifactPosition: [20, 4]
-              }
-            ],
-            repository: {
-              storageType: 'DL',
-              objects: [],
-              _number_of_elements: 0
-            },
-            createdTimestamp: currentTimeStamp,
-            userId: userId,
-            userFullName: loginId,
-            sqlBuilder: {
-              booleanCriteria: 'AND',
-              filters: filters ? filters : [],
-              sorts: [],
-              dataFields: [
-                {
-                  name: 'string',
-                  type: 'string',
-                  columnName: 'string.keyword',
-                  displayName: 'String',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'long',
-                  type: 'long',
-                  columnName: 'long',
-                  displayName: 'Long',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'float',
-                  type: 'float',
-                  columnName: 'float',
-                  displayName: 'Float',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: {
-                    precision: 2
-                  }
-                },
-                {
-                  name: 'date',
-                  type: 'date',
-                  columnName: 'date',
-                  displayName: 'Date',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: 'yyyy-MM-dd'
-                },
-                {
-                  name: 'integer',
-                  type: 'integer',
-                  columnName: 'integer',
-                  displayName: 'Integer',
-                  aliasName: '',
-                  table: 'sample',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true
-                },
-                {
-                  name: 'double',
-                  type: 'double',
-                  columnName: 'double',
-                  displayName: 'Double',
-                  aliasName: '',
-                  table: 'sales',
-                  joinEligible: false,
-                  kpiEligible: true,
-                  filterEligible: true,
-                  checked: true,
-                  format: {
-                    precision: 2
-                  }
-                }
-              ]
-            },
-            edit: false,
-            categoryId: subCategoryId,
-            saved: true,
-            executionType: 'publish'
-          }
-        ]
-      }
-    };
-
     if (action === 'update') {
-      body = update;
-    } else if (action === 'execute') {
-      body = executeBody;
+      body = dslUpdateBpdy;
     } else {
       throw new Error('Invalid action: ' + action);
     }
-
     return body;
   }
 
@@ -1543,7 +1227,11 @@ class RequestModel {
   }
 
   getAnalysisCreatePayload(semanticId, analysisType, customerCode) {
-    if (analysisType === Constants.CHART || analysisType === Constants.PIVOT) {
+    if (
+      analysisType === Constants.CHART ||
+      analysisType === Constants.PIVOT ||
+      analysisType === Constants.ES_REPORT
+    ) {
       return {
         type: analysisType,
         semanticId: semanticId,

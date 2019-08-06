@@ -47,6 +47,7 @@ class Designer extends SaveDialog {
     commonFunctions.clickOnElement(this._previewBtn);
   }
   clickOnFilterButton() {
+    commonFunctions.waitFor.elementToBeClickable(this._saveButton);
     commonFunctions.clickOnElement(this._filterBtn);
   }
 
