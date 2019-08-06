@@ -51,7 +51,8 @@ describe('Running create and delete dashboards with charts in create-delete-dash
             host,
             token,
             protractorConf.config.customerCode,
-            currentAnalysis.analysisId
+            currentAnalysis.analysisId,
+            CHART
           );
         }
       });

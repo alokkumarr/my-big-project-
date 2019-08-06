@@ -16,7 +16,7 @@
     "coverage:generate": "run-s coverage coverage:generate-only",
     "coverage:check-only": "node src/code-coverage/check-coverage.js",
     "coverage:check": "run-s coverage coverage:check-only",
-    "test:start": "ng test --watch=true --browsers=ChromeHeadlessCI",
+    "test:start": "ng test --watch=true --browsers=ChromeHeadlessCI --codeCoverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "version": "node ./src/version.js",

@@ -402,3 +402,60 @@ Following are the conditions to be met in order to make module compatible with S
 
 Please refer to the **README** of [product modules repository]
 for further details.
+
+# XDA Sample Application on Docker
+
+This section will describe list of steps to use the XDA Sample application on the Docker environment.
+
+### Fireup Docker environment
+
+`Command`
+
+       mvn clean package -DskipTests=true -Dsip-cloud-secure=False
+       mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
+
+### Prerequisites Script
+
+This script will register the XDA application on maprdb and create all required folders on MapR FS.
+
+`Command`
+
+       /home/mapr/sip-xda-prereq.sh
+
+### Running XDA Sampleapp
+
+Developer can run each individual XDA Component or complete end-to-end pipeline using this script. Sample configurations and sample input file location will pop up as suggestions once the below shell script is run.
+
+`Command`
+
+       /home/mapr/sip-xda-run.sh
+
+User can then select to run requied individual XDA Component or run end-to-end Pipeline component by providing the input file or input file location. Developer will provide the input and output locations for each component in the configuration files. 
+
+For this XDA Sample application, Parsar component will run first on the input files and the output of the parser can be used as input for Transformer or SQL component by making necessary configurations.
+
+> Note: Developers should remember that input files in RAW folder are archived once the parser component is run and might observe the null pointer error if there is no input file provided while running parser component the second time.
+
+Since the script requests for the configuration file and sample file locations, developers can either use the same files as shown up in the suggestions or create a their own file with new / modified configurations on new / existing data files while developing the new applications.
+
+### Input and Output Location 
+
+Defalut Raw folder for input files and output files after processing ( this can be changed according the developer preference if required in configuration file )
+
+##### XDA Raw files location:
+
+       /data/bda/xdf-sample-data/raw
+       `Command to check the input files`: hadoop fs -ls /data/bda/xdf-sample-data/raw
+
+
+##### XDA Output files location for all components:
+
+      /var/sip/sip-xda-sampleapp/dl/fs/dout/
+      `Command to check the output files`: hadoop fs -ls /var/sip/sip-xda-sampleapp/dl/fs/dout/
+
+
+##### ESLoader output indices can be viewed by using the below CLI command from sip-mapr container using CURL
+
+      curl http://sip-elastic:8200/_cat/indices?pretty
+ 
+

@@ -1,9 +1,19 @@
-<div class="view-analysis-grid" [ngStyle]="{'height': analysis.sqlBuilder.filters.length !== 0 ? 'calc(100vh - 312px)' : 'calc(100vh - 193px)'}">
-  <report-grid-upgraded *ngIf="analysis && dataLoader"
-                        (change)="onReportGridChange($event)"
-                        [artifacts]="artifacts"
-                        [analysis]="analysis"
-                        [sorts]="analysis.sqlBuilder.sorts || analysis.sqlBuilder.orderByColumns"
-                        [dataLoader]="dataLoader">
+<div
+  class="view-analysis-grid"
+  [ngStyle]="{
+    height:
+      (analysis.sipQuery || analysis.sqlBuilder).filters.length != 0
+        ? 'calc(100vh - 312px)'
+        : 'calc(100vh - 193px)'
+  }"
+>
+  <report-grid-upgraded
+    *ngIf="analysis && dataLoader"
+    (change)="onReportGridChange($event)"
+    [artifacts]="artifacts"
+    [analysis]="analysis"
+    [sorts]="analysisSorts"
+    [dataLoader]="dataLoader"
+  >
   </report-grid-upgraded>
 </div>
