@@ -265,8 +265,8 @@ class Analysis extends BaseController {
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
         m_log.debug("search key" + keys);
-        //below condition is temporary change made for migration of Analysis as part of sip-7149 to filter only reports
-        val listAnlys:List[JObject] = searchAnalysisJson(keys).filter(x => x.values.get("type").get == "report" || x.values.get("type").get == "esReport")
+        //below condition is temporary change made for migration of Analysis as part of sip-7149 to filter only DL reports
+        val listAnlys:List[JObject] = searchAnalysisJson(keys).filter(x => x.values.get("type").get == "report" )
         val categoryId = extractKey(json, "categoryId")
         if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product, categoryId))
           json merge contentsAnalyze(listAnlys, ticket.get.userId.toString)

@@ -99,9 +99,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     Boolean isZipRequired = analysis.getZip();
     String[] latestExecution;
     boolean isDslScheduled =
-        analysis.getType() != null
-            && (analysis.getType().equalsIgnoreCase("pivot")
-                || analysis.getType().equalsIgnoreCase("chart"));
+        analysis.getType() != null && analysis.getType().matches("pivot|chart|map|esReport");
+
     if (isDslScheduled) {
       latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
     } else {
@@ -248,7 +247,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             + analysisId
             + "&size="
             + dispatchRowLimit
-            + "&ExecutionType=scheduled";
+            + "&executionType=scheduled";
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
