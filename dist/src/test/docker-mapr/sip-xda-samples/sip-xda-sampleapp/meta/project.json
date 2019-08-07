@@ -1,0 +1,19 @@
+{
+  "action": "create",
+  "category": "Project",
+  "id" : "sip-xda-sampleapp",
+  "output" : "hdfs:///opt/bda/apps/sip-xda-sampleapp/logs/xdf_sample.log",
+  "xdf-root" : "hdfs:///var/sip",
+  "source" : {
+    "description" : "Test project for testing oozie workflow",
+    "projectLevelParameters" : [
+      {"name": "spark.master",            "value": "yarn-cluster"},
+      {"name": "spark.master",            "value": "yarn"},
+      {"name": "spark.driver.memory",     "value": "2g"},
+      {"name": "spark.executor.memory",   "value": "6g"},
+      {"name": "spark.executor.cores",    "value": "4"},
+      {"name": "spark.executor.instances","value": "8"},
+      {"name": "spark.yarn.tags",         "value": "xda-sample-app"}
+    ]
+  }
+}

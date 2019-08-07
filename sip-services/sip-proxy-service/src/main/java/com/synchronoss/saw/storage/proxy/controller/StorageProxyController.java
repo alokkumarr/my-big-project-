@@ -13,6 +13,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
+import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
@@ -380,6 +381,10 @@ public class StorageProxyController {
       logger.error("Exception generated while validating incoming json against schema.", e);
       throw new JSONProcessingSAWException(
           "Exception generated while validating incoming json against schema.");
+    } catch (SipDslProcessingException sipExeception) {
+      throw sipExeception;
+    } catch (RuntimeException runTimeExecption) {
+      throw runTimeExecption;
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");

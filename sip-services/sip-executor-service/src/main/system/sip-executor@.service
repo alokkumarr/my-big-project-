@@ -9,8 +9,8 @@ SyslogIdentifier=sip-executor
 User=mapr
 Restart=always
 Environment="JAVA_OPTS=-Dsaw.executor=%i"
+SuccessExitStatus=143
 
 [Install]
 WantedBy=sip-storage-proxy.service
 
-SuccessExitStatus=143

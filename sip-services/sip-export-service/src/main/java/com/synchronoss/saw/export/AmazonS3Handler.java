@@ -72,6 +72,8 @@ public class AmazonS3Handler {
 
     String s3Key = outputLocation + "/" + finalFileName;
 
+    logger.debug("Upload location = " + s3Key);
+
     PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
     putObject(s3Client, request);
   }

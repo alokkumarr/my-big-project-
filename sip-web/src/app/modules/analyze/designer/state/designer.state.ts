@@ -6,6 +6,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
 import * as set from 'lodash/set';
 import * as remove from 'lodash/remove';
+import * as lowerCase from 'lodash/lowerCase';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -263,7 +264,7 @@ export class DesignerState {
     sipQuery.artifacts = artifacts;
 
     patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery} }
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
@@ -281,7 +282,7 @@ export class DesignerState {
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
     const artifactIndex = artifacts.findIndex(
-      artifact => artifact.artifactsName === artifactsName
+      artifact => lowerCase(artifact.artifactsName) === lowerCase(artifactsName)
     );
 
     if (artifactIndex < 0) {
@@ -289,7 +290,8 @@ export class DesignerState {
     }
 
     const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field => field.columnName === artifactColumn.columnName
+      field =>
+        lowerCase(field.columnName) === lowerCase(artifactColumn.columnName)
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -424,7 +426,7 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     return patchState({
-      analysis: { ...analysis, ...metadata }
+      analysis: { ...analysis, ...metadata } as AnalysisDSL
     });
   }
 
@@ -434,8 +436,13 @@ export class DesignerState {
     { designerEdit }: DesignerUpdateEditMode
   ) {
     const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    if (designerEdit) {
+      sipQuery.filters = [];
+      sipQuery.sorts = [];
+    }
     return patchState({
-      analysis: { ...analysis, designerEdit }
+      analysis: { ...analysis, designerEdit, sipQuery: { ...sipQuery } }
     });
   }
 
@@ -801,12 +808,14 @@ export class DesignerState {
         operator: 'EQ',
         left: leftJoin,
         right: rightJoin
-      }
+      };
       const sipJoin = {
         join: join.type,
-        criteria: [{
-          joinCondition
-        }]
+        criteria: [
+          {
+            joinCondition
+          }
+        ]
       };
       sipJoins.push(sipJoin);
     });
@@ -838,7 +847,6 @@ export class DesignerState {
           columnName: dslCRT.joinCondition['right'].columnName,
           side: 'right'
         });
-
       });
       const dslJoin = {
         type: join.join,
@@ -851,7 +859,6 @@ export class DesignerState {
     });
   }
 
-
   @Action(DesignerUpdateAggregateInSorts)
   updateAggregateInSorts(
     { patchState, getState }: StateContext<DesignerStateModel>,
@@ -863,12 +870,12 @@ export class DesignerState {
       return;
     }
     sipQuery.sorts.forEach(sort => {
-      sort.aggregate = column.aggregate;
+      if (sort.columnName === column.columnName) {
+        sort.aggregate = column.aggregate;
+      }
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
 }
-
-
