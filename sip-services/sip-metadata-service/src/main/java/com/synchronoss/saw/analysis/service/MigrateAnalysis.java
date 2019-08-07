@@ -113,6 +113,9 @@ public class MigrateAnalysis {
 
               try {
                 analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                if (analysis.getSemanticId() != null) {
+                  analysis.getSipQuery().setSemanticId(analysis.getSemanticId());
+                }
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
                 JsonElement parsedAnalysis =
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
