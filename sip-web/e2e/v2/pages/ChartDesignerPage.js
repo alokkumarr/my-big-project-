@@ -174,20 +174,6 @@ class ChartsDesignerPage extends Designer {
       .perform();
   }
 
-  clickOnOpenChartSettings() {
-    browser.sleep(200); // Chart setting arrows were not able to load. So putting browser to sleep.
-    commonFunctions.clickOnElement(this._openChartSettings);
-  }
-
-  clickOnAggregateDataOptions(text) {
-    // Commonfunction is not able to make `mat-expansion-panel` comopnent visible to using browser to identify the element.
-    browser
-      .actions()
-      .mouseMove(this._aggregateDataOptions(text))
-      .click()
-      .perform();
-  }
-
   validateSelectedAggregate(metric, designerLabelText, buttonText) {
     expect(this._verifyMetricAggregate(metric, designerLabelText)).toBeTruthy();
     expect(this._selectAndChooseAggregate(buttonText)).toBeTruthy();

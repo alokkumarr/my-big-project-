@@ -85,10 +85,9 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
 
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
-          chartDesignerPage.clickOnAttribute(groupName, 'Color By');
         }
-        chartDesignerPage.clickOnOpenChartSettings();
-        chartDesignerPage.clickOnAggregateDataOptions(metrics);
+       chartDesignerPage.clickOnDataOptionsTab();
+        chartDesignerPage.clickOnDataOptions(metrics);
         chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
         chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
 
