@@ -30,6 +30,7 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,7 +116,10 @@ public class MigrateAnalysis {
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
                 JsonElement parsedAnalysis =
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-                analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                Document document = analysisMetadataStore.searchById(analysis.getId());
+                if (document == null && document.isEmpty()) {
+                  analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                }
 
                 migrationStatusObject.setAnalysisId(analysis.getId());
                 logger.info(
