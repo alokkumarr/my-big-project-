@@ -76,7 +76,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     String s3List = null;
     try {
-      s3List = prepareStringFromList(analysis.getS3());
+      if (analysis.getS3() != null) {
+        s3List = prepareStringFromList(analysis.getS3());
+        logger.debug("S3 List = " + s3List);
+      }
     } catch (Exception e) {
       logger.error("Error reading s3 List: " + e.getMessage());
       s3List = "";

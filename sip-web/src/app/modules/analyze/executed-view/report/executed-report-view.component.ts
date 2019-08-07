@@ -11,6 +11,9 @@ export class ExecutedReportViewComponent {
 
   @Input('analysis')
   set setAnalysis(analysis: AnalysisDSL) {
+    if (!analysis) {
+      return;
+    }
     this.analysis = analysis;
     // if in query mode, don't send the artifacts, just use the column names in the data
     // TODO use the columns from the query

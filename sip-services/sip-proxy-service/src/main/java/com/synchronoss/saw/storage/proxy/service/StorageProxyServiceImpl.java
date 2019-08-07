@@ -722,6 +722,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       List<JsonNode> elements =
           maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 1);
       // its last execution for the for Query Id , So consider 0 index.
+      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       ExecutionResult executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);

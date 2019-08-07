@@ -106,8 +106,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
             null
           );
           expect(analysis).toBeTruthy();
-          analysisId = analysis.contents.analyze[0].executionId.split('::')[0];
-          analyses.push(analysisId);
+          analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
           loginPage.loginAs(data.user, /analyze/);
           const header = new Header();

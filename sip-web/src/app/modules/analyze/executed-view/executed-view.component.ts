@@ -168,7 +168,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     );
-
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent
@@ -490,7 +489,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          ...(isDSLAnalysis(this.executedAnalysis || this.analysis)
+          ...(isDSLAnalysis(this.executedAnalysis || this.analysis) && this.executedAnalysis.type === 'map'
             ? {
                 sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                   get(this.metric, 'artifacts.0.columns', []),
@@ -500,7 +499,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
                 )
               }
             : {
-                sqlBuilder:
+                sipQuery:
                   executeResponse.queryBuilder ||
                   (<Analysis>(this.executedAnalysis || this.analysis))
                     .sqlBuilder

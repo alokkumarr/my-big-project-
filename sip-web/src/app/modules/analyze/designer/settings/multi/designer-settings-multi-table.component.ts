@@ -49,4 +49,35 @@ export class DesignerSettingsMultiTableComponent {
     });
     return artifacts;
   }
+
+  refactor(joins) {
+    const analysisJoins = [];
+    let DSLState = false;
+    joins.forEach(join => {
+      const DSLCriteria = [];
+      if (!join.type) {
+        DSLState = true;
+        join.criteria.forEach(dslCRT => {
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['left'].artifactsName,
+            columnName: dslCRT.joinCondition['left'].columnName,
+            side: 'left'
+          });
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['right'].artifactsName,
+            columnName: dslCRT.joinCondition['right'].columnName,
+            side: 'right'
+          });
+
+        });
+        const dslJoin = {
+          type: join.join,
+          criteria: DSLCriteria
+        };
+        analysisJoins.push(dslJoin);
+      }
+    });
+    joins = DSLState ? analysisJoins : joins;
+    return joins;
+  }
 }
