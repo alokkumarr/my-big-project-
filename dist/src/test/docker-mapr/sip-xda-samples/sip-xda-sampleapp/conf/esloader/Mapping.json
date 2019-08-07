@@ -1,0 +1,22 @@
+{
+   "settings":{
+      "number_of_shards":2,
+      "number_of_replicas":1,
+      "refresh_interval":"30s"
+   },
+   "mappings":{
+      "es_record":{
+         "dynamic":"strict",
+         "properties":{
+            "GEORegion":{
+               "type":"text",
+               "fields":{
+                  "raw":{
+                     "type":"keyword"
+                  }
+               }
+            }
+         }
+      }
+   }
+}

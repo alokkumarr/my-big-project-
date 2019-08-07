@@ -100,8 +100,10 @@ public class ElasticSearchLoader {
 
         configMap.put(ES_NODE_DISCOVERY, String.valueOf(false));
         configMap.put(ES_PARAM_NODES, esHosts);
-        configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
         configMap.put("es.index.auto.create", "false");
+        configMap.put(ES_PARAM_PORT, String.valueOf(config.getEsPort()));
+        configMap.put("es.nodes.wan.only","true");
+
 
         if(config.getEsUser() != null && config.getEsPassword() != null) {
             configMap.put(ES_PARAM_USER, config.getEsUser());
@@ -114,7 +116,6 @@ public class ElasticSearchLoader {
         configMap.put("es.net.ssl","true");
         configMap.put("es.net.ssl.truststore.location",config.getKeyStorePath());
         configMap.put("es.net.ssl.truststore.pass",config.getStorePassword());
-        configMap.put("es.nodes.wan.only","true");
         configMap.put("es.net.ssl.cert.allow.self.signed","true");
         }
         return configMap;

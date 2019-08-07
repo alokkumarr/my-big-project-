@@ -1,0 +1,24 @@
+{
+   "pipeline": [
+    {
+      "component": "parser",
+      "configuration": "file:///home/mapr/sip-xda-sampleapp/conf/parser/testparser.jconf",
+      "persist":"false"
+    },
+   {
+      "component": "transformer",
+      "configuration": "file:///home/mapr/sip-xda-sampleapp/conf/transformer/testtransformer.jconf",
+      "persist":"false"
+    },
+    {
+      "component": "sql",
+      "configuration": "file:///home/mapr/sip-xda-sampleapp/conf/sql/testsql.jconf",
+      "persist":"false"
+    },
+   {
+      "component": "esloader",
+      "configuration": "file:///home/mapr/sip-xda-sampleapp/conf/esloader/test-esloader.jconf",
+      "persist":"true"
+    }
+  ]
+}

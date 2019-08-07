@@ -12,9 +12,11 @@ import * as uniq from 'lodash/uniq';
 import * as reduce from 'lodash/reduce';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as isUndefined from 'lodash/isUndefined';
+import * as isNil from 'lodash/isNil';
 import * as clone from 'lodash/clone';
+import * as omit from 'lodash/omit';
 import { Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Analysis,
@@ -30,7 +32,7 @@ import {
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
-import { zip, Observable } from 'rxjs';
+import { zip, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
@@ -40,6 +42,7 @@ import * as isArray from 'lodash/isArray';
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
 const PROJECT_CODE = 'workbench';
+const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts'];
 
 interface ExecutionRequestOptions {
   take?: number;
@@ -86,7 +89,8 @@ export class AnalyzeService {
     public _http: HttpClient,
     public _jwtService: JwtService,
     public _toastMessage: ToastService,
-    public _menu: MenuService
+    public _menu: MenuService,
+    private store: Store
   ) {
     window['analysisService'] = this;
   }
@@ -137,7 +141,7 @@ export class AnalyzeService {
       executionType === EXECUTION_DATA_MODES.ONETIME
         ? '&executionType=onetime'
         : '';
-    const requestURL = isUndefined(executionId)
+    const requestURL = isNil(executionId)
       ? `exports/latestExecution/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`
       : `exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`;
     return this.getRequest(requestURL).toPromise();
@@ -231,15 +235,19 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     let url = '';
+    const page = floor(options.skip / options.take) + 1;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }`;
     if (options.isDSL) {
-      const path = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
-      url = `${path}`;
+      url = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
-      const page = floor(options.skip / options.take) + 1;
       const path = `analysis/${analysisId}/executions/data`;
-      const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-        options.analysisType
-      }`;
       url = `${path}?${queryParams}`;
     }
 
@@ -279,15 +287,16 @@ export class AnalyzeService {
         ? '&executionType=onetime'
         : '';
 
+    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+      options.analysisType
+    }${onetimeExecution}`;
+
     let url = '';
     if (options.isDSL) {
       const path = `internal/proxy/storage/${executionId}/executions/data`;
-      url = `${path}`;
+      url = `${path}${queryParams}`;
     } else {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
-      const queryParams = `?page=${page}&pageSize=${
-        options.take
-      }&analysisType=${options.analysisType}${onetimeExecution}`;
       url = `${path}${queryParams}`;
     }
     return this.getRequest(url)
@@ -509,10 +518,15 @@ export class AnalyzeService {
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
     return <Observable<AnalysisDSL>>(
-      this._http.put(`${apiUrl}/dslanalysis/${model.id}`, model).pipe(
-        first(),
-        map((res: { analysis: AnalysisDSL }) => res.analysis)
-      )
+      this._http
+        .put(
+          `${apiUrl}/dslanalysis/${model.id}`,
+          omit(model, LEGACY_PROPERTIES)
+        )
+        .pipe(
+          first(),
+          map((res: { analysis: AnalysisDSL }) => res.analysis)
+        )
     );
   }
 
@@ -533,24 +547,34 @@ export class AnalyzeService {
   ) {
     // This addition is a part of SIP-7145 as this is required for DSK implementation. This is a request from BE.
     model.sipQuery.semanticId = model.semanticId;
+    options.skip = options.skip || 0;
+    options.take = options.take || 10;
+    const page = floor(options.skip / options.take) + 1;
+
+    /* Use pagination options only when executing reports */
+    const paginationParams = ['report', 'esReport'].includes(model.type)
+      ? `&page=${page}&pageSize=${options.take}`
+      : '';
+
     return this._http
       .post(
         `${apiUrl}/internal/proxy/storage/execute?id=${
           model.id
-        }&ExecutionType=${mode}`,
-        model
+        }&executionType=${mode}${paginationParams}`,
+        omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
         map((resp: any) => {
+          const data = resp.data ? resp.data : resp;
           return {
-            data: resp,
+            data: data,
             executionId: resp.executionId || (model.sipQuery ? '123456' : null),
             executionType: mode,
             executedBy: this._jwtService.getLoginId(),
             executedAt: Date.now(),
             designerQuery: fpGet(`query`, resp),
             queryBuilder: { ...model.sipQuery },
-            count: fpGet(`totalRows`, resp)
+            count: fpGet(`totalRows`, resp) || data.length
           };
         })
       )
@@ -646,6 +670,10 @@ export class AnalyzeService {
   }
 
   getArtifactsForDataSet(semanticId: string) {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (metrics && metrics[semanticId] && metrics[semanticId].artifacts) {
+      return of(metrics[semanticId]);
+    }
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
@@ -686,8 +714,10 @@ export class AnalyzeService {
       switchMap(semanticData => {
         /* Set the store details from semantic data */
         const repo = semanticData.esRepository;
-        model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
-        model.sipQuery.store.storageType = repo.storageType;
+        if (repo) {
+          model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
+          model.sipQuery.store.storageType = repo.storageType;
+        }
 
         return <Observable<AnalysisDSL>>(
           this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
@@ -716,6 +746,7 @@ export class AnalyzeService {
         artifacts: [],
         booleanCriteria: 'AND',
         filters: [],
+        joins: [],
         sorts: [],
         store: {
           dataStore: null, // This is filled up when creating analysis
