@@ -21,14 +21,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "urlParameters",
   "bodyParameters"
 })
-public class RouteMedata {
+public class RouteMetadata {
 
   /** (Required) */
   @JsonProperty("apiEndPoint")
   private String apiEndPoint;
   /** (Required) */
   @JsonProperty("httpMethod")
-  private RouteMedata.HttpMethod httpMethod = RouteMedata.HttpMethod.fromValue("GET");
+  private RouteMetadata.HttpMethod httpMethod = RouteMetadata.HttpMethod.fromValue("GET");
   /** (Required) */
   @JsonProperty("queryParameters")
   private List<QueryParameter> queryParameters = null;
@@ -56,13 +56,13 @@ public class RouteMedata {
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public RouteMedata.HttpMethod getHttpMethod() {
+  public RouteMetadata.HttpMethod getHttpMethod() {
     return httpMethod;
   }
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public void setHttpMethod(RouteMedata.HttpMethod httpMethod) {
+  public void setHttpMethod(RouteMetadata.HttpMethod httpMethod) {
     this.httpMethod = httpMethod;
   }
 
@@ -139,10 +139,10 @@ public class RouteMedata {
     if (other == this) {
       return true;
     }
-    if ((other instanceof RouteMedata) == false) {
+    if ((other instanceof RouteMetadata) == false) {
       return false;
     }
-    RouteMedata rhs = ((RouteMedata) other);
+    RouteMetadata rhs = ((RouteMetadata) other);
     return new EqualsBuilder()
         .append(headerParameters, rhs.headerParameters)
         .append(apiEndPoint, rhs.apiEndPoint)
@@ -159,11 +159,11 @@ public class RouteMedata {
     PUT("PUT"),
     DELETE("DELETE");
     private final String value;
-    private static final Map<String, RouteMedata.HttpMethod> CONSTANTS =
-        new HashMap<String, RouteMedata.HttpMethod>();
+    private static final Map<String, RouteMetadata.HttpMethod> CONSTANTS =
+        new HashMap<String, RouteMetadata.HttpMethod>();
 
     static {
-      for (RouteMedata.HttpMethod c : values()) {
+      for (RouteMetadata.HttpMethod c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -183,8 +183,8 @@ public class RouteMedata {
     }
 
     @JsonCreator
-    public static RouteMedata.HttpMethod fromValue(String value) {
-      RouteMedata.HttpMethod constant = CONSTANTS.get(value);
+    public static RouteMetadata.HttpMethod fromValue(String value) {
+      RouteMetadata.HttpMethod constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {
