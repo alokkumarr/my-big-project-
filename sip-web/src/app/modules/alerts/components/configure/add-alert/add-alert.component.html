@@ -62,6 +62,22 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
+              <mat-label>Notification</mat-label>
+              <mat-select
+                formControlName="notification"
+                required
+                e2e="notification"
+              >
+                <mat-option
+                  *ngFor="let notification of (notifications$ | async)"
+                  [value]="notification.value"
+                  >{{ notification.label }}</mat-option
+                >
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
               <mat-label>Alert Status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
                 <mat-option

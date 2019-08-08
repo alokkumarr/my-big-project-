@@ -13,7 +13,25 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
-import { SubscriptionLike } from 'rxjs';
+import { SubscriptionLike, of } from 'rxjs';
+
+const notifications = [
+  {
+    value: 'email',
+    label: 'email',
+    enabled: true
+  },
+  {
+    value: 'slack',
+    label: 'slack',
+    enabled: false
+  },
+  {
+    value: 'webhook',
+    label: 'web hooks',
+    enabled: false
+  }
+];
 @Component({
   selector: 'add-alert',
   templateUrl: './add-alert.component.html',
@@ -27,6 +45,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   metricsList$;
   operators$;
   aggregations$;
+  notifications$;
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
@@ -55,6 +74,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.datapods$ = this._configureAlertService.getListOfDatapods$();
     this.aggregations$ = this._configureAlertService.getAggregations();
     this.operators$ = this._configureAlertService.getOperators();
+    this.notifications$ = of(notifications);
   }
 
   ngOnDestroy() {
@@ -66,6 +86,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       alertName: ['', [Validators.required, Validators.maxLength(18)]],
       alertDescription: ['', [Validators.required, Validators.maxLength(36)]],
       alertSeverity: ['', [Validators.required]],
+      notification: ['', [Validators.required]],
       activeInd: [true]
     });
 
@@ -107,21 +128,25 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   constructPayload() {
-    const payload: AlertConfig = {
+    const partialAlertConfig = {
       ...this.alertDefFormGroup.value,
       ...this.alertMetricFormGroup.value,
       ...this.alertRuleFormGroup.value,
       product: 'SAWD000001'
     };
 
-    this.endPayload = payload;
+    const alertConfig: AlertConfig = {
+      ...partialAlertConfig,
+      sipQuery: {} // TODO: generate sipQuery
+    };
 
-    return payload;
+    this.endPayload = alertConfig;
+    return alertConfig;
   }
 
   createAlert() {
     const payload = this.constructPayload();
-
+    console.log('new alert', payload);
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {

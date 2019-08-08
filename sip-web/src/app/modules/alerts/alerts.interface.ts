@@ -1,21 +1,42 @@
+export interface AlertSipQuery {
+  artifacts: {
+    dataField: string;
+    area: string;
+    alias: string;
+    columnName: string;
+    name: string;
+    displayName: String;
+    type: string;
+    aggregate?: string;
+  }[];
+  filters: {
+    type: string;
+    artifactsName: string;
+    model: {
+      operator: string;
+      value: number;
+    };
+  }[];
+}
 export interface AlertConfig {
+  alertRuleName: string;
+  alertRuleDescription: any;
+  alertSeverity: string;
+  alertRulesSysId?: string;
+  monitoringEntity: string;
   datapodId: string;
   datapodName: string;
-  alertName: string;
-  alertDescription: any;
-  alertSeverity: string;
-  monitoringEntity: string;
-  aggregation: string;
-  operator: string;
-  thresholdValue: number;
   activeInd: boolean;
-  alertRulesSysId?: string;
-  category?: string;
+  categoryId?: string;
   product?: string;
   createdBy?: any;
   createdTime?: any;
   modifiedTime?: any;
   modifiedBy?: any;
+  aggregation: string;
+  operator: string;
+  thresholdValue: number;
+  sipQuery: AlertSipQuery;
 }
 
 export interface AlertDefinition {
