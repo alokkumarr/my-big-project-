@@ -233,7 +233,7 @@ public class MigrateAnalysis {
           new AnalysisMetadata(migrationStatusTable, basePath);
       logger.debug("Connection established with MaprDB..!!");
       logger.info("Started Writing the status into MaprDB, id : " + id);
-      analysisMetadataStore1.create(id, new Gson().toJson(migrationStatus));
+      analysisMetadataStore1.update(id, new Gson().toJson(migrationStatus));
     } catch (Exception e) {
       logger.error(e.getMessage());
       logger.error(
