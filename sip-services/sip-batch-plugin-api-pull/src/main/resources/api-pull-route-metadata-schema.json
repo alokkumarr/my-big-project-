@@ -56,7 +56,7 @@
       "type": "object",
       "properties": {
         "content": {
-          "type": "string"
+          "type": "object"
         }
       },
       "required": [
