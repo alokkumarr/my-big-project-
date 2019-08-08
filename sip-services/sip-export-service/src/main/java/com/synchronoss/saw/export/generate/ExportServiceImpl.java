@@ -528,58 +528,55 @@ public class ExportServiceImpl implements ExportService {
               @Override
               public void onSuccess(ResponseEntity<JsonNode> entity) {
                 JsonNode jsonDataNode = entity.getBody().get("data");
-                if (finalRecipients != null && !finalRecipients.equals("")) {
-                  logger.debug(
-                      "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
-                  IFileExporter iFileExporter = new XlsxExporter();
-                  String dir = UUID.randomUUID().toString();
-                  MailSenderUtil MailSender =
-                      new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-                  exportBean.setFileType(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-                  exportBean.setFileName(
-                      publishedPath
-                          + File.separator
-                          + dir
-                          + File.separator
-                          + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
-                          + "."
-                          + exportBean.getFileType());
-                  exportBean.setReportDesc(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-                  exportBean.setReportName(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-                  exportBean.setPublishDate(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-                  exportBean.setCreatedBy(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-                  try {
-                    // create a directory with unique name in published location to avoid file
-                    // conflict for dispatch.
-                    File file = new File(exportBean.getFileName());
-                    file.getParentFile().mkdir();
+                IFileExporter iFileExporter = new XlsxExporter();
+                String dir = UUID.randomUUID().toString();
 
-                    List<Field> fieldList = getPivotFields(sipQuery);
-                    ElasticSearchAggregationParser responseParser =
-                        new ElasticSearchAggregationParser(fieldList);
-                    responseParser.setColumnDataType(exportBean);
+                exportBean.setFileType(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+                exportBean.setFileName(
+                    publishedPath
+                        + File.separator
+                        + dir
+                        + File.separator
+                        + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+                        + "."
+                        + exportBean.getFileType());
+                exportBean.setReportDesc(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+                exportBean.setReportName(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+                exportBean.setPublishDate(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+                exportBean.setCreatedBy(
+                    String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+                try {
+                  // create a directory with unique name in published location to avoid file
+                  // conflict for dispatch.
+                  File file = new File(exportBean.getFileName());
+                  file.getParentFile().mkdir();
 
-                    List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-                    logger.trace("Parse data for workbook writing : " + dataObj);
+                  List<Field> fieldList = getPivotFields(sipQuery);
+                  ElasticSearchAggregationParser responseParser =
+                      new ElasticSearchAggregationParser(fieldList);
+                  responseParser.setColumnDataType(exportBean);
 
-                    Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-                    logger.debug("workbook created with DSL : " + workbook);
-                    CreatePivotTable createPivotTable = new CreatePivotTable();
-                    createPivotTable.createPivot(workbook, file, fieldList);
-                    if (finalRecipients != null && !finalRecipients.equals("")) {
-                      dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
-                    }
-                  } catch (IOException e) {
-                    logger.error(
-                        "Exception occurred while dispatching pivot :"
-                            + this.getClass().getName()
-                            + "  method dataToBeDispatchedAsync()");
+                  List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
+                  logger.trace("Parse data for workbook writing : " + dataObj);
+
+                  Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
+                  logger.debug("workbook created with DSL : " + workbook);
+                  CreatePivotTable createPivotTable = new CreatePivotTable();
+                  createPivotTable.createPivot(workbook, file, fieldList);
+                  if (finalRecipients != null && !finalRecipients.equals("")) {
+                    logger.debug(
+                        "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
+                    dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
                   }
+                } catch (IOException e) {
+                  logger.error(
+                      "Exception occurred while dispatching pivot :"
+                          + this.getClass().getName()
+                          + "  method dataToBeDispatchedAsync()");
                 }
 
                 logger.debug("S3 details = " + s3bucket);
