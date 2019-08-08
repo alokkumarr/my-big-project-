@@ -29,6 +29,10 @@ public class Parser {
   @Expose
   private List<Field> fields = new ArrayList<Field>();
 
+  @SerializedName("parserOutputs")
+  @Expose
+  private List<ParserFieldsOutput> parserFieldsOutputs = new ArrayList<ParserFieldsOutput>();
+
   @SerializedName("lineSeparator")
   @Expose
   private String lineSeparator;
@@ -69,6 +73,7 @@ public class Parser {
   public Parser(
       String file,
       List<Field> fields,
+      List<ParserFieldsOutput> parserOutputs,
       String lineSeparator,
       String delimiter,
       String quoteChar,
@@ -77,6 +82,7 @@ public class Parser {
       Integer numberOfFiles) {
     this.file = file;
     this.fields = fields;
+    this.parserFieldsOutputs = parserFieldsOutputs;
     this.lineSeparator = lineSeparator;
     this.delimiter = delimiter;
     this.quoteChar = quoteChar;
@@ -142,6 +148,22 @@ public class Parser {
     this.fields = fields;
     return this;
   }
+
+    /** @return The parserFieldsOutputs */
+    public List<ParserFieldsOutput> getParserFieldsOutputs() {
+        return parserFieldsOutputs;
+    }
+
+    /** @param fields The parserFieldsOutputs */
+    public void setParserFieldsOutputs(List<ParserFieldsOutput> parserFieldsOutputs) {
+        this.parserFieldsOutputs = parserFieldsOutputs;
+    }
+
+    public Parser withParserFieldsOutputs(List<ParserFieldsOutput> parserFieldsOutputs) {
+        this.parserFieldsOutputs = parserFieldsOutputs;
+        return this;
+    }
+
 
   /** @return The lineSeparator */
   public String getLineSeparator() {
@@ -253,6 +275,7 @@ public class Parser {
         .append(parserInputFileFormat)
         .append(schemaValidationRequired)
         .append(fields)
+        .append(parserFieldsOutputs)
         .append(lineSeparator)
         .append(delimiter)
         .append(quoteChar)
@@ -276,6 +299,7 @@ public class Parser {
         .append(parserInputFileFormat, rhs.parserInputFileFormat)
         .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
+        .append(parserFieldsOutputs,rhs.parserFieldsOutputs)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
         .append(quoteChar, rhs.quoteChar)
