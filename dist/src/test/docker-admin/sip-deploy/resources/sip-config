@@ -129,7 +129,7 @@ saw_executor_restart_threshold=50
 ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}]}'
 
 ## S3 host should be setup in docker instance itself but for timing being we are setting it manually.
-s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"US_EAST_1", "outputLocation": "Analysis", "accessKey": "AKIAJMRWBPAZY4AECBVQ", "secretKey": "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", "type": "s3"}]}'
+s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******4AECBVQ", "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz", "type": "s3"}]}'
 
 #
 # Email and FTP export size definition
