@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "headerParam": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": "object"
+      },
+      "datatype": {
+        "type": "string",
+        "default": "string"
+      }
+    }
+  },
+  "queryParam": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      }
+    }
+  },
+  "properties": {
+    "apiEndPoint": {
+      "type": "string"
+    },
+    "httpMethod": {
+      "type": "string",
+      "enum": ["GET", "POST", "PUT", "DELETE"],
+      "default": "GET"
+    },
+    "queryParameters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/queryParam"
+      }
+    },
+    "headerParameters": {
+      "type": "array",
+      "items" : {
+        "$ref": "#/headerParam"
+      }
+    },
+    "urlParameters": {
+      "type": "array",
+      "items": []
+    },
+    "bodyParameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    }
+  },
+  "required": [
+    "apiEndPoint",
+    "httpMethod",
+    "queryParameters",
+    "headerParams",
+    "urlParameters",
+    "bodyParams"
+  ]
+}

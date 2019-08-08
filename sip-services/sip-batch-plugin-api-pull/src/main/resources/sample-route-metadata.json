@@ -8,15 +8,17 @@
     "key": "param2",
     "value": "value2"
   }],
-  "headerParams": [{
+  "headerParameters": [{
     "key": "header1",
-    "value": "value1"
+    "value": "value1",
+    "datatype": "string"
   }, {
     "key": "header2",
-    "value": 1
+    "value": 1,
+    "datatype": "int"
   }],
   "urlParameters": [],
-  "bodyParams": {
+  "bodyParameters": {
     // content can be a string for 'text/plain' content type or json data for 'applicaition/json'
     "content": ""
   }
