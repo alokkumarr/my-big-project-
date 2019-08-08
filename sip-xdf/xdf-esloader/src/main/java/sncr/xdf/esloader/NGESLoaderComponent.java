@@ -23,7 +23,8 @@ import com.google.gson.JsonArray;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
     import sncr.xdf.exceptions.FatalXDFException;
     import sncr.xdf.exceptions.XDFException;
-    import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
+import sncr.xdf.ngcomponent.AbstractComponent;
     import sncr.xdf.ngcomponent.WithSpark;
     import sncr.xdf.services.NGContextServices;
     import sncr.xdf.services.WithDataSet;
@@ -526,6 +527,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
         return dataSetmap;
     }
+
 }
 
 

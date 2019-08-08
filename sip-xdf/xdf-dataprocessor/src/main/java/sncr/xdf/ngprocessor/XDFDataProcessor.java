@@ -14,6 +14,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.services.NGContextServices;
 import java.util.HashMap;
@@ -25,8 +26,8 @@ import sncr.xdf.rtps.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
 
-public class XDFDataProcessor  {
-   
+@SuppressWarnings("rawtypes")
+public class XDFDataProcessor  extends AbstractComponent {
 
     public XDFDataProcessor()
     {
@@ -42,7 +43,7 @@ public class XDFDataProcessor  {
     private  String PIPELINE_CONFIG;
     private JSONObject jsonObj;
     private Map<String, Object> pipelineConfigParams;
-    private boolean RUNNING_MODE  = true;
+    private boolean runningMode  = true;
     private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
     Map<String, Dataset> datafileDFmap = new HashMap<>();
     String dataSetName = "";
@@ -80,7 +81,7 @@ public class XDFDataProcessor  {
             Map<String, Object> parameters = cli.parse(args);
 
             PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
-            jsonObj =  LoadPipelineConfig(PIPELINE_CONFIG);
+            jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
             JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
             JSONObject componentConfig = (JSONObject)pipeline.get(0);
             
@@ -172,7 +173,8 @@ public class XDFDataProcessor  {
             logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
             System.exit(ret);
         }
-    }
+	}
+
 
    
     
@@ -234,7 +236,7 @@ public class XDFDataProcessor  {
             String rtpsKey =  cfg.getOutputs().get(0).getDataSet().toString();
           
             ngRtpsCtxSvc.getNgctx().dataSetName = rtpsKey;
-            ngRtpsCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngRtpsCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngRtpsCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx(),configPath);
@@ -272,7 +274,7 @@ public class XDFDataProcessor  {
         return config;
     }
 
-    public JSONObject LoadPipelineConfig(String cfg)
+    public JSONObject loadPipelineConfig(String cfg)
     {
         JSONParser parser = new JSONParser();
         JSONObject pipelineObj = null;
@@ -308,7 +310,7 @@ public class XDFDataProcessor  {
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -343,7 +345,7 @@ public class XDFDataProcessor  {
             }
             
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
-            ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngParserCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGParser component = null;
@@ -365,8 +367,8 @@ public class XDFDataProcessor  {
             ret = component.run();
 
             if (ret != 0){
-                error = "Could not complete Parser component " + "entry";
-                throw new Exception(error);
+                error = "Could not complete Parser component entry";
+                throw new XDFException(ErrorCodes.IncorrectCall, error);
             }
 
             datafileDFmap =  new HashMap<>();
@@ -421,7 +423,7 @@ public class XDFDataProcessor  {
 
             NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
                 "transformer", batchId);
-            ngTransformerCtxSvc.initContext(); // debug
+            ngTransformerCtxSvc.initContext();
             ngTransformerCtxSvc.registerOutputDataSet();
 
             logger.trace("Output datasets:   ");
@@ -430,14 +432,13 @@ public class XDFDataProcessor  {
                 logger.trace(id)
             );
 
-            String transInKey =  config.getInputs().get(0).getDataSet().toString();
-            String transOutKey =  config.getOutputs().get(0).getDataSet().toString();
+            String transInKey =  config.getInputs().get(0).getDataSet();
+            String transOutKey =  config.getOutputs().get(0).getDataSet();
 
             ngTransformerCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
             ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey,datafileDFmap.get(dataSetName));
-            logger.debug("dataset count in transformer ::"+ datafileDFmap.get(dataSetName).count());
-            ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngTransformerCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGTransformerComponent tcomponent = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
@@ -448,10 +449,8 @@ public class XDFDataProcessor  {
             ret = tcomponent.run();
 
             if (ret != 0){
-                error = "Could not complete Transformer component " + "entry";
-                throw new Exception(error);
+                throw new XDFException(ErrorCodes.IncorrectCall, "Could not complete Transformer component");
             }
-
 
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(transOutKey,ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
@@ -527,7 +526,7 @@ public class XDFDataProcessor  {
             ngSQLCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
             ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey,datafileDFmap.get(dataSetName)); //TRANS_OUT
-            ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngSQLCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
             ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
@@ -539,9 +538,9 @@ public class XDFDataProcessor  {
             ret = sqlcomponent.run();
 
             if (ret != 0){
-                error = "Could not complete SQL component " + "entry";
+                error = "Could not complete SQL component entry";
                 logger.error(error);
-                throw new Exception(error);
+                throw new XDFException(ErrorCodes.IncorrectCall, error);
             }
 
 
@@ -615,7 +614,7 @@ public class XDFDataProcessor  {
             ngESCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             ngESCtxSvc.getNgctx().dataSetName = dataSetInKey;
             ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey,datafileDFmap.get(dataSetName));
-            ngESCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngESCtxSvc.getNgctx().runningPipeLine = runningMode;
 
             NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
 
@@ -624,8 +623,8 @@ public class XDFDataProcessor  {
             ret = esloader.run();
 
             if (ret != 0){
-                error = "Could not complete ESLoader component " + "entry";
-                throw new Exception(error);
+                error = "Could not complete ESLoader component entry";
+                throw new XDFException(ErrorCodes.IncorrectCall , error);
             }
 
             logger.debug("End Of ESLoader Component ==>  dataSetName  & size " +  ngESCtxSvc.getNgctx().dataSetName + "," + ngESCtxSvc.getNgctx().datafileDFmap.size()+ "\n");
