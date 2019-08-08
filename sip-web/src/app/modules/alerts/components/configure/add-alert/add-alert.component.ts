@@ -10,6 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
+import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
@@ -94,7 +95,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodId: ['', Validators.required],
       datapodName: [''],
       categoryId: [''],
-      monitoringEntity: ['', Validators.required]
+      monitoringEntity: ['', Validators.required],
+      lookbackColumn: ['', Validators.required]
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
@@ -146,7 +148,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlert() {
     const payload = this.constructPayload();
-    console.log('new alert', payload);
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
@@ -169,5 +170,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   notifyOnAction(data) {
     this._notify.success(data.message);
     this.onAddAlert.emit(true);
+  }
+
+  numericMetricFilter(metric) {
+    return NUMBER_TYPES.includes(metric.type);
+  }
+
+  dateMetricFilter(metric) {
+    return DATE_TYPES.includes(metric.type);
   }
 }

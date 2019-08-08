@@ -69,7 +69,7 @@
                 e2e="notification"
               >
                 <mat-option
-                  *ngFor="let notification of (notifications$ | async)"
+                  *ngFor="let notification of notifications$ | async"
                   [value]="notification.value"
                   >{{ notification.label }}</mat-option
                 >
@@ -181,7 +181,7 @@
                 ngDefaultControl
                 required
                 formControlName="monitoringEntity"
-                [items]="metricsList$ | async"
+                [items]="metricsList$ | async | filterFn: numericMetricFilter"
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
@@ -197,6 +197,41 @@
               fxFlex
               *ngIf="
                 alertMetricFormGroup.controls.monitoringEntity.hasError(
+                  'required'
+                )
+              "
+              ><small>This field is required </small></mat-error
+            >
+
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Lookback column</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                required
+                formControlName="lookbackColumn"
+                [items]="metricsList$ | async | filterFn: dateMetricFilter"
+                displayExpr="displayName"
+                valueExpr="columnName"
+                [searchEnabled]="true"
+                placeholder="Select a column"
+                [readOnly]="!alertMetricFormGroup.controls.datapodId.value"
+                e2e="lookbackColumn"
+              ></dx-select-box>
+            </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertMetricFormGroup.controls.lookbackColumn.hasError(
                   'required'
                 )
               "

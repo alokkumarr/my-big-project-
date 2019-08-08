@@ -79,7 +79,7 @@ export class AlertsConfigurationComponent implements OnDestroy {
       width: '400px',
       data: {
         typeTitle: 'Alert Name',
-        typeName: alertConfig.alertName
+        typeName: alertConfig.alertRuleName
       }
     });
 
