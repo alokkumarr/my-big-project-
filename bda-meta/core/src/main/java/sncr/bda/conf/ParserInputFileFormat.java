@@ -10,7 +10,10 @@ public enum ParserInputFileFormat {
     @SerializedName("json")
     JSON("json"),
     @SerializedName("parquet")
-    PARQUET("parquet");
+    PARQUET("parquet"),
+    @SerializedName("dataframe")
+    DATAFRAME("dataframe");
+
     private final String value;
     private static final Map<String, ParserInputFileFormat> CONSTANTS = new HashMap<>();
 

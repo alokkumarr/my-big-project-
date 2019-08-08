@@ -7,6 +7,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.conf.ComponentConfiguration;
@@ -58,6 +59,7 @@ public abstract class AbstractComponent implements WithContext{
     protected InternalContext ctx;
     protected String componentName = "unnamed";
     protected final Services services = new Services();
+    protected Dataset inputDataFrame;
 
     protected DLBatchReader reader;
 
@@ -76,6 +78,28 @@ public abstract class AbstractComponent implements WithContext{
         }
     }
 
+    
+    /**
+     * The constructor is to be used when component is running with different services than NGContext has.
+     * ngctx should not be null & Dataset cannot be null
+     * @param ngctx
+     * @param inputDataFrame
+     * This has been added as a part of SIP-7758
+     */
+    public AbstractComponent(NGContext ngctx, ComponentServices[] cs, Dataset<?> inputDataFrame){
+        if (ngctx == null)
+            throw new IllegalArgumentException("NGContext must not be null");
+        if (inputDataFrame == null)
+            throw new IllegalArgumentException("DataSet must not be null");
+
+        this.ngctx = ngctx;
+        this.inputDataFrame = inputDataFrame;
+        for (int i = 0; i < cs.length; i++) {
+            this.ngctx.serviceStatus.put(cs[i], false);
+        }
+    }
+    
+    
     /**
      * The constructor is to be used in component asynchronous execution
      * NGContext must be initialized, output datasets must be pre-registered.
@@ -114,6 +138,7 @@ public abstract class AbstractComponent implements WithContext{
             logger.error(error);
             return -1;
         }
+        
         int ret = execute();
         if (ngctx.runningPipeLine) {
               ret = moveAndArchiveForPipeline(ret);
@@ -642,7 +667,6 @@ public abstract class AbstractComponent implements WithContext{
 
     //dev
     protected abstract int execute();
-
 
     protected int move(){
         int ret = 0;

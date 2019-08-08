@@ -26,13 +26,14 @@ import sncr.xdf.ngcomponent.WithSpark;
 import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
 
 public class NGRTPSComponent extends AbstractComponent
 		implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
-	
+
 	  private static final Logger logger = Logger.getLogger(NGRTPSComponent.class);
 
-	
+
 	 public NGRTPSComponent(NGContext ngctx) {
 	        super(ngctx);
 	    }
@@ -45,16 +46,17 @@ public class NGRTPSComponent extends AbstractComponent
 	                .appName("SparkSample")
 	                .master("local[*]")
 	                .getOrCreate();
-		
+
 		List<Tuple2<String,String[]>> inputList = new ArrayList<Tuple2<String,String[]>>();
         inputList.add(new Tuple2<String,String[]>("link91",new String[]{"link620","link761"}));
         inputList.add(new Tuple2<String,String[]>("link297",new String[]{"link999","link942"}));
-        Dataset<Row> dataset = spark.createDataset(inputList, Encoders.tuple(Encoders.STRING(), 
+        Dataset<Row> dataset = spark.createDataset(inputList, Encoders.tuple(Encoders.STRING(),
         		spark.implicits().newStringArrayEncoder())).toDF();
         ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
 		logger.debug("########rtps execute completed#######");
 		return 0;
 	}
+
 
 	@Override
 	protected int archive() {
@@ -73,11 +75,11 @@ public class NGRTPSComponent extends AbstractComponent
 			logger.debug("Hadoop file system initialized");
 
 			Map<String, Object> parameters = cli.parse(args);
-			
+
 			logger.debug("Command line arguments parsing completed");
-			
+
 			String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
-			
+
 			String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
 			if (configAsStr == null || configAsStr.isEmpty()) {
 				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
@@ -98,20 +100,20 @@ public class NGRTPSComponent extends AbstractComponent
 				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
 			}
 
-			
+
 			logger.debug("Config validation completed");
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
 					ComponentServices.TransformationMetadata, ComponentServices.Spark, };
 			ComponentConfiguration cfg = NGRTPSComponent.analyzeAndValidate(configAsStr);
-			
+
 			logger.debug("Analyze and validation completed");
-			
-			
+
+
 			ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
 			logger.debug("NG Context services initialized");
-			
+
 			ngCtxSvc.initContext();
-			
+
 			logger.debug("NG init Context completed");
 			logger.debug("Starting register output dataset");
 	        ngCtxSvc.registerOutputDataSet();
@@ -124,7 +126,7 @@ public class NGRTPSComponent extends AbstractComponent
         logger.debug("NGRTPSComponent initialized with NgContext");
         if (!component.initComponent(null))
             System.exit(-1);
-        
+
         logger.debug("Invoking run() method.....");
         int rc = component.run();
         logger.debug("run() execution completed");
@@ -149,7 +151,7 @@ public class NGRTPSComponent extends AbstractComponent
 			throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
 		}
 
-		
+
 
 		return compConf;
 	}
