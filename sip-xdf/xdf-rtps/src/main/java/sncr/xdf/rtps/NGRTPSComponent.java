@@ -3,6 +3,7 @@ package sncr.xdf.rtps;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -48,19 +49,6 @@ public class NGRTPSComponent extends AbstractComponent
 	@Override
 	protected int execute() {
 		logger.debug("########rtps execute started#######");
-		/*SparkSession spark = SparkSession
-	                .builder()
-	                .appName("SparkSample")
-	                .master("local[*]")
-	                .getOrCreate();
-		
-		List<Tuple2<String,String[]>> inputList = new ArrayList<Tuple2<String,String[]>>();
-        inputList.add(new Tuple2<String,String[]>("link91",new String[]{"link620","link761"}));
-        inputList.add(new Tuple2<String,String[]>("link297",new String[]{"link999","link942"}));
-        Dataset<Row> dataset = spark.createDataset(inputList, Encoders.tuple(Encoders.STRING(), 
-        		spark.implicits().newStringArrayEncoder())).toDF();
-        ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());*/
-        
         
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
         String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
@@ -72,7 +60,13 @@ public class NGRTPSComponent extends AbstractComponent
 			logger.error(ex.getMessage());
 		}
 		Rtps rtpsProps = config.getRtps();
-        driver.run(rtpsProps, ctx);
+		
+		if(ngctx == null) {
+			driver.run(rtpsProps, Optional.empty(), Optional.empty());
+		} else {
+			driver.run(rtpsProps, Optional.of(ngctx), Optional.of(ctx));
+	        
+		}
         
         
 		logger.debug("########rtps execute completed#######");

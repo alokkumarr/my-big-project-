@@ -40,12 +40,15 @@ public class XDFDataProcessor  {
     }
 
     private  String PIPELINE_CONFIG;
+    private JSONObject jsonObj;
+    private Map<String, Object> pipelineConfigParams;
     private boolean RUNNING_MODE  = true;
     private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
     Map<String, Dataset> datafileDFmap = new HashMap<>();
     String dataSetName = "";
     String error;
     boolean isRealTime = false;
+    String[] args;
 
     public static void main(String[] args)  {
 
@@ -69,6 +72,7 @@ public class XDFDataProcessor  {
         int ret = 0 ;
 
         CliHandler cli = new CliHandler();
+        this.args = args;
 
         try {
 
@@ -76,45 +80,47 @@ public class XDFDataProcessor  {
             Map<String, Object> parameters = cli.parse(args);
 
             PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
-            JSONObject jsonObj =  LoadPipelineConfig(PIPELINE_CONFIG);
-
+            jsonObj =  LoadPipelineConfig(PIPELINE_CONFIG);
             JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
-
-            for(int i=0;i<pipeline.size();i++)
-            {
-                JSONObject pipeObj = (JSONObject)pipeline.get(i);
-
-                String component = pipeObj.get("component").toString();
-                boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-                logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
-                switch(component)
+            JSONObject componentConfig = (JSONObject)pipeline.get(0);
+            
+            if(componentConfig.get("component").toString().equals("rtps")) {
+            	processRtps(parameters,componentConfig.get("configuration").toString(),
+            			Boolean.valueOf(componentConfig.get("persist").toString()));
+            } else {
+            	
+            	for(int i=0;i<pipeline.size();i++)
                 {
-                
-                
-                	case "rtps" :
-                	isRealTime = true;
-                	 logger.debug("Switch case rtps   ---> " );
-                    ret = processRtps(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
-                
-                
-                    case "parser" :
-                    ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,isRealTime);
-                    break;
+                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
 
-                    case "transformer" :
-                    ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+                    switch(component)
+                    {
+                    
+                    
+                        case "parser" :
+                        ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,false);
+                        break;
 
-                    case "sql" :
-                    ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
+                        case "transformer" :
+                        ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
 
-                    case "esloader" :
-                    ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
+                        case "sql" :
+                        ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
+
+                        case "esloader" :
+                        ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
+                    }
                 }
             }
+
+
+            
 
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
@@ -122,7 +128,54 @@ public class XDFDataProcessor  {
         }
     }
 
+    
+    public void  processDataWithDataFrame()
+    {
+    	 int ret = 0 ;
 
+        try {
+        	JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
+            
+            	for(int i=1;i<pipeline.size();i++)
+                {
+                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
+
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+                    switch(component)
+                    {
+                    
+                    
+                        case "parser" :
+                        ret = processParser(pipelineConfigParams,pipeObj.get("configuration").toString(),persist, true);
+                        break;
+
+                        case "transformer" :
+                        ret = processTransformer( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+
+                        case "sql" :
+                        ret = processSQL( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+
+                        case "esloader" :
+                        ret = processESLoader(pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+                    }
+                }
+
+
+            
+
+        } catch (Exception e) {
+            logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
+            System.exit(ret);
+        }
+    }
+
+   
+    
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
     	 logger.debug("###### Starting RTPS #####"  );
         int ret = 0;
@@ -155,6 +208,7 @@ public class XDFDataProcessor  {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
+            
             logger.debug("###### Analize and validate...#####" + configAsStr  );
             ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
             logger.debug("###### Analize and validate completed ...#####"  );
@@ -171,7 +225,11 @@ public class XDFDataProcessor  {
             logger.warn(ngRtpsCtxSvc.getNgctx().toString());
 
             logger.debug("Parser Input dataset size is : " + datafileDFmap.size() );
-
+            
+            
+            ngRtpsCtxSvc.getNgctx().pipelineConfig = jsonObj;
+            ngRtpsCtxSvc.getNgctx().pipelineConfigParams = parameters;
+            ngRtpsCtxSvc.getNgctx().pipeineArgs = args;
             ngRtpsCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String rtpsKey =  cfg.getOutputs().get(0).getDataSet().toString();
           
@@ -279,7 +337,7 @@ public class XDFDataProcessor  {
             String parserKey = null;
             
             if(isRealTime) {
-            	parserKey = dataSetName;
+            	parserKey = ngParserCtxSvc.getNgctx().dataSetName;
             } else {
             	parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
             }
@@ -291,7 +349,7 @@ public class XDFDataProcessor  {
             NGParser component = null;
             
     		if(isRealTime) {
-    			Dataset dataset = ngParserCtxSvc.getNgctx().datafileDFmap.get(parserKey);
+    			Dataset dataset =  datafileDFmap.get("DATA_STREAM");
     			component  =  	new NGParser(ngParserCtxSvc.getNgctx(), dataset, true);
             } else {
             	

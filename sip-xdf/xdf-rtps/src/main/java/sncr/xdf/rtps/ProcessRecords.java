@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +35,7 @@ import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
 
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 
 import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_GENERIC;
 import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_GENERIC;
@@ -70,13 +72,14 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private String basePath;
     private String batchPrefix;
     private String outputType;
-    InternalContext itcx;
+    private InternalContext itcx;
+    private NGContext ngctx ;
 
     public ProcessRecords(
         JavaInputDStream<ConsumerRecord<String, String>> inStream,
         String dataModel, String definitions,
         String esIndex, Map<String, String> esConfig,
-        String basePath, String batchPrefix, String outputType, InternalContext itcx){
+        String basePath, String batchPrefix, String outputType, Optional<NGContext> ngctx , Optional<InternalContext> ctx){
     	logger.debug("### Inside process records ####");
         this.inStream = inStream;
         this.itcx = itcx;
@@ -99,6 +102,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         this.basePath = basePath;
         this.batchPrefix = batchPrefix;
         this.outputType = outputType;
+        if(ngctx.isPresent()) {
+        	this.ngctx = ngctx.get();
+        }
+        if(ctx.isPresent()) {
+        	this.itcx = ctx.get();
+        }
+        
     }
     public void  call(
         JavaRDD<ConsumerRecord<String, String>> in, Time tm) throws Exception {
@@ -255,8 +265,20 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
           logger.trace("Alert metrics to be be collected: " + df.count());
         }
         logger.debug("######## Data frame crated with XDF-RTPS ##########");
+        
+        if(this.ngctx != null && this.ngctx.runningPipeLine) {
+        	  logger.debug("######## Triggering pipeline as part of RTPS listener ##########");
+        	 RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
+             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams );
+        }
+        
+       
+        
         return 0;
     }
+
+    
+    
 
     private int finalizeBatch(String strTmpPath, String finalPath){
         // Done with writing - safe to rename batch directory

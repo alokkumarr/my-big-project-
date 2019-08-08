@@ -7,6 +7,7 @@ import com.mapr.streams.Streams;
 
 import sncr.bda.conf.Rtps;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 
 import com.mapr.streams.StreamDescriptor;
 import org.apache.hadoop.conf.Configuration;
@@ -16,6 +17,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
@@ -59,7 +61,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
      * @param   appConfig configuration object
      * @return  new Java Streaming context initialized with provided configuration
      */
-    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig, InternalContext ctx){
+    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig, Optional<NGContext> ngctx , Optional<InternalContext> ctx){
 
 
         // Validate configuration and settings
@@ -145,8 +147,20 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         Integer batchInterval = appConfig.getInt("spark.batch.interval");
         //JavaStreamingContext jssc = new JavaStreamingContext(ctx.sparkSession.sparkContext(), Durations.seconds(batchInterval));
         
-        JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(ctx.sparkSession.sparkContext().getOrCreate(sparkConf));
-        JavaStreamingContext jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        JavaSparkContext jsCtx =  null;
+        JavaStreamingContext jssc = null;
+        
+        /**
+         * Create or Use spark context from InternalContext
+         */
+        if(ctx.isPresent()) {
+        	ctx.get().sparkSession.sparkContext();
+			jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(sparkConf));
+			jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        } else {
+        	jssc =  new JavaStreamingContext(sparkConf, Durations.seconds(batchInterval));
+        }
+        
 
         logger.info("Java streaming context created" );
         // Create stream
@@ -169,13 +183,13 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             .foreachRDD(new ProcessRecords(eventsStream,
                                           model, fieldDefinitions,
                                           esIndex, esConfig,
-                                          outputPath, this.appName, outputType, ctx));
+                                          outputPath, this.appName, outputType,  ngctx ,  ctx));
         return jssc;
     }
     
     
     
-    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros, InternalContext ctx){
+    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros,  Optional<NGContext> ngctx , Optional<InternalContext> ctx){
 
 
         // Validate configuration and settings
@@ -271,8 +285,19 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         Integer batchInterval  = Integer.valueOf(rtpsPros.getSpark().getBatchInterval());
         //JavaStreamingContext jssc = new JavaStreamingContext(ctx.sparkSession.sparkContext(), Durations.seconds(batchInterval));
         
-        JavaSparkContext jsCtx = JavaSparkContext.fromSparkContext(ctx.sparkSession.sparkContext().getOrCreate(sparkConf));
-        JavaStreamingContext jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        JavaSparkContext jsCtx =  null;
+        JavaStreamingContext jssc = null;
+        
+        /**
+         * Create or Use spark context from InternalContext
+         */
+        if(ctx.isPresent()) {
+        	ctx.get().sparkSession.sparkContext();
+			jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(sparkConf));
+			jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        } else {
+        	jssc =  new JavaStreamingContext(sparkConf, Durations.seconds(batchInterval));
+        }
 
         logger.info("Java streaming context created" );
         // Create stream
@@ -306,7 +331,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             .foreachRDD(new ProcessRecords(eventsStream,
                                           model, fieldDefinitions,
                                           esIndex, esConfig,
-                                          outputPath, this.appName, outputType, ctx));
+                                          outputPath, this.appName, outputType, ngctx, ctx));
         return jssc;
     }
 

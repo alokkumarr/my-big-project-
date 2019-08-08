@@ -4,11 +4,13 @@ import com.typesafe.config.ConfigFactory;
 import info.faljse.SDNotify.SDNotify;
 import sncr.bda.conf.Rtps;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function0;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import java.io.File;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -35,7 +37,7 @@ public class RealTimeApplicationDriver {
             {"monitoring.interval", "Monitoring interval is not configured (%s). Please correct configuration file."}
     };
 
-    protected void run(Rtps rtpsProps, InternalContext ctx) {
+    protected void run(Rtps rtpsProps, Optional<NGContext> ngctx , Optional<InternalContext> ctx) {
         int exit_code;
 
         // Read configuration file
@@ -49,6 +51,11 @@ public class RealTimeApplicationDriver {
         
         JavaStreamingContext jssc = null;
         
+        /**
+         * No configPath means its new way with json.
+         * ConfigPath entry with path in configuration means
+         * its older way of loading with typeconfig. 
+         */
         if(configPath == null  || "".equals(configPath)) {
         	appName = rtpsProps.getSpark().getAppName();
         	controlFilePath = rtpsProps.getMonitoring().getControlfilePath();
@@ -59,7 +66,7 @@ public class RealTimeApplicationDriver {
                 System.exit(-3);
             }
         	logger.debug("##### About to start Create Context JSON #######");
-        	 jssc = createContext(appName, rtpsProps, ctx);
+        	 jssc = createContext(appName, rtpsProps, ngctx, ctx);
         	
         } else {
         	logger.debug("##### Before parsing config file name:: #######"+ configPath);
@@ -85,7 +92,7 @@ public class RealTimeApplicationDriver {
 
             // Create Streaming context
         	logger.debug("##### About to start Create Context type safe config #######");
-        	jssc = createContext(appName, appConfig, ctx);
+        	jssc = createContext(appName, appConfig,ngctx,  ctx);
          
 
         }
@@ -125,13 +132,13 @@ public class RealTimeApplicationDriver {
 
     // This function should define pipeline of Spark stages.
     // Should be redefined in all applications
-    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig, InternalContext itx){
+    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig, Optional<NGContext> ngctx , Optional<InternalContext> ctx){
         logger.error("createContext() method should be redefined on application level.");
         return null;
     }
     
     
-    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros, InternalContext ctx) {
+    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros, Optional<NGContext> ngctx , Optional<InternalContext> ctx) {
     	 logger.error("createContext() method should be redefined on application level.");
          return null;
     }
