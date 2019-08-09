@@ -3,6 +3,7 @@ package sncr.xdf.ngcomponent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.Date;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.readers.DLBatchReader;
+import sncr.xdf.alert.AlertQueueManager;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -224,6 +226,19 @@ public abstract class AbstractComponent implements WithContext{
             }
         }
         return true;
+    }
+
+    /**
+     * Send the notification to evaluate the data based on configured alert rules.
+     * @return boolean
+     */
+    private boolean sendAlertNotification()
+    {
+        // Todo: This is placeholder for the alert notification , will be triggered.
+        //  based on alert configuration.
+        AlertQueueManager alertQueueManager = new AlertQueueManager("dummy");
+        return alertQueueManager.sendMessageToStream("baseLocation", new Date().getTime());
+
     }
 
     private int initServices(){
