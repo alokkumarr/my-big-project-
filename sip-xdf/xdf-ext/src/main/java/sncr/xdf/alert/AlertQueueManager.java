@@ -31,7 +31,7 @@ public class AlertQueueManager {
     try {
       createIfNotExists(10);
     } catch (Exception e) {
-      logger.error("unable to create path for executor stream : " + this.streamBasePath);
+      logger.error("unable to create path for alert stream : " + this.streamBasePath);
     }
   }
 
@@ -46,7 +46,7 @@ public class AlertQueueManager {
       HFileOperations.createDir(streamBasePath);
     } catch (Exception e) {
       if (retries == 0) {
-        logger.error("unable to create path for executor stream for path : " + streamBasePath);
+        logger.error("unable to create path for alert stream for path : " + streamBasePath);
       }
       Thread.sleep(5 * 1000);
       createIfNotExists(retries - 1);
