@@ -7,6 +7,7 @@ import {
   Input
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as filter from 'lodash/filter';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
@@ -15,6 +16,7 @@ import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 const notifications = [
   {
@@ -44,6 +46,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertRuleFormGroup: FormGroup;
   datapods$;
   metricsList$;
+  metricsListWithoutMonitoringEntity$;
+  metricsListWithoutEntity$;
   operators$;
   aggregations$;
   notifications$;
@@ -96,6 +100,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodName: [''],
       categoryId: [''],
       monitoringEntity: ['', Validators.required],
+      entityName: ['', Validators.required],
       lookbackColumn: ['', Validators.required]
     });
 
@@ -125,6 +130,25 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
       this.metricsList$ = this._configureAlertService.getMetricsInDatapod$(
         selectedItem.id
+      );
+      this.metricsListWithoutMonitoringEntity$ = this.metricsList$.pipe(
+        map(columns =>
+          filter(
+            columns,
+            col =>
+              col.columnName ===
+              this.alertMetricFormGroup.get('monitoringEntity')
+          )
+        )
+      );
+      this.metricsListWithoutEntity$ = this.metricsList$.pipe(
+        map(columns =>
+          filter(
+            columns,
+            col =>
+              col.columnName === this.alertMetricFormGroup.get('entityName')
+          )
+        )
       );
     }
   }

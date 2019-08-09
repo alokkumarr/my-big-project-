@@ -170,7 +170,7 @@
               appearance="outline"
               class="add-container__body__stepper__dxselect padtop10"
             >
-              <mat-label>Metric Name</mat-label>
+              <mat-label>Monitoring Entity</mat-label>
               <input
                 hidden="true"
                 value="dummy"
@@ -185,11 +185,11 @@
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
-                placeholder="Select a Metric"
+                placeholder="Select a monitoring entity"
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
-                e2e="metricName"
+                e2e="monitoringEntity"
               ></dx-select-box>
             </mat-form-field>
             <mat-error
@@ -199,6 +199,40 @@
                 alertMetricFormGroup.controls.monitoringEntity.hasError(
                   'required'
                 )
+              "
+              ><small>This field is required </small></mat-error
+            >
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Entity name</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                required
+                formControlName="monitoringEntity"
+                [items]="metricsList$ | async"
+                displayExpr="displayName"
+                valueExpr="columnName"
+                [searchEnabled]="true"
+                placeholder="Select an Entity"
+                [readOnly]="
+                  alertMetricFormGroup.controls.datapodId.hasError('required')
+                "
+                e2e="entityName"
+              ></dx-select-box>
+            </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertMetricFormGroup.controls.entityName.hasError('required')
               "
               ><small>This field is required </small></mat-error
             >
