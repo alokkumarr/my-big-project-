@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -374,46 +375,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return result;
     }
 
-
-//    protected int archive(){
-//        int result = 0;
-//        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
-//
-//        try {
-//            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
-//
-//            if (files != null && files.length != 0) {
-//                //Create archive directory
-//
-//                logger.debug("Total files = " + files.length);
-//
-//                int archiveCounter = 0;
-//
-//                for(FileStatus fiile: files) {
-//                    String currentTimestamp = LocalDateTime.now()
-//                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-//
-//                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-//                    ctx.fs.mkdirs(archivePath);
-//
-//                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
-//                        archiveCounter++;
-//                    }
-//                }
-//
-//                logger.info("Total files archived = " + archiveCounter);
-//            }
-//        } catch (IOException e) {
-//            logger.error("Archival failed");
-//
-//            logger.error(ExceptionUtils.getStackTrace(e));
-//
-//            result = 1;
-//        }
-//
-//        return result;
-//    }
-
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
         return ctx.fs.rename(sourceFilePath, archiveLocation);
@@ -465,7 +426,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         Dataset filterOutputDS = null;
         Dataset renameOutputDS = outputDataset;
 
-        // using for-each loop for iteration over Map.entrySet()
         for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
             String origin = e.getKey();
             String destination = e.getValue();
@@ -735,10 +695,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private static Map createDestinationFieldList(List<ParserFieldsOutput> outputs){
 
-        Map<String,String> hmap = new java.util.HashMap();
-        //List<Column> retval = new ArrayList<>(outputs.size());
+        Map<String,String> hmap = new HashMap();
         for(ParserFieldsOutput output : outputs){
-
             if (output.getDestinationName() != null ) {
                 hmap.put(output.getName(),output.getDestinationName());
             }
