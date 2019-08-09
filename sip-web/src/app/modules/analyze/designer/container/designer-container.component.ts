@@ -463,14 +463,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'report':
       const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
 
-      forEach(artifacts, table => {
-        table.columns = map(table.columns, column => {
-            forEach(fields, field => {
-              if (field.columnName === column.columnName) {
-                column.checked = true;
-              }
-            });
-          return column;
+      const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
+
+      flatArtifacts.forEach(col => {
+        col.checked  = '';
+        fields.forEach(field => {
+          if (col.table === field.table && col.columnName === field.columnName) {
+            col.checked = true;
+          }
         });
       });
       break;
@@ -1299,19 +1299,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       return Boolean(analysis.sipQuery.query);
     }
 
-    let atLeastOneIsChecked = false;
-    forEach(artifacts, artifact => {
-      forEach(artifact.columns, column => {
-        if (column.checked) {
-          atLeastOneIsChecked = true;
-          return false;
-        }
-      });
-      if (atLeastOneIsChecked) {
-        return false;
-      }
-    });
-    return atLeastOneIsChecked;
+    const selectedFields = flatMap(
+      analysis.sipQuery.artifacts,
+      artifact => artifact.fields
+    );
+    return selectedFields.length > 0;
   }
 
   updateAnalysis() {

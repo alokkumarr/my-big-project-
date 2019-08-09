@@ -80,7 +80,7 @@ public class MigrateAnalysis {
       MigrationStatus migrationStatus = convertAllAnalysis(jsonArray);
       logger.info("Total number of Files for migration : {}", migrationStatus.getTotalAnalysis());
       logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getSuccessCount());
-      logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getFailureCount());
+      logger.info("Number of Files Failed Migrated {}: ", migrationStatus.getFailureCount());
     }
   }
 
@@ -112,10 +112,13 @@ public class MigrateAnalysis {
 
               try {
                 analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                if (analysis.getSemanticId() != null && analysis.getSipQuery() != null) {
+                  analysis.getSipQuery().setSemanticId(analysis.getSemanticId());
+                }
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
                 JsonElement parsedAnalysis =
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-                analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                analysisMetadataStore.update(analysis.getId(), parsedAnalysis);
 
                 migrationStatusObject.setAnalysisId(analysis.getId());
                 logger.info(
@@ -226,7 +229,9 @@ public class MigrateAnalysis {
           new AnalysisMetadata(migrationStatusTable, basePath);
       logger.debug("Connection established with MaprDB..!!");
       logger.info("Started Writing the status into MaprDB, id : " + id);
-      analysisMetadataStore1.create(id, new Gson().toJson(migrationStatus));
+      Gson gson = new Gson();
+      JsonElement jsonElement = gson.toJsonTree(migrationStatus, MigrationStatusObject.class);
+      analysisMetadataStore1.update(id, jsonElement);
     } catch (Exception e) {
       logger.error(e.getMessage());
       logger.error(

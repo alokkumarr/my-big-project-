@@ -349,6 +349,9 @@ public class MigrateAnalysisService {
       List<Object> objectList = new ArrayList<>();
       objectList.add(dslExecutionResult);
       Analysis analysis = getAnalysis(dslQueryId);
+      if (analysis.getSemanticId() != null) {
+        sipQuery.setSemanticId(analysis.getSemanticId());
+      }
       analysis.setSipQuery(sipQuery);
       ExecutionResult executionResult = new ExecutionResult();
       executionResult.setExecutionId(executionId);

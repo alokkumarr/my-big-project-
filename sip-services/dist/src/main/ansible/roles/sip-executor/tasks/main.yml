@@ -60,12 +60,14 @@
   file: path=/etc/bda/saw-transport-service-env state=touch
 
 - name: Enable SIP Executor (regular)
-  systemd: name="sip-executor@regular-{{ item }}" state=started enabled=true daemon_reload=true
+  systemd: name="sip-executor@regular-{{ item }}" enabled=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
   notify:
+    - restart sip-executor-fast
     - restart sip-executor-regular
 - name: Enable SIP Executor (fast)
-  systemd: name="sip-executor@fast-{{ item }}" state=started enabled=true daemon_reload=true
+  systemd: name="sip-executor@fast-{{ item }}" enabled=true
   with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}
   notify:
+    - restart sip-executor-regular
     - restart sip-executor-fast
