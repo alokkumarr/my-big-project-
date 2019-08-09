@@ -15,6 +15,24 @@
   notify:
     - restart sip-transport
 
+# Workaround: Executors associated with transport Service have been replaced with sip-executor,
+# so stop the existing transport service executors,Workaround can be removed once all environments
+# upgraded to SIP 3.3.2.
+- name: Stop sip-transport-executors before upgrading
+  command: systemctl stop sip-executor*
+  ignore_errors: yes
+- name: Disable sip-transport fast executor
+  command: systemctl disable sip-transport-executor@fast-{{ item }}
+  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+  ignore_errors: yes
+- name: Disable sip-transport regular executor
+  command: systemctl disable sip-transport-executor@regular-{{ item }}
+  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+  ignore_errors: yes
+- name: Remove the existing executor
+  file: state=absent path="/usr/lib/systemd/system/sip-transport-executor@.service"
+  ignore_errors: yes
+
 - name: Install SAW Transport Service configuration file
   template: src=application.conf dest=/opt/saw/service/conf
   notify:
