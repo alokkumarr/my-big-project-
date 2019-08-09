@@ -76,6 +76,12 @@ export const CHANNEL_TYPES: any[] = [
     supported: true
   },
   {
+    name: 'API',
+    uid: 'api',
+    imgsrc: 'assets/img/sftp.png',
+    supported: true
+  },
+  {
     name: 'Amazon S3',
     uid: 's3',
     imgsrc: 'assets/img/s3.png',
