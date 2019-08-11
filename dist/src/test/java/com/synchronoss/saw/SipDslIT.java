@@ -1,7 +1,10 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
-
+import static org.junit.Assert.assertTrue;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -10,13 +13,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.net.ftp.FTPClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockftpserver.fake.FakeFtpServer;
+import org.mockftpserver.fake.UserAccount;
+import org.mockftpserver.fake.filesystem.DirectoryEntry;
+import org.mockftpserver.fake.filesystem.FileEntry;
+import org.mockftpserver.fake.filesystem.FileSystem;
+import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 public class SipDslIT extends BaseIT {
   String analysisId = "f37cde24-b833-46ba-ae2d-42e286c3fc39";
@@ -191,6 +202,7 @@ public class SipDslIT extends BaseIT {
   public void setUpDataForDl() {
     testDataForDl = new JsonObject();
     testDataForDl.addProperty("type", "report");
+    testDataForDl.addProperty("name", "integrationTest");
     testDataForDl.addProperty("semanticId", "workbench::sample-spark");
     testDataForDl.addProperty("metricName", "sample-spark");
     testDataForDl.addProperty("id", analysisId);
@@ -296,8 +308,6 @@ public class SipDslIT extends BaseIT {
 
     JsonObject join = new JsonObject();
     join.addProperty("join", "inner");
-
-
 
     JsonObject leftTable = new JsonObject();
     leftTable.addProperty("artifactsName", "PRODUCT");
@@ -502,5 +512,163 @@ public class SipDslIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void exportData() throws IOException {
+    ObjectNode analysis = testCreateDLAnalysis();
+    String analysisId = analysis.get("analysisId").asText();
+    executeAnalysis(analysisId);
+    ObjectNode node = scheduleData();
+    node.put("analysisID", analysisId);
+    String json = mapper.writeValueAsString(node);
+    createSchedule(json);
+    List<Map<String, String>> data = getLastExecutionsData(analysisId);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+    // base setup for ftp server
+    String username = "user";
+    String password = "password";
+    String homeDirectory = "/";
+    String filename = "report.csv";
+    // Write the data to csv
+    FakeFtpServer f = createFileOnFakeFTP(username, password, homeDirectory, filename, data);
+
+    // check if the file has been uploaded and read the contents
+    String dataResult =
+        readFile("/data/" + filename, "localhost", f.getServerControlPort(), username, password);
+    // check if the file actually has data
+    // this has been done just to avoid rewriting integration test case when data changes.
+    // the goal here is to just check if the data that we got from scheduled analysis execution
+    // is present in the file.
+    assertTrue(dataResult.length() > 0);
+  }
+
+  private ObjectNode scheduleData() {
+    ObjectNode objectNode = mapper.createObjectNode();
+    objectNode.put("activeRadio", "everyDay");
+    objectNode.put("activeTab", "daily");
+    objectNode.put("analysisID", "123");
+    objectNode.put("analysisName", "Untitled Analysis");
+    objectNode.put("cronExpression", "0 31 20 1/1 * ? *");
+    objectNode.put("fileType", "csv");
+    objectNode.put("jobName", "123");
+    objectNode.put("metricName", "Sample (report) - new");
+    objectNode.put("type", "report");
+    objectNode.put("userFullName", "System");
+    ArrayNode email = objectNode.putArray("emailList");
+    email.add("abc@synchronoss.com");
+    email.add("xyz@synchronoss.com");
+    ArrayNode ftp = objectNode.putArray("ftp");
+    ftp.add("ftp");
+    objectNode.put("jobScheduleTime", "2018-03-01T16:24:28+05:30");
+    objectNode.put("categoryID", "4");
+    objectNode.put("jobGroup", "SYNCHRONOSS");
+    objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
+    objectNode.put("timezone", "UTC");
+    return objectNode;
+  }
+
+  public ObjectNode testCreateDLAnalysis() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(jsonNode)
+            .when()
+            .post("/sip/services/dslanalysis/")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    Assert.assertNotNull(response);
+    return response.getBody().as(ObjectNode.class);
+  }
+
+  public List<Map<String, String>> getLastExecutionsData(String analysisId) throws IOException {
+    return given(spec)
+        .header("Authorization", "Bearer " + token)
+        .get(
+            "/sip/services/internal/proxy/storage/"
+                + analysisId
+                + "/lastExecutions/data?analysisType=report")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response()
+        .path("data");
+  }
+
+  private void createSchedule(String json) {
+    given(spec)
+        .filter(document("create-schedule", preprocessResponse(prettyPrint())))
+        .header("Authorization", "Bearer " + token)
+        .body(json)
+        .when()
+        .post("/sip/services/scheduler/schedule")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+  }
+
+  public FakeFtpServer createFileOnFakeFTP(
+      String username,
+      String password,
+      String homeDirectory,
+      String filename,
+      List<Map<String, String>> data) {
+    FakeFtpServer aFakeFtpServer = new FakeFtpServer();
+    aFakeFtpServer.setServerControlPort(0);
+    aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
+
+    FileSystem aFileSystem = new UnixFakeFileSystem();
+    aFileSystem.add(new DirectoryEntry("/data"));
+    aFileSystem.add(new FileEntry("/data/" + filename, data.toString()));
+    aFakeFtpServer.setFileSystem(aFileSystem);
+
+    aFakeFtpServer.start();
+    return aFakeFtpServer;
+  }
+
+  void executeAnalysis(String analysisId) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(jsonNode)
+        .when()
+        .post("/sip/services/internal/proxy/storage/execute?executionType=publish&id=" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+  }
+
+  public String readFile(String filename, String server, int port, String username, String password)
+      throws IOException {
+
+    FTPClient ftpClient = new FTPClient();
+    ftpClient.connect(server, port);
+    ftpClient.login(username, password);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    boolean success = ftpClient.retrieveFile(filename, outputStream);
+    ftpClient.disconnect();
+
+    if (!success) {
+      throw new IOException("Retrieve file failed: " + filename);
+    }
+    return outputStream.toString();
   }
 }
