@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -516,7 +517,7 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void exportData() throws IOException {
-    ObjectNode analysis = testCreateDLAnalysis();
+    ObjectNode analysis = testCreateDlAnalysis();
     String analysisId = analysis.get("analysisId").asText();
     executeAnalysis(analysisId);
     ObjectNode node = scheduleData();
@@ -537,7 +538,7 @@ public class SipDslIT extends BaseIT {
     String homeDirectory = "/";
     String filename = "report.csv";
     // Write the data to csv
-    FakeFtpServer f = createFileOnFakeFTP(username, password, homeDirectory, filename, data);
+    FakeFtpServer f = createFileOnFakeFtp(username, password, homeDirectory, filename, data);
 
     // check if the file has been uploaded and read the contents
     String dataResult =
@@ -566,7 +567,7 @@ public class SipDslIT extends BaseIT {
     email.add("xyz@synchronoss.com");
     ArrayNode ftp = objectNode.putArray("ftp");
     ftp.add("ftp");
-    objectNode.put("jobScheduleTime", "2018-03-01T16:24:28+05:30");
+    objectNode.put("jobScheduleTime", "2019-07-01T16:24:28+05:30");
     objectNode.put("categoryID", "4");
     objectNode.put("jobGroup", "SYNCHRONOSS");
     objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
@@ -574,7 +575,12 @@ public class SipDslIT extends BaseIT {
     return objectNode;
   }
 
-  public ObjectNode testCreateDLAnalysis() throws IOException {
+  /**
+   * This Method is create analysis.
+   *
+   * @return created analysis
+   */
+  public ObjectNode testCreateDlAnalysis() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
     Response response =
@@ -592,6 +598,12 @@ public class SipDslIT extends BaseIT {
     return response.getBody().as(ObjectNode.class);
   }
 
+  /**
+   * This Method is used to last execution for analysis.
+   *
+   * @param analysisId analysis id.
+   * @return data for the execution
+   */
   public List<Map<String, String>> getLastExecutionsData(String analysisId) throws IOException {
     return given(spec)
         .header("Authorization", "Bearer " + token)
@@ -621,25 +633,40 @@ public class SipDslIT extends BaseIT {
         .response();
   }
 
-  public FakeFtpServer createFileOnFakeFTP(
+  /**
+   * This Method is create ftp server.
+   *
+   * @param username username.
+   * @param password password.
+   * @param homeDirectory homeDirectory.
+   * @param filename filename.
+   * @param data execution data.
+   * @return ftpserver
+   */
+  public FakeFtpServer createFileOnFakeFtp(
       String username,
       String password,
       String homeDirectory,
       String filename,
       List<Map<String, String>> data) {
-    FakeFtpServer aFakeFtpServer = new FakeFtpServer();
-    aFakeFtpServer.setServerControlPort(0);
-    aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
+    FakeFtpServer fakeFtpServer = new FakeFtpServer();
+    fakeFtpServer.setServerControlPort(0);
+    fakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
 
-    FileSystem aFileSystem = new UnixFakeFileSystem();
-    aFileSystem.add(new DirectoryEntry("/data"));
-    aFileSystem.add(new FileEntry("/data/" + filename, data.toString()));
-    aFakeFtpServer.setFileSystem(aFileSystem);
+    FileSystem fileSystem = new UnixFakeFileSystem();
+    fileSystem.add(new DirectoryEntry("/data"));
+    fileSystem.add(new FileEntry("/data/" + filename, data.toString()));
+    fakeFtpServer.setFileSystem(fileSystem);
 
-    aFakeFtpServer.start();
-    return aFakeFtpServer;
+    fakeFtpServer.start();
+    return fakeFtpServer;
   }
 
+  /**
+   * This Method is used to execute the analysis.
+   *
+   * @param analysisId analysis id
+   */
   void executeAnalysis(String analysisId) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
@@ -655,6 +682,16 @@ public class SipDslIT extends BaseIT {
         .response();
   }
 
+  /**
+   * This Method is read file.
+   *
+   * @param filename filename.
+   * @param server server.
+   * @param port port .
+   * @param username username.
+   * @param password password.
+   * @return content of file as string
+   */
   public String readFile(String filename, String server, int port, String username, String password)
       throws IOException {
 
