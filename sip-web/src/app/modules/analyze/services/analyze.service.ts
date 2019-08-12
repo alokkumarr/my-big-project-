@@ -32,11 +32,10 @@ import {
 import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
-import { zip, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { DSL_ANALYSIS_TYPES } from '../consts';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
-import { isDSLAnalysis } from '../designer/types';
 import * as isArray from 'lodash/isArray';
 
 const apiUrl = AppConfig.api.url;
@@ -148,30 +147,6 @@ export class AnalyzeService {
   }
 
   /**
-   * Gets list of analyses from legacy endpoint (non-dsl).
-   * This endpoint is for backward-compatibility. Remove when not needed.
-   *
-   * @param {*} subCategoryId
-   * @returns {Observable<Analysis[]>}
-   * @memberof AnalyzeService
-   */
-  getAnalysesForNonDSL(subCategoryId): Observable<Analysis[]> {
-    const payload = this.getRequestParams([
-      ['contents.action', 'search'],
-      ['contents.keys.[0].categoryId', subCategoryId]
-    ]);
-    return <Observable<Analysis[]>>(
-      this.postRequest(`analysis`, payload).pipe(map(fpGet('contents.analyze')))
-    );
-  }
-
-  getAnalysesDSL(subCategoryId: string | number): Observable<AnalysisDSL[]> {
-    return <Observable<AnalysisDSL[]>>(
-      this.getRequest(`dslanalysis?category=${subCategoryId}`)
-    );
-  }
-
-  /**
    * Stitches non-dsl and dsl endpoints for listing analyses and provides
    * results as a single array.
    *
@@ -185,24 +160,13 @@ export class AnalyzeService {
     // Create fp sort's type to nail everything down with types
     type FPSort<T> = (input: Array<T>) => Array<T>;
 
-    return zip(
-      this.getAnalysesForNonDSL(subCategoryId),
-      this.getAnalysesDSL(subCategoryId)
+    return <Observable<AnalysisDSL[]>>this.getRequest(
+      `dslanalysis?category=${subCategoryId}`
     ).pipe(
-      // Merge list of analyses from both observables into one
-      map(([nonDSLAnalyses, dslAnalyses]) => {
-        return [].concat(nonDSLAnalyses).concat(dslAnalyses);
-      }),
-
       // Sort all the analyses based on their create time in descending order (newest first).
       // Uses correct time field based on if analysis is new dsl type or not
-      map(<FPSort<Analysis | AnalysisDSL>>(
-        fpSortBy([
-          analysis =>
-            isDSLAnalysis(analysis)
-              ? -(analysis.createdTime || 0)
-              : -(analysis.createdTimestamp || 0)
-        ])
+      map(<FPSort<AnalysisDSL>>(
+        fpSortBy([analysis => -(analysis.createdTime || 0)])
       ))
     );
   }
@@ -287,14 +251,18 @@ export class AnalyzeService {
         ? '&executionType=onetime'
         : '';
 
-    const queryParams = `?page=${page}&pageSize=${options.take}&analysisType=${
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
       options.analysisType
     }${onetimeExecution}`;
 
     let url = '';
     if (options.isDSL) {
-      const path = `internal/proxy/storage/${executionId}/executions/data`;
-      url = `${path}${queryParams}`;
+      url = `internal/proxy/storage/${executionId}/executions/data`;
+      // Load full data for charts, pivot etc. Use pagination only for
+      // reports.
+      if (['report', 'esReport'].includes(options.analysisType)) {
+        url = `${url}?${queryParams}`;
+      }
     } else {
       const path = `analysis/${analysisId}/executions/${executionId}/data`;
       url = `${path}${queryParams}`;
@@ -517,6 +485,7 @@ export class AnalyzeService {
   }
 
   updateAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
+    model.sipQuery.semanticId = model.semanticId;
     return <Observable<AnalysisDSL>>(
       this._http
         .put(
@@ -718,7 +687,6 @@ export class AnalyzeService {
           model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
           model.sipQuery.store.storageType = repo.storageType;
         }
-
         return <Observable<AnalysisDSL>>(
           this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
             first(),
@@ -751,7 +719,8 @@ export class AnalyzeService {
         store: {
           dataStore: null, // This is filled up when creating analysis
           storageType: null
-        }
+        },
+        semanticId: ''
       }
     };
   }
@@ -834,7 +803,7 @@ export class AnalyzeService {
     forEach(artifacts, artifact => {
       forEach(artifact.fields, column => {
         const metricColumn = metricArtifactMap[column.columnName];
-        if (metricColumn.geoType) {
+        if (metricColumn && metricColumn.geoType) {
           column.geoType = metricColumn.geoType;
         }
       });

@@ -78,6 +78,7 @@ public class DataExportController {
                                 RequestEntity request, HttpServletResponse response){
     logger.debug("executionId in dispatch {}", executionId);
     logger.debug("Request body {}", request.getBody());
+    logger.debug("Analysis type = " + analysisType);
 
     Object dispatchBean = request.getBody();
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {

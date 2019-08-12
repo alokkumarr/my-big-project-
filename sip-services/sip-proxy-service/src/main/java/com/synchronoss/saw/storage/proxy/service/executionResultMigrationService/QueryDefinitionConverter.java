@@ -9,6 +9,7 @@ import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Field.LimitType;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.Join.JoinType;
 import com.synchronoss.saw.model.JoinCondition;
@@ -20,6 +21,7 @@ import com.synchronoss.saw.model.geomap.GeoRegion;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.util.StringUtils;
 
 public class QueryDefinitionConverter implements FieldsSipDslConverter {
 
@@ -39,8 +41,9 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     // Unlike Analysis definition, we don't have type information in Execution Results,
     // So prepare data with custom logic by identifying based on their structure.
     // Below code is for preparing Artifacts for ES and DL Reports.
-    if (sipQuery.getArtifacts().get(0).getFields().size() == 1
-        || sipQuery.getArtifacts().get(0).getFields().get(0).getColumnName() == null) {
+    if (sipQuery.getArtifacts().get(0).getFields().size() != 0
+        && (sipQuery.getArtifacts().get(0).getFields().size() == 1
+            || sipQuery.getArtifacts().get(0).getFields().get(0).getColumnName() == null)) {
 
       sipQuery.setArtifacts(buildArtifactsList(queryBuilderObject));
 
@@ -55,6 +58,7 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
       }
     }
 
+    sipQuery = removeEpochFromFilter(sipQuery);
     return sipQuery;
   }
 
@@ -126,8 +130,14 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
       field.setArea(checkedVal);
     }
 
-    if (fieldObject.has(FieldNames.AREA_INDEX)) {
-      int index = fieldObject.get(FieldNames.AREA_INDEX).getAsInt();
+    if (fieldObject.has(FieldNames.AREA_INDEX) || fieldObject.has(FieldNames.VISIBLE_INDEX)) {
+      int index = 0;
+      if ((fieldObject.has(FieldNames.AREA_INDEX)
+          && (!fieldObject.get(FieldNames.AREA_INDEX).isJsonNull()))) {
+        index = fieldObject.get(FieldNames.AREA_INDEX).getAsInt();
+      } else if (!fieldObject.get(FieldNames.VISIBLE_INDEX).isJsonNull()) {
+        index = fieldObject.get(FieldNames.VISIBLE_INDEX).getAsInt();
+      }
 
       field.setAreaIndex(index);
     }
@@ -288,7 +298,13 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     if (sortObject.has(FieldNames.TABLE_NAME)) {
       String tableName = sortObject.get(FieldNames.TABLE_NAME).getAsString();
 
-      sort.setArtifacts(tableName);
+      sort.setArtifactsName(tableName);
+    }
+
+    if (sortObject.has(FieldNames.AGGREGATE)) {
+      String aggregate = sortObject.get(FieldNames.AGGREGATE).getAsString();
+
+      sort.setAggregate(Sort.Aggregate.fromValue(aggregate));
     }
 
     return sort;
@@ -382,5 +398,25 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     }
 
     return right;
+  }
+
+  /**
+   * DL didn't had support of epoch earlier but FE had sent format as epoch milli, need to remove it
+   * to avoid confusions.
+   *
+   * @param sipQuery SipQuery obj.
+   * @return SipQuery obj
+   */
+  public SipQuery removeEpochFromFilter(SipQuery sipQuery) {
+    for (Filter filter : sipQuery.getFilters()) {
+      if (filter != null
+          && filter.getModel() != null
+          && !StringUtils.isEmpty(filter.getModel().getFormat())) {
+        if (filter.getModel().getFormat().equalsIgnoreCase("epoch_millis")) {
+          filter.getModel().setFormat("yyyy-MM-dd");
+        }
+      }
+    }
+    return sipQuery;
   }
 }
