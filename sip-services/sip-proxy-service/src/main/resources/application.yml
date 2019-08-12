@@ -40,6 +40,14 @@ metastore:
     analysis: analysisMetadata
     execution-result-limit: 5
 
+executor:
+  streamPath: /var/sip/services/transport/executor
+  wait-time: 120
+  preview-output-location: /var/sip/services/transport/executor/output
+  publish-schedule-output-location: /var/sip/services/transport/executor
+  preview-rows-limit: 10000
+  publish-rows-limit: 100000
+
 connector : http
 
 metadata:
@@ -49,17 +57,5 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
-{% if sip_secure %}
-  ssl:
-    enable : true
-  trust:
-    store: ${server.ssl.trust-store}
-    password: ${server.ssl.trust-store-password}
-  key:
-    store: ${server.ssl.key-store}
-    password: ${server.ssl.key-store-password}
-
-{% else %}
   ssl:
     enable: false
-{% endif %}

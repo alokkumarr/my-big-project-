@@ -41,9 +41,11 @@ export interface QueryDSL {
   booleanCriteria: string;
   filters: Filter[];
   joins: Join[];
+  query?: string;
   sorts: Sort[];
   orderByColumns?: Sort[]; // this is legacy field. Should be removed after migration
   store: StorageDSL;
+  semanticId: string;
 }
 
 // All fields marked todo have not yet been implemented in
@@ -59,7 +61,7 @@ export interface AnalysisBaseDSL {
   customerCode: string;
   dataSecurityKey?: string; // todo
   description: string; // todo
-  edit: boolean; // todo - this field needs to be removed and worked around
+  designerEdit: boolean;
   id: string;
   metricName?: string; // required for exporting analyses from admin module
   modifiedBy: string; // email

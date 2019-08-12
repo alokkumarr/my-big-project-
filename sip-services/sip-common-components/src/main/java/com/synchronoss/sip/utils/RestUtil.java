@@ -47,64 +47,35 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
-
-  /**
-   * creating rest template using SSL connection.
-   */
+  /** creating rest template using SSL connection. */
   public RestTemplate restTemplate() {
-    
-    
-    HttpClient client = null;
-    
-    logger.trace("ssl enable?" + sipSslEnable);
-    logger.trace("restTemplate trustStore: " + trustStore);
-    logger.trace("restTemplate keyStore: " + keyStore);
-    logger.trace("restTemplate keyStorePassword: " + keyStorePassword);
-    logger.trace("restTemplate trustStorePassword: " + trustStore);
-    RestTemplate restTemplate = null;
-    if (sipSslEnable) {
-      logger.trace("RestUtil if block");
-      SSLContext sslContext = null;
-      try {
-        sslContext = SSLContextBuilder.create()
-            .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
-                keyStorePassword.toCharArray())
-            .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray()).build();
-        client = HttpClients.custom().setSSLContext(sslContext)
-            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-        HttpComponentsClientHttpRequestFactory factory =
-            new HttpComponentsClientHttpRequestFactory(client);
-        restTemplate = new RestTemplate(factory);
-      } catch (Exception e) {
-        logger.error("Exception :" + e);
-      }
-    } else {
-      logger.info("RestUtil if block");
-      restTemplate = new RestTemplate();
-    }
-    return restTemplate;
-  }
 
-  /**
-   * creating rest template using SSL connection.
-   */
-  public RestTemplate restTemplate(String keyStore, String keyPassword, String trustStore,
-      String trustPassword) {
-    logger.trace("restTemplate with parameter trustStore: " + trustStore);
-    logger.trace("restTemplate with parameter keyStore: " + keyStore);
-    logger.trace("restTemplate with parameter keyStorePassword: " + keyPassword);
-    logger.trace("restTemplate with parameter trustStorePassword: " + trustPassword);
     HttpClient client = null;
+
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
-        sslContext = SSLContextBuilder.create()
-            .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(),
-                keyPassword.toCharArray())
-            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
-        client = HttpClients.custom().setSSLContext(sslContext)
-            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+        sslContext =
+            SSLContextBuilder.create()
+                .loadKeyMaterial(
+                    new File(keyStore),
+                    keyStorePassword.toCharArray(),
+                    keyStorePassword.toCharArray())
+                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
+                .build();
+        client =
+            HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                .build();
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory(client);
         restTemplate = new RestTemplate(factory);
@@ -117,31 +88,79 @@ public class RestUtil {
     return restTemplate;
   }
 
+  /** creating rest template using SSL connection. */
+  public RestTemplate restTemplate(
+      String keyStore, String keyPassword, String trustStore, String trustPassword) {
+    HttpClient client = null;
+
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
+
+    RestTemplate restTemplate = null;
+    if (sipSslEnable) {
+      SSLContext sslContext = null;
+      try {
+        sslContext =
+            SSLContextBuilder.create()
+                .loadKeyMaterial(
+                    new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
+                .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
+                .build();
+        client =
+            HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                .build();
+        HttpComponentsClientHttpRequestFactory factory =
+            new HttpComponentsClientHttpRequestFactory(client);
+        restTemplate = new RestTemplate(factory);
+      } catch (Exception e) {
+        logger.error("Exception :" + e);
+      }
+    } else {
+      restTemplate = new RestTemplate();
+    }
+    return restTemplate;
+  }
 
   /**
    * creating async rest template using SSL connection. TODO: This method should be changed when
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
-    logger.trace("asyncRestTemplate trustStore: " + trustStore);
-    logger.trace("asyncRestTemplate keyStore: " + keyStore);
-    logger.trace("asyncRestTemplate keyStorePassword: " + keyStorePassword);
-    logger.trace("asyncRestTemplate trustStorePassword: " + trustStore);
-
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
-        sslContext = SSLContextBuilder.create()
-            .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
-                keyStorePassword.toCharArray())
-            .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray()).build();
+        sslContext =
+            SSLContextBuilder.create()
+                .loadKeyMaterial(
+                    new File(keyStore),
+                    keyStorePassword.toCharArray(),
+                    keyStorePassword.toCharArray())
+                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
+                .build();
       } catch (Exception e) {
-        logger.error("Exception :" + e);
+        logger.error("Error occured while building SSL context", e);
       }
 
-      CloseableHttpAsyncClient httpclient = HttpAsyncClients.custom()
-          .setSSLHostnameVerifier(new NoopHostnameVerifier()).setSSLContext(sslContext).build();
+      CloseableHttpAsyncClient httpclient =
+          HttpAsyncClients.custom()
+              .setSSLHostnameVerifier(new NoopHostnameVerifier())
+              .setSSLContext(sslContext)
+              .build();
       AsyncClientHttpRequestFactory reqFactory =
           new HttpComponentsAsyncClientHttpRequestFactory(httpclient);
       restTemplate = new AsyncRestTemplate(reqFactory);
@@ -151,15 +170,15 @@ public class RestUtil {
     return restTemplate;
   }
 
-
-  /**
-   * creating a https client.
-   */
+  /** creating a https client. */
   public HttpClient getHttpClient() throws Exception {
-    logger.trace("getHttpClient trustStore: " + trustStore);
-    logger.trace("getHttpClient keyStore: " + keyStore);
-    logger.trace("getHttpClient keyStorePassword: " + keyStorePassword);
-    logger.trace("getHttpClient trustStorePassword: " + trustStore);
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
     HttpClient client = null;
     PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     if (sipSslEnable) {
@@ -174,62 +193,50 @@ public class RestUtil {
     return client;
   }
 
-  /**
-   * ssl context using store passcode.
-   */
-  private SSLContext getSsLContext(String keyStore, String keyPassword, String trustStore,
-      String trustPassword) throws KeyStoreException, NoSuchAlgorithmException,
-      CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
-    logger.trace("getSsLContext trustStore: " + trustStore);
-    logger.trace("getSsLContext keyStore: " + keyStore);
-    logger.trace("getSsLContext keyStorePassword: " + keyPassword);
-    logger.trace("getSsLContext trustStorePassword: " + trustStore);
+  /** ssl context using store passcode. */
+  private SSLContext getSsLContext(
+      String keyStore, String keyPassword, String trustStore, String trustPassword)
+      throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
+          KeyManagementException, UnrecoverableKeyException {
+    logger.trace(
+        "ssl enable?"
+            + sipSslEnable
+            + " restTemplate trustStore: "
+            + trustStore
+            + " restTemplate keyStore: "
+            + keyStore);
 
-    SSLContext sslContext = SSLContextBuilder.create()
-        .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
-        .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
+    SSLContext sslContext =
+        SSLContextBuilder.create()
+            .loadKeyMaterial(
+                new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
+            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
+            .build();
     return sslContext;
   }
 
-  /**
-   * getTrustStore.
-   */
+  /** getTrustStore. */
   public String getTrustStore() {
     return trustStore;
   }
 
-  /**
-   * getTrustStorePassword.
-   */
-
+  /** getTrustStorePassword. */
   public String getTrustStorePassword() {
     return trustStorePassword;
   }
 
-  /**
-   * getKeyStore.
-   */
-
+  /** getKeyStore. */
   public String getKeyStore() {
     return keyStore;
   }
 
-  /**
-   * getKeyStorePassword.
-   */
-
+  /** getKeyStorePassword. */
   public String getKeyStorePassword() {
     return keyStorePassword;
   }
 
-  /**
-   * getTrustStore.
-   */
-
+  /** getTrustStore. */
   public Boolean getSipSslEnable() {
     return sipSslEnable;
   }
-
-
-
 }

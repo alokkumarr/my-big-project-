@@ -44,7 +44,7 @@ export class ObserveReportComponent implements OnDestroy {
   }
 
   get analysisArtifacts() {
-    if (this.analysis.edit) {
+    if ((<AnalysisDSL>this.analysis).designerEdit) {
       return null;
     }
 

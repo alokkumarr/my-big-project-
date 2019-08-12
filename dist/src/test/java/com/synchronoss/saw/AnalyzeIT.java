@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.net.ftp.FTPClient;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
@@ -60,82 +61,6 @@ public class AnalyzeIT extends BaseIT {
      * zero rows.  Update to expected count when implementation
      * changes.  */
     assertThat(data.size(), equalTo(0));
-  }
-
-  @Test(timeout = 300000)
-  public void exportData() throws JsonProcessingException, IOException {
-
-    // create and save analysis
-    String metricId = listMetrics(token, "sample-spark");
-    ObjectNode analysis = createAnalysis(token, metricId, "report");
-    String analysisId = analysis.get("id").asText();
-    String analysisName = "Test DL Report (" + System.currentTimeMillis() + ")";
-    saveDLReportAnalysis(token, analysisId, analysisName, analysis);
-
-    // create schedule
-    ObjectNode node = scheduleData();
-    // udpate the analysis ID
-    node.put("analysisID", analysisId);
-    String json = mapper.writeValueAsString(node);
-    createSchedule(json);
-
-    // execute the analysis and retrieve results
-    executeDLAnalysis(token, analysisId);
-    String executionId = listSingleExecution(token, analysisId);
-    List<Map<String, String>> data = getExecution(token, analysisId, executionId);
-    // base setup for ftp server
-    String username = "user";
-    String password = "password";
-    String homeDirectory = "/";
-    String filename = "report.csv";
-    // Write the data to csv
-    FakeFtpServer f = createFileOnFakeFTP(username, password, homeDirectory, filename, data);
-
-    // check if the file has been uploaded and read the contents
-    String dataResult =
-        readFile("/data/" + filename, "localhost", f.getServerControlPort(), username, password);
-    // check if the file actually has data
-    // this has been done just to avoid rewriting integration test case when data changes.
-    // the goal here is to just check if the data that we got from scheduled analysis execution
-    // is present in the file.
-    assertTrue(dataResult.length() > 0);
-  }
-
-  public FakeFtpServer createFileOnFakeFTP(
-      String username,
-      String password,
-      String homeDirectory,
-      String filename,
-      List<Map<String, String>> data) {
-    FakeFtpServer aFakeFtpServer = new FakeFtpServer();
-    aFakeFtpServer.setServerControlPort(0);
-    aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
-
-    FileSystem aFileSystem = new UnixFakeFileSystem();
-    aFileSystem.add(new DirectoryEntry("/data"));
-    // using tostring because data is empty
-    aFileSystem.add(new FileEntry("/data/" + filename, data.toString()));
-    aFakeFtpServer.setFileSystem(aFileSystem);
-
-    aFakeFtpServer.start();
-    return aFakeFtpServer;
-  }
-
-  public String readFile(String filename, String server, int port, String username, String password)
-      throws IOException {
-
-    FTPClient ftpClient = new FTPClient();
-    ftpClient.connect(server, port);
-    ftpClient.login(username, password);
-
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    boolean success = ftpClient.retrieveFile(filename, outputStream);
-    ftpClient.disconnect();
-
-    if (!success) {
-      throw new IOException("Retrieve file failed: " + filename);
-    }
-    return outputStream.toString();
   }
 
   @Test
@@ -564,6 +489,31 @@ public class AnalyzeIT extends BaseIT {
             .response();
   }
 
+    private ObjectNode scheduleData() {
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("activeRadio", "everyDay");
+        objectNode.put("activeTab", "daily");
+        objectNode.put("analysisID", "123");
+        objectNode.put("analysisName", "Untitled Analysis");
+        objectNode.put("cronExpression", "0 31 20 1/1 * ? *");
+        objectNode.put("fileType", "csv");
+        objectNode.put("jobName", "123");
+        objectNode.put("metricName", "Sample (report) - new");
+        objectNode.put("type", "report");
+        objectNode.put("userFullName", "System");
+        ArrayNode email = objectNode.putArray("emailList");
+        email.add("abc@synchronoss.com");
+        email.add("xyz@synchronoss.com");
+        ArrayNode ftp = objectNode.putArray("ftp");
+        ftp.add("ftp");
+        objectNode.put("jobScheduleTime", "2018-03-01T16:24:28+05:30");
+        objectNode.put("categoryID", "4");
+        objectNode.put("jobGroup", "SYNCHRONOSS");
+        objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
+        objectNode.put("timezone", "UTC");
+        return objectNode;
+    }
+
   private void listSchedule(String categoryID, String groupName) throws JsonProcessingException {
     ObjectNode node = mapper.createObjectNode();
     node.put("categoryId", categoryID);
@@ -581,31 +531,6 @@ public class AnalyzeIT extends BaseIT {
             .statusCode(200)
             .extract()
             .response();
-  }
-
-  private ObjectNode scheduleData() {
-    ObjectNode objectNode = mapper.createObjectNode();
-    objectNode.put("activeRadio", "everyDay");
-    objectNode.put("activeTab", "daily");
-    objectNode.put("analysisID", "123");
-    objectNode.put("analysisName", "Untitled Analysis");
-    objectNode.put("cronExpression", "0 31 20 1/1 * ? *");
-    objectNode.put("fileType", "csv");
-    objectNode.put("jobName", "123");
-    objectNode.put("metricName", "Sample (report) - new");
-    objectNode.put("type", "report");
-    objectNode.put("userFullName", "System");
-    ArrayNode email = objectNode.putArray("emailList");
-    email.add("abc@synchronoss.com");
-    email.add("xyz@synchronoss.com");
-    ArrayNode ftp = objectNode.putArray("ftp");
-    ftp.add("ftp");
-    objectNode.put("jobScheduleTime", "2018-03-01T16:24:28+05:30");
-    objectNode.put("categoryID", "4");
-    objectNode.put("jobGroup", "SYNCHRONOSS");
-    objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
-    objectNode.put("timezone", "UTC");
-    return objectNode;
   }
 
   @Test

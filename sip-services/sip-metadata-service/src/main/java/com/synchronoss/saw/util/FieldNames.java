@@ -19,6 +19,8 @@ public class FieldNames {
   public static final String FORMAT = "format";
   public static final String FILTERS = "filters";
   public static final String DATE_FORMAT = "dateFormat";
+  public static final String VISIBLE_INDEX = "visibleIndex";
+  public static final String AREA_INDEX = "areaIndex";
 
   public static final String USER_NAME = "username";
   public static final String OPERATOR = "operator";
