@@ -1,4 +1,4 @@
-package com.synchronoss.saw.apipull.pojo;
+package com.synchronoss.saw.pojo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +9,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"cronexp", "activeTab", "startDate", "endDate", "timezone"})
+@JsonPropertyOrder({"cronexp", "activeTab", "activeRadio", "startDate", "endDate", "timezone"})
 public class SchedulerExpression {
 
   @JsonProperty("cronexp")
@@ -17,6 +17,9 @@ public class SchedulerExpression {
 
   @JsonProperty("activeTab")
   private String activeTab;
+
+  @JsonProperty("activeRadio")
+  private String activeRadio;
 
   @JsonProperty("startDate")
   private DateTime startDate;
@@ -45,6 +48,16 @@ public class SchedulerExpression {
   @JsonProperty("activeTab")
   public void setActiveTab(String activeTab) {
     this.activeTab = activeTab;
+  }
+
+  @JsonProperty("activeRadio")
+  public String getActiveRadio() {
+    return activeRadio;
+  }
+
+  @JsonProperty("activeRadio")
+  public void setActiveRadio(String activeRadio) {
+    this.activeRadio = activeRadio;
   }
 
   @JsonProperty("startDate")
@@ -82,6 +95,7 @@ public class SchedulerExpression {
     return new ToStringBuilder(this)
         .append("cronexp", cronexp)
         .append("activeTab", activeTab)
+        .append("activeRadio", activeRadio)
         .append("startDate", startDate)
         .append("endDate", endDate)
         .append("timezone", timezone)
@@ -94,6 +108,7 @@ public class SchedulerExpression {
         .append(startDate)
         .append(timezone)
         .append(cronexp)
+        .append(activeRadio)
         .append(endDate)
         .append(activeTab)
         .toHashCode();
@@ -112,6 +127,7 @@ public class SchedulerExpression {
         .append(startDate, rhs.startDate)
         .append(timezone, rhs.timezone)
         .append(cronexp, rhs.cronexp)
+        .append(activeRadio, rhs.activeRadio)
         .append(endDate, rhs.endDate)
         .append(activeTab, rhs.activeTab)
         .isEquals();

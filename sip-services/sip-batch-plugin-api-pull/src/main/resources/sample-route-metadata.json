@@ -21,5 +21,14 @@
   "bodyParameters": {
     // content can be a string for 'text/plain' content type or json data for 'applicaition/json'
     "content": ""
+  },
+  "destinationLocation": "/user/apidata/",
+  "schedulerExpression": {
+    "cronexp": "0 0/5 * 1/1 * ? *",
+    "activeTab": "hourly",
+    "activeRadio": "",
+    "startDate": "2019-02-22T14:20:09+05:30",
+    "endDate": "2019-02-23T12:47:00+05:30",
+    "timezone": "Asia/Calcutta"
   }
 }
