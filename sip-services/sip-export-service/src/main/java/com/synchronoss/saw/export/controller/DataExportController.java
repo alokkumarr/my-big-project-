@@ -1,6 +1,7 @@
 package com.synchronoss.saw.export.controller;
 
 import com.synchronoss.saw.export.model.S3.S3;
+import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -77,7 +78,19 @@ public class DataExportController {
                                 RequestEntity request, HttpServletResponse response){
     logger.debug("executionId in dispatch {}", executionId);
     logger.debug("Request body {}", request.getBody());
+    logger.debug("Analysis type = " + analysisType);
 
+    Object dispatchBean = request.getBody();
+    if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+      Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
+      Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
+      Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
+      if (s3Obj == null && ftpObj == null && recipientsObj == null) {
+        throw new RuntimeException("Either one of the dispatcher(S3, ftp, email) is mandatory!!.");
+      }
+    } else {
+      throw new RuntimeException("Bad request, request body can't be null or empty");
+    }
     if (analysisType.equalsIgnoreCase("report") || analysisType.equalsIgnoreCase("esReport"))
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId, analysisType);
     else if(analysisType.equalsIgnoreCase("pivot"))

@@ -379,604 +379,133 @@ class RequestModel {
     subType,
     filters = null
   ) {
-    let body;
-
-    let update = {
-      contents: {
-        keys: [
+    let updatenew = {
+      type: analysisType,
+      semanticId: semanticId,
+      metricName: dataSetName,
+      name: analysisName,
+      description: analysisDesc,
+      id: id,
+      parentAnalysisId: null,
+      category: subCategoryId,
+      customerCode: customerCode,
+      projectCode: 'workbench',
+      module: 'ANALYZE',
+      createdTime: currentTimeStamp,
+      createdBy: loginId,
+      userId: userId,
+      modifiedTime: currentTimeStamp,
+      modifiedBy: loginId,
+      sipQuery: {
+        artifacts: [
           {
-            customerCode: customerCode,
-            module: 'ANALYZE',
-            id: id,
-            type: analysisType
+            artifactsName: 'sales',
+            fields: [
+              {
+                columnName: 'date',
+                dataField: 'date',
+                displayName: 'Date',
+                groupInterval: null,
+                name: 'date',
+                type: 'date',
+                table: 'sales',
+                dateFormat: 'yyyy-MM-dd',
+                visibleIndex: 0
+              },
+              {
+                columnName: 'double',
+                dataField: 'double',
+                displayName: 'Double',
+                groupInterval: null,
+                name: 'double',
+                type: 'double',
+                table: 'sales',
+                format: {
+                  precision: 2
+                },
+                visibleIndex: 1
+              },
+              {
+                columnName: 'float',
+                dataField: 'float',
+                displayName: 'Float',
+                groupInterval: null,
+                name: 'float',
+                type: 'float',
+                table: 'sales',
+                format: {
+                  precision: 2
+                },
+                visibleIndex: 2
+              },
+              {
+                columnName: 'integer',
+                dataField: 'integer',
+                displayName: 'Integer',
+                groupInterval: null,
+                name: 'integer',
+                type: 'integer',
+                table: 'sales',
+                format: {},
+                visibleIndex: 3
+              },
+              {
+                columnName: 'long',
+                dataField: 'long',
+                displayName: 'Long',
+                groupInterval: null,
+                name: 'long',
+                type: 'long',
+                table: 'sales',
+                format: {},
+                visibleIndex: 4
+              },
+              {
+                columnName: 'string',
+                dataField: 'string',
+                displayName: 'String',
+                groupInterval: null,
+                name: 'string',
+                type: 'string',
+                table: 'sales',
+                visibleIndex: 5
+              }
+            ]
           }
         ],
-        action: action,
-        analyze: [
-          {
-            type: analysisType,
-            semanticId: semanticId,
-            metricName: dataSetName,
-            name: analysisName,
-            description: analysisDesc,
-            scheduled: null,
-            statusMessage: 'Entity has retrieved successfully',
-            id: id,
-            createdBy: 'sipadmin@synchronoss.com',
-            customerCode: customerCode,
-            projectCode: 'workbench',
-            saved: true,
-            username: 'sipadmin@synchronoss.com',
-            module: 'ANALYZE',
-            artifacts: [
-              {
-                artifactName: 'SALES',
-                columns: [
-                  {
-                    aliasName: '',
-                    columnName: 'string',
-                    displayName: 'String',
-                    filterEligible: true,
-                    joinEligible: true,
-                    name: 'string',
-                    table: 'sales',
-                    type: 'string',
-                    visibleIndex: 0
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'long',
-                    displayName: 'Long',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'long',
-                    table: 'sample',
-                    type: 'long',
-                    visibleIndex: 1
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'float',
-                    displayName: 'Float',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'float',
-                    table: 'sales',
-                    type: 'float',
-                    format: {
-                      precision: 2
-                    },
-                    visibleIndex: 3
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'date',
-                    displayName: 'Date',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'date',
-                    table: 'sales',
-                    type: 'date',
-                    format: 'yyyy-MM-dd',
-                    visibleIndex: 5
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'integer',
-                    displayName: 'Integer',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'integer',
-                    table: 'sample',
-                    type: 'integer',
-                    visibleIndex: 2
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'double',
-                    displayName: 'Double',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'double',
-                    table: 'sales',
-                    type: 'double',
-                    format: {
-                      precision: 2
-                    },
-                    visibleIndex: 4
-                  }
-                ],
-                artifactPosition: [19, 8]
-              },
-              {
-                artifactName: 'PRODUCT',
-                columns: [
-                  {
-                    aliasName: '',
-                    columnName: 'string_2',
-                    displayName: 'String_2',
-                    filterEligible: true,
-                    joinEligible: true,
-                    name: 'string_2',
-                    table: 'product',
-                    type: 'string'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'long_2',
-                    displayName: 'Long_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'long_2',
-                    table: 'sample',
-                    type: 'long'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'float_2',
-                    displayName: 'Float_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'float_2',
-                    table: 'product',
-                    type: 'float'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'date_2',
-                    displayName: 'Date_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'date_2',
-                    table: 'product',
-                    type: 'date'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'integer_2',
-                    displayName: 'Integer_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'integer_2',
-                    table: 'sample',
-                    type: 'integer'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'double_2',
-                    displayName: 'Double_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'double_2',
-                    table: 'sales',
-                    type: 'double'
-                  }
-                ],
-                artifactPosition: [420, 0]
-              }
-            ],
-            repository: [
-              {
-                format: 'ndjson',
-                name: 'SALES',
-                physicalLocation:
-                  '/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson'
-              },
-              {
-                format: 'ndjson',
-                name: 'PRODUCT',
-                physicalLocation:
-                  '/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson'
-              }
-            ],
-            parentDataSetIds: [
-              'SALES::json::1539937726998',
-              'PRODUCT::json::1539937737836'
-            ],
-            modifiedTime: currentTimeStamp,
-            createdTime: currentTimeStamp,
-            parentDataSetNames: ['SALES', 'PRODUCT'],
-            createdTimestamp: currentTimeStamp,
-            userId: userId,
-            userFullName: loginId,
-            sqlBuilder: {
-              booleanCriteria: 'AND',
-              filters: filters ? filters : [],
-              orderByColumns: [],
-              dataFields: [
-                {
-                  tableName: 'SALES',
-                  columns: [
-                    {
-                      aliasName: '',
-                      columnName: 'string',
-                      displayName: 'String',
-                      filterEligible: true,
-                      joinEligible: true,
-                      name: 'string',
-                      table: 'sales',
-                      type: 'string',
-                      visibleIndex: 0
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'long',
-                      displayName: 'Long',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'long',
-                      table: 'sample',
-                      type: 'long',
-                      visibleIndex: 1
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'float',
-                      displayName: 'Float',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'float',
-                      table: 'sales',
-                      type: 'float',
-                      format: {
-                        precision: 2
-                      },
-                      visibleIndex: 3
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'date',
-                      displayName: 'Date',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'date',
-                      table: 'sales',
-                      type: 'date',
-                      format: 'yyyy-MM-dd',
-                      visibleIndex: 5
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'integer',
-                      displayName: 'Integer',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'integer',
-                      table: 'sample',
-                      type: 'integer',
-                      visibleIndex: 2
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'double',
-                      displayName: 'Double',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'double',
-                      table: 'sales',
-                      type: 'double',
-                      format: {
-                        precision: 2
-                      },
-                      visibleIndex: 4
-                    }
-                  ]
-                }
-              ],
-              joins: []
-            },
-            edit: false,
-            categoryId: subCategoryId
-          }
-        ]
-      }
-    };
-
-    let execute = {
-      contents: {
-        keys: [
-          {
-            customerCode: customerCode,
-            module: 'ANALYZE',
-            id: id,
-            type: analysisType
-          }
-        ],
-        action: action,
-        executedBy: loginId,
-        page: 1,
-        pageSize: 25,
-        analyze: [
-          {
-            type: analysisType,
-            semanticId: semanticId,
-            metricName: dataSetName,
-            name: analysisName,
-            description: analysisDesc,
-            scheduled: null,
-            statusMessage: 'Entity has retrieved successfully',
-            id: id,
-            createdBy: 'sipadmin@synchronoss.com',
-            customerCode: customerCode,
-            projectCode: 'workbench',
-            saved: false,
-            username: 'sipadmin@synchronoss.com',
-            module: 'ANALYZE',
-            artifacts: [
-              {
-                artifactName: 'SALES',
-                columns: [
-                  {
-                    aliasName: '',
-                    columnName: 'string',
-                    displayName: 'String',
-                    filterEligible: true,
-                    joinEligible: true,
-                    name: 'string',
-                    table: 'sales',
-                    type: 'string',
-                    visibleIndex: 0
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'long',
-                    displayName: 'Long',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'long',
-                    table: 'sample',
-                    type: 'long',
-                    visibleIndex: 1
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'float',
-                    displayName: 'Float',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'float',
-                    table: 'sales',
-                    type: 'float',
-                    format: {
-                      precision: 2
-                    },
-                    visibleIndex: 3
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'date',
-                    displayName: 'Date',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'date',
-                    table: 'sales',
-                    type: 'date',
-                    format: 'yyyy-MM-dd',
-                    visibleIndex: 5
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'integer',
-                    displayName: 'Integer',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'integer',
-                    table: 'sample',
-                    type: 'integer',
-                    visibleIndex: 2
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'double',
-                    displayName: 'Double',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'double',
-                    table: 'sales',
-                    type: 'double',
-                    format: {
-                      precision: 2
-                    },
-                    visibleIndex: 4
-                  }
-                ],
-                artifactPosition: [19, 8]
-              },
-              {
-                artifactName: 'PRODUCT',
-                columns: [
-                  {
-                    aliasName: '',
-                    columnName: 'string_2',
-                    displayName: 'String_2',
-                    filterEligible: true,
-                    joinEligible: true,
-                    name: 'string_2',
-                    table: 'product',
-                    type: 'string'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'long_2',
-                    displayName: 'Long_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'long_2',
-                    table: 'sample',
-                    type: 'long'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'float_2',
-                    displayName: 'Float_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'float_2',
-                    table: 'product',
-                    type: 'float'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'date_2',
-                    displayName: 'Date_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'date_2',
-                    table: 'product',
-                    type: 'date'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'integer_2',
-                    displayName: 'Integer_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'integer_2',
-                    table: 'sample',
-                    type: 'integer'
-                  },
-                  {
-                    aliasName: '',
-                    columnName: 'double_2',
-                    displayName: 'Double_2',
-                    filterEligible: true,
-                    joinEligible: false,
-                    name: 'double_2',
-                    table: 'sales',
-                    type: 'double'
-                  }
-                ],
-                artifactPosition: [420, 0]
-              }
-            ],
-            repository: [
-              {
-                format: 'ndjson',
-                name: 'SALES',
-                physicalLocation:
-                  '/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson'
-              },
-              {
-                format: 'ndjson',
-                name: 'PRODUCT',
-                physicalLocation:
-                  '/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson'
-              }
-            ],
-            parentDataSetIds: [
-              'SALES::json::1539937726998',
-              'PRODUCT::json::1539937737836'
-            ],
-            modifiedTime: currentTimeStamp,
-            createdTime: currentTimeStamp,
-            parentDataSetNames: ['SALES', 'PRODUCT'],
-            createdTimestamp: currentTimeStamp,
-            userId: userId,
-            userFullName: loginId,
-            sqlBuilder: {
-              booleanCriteria: 'AND',
-              filters: filters ? filters : [],
-              orderByColumns: [],
-              dataFields: [
-                {
-                  tableName: 'SALES',
-                  columns: [
-                    {
-                      aliasName: '',
-                      columnName: 'string',
-                      displayName: 'String',
-                      filterEligible: true,
-                      joinEligible: true,
-                      name: 'string',
-                      table: 'sales',
-                      type: 'string',
-                      visibleIndex: 0
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'long',
-                      displayName: 'Long',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'long',
-                      table: 'sample',
-                      type: 'long',
-                      visibleIndex: 1
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'float',
-                      displayName: 'Float',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'float',
-                      table: 'sales',
-                      type: 'float',
-                      format: {
-                        precision: 2
-                      },
-                      visibleIndex: 3
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'date',
-                      displayName: 'Date',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'date',
-                      table: 'sales',
-                      type: 'date',
-                      format: 'yyyy-MM-dd',
-                      visibleIndex: 5
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'integer',
-                      displayName: 'Integer',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'integer',
-                      table: 'sample',
-                      type: 'integer',
-                      visibleIndex: 2
-                    },
-                    {
-                      aliasName: '',
-                      columnName: 'double',
-                      displayName: 'Double',
-                      filterEligible: true,
-                      joinEligible: false,
-                      name: 'double',
-                      table: 'sales',
-                      type: 'double',
-                      format: {
-                        precision: 2
-                      },
-                      visibleIndex: 4
-                    }
-                  ]
-                }
-              ],
-              joins: []
-            },
-            edit: false,
-            categoryId: subCategoryId,
-            query:
-              'SELECT SALES.string, SALES.long, SALES.float, SALES.date, SALES.integer, SALES.double FROM SALES',
-            executionType: 'publish'
-          }
-        ]
-      }
+        booleanCriteria: 'AND',
+        filters: filters ? filters : [],
+        sorts: [],
+        joins: [],
+        store: {},
+        semanticId: semanticId,
+        query:
+          'SELECT sales.date, sales.double, sales.float, sales.integer, sales.long, sales.string FROM sales'
+      },
+      designerEdit: false,
+      categoryId: subCategoryId,
+      scheduled: null,
+      supports: [
+        {
+          category: 'table',
+          children: [
+            {
+              icon: 'icon-report',
+              label: 'Report',
+              type: 'table:report'
+            }
+          ],
+          label: 'TABLES'
+        }
+      ],
+      saved: true
     };
 
     if (action === 'update') {
-      body = update;
-    } else if (action === 'execute') {
-      body = execute;
+      return updatenew;
     } else {
       throw new Error('Invalid action: ' + action);
     }
-    return body;
   }
 
   getChartBody(
@@ -1230,7 +759,8 @@ class RequestModel {
     if (
       analysisType === Constants.CHART ||
       analysisType === Constants.PIVOT ||
-      analysisType === Constants.ES_REPORT
+      analysisType === Constants.ES_REPORT ||
+      analysisType === Constants.REPORT
     ) {
       return {
         type: analysisType,
@@ -1246,8 +776,9 @@ class RequestModel {
           filters: [],
           sorts: [],
           store: {
-            dataStore: 'sampleAlias/sample',
-            storageType: 'ES'
+            dataStore:
+              analysisType === Constants.REPORT ? null : 'sampleAlias/sample',
+            storageType: analysisType === Constants.REPORT ? null : 'ES'
           }
         }
       };

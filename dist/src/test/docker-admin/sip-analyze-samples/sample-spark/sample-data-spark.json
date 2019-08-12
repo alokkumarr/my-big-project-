@@ -20,7 +20,7 @@
           "filterEligible":true,
           "joinEligible":false,
           "name":"long",
-          "table":"sample",
+          "table":"sales",
           "type":"long"
         },
         {
@@ -50,7 +50,7 @@
           "filterEligible":true,
           "joinEligible":false,
           "name":"integer",
-          "table":"sample",
+          "table":"sales",
           "type":"integer"
         },
         {
@@ -85,7 +85,7 @@
           "filterEligible":true,
           "joinEligible":false,
           "name":"long_2",
-          "table":"sample",
+          "table":"product",
           "type":"long"
         },
         {
@@ -115,7 +115,7 @@
           "filterEligible":true,
           "joinEligible":false,
           "name":"integer_2",
-          "table":"sample",
+          "table":"product",
           "type":"integer"
         },
         {
@@ -125,7 +125,7 @@
           "filterEligible":true,
           "joinEligible":false,
           "name":"double_2",
-          "table":"sales",
+          "table":"product",
           "type":"double"
         }
       ]
