@@ -12,18 +12,20 @@ import com.mapr.db.Table;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
 import com.synchronoss.sip.utils.RestUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -52,6 +54,20 @@ public class StorageProxyUtil {
       logger.error("Error occurred while fetching the alert details", e);
     }
     return null;
+  }
+
+  /**
+   * @param jsonNode
+   * @param globalFilter
+   * @return
+   */
+  public static JsonNode buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter) {
+    GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
+    JsonNode jsonNode1 = jsonNode.get("global_filter_values");
+    Map<String, Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+    result.put("esRepository", globalFilter.getEsRepository());
+    ObjectMapper mapper = new ObjectMapper();
+      return mapper.valueToTree(result);
   }
 
   /**
@@ -112,12 +128,7 @@ public class StorageProxyUtil {
     SipQuery semanticSipQuery = new SipQuery();
     if (semanticId != null) {
       try {
-        RestTemplate restTemplate = restUtil.restTemplate();
-
-        String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
-        logger.debug("SIP query url for analysis fetch : " + url);
-
-        SemanticNode semanticNode = restTemplate.getForObject(url, SemanticNode.class);
+         SemanticNode semanticNode = fetchSemantic(semanticId,metaDataServiceExport,restUtil);
         List<Object> artifactList = semanticNode.getArtifacts();
         logger.info("artifact List: " + artifactList);
 
@@ -152,6 +163,23 @@ public class StorageProxyUtil {
       }
     }
     return semanticSipQuery;
+  }
+
+    /**
+     *  Return the semantic Node based on semantic ID .
+     * @param semanticId
+     * @param metaDataServiceUrl
+     * @param restUtil
+     * @return
+     */
+  public static SemanticNode fetchSemantic(String semanticId, String  metaDataServiceUrl , RestUtil restUtil)
+  {
+      RestTemplate restTemplate = restUtil.restTemplate();
+
+      String url = metaDataServiceUrl + "/internal/semantic/workbench/" + semanticId;
+      logger.debug("SIP query url for analysis fetch : " + url);
+
+      return restTemplate.getForObject(url, SemanticNode.class);
   }
 
   /**
@@ -210,5 +238,44 @@ public class StorageProxyUtil {
 
   public static List<String> getDataLakeJunkIds() {
     return dataLakeJunkIds;
+  }
+
+  /**
+   *
+   * @param mainNode
+   * @param updateNode
+   * @return
+   */
+  public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+    Iterator<String> fieldNames = updateNode.fieldNames();
+    while (fieldNames.hasNext()) {
+      String fieldName = fieldNames.next();
+      JsonNode jsonNode = mainNode.get(fieldName);
+      if (jsonNode != null) {
+        if (jsonNode.isObject()) {
+          merge(jsonNode, updateNode.get(fieldName));
+        } else if (jsonNode.isArray()) {
+          for (int i = 0; i < jsonNode.size(); i++) {
+            merge(jsonNode.get(i), updateNode.get(fieldName).get(i));
+          }
+        }
+      } else {
+        if (mainNode instanceof ObjectNode) {
+          // Overwrite field
+          JsonNode value = updateNode.get(fieldName);
+          if (value.isNull()) {
+            continue;
+          }
+          if (value.isIntegralNumber() && value.toString().equals("0")) {
+            continue;
+          }
+          if (value.isFloatingPointNumber() && value.toString().equals("0.0")) {
+            continue;
+          }
+          ((ObjectNode) mainNode).put(fieldName, value);
+        }
+      }
+    }
+    return mainNode;
   }
 }

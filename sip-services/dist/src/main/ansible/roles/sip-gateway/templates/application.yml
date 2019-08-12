@@ -105,12 +105,6 @@ api:
         -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]dslanalysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: GET
-            path: '[/]analysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: POST
-            path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'
@@ -144,10 +138,10 @@ api:
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]kpi.*'
-        -   location: ${workbench.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/workbench.*'
         -   location: ${workbench.service.host}
