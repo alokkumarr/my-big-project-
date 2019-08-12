@@ -52,7 +52,7 @@ connector : http
 
 metadata:
   service:
-    host: ${connector}://10.167.110.14:9500
+    host: ${connector}://localhost:9501
     execution-migration-flag: true
     transporthost: ${connector}://localhost:9200/analysis
 
