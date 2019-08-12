@@ -48,19 +48,4 @@ public class AnalysisServiceTest {
   public void setUp() {
       server = MockRestServiceServer.createServer(restTemplate);
   }
-  
-  @Test
-  @Ignore
-  /*
-    Ignoring this as this doesn't seem to have been working at all
-   */
-  public void testAnalysisExecute() throws Exception {
-    /* Set up mock response */
-    String json = "{}";
-    log.trace("Mock execute analysis JSON: {}", json);
-    server.expect(requestTo(metadataServiceUrl + "/123/executions"));
-    // .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
-    /* Execute analysis */
-    service.executeDslAnalysis(ANALYSIS_ID);
-  }
 }
