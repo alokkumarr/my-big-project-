@@ -12,11 +12,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>sip-transport-service</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>sip-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
