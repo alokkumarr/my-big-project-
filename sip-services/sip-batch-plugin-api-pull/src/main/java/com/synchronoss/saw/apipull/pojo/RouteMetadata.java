@@ -1,4 +1,4 @@
-package com.synchronoss.saw.pojo;
+package com.synchronoss.saw.apipull.pojo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "queryParameters",
   "headerParameters",
   "urlParameters",
-  "bodyParameters"
+  "bodyParameters",
+  "destinationLocation",
+  "schedulerExpression"
 })
 public class RouteMetadata {
 
@@ -41,6 +43,12 @@ public class RouteMetadata {
 
   @JsonProperty("bodyParameters")
   private BodyParameters bodyParameters;
+
+  @JsonProperty("destinationLocation")
+  private String destinationLocation;
+
+  @JsonProperty("schedulerExpression")
+  private SchedulerExpression schedulerExpression;
 
   /** (Required) */
   @JsonProperty("apiEndPoint")
@@ -110,6 +118,26 @@ public class RouteMetadata {
     this.bodyParameters = bodyParameters;
   }
 
+  @JsonProperty("destinationLocation")
+  public String getDestinationLocation() {
+    return destinationLocation;
+  }
+
+  @JsonProperty("destinationLocation")
+  public void setDestinationLocation(String destinationLocation) {
+    this.destinationLocation = destinationLocation;
+  }
+
+  @JsonProperty("schedulerExpression")
+  public SchedulerExpression getSchedulerExpression() {
+    return schedulerExpression;
+  }
+
+  @JsonProperty("schedulerExpression")
+  public void setSchedulerExpression(SchedulerExpression schedulerExpression) {
+    this.schedulerExpression = schedulerExpression;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -119,6 +147,8 @@ public class RouteMetadata {
         .append("headerParameters", headerParameters)
         .append("urlParameters", urlParameters)
         .append("bodyParameters", bodyParameters)
+        .append("destinationLocation", destinationLocation)
+        .append("schedulerExpression", schedulerExpression)
         .toString();
   }
 
@@ -130,6 +160,8 @@ public class RouteMetadata {
         .append(bodyParameters)
         .append(httpMethod)
         .append(urlParameters)
+        .append(schedulerExpression)
+        .append(destinationLocation)
         .append(queryParameters)
         .toHashCode();
   }
@@ -149,6 +181,8 @@ public class RouteMetadata {
         .append(bodyParameters, rhs.bodyParameters)
         .append(httpMethod, rhs.httpMethod)
         .append(urlParameters, rhs.urlParameters)
+        .append(schedulerExpression, rhs.schedulerExpression)
+        .append(destinationLocation, rhs.destinationLocation)
         .append(queryParameters, rhs.queryParameters)
         .isEquals();
   }

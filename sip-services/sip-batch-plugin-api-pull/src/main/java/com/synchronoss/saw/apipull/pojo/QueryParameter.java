@@ -1,4 +1,4 @@
-package com.synchronoss.saw.pojo;
+package com.synchronoss.saw.apipull.pojo;
 
 import java.util.HashMap;
 import java.util.Map;

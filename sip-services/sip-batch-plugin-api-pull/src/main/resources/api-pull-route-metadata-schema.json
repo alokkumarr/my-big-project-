@@ -62,6 +62,31 @@
       "required": [
         "content"
       ]
+    },
+    "destinationLocation": {
+      "type": "string"
+    },
+    "schedulerExpression": {
+      "type": "object",
+      "properties" : {
+        "cronexp": {
+          "type": "string"
+        },
+        "activeTab": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
     }
   },
   "required": [

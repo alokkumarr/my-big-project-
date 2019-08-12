@@ -1,4 +1,4 @@
-package com.synchronoss.saw.pojo;
+package com.synchronoss.saw.apipull.pojo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
