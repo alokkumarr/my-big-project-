@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isNil from 'lodash/isNil';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
@@ -44,7 +45,7 @@ export class AnalyzeListViewComponent implements OnInit {
   @Input() analysisType: string;
   @Input() searchTerm: string;
   @Input('cronJobs') set _cronJobs(value) {
-    if (isEmpty(value)) {
+    if (isNil(value)) {
       return;
     }
     this.cronJobs = value;

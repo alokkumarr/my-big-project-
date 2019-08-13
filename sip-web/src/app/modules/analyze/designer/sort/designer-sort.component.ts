@@ -71,7 +71,7 @@ export class DesignerSortComponent implements OnInit {
       fpFlatMap((artifact: Artifact) => {
         return map(artifact.columns, column => {
           const cloned = clone(column);
-          cloned.tableName = artifact.artifactName;
+          cloned.artifactsName = artifact.artifactName;
           return cloned;
         });
       }),
@@ -108,9 +108,9 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
-  transform({ columnName, aggregate, type, tableName }: ArtifactColumnReport): Sort {
+  transform({ columnName, aggregate, type, artifactsName }: ArtifactColumnReport): Sort {
     return {
-      tableName,
+      artifactsName,
       aggregate,
       columnName,
       type,
@@ -122,10 +122,10 @@ export class DesignerSortComponent implements OnInit {
     return filter(checkedFields, field => {
       return !find(
         this.sorts,
-        ({ columnName, tableName }) =>
-          isUndefined(tableName)
+        ({ columnName, artifactsName }) =>
+          isUndefined(artifactsName)
             ? columnName === field.columnName
-            : tableName === field.tableName && columnName === field.columnName
+            : artifactsName === field.artifactsName && columnName === field.columnName
       );
     });
   }
@@ -135,7 +135,7 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
-  trackByFn(_, { tableName, columnName }) {
-    return `${tableName}:${columnName}`;
+  trackByFn(_, { artifactsName, columnName }) {
+    return `${artifactsName}:${columnName}`;
   }
 }

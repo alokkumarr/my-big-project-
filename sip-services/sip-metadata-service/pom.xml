@@ -23,7 +23,8 @@
     <java.version>1.8</java.version>
     <jackson-coreutils>1.8</jackson-coreutils>
     <json-core>1.2.5</json-core>
-    <mapr.db.version>6.0.1-mapr</mapr.db.version>
+    <mapr.db.version>6.1.0-mapr</mapr.db.version>
+    <hbase.version>1.1.8-mapr-1710-m7-6.0.1</hbase.version>
   </properties>
 
   <dependencies>
@@ -151,6 +152,21 @@
       <groupId>com.synchronoss</groupId>
       <artifactId>sip-query-dsl</artifactId>
       <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>${hbase.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>slf4j-log4j12</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

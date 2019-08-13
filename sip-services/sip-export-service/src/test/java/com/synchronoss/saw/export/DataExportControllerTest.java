@@ -72,8 +72,8 @@ public class DataExportControllerTest {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-	@Value("${analysis.service.host}")
-	private String analysisUrl;
+	@Value("${proxy.service.host}")
+	private String proxyServiceUrl;
 
 	@Value("${analysis.wireMockRule.port}")
     private int wireMockRulePort;
@@ -139,7 +139,8 @@ public class DataExportControllerTest {
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("host", "localhost");
 		requestHeaders.set("authorization", "localhost");
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(analysisUrl + wireMockServer.port() + "md/?analysisId="+ANALYSIS_ID)
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(proxyServiceUrl
+            + wireMockServer.port() + "dslanalysis=" +  ANALYSIS_ID)
 				.headers(requestHeaders).contentType(MediaType.APPLICATION_JSON);
 		mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isNotFound())
 				.andDo(MockMvcResultHandlers.print());

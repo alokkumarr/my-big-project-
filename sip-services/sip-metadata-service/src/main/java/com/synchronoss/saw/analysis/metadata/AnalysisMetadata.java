@@ -63,4 +63,8 @@ public class AnalysisMetadata extends MetadataStore
     cond.build();
     return searchAsList(table, cond);
   }
+
+  public Document searchById(String id) throws Exception {
+    return _read(id);
+  }
 }

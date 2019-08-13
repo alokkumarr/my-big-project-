@@ -348,7 +348,7 @@
               <!-- Note: If disk size is changed, the Docker Machine
                    has to be recreated with "docker-machine rm <name>"
                    for the change to take effect -->
-              <amazonec2-root-size>100</amazonec2-root-size>
+              <amazonec2-root-size>120</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
               <amazonec2-ami>${sip.cloud.aws.ami}</amazonec2-ami>
