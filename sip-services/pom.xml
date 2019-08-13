@@ -204,7 +204,8 @@
 		<module>sip-batch-plugin-s3</module>
     <module>sip-common-components</module>
 		<module>dist</module>
-	</modules>
+    <module>sip-batch-plugin-api-pull</module>
+  </modules>
   <distributionManagement>
     <repository>
       <id>client-releases</id>
