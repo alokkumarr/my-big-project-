@@ -33,7 +33,7 @@ elastic-xpack :
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
 metastore:
-    base:  hdfs:///main
+    base:  hdfs:///var/sip
     binary-store-path:  /services/metadata/analysis_results
     migration: analysisMigration
     ttl-for-onetime: 1800

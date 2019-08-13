@@ -65,13 +65,18 @@ train_model.spark_model <- function(mobj,
                    "should be 2 for classifaction models"))
       }
     }
+    
+    # Create validator pipeline
+    val_pipe <- sparklyr::ml_pipeline(sc) %>%
+      sparklyr::ft_r_formula(paste(mobj$target, "~.")) %>%
+      method_fun(uid = mobj$uid, layers = mobj$method_args$layers)
   }
   
   
   # Create validator pipeline
   val_pipe <- sparklyr::ml_pipeline(sc) %>%
     sparklyr::ft_r_formula(paste(mobj$target, "~.")) %>%
-    method_fun(uid = mobj$uid, layers = mobj$method_args$layers)
+    method_fun(uid = mobj$uid)
   
   
   # Set Validator
@@ -223,6 +228,3 @@ get_variable_importance.spark_model <- function(mobj) {
   
   get_variable_importance(mobj$fit$stages[[2]], mobj$features)
 }
-
-
-
