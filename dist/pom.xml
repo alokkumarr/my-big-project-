@@ -284,7 +284,7 @@
         </executions>
         <configuration>
           <!-- Package for old SIP version to test upgrading from -->
-          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-1303/artifact/shared/SIP-Package/saw-3.2.3.tgz</url>
+          <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases/com/synchronoss/saw/sip-package/3.3.0/sip-package-3.3.0.tgz</url>
           <outputDirectory>${project.build.directory}/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
           <skip>${sip.upgrade.skip}</skip>
         </configuration>
