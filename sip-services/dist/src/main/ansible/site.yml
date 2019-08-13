@@ -5,7 +5,7 @@
     # This role to be executed when sip environment
     # tend to have secured communication across.
     - { role: sip-secure, when: sip_secure }
-    - sip-transport
+    - sip-executor
     - sip-workbench
     - sip-export
     - sip-metadata

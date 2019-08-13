@@ -87,7 +87,7 @@ export class DesignerPreviewDialogComponent implements OnInit {
   }
 
   get analysisArtifacts() {
-    return this.analysis.edit
+    return (<AnalysisDSL>this.analysis).designerEdit
       ? null
       : isDSLAnalysis(this.analysis)
       ? this.analysis.sipQuery.artifacts

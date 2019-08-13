@@ -77,6 +77,10 @@
   command: systemctl stop saw-*.socket
 - name: Stop systemd units with old SAW prefix before upgrading
   command: systemctl stop saw-*
+- name: Stop systemd sockets with old sip-transport-service before upgrading
+  command: systemctl stop sip-transport*.socket
+- name: Stop systemd units with old sip-transport-service before upgrading
+  command: systemctl stop sip-transport*
 - name: Ensure a list of packages installed
   yum:
     name: "{{ packages }}"

@@ -108,4 +108,8 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   asPivotColumn(column): ArtifactColumnPivot {
     return column;
   }
+
+  checkChartType() {
+    return ['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype);
+  }
 }

@@ -41,7 +41,7 @@ export class ImportService {
   }
 
   createAnalysis(semanticId, type) {
-    return this._analyzeService.createAnalysis(semanticId, type);
+    return this._analyzeService.newAnalysisModel(semanticId, type);
   }
 
   updateAnalysis(
