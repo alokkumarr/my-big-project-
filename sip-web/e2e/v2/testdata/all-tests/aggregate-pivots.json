@@ -1,0 +1,69 @@
+{
+  "AGGREGATE_PIVOTS": {
+    "aggr_pivots": {
+      "AGGPV001": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "aggregate": {
+          "designerLabel": "AVG",
+          "value": "avg"
+        },
+        "description": "User should be able to add AVG aggregate for pivots"
+      },
+      "AGGPV002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "aggregate": {
+          "designerLabel": "Sum",
+          "value": "sum"
+        },
+        "description": "Admin should be able to add Sum aggregate for pivots"
+      },
+      "AGGPV003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "aggregate": {
+          "designerLabel": "MIN",
+          "value": "min"
+        },
+        "description": "User should be able to add MIN aggregate for pivots"
+      },
+      "AGGPV004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "aggregate": {
+          "designerLabel": "MAX",
+          "value": "max"
+        },
+        "description": "Admin should be able to add MAX aggregate for pivots"
+      },
+      "AGGPV005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "aggregate": {
+          "designerLabel": "CNT",
+          "value": "count"
+        },
+        "description": "user should be able to add Count aggregate for pivots"
+      },
+      "AGGPV006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "aggregate": {
+          "designerLabel": "CNTD",
+          "value": "distinctcount"
+        },
+        "description": "Admin should be able to add distinctcount aggregate for pivots"
+      },
+      "AGGPV007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "aggregate": {
+          "designerLabel": "PCTC",
+          "value": "percentage"
+        },
+        "description": "user should be able to add percentage aggregate for pivots"
+      }
+    }
+  }
+}
