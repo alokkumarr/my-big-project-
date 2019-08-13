@@ -71,197 +71,20 @@
         </div>
       </mat-step>
       <mat-step label="Channel Details">
-        <form
-          fxFlex
-          fxLayout="row wrap"
-          class="source-container"
-          #sourceDetails
-          novalidate
-          [formGroup]="detailsFormGroup"
-          autocomplete="false"
-        >
-          <section
-            fxFlex="49"
-            fxLayout="column"
-            fxLayoutAlign="space-around center"
-          >
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Name Your Channel</mat-label>
-              <input
-                matInput
-                name="name-of-channel"
-                e2e="name-of-channel"
-                formControlName="channelName"
-                maxlength="18"
-                required
-                autocomplete="off"
-              />
-              <mat-error
-                *ngIf="
-                  detailsFormGroup.controls.channelName.hasError('required')
-                "
-                i18n
-              >
-                Channel Name is
-                <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="channel-exist-error-msg"
-                *ngIf="
-                  detailsFormGroup.controls.channelName.hasError('isUnique')
-                "
-                i18n
-              >
-                Channel Name already
-                <strong>exists</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Hostname</mat-label>
-              <input
-                matInput
-                placeholder="Host Name"
-                name="hostName"
-                e2e="host-name-input"
-                formControlName="hostName"
-                required
-                name="name-of-host"
-                autocomplete="new-password"
-              />
-              <mat-error
-                *ngIf="detailsFormGroup.controls.hostName.hasError('required')"
-                i18n
-              >
-                Host Name is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Port Number</mat-label>
-              <input
-                matInput
-                placeholder="Port Number"
-                name="portNo"
-                e2e="port-no-input"
-                formControlName="portNo"
-                required
-              />
-              <mat-error
-                *ngIf="detailsFormGroup.controls.portNo.hasError('required')"
-                i18n
-              >
-                Port Number is
-                <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="port-number-error-msg"
-                *ngIf="detailsFormGroup.controls.portNo.hasError('pattern')"
-                i18n
-              >
-                Port Number can consist of only
-                <strong>Numbers</strong>
-              </mat-error>
-            </mat-form-field>
-          </section>
-          <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
-          <section
-            fxFlex="49"
-            fxLayout="column"
-            fxLayoutAlign="space-around center"
-          >
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Access Type</mat-label>
-              <mat-select formControlName="accessType" e2e="access-type-select">
-                <mat-option value="R" e2e="access-r" i18n>Read</mat-option>
-                <mat-option value="RW" e2e="access-rw" i18n
-                  >Read & Write</mat-option
-                >
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Username</mat-label>
-              <input
-                type="text"
-                matInput
-                placeholder="Username"
-                name="name-of-user"
-                e2e="name-of-user-input"
-                autocomplete="new-password"
-                formControlName="userName"
-                required
-              />
-              <button mat-button matSuffix mat-icon-button>
-                <mat-icon
-                  matTooltip="Username"
-                  fontIcon="icon-chat-bot"
-                ></mat-icon>
-              </button>
-              <mat-error
-                e2e="user-error-msg"
-                *ngIf="detailsFormGroup.controls.userName.hasError('required')"
-                i18n
-              >
-                Username is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Password</mat-label>
-              <input
-                [type]="show ? 'text' : 'password'"
-                matInput
-                placeholder="Password"
-                name="user-password"
-                e2e="user-password"
-                formControlName="password"
-                required
-                autocomplete="new-password"
-              />
-              <button
-                matTooltip="Show Password"
-                e2e="show-password-sc"
-                *ngIf="!show"
-                mat-button
-                matSuffix
-                mat-icon-button
-                aria-label="show"
-                (click)="togglePWD()"
-              >
-                <mat-icon fontIcon="icon-show"></mat-icon>
-              </button>
-              <button
-                matTooltip="Hide Password"
-                e2e="hide-password-cs"
-                *ngIf="show"
-                mat-button
-                matSuffix
-                mat-icon-button
-                aria-label="show"
-                (click)="togglePWD()"
-              >
-                <mat-icon fontIcon="icon-hide"></mat-icon>
-              </button>
-              <mat-error
-                e2e="pwd-validation-msg"
-                *ngIf="detailsFormGroup.controls.password.hasError('required')"
-                i18n
-              >
-                Password is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </section>
-          <section fxFlex fxLayout="column" fxLayoutAlign="center center">
-            <mat-form-field style="width: 90%;" appearance="outline">
-              <mat-label i18n>Description about the source</mat-label>
-              <textarea
-                matInput
-                formControlName="description"
-                e2e="channel-description-input"
-              ></textarea>
-            </mat-form-field>
-          </section>
-        </form>
+        <ng-container [ngSwitch]="selectedSource">
+          <sftp-source
+            #channelDetails
+            *ngSwitchCase="uid.SFTP"
+            [channelData]="channelData"
+            [opType]="opType"
+          ></sftp-source>
+          <api-source
+            #channelDetails
+            *ngSwitchCase="uid.API"
+            [channelData]="channelData"
+            [opType]="opType"
+          ></api-source>
+        </ng-container>
         <mat-divider></mat-divider>
         <div
           fxFlex
@@ -293,9 +116,9 @@
             e2e="channel-test-connect-btn-model"
             mat-stroked-button
             color="primary"
-            (click)="testChannel(detailsFormGroup.value)"
+            (click)="testChannel(detailsFormValue)"
             i18n
-            [disabled]="!detailsFormGroup.valid"
+            [disabled]="!isDetailsFormValid"
           >
             <mat-icon
               fontIcon="icon-query-mode"
@@ -309,8 +132,8 @@
             *ngIf="opType === 'create'"
             color="primary"
             type="submit"
-            [disabled]="!detailsFormGroup.valid"
-            (click)="createSource(detailsFormGroup.value)"
+            [disabled]="!isDetailsFormValid"
+            (click)="createSource(detailsFormValue)"
             i18n
           >
             Create
@@ -321,8 +144,8 @@
             *ngIf="opType === 'update'"
             color="primary"
             type="submit"
-            [disabled]="!detailsFormGroup.valid"
-            (click)="createSource(detailsFormGroup.value)"
+            [disabled]="!isDetailsFormValid"
+            (click)="createSource(detailsFormValue)"
             i18n
           >
             Update

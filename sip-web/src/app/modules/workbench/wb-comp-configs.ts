@@ -68,70 +68,91 @@ export const TYPE_CONVERSION = {
   timestamp: 'date'
 };
 
-export const CHANNEL_TYPES: any[] = [
+export interface ChannelType {
+  name: string;
+  uid: string;
+  imgsrc: string;
+  supported: boolean;
+}
+
+export enum CHANNEL_UID {
+  SFTP = 'sftp',
+  API = 'api',
+  AMAZON_S3 = 's3',
+  MAPR = 'mapr',
+  ELASTIC_SEARCH = 'es',
+  MARIA_DB = 'mariadb',
+  HDFS = 'hdfs',
+  MY_SQL = 'mysql',
+  SQL_SERVER = 'sqlserver',
+  MONGO_DB = 'mongodb',
+  JDBC = 'jdbc',
+  NONE = ''
+}
+export const CHANNEL_TYPES: ChannelType[] = [
   {
     name: 'SFTP',
-    uid: 'sftp',
+    uid: CHANNEL_UID.SFTP,
     imgsrc: 'assets/img/sftp.png',
     supported: true
   },
   {
     name: 'API',
-    uid: 'api',
-    imgsrc: 'assets/img/sftp.png',
+    uid: CHANNEL_UID.API,
+    imgsrc: 'assets/img/api-source.png',
     supported: true
   },
   {
     name: 'Amazon S3',
-    uid: 's3',
+    uid: CHANNEL_UID.AMAZON_S3,
     imgsrc: 'assets/img/s3.png',
     supported: false
   },
   {
     name: 'MAPR',
-    uid: 'mapr',
+    uid: CHANNEL_UID.MAPR,
     imgsrc: 'assets/svg/mapr.svg',
     supported: false
   },
   {
     name: 'Elastic Search',
-    uid: 'es',
+    uid: CHANNEL_UID.ELASTIC_SEARCH,
     imgsrc: 'assets/svg/elastic.svg',
     supported: false
   },
   {
     name: 'MariaDB',
-    uid: 'maridb',
+    uid: CHANNEL_UID.MARIA_DB,
     imgsrc: 'assets/img/mariadb.jpg',
     supported: false
   },
   {
     name: 'HDFS',
-    uid: 'hdfs',
+    uid: CHANNEL_UID.HDFS,
     imgsrc: 'assets/img/hadoop.jpg',
     supported: false
   },
   {
     name: 'MySQL',
-    uid: 'mysql',
+    uid: CHANNEL_UID.MY_SQL,
     imgsrc: 'assets/svg/mysql.svg',
     supported: false
   },
   {
     name: 'SQL Server',
-    uid: 'sqlserver',
+    uid: CHANNEL_UID.SQL_SERVER,
     imgsrc: 'assets/img/sqlserver.png',
     supported: false
   },
   {
     name: 'MongoDB',
-    uid: 'mongodb',
+    uid: CHANNEL_UID.MONGO_DB,
     imgsrc: 'assets/img/mongodb.png',
     supported: false
   },
   {
     name: 'JDBC',
-    uid: 'jdbc',
+    uid: CHANNEL_UID.JDBC,
     imgsrc: 'assets/img/jdbc.png',
     supported: false
   }

@@ -1,13 +1,16 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import { DatasourceService } from '../../../services/datasource.service';
-import { isUnique } from '../../../../../common/validators';
 
-import { CHANNEL_TYPES } from '../../../wb-comp-configs';
+import { CHANNEL_TYPES, CHANNEL_UID } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
+import {
+  DetailFormable,
+  CHANNEL_OPERATION
+} from '../../../models/workbench.interface';
 
 @Component({
   selector: 'createsource-dialog',
@@ -15,16 +18,17 @@ import { TestConnectivityComponent } from '../test-connectivity/test-connectivit
   styleUrls: ['./createSource-dialog.component.scss']
 })
 export class CreateSourceDialogComponent {
-  selectedSource = '';
-  form: FormGroup;
+  selectedSource: CHANNEL_UID = CHANNEL_UID.NONE;
   sources = CHANNEL_TYPES;
+  uid = CHANNEL_UID;
   firstStep: FormGroup;
-  public detailsFormGroup: FormGroup;
-  opType: 'create' | 'update' = 'create';
-  show = false;
+  opType: CHANNEL_OPERATION = CHANNEL_OPERATION.CREATE;
   dialogTitle = 'Create Data Channel';
   selectedStepIndex = 0;
   isTypeEditable = true;
+
+  // All channel forms implement this interface to guarantee common properties
+  @ViewChild('channelDetails') channelDetails: DetailFormable;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -34,7 +38,7 @@ export class CreateSourceDialogComponent {
     @Inject(MAT_DIALOG_DATA) public channelData: any
   ) {
     if (isUndefined(this.channelData.length)) {
-      this.opType = 'update';
+      this.opType = CHANNEL_OPERATION.UPDATE;
       this.isTypeEditable = false;
       this.dialogTitle = 'Edit Channel';
       this.selectedStepIndex = 1;
@@ -43,31 +47,12 @@ export class CreateSourceDialogComponent {
     this.createForm();
     if (isUndefined(this.channelData.length)) {
       this.firstStep.patchValue(this.channelData);
-      this.detailsFormGroup.patchValue(this.channelData);
     }
   }
 
   createForm() {
     this.firstStep = this._formBuilder.group({
       channelType: ['', Validators.required]
-    });
-
-    const oldChannelName = this.opType === 'update' ? this.channelData.channelName : '';
-
-    this.detailsFormGroup = this._formBuilder.group({
-      channelName: ['', Validators.required, isUnique(this.datasourceService.isDuplicateChannel, v => v, oldChannelName)],
-      hostName: ['', Validators.required],
-      portNo: [
-        '',
-        Validators.compose([
-          Validators.required,
-          Validators.pattern('^[0-9]*$')
-        ])
-      ],
-      userName: ['', Validators.required],
-      password: ['', Validators.required],
-      description: [''],
-      accessType: ['R', Validators.required]
     });
   }
 
@@ -101,11 +86,16 @@ export class CreateSourceDialogComponent {
     this.dialogRef.close();
   }
 
-  togglePWD() {
-    this.show = !this.show;
+  get isDetailsFormValid() {
+    return this.channelDetails && this.channelDetails.valid;
+  }
+
+  get detailsFormValue() {
+    return this.channelDetails && this.channelDetails.value;
   }
 
   testChannel(formData) {
+    console.log(formData);
     const channelData = {
       channelType: this.selectedSource,
       hostName: formData.hostName,

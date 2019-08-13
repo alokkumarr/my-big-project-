@@ -155,11 +155,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       autoFocus: false,
       closeOnNavigation: true,
       disableClose: true,
-      height: '60%',
-      width: '70%',
+      height: '75%',
+      width: '85%',
       minWidth: '750px',
       minHeight: '600px',
-      maxWidth: '900px',
       panelClass: 'sourceDialogClass',
       data: channelMetadata
     });
