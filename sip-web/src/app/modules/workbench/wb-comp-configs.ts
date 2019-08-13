@@ -77,7 +77,7 @@ export interface ChannelType {
 
 export enum CHANNEL_UID {
   SFTP = 'sftp',
-  API = 'api',
+  API = 'apipull',
   AMAZON_S3 = 's3',
   MAPR = 'mapr',
   ELASTIC_SEARCH = 'es',

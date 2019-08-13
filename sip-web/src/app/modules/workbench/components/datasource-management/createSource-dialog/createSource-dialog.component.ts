@@ -28,7 +28,8 @@ export class CreateSourceDialogComponent {
   isTypeEditable = true;
 
   // All channel forms implement this interface to guarantee common properties
-  @ViewChild('channelDetails') channelDetails: DetailFormable;
+  @ViewChild('sftpForm') sftpForm: DetailFormable;
+  @ViewChild('apiForm') apiForm: DetailFormable;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -50,6 +51,29 @@ export class CreateSourceDialogComponent {
     }
   }
 
+  get isDetailsFormValid() {
+    return this.channelDetails && this.channelDetails.valid;
+  }
+
+  get detailsFormValue() {
+    return this.channelDetails && this.channelDetails.value;
+  }
+
+  get detailsFormTestValue() {
+    return this.channelDetails && this.channelDetails.testConnectivityValue;
+  }
+
+  get channelDetails(): DetailFormable {
+    switch (this.selectedSource) {
+      case CHANNEL_UID.SFTP:
+        return this.sftpForm;
+      case CHANNEL_UID.API:
+        return this.apiForm;
+      default:
+        break;
+    }
+  }
+
   createForm() {
     this.firstStep = this._formBuilder.group({
       channelType: ['', Validators.required]
@@ -64,44 +88,21 @@ export class CreateSourceDialogComponent {
   }
 
   createSource(formData) {
-    const sourceDetails = this.mapData(formData);
-    this.dialogRef.close({ sourceDetails, opType: this.opType });
-  }
-
-  mapData(data) {
     const sourceDetails = {
-      channelName: data.channelName,
       channelType: this.selectedSource,
-      hostName: data.hostName,
-      portNo: data.portNo,
-      accessType: data.accessType,
-      userName: data.userName,
-      password: data.password,
-      description: data.description
+      ...formData
     };
-    return sourceDetails;
+    this.dialogRef.close({ sourceDetails, opType: this.opType });
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
   }
 
-  get isDetailsFormValid() {
-    return this.channelDetails && this.channelDetails.valid;
-  }
-
-  get detailsFormValue() {
-    return this.channelDetails && this.channelDetails.value;
-  }
-
   testChannel(formData) {
-    console.log(formData);
     const channelData = {
       channelType: this.selectedSource,
-      hostName: formData.hostName,
-      password: formData.password,
-      portNo: formData.portNo,
-      userName: formData.userName
+      ...formData
     };
     this.datasourceService.testChannelWithBody(channelData).subscribe(data => {
       this.showConnectivityLog(data);

@@ -72,6 +72,16 @@ export class SftpSourceComponent implements OnInit, DetailFormable {
     return this.detailsFormGroup.valid;
   }
 
+  get testConnectivityValue() {
+    const val = this.value;
+    return {
+      hostName: val.hostName,
+      password: val.password,
+      portNo: val.portNo,
+      userName: val.userName
+    };
+  }
+
   togglePWD() {
     this.show = !this.show;
   }

@@ -1,6 +1,7 @@
 export interface DetailFormable {
   valid: boolean;
   value: any;
+  testConnectivityValue: any;
 }
 
 export enum CHANNEL_OPERATION {

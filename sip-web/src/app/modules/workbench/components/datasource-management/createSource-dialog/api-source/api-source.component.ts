@@ -23,7 +23,6 @@ import { requireIf } from 'src/app/modules/observe/validators/required-if.valida
 })
 export class ApiSourceComponent implements OnInit, DetailFormable {
   public detailsFormGroup: FormGroup;
-  show = false;
   httpMethods: HTTP_METHODS[] = [
     HTTP_METHODS.GET,
     HTTP_METHODS.POST,
@@ -93,7 +92,7 @@ export class ApiSourceComponent implements OnInit, DetailFormable {
     return this.detailsFormGroup.valid;
   }
 
-  togglePWD() {
-    this.show = !this.show;
+  get testConnectivityValue() {
+    return this.value;
   }
 }

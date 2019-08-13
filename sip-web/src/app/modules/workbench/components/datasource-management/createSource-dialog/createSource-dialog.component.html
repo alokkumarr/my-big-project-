@@ -73,13 +73,13 @@
       <mat-step label="Channel Details">
         <ng-container [ngSwitch]="selectedSource">
           <sftp-source
-            #channelDetails
+            #sftpForm
             *ngSwitchCase="uid.SFTP"
             [channelData]="channelData"
             [opType]="opType"
           ></sftp-source>
           <api-source
-            #channelDetails
+            #apiForm
             *ngSwitchCase="uid.API"
             [channelData]="channelData"
             [opType]="opType"
@@ -116,7 +116,7 @@
             e2e="channel-test-connect-btn-model"
             mat-stroked-button
             color="primary"
-            (click)="testChannel(detailsFormValue)"
+            (click)="testChannel(detailsFormTestValue)"
             i18n
             [disabled]="!isDetailsFormValid"
           >
