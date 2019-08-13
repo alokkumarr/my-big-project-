@@ -41,7 +41,7 @@ import { isDSLAnalysis } from '../designer/types';
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
 const PROJECT_CODE = 'workbench';
-const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts'];
+const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts', 'supports'];
 
 interface ExecutionRequestOptions {
   take?: number;
