@@ -10,15 +10,19 @@ export const alertPayload: AlertConfig = {
   activeInd: true,
   aggregation: 'AVG',
   alertSeverity: 'CRITICAL',
-  category: 'string',
+  categoryId: 'string',
   datapodId: 'string',
   datapodName: 'string',
   monitoringEntity: 'string',
   operator: 'GT',
   product: 'string',
-  alertDescription: 'string',
-  alertName: 'string',
-  thresholdValue: 0
+  alertRuleDescription: 'string',
+  alertRuleName: 'string',
+  thresholdValue: 0,
+  entityName: '',
+  lookbackColumn: '',
+  notification: [],
+  sipQuery: { artifacts: [], filters: [] }
 };
 
 describe('ConfigureAlertService', () => {

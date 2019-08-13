@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../material.module';
+import { CommonPipesModule } from '../../../../../common/pipes/common-pipes.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddAlertComponent } from './add-alert.component';
 import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
@@ -35,19 +36,23 @@ const confAlertServiceStub = {
   }
 };
 
-const payload = {
-  alertName: 'abc',
-  alertDescription: 'abc',
+const payload: AlertConfig = {
+  alertRuleName: 'abc',
+  alertRuleDescription: 'abc',
   alertSeverity: 'CRITICAL',
   activeInd: false,
   datapodId: '1',
   datapodName: 'abc',
   categoryId: '',
+  notification: [],
+  entityName: '',
+  lookbackColumn: '',
   monitoringEntity: 'abc123',
   aggregation: 'AVG',
   operator: 'GT',
   thresholdValue: 2,
-  product: 'SAWD000001'
+  product: 'SAWD000001',
+  sipQuery: { artifacts: [], filters: [] }
 };
 
 const alertDefinitionStub: AlertDefinition = {
@@ -67,7 +72,8 @@ describe('AddAlertComponent', () => {
         ReactiveFormsModule,
         FormsModule,
         NoopAnimationsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        CommonPipesModule
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [

@@ -27,9 +27,9 @@ const alertDefinitionStub: AlertDefinition = {
     alertRulesSysId: '1',
     datapodId: '1',
     datapodName: 'abc',
-    alertName: 'abc',
-    alertDescription: 'abc',
-    category: '1',
+    alertRuleName: 'abc',
+    alertRuleDescription: 'abc',
+    categoryId: '1',
     alertSeverity: 'CRITICAL',
     monitoringEntity: 'abc123',
     aggregation: 'AVG',
@@ -39,7 +39,11 @@ const alertDefinitionStub: AlertDefinition = {
     createdBy: 'admin',
     createdTime: 1555524407000,
     modifiedTime: null,
-    modifiedBy: null
+    modifiedBy: null,
+    entityName: '',
+    lookbackColumn: '',
+    notification: [],
+    sipQuery: { artifacts: [], filters: [] }
   }
 };
 export class MatDialogMock {

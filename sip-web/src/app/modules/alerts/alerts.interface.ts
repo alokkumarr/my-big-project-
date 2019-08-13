@@ -27,6 +27,9 @@ export interface AlertConfig {
   datapodId: string;
   datapodName: string;
   activeInd: boolean;
+  entityName: string;
+  lookbackColumn: string;
+  notification: string[];
   categoryId?: string;
   product?: string;
   createdBy?: any;

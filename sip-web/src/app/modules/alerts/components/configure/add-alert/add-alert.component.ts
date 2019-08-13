@@ -11,6 +11,7 @@ import * as filter from 'lodash/filter';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
+import { timeIntervalValidator } from '../../../../../common/validators';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
@@ -88,8 +89,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
-      alertName: ['', [Validators.required, Validators.maxLength(18)]],
-      alertDescription: ['', [Validators.required, Validators.maxLength(36)]],
+      alertRuleName: ['', [Validators.required, Validators.maxLength(18)]],
+      alertRuleDescription: [
+        '',
+        [Validators.required, Validators.maxLength(36)]
+      ],
       alertSeverity: ['', [Validators.required]],
       notification: ['', [Validators.required]],
       activeInd: [true]
@@ -101,7 +105,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       categoryId: [''],
       monitoringEntity: ['', Validators.required],
       entityName: ['', Validators.required],
-      lookbackColumn: ['', Validators.required]
+      lookbackColumn: ['', Validators.required],
+      lookbackPeriod: [
+        '',
+        [Validators.required, Validators.maxLength(20), timeIntervalValidator]
+      ]
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
@@ -163,7 +171,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
     const alertConfig: AlertConfig = {
       ...partialAlertConfig,
-      sipQuery: {} // TODO: generate sipQuery
+      sipQuery: { artifacts: [], filters: [] } // TODO: generate sipQuery
     };
 
     this.endPayload = alertConfig;
