@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.base.MaprConnection;
+import sncr.bda.core.file.HFileOperations;
 
 public class StorageProxyUtil {
 
@@ -277,5 +278,24 @@ public class StorageProxyUtil {
       }
     }
     return mainNode;
+  }
+
+  /**
+   * Create required path if they do not exist.
+   *
+   * @param retries number of retries.
+   * @throws Exception when unable to create directory path.
+   */
+  public static void createDirIfNotExists(String path, int retries) throws Exception {
+    try {
+        if (!HFileOperations.exists(path))
+      HFileOperations.createDir(path);
+    } catch (Exception e) {
+      if (retries == 0) {
+        logger.error("unable to create path : " + path);
+      }
+      Thread.sleep(5 * 1000);
+      createDirIfNotExists(path, retries - 1);
+    }
   }
 }

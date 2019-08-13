@@ -101,7 +101,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private String tablePath;
 
   @PostConstruct
-  public void init() {
+  public void init() throws Exception {
+      //Create directory if doesn't exist
+      StorageProxyUtil.createDirIfNotExists(basePath + File.separator + METASTORE ,10);
     tablePath = basePath + File.separator + METASTORE + File.separator + tempResultTable;
     logger.trace("Create Table path :" + tablePath);
 
