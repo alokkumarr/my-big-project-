@@ -1,0 +1,73 @@
+<form
+  fxFlex
+  fxLayout="row wrap"
+  class="source-container"
+  #sourceDetails
+  novalidate
+  [formGroup]="detailsFormGroup"
+  autocomplete="false"
+>
+  <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Name Your Channel</mat-label>
+      <input
+        matInput
+        name="name-of-channel"
+        e2e="name-of-channel"
+        formControlName="channelName"
+        maxlength="18"
+        required
+        autocomplete="off"
+      />
+      <mat-error
+        *ngIf="!!detailsFormGroup.controls.channelName.hasError('required')"
+        i18n
+      >
+        Channel Name is
+        <strong>required</strong>
+      </mat-error>
+      <mat-error
+        e2e="channel-exist-error-msg"
+        *ngIf="!!detailsFormGroup.controls.channelName.hasError('isUnique')"
+        i18n
+      >
+        Channel Name
+        <strong>already exists</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Hostname</mat-label>
+      <input
+        matInput
+        placeholder="Host Name"
+        name="hostName"
+        e2e="host-name-input"
+        formControlName="hostName"
+        required
+        name="name-of-host"
+        autocomplete="new-password"
+      />
+      <mat-error
+        *ngIf="!!detailsFormGroup.controls.hostName.hasError('required')"
+        i18n
+      >
+        Host Name is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+  </section>
+  <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
+  <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+    <http-metadata [parentForm]="detailsFormGroup"></http-metadata>
+  </section>
+  <section fxFlex fxLayout="column" fxLayoutAlign="center center">
+    <mat-form-field style="width: 90%;" appearance="outline">
+      <mat-label i18n>Description about the source</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        e2e="channel-description-input"
+      ></textarea>
+    </mat-form-field>
+  </section>
+</form>

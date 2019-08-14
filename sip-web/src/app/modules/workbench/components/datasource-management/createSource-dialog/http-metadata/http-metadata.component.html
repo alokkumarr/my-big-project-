@@ -1,0 +1,177 @@
+<div [formGroup]="parentForm">
+  <!-- Request Method -->
+  <mat-form-field appearance="outline">
+    <mat-label i18n>Request Method</mat-label>
+    <mat-select
+      formControlName="httpMethod"
+      e2e="http-method-select"
+      (selectionChange)="httpMethodChanged()"
+      required
+    >
+      <mat-option
+        *ngFor="let method of httpMethods"
+        [value]="method"
+        [e2e]="'http-method-' + method"
+        i18n
+        >{{ method }}</mat-option
+      >
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Endpoint -->
+  <mat-form-field appearance="outline">
+    <mat-label i18n>Endpoint</mat-label>
+    <input
+      type="text"
+      matInput
+      placeholder="Endpoint"
+      name="api-endpoint"
+      e2e="api-endpoint"
+      formControlName="apiEndPoint"
+      autocomplete="new-password"
+    />
+  </mat-form-field>
+
+  <section
+    class="parameters body"
+    [style.display]="showBodyParams ? 'inherit' : 'none'"
+  >
+    <div formGroupName="bodyParameters">
+      <mat-form-field style="width: 90%;" appearance="outline">
+        <mat-label i18n>Request Body</mat-label>
+        <textarea
+          matInput
+          formControlName="content"
+          e2e="body-parameter-content"
+        ></textarea>
+        <mat-error
+          *ngIf="
+            !!parentForm.controls.bodyParameters.controls.content.hasError(
+              'required'
+            )
+          "
+          i18n
+        >
+          Body is
+          <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </section>
+
+  <!-- Header Parameters form -->
+  <section class="parameters headers">
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <h4>Headers</h4>
+      <button mat-icon-button (click)="addHeader()">
+        <mat-icon fontIcon="icon-plus"></mat-icon>
+      </button>
+    </div>
+
+    <div
+      formArrayName="headerParameters"
+      *ngFor="let item of headerParams.controls; let i = index"
+    >
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-evenly center"
+        [formGroupName]="i"
+      >
+        <!-- Header Key -->
+        <mat-form-field>
+          <mat-label i18n>Header Name</mat-label>
+          <input
+            matInput
+            name="name-of-header"
+            [e2e]="'name-of-header-' + i"
+            formControlName="key"
+            required
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!item.controls.key.hasError('required')" i18n>
+            Header Name is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Header Value -->
+        <mat-form-field>
+          <mat-label i18n>Header Value</mat-label>
+          <input
+            matInput
+            name="value-of-header"
+            [e2e]="'value-of-header-' + i"
+            formControlName="value"
+            required
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!item.controls.value.hasError('required')" i18n>
+            Header Value is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+        <button mat-icon-button (click)="removeHeader(i)">
+          <mat-icon fontIcon="icon-Minus"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Query Parameters form -->
+  <section class="parameters query">
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <h4>Query Parameters</h4>
+      <button mat-icon-button (click)="addQueryParam()">
+        <mat-icon fontIcon="icon-plus"></mat-icon>
+      </button>
+    </div>
+
+    <div
+      formArrayName="queryParameters"
+      *ngFor="let item of queryParams.controls; let i = index"
+    >
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-evenly center"
+        [formGroupName]="i"
+      >
+        <!-- Query Param Key -->
+        <mat-form-field>
+          <mat-label i18n>Parameter Name</mat-label>
+          <input
+            matInput
+            name="name-of-query-param"
+            [e2e]="'name-of-query-param-' + i"
+            formControlName="key"
+            required
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!item.controls.key.hasError('required')" i18n>
+            Parameter Name is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Query Param Value -->
+        <mat-form-field>
+          <mat-label i18n>Parameter Value</mat-label>
+          <input
+            matInput
+            name="value-of-query-parameter"
+            [e2e]="'value-of-query-parameter-' + i"
+            formControlName="value"
+            required
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!item.controls.value.hasError('required')" i18n>
+            Parameter Value is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+        <button mat-icon-button (click)="removeQueryParam(i)">
+          <mat-icon fontIcon="icon-Minus"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
