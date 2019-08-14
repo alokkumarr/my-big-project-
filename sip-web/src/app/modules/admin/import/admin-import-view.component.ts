@@ -340,7 +340,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
       ...fields,
       userFullName,
       userId
-    };
+    } as Analysis | AnalysisDSL;
   }
 
   import() {
@@ -485,7 +485,7 @@ export class AdminImportViewComponent implements OnInit, OnDestroy {
           this.importExistingAnalysis({
             ...analysis,
             ...fields
-          }).then(
+          } as Analysis | AnalysisDSL).then(
             updatedAnalysis => resolve(updatedAnalysis),
             err => reject(err)
           );

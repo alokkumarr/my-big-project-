@@ -35,9 +35,11 @@ class ReportExecutorQueue(val executorType: String) {
    */
   def createIfNotExists(retries: Int = 12) {
     /* Create the parent directory of the stream if it does not exist */
-    try {
-      HFileOperations.createDir(MainPath)
-    } catch {
+    try
+        if (!HFileOperations.exists(MainPath)) {
+          HFileOperations.createDir(MainPath)
+        }
+    catch {
       case e: IOException => {
         log.debug("Failed creating main directory: {}", MainPath)
         /* Retry creating directory for some time, as the MapR-FS connection

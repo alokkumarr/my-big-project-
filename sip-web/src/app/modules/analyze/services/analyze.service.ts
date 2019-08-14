@@ -33,15 +33,15 @@ import { JwtService } from '../../../common/services';
 import { ToastService, MenuService } from '../../../common/services';
 import AppConfig from '../../../../../appConfig';
 import { Observable, of } from 'rxjs';
-import { first, map, switchMap } from 'rxjs/operators';
-import { DSL_ANALYSIS_TYPES } from '../consts';
+import { first, map } from 'rxjs/operators';
 import { DEFAULT_MAP_SETTINGS } from '../designer/consts';
 import * as isArray from 'lodash/isArray';
+import { isDSLAnalysis } from '../designer/types';
 
 const apiUrl = AppConfig.api.url;
 const ANALYZE_MODULE_NAME = 'ANALYZE';
 const PROJECT_CODE = 'workbench';
-const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts'];
+const LEGACY_PROPERTIES = ['sqlBuilder', 'artifacts', 'supports'];
 
 interface ExecutionRequestOptions {
   take?: number;
@@ -90,9 +90,7 @@ export class AnalyzeService {
     public _toastMessage: ToastService,
     public _menu: MenuService,
     private store: Store
-  ) {
-    window['analysisService'] = this;
-  }
+  ) {}
 
   isExecuting(analysisId) {
     return EXECUTION_STATES.EXECUTING === this._executingAnalyses[analysisId];
@@ -514,6 +512,10 @@ export class AnalyzeService {
     mode = EXECUTION_MODES.LIVE,
     options: ExecutionRequestOptions = {}
   ) {
+    // Use dummy analysis id in case analysis doesn't have id. This can happend
+    // when user has opened designer to create an analysis but hasn't yet saved it.
+    const DUMMY_ANALYSIS_ID = '123';
+
     // This addition is a part of SIP-7145 as this is required for DSK implementation. This is a request from BE.
     model.sipQuery.semanticId = model.semanticId;
     options.skip = options.skip || 0;
@@ -527,9 +529,8 @@ export class AnalyzeService {
 
     return this._http
       .post(
-        `${apiUrl}/internal/proxy/storage/execute?id=${
-          model.id
-        }&executionType=${mode}${paginationParams}`,
+        `${apiUrl}/internal/proxy/storage/execute?id=${model.id ||
+          DUMMY_ANALYSIS_ID}&executionType=${mode}${paginationParams}`,
         omit(model, LEGACY_PROPERTIES)
       )
       .pipe(
@@ -625,10 +626,13 @@ export class AnalyzeService {
     return this.postRequest('/api/analyze/generateQuery', payload).toPromise();
   }
 
-  saveReport(model) {
+  saveAnalysis(model: AnalysisDSL | Analysis) {
     model.saved = true;
-    const updatePromise = this.updateAnalysis(model);
-    return updatePromise;
+    if (model.id) {
+      return this.updateAnalysis(model);
+    } else {
+      return this.createAnalysis(model);
+    }
   }
 
   getSemanticLayerData() {
@@ -647,61 +651,55 @@ export class AnalyzeService {
   }
 
   getSemanticObject(semanticId: string): Observable<any> {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (!isEmpty(metrics)) {
+      const metric = fpGet(semanticId, metrics);
+      if (!isEmpty(metric)) {
+        if (has(metric, 'artifacts')) {
+          return of(metric);
+        }
+      }
+    }
     return this.getRequest(`internal/semantic/workbench/${semanticId}`);
   }
 
   createAnalysis(
-    metricId,
-    type
+    model: Analysis | AnalysisDSL
   ): Promise<AnalysisPivotDSL | AnalysisDSL | Analysis> {
     // return this.createAnalysisNonDSL(metricId, type);
-    return DSL_ANALYSIS_TYPES.includes(type)
-      ? this.createAnalysisDSL(
-          type === 'pivot'
-            ? this.newAnalysisPivotModel(metricId, type)
-            : this.newAnalysisChartModel(metricId, type)
-        ).toPromise()
-      : this.createAnalysisNonDSL(metricId, type);
+    return isDSLAnalysis(model)
+      ? this.createAnalysisDSL(model).toPromise()
+      : this.createAnalysisNonDSL(model);
   }
 
-  createAnalysisNonDSL(metricId, type): Promise<Analysis> {
+  createAnalysisNonDSL(model: Analysis): Promise<Analysis> {
     const params = this.getRequestParams([
       ['contents.action', 'create'],
       [
         'contents.keys.[0].id',
-        metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'
+        model.metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'
       ],
-      ['contents.keys.[0].analysisType', type]
+      ['contents.keys.[0].analysisType', model.type]
     ]);
     return <Promise<Analysis>>this.postRequest(`analysis`, params)
       .toPromise()
       .then(fpGet('contents.analyze.[0]'));
   }
 
-  createAnalysisDSL(model: Partial<AnalysisDSL>): Observable<AnalysisDSL> {
-    return this.getSemanticObject(model.semanticId).pipe(
-      switchMap(semanticData => {
-        /* Set the store details from semantic data */
-        const repo = semanticData.esRepository;
-        if (repo) {
-          model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
-          model.sipQuery.store.storageType = repo.storageType;
-        }
-        return <Observable<AnalysisDSL>>(
-          this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
-            first(),
-            map((resp: { analysis: AnalysisDSL }) => resp.analysis)
-          )
-        );
-      })
+  createAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
+    return <Observable<AnalysisDSL>>(
+      this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
+        first(),
+        map((resp: { analysis: AnalysisDSL }) => resp.analysis)
+      )
     );
   }
 
   newAnalysisModel(
     semanticId: string,
     type: AnalysisType
-  ): Partial<AnalysisDSL> {
-    return {
+  ): Promise<Partial<AnalysisDSL>> {
+    let model: Partial<AnalysisDSL> = {
       type,
       semanticId,
       name: 'Untitled Analysis',
@@ -723,12 +721,25 @@ export class AnalyzeService {
         semanticId: ''
       }
     };
+    if (['chart', 'map'].includes(type)) {
+      model = { ...model, ...this.newAnalysisChartModel(model) };
+    }
+
+    return (<Observable<Analysis | AnalysisDSL>>this.getSemanticObject(
+      semanticId
+    ).pipe(
+      map(semanticData => {
+        const repo = semanticData.esRepository;
+        if (repo) {
+          model.sipQuery.store.dataStore = `${repo.indexName}/${repo.type}`;
+          model.sipQuery.store.storageType = repo.storageType;
+        }
+        return model;
+      })
+    )).toPromise();
   }
 
-  newAnalysisChartModel(
-    semanticId: string,
-    type: AnalysisType
-  ): Partial<AnalysisDSL> {
+  newAnalysisChartModel(model: Partial<AnalysisDSL>): Partial<AnalysisDSL> {
     const chartOptions = {
       chartType: 'column',
       chartTitle: '',
@@ -746,18 +757,9 @@ export class AnalyzeService {
     };
     const mapOptions = DEFAULT_MAP_SETTINGS;
     return {
-      ...this.newAnalysisModel(semanticId, type),
-      chartOptions: type === 'chart' ? chartOptions : null,
-      mapOptions: type === 'map' ? mapOptions : null
-    };
-  }
-
-  newAnalysisPivotModel(
-    semanticId: string,
-    type: AnalysisType
-  ): Partial<AnalysisPivotDSL> {
-    return {
-      ...this.newAnalysisModel(semanticId, type)
+      ...model,
+      chartOptions: model.type === 'chart' ? chartOptions : null,
+      mapOptions: model.type === 'map' ? mapOptions : null
     };
   }
 

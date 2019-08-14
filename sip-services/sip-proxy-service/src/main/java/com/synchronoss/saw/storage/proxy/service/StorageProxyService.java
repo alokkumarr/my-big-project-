@@ -1,13 +1,17 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.globalfilter.GlobalFilters;
+import com.synchronoss.saw.model.kpi.KPIBuilder;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
+import java.io.IOException;
 import java.util.List;
 
 public interface StorageProxyService {
@@ -36,4 +40,10 @@ public interface StorageProxyService {
     ExecutionResponse fetchLastExecutionsDataForDL(
         String analysisId, Integer pageNo, Integer pageSize);
   Boolean saveTtlExecutionResult(ExecutionResult executionResult);
+
+  Object fetchGlobalFilter(GlobalFilters globalFilters,DataSecurityKey dataSecurityKey )
+      throws Exception;
+
+    Object processKpi(KPIBuilder kpiBuilder, DataSecurityKey dataSecurityKey)
+        throws Exception;
 }

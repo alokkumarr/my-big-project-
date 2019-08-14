@@ -1,0 +1,12 @@
+.parameters {
+  mat-form-field {
+    min-width: auto !important;
+  }
+
+  max-height: 300px;
+  overflow: auto;
+}
+
+:host > div {
+  overflow: auto;
+}

@@ -21,7 +21,7 @@ public class StorageProxySwaggerConfig extends WebMvcConfigurationSupport {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(getApiInfo())  
           .select()                                  
           .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.storage.proxy"))              
-          .paths(PathSelectors.regex("/internal/proxy.*"))   
+          .paths(PathSelectors.regex("/internal/proxy.*|/filters|/kpi"))
           .build();
                    
     }
