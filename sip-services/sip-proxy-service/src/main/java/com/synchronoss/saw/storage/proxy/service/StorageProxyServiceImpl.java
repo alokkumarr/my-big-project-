@@ -13,11 +13,19 @@ import com.mapr.db.TableDescriptor;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
+import com.synchronoss.saw.es.KPIResultParser;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
+import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.Store;
+import com.synchronoss.saw.model.globalfilter.GlobalFilterExecutionObject;
+import com.synchronoss.saw.model.globalfilter.GlobalFilters;
+import com.synchronoss.saw.model.kpi.KPIBuilder;
+import com.synchronoss.saw.model.kpi.KPIExecutionObject;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
@@ -93,7 +101,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private String tablePath;
 
   @PostConstruct
-  public void init() {
+  public void init() throws Exception {
+      //Create directory if doesn't exist
+      StorageProxyUtil.createDirIfNotExists(basePath + File.separator + METASTORE ,10);
     tablePath = basePath + File.separator + METASTORE + File.separator + tempResultTable;
     logger.trace("Create Table path :" + tablePath);
 
@@ -583,7 +593,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       SearchSourceBuilder searchSourceBuilder =
           elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
       JsonNode percentageData =
-          storageConnectorService.ExecuteESQuery(
+          storageConnectorService.executeESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
       elasticSearchQueryBuilder.setPriorPercentages(
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
@@ -591,7 +601,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     String query;
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
     logger.trace("ES -Query {} " + query);
-    JsonNode response = storageConnectorService.ExecuteESQuery(query, sipQuery.getStore());
+    JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
     if (response.get("aggregations") != null)
@@ -790,6 +800,73 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   /**
+   * This Method will process the global filter request.
+   *
+   * @param globalFilters globalfilter.
+   * @param dataSecurityKey datasecurity.
+   * @return global filter response.
+   */
+  @Override
+  public Object fetchGlobalFilter(GlobalFilters globalFilters, DataSecurityKey dataSecurityKey)
+      throws Exception {
+    GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
+    List<GlobalFilterExecutionObject> executionList =
+        globalFilterDataQueryBuilder.buildQuery(globalFilters);
+    JsonNode result = null;
+    for (GlobalFilterExecutionObject globalFilterExecutionObject : executionList) {
+      globalFilterExecutionObject.getEsRepository();
+      Store store = new Store();
+      store.setDataStore(
+          globalFilterExecutionObject.getEsRepository().getIndexName()
+              + "/"
+              + globalFilterExecutionObject.getEsRepository().getType());
+      store.setStorageType("ES");
+      JsonNode esResponse =
+          storageConnectorService.executeESQuery(
+              globalFilterExecutionObject.getSearchSourceBuilder().toString(), store);
+      JsonNode filterResponse = esResponse.get("aggregations");
+      JsonNode response =
+          StorageProxyUtil.buildGlobalFilterData(
+              filterResponse, globalFilterExecutionObject.getGlobalFilter());
+      if (result == null) {
+        result = response;
+      } else {
+        result = StorageProxyUtil.merge(result, response);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public Object processKpi(KPIBuilder kpiBuilder, DataSecurityKey dataSecurityKey)
+      throws Exception {
+    KPIExecutionObject kpiExecutionObject =
+        new KPIDataQueryBuilder(dataSecurityKey).buildQuery(kpiBuilder);
+    Store store = new Store();
+    store.setDataStore(
+        kpiBuilder.getKpi().getEsRepository().getIndexName()
+            + "/"
+            + kpiBuilder.getKpi().getEsRepository().getType());
+    store.setStorageType(kpiBuilder.getKpi().getEsRepository().getStorageType());
+    KPIResultParser kpiResultParser = new KPIResultParser(kpiExecutionObject.getDataFields());
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode data = mapper.createObjectNode();
+    JsonNode kpiCurrentResponse =
+        storageConnectorService
+            .executeESQuery(kpiExecutionObject.getCurrentSearchSourceBuilder().toString(), store)
+            .get("aggregations");
+    JsonNode kpiPriorResponse =
+        storageConnectorService
+            .executeESQuery(kpiExecutionObject.getCurrentSearchSourceBuilder().toString(), store)
+            .get("aggregations");
+    data.put("current", mapper.valueToTree(kpiResultParser.jsonNodeParser(kpiCurrentResponse)));
+    data.put("prior", mapper.valueToTree(kpiResultParser.jsonNodeParser(kpiPriorResponse)));
+    ObjectNode result = mapper.createObjectNode();
+    result.putPOJO("data", data);
+    return result;
+  }
+
+    /**
    * Check for temp execution type.
    *
    * @param executionType
