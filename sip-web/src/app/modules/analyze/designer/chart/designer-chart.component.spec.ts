@@ -76,6 +76,7 @@ describe('Designer Chart Component', () => {
         dataStore: null,
         storageType: null
       },
+      semanticId: 'workbench::sample-elasticsearch',
       booleanCriteria: 'AND'
     };
     expect(component.sipQuery).not.toBeNull();

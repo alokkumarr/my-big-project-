@@ -1,8 +1,11 @@
 package com.synchronoss.saw.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.model.globalfilter.GlobalFilters;
+import com.synchronoss.saw.model.kpi.KPIBuilder;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -55,6 +58,36 @@ public class BuilderUtil {
   }
 
   /**
+   * Global filter.
+   * @param jsonString
+   * @param node
+   * @return
+   * @throws IOException
+   */
+  public static GlobalFilters getNodeTreeGlobalFilters(String jsonString, String node)
+      throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode objectNode = objectMapper.readTree(jsonString);
+    GlobalFilters globalFilters = objectMapper.treeToValue(objectNode, GlobalFilters.class);
+    return globalFilters;
+  }
+
+  /**
+   * KPI.
+   * @param jsonString
+   * @return
+   * @throws IOException
+   */
+  public static KPIBuilder getNodeTreeKPIBuilder(String jsonString) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode objectNode = objectMapper.readTree(jsonString);
+    KPIBuilder kpiBuilder = objectMapper.treeToValue(objectNode, KPIBuilder.class);
+    return kpiBuilder;
+  }
+
+  /**
    * construct DSK Compatible String.
    *
    * @param dskJSONString
@@ -79,13 +112,13 @@ public class BuilderUtil {
     String space = " ";
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
-    switch (dynamic) {
-      case "Yesterday":
+    switch (dynamic.toUpperCase()) {
+      case "YESTERDAY":
         LocalDateTime yesterday = now.minusDays(1);
         dynamicConvertor.setLte(yesterday.format(dateTimeFormatter) + space + dateFormatLte);
         dynamicConvertor.setGte(yesterday.format(dateTimeFormatter) + space + dateFormatGte);
         break;
-      case "Today":
+      case "TODAY":
         {
           LocalDateTime today = now;
           dynamicConvertor.setLte(today.format(dateTimeFormatter) + space + dateFormatLte);
@@ -237,7 +270,7 @@ public class BuilderUtil {
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
     DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-    switch (dynamic) {
+    switch (dynamic.toUpperCase()) {
       case "YESTERDAY":
         LocalDateTime yesterday = now.minusDays(1);
         LocalDateTime dayBeforeYesterday = yesterday.minusDays(1);

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import { Store } from '@ngxs/store';
 
 import {
   Artifact,
@@ -20,11 +21,16 @@ export class DesignerSettingsMultiTableComponent {
   @Input() useAggregate: boolean;
   @Input('artifacts')
   set setArtifacts(artifacts: Artifact[]) {
+    const analysis = this._store.selectSnapshot(state => state.designerState.analysis);;
+    this.sqlBuilder = analysis.sipQuery;
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }
   @Input() data;
-  @Input() sqlBuilder: QueryDSL | SqlBuilderReport;
   public artifacts: Artifact[];
+  public sqlBuilder: QueryDSL | SqlBuilderReport;
+  constructor(
+    private _store: Store
+  ) {}
 
   onChange(event: JsPlumbCanvasChangeEvent) {
     this.change.emit(event);
@@ -42,5 +48,36 @@ export class DesignerSettingsMultiTableComponent {
       }
     });
     return artifacts;
+  }
+
+  refactor(joins) {
+    const analysisJoins = [];
+    let DSLState = false;
+    joins.forEach(join => {
+      const DSLCriteria = [];
+      if (!join.type) {
+        DSLState = true;
+        join.criteria.forEach(dslCRT => {
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['left'].artifactsName,
+            columnName: dslCRT.joinCondition['left'].columnName,
+            side: 'left'
+          });
+          DSLCriteria.push({
+            tableName: dslCRT.joinCondition['right'].artifactsName,
+            columnName: dslCRT.joinCondition['right'].columnName,
+            side: 'right'
+          });
+
+        });
+        const dslJoin = {
+          type: join.join,
+          criteria: DSLCriteria
+        };
+        analysisJoins.push(dslJoin);
+      }
+    });
+    joins = DSLState ? analysisJoins : joins;
+    return joins;
   }
 }

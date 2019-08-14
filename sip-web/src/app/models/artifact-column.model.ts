@@ -50,7 +50,7 @@ export interface ArtifactColumnReport extends ArtifactColumn {
   joinEigible?: boolean;
   dateFormat?: string;
   hide?: boolean;
-  tableName?: string;
+  artifactsName?: string;
   joinEligible?: boolean;
   visibleIndex?: number;
   visible: boolean;

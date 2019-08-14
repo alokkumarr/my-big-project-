@@ -72,6 +72,8 @@ public class AmazonS3Handler {
 
     String s3Key = outputLocation + "/" + finalFileName;
 
+    logger.debug("Upload location = " + s3Key);
+
     PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
     putObject(s3Client, request);
   }
@@ -91,15 +93,15 @@ public class AmazonS3Handler {
     } catch (AmazonServiceException e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.
-      logger.error("AmazonServiceException : The call was transmitted successfully, but Amazon S3 couldn't process");
-      logger.error(e.getMessage());
+      logger.error("AmazonServiceException : The call was transmitted successfully,"
+          + " but Amazon S3 couldn't process", e);
     } catch (SdkClientException e) {
       // Amazon S3 couldn't be contacted for a response, or the client
       // couldn't parse the response from Amazon S3.
-      logger.error("SdkClientException : Amazon S3 couldn't be contacted for a response, or the client");
-      logger.error(e.getMessage());
+      logger.error("SdkClientException : Amazon S3 couldn't be contacted for a response,"
+          + " or the client", e);
     } catch (Exception e) {
-        logger.error("Error dispatching to S3 : ",e.getMessage());
+        logger.error("Error dispatching to S3 : ",e);
     }
   }
 }

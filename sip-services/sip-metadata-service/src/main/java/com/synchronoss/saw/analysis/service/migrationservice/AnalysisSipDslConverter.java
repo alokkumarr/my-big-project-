@@ -361,7 +361,7 @@ public interface AnalysisSipDslConverter {
    */
   default Sort generateSortObject(String artifactName, JsonObject sortObject) {
     Sort sort = new Sort();
-    sort.setArtifacts(artifactName);
+    sort.setArtifactsName(artifactName);
 
     if (sortObject.has(FieldNames.TYPE)) {
       String typeVal = sortObject.get(FieldNames.TYPE).getAsString();
@@ -501,6 +501,18 @@ public interface AnalysisSipDslConverter {
           Format format = createFormatObject(formatObject);
           field.setFormat(format);
         }
+      }
+    }
+
+    if (fieldObject.has(FieldNames.AREA_INDEX) || fieldObject.has(FieldNames.VISIBLE_INDEX)) {
+      int index = 0;
+      if ((fieldObject.has(FieldNames.AREA_INDEX)
+          && (!fieldObject.get(FieldNames.AREA_INDEX).isJsonNull()))) {
+        index = fieldObject.get(FieldNames.AREA_INDEX).getAsInt();
+        field.setAreaIndex(index);
+      } else if (!fieldObject.get(FieldNames.VISIBLE_INDEX).isJsonNull()) {
+        index = fieldObject.get(FieldNames.VISIBLE_INDEX).getAsInt();
+        field.setAreaIndex(index);
       }
     }
 
