@@ -278,35 +278,43 @@
               "
               ><small>This field is required </small></mat-error
             >
-            <mat-form-field appearance="outline">
-              <mat-label>Lookback period</mat-label>
-              <input
-                matInput
-                placeholder="Loockback period"
-                formControlName="lookbackPeriod"
-                [readonly]="!alertMetricFormGroup.controls.lookbackColumn.value"
-                maxlength="20"
-                (blur)="onLookbackPeriodBlur()"
-                e2e="lookbackPeriod"
-              />
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.lookbackPeriod.hasError(
-                    'required'
-                  )
-                "
-                >This field is required</mat-error
-              >
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.lookbackPeriod.hasError(
-                    'maxlength'
-                  )
-                "
-                >Alert Name cannot exceed 20 characters</mat-error
-              >
-            </mat-form-field>
-
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-label>Lookback period</mat-label>
+                <input
+                  matInput
+                  placeholder="Loockback period"
+                  formControlName="lookbackPeriod"
+                  [readonly]="
+                    !alertMetricFormGroup.controls.lookbackColumn.value
+                  "
+                  maxlength="20"
+                  (blur)="onLookbackPeriodBlur()"
+                  e2e="lookbackPeriod"
+                />
+                <mat-error
+                  *ngIf="
+                    alertMetricFormGroup.controls.lookbackPeriod.hasError(
+                      'required'
+                    )
+                  "
+                  >This field is required</mat-error
+                >
+                <mat-error
+                  *ngIf="
+                    alertMetricFormGroup.controls.lookbackPeriod.hasError(
+                      'maxlength'
+                    )
+                  "
+                  >Alert Name cannot exceed 20 characters</mat-error
+                >
+              </mat-form-field>
+              <mat-icon
+                class="lookback-period__info-icon"
+                fontIcon="icon-info"
+                matTooltip="Interval made of weeks, days, hours, minutes. Ex: '2w 3d', '3h', '1w 10m'"
+              ></mat-icon>
+            </div>
             <div
               fxFlex="45px"
               fxLayout="row"
