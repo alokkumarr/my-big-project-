@@ -47,10 +47,8 @@ export class ConfigureAlertService {
    * @returns {Observable<any>}
    * @memberof ConfigureAlertService
    */
-  getMetricsInDatapod$(id: string): Observable<any> {
-    return this.http
-      .get(`${this.api}/internal/semantic/${PROJECTID}/${id}`)
-      .pipe(map(fpGet('artifacts.[0].columns')));
+  getDatapod$(id: string): Observable<any> {
+    return this.http.get(`${this.api}/internal/semantic/${PROJECTID}/${id}`);
   }
 
   /**

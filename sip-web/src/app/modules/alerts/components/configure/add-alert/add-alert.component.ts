@@ -8,16 +8,18 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as filter from 'lodash/filter';
+import * as split from 'lodash/split';
+import * as fpGet from 'lodash/fp/get';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
-import { timeIntervalValidator } from '../../../../../common/validators';
+import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
-import { SubscriptionLike, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 const notifications = [
   {
@@ -45,10 +47,13 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertDefFormGroup: FormGroup;
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
-  datapods$;
+  datapods$: Observable<any>;
+  selectedDatapod;
+  selectedMonitoringEntity;
+  selectedEntityName;
   metricsList$;
-  metricsListWithoutMonitoringEntity$;
-  metricsListWithoutEntity$;
+  metricsListWithoutMonitoringEntity;
+  metricsListWithoutEntity;
   operators$;
   aggregations$;
   notifications$;
@@ -106,10 +111,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       monitoringEntity: ['', Validators.required],
       entityName: ['', Validators.required],
       lookbackColumn: ['', Validators.required],
-      lookbackPeriod: [
-        '',
-        [Validators.required, Validators.maxLength(20), timeIntervalValidator]
-      ]
+      lookbackPeriod: ['', [Validators.required, Validators.maxLength(20)]]
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
@@ -122,8 +124,23 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     });
   }
 
+  onLookbackPeriodBlur() {
+    const control = this.alertMetricFormGroup.get('lookbackPeriod');
+    const controlValue = control.value;
+    const correctedValue = correctTimeInterval(controlValue);
+    control.setValue(correctedValue);
+  }
+
   onDatapodChanged() {
     this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
+  }
+
+  onSelectedMonitoringEntity(selectedItem) {
+    this.selectedMonitoringEntity = selectedItem;
+  }
+
+  onSelectedEntityName(selectedItem) {
+    this.selectedEntityName = selectedItem;
   }
 
   onDatapodSelected(selectedItem) {
@@ -136,46 +153,118 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         selectedItem.categoryId || 'Default'
       );
 
-      this.metricsList$ = this._configureAlertService.getMetricsInDatapod$(
-        selectedItem.id
+      this.metricsList$ = this._configureAlertService
+        .getDatapod$(selectedItem.id)
+        .pipe(
+          tap(datapod => (this.selectedDatapod = datapod)),
+          map(fpGet('artifacts.[0].columns'))
+        );
+
+      const monitoringEntityControl = this.alertMetricFormGroup.get(
+        'monitoringEntity'
       );
-      this.metricsListWithoutMonitoringEntity$ = this.metricsList$.pipe(
-        map(columns =>
-          filter(
-            columns,
-            col =>
-              col.columnName ===
-              this.alertMetricFormGroup.get('monitoringEntity')
+      combineLatest(this.metricsList$, monitoringEntityControl.valueChanges)
+        .pipe(
+          map(([columns, monitoringEntity]) =>
+            filter(columns, col => col.columnName !== monitoringEntity)
           )
         )
-      );
-      this.metricsListWithoutEntity$ = this.metricsList$.pipe(
-        map(columns =>
-          filter(
-            columns,
-            col =>
-              col.columnName === this.alertMetricFormGroup.get('entityName')
+        .subscribe(
+          metrics => (this.metricsListWithoutMonitoringEntity = metrics)
+        );
+      const entityNameControl = this.alertMetricFormGroup.get('entityName');
+      combineLatest(this.metricsList$, entityNameControl.valueChanges)
+        .pipe(
+          map(([columns, entityName]) =>
+            filter(
+              columns,
+              col =>
+                col.columnName !== entityName && this.numericMetricFilter(col)
+            )
           )
         )
-      );
+        .subscribe(metrics => (this.metricsListWithoutEntity = metrics));
+      monitoringEntityControl.updateValueAndValidity();
+      entityNameControl.updateValueAndValidity();
     }
   }
 
   constructPayload() {
-    const partialAlertConfig = {
+    const {
+      datapodId,
+      datapodName,
+      categoryId,
+      lookbackColumn,
+      lookbackPeriod
+    } = this.alertMetricFormGroup.value;
+
+    const sipQuery = this.generateSipQuery();
+
+    const alertConfigWithoutSipQuery = {
       ...this.alertDefFormGroup.value,
-      ...this.alertMetricFormGroup.value,
-      ...this.alertRuleFormGroup.value,
+      datapodId,
+      datapodName,
+      categoryId,
+      lookbackColumn,
+      lookbackPeriod,
       product: 'SAWD000001'
     };
 
     const alertConfig: AlertConfig = {
-      ...partialAlertConfig,
-      sipQuery: { artifacts: [], filters: [] } // TODO: generate sipQuery
+      ...alertConfigWithoutSipQuery,
+      sipQuery
     };
 
-    this.endPayload = alertConfig;
+    this.endPayload = alertConfigWithoutSipQuery;
     return alertConfig;
+  }
+
+  generateSipQuery() {
+    const {
+      aggregation,
+      operator,
+      thresholdValue
+    } = this.alertRuleFormGroup.value;
+
+    const selectedEntityName = this.selectedEntityName;
+
+    const entityName = {
+      dataField: split(selectedEntityName.columnName, '.')[0],
+      area: 'x-axis',
+      alias: selectedEntityName.alias,
+      columnName: selectedEntityName.columnName,
+      // name: string, // take out name, and see if it works
+      displayName: selectedEntityName.displayName,
+      type: selectedEntityName.type
+    };
+
+    const selectedMonitoringEntity = this.selectedMonitoringEntity;
+
+    const monitoringEntity = {
+      dataField: selectedMonitoringEntity.columnName,
+      area: 'y-axis',
+      columnName: selectedMonitoringEntity.columnName,
+      // name: integer,  // take out name, and see if it works
+      displayName: selectedMonitoringEntity.displayName,
+      type: selectedMonitoringEntity.type,
+      aggregate: aggregation
+    };
+
+    const { artifactName } = this.selectedDatapod.artifacts[0];
+
+    const alertFilter = {
+      type: selectedMonitoringEntity.type,
+      artifactName,
+      model: {
+        operator,
+        value: thresholdValue
+      }
+    };
+
+    return {
+      artifacts: [{ artifactName, fields: [entityName, monitoringEntity] }],
+      filters: [alertFilter]
+    };
   }
 
   createAlert() {

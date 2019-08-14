@@ -31,7 +31,7 @@ const confAlertServiceStub = {
   getListOfDatapods$: () => {
     return new Observable();
   },
-  getMetricsInDatapod$: id => {
+  getDatapod$: id => {
     return new Observable();
   }
 };
@@ -47,6 +47,7 @@ const payload: AlertConfig = {
   notification: [],
   entityName: '',
   lookbackColumn: '',
+  lookbackPeriod: '',
   monitoringEntity: 'abc123',
   aggregation: 'AVG',
   operator: 'GT',

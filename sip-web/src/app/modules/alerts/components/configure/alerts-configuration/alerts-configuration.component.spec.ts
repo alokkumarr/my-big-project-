@@ -42,6 +42,7 @@ const alertDefinitionStub: AlertDefinition = {
     modifiedBy: null,
     entityName: '',
     lookbackColumn: '',
+    lookbackPeriod: '',
     notification: [],
     sipQuery: { artifacts: [], filters: [] }
   }

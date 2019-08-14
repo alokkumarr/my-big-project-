@@ -181,11 +181,12 @@
                 ngDefaultControl
                 required
                 formControlName="monitoringEntity"
-                [items]="metricsList$ | async | filterFn: numericMetricFilter"
+                [items]="metricsListWithoutEntity"
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a monitoring entity"
+                (onSelectionChanged)="onSelectedMonitoringEntity($event?.selectedItem)"
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
@@ -216,12 +217,13 @@
               <dx-select-box
                 ngDefaultControl
                 required
-                formControlName="monitoringEntity"
-                [items]="metricsList$ | async"
+                formControlName="entityName"
+                [items]="metricsListWithoutMonitoringEntity"
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select an Entity"
+                (onSelectionChanged)="onSelectedEntityName($event?.selectedItem)"
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
@@ -257,7 +259,7 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
-                [disabled]="!alertMetricFormGroup.controls.datapodId.value"
+                [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="lookbackColumn"
               ></dx-select-box>
             </mat-form-field>
@@ -277,19 +279,22 @@
                 matInput
                 placeholder="Loockback period"
                 formControlName="lookbackPeriod"
-                [disabled]="!alertMetricFormGroup.controls.lookbackColumn.value"
+                [readonly]="!alertMetricFormGroup.controls.lookbackColumn.value"
                 maxlength="20"
+                (blur)="onLookbackPeriodBlur()"
                 e2e="lookbackPeriod"
               />
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.lookbackPeriod.hasError('required')
+                  alertMetricFormGroup.controls.lookbackPeriod.hasError(
+                    'required'
+                  )
                 "
                 >This field is required</mat-error
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.lookbackPeriod.hasError(
+                  alertMetricFormGroup.controls.lookbackPeriod.hasError(
                     'maxlength'
                   )
                 "

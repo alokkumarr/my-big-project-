@@ -21,6 +21,7 @@ export const alertPayload: AlertConfig = {
   thresholdValue: 0,
   entityName: '',
   lookbackColumn: '',
+  lookbackPeriod: '',
   notification: [],
   sipQuery: { artifacts: [], filters: [] }
 };
@@ -44,9 +45,9 @@ describe('ConfigureAlertService', () => {
     ).toBeTruthy();
   });
 
-  it('getMetricsInDatapod should return an Observable', () => {
+  it('getDatapod should return an Observable', () => {
     expect(
-      configureAlertService.getMetricsInDatapod$('1') instanceof Observable
+      configureAlertService.getDatapod$('1') instanceof Observable
     ).toBeTruthy();
   });
 
