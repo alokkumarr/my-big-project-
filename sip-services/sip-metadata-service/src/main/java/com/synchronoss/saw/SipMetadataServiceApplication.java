@@ -82,11 +82,11 @@ public class SipMetadataServiceApplication {
     LOG.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
 
-    try {
+    /* try {
       migrateSemantic.init();
     } catch (Exception ex) {
       LOG.error("Semantic migration failed", ex);
-    }
+    }*/
 
     try {
       migrateAnalysis.start();
