@@ -98,6 +98,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         super(ngctx);
     }
     
+    public NGParser(NGContext ngctx, ComponentServices[] pcs, Dataset dataset) {
+		super( ngctx, pcs, dataset);
+	}
+    
     public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealtime) {
     	
         super(ngctx);
@@ -107,7 +111,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     public NGParser() {  super(); }
 
     
-    @SuppressWarnings("unchecked")
+   
+
+	@SuppressWarnings("unchecked")
 	@Override
     protected int execute(){
         int retval = 0;
