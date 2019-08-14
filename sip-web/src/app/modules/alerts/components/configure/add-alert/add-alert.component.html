@@ -66,6 +66,7 @@
               <mat-select
                 formControlName="notification"
                 required
+                multiple
                 e2e="notification"
               >
                 <mat-option
@@ -186,7 +187,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a monitoring entity"
-                (onSelectionChanged)="onSelectedMonitoringEntity($event?.selectedItem)"
+                (onSelectionChanged)="
+                  onSelectedMonitoringEntity($event?.selectedItem)
+                "
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
@@ -223,7 +226,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select an Entity"
-                (onSelectionChanged)="onSelectedEntityName($event?.selectedItem)"
+                (onSelectionChanged)="
+                  onSelectedEntityName($event?.selectedItem)
+                "
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
