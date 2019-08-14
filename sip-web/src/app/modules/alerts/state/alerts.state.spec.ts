@@ -78,7 +78,7 @@ class AlertsServiceStub {
     return of(alertCountArray);
   }
 
-  getAlertCountById() {
+  getAlertCountById(id, alertFilter) {
     return of(alertCountArray);
   }
 
@@ -93,7 +93,7 @@ describe('Alerts actions', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([AlertsState])],
-      providers: [{ provide: AlertsService, useValue: new AlertsServiceStub() }]
+      providers: [{ provide: AlertsService, useClass: AlertsServiceStub }]
     }).compileComponents();
     store = TestBed.get(Store);
   }));

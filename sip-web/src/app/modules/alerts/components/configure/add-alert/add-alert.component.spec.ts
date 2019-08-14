@@ -45,15 +45,9 @@ const payload: AlertConfig = {
   datapodName: 'abc',
   categoryId: '',
   notification: [],
-  entityName: '',
   lookbackColumn: '',
   lookbackPeriod: '',
-  monitoringEntity: 'abc123',
-  aggregation: 'AVG',
-  operator: 'GT',
-  thresholdValue: 2,
-  product: 'SAWD000001',
-  sipQuery: { artifacts: [], filters: [] }
+  product: 'SAWD000001'
 };
 
 const alertDefinitionStub: AlertDefinition = {
@@ -115,6 +109,21 @@ describe('AddAlertComponent', () => {
   });
 
   it('should create alert payload', () => {
+    component.selectedEntityName = {
+      alias: 'aslias',
+      columnName: 'colName',
+      displayName: 'displayName',
+      type: 'string'
+    };
+    component.selectedMonitoringEntity = {
+      alias: 'aslias2',
+      columnName: 'colName2',
+      displayName: 'displayName2',
+      type: 'integer'
+    };
+    component.selectedDatapod = {
+      artifacts: [{ artifactName: 'sample', fields: [] }]
+    };
     component.constructPayload();
     expect(component.endPayload).toEqual(payload);
   });

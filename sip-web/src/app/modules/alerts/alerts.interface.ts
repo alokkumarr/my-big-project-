@@ -35,7 +35,7 @@ export interface AlertConfig {
   createdTime?: any;
   modifiedTime?: any;
   modifiedBy?: any;
-  sipQuery: AlertSipQuery;
+  sipQuery?: AlertSipQuery;
 }
 
 export interface AlertDefinition {

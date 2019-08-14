@@ -8,18 +8,13 @@ import { Observable } from 'rxjs';
 
 export const alertPayload: AlertConfig = {
   activeInd: true,
-  aggregation: 'AVG',
   alertSeverity: 'CRITICAL',
   categoryId: 'string',
   datapodId: 'string',
   datapodName: 'string',
-  monitoringEntity: 'string',
-  operator: 'GT',
   product: 'string',
   alertRuleDescription: 'string',
   alertRuleName: 'string',
-  thresholdValue: 0,
-  entityName: '',
   lookbackColumn: '',
   lookbackPeriod: '',
   notification: [],
