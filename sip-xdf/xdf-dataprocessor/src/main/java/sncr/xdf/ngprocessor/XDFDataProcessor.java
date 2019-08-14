@@ -193,13 +193,14 @@ public class XDFDataProcessor  extends AbstractComponent {
                 System.exit(-1);
 
             ret = component.run();
-
+            
+            
             if (ret != 0){
                 error = "Could not complete Parser component " + "entry";
                 throw new Exception(error);
             }
 
-            datafileDFmap =  new HashMap<>();
+            //datafileDFmap =  new HashMap<>();
             datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
             dataSetName = parserKey;
 
@@ -283,7 +284,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             }
 
 
-            datafileDFmap =  new HashMap<>();
+            //datafileDFmap =  new HashMap<>();
             datafileDFmap.put(transOutKey,ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
             dataSetName = transOutKey;
 
@@ -375,7 +376,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             }
 
 
-            datafileDFmap =  new HashMap<>();
+            //datafileDFmap =  new HashMap<>();
             datafileDFmap.put(sqlOutKey,ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
             dataSetName = sqlOutKey;
 
