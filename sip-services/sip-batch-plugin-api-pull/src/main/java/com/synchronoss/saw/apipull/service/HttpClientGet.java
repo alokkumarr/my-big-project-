@@ -1,16 +1,17 @@
 package com.synchronoss.saw.apipull.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 @ContextConfiguration(classes = {RestTemplateConfig.class, HttpClientConfig.class})
 public class HttpClientGet extends SncrBaseHttpClient {
-  // Create object for HttpGet
-  HttpGet request;
-    RestTemplate restTemplate = new RestTemplate();
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientGet.class);
+  RestTemplate restTemplate = new RestTemplate();
 
   /**
    * This Constructor accepts host name(a mandotory parameter for all methods)
@@ -22,19 +23,22 @@ public class HttpClientGet extends SncrBaseHttpClient {
   }
 
   @Override
-  public JsonNode execute() {
-      JsonNode jsonNode = null;
+  public ApiResponse execute() {
+    ApiResponse apiResponse = new ApiResponse();
     url = this.generateUrl(apiEndPoint, queryParams);
-    request = new HttpGet(url);
 
-    // Create a reference for CloseableHttpResponse
-    CloseableHttpResponse response = null;
     try {
-        jsonNode = restTemplate.getForObject(url, JsonNode.class);
+      apiResponse.setResponseBody(restTemplate.getForObject(url, JsonNode.class));
+      HttpHeaders httpHeaders = restTemplate.headForHeaders(url);
+      apiResponse.setHttpHeaders(httpHeaders);
+      if (httpHeaders.getContentType() != null) {
+        apiResponse.setContentType(httpHeaders.getContentType().toString());
+      }
 
     } catch (Exception e) {
-      e.printStackTrace();
+        logger.error("Unable to fetch data for url : {}",url);
+        logger.error("Stacktrace : {}",e.getMessage());
     }
-    return jsonNode;
+    return apiResponse;
   }
 }

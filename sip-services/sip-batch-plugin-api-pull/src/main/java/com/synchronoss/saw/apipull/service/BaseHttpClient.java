@@ -1,7 +1,7 @@
 package com.synchronoss.saw.apipull.service;
 
-    import com.fasterxml.jackson.databind.JsonNode;
+    import com.synchronoss.saw.apipull.pojo.ApiResponse;
 
 public interface BaseHttpClient {
-    public JsonNode execute() throws Exception;
+    public ApiResponse execute() throws Exception;
 }
