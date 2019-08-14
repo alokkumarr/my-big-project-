@@ -119,12 +119,15 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                     if (transformations == null) {
                         transformations = GenericJsonModel.createTransformationsList(definitions);
                     }
+                    logger.info("####transofrmations ::" + transformations);
                     if(types == null){
                         types = GenericJsonModel.getObjectTypeList(definitions);
                     }
+                    logger.info("####types ::" + types);
                     if(schema == null){
                         schema = GenericJsonModel.createGlobalSchema(definitions);
                     }
+                    logger.info("####schema ::" + schema);
                     ProcessGenericRecords(in, tm ,itcx);
                     break;
                 }
@@ -219,10 +222,21 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx){
     	logger.debug("######## Inside process json records #####" );
+    	for(String line:jsonRdd.collect()){
+            logger.debug(line);
+        }
        // SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
     	SparkSession sess = ctx.sparkSession;
         JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
+        
+        
+        
+        if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
+      	  logger.debug("######## Triggering pipeline as part of RTPS listener ##########");
+      	  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
+           processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams );
+      }
 
         // Elastic Search
         if (esIndex != null && !esIndex.isEmpty()) {
@@ -262,15 +276,11 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
         /* Alert metrics collection */
         if (logger.isTraceEnabled()) {
-          logger.trace("Alert metrics to be be collected: " + df.count());
+          logger.debug("Alert metrics to be be collected: " + df.count());
         }
         logger.debug("######## Data frame crated with XDF-RTPS ##########");
         
-        if(this.ngctx != null && this.ngctx.runningPipeLine) {
-        	  logger.debug("######## Triggering pipeline as part of RTPS listener ##########");
-        	 RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
-             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams );
-        }
+        
         
        
         

@@ -131,7 +131,6 @@ public class RTPSPipelineProcessor {
 
 			logger.warn(ngParserCtxSvc.getNgctx().toString());
 
-			logger.debug("Parser Input dataset size is : " + datafileDFmap.size());
 
 			ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			String parserKey = null;
@@ -145,10 +144,15 @@ public class RTPSPipelineProcessor {
 			NGParser component = null;
 
 			Dataset dataset = datafileDFmap.get("DATA_STREAM");
-			component = new NGParser(ngParserCtxSvc.getNgctx(), dataset, true);
+			logger.debug("######Retrived dataset and passing to parser #####");
+			dataset.show();
+			component = new NGParser(ngParserCtxSvc.getNgctx(), pcs, dataset);
 
-			if (!component.initComponent(null))
-				System.exit(-1);
+			if (!component.initComponent(null)) {
+				logger.error("Unable to initialize Parser component");
+				return 1;
+			}
+			
 
 			ret = component.run();
 
