@@ -494,11 +494,13 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
     train_data <- obj$pipelines[[obj$models[[uid]]$pipe]]$output
     
     # Check for holdout
+	chk_list <- obj$samples$test_index
+	
     if (!is.null(obj$samples$test_holdout_prct)) {
       train_data <- train_data %>%
         dplyr::mutate(rn = 1) %>% 
         dplyr::mutate(rn = row_number(rn)) %>% 
-        dplyr::filter(! rn %in% obj$samples$test_index) %>%
+        dplyr::filter(! rn %in% chk_list) %>%
         dplyr::select(-rn)
     }
     

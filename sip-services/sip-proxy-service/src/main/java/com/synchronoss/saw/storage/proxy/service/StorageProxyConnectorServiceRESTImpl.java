@@ -131,7 +131,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   }
 
     @Override
-    public JsonNode ExecuteESQuery(String query, Store store) throws Exception {
+    public JsonNode executeESQuery(String query, Store store) throws Exception {
         Preconditions.checkArgument(query != null && !"".equals(query), "query cannnot be null.");
         logger.debug("Query:", query);
         Response response = null;

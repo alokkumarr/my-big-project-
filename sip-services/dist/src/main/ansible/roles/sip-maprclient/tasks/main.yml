@@ -11,6 +11,9 @@
     state: present
 - name: Install MapR client
   yum: name=mapr-client
+# Mapr-spark is prerequisite for multiple sip-services, install with mapr-client setup.
+- name: Install Mapr spark client
+  yum: name=mapr-spark
 # Workaround: The MapR logging configuration refers to a file that is
 # not writable by the "mapr" user, so change the path to a writable
 # location.

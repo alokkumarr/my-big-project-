@@ -41,27 +41,6 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
  * execution results.
  */
 public class AnalyzeIT extends BaseIT {
-  @Test(timeout = 300000)
-  public void testExecuteAnalysis() throws JsonProcessingException {
-    String metricId = listMetrics(token, "sample-elasticsearch");
-    ObjectNode analysis = createAnalysis(token, metricId, "pivot");
-    String analysisId = analysis.get("id").asText();
-    String analysisName = "Test (" + System.currentTimeMillis() + ")";
-    savePivotAnalysis(token, analysisId, analysisName, analysis);
-    /**
-     * below comment is temporary change made as part of sip-7149(filter chart and pivot analysis
-     * from /analysis Api).This test creates analysis for pivots ,so if we call listAnalysis it does
-     * not return data since we filtered pivot and charts from /analysis API.
-     */
-    // listAnalyses(token, analysisName);
-    executeAnalysis(token, analysisId);
-    String executionId = listSingleExecution(token, analysisId);
-    List<Map<String, String>> data = getExecution(token, analysisId, executionId);
-    /* Note: For now the execution results are empty, so expect
-     * zero rows.  Update to expected count when implementation
-     * changes.  */
-    assertThat(data.size(), equalTo(0));
-  }
 
   @Test
   public void testSSOAuthentication() {

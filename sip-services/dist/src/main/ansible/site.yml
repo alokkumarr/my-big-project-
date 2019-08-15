@@ -5,13 +5,12 @@
     # This role to be executed when sip environment
     # tend to have secured communication across.
     - { role: sip-secure, when: sip_secure }
-    - sip-transport
+    - sip-executor
     - sip-workbench
     - sip-export
     - sip-metadata
     - sip-scheduler
     - sip-storage-proxy
-    - sip-executor
     - sip-batch-ingestion
     # Keep Gateway Service last to avoid starting socket-activated
     # services from the health check until all Ansible handlers have
