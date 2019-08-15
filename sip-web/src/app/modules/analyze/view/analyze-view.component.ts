@@ -45,6 +45,7 @@ export class AnalyzeViewComponent implements OnInit {
   public LIST_VIEW = 'list';
   public CARD_VIEW = 'card';
   public analysisId: string;
+  public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
   public privileges = {
     create: false
@@ -102,6 +103,9 @@ export class AnalyzeViewComponent implements OnInit {
 
   onParamsChange(params) {
     this.analysisId = params.id;
+    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
+      subCategoryId: this.analysisId
+    });
 
     this.categoryName = this._analyzeService
       .getCategory(this.analysisId)
@@ -174,15 +178,15 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    setTimeout(() => {
+    const categroyID = isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId;
+    this.getCronJobs(categroyID).then(() => {
       // Wait till cron job and schedule is created or updated or deleted successfully.
-      this.getCronJobs(analysis.category);
       /* Update the new analysis in the current list */
       this._router.navigate([
         'analyze',
-        isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId
+        categroyID
       ]);
-    }, 100);
+    });
   }
 
   spliceAnalyses(analysis, replace) {
@@ -269,7 +273,7 @@ export class AnalyzeViewComponent implements OnInit {
       categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
-    this._analyzeService
+    return this._analyzeService
       .getAllCronJobs(requestModel)
       .then((response: any) => {
         if (response.statusCode === 200) {

@@ -6,6 +6,8 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.bda.conf.Input;
+import sncr.bda.conf.Output;
 import sncr.bda.conf.Parameter;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.context.Context;
@@ -164,7 +166,8 @@ public class NGSQLScriptDescriptor {
             for(Statement stmt : stmts.getStatements()) {
                 i++;
                 List<TableDescriptor> tables = p.getTableList(stmt, i);
-                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: " + ((tables != null)?tables.size():"no tables"));
+                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
+                    + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
                 for(TableDescriptor td : tables){
                     logger.trace("Try table: " + td.toString());
@@ -193,23 +196,34 @@ public class NGSQLScriptDescriptor {
 
                     case CREATE:
 
-                    if (targetTable == null) {
-                        throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, " Target table was not found in table register.");
-                    }
-                    else {
-                        sqlDesc.statementType = StatementType.CREATE;
-                        sqlDesc.isTemporaryTable = targetTable.isTempTable;
-                        if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
-                        String s = stmt.toString().toLowerCase();
-                        int pos = -1;
-                        pos = s.indexOf("with");
-                        if(pos < 0)
-                            pos = s.indexOf("select");
-                        if (pos < 0)
-                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
-                        sqlDesc.SQL = stmt.toString().substring(pos);
-                        sqlDesc.tableDescriptor = targetTable;
-                    }
+                        if (targetTable == null) {
+                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, " Target table was not found in table register.");
+                        }
+                        else {
+                            sqlDesc.statementType = StatementType.CREATE;
+                            sqlDesc.isTemporaryTable = targetTable.isTempTable;
+                            if (!sqlDesc.isTemporaryTable) sqlDesc.targetObjectName = targetTable.tableName;
+                            String s = stmt.toString().toLowerCase();
+                            int pos = -1;
+
+
+                            /**
+                             * Fix for SIP-7744.  To avoid
+                             * splitting queries which has key word 'WITH'
+                             * any where in middle. Using trim to be
+                             * safe with leading empty spaces
+                             */
+                            if(s.trim().startsWith("with")) {
+                                pos = s.indexOf("with");
+                            }
+                            // pos = s.indexOf("with");
+                            if(pos < 0)
+                                pos = s.indexOf("select");
+                            if (pos < 0)
+                                throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                            sqlDesc.SQL = stmt.toString().substring(pos);
+                            sqlDesc.tableDescriptor = targetTable;
+                        }
                     break;
 
                     case DROP_TABLE:
@@ -284,16 +298,18 @@ public class NGSQLScriptDescriptor {
             TableDescriptor td = scriptWideTableMap.get(tn);
             if (td.isTargetTable ^ td.isInDropStatement) continue;
 
-            //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
-            logger.trace("Resolving in table: " + tn);
-            if (inputDataObjects.containsKey(tn)) {
-                Map<String, Object> doProps = inputDataObjects.get(tn);
-                td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
-                td.format = (String) doProps.get( DataSetProperties.Format.name() );
-                td.mode = (String) doProps.get(DataSetProperties.Mode.name());
-                logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
-            } else {
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
+            if (!tn.equalsIgnoreCase(ctx.dataSetName)) {
+                //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
+                logger.trace("Resolving in table: " + tn);
+                if (inputDataObjects.containsKey(tn)) {
+                    Map<String, Object> doProps = inputDataObjects.get(tn);
+                    td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
+                    td.format = (String) doProps.get( DataSetProperties.Format.name() );
+                    td.mode = (String) doProps.get(DataSetProperties.Mode.name());
+                    logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
+                } else {
+                    throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
+                }
             }
         }
     }
@@ -308,6 +324,15 @@ public class NGSQLScriptDescriptor {
         for (String tn : scriptWideTableMap.keySet()) {
             TableDescriptor td = scriptWideTableMap.get(tn);
             if (td.isTargetTable == td.isInDropStatement) continue;
+            if (td.isTargetTable && td.isTempTable) {
+                td.format = Input.Format.PARQUET.toString();
+                td.mode = Output.Mode.REPLACE.toString();
+                td.numberOfFiles = 1;
+
+                continue;
+            }
+
+            logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
 
             logger.trace("Resolving out table: " + tn);
 
@@ -321,9 +346,8 @@ public class NGSQLScriptDescriptor {
                 td.mode = (String) oDO.get(DataSetProperties.Mode.name());
                 td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
                 td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
-
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
-                        tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
+                    tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
             } else {
                 throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters target data object: " + tn);
             }

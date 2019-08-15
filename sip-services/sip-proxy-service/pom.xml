@@ -27,6 +27,8 @@
     <mapr.db.version>6.1.0-mapr</mapr.db.version>
 		<es.version>6.3.0</es.version>
 		<surefire-api>2.19.1</surefire-api>
+    <kafka.driver.version>1.1.1-mapr-1808</kafka.driver.version>
+    <mapr.streams.version>6.1.0-mapr</mapr.streams.version>
 		<surefire.rerunFailingTestsCount>5</surefire.rerunFailingTestsCount>
 	</properties>
 
@@ -269,6 +271,23 @@
       <version>${revision}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>com.mapr.streams</groupId>
+      <artifactId>mapr-streams</artifactId>
+      <version>${mapr.streams.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${kafka.driver.version}</version>
+    </dependency>
+
   </dependencies>
 	<build>
 		<pluginManagement>
@@ -387,4 +406,20 @@
 			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>

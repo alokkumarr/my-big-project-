@@ -76,6 +76,7 @@ import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
 import { DateFormatDialogComponent } from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
+import { PasswordToggleComponent } from './components/password-toggle';
 import { ClickToCopyDirective, E2eDirective } from './directives';
 import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-schedular';
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
@@ -158,6 +159,7 @@ const COMPONENTS = [
   DateFormatDialogComponent,
   AliasRenameDialogComponent,
   AggregateChooserComponent,
+  PasswordToggleComponent,
   ChoiceGroupComponent,
   SearchBoxComponent,
   FieldDetailsComponent,

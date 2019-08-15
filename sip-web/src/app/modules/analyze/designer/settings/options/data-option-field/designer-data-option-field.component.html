@@ -17,6 +17,7 @@
           type="text"
           maxlength="20"
           autocomplete="off"
+          [attr.e2e]="'alias-input-' + artifactColumn.displayName"
           (input)="onAliasChange($event.target.value)"
           [value]="artifactColumn.alias || artifactColumn.aliasName || ''"
         />
@@ -37,7 +38,7 @@
         [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
         [enablePercentByRow]="
-          asChartColumn(artifactColumn).displayType === 'column'
+          checkChartType()
         "
         fxFlex="75"
       >

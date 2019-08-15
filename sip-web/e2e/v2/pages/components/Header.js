@@ -67,9 +67,8 @@ class Header extends SideNav {
     if (!this._accountSettingIcon.isPresent()) {
       commonFunctions.goToHome();
     }
-    this._accountSettingIcon.click();
-    commonFunctions.waitFor.elementToBeVisible(this._accountLogoutLink);
-    this._accountLogoutLink.click();
+    commonFunctions.clickOnElement(this._accountSettingIcon);
+    commonFunctions.clickOnElement(this._accountLogoutLink);
     commonFunctions.waitFor.pageToBeReady(/login/);
     commonFunctions.clearLocalStorage();
   }

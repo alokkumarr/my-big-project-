@@ -5,7 +5,6 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -53,7 +52,7 @@ public class AmazonS3Handler {
 
     s3Client =
         AmazonS3ClientBuilder.standard()
-            .withRegion(Regions.US_EAST_1)
+            .withRegion(region)
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
             .build();
   }
@@ -72,7 +71,8 @@ public class AmazonS3Handler {
     String finalFileName = fileName + "_" + timeStampStr + "." + extension;
 
     String s3Key = outputLocation + "/" + finalFileName;
-    logger.debug("S3 key = " + s3Key);
+
+    logger.debug("Upload location = " + s3Key);
 
     PutObjectRequest request = new PutObjectRequest(bucket, s3Key, file);
     putObject(s3Client, request);
@@ -86,7 +86,6 @@ public class AmazonS3Handler {
 
   public void putObject(AmazonS3 s3, PutObjectRequest request) {
     try {
-      logger.debug("s3 key in put object " + request.getKey());
       logger.debug("S3 Bucket " + request.getBucketName());
       logger.debug("File = " + request.getFile().getName());
       s3.putObject(request);
@@ -94,15 +93,15 @@ public class AmazonS3Handler {
     } catch (AmazonServiceException e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.
-      logger.error("AmazonServiceException : The call was transmitted successfully, but Amazon S3 couldn't process");
-      logger.error(e.getMessage());
+      logger.error("AmazonServiceException : The call was transmitted successfully,"
+          + " but Amazon S3 couldn't process", e);
     } catch (SdkClientException e) {
       // Amazon S3 couldn't be contacted for a response, or the client
       // couldn't parse the response from Amazon S3.
-      logger.error("SdkClientException : Amazon S3 couldn't be contacted for a response, or the client");
-      logger.error(e.getMessage());
+      logger.error("SdkClientException : Amazon S3 couldn't be contacted for a response,"
+          + " or the client", e);
     } catch (Exception e) {
-        logger.error("Error dispatching to S3 : ",e.getMessage());
+        logger.error("Error dispatching to S3 : ",e);
     }
   }
 }

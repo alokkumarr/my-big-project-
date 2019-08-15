@@ -135,20 +135,6 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older SIP versions.
 
-==== Upgrading to SIP 3.1
-
-The SIP environment configuration file must contain the roles
-`sip-rtis` and `sip-rtps`, as shown below:
-
-        [sip-rtis]
-        [sip-rtps]
-
-The environment configurations of previous SIP versions might not
-contain these roles, so they have to be added to the configuration
-file before deploying a newer SIP version.  The roles can however be
-left empty (no hosts listed under them), if RTIS and RTPS are not to
-be installed.
-
 ==== Upgrading to SIP 2.5
 
 Before upgrading, install and configure Apache Livy from the MapR
@@ -215,6 +201,49 @@ this the SIP data can be saved using a MapR volume snapshot, for
 backup and restore purposes.  If no dedicated volume has been
 configured for SIP data, it can still be saved as part of a root
 volume snapshot which does not require any additional setup steps.
+
+==== Upgrading to SIP 3.1
+
+The SIP environment configuration file must contain the roles
+`sip-rtis` and `sip-rtps`, as shown below:
+
+        [sip-rtis]
+        [sip-rtps]
+
+The environment configurations of previous SIP versions might not
+contain these roles, so they have to be added to the configuration
+file before deploying a newer SIP version.  The roles can however be
+left empty (no hosts listed under them), if RTIS and RTPS are not to
+be installed.
+
+==== Upgrading to SIP 3.3.0
+SIP 3.3.0 needs mapr 6.1.0 and spark 2.3.2. Please look into the
+<<Prerequisites, prerequisites>> section for more information.
+
+There are possibilities where semantic definitions are created manually by
+users and missed during semantic migration, this breaks the relationship
+of semantic ID's for existing reports, as the reports would store the info semantic id
+as part of its definition. To overcome this, run the following shell
+script, which updates the semantic id info of each reports with matching
+semantic node present in semanticDataStore.
+
+Run the below command manually in sip-node as mapr user
+
+ /opt/bda/sip-metadata-service semanticIdMigration <metadata base path>
+
+For Example:
+
+       bash semanticIdMigration maprfs:///var/sip
+
+NOTE: This script has not enabled for auto run with SIP installation
+due special scenario where existing semantic node was deleted and recreated
+manually instead of using previous SIP version auto migration.
+
+****
+Some content here
+****
+
+
 
 ==== Interfaces
 
@@ -408,6 +437,21 @@ Enabling the secure mode will make the SIP internal MariaDB Galera
 cluster encrypt data stored in the database.  Database encryption is
 set up automatically on the first installation and happens thereafter
 transparently.
+
+=== Mapr secured custer authentication ticket
+
+MapR uses authentication with tickets to access the mapr cluster, file system
+in secure mode. sip-deployment configured for setting the mapr ticket in
+sip-nodes gracefully if exists, in case mapr ticket require to setup
+with respect to any changes in mapr cluster below steps can be followed for `mapr`
+user.
+
+     # copy the ticket for mapr user
+      cp /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000
+     # provide permission to mapr user
+      chown mapr:mapr /opt/mapr/conf/maprticket_5000
+     # set the mapr ticket location in enviroment variable for mapr user .
+      export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000
 
 === Elasticsearch SSL configuration
 

@@ -6,8 +6,10 @@ import {
   OnDestroy,
   ElementRef
 } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
+import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
@@ -18,7 +20,7 @@ import {
   combineLatest,
   timer
 } from 'rxjs';
-import { debounce } from 'rxjs/operators';
+import { debounce, first } from 'rxjs/operators';
 import * as clone from 'lodash/clone';
 import * as Bowser from 'bowser';
 import * as forEach from 'lodash/forEach';
@@ -96,7 +98,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
     public _analyzeExportService: AnalyzeExportService,
-    public _toastMessage: ToastService
+    public _toastMessage: ToastService,
+    private store: Store
   ) {
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
@@ -165,7 +168,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     );
-
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent
@@ -214,9 +216,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         const lastExecutionId = get(analyses, '[0].id', null);
         if (!this.executionId && lastExecutionId) {
           this.executionId = lastExecutionId;
-          if (!this.executedAt) {
-            this.setExecutedAt(this.executionId);
-          }
+          this.setExecutedAt(this.executionId);
         }
       });
     }
@@ -297,7 +297,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.detailsSidenav && this.detailsSidenav.close();
-    window['siden'] = this.detailsSidenav;
     this.onetimeExecution = false;
     this._router.navigate(
       ['analyze', 'analysis', this.analysis.id, 'executed'],
@@ -313,19 +312,24 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   executeAnalysis(analysis, mode) {
-    this._analyzeActionsService
-      .execute(analysis, mode)
-      .then(executionStarted => {
-        // this.afterExecuteLaunched(analysis);
-        if (!executionStarted && !this.analyses) {
-          // at least load the executed analyses if none are loaded
-          this.loadExecutedAnalysesAndExecutionData(
-            analysis.id,
-            null,
-            analysis.type,
-            null
-          );
-        }
+    this.store
+      .select(state => state.common.metrics)
+      .pipe(first(metrics => values(metrics).length > 0))
+      .subscribe(() => {
+        this._analyzeActionsService
+          .execute(analysis, mode)
+          .then(executionStarted => {
+            // this.afterExecuteLaunched(analysis);
+            if (!executionStarted && !this.analyses) {
+              // at least load the executed analyses if none are loaded
+              this.loadExecutedAnalysesAndExecutionData(
+                analysis.id,
+                null,
+                analysis.type,
+                null
+              );
+            }
+          });
       });
   }
 
@@ -364,28 +368,37 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   setExecutedAt(executionId) {
-    const finished = (
-      find(this.analyses, execution => execution.id === executionId) || {
-        finished: null
-      }
-    ).finished;
-    /* If a valid finish time is found, use that. If not, and if we don't have an
-      execution id, we're showing last execution. Use the time from last execution list
+    /* If no execution id present, there can be two possible reasons:
+       1. We executed right now using either auto-refresh or manually
+       2. We are loading last execution data
     */
-    this.executedAt = finished
-      ? this.utcToLocal(finished)
-      : executionId
-      ? this.executedAt
-      : this.utcToLocal(get(this.analyses, '0.finished', this.executedAt));
-    if (isUndefined(this.executedAt)) {
-      this.executedAt = moment(
-        this.secondsToMillis(
-          (<Analysis>this.analysis).updatedTimestamp ||
-            this.analysis.modifiedTime
-        )
-      )
-        .local()
-        .format('YYYY/MM/DD h:mm A');
+    if (!executionId) {
+      if (this.onetimeExecution) {
+        this.executedAt = this.utcToLocal(Date.now());
+      } else if (this.analyses && this.analyses.length) {
+        const execution: any = this.analyses[0];
+        this.executedAt = this.utcToLocal(
+          this.secondsToMillis(execution.finished || execution.finishedTime)
+        );
+      }
+    } else {
+      /* If execution id is present, try to find an already existing execution
+         to load execution time. If not found, it's a weird case, so show
+         current time. Can't do much here.
+      */
+      const finishedExecution = find(
+        this.analyses,
+        execution => (execution.id || execution.executionId) === executionId
+      ) || {
+        finished: null
+      };
+      const finished =
+        finishedExecution.finished || finishedExecution.finishedTime;
+      if (finished) {
+        this.executedAt = this.utcToLocal(finished);
+      } else {
+        this.executedAt = this.utcToLocal(Date.now());
+      }
     }
   }
 
@@ -465,24 +478,31 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        this.executedAnalysis.artifacts = this.metric.artifacts;
         executeResponse.data = clone(
-          flattenReportData(executeResponse.data, this.executedAnalysis)
+          flattenReportData(
+            executeResponse.data,
+            this.executedAnalysis || this.analysis
+          )
         );
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          ...(isDSLAnalysis(this.executedAnalysis)
+          ...(isDSLAnalysis(this.executedAnalysis || this.analysis) && this.executedAnalysis.type === 'map'
             ? {
                 sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                   get(this.metric, 'artifacts.0.columns', []),
-                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                  executeResponse.queryBuilder ||
+                    (<AnalysisDSL>(this.executedAnalysis || this.analysis))
+                      .sipQuery
                 )
               }
             : {
-                sqlBuilder:
+                sipQuery:
                   executeResponse.queryBuilder ||
-                  this.executedAnalysis.sqlBuilder
+                  (<Analysis>(this.executedAnalysis || this.analysis))
+                    .sqlBuilder
               })
         };
         this.fetchFilters(this.executedAnalysis);
@@ -594,24 +614,25 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          if (isDSLAnalysis(this.executedAnalysis)) {
+          if (this.executedAnalysis.type !== 'report') {
             this.executedAnalysis = {
-              ...this.executedAnalysis,
+              ...queryBuilder,
               sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                 get(this.metric, 'artifacts.0.columns', []),
-                queryBuilder
+                queryBuilder.sipQuery
               )
             };
           } else {
             this.executedAnalysis = {
-              ...this.executedAnalysis,
-              sqlBuilder: queryBuilder
+              ...queryBuilder,
+              sipQuery: queryBuilder.sipQuery
             };
           }
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
-          data = clone(flattenReportData(data, this.analysis));
+          const requestAnalysis = {...this.analysis, artifacts: get(this.analysis, 'sipQuery.artifacts')};
+          data = clone(flattenReportData(data, requestAnalysis));
         }
 
         this.setExecutedBy(executedBy);

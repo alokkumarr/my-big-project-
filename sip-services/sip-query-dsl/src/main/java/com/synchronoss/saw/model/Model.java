@@ -8,18 +8,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "booleanCriteria",
-    "operator",
-    "preset",
-    "value",
-    "otherValue",
-    "gte",
-    "lte",
-    "format",
-    "modelValues"
+  "booleanCriteria",
+  "operator",
+  "preset",
+  "value",
+  "otherValue",
+  "gte",
+  "lte",
+  "format",
+  "modelValues"
 })
 public class Model {
 
@@ -170,8 +171,7 @@ public class Model {
     AND("AND"),
     OR("OR");
     private final String value;
-    private static final Map<String, Model.BooleanCriteria> CONSTANTS =
-        new HashMap<>();
+    private static final Map<String, Model.BooleanCriteria> CONSTANTS = new HashMap<>();
 
     static {
       for (Model.BooleanCriteria c : values()) {
@@ -224,8 +224,7 @@ public class Model {
     ISIN("ISIN"),
     ISNOTIN("ISNOTIN");
     private final String value;
-    private static final Map<String, Model.Operator> CONSTANTS =
-        new HashMap<>();
+    private static final Map<String, Model.Operator> CONSTANTS = new HashMap<>();
 
     static {
       for (Model.Operator c : values()) {
@@ -317,5 +316,21 @@ public class Model {
         return constant;
       }
     }
+  }
+
+  /**
+   * This method will check if model filter values are empty.
+   *
+   * @return Boolean value
+   */
+  public Boolean isEmpty() {
+    return this.preset == null
+        && StringUtils.isEmpty(this.getLte())
+        && StringUtils.isEmpty(this.getGte())
+        && StringUtils.isEmpty(this.getGt())
+        && StringUtils.isEmpty(this.getLt())
+        && this.getValue() == null
+        && this.getOtherValue() == null
+        && (this.getModelValues() == null || this.getModelValues().size() == 0);
   }
 }

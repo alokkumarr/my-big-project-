@@ -1,0 +1,48 @@
+
+
+left to right direction
+[Data source]
+
+package SIP {
+ node "XDF-NG" {
+
+		[Parser]
+        [SQL]
+        [Transformer]
+        [ESLoader]
+       
+    }
+    
+    file Parser_output
+    file SQL_output
+    file Transformer_output
+    
+    [Parser] ..> [Parser_output] : Ouputs file
+    [Parser_output] ..> [SQL]: Reads file
+    [SQL] ..> [SQL_output]: Ouputs file
+    [SQL_output] ..> [Transformer]: Reads file
+    [Transformer] ..> [Transformer_output]: Ouputs file
+    [Transformer_output] ..> [ESLoader]: Reads file
+    
+   
+      
+    
+    node "XDF-NG" {
+
+        [Parser]
+        [SQL]
+        [Transformer]
+        [ESLoader]
+       
+    }
+    [Data source] ..> [Parser]: Batch data
+    [Parser] ..> [SQL] : In memory
+   
+    [SQL] ..> [Transformer]: In memory
+    [Transformer] ..> [ESLoader]: In memory
+    
+
+
+   
+}
+

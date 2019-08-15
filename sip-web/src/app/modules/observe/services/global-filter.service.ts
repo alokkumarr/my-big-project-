@@ -2,10 +2,42 @@ import { Injectable } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isEqual from 'lodash/isEqual';
+import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
+import * as has from 'lodash/has';
 
 import { Subject, BehaviorSubject } from 'rxjs';
+
+import {
+  CUSTOM_DATE_PRESET_VALUE,
+  NUMBER_TYPES,
+  DATE_TYPES
+} from '../../analyze/consts';
+
+interface KPIFilter {
+  preset: string;
+  gte?: string;
+  lte?: string;
+}
+
+export const isValidDateFilter: (Filter) => boolean = filt => {
+  return (
+    filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
+    (filt.model.lte && filt.model.gte)
+  );
+};
+
+export const isValidNumberFilter: (Filter) => boolean = filt =>
+  has(filt, 'model.value') &&
+  has(filt, 'model.otherValue') &&
+  has(filt, 'model.operator');
+
+export const isValidStringFilter: (Filter) => boolean = filt =>
+  has(filt, 'model.modelValues') && filt.model.modelValues.length > 0;
 
 @Injectable()
 export class GlobalFilterService {
@@ -16,6 +48,8 @@ export class GlobalFilterService {
   public onApplyKPIFilter = new BehaviorSubject(null);
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
+  private _lastKPIFilter: KPIFilter = null;
+  private _lastAnalysisFilters = {};
 
   constructor() {}
 
@@ -31,6 +65,55 @@ export class GlobalFilterService {
 
   get globalFilters() {
     return groupBy(this.updatedFilters, 'semanticId');
+  }
+
+  hasKPIFilterChanged(kpiFilter: KPIFilter) {
+    const lastPreset = get(this._lastKPIFilter, 'preset');
+    const currentPreset = get(kpiFilter, 'preset');
+    if (isEmpty(lastPreset) && isEmpty(currentPreset)) {
+      return false;
+    }
+
+    if (lastPreset !== currentPreset) {
+      return true;
+    }
+
+    if (lastPreset === CUSTOM_DATE_PRESET_VALUE) {
+      return (
+        this._lastKPIFilter.gte !== kpiFilter.gte ||
+        this._lastKPIFilter.lte !== kpiFilter.lte
+      );
+    } else {
+      return false;
+    }
+  }
+
+  resetLastKPIFilterApplied() {
+    this._lastKPIFilter = null;
+  }
+
+  get lastKPIFilter() {
+    return this._lastKPIFilter;
+  }
+
+  set lastKPIFilter(filt: KPIFilter) {
+    this._lastKPIFilter = cloneDeep(filt);
+  }
+
+  haveAnalysisFiltersChanged(filts) {
+    return !isEqual(this._lastAnalysisFilters, filts);
+  }
+
+  resetLastAnalysisFiltersApplied() {
+    this._lastAnalysisFilters = {};
+  }
+
+  get lastAnalysisFilters() {
+    return this._lastAnalysisFilters;
+  }
+
+  set lastAnalysisFilters(filts) {
+    this._lastAnalysisFilters = cloneDeep(filts);
   }
 
   /**
@@ -80,12 +163,26 @@ export class GlobalFilterService {
 
       if (!(exists >= 0)) {
         this.rawFilters.push(f);
+        if (this.isValid(f)) {
+          this.updatedFilters.push(f);
+        }
         validFilter.push(f);
       }
     });
     if (validFilter.length) {
       this.onFilterChange.next(validFilter);
     }
+  }
+
+  isValid(filt): boolean {
+    if (NUMBER_TYPES.includes(filt.type)) {
+      return isValidNumberFilter(filt);
+    } else if (DATE_TYPES.includes(filt)) {
+      return isValidDateFilter(filt);
+    } else if (filt.type === 'string') {
+      return isValidStringFilter(filt);
+    }
+    return false;
   }
 
   removeInvalidFilters(filt: Array<any>) {

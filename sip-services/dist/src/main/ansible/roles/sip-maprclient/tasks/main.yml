@@ -11,6 +11,9 @@
     state: present
 - name: Install MapR client
   yum: name=mapr-client
+# Mapr-spark is prerequisite for multiple sip-services, install with mapr-client setup.
+- name: Install Mapr spark client
+  yum: name=mapr-spark
 # Workaround: The MapR logging configuration refers to a file that is
 # not writable by the "mapr" user, so change the path to a writable
 # location.
@@ -24,3 +27,15 @@
 # So install it as a workaround.
 - name: Install which for MapR classpath command
   yum: name=which state=present
+# ignore_errors for the below statement as it checking gracefully
+# if mapr cluster configured in secured mode the set the ticket
+# location
+- name: Copy the mapr authentication ticket
+  command : "install -C -o mapr -g mapr /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000"
+  when: sip_secure
+  ignore_errors: yes
+- name: Setup mapr ticket Location
+  lineinfile: dest=/home/mapr/.bashrc line='export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000'
+  when: sip_secure
+  ignore_errors: yes
+

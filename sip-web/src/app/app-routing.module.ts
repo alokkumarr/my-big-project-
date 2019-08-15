@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import {
   IsUserLoggedInGuard,
   DefaultModuleGuard,
@@ -55,7 +55,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       useHash: true,
-      onSameUrlNavigation: 'reload'
+      onSameUrlNavigation: 'reload',
+      preloadingStrategy: PreloadAllModules
     })
   ],
   exports: [RouterModule]

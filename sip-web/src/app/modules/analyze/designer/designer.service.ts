@@ -66,8 +66,8 @@ export class DesignerService {
   createAnalysis(
     semanticId: string,
     type: AnalysisType
-  ): Promise<Analysis | AnalysisDSL | AnalysisPivotDSL> {
-    return this._analyzeService.createAnalysis(semanticId, type);
+  ): Promise<Partial<Analysis | AnalysisDSL | AnalysisPivotDSL>> {
+    return this._analyzeService.newAnalysisModel(semanticId, type);
   }
 
   generateReportPayload(analysis) {
@@ -76,11 +76,6 @@ export class DesignerService {
         delete col.checked;
       });
     });
-
-    /* Remove analysis queryManual if not being saved from query mode */
-    if (!analysis.edit) {
-      delete analysis.queryManual;
-    }
 
     return analysis;
   }
@@ -114,7 +109,7 @@ export class DesignerService {
       analysis.type === 'report'
         ? this.generateReportPayload(cloneDeep(analysis))
         : analysis;
-    return this._analyzeService.saveReport(analysisRequest);
+    return this._analyzeService.saveAnalysis(analysisRequest);
   }
 
   public getPivotGroupAdapters(

@@ -23,14 +23,15 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
 
   //updated fields
   const metrics = 'Integer';
-  const dimension = 'String';
+  const dimension = 'Date';
   const yAxisName2 = 'Long';
-  const groupName = 'Date';
+  const groupName = 'String';
   const sizeByName = 'Float';
-  let analysisId;
+
   let forkedAnalysisId;
   let host;
   let token;
+  let analyses = [];
   beforeAll(() => {
     logger.info('Starting charts/editAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -46,22 +47,20 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
 
   afterEach(function(done) {
     setTimeout(function() {
-      if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
-      }
       if (forkedAnalysisId) {
+        analyses.push(forkedAnalysisId);
+      }
+      analyses.forEach(id => {
+        logger.warn('deleting analysis with id: ' + id);
         new AnalysisHelper().deleteAnalysis(
           host,
           token,
           protractorConf.config.customerCode,
-          forkedAnalysisId
+          id,
+          Constants.CHART
         );
-      }
+      });
+
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -94,7 +93,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         );
         expect(analysis).toBeTruthy();
         assert.isNotNull(analysis, 'analysis should not be null');
-
+        analyses.push(analysis.analysisId);
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
 
@@ -114,8 +113,13 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         chartDesignerPage.searchInputPresent();
         chartDesignerPage.clearAttributeSelection();
 
-        chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
-        chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        if (data.chartType === 'chart:pie') {
+          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+        } else {
+          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        }
 
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,15 @@ public class JobController extends BaseJobController{
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
+    boolean isValidDispatch =
+        !CollectionUtils.isEmpty(jobDetail.getFtp())
+            || !CollectionUtils.isEmpty(jobDetail.getEmailList())
+            || !CollectionUtils.isEmpty(jobDetail.getS3());
+
+    if (!isValidDispatch && !jobDetail.getType().equalsIgnoreCase("chart")) {
+      return getServerResponse(ServerResponseCode.ATLEAST_ONE_DISPATCHER_IS_MUST, false);
+    }
+
         ScheduleKeys scheduleKeys = new ScheduleKeys();
 		scheduleKeys.setGroupName(jobDetail.getJobGroup());
 		scheduleKeys.setJobName(jobDetail.getJobName());

@@ -4,6 +4,8 @@ let Utils = require('../Utils');
 const API_ROUTES = require('../Constants').API_ROUTES;
 const AnalysisHelper = require('./AnalysisHelper');
 const logger = require('../../conf/logger')(__filename);
+const Constants = require('../Constants');
+
 class ObserveHelper {
   deleteDashboard(url, token, dashboardId) {
     const apiUrl = url + API_ROUTES.DELETE_DASHBOARD + '/' + dashboardId;
@@ -32,9 +34,12 @@ class ObserveHelper {
       if (!createdAnalysis) {
         return null;
       }
-      const analysisId = createdAnalysis.contents.analyze[0].executionId.split(
-        '::'
-      )[0];
+      const analysisId =
+        analysisType === Constants.CHART ||
+        analysisType == Constants.PIVOT ||
+        analysisType == Constants.ES_REPORT
+          ? createdAnalysis.analysis.id
+          : createdAnalysis.contents.analyze[0].executionId.split('::')[0];
 
       const analysis = { analysisName: name, analysisId: analysisId };
       return analysis;

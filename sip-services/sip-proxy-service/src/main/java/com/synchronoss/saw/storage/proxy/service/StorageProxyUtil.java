@@ -1,33 +1,46 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
+import com.synchronoss.sip.utils.RestUtil;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import sncr.bda.base.MaprConnection;
+import sncr.bda.core.file.HFileOperations;
 
 public class StorageProxyUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyUtil.class);
+
+  private static final String METASTORE = "services/metadata";
+  private static List<String> dataLakeJunkIds;
+
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
    *
@@ -45,6 +58,20 @@ public class StorageProxyUtil {
   }
 
   /**
+   * @param jsonNode
+   * @param globalFilter
+   * @return
+   */
+  public static JsonNode buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter) {
+    GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
+    JsonNode jsonNode1 = jsonNode.get("global_filter_values");
+    Map<String, Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+    result.put("esRepository", globalFilter.getEsRepository());
+    ObjectMapper mapper = new ObjectMapper();
+      return mapper.valueToTree(result);
+  }
+
+  /**
    * Get JWT token details.
    *
    * @param req http Request
@@ -52,19 +79,13 @@ public class StorageProxyUtil {
    * @throws IllegalAccessException If Authorization not found
    */
   public static String getToken(final HttpServletRequest req) throws IllegalAccessException {
-
     if (!("OPTIONS".equals(req.getMethod()))) {
-
       final String authHeader = req.getHeader("Authorization");
-
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-
         throw new IllegalAccessException("Missing or invalid Authorization header.");
       }
-
       return authHeader.substring(7); // The part after "Bearer "
     }
-
     return null;
   }
 
@@ -95,7 +116,10 @@ public class StorageProxyUtil {
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      SipQuery sipQuery, String metaDataServiceExport, HttpServletRequest request) {
+      SipQuery sipQuery,
+      String metaDataServiceExport,
+      HttpServletRequest request,
+      RestUtil restUtil) {
     String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
@@ -105,24 +129,9 @@ public class StorageProxyUtil {
     SipQuery semanticSipQuery = new SipQuery();
     if (semanticId != null) {
       try {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        String url = metaDataServiceExport + "/internal/semantic/workbench/" + semanticId;
-        logger.debug("SIP query url for analysis fetch : " + url);
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.set("Host", request.getHeader("Host"));
-        requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
-        requestHeaders.set("Authorization", request.getHeader("Authorization"));
-
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        ResponseEntity<SemanticNode> analysisResponse =
-            restTemplate.exchange(url, HttpMethod.GET, requestEntity, SemanticNode.class);
-
-        List<Object> artifactList = analysisResponse.getBody().getArtifacts();
+         SemanticNode semanticNode = fetchSemantic(semanticId,metaDataServiceExport,restUtil);
+        List<Object> artifactList = semanticNode.getArtifacts();
+        logger.info("artifact List: " + artifactList);
 
         List<Artifact> artifacts = new ArrayList<>();
         List<Field> fields = new ArrayList<>();
@@ -151,9 +160,142 @@ public class StorageProxyUtil {
 
         logger.debug("Fetched SIP query for analysis : " + semanticSipQuery.toString());
       } catch (Exception ex) {
-        logger.error("Sip query not fetched from semantic");
+        logger.error("Sip query not fetched from semantic" + ex.getMessage());
       }
     }
     return semanticSipQuery;
+  }
+
+    /**
+     *  Return the semantic Node based on semantic ID .
+     * @param semanticId
+     * @param metaDataServiceUrl
+     * @param restUtil
+     * @return
+     */
+  public static SemanticNode fetchSemantic(String semanticId, String  metaDataServiceUrl , RestUtil restUtil)
+  {
+      RestTemplate restTemplate = restUtil.restTemplate();
+
+      String url = metaDataServiceUrl + "/internal/semantic/workbench/" + semanticId;
+      logger.debug("SIP query url for analysis fetch : " + url);
+
+      return restTemplate.getForObject(url, SemanticNode.class);
+  }
+
+  /**
+   * This method will clean up junk execution result table from maprdb and data lake.
+   *
+   * @param dslQueryId
+   * @param configExecution
+   * @return
+   */
+  public static void deleteJunkExecutionResult(
+      String dslQueryId, Long configExecution, String basePath, String tableName) {
+    try {
+      // Create executionResult table if doesn't exists.
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      ExecutionResultStore resultStore = new ExecutionResultStore(tableName, basePath);
+      String fields[] = {"executionId", "analysis.type"};
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectNode node = objectMapper.createObjectNode();
+      ObjectNode objectNode = node.putObject("$eq");
+      objectNode.put("dslQueryId", dslQueryId);
+
+      // Mapr DB has limitation of limit clause which is 5k, so added default limit to fetch sorted
+      // record based upon given field
+      List<JsonNode> elements =
+          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 5000);
+
+      logger.debug("List of execution ids needs to be cleaned ...!" + elements);
+
+      configExecution = configExecution < elements.size() ? configExecution : elements.size();
+      if (elements != null && elements.size() > 0) {
+        List<String> junkList =
+            elements.stream()
+                .skip(configExecution)
+                .map(jsonNode -> jsonNode.get("executionId").asText())
+                .collect(Collectors.toList());
+
+        logger.debug("List of execution ids needs to be cleaned from es ...!" + junkList);
+        dataLakeJunkIds =
+            elements.stream()
+                .skip(configExecution)
+                .filter(jsonNode -> jsonNode.get("analysis").get("type").equals("report"))
+                .map(jsonNode -> jsonNode.get("executionId").asText())
+                .collect(Collectors.toList());
+
+        logger.debug("List of execution ids needs to be cleaned from data lake...!" + dataLakeJunkIds);
+
+        String tablePath = basePath + File.separator + METASTORE + File.separator + tableName;
+        Table table = MapRDB.getTable(tablePath);
+        resultStore.bulkDelete(table, junkList);
+      }
+    } catch (Exception e) {
+      logger.error("Error occurred while purging execution result the execution Ids : {}", e);
+    }
+  }
+
+  public static List<String> getDataLakeJunkIds() {
+    return dataLakeJunkIds;
+  }
+
+  /**
+   *
+   * @param mainNode
+   * @param updateNode
+   * @return
+   */
+  public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+    Iterator<String> fieldNames = updateNode.fieldNames();
+    while (fieldNames.hasNext()) {
+      String fieldName = fieldNames.next();
+      JsonNode jsonNode = mainNode.get(fieldName);
+      if (jsonNode != null) {
+        if (jsonNode.isObject()) {
+          merge(jsonNode, updateNode.get(fieldName));
+        } else if (jsonNode.isArray()) {
+          for (int i = 0; i < jsonNode.size(); i++) {
+            merge(jsonNode.get(i), updateNode.get(fieldName).get(i));
+          }
+        }
+      } else {
+        if (mainNode instanceof ObjectNode) {
+          // Overwrite field
+          JsonNode value = updateNode.get(fieldName);
+          if (value.isNull()) {
+            continue;
+          }
+          if (value.isIntegralNumber() && value.toString().equals("0")) {
+            continue;
+          }
+          if (value.isFloatingPointNumber() && value.toString().equals("0.0")) {
+            continue;
+          }
+          ((ObjectNode) mainNode).put(fieldName, value);
+        }
+      }
+    }
+    return mainNode;
+  }
+
+  /**
+   * Create required path if they do not exist.
+   *
+   * @param retries number of retries.
+   * @throws Exception when unable to create directory path.
+   */
+  public static void createDirIfNotExists(String path, int retries) throws Exception {
+    try {
+        if (!HFileOperations.exists(path))
+      HFileOperations.createDir(path);
+    } catch (Exception e) {
+      if (retries == 0) {
+        logger.error("unable to create path : " + path);
+      }
+      Thread.sleep(5 * 1000);
+      createDirIfNotExists(path, retries - 1);
+    }
   }
 }

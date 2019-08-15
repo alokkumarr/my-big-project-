@@ -10,12 +10,12 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
-import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
+import * as forEach from 'lodash/forEach';
+import { NUMBER_TYPES } from './../consts';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -200,37 +200,31 @@ export function checkNullinReportData(data) {
 }
 
 export function flattenReportData(data, analysis) {
-  if (analysis.edit) {
+  if (analysis.designerEdit) {
     return data;
   }
-  const columnMap = fpPipe(
-    fpFlatMap(artifact => artifact.columns),
-    fpReduce((accumulator, column) => {
-      const { columnName, aggregate } = column;
-      const key = `${columnName})-${aggregate}`;
-      accumulator[key] = column;
-      return accumulator;
-    }, {})
-  )(analysis.artifacts);
+
   data = checkNullinReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
+      /* If the column has aggregation, preserve the aggregate name when removing keyword */
       const hasAggregateFunction = key.includes('(') && key.includes(')');
 
       if (!hasAggregateFunction) {
-        return key;
+        return removeKeyword(key);
       }
-      const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
 
-      const columnMapKey = `${columnName}-${aggregate}`;
-      const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
-
-      if (isInArtifactColumn) {
-        return columnName.split(')')[0];
-      }
-      return key;
+      const [, columnName] = fpPipe(fpSplit('('))(key);
+      return removeKeyword(columnName.split(')')[0]);
     });
   });
+}
+
+function removeKeyword(key: string) {
+  if (!key) {
+    return key;
+  }
+  return key.replace('.keyword', '');
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
@@ -259,4 +253,38 @@ function parseLeafChart(node, dataObj) {
   )(node);
 
   return assign(dataFields, dataObj);
+}
+
+/**
+ * Includes a new property to chart options for the chart engine.
+ * reversed instucts the highchart engine to plot the chart in descending order
+ * which is needed when desc is applied for a field in x-axis.
+ *
+ * @param {*} chartOptions
+ * @param {*} sipQuery
+ * @returns {chartOptions}
+ */
+
+export function setReverseProperty(chartOptions, sipQuery) {
+  const xAxisFields = [
+    find(sipQuery.artifacts[0].fields, field => field.area === 'x')
+  ];
+  if (!NUMBER_TYPES.includes(xAxisFields[0].type)) {
+    return chartOptions;
+  }
+  if (!isEmpty(sipQuery.sorts)) {
+    forEach(sipQuery.sorts, sort => {
+      chartOptions.xAxis = {
+        reversed: false
+      };
+      if (
+        sort.order === 'desc' &&
+        sort.columnName === xAxisFields[0].columnName
+      ) {
+        chartOptions.xAxis.reversed = true;
+        return false;
+      }
+    });
+  }
+  return chartOptions;
 }

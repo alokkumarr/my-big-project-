@@ -10,6 +10,7 @@ public enum Action {
   delete("delete"),
   read("read"),
   update("update"),
+  init("init"),
   search("search");
   private final String value;
   private final static Map<String, Action> CONSTANTS = new HashMap<String, Action>();

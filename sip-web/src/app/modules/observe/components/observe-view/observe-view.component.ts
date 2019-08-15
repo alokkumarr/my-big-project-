@@ -279,17 +279,38 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    * @memberof ObserveViewComponent
    */
   onApplyGlobalFilter(data): void {
-    if (!data) {
+    if (data === false) {
       this.sidenav.close();
       return;
     }
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
+      this.filters.onApplyFilter.next(data.analysisFilters);
+    }
 
-    this.filters.onApplyFilter.next(data.analysisFilters);
-    this.filters.onApplyKPIFilter.next(data.kpiFilters);
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
+      this.filters.onApplyKPIFilter.next(data.kpiFilters);
+    }
+    this.sidenav.close();
+  }
+
+  onClearGlobalFilter(data) {
+    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)) {
+      this.filters.lastAnalysisFilters = data.analysisFilters;
+      this.filters.onApplyFilter.next(data.analysisFilters);
+    }
+
+    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
+      this.filters.lastKPIFilter = data.kpiFilters;
+      this.filters.onApplyKPIFilter.next(data.kpiFilters);
+    }
     this.sidenav.close();
   }
 
   loadDashboard(): Observable<Dashboard> {
+    this.filters.resetLastKPIFilterApplied();
+    this.filters.resetLastAnalysisFiltersApplied();
     return this.observe.getDashboard(this.dashboardId).pipe(
       map((data: Dashboard) => {
         this.dashboard = data;

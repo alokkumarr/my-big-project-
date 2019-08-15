@@ -8,6 +8,7 @@ import {
   Analysis,
   Filter
 } from '../../types';
+import { QueryDSL } from 'src/app/models';
 import { DesignerStates } from '../../consts';
 
 @Component({
@@ -18,11 +19,11 @@ import { DesignerStates } from '../../consts';
 export class MultiTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
-  @Input() analysis: Analysis;
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
+  @Input() analysis: Analysis;
   @Input() isInQueryMode: boolean;
-  @Input() sqlBuilder: SqlBuilder;
+  @Input() sqlBuilder: QueryDSL | SqlBuilder;
   @Input() designerState: DesignerStates;
   @Input() dataCount: number;
   @Input('data')
@@ -35,12 +36,15 @@ export class MultiTableDesignerLayoutComponent {
   public data;
   public isGridPanelExpanded = false;
 
+  constructor(
+  ) {}
+
   toggleGridPanel() {
     this.isGridPanelExpanded = !this.isGridPanelExpanded;
   }
 
-  onQueryChange() {
-    this.change.emit({ subject: 'changeQuery' });
+  onQueryChange(query) {
+    this.change.emit({ subject: 'changeQuery', data: { query } });
   }
 
   onSaveQuery(evt) {

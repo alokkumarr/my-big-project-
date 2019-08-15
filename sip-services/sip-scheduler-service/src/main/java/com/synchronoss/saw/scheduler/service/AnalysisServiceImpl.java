@@ -1,7 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
-import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
@@ -22,12 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
 
@@ -45,6 +39,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${saw-dispatch-service-url}")
   private String dispatchUrl;
 
+  @Value("${sip-dispatch-row-limit}")
+  private int dispatchRowLimit;
+
   @Autowired private RestUtil restUtil;
 
   private RestTemplate restTemplate;
@@ -54,15 +51,6 @@ public class AnalysisServiceImpl implements AnalysisService {
   @PostConstruct
   public void init() throws Exception {
     restTemplate = restUtil.restTemplate();
-  }
-
-  public void executeAnalysis(String analysisId) {
-    AnalysisExecution execution = ImmutableAnalysisExecution.builder().type("scheduled").build();
-    String url = analysisUrl + "/{analysisId}/executions";
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<AnalysisExecution> entity = new HttpEntity<>(execution, headers);
-    restTemplate.postForObject(url, entity, String.class, analysisId);
   }
 
   public void scheduleDispatch(SchedulerJobDetail analysis) {
@@ -88,23 +76,18 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     String s3List = null;
     try {
-      s3List = prepareStringFromList(analysis.getS3());
+      if (analysis.getS3() != null) {
+        s3List = prepareStringFromList(analysis.getS3());
+        logger.debug("S3 List = " + s3List);
+      }
     } catch (Exception e) {
       logger.error("Error reading s3 List: " + e.getMessage());
       s3List = "";
     }
     Boolean isZipRequired = analysis.getZip();
     String[] latestExecution;
-    boolean isDslScheduled =
-        analysis.getType() != null
-            && (analysis.getType().equalsIgnoreCase("pivot")
-                || analysis.getType().equalsIgnoreCase("chart"));
-    if (isDslScheduled) {
-      latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
-    } else {
-      ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-      latestExecution = findLatestExecution(executionBeans);
-    }
+
+    latestExecution = fetchLatestFinishedTime(analysis.getAnalysisID());
 
     logger.debug("latestExecution : " + latestExecution[1]);
     Date date = latestExecution != null ? new Date(Long.parseLong(latestExecution[1])) : new Date();
@@ -233,15 +216,21 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public void executeDslAnalysis(String analysisId) {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId;
-    logger.info("URL for SIP Query :" + dslUrl);
+    logger.info("URL for request body :" + dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
-    logger.info("Analysis body :" + analysisResponse.getAnalysis());
-    SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
-    logger.info("SIP Query :" + analysisResponse.getAnalysis());
+    Analysis analysis = analysisResponse.getAnalysis();
+    logger.info("Analysis request body :" + analysisResponse.getAnalysis());
 
-    String url = proxyAnalysisUrl + "/execute?id=" + analysisId + "&ExecutionType=" + "scheduled";
-    HttpEntity<?> requestEntity = new HttpEntity<>(sipQuery);
+    String url =
+        proxyAnalysisUrl
+            + "/execute?id="
+            + analysisId
+            + "&size="
+            + dispatchRowLimit
+            + "&executionType=scheduled";
+    logger.info("Execute URL for dispatch :" + url);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
     restTemplate.postForObject(url, requestEntity, String.class);
   }

@@ -1,25 +1,37 @@
 package sncr.xdf.ngcomponent;
 
-import com.google.gson.JsonElement;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.hadoop.fs.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hadoop.fs.FileContext;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Options;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.sql.Dataset;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonElement;
+
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.adapters.writers.DLBatchWriter;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.MapAccumulator;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.file.DLDataSetOperations;
-import sncr.xdf.adapters.writers.*;
-
-
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by srya0001 on 9/11/2017.
@@ -28,6 +40,7 @@ public interface WithDLBatchWriter {
 
 
     default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
+
         WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
         return helper.writeDataset(DSMapKey.parameter, dataset, dataSetName, location, mode);
     }
@@ -38,6 +51,8 @@ public interface WithDLBatchWriter {
     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
+    	
+    	MapAccumulator mapAccumulator = new MapAccumulator();
         try {
 
             WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
@@ -45,14 +60,11 @@ public interface WithDLBatchWriter {
                 WithDLBatchWriterHelper.logger.warn("Final file collection is Empty, nothing to move.");
                 return 0;
             }
-
-
             //TODO:: Open JIRA ticket to prepare rollback artifacts.
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
-
                 WithDLBatchWriterHelper.logger.warn(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
-                        moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
+                    moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
                 // TODO:: Fix BDA Meta
                 // Check if we have created data sample to move to final destination,
@@ -64,9 +76,8 @@ public interface WithDLBatchWriter {
                     String sampleDirSource = helper.getSampleSourceDir(moveTask);
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
-
                     WithDLBatchWriterHelper.logger.debug("Clean up sample for " + moveTask.objectName);
-                    if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
+                    if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName,ngctx) < 0) return -1;
 
                     WithDLBatchWriterHelper.logger.debug("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
@@ -75,25 +86,25 @@ public interface WithDLBatchWriter {
                 else{
                     WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
+                
+                helper.createDestDir(moveTask.dest, moveTask.source);
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
-
                     //Remove existing data if they are presented
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
-                        if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
+                        if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName, ngctx) < 0) return -1;
                     }
                     WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
                 }
                 else // else - move partitions result
                 {
-
                     Set<String> partitions = new HashSet<>();
                     Path lp = new Path(moveTask.source);
 
                     String m = "/"; for (String s : moveTask.partitionList) m += s + "*/"; m += "*/";
-                    WithDLBatchWriterHelper.logger.trace("Glob depth: " + m);
+                    WithDLBatchWriterHelper.logger.debug("Glob depth: " + m);
 
 
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
@@ -103,15 +114,22 @@ public interface WithDLBatchWriter {
                             // We also need list of partitions (directories) for reporting and appending/replacing
                             // We will extract parent directory of the file for that
                             String ss = file.getPath().getParent().toString();
+                            
+                            
                             //
                             // Potential bug: if batch name contains object name - position will be calculated incorrectly
                             //
-                            int i = ss.indexOf(lp.getName());
+                            /**
+                             * Updated to last index as it fails case lp.getName is found in 
+                             * beginning itself
+                             */
+                            int i = ss.lastIndexOf(lp.getName());
                             // Store full partition path for future use in unique collection
                             // Should <set> to be used instead of <map>?
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
                             WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
                             partitions.add(p);
+                           ;
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
                         }
@@ -122,17 +140,23 @@ public interface WithDLBatchWriter {
                     // Check if configuration asks data to be copied
                     // to final processed location
                     WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
+                    
+                    
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
-                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx);
+                    	 
+                        Integer copiedFiles = helper.copyMergePartition( e , moveTask, ctx, mapAccumulator.value());
                         partitionsInfo.put(e, new Tuple3<>(1L, copiedFiles, copiedFiles));
                         completedFileCount += copiedFiles;
                     }
+                    
+                    WithDLBatchWriterHelper.logger.debug("Deleting source :: "+ moveTask.source );
                     //Delete temporary data object directory
                     HFileOperations.fs.delete(new Path(moveTask.source ), true);
                 }
             } //<-- for
+            
             return 0;
         }
         catch(IOException e){
@@ -153,22 +177,38 @@ public interface WithDLBatchWriter {
         public WithDLBatchWriterHelper(NGContext ngctx) {
             super(ngctx);
         }
-
+        
 
         public int copyMergePartition(String partitionKey,
                                       MoveDataDescriptor moveDataDesc,
-                                      InternalContext ctx ) throws Exception {
+                                      InternalContext ctx, Map<String, Long> partitionKeys ) throws Exception {
             int numberOfFilesSuccessfullyCopied = 0;
+            
+            
             Path source = new Path(moveDataDesc.source + partitionKey);
             Path dest = new Path(moveDataDesc.dest +  partitionKey);
 
             String ext = "." + moveDataDesc.format.toLowerCase();
 
             // If we have to replace partition - just remove directory
-            // Will do nothing if directory doesn't exists
+            // Will do nothing if directory doesn't exists`
             if(! moveDataDesc.mode.toLowerCase().equals("append")) {
-                if(HFileOperations.fs.exists(dest))
-                    HFileOperations.fs.delete(dest, true);
+            	
+            	
+            	/**
+            	 * Delete only if it is not part of current partition. 
+            	 * Multiple files partition use case
+            	 */
+                if(HFileOperations.fs.exists(dest) ) {
+                 	boolean isOldPartition = (partitionKeys.get(partitionKey) == null || partitionKeys.get(partitionKey) == 0);
+                 	logger.debug("Delete check isOldPartition ???? "+ isOldPartition);
+                 	if(isOldPartition) {
+                 		logger.debug("######## Deleting "+ dest  + "#########");
+                 		HFileOperations.fs.delete(dest, true);
+                 		partitionKeys.put(partitionKey,1L);
+                 	}
+                }
+                	
             }
 
             // Check if destination folder exists
@@ -230,82 +270,83 @@ public interface WithDLBatchWriter {
 
         public int writeDataset(DSMapKey mapType, Dataset dataset, String dataSetName, String location, String mode) {
 
-        try{
+            try{
+                // Some components are using outputs (Transformer), other (SQL, Parser)  outputDataSets
+                // in any case we need some attributed from dataset descriptors.
 
-            // Some components are using outputs (Transformer), other (SQL, Parser)  outputDataSets
-            // in any case we need some attributed from dataset descriptors.
+                Map<String, Object> outputDS = null;
+                if (mapType == DSMapKey.dataset)
+                    outputDS = ngctx.outputDataSets.get(dataSetName);
+                else
+                    outputDS = ngctx.outputs.get(dataSetName);
 
-            Map<String, Object> outputDS = null;
-            if (mapType == DSMapKey.dataset)
-                outputDS = ngctx.outputDataSets.get(dataSetName);
-            else
-                outputDS = ngctx.outputs.get(dataSetName);
+                String name = (String) outputDS.get(DataSetProperties.Name.name());
+                String loc = location;
+                //String loc = location + Path.SEPARATOR + name;
+                logger.info("Output write location : " + loc);
 
-            String name = (String) outputDS.get(DataSetProperties.Name.name());
+                format = (String) outputDS.get(DataSetProperties.Format.name());
+                numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
+                keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
 
-            String loc = location + Path.SEPARATOR + name;
-            logger.info("Output write location : " + loc);
+                //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
+                //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
+                String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
 
-            format = (String) outputDS.get(DataSetProperties.Format.name());
-            numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
-            keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
+                boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
+                if (ngctx.runningPipeLine) {
+                    if (ngctx.persistMode) {
+                        baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                    }
+                }
+                else
+                {
+                    baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                }
 
+                // Whatever a component uses: outputs or outputDataSets --
+                // All final data should go to outputDataSets, to make a single source of
+                // dataset descriptors.
 
-            //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
-            //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
-            String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
-            boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
+                DateTime timeStamp = new DateTime();
+                long currentTime = timeStamp.getMillis() / 1000;
 
+                if (mapType == DSMapKey.dataset) {
+                    outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                    logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
 
-            baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
+                    //Add record count
+                    outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
-
-            // Whatever a component uses: outputs or outputDataSets --
-            // All final data should go to outputDataSets, to make a single source of
-            // dataset descriptors.
-
-            DateTime timeStamp = new DateTime();
-            long currentTime = timeStamp.getMillis() / 1000;
-
-            if (mapType == DSMapKey.dataset) {
-                outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
-
-                //Add record count
-                outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
-
-                //Add timestamp fields
+                    //Add timestamp fields
 //                outputDS.put(DataSetProperties.CreatedTime.name(), currentTime);
 //                outputDS.put(DataSetProperties.ModifiedTime.name(), currentTime);
-            }
-            else{
-                Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
-                outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
+                }
+                else{
+                    Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
+                    outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                    logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
 
-                //Add record count
-                outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
+                    //Add record count
+                    outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
-                //Add timestamp fields
+                    //Add timestamp fields
 //                outputDS2.put(DataSetProperties.CreatedTime.name(), currentTime);
 //                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
+                }
+
+                return 0;
+            } catch (Exception e) {
+                String error = ExceptionUtils.getFullStackTrace(e);
+                logger.error("Error at writing result: " + error);
+                return -1;
             }
-
-
-
-            return 0;
-        } catch (Exception e) {
-            String error = ExceptionUtils.getFullStackTrace(e);
-            logger.error("Error at writing result: " + error);
-            return -1;
         }
 
-
-    }
-
         private void moveFilesForDataset(String source, String dest, String objectName, String format, String mode, InternalContext ctx) throws Exception {
-
+        	
+        	logger.debug("#### Move files starting. format ::"+ format );
             //If output files are PARQUET files - clean up temp. directory - remove
             // _metadata and _common_? files.
             if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_PARQUET)) {
@@ -313,30 +354,30 @@ public interface WithDLBatchWriter {
             } else if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_JSON)) {
             }
 
-            createOrCleanUpDestDir(dest, objectName);
-
             WithDLBatchWriterHelper.logger.info("Moving files from " + source + " to " + dest);
 
             //get list of files to be processed
             FileStatus[] files = fs.listStatus(new Path(source));
 
             WithDLBatchWriterHelper.logger.warn("Prepare the list of the files, number of files: " + files.length);
+            
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
-                    //move data files with new name to output location
 
+                    //move data files with new name to output location
                     String destFileName =   dest + Path.SEPARATOR +
-                                            objectName + "." +
-                                            ngctx.batchID + "." + ngctx.startTs + "." +
-                                            String.format("%05d", ctx.globalFileCount ) +
-                                            "." + format;
+                        objectName + "." +
+                        ngctx.batchID + "." + ngctx.startTs + "." +
+                        String.format("%05d", ctx.globalFileCount ) +
+                        "." + format;
 
                     Path fdest = new Path(destFileName);
-                    WithDLBatchWriterHelper.logger.warn(String.format("move from: %s to %s", srcFileName, fdest.toString()));
+                    WithDLBatchWriterHelper.logger.debug(String.format("move from: %s to %s", srcFileName, fdest.toString()));
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
+                    
                     fc.rename(src, dst, opt);
                 }
                 ctx.globalFileCount++;
@@ -346,21 +387,40 @@ public interface WithDLBatchWriter {
             if (fs.exists(tmpDIR))
                 fs.delete(tmpDIR, true);
             logger.warn("Data Objects were successfully moved from " + source + " into " + dest);
-
         }
 
-        public int createOrCleanUpDestDir(String dest, String objectName) {
+        public int createOrCleanUpDestDir(String dest, String objectName, NGContext ngctx) {
             Path objOutputPath = new Path(dest);
             try {
                 if (fs.exists(objOutputPath)) {
 
                     FileStatus[] list = fs.listStatus(objOutputPath);
                     for (int i = 0; i < list.length; i++) {
-                        fs.delete(list[i].getPath(), true);
+                    	
+                    	if(!list[i].getPath().getName().contains(ngctx.batchID + "." + ngctx.startTs + ".")) {
+                    		fs.delete(list[i].getPath(), true);
+                    	}
+                        
                     }
 
                 } else {
-                    logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
+                    logger.debug("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
+                    fs.mkdirs(objOutputPath);
+                }
+            } catch (IOException e) {
+                logger.error("IO exception in attempt to create/clean up: destination directory", e);
+                return -1;
+            }
+            return 0;
+        }
+
+        public int createDestDir(String dest, String objectName) {
+            Path objOutputPath = new Path(dest);
+            try {
+                if (fs.exists(objOutputPath)) {
+                	logger.debug("Output directory already exists. Use existing and not creating new" );
+                } else {
+                    logger.debug("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
                     fs.mkdirs(objOutputPath);
                 }
             } catch (IOException e) {

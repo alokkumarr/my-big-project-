@@ -118,31 +118,27 @@ public class QueryBuilderUtil {
    */
   public static AggregationBuilder aggregationBuilderDataField(Field field) {
     AggregationBuilder aggregationBuilder = null;
+    String dataField = field.getDataField() == null ? field.getColumnName() : field.getDataField();
 
     switch (field.getAggregate()) {
       case SUM:
-        aggregationBuilder =
-            AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.sum(dataField).field(field.getColumnName());
         break;
       case AVG:
-        aggregationBuilder =
-            AggregationBuilders.avg(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.avg(dataField).field(field.getColumnName());
         break;
       case MIN:
-        aggregationBuilder =
-            AggregationBuilders.min(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.min(dataField).field(field.getColumnName());
         break;
       case MAX:
-        aggregationBuilder =
-            AggregationBuilders.max(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.max(dataField).field(field.getColumnName());
         break;
       case COUNT:
-        aggregationBuilder =
-            AggregationBuilders.count(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.count(dataField).field(field.getColumnName());
         break;
       case DISTINCTCOUNT:
         aggregationBuilder =
-            AggregationBuilders.cardinality(field.getDataField()).field(field.getColumnName());
+            AggregationBuilders.cardinality(dataField).field(field.getColumnName());
         break;
       case PERCENTAGE:
         Script script =
@@ -150,13 +146,10 @@ public class QueryBuilderUtil {
                 "_value*100/"
                     + field.getAdditionalProperties().get(field.getColumnName() + "_sum"));
         aggregationBuilder =
-            AggregationBuilders.sum(field.getDataField())
-                .field(field.getColumnName())
-                .script(script);
+            AggregationBuilders.sum(dataField).field(field.getColumnName()).script(script);
         break;
       case PERCENTAGE_BY_ROW:
-        aggregationBuilder =
-            AggregationBuilders.sum(field.getDataField()).field(field.getColumnName());
+        aggregationBuilder = AggregationBuilders.sum(dataField).field(field.getColumnName());
         break;
     }
     return aggregationBuilder;
@@ -368,8 +361,10 @@ public class QueryBuilderUtil {
       if (dataField instanceof com.synchronoss.saw.model.Field) {
         Field field = (Field) dataField;
         if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+          String aggDataField =
+              field.getDataField() == null ? field.getColumnName() : field.getDataField();
           preSearchSourceBuilder.aggregation(
-              AggregationBuilders.sum(field.getDataField()).field(field.getColumnName()));
+              AggregationBuilders.sum(aggDataField).field(field.getColumnName()));
         }
       }
     }
@@ -386,8 +381,14 @@ public class QueryBuilderUtil {
       DataSecurityKey dataSecurityKeyNode, List<QueryBuilder> builder) {
     if (dataSecurityKeyNode != null) {
       for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
+        String[] col = dsk.getName().split("\\.");
+        String dskColName = col.length == 1 ? col[0] : col[1];
+        // If dsk name as <TableName.columnName>; then split for '.' and select columnName.
+        // If dsk name is <columnName>; then return columnName.
+        // If dsk name as <TableName.columnName.keyword>; then split length return 3, select
+        // columnName.
         TermsQueryBuilder termsQueryBuilder =
-            new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
+            new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX), dsk.getValues());
         List<?> modelValues = QueryBuilderUtil.buildStringTermsfilter(dsk.getValues());
         TermsQueryBuilder termsQueryBuilder1 =
             new TermsQueryBuilder(QueryBuilderUtil.buildFilterColumn(dsk.getName()), modelValues);
@@ -421,6 +422,8 @@ public class QueryBuilderUtil {
         List<Field> fieldList = artifact.getFields();
         for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
           if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+            String dskColName = dataSecurityKeyDef.getName();
+            dataSecurityKeyDef.setName(artifactName + "." + dskColName);
             dataSecurityKeyDefs.add(dataSecurityKeyDef);
           }
         }

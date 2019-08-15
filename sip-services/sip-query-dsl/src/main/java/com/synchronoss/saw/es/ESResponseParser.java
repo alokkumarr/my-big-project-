@@ -71,39 +71,35 @@ public class ESResponseParser {
 
     String childNodeName = childNodeName(childNode);
 
-        if (childNodeName!=null
-                && childNode.get(childNodeName)!=null)
-        {
-            JsonNode jsonNode1 = childNode.get(childNodeName).get(BUCKETS);
-            Iterator<JsonNode> iterable1 = jsonNode1.iterator();
-            while(iterable1.hasNext())
-            {
-                JsonNode jsonNode2 = iterable1.next();
-                jsonNodeParser(jsonNode2,dataObj,flatStructure,level+1);
-            }
-        }
-        // if result contains only aggregated fields.
-        else if (groupByFields.length==0 && childNode !=null)
-        {
-            Map<String,Object> flatValues = new LinkedHashMap<>();
-            for (Field dataField : aggregationFields){
-                String columnName = dataField.getDataField();
-                flatValues.put(columnName, childNode.get(columnName).get(VALUE));
-            }
-            flatStructure.add(flatValues);
-        }
-        else
-        {
-            Map<String,Object> flatValues = new LinkedHashMap<>();
-            flatValues.putAll(dataObj);
-            for (Field dataField : aggregationFields){
-                String columnName = dataField.getDataField();
-                flatValues.put(columnName, childNode.get(columnName).get(VALUE));
-            }
-            flatStructure.add(flatValues);
-        }
-        return flatStructure;
+    if (childNodeName != null && childNode.get(childNodeName) != null) {
+      JsonNode jsonNode1 = childNode.get(childNodeName).get(BUCKETS);
+      Iterator<JsonNode> iterable1 = jsonNode1.iterator();
+      while (iterable1.hasNext()) {
+        JsonNode jsonNode2 = iterable1.next();
+        jsonNodeParser(jsonNode2, dataObj, flatStructure, level + 1);
+      }
     }
+    // if result contains only aggregated fields.
+    else if (groupByFields.length == 0 && childNode != null) {
+      Map<String, Object> flatValues = new LinkedHashMap<>();
+      for (Field dataField : aggregationFields) {
+        String columnName =
+            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
+      }
+      flatStructure.add(flatValues);
+    } else {
+      Map<String, Object> flatValues = new LinkedHashMap<>();
+      flatValues.putAll(dataObj);
+      for (Field dataField : aggregationFields) {
+        String columnName =
+            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
+      }
+      flatStructure.add(flatValues);
+    }
+    return flatStructure;
+  }
 
   /**
    * ES response parsing as JSON Node.

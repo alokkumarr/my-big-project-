@@ -12,16 +12,19 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const Constants = require('../../helpers/Constants');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
   let analysisId;
   let host;
   let token;
-  const yAxisName = 'Double';
-  const xAxisName = 'Date';
-  const groupName = 'String';
   const metricName = dataSets.pivotChart;
+  const metrics = 'Integer';
+  const dimension = 'Date';
+  const yAxisName2 = 'Long';
+  const groupName = 'String';
   const sizeByName = 'Float';
+
   beforeAll(() => {
     logger.info('Starting charts/createAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -42,7 +45,8 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
           host,
           token,
           protractorConf.config.customerCode,
-          analysisId
+          analysisId,
+          Constants.CHART
         );
       }
       // Logout by clearing the storage
@@ -73,8 +77,14 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
 
         const chartDesignerPage = new ChartDesignerPage();
         chartDesignerPage.searchInputPresent();
-        chartDesignerPage.clickOnAttribute(xAxisName, 'Dimension');
-        chartDesignerPage.clickOnAttribute(yAxisName, 'Metrics');
+
+        if (data.chartType === 'chart:pie') {
+          chartDesignerPage.clickOnAttribute(dimension, 'Color By');
+          chartDesignerPage.clickOnAttribute(metrics, 'Angle');
+        } else {
+          chartDesignerPage.clickOnAttribute(dimension, 'Dimension');
+          chartDesignerPage.clickOnAttribute(metrics, 'Metrics');
+        }
 
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');

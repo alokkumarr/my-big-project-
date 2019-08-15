@@ -134,13 +134,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>19.0</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -330,4 +323,20 @@
 			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
 </project>

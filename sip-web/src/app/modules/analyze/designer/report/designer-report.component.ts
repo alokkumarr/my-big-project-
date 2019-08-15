@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import { Artifact, DesignerChangeEvent, Sort, Filter } from '../types';
 import { DesignerStates } from '../consts';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'designer-report',
@@ -13,6 +14,7 @@ export class DesignerReportComponent {
   @Input() artifacts: Artifact[];
   @Input() sorts: Sort[];
   @Input() analysis;
+  @Input() hasSIPQuery: boolean;
   @Input() isInQueryMode;
   @Input() filters: Filter[];
   @Input() designerState: DesignerStates;
@@ -20,6 +22,18 @@ export class DesignerReportComponent {
   set _data(val) {
     this.data = val;
     this.currentDataCount = Math.min(this.totalDataCount, (val || []).length);
+  }
+
+  constructor(public store: Store) {}
+
+  get analysisArtifacts() {
+    return this.analysis.designerEdit
+      ? null
+      : this.hasSIPQuery
+      ? this.store.selectSnapshot(
+          state => state.designerState.analysis.sipQuery.artifacts
+        )
+      : this.artifacts;
   }
 
   @Input('dataCount')

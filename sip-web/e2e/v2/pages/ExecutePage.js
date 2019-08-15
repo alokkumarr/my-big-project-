@@ -2,12 +2,15 @@
 
 const commonFunctions = require('./utils/commonFunctions');
 const ConfirmationModel = require('./components/ConfirmationModel');
+const Constants = require('../helpers/Constants');
 
 class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
-    this._actionMenuContents = element(by.xpath(`//*[@class="mat-menu-content"]`));
+    this._actionMenuContents = element(
+      by.xpath(`//*[@class="mat-menu-content"]`)
+    );
     this._analysisTitle = element(by.css(`[class="analysis__title"]`));
     this._actionDetailsLink = element(
       by.css(`[e2e="actions-menu-selector-details"]`)
@@ -25,6 +28,15 @@ class ExecutePage extends ConfirmationModel {
     );
     this._selectedFilter = value =>
       element(by.css(`[e2e="filters-execute-${value}"]`));
+    this._reportColumnChooser = element(by.css(`[title="Column Chooser"]`));
+    this._pivotData = element(
+      by.xpath(`//pivot-grid[contains(@class,'executed-view-pivot')]`)
+    );
+    this._chartData = element(
+      by.xpath(
+        `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
+      )
+    );
   }
 
   verifyTitle(title) {
@@ -102,9 +114,22 @@ class ExecutePage extends ConfirmationModel {
   "displayedValue":"TW" // This week
   }]`
    */
-  verifyAppliedFilter(filters) {
+  verifyAppliedFilter(filters, analysisType = null) {
+    if (Constants.CHART === analysisType) {
+      commonFunctions.waitFor.elementToBeVisible(this._chartData);
+    } else if (Constants.PIVOT === analysisType) {
+      commonFunctions.waitFor.elementToBeVisible(this._pivotData);
+    } else if (
+      Constants.REPORT === analysisType ||
+      Constants.ES_REPORT === analysisType
+    ) {
+      commonFunctions.waitFor.elementToBeVisible(this._reportColumnChooser);
+    }
+
     filters.forEach(filter => {
       const value = `${filter.field}: ${filter.displayedValue}`;
+      browser.sleep(1500); // Some how this need to be added
+      commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
     });
   }

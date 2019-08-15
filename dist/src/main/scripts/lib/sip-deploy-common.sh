@@ -9,7 +9,10 @@ yum_install() {
 # Install deployment tools, if not already installed
 if ! command -v ansible-playbook > /dev/null; then
     echo "Installing deployment tools"
-    yum_install ansible
+    yum_install ansible-2.8.0-2.el7 
+else
+    echo "Upgrading ansible to required version 2.8"
+    yum_install ansible-2.8*
 fi
 
 # Workaround: Ansible version 2.4 has deprecated using the "include"

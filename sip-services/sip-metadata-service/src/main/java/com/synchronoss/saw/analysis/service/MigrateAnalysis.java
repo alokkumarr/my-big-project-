@@ -1,12 +1,8 @@
 package com.synchronoss.saw.analysis.service;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,44 +10,36 @@ import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.service.migrationservice.AnalysisSipDslConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.ChartConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.DlReportConverter;
+import com.synchronoss.saw.analysis.service.migrationservice.EsReportConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.GeoMapConverter;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatus;
 import com.synchronoss.saw.analysis.service.migrationservice.MigrationStatusObject;
 import com.synchronoss.saw.analysis.service.migrationservice.PivotConverter;
 import com.synchronoss.saw.exceptions.MissingFieldException;
-import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.FieldNames;
+import com.synchronoss.saw.util.HBaseUtils;
 import com.synchronoss.saw.util.SipMetadataUtils;
-import com.synchronoss.sip.utils.RestUtil;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.constraints.NotNull;
-import org.ojai.Document;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class MigrateAnalysis {
   private static final Logger logger = LoggerFactory.getLogger(MigrateAnalysis.class);
 
-  @Autowired private RestUtil restUtil;
-  RestTemplate restTemplate = null;
+  private AnalysisMetadata analysisMetadataStore = null;
 
   @Value("${analysis.binary-migration-required}")
   @NotNull
@@ -74,11 +62,11 @@ public class MigrateAnalysis {
   @NotNull
   private String listAnalysisUrl;
 
-  private AnalysisMetadata analysisMetadataStore = null;
-  private AnalysisMetadata semanticMedatadataStore = null;
+  @Value("${metastore.analysis-metadata-path}")
+  @NotNull
+  private String binaryAnalysisMetadata;
 
   private static ObjectMapper objectMapper = new ObjectMapper();
-  private Map<String, String> semanticMap;
 
   public MigrateAnalysis() {}
 
@@ -86,30 +74,13 @@ public class MigrateAnalysis {
   public void convertBinaryToJson() throws Exception {
     logger.trace("Migration process will begin here");
     analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-    semanticMap = getMetaData();
-    HttpHeaders requestHeaders = new HttpHeaders();
-    requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    HttpEntity<?> requestEntity = new HttpEntity<Object>(semanticNodeQuery(), requestHeaders);
-    logger.debug("Analysis server URL {}", listAnalysisUrl + "/analysis");
-    String url = listAnalysisUrl + "/analysis";
 
-    restTemplate = restUtil.restTemplate();
-    ResponseEntity analysisBinaryData =
-        restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
-    if (analysisBinaryData.getBody() != null) {
-      JsonNode jsonNode = (JsonNode) analysisBinaryData.getBody();
-      JsonElement jelement = new com.google.gson.JsonParser().parse(jsonNode.toString());
-      JsonObject analysisBinaryObject = jelement.getAsJsonObject();
-      JsonArray analysisList =
-          analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-
-      MigrationStatus migrationStatus = convertAllAnalysis(analysisList);
+    JsonArray jsonArray = getAllAnalysis();
+    if (jsonArray != null && jsonArray.size() > 0) {
+      MigrationStatus migrationStatus = convertAllAnalysis(jsonArray);
       logger.info("Total number of Files for migration : {}", migrationStatus.getTotalAnalysis());
       logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getSuccessCount());
-      logger.info("Number of Files Successfully Migrated {}: ", migrationStatus.getFailureCount());
+      logger.info("Number of Files Failed Migrated {}: ", migrationStatus.getFailureCount());
     }
   }
 
@@ -141,10 +112,13 @@ public class MigrateAnalysis {
 
               try {
                 analysis = convertOldAnalysisObjtoSipDsl(analysisElement.getAsJsonObject());
+                if (analysis.getSemanticId() != null && analysis.getSipQuery() != null) {
+                  analysis.getSipQuery().setSemanticId(analysis.getSemanticId());
+                }
                 logger.info("Inserting analysis " + analysis.getId() + " into json store");
                 JsonElement parsedAnalysis =
                     SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
-                analysisMetadataStore.create(analysis.getId(), parsedAnalysis);
+                analysisMetadataStore.update(analysis.getId(), parsedAnalysis);
 
                 migrationStatusObject.setAnalysisId(analysis.getId());
                 logger.info(
@@ -210,9 +184,11 @@ public class MigrateAnalysis {
         converter = new PivotConverter();
         break;
       case "esReport":
-        throw new UnsupportedOperationException("ES Report migration not supported yet");
+        converter = new EsReportConverter();
+        break;
       case "report":
-        throw new UnsupportedOperationException("DL Report migration not supported yet");
+        converter = new DlReportConverter();
+        break;
       case "map":
         converter = new GeoMapConverter();
         break;
@@ -223,8 +199,6 @@ public class MigrateAnalysis {
 
     if (converter != null) {
       analysis = converter.convert(analysisObject);
-      // Updating the semantic id
-      updatedSemanticId(analysis, semanticMap);
     } else {
       logger.error("Unknown analysis type");
     }
@@ -255,7 +229,9 @@ public class MigrateAnalysis {
           new AnalysisMetadata(migrationStatusTable, basePath);
       logger.debug("Connection established with MaprDB..!!");
       logger.info("Started Writing the status into MaprDB, id : " + id);
-      analysisMetadataStore1.create(id, new Gson().toJson(migrationStatus));
+      Gson gson = new Gson();
+      JsonElement jsonElement = gson.toJsonTree(migrationStatus, MigrationStatusObject.class);
+      analysisMetadataStore1.update(id, jsonElement);
     } catch (Exception e) {
       logger.error(e.getMessage());
       logger.error(
@@ -268,177 +244,42 @@ public class MigrateAnalysis {
     return status;
   }
 
-  private String semanticNodeQuery() {
-    return "{\n"
-        + "   \"contents\":{\n"
-        + "      \"keys\":[\n"
-        + "         {\n"
-        + "            \"module\":\"ANALYZE\"\n"
-        + "         }\n"
-        + "      ],\n"
-        + "      \"action\":\"export\"\n"
-        + "   }\n"
-        + "}";
-  }
-
   /**
-   * Return the semantic id for the migration.
+   * Get list of all analysis to remove transport service dependency.
    *
-   * @param analysis Analysis
-   * @param semanticMap semanticMap
-   * @return
+   * @return JsonArray
    */
-  private void updatedSemanticId(Analysis analysis, Map<String, String> semanticMap) {
-    logger.debug("Semantic Map = {}", semanticMap);
-    logger.debug("Analysis definition = {}", analysis);
-    String analysisSemanticId =
-        analysis != null && analysis.getSemanticId() != null ? analysis.getSemanticId() : null;
-    logger.debug("Analysis semantic id = {}", analysisSemanticId);
-    if (analysisSemanticId != null && semanticMap != null && !semanticMap.isEmpty()) {
-      for (Map.Entry<String, String> entry : semanticMap.entrySet()) {
-        if (analysisSemanticId.equalsIgnoreCase(entry.getValue())) {
-          break;
-        } else {
-          String semanticArtifactName = entry.getKey();
-          SipQuery sipQuery = analysis.getSipQuery();
-
-          if (sipQuery != null) {
-            List<Artifact> artifacts = sipQuery.getArtifacts();
-
-            if (artifacts != null && artifacts.size() != 0) {
-              String artifactName = artifacts.get(0).getArtifactsName();
-              logger.debug("Artifact name = {}", artifactName);
-              if (semanticArtifactName.equalsIgnoreCase(artifactName)) {
-                logger.info(
-                    "Semantic id updated from {} to {}",
-                    analysis.getSemanticId(),
-                    entry.getValue());
-                analysis.setSemanticId(entry.getKey());
-                break;
-              }
-            } else {
-              logger.warn("Artifacts is not present");
-            }
-          } else {
-            logger.warn("sipQuery not present");
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Main function.
-   *
-   * @param args - command line args
-   * @throws IOException - In case of file errors
-   */
-  public static void main1(String[] args) throws Exception {
-    String analysisFile = args[0];
-    System.out.println("Convert analysis from file = " + analysisFile);
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    File jsonFile = new File(analysisFile);
-    JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
-
-    JsonObject analyzeObject =
-        jsonObject.getAsJsonObject("contents").getAsJsonArray("analyze").get(0).getAsJsonObject();
-
-    MigrateAnalysis ma = new MigrateAnalysis();
-
-    Analysis analysis = ma.convertOldAnalysisObjtoSipDsl(analyzeObject);
-
-    System.out.println(gson.toJson(analysis));
-  }
-
-  /**
-   * Main function.
-   *
-   * @param args Command-line args
-   * @throws IOException In-case of file error
-   */
-  public static void main(String[] args) throws IOException {
-    String analysisFile = args[0];
-    System.out.println("Convert analysis from file = " + analysisFile);
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    File jsonFile = new File(analysisFile);
-
-    JsonObject analysisBinaryObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);
-
-    JsonArray analysisList =
-        analysisBinaryObject.get("contents").getAsJsonObject().getAsJsonArray("analyze");
-
-    MigrateAnalysis ma = new MigrateAnalysis();
-
-    MigrationStatus migrationStatus = ma.convertAllAnalysis(analysisList);
-    System.out.println(gson.toJson(migrationStatus));
-  }
-
-  /**
-   * Return all the semantic details with key/value.
-   *
-   * @return
-   */
-  private Map<String, String> getMetaData() {
-
-    Map<String, String> semanticMap = new HashMap<>();
-
-    List<Document> docs = null;
-
-    List<JsonObject> objDocs = new ArrayList<>();
-
+  public JsonArray getAllAnalysis() {
+    JsonArray arrayElements = new JsonArray();
+    HBaseUtils utils = new HBaseUtils();
     try {
+      Connection connection = utils.getConnection();
+      String tablePath = basePath + binaryAnalysisMetadata;
+      logger.info("Binary store table path : " + tablePath);
+      Table table = utils.getTable(connection, tablePath);
 
-      semanticMedatadataStore = new AnalysisMetadata(metadataTable, basePath);
+      // Instantiating the Scan class
+      Scan scan = new Scan();
+      scan.addColumn(Bytes.toBytes("_source"), Bytes.toBytes("content"));
+      ResultScanner results = table.getScanner(scan);
 
-      docs = semanticMedatadataStore.searchAll();
-
-      if (docs == null) {
-
-        return null;
-      }
-
-      for (Document d : docs) {
-
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        objDocs.add(toJsonElement(d).getAsJsonObject());
-      }
-
-    } catch (Exception e) {
-
-      logger.error("Exception occurred while fetching Semantic definition", e);
-    }
-    for (JsonObject semanticData : objDocs) {
-
-      logger.debug("Semantic Metadata = " + semanticData);
-
-      String id = semanticData.get("_id").getAsString();
-      logger.debug("Semantic ID = " + id);
-
-      if (id != null) {
-        JsonArray artifacts = semanticData.getAsJsonArray(FieldNames.ARTIFACTS);
-        logger.debug("Artifacts = " + artifacts);
-
-        if (artifacts != null) {
-          String artifactName =
-              artifacts.get(0).getAsJsonObject().get(FieldNames.ARTIFACT_NAME).getAsString();
-
-          if (artifactName != null) {
-
-            semanticMap.put(artifactName, id);
-          }
+      // Reading values from scan result
+      for (Result result = results.next(); result != null; result = results.next()) {
+        byte[] contentBinary = result.getValue("_source".getBytes(), "content".getBytes());
+        if (contentBinary != null && contentBinary.length > 0) {
+          com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+          JsonElement element = parser.parse(new String(contentBinary));
+          logger.debug("Content binary store data....!!" + element);
+          arrayElements.add(element);
         }
       }
+    } catch (Exception ex) {
+      logger.error("Error while fetch analysis from hbase.", ex);
+    } finally {
+      utils.closeConnection();
     }
-    return semanticMap;
-  }
-
-  private JsonElement toJsonElement(Document doc) {
-    String json = doc.asJsonString();
-    com.google.gson.JsonParser jsonParser = new com.google.gson.JsonParser();
-    return jsonParser.parse(json);
+    logger.info("Array size : " + arrayElements.size());
+    return arrayElements;
   }
 
   /**
