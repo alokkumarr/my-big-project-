@@ -116,7 +116,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         outputDataSetLocation = outputDataset.get(DataSetProperties.PhysicalLocation.name()).toString();
 
         outputDataSetMode = outputDataset.get(DataSetProperties.Mode.name()).toString();
-        logger.debug("Output dataset mode = " + outputDataSetMode);
+        logger.debug("Output dataset mode  is = " + outputDataSetMode);
 
         outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
         outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
@@ -125,6 +125,29 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
+        logger.debug("outputDsPartitionKeys size is = " + outputDsPartitionKeys.size());
+
+        try {
+           if (outputDsPartitionKeys.size() <= 0 ) {
+               if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation)) {
+                   logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for " + outputDataSetMode);
+                   HFileOperations.deleteEnt(outputDataSetLocation);
+               }
+           }
+
+            FileSystem fs = HFileOperations.getFileSystem();
+            FileStatus[] files = fs.globStatus(new Path(sourcePath));
+
+            if (files.length <= 0 ) {
+                logger.debug("Total number of files in the directory = " + files.length);
+                return 0;
+            }
+
+        }catch(Exception e)
+        {
+            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
+            logger.error(e.getMessage());
+        }
 
         if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
             headerSize = ctx.componentConfiguration.getParser().getHeaderSize();

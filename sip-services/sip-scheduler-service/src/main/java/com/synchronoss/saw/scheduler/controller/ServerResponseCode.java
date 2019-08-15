@@ -12,6 +12,8 @@ public class ServerResponseCode {
 	public static final int JOB_NOT_IN_RUNNING_STATE = 521;
 	
 	public static final int JOB_DOESNT_EXIST = 500;
+
+	public static final int ATLEAST_ONE_DISPATCHER_IS_MUST = 400;
 	
 	//GENERIC ERROR
 	public static final int ERROR = 600;

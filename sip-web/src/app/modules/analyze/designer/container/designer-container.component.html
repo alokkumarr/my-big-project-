@@ -1,6 +1,6 @@
 <designer-header
   class="designer__header"
-  [analysis]="analysis"
+  [analysis]="dslAnalysis$ | async"
   [areMinRequirmentsMet]="areMinRequirmentsMet"
   [isInDraftMode]="isInDraftMode"
   [designerState]="designerState"
@@ -25,7 +25,6 @@
     [filters]="filters"
     [chartTitle]="chartTitle"
     [sipQuery]="analysis.sipQuery"
-    [sqlBuilder]="analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </single-table-designer-layout>
@@ -34,13 +33,12 @@
     *ngSwitchCase="'multi'"
     (change)="onSettingsChange($event)"
     [isInQueryMode]="isInQueryMode"
-    [analysis]="analysis"
+    [analysis]="dslAnalysis$ | async"
     [artifacts]="artifacts"
     [data]="data"
     [dataCount]="dataCount"
     [sorts]="sorts"
     [filters]="filters"
-    [sqlBuilder]="analysis.sqlBuilder"
     [designerState]="designerState"
   >
   </multi-table-designer-layout>

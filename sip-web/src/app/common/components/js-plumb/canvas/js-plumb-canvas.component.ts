@@ -5,12 +5,18 @@ import {
   EventEmitter,
   ElementRef,
   OnInit,
+  OnDestroy,
   AfterViewInit
 } from '@angular/core';
+import { Select } from '@ngxs/store';
+import * as get from 'lodash/get';
 import * as jsPlumb from 'jsplumb';
 import * as find from 'lodash/find';
 import * as isEqual from 'lodash/isEqual';
+import * as isEmpty from 'lodash/isEmpty';
 import * as findIndex from 'lodash/findIndex';
+import { tap } from 'rxjs/operators';
+import { Store } from '@ngxs/store';
 
 import {
   Artifact,
@@ -19,8 +25,18 @@ import {
   EndpointPayload,
   JoinChangeEvent,
   ConnectionPayload,
-  JsPlumbCanvasChangeEvent
+  JoinEventData
 } from '../types';
+import { Observable, Subscription } from 'rxjs';
+import {
+  AnalysisDSL,
+  ArtifactDSL,
+  ArtifactColumnDSL,
+  ArtifactColumnReport
+} from 'src/app/models';
+import {
+  DesignerJoinsArray
+} from './../../../../modules/analyze/designer/actions/designer.actions';
 
 @Component({
   selector: 'js-plumb-canvas-u',
@@ -33,14 +49,58 @@ import {
     `
   ]
 })
-export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
-  @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
+export class JsPlumbCanvasComponent
+  implements OnInit, AfterViewInit, OnDestroy {
+  @Output() change: EventEmitter<JoinEventData> = new EventEmitter();
   @Input() useAggregate: boolean;
   @Input() artifacts: Artifact[];
   @Input() joins: Join[] = [];
+  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
+    AnalysisDSL
+  >;
   public _jsPlumbInst: any;
+  private listeners: Subscription[] = [];
 
-  constructor(public _elementRef: ElementRef) {
+  /* If we change fields from outside the table component,
+     like removing it from the preview grid, we need to
+     sync check boxes in table with the latest artifacts
+  */
+  private syncCheckedField = this.dslAnalysis$.pipe(
+    tap(analysis => {
+      const artifacts: ArtifactDSL[] =
+        get(analysis, 'sipQuery.artifacts') || [];
+
+      /* For each artifact, find the corresponding artifact in sipQuery */
+      (this.artifacts || []).forEach(metricArtifact => {
+        const analysisArtifact = find(
+          artifacts,
+          a => a.artifactsName === metricArtifact.artifactName
+        );
+        if (!analysisArtifact || !analysisArtifact.fields) {
+          return;
+        }
+
+        /* For each column in artifact, find corresponding column in sipQuery */
+        (<ArtifactColumnReport[]>metricArtifact.columns).forEach(
+          metricField => {
+            const analysisField = find(
+              analysisArtifact.fields,
+              (col: ArtifactColumnDSL) =>
+                metricField.columnName === col.columnName
+            );
+
+            /* If column not found in sipQuery, it's not selected.
+             Mark it unchecked.
+          */
+            metricField.checked = Boolean(analysisField);
+          }
+        );
+      });
+      this.artifacts = [...this.artifacts];
+    })
+  );
+
+  constructor(public _elementRef: ElementRef, private _store: Store) {
     this.onConnection = this.onConnection.bind(this);
     this.onConnectionDetached = this.onConnectionDetached.bind(this);
   }
@@ -48,6 +108,14 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this._jsPlumbInst = jsPlumb.getInstance();
     this._jsPlumbInst.setContainer(this._elementRef.nativeElement);
+    if (!isEmpty(this.joins)) {
+      this._store.dispatch(new DesignerJoinsArray(this.joins));
+    }
+    this.listeners.push(this.syncCheckedField.subscribe());
+  }
+
+  ngOnDestroy() {
+    this.listeners.forEach(sub => sub.unsubscribe());
   }
 
   ngAfterViewInit() {
@@ -58,7 +126,7 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
     return index;
   }
 
-  onChange(event: JsPlumbCanvasChangeEvent) {
+  onChange(event: JoinEventData) {
     this.change.emit(event);
   }
 
@@ -183,12 +251,12 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
       criteria: [sourceCriterion, targetCriterion]
     };
     this.joins.push(join);
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 
   changeJoin(index, newJoin) {
     this.joins[index] = newJoin;
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 
   removeJoin(join) {
@@ -197,6 +265,6 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
     if (index >= 0) {
       this.joins.splice(index, 1);
     }
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 }

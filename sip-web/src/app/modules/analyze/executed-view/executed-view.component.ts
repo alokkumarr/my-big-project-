@@ -168,7 +168,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         );
       }
     );
-
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent
@@ -479,24 +478,31 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        this.executedAnalysis.artifacts = this.metric.artifacts;
         executeResponse.data = clone(
-          flattenReportData(executeResponse.data, this.executedAnalysis)
+          flattenReportData(
+            executeResponse.data,
+            this.executedAnalysis || this.analysis
+          )
         );
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          ...(isDSLAnalysis(this.executedAnalysis)
+          ...(isDSLAnalysis(this.executedAnalysis || this.analysis) && this.executedAnalysis.type === 'map'
             ? {
                 sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                   get(this.metric, 'artifacts.0.columns', []),
-                  executeResponse.queryBuilder || this.executedAnalysis.sipQuery
+                  executeResponse.queryBuilder ||
+                    (<AnalysisDSL>(this.executedAnalysis || this.analysis))
+                      .sipQuery
                 )
               }
             : {
-                sqlBuilder:
+                sipQuery:
                   executeResponse.queryBuilder ||
-                  this.executedAnalysis.sqlBuilder
+                  (<Analysis>(this.executedAnalysis || this.analysis))
+                    .sqlBuilder
               })
         };
         this.fetchFilters(this.executedAnalysis);
@@ -608,7 +614,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           execution for this analysis present */
         this.noPreviousExecution = !executionId && !this.hasExecution;
         if (this.executedAnalysis && queryBuilder) {
-          if (isDSLAnalysis(this.executedAnalysis)) {
+          if (this.executedAnalysis.type !== 'report') {
             this.executedAnalysis = {
               ...queryBuilder,
               sipQuery: this._analyzeService.copyGeoTypeFromMetric(
@@ -618,14 +624,15 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
             };
           } else {
             this.executedAnalysis = {
-              ...this.executedAnalysis,
-              sqlBuilder: queryBuilder
+              ...queryBuilder,
+              sipQuery: queryBuilder.sipQuery
             };
           }
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
-          data = clone(flattenReportData(data, this.analysis));
+          const requestAnalysis = {...this.analysis, artifacts: get(this.analysis, 'sipQuery.artifacts')};
+          data = clone(flattenReportData(data, requestAnalysis));
         }
 
         this.setExecutedBy(executedBy);

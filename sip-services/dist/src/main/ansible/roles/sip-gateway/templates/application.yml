@@ -65,9 +65,6 @@ internal-analysis:
 metadata:
     service:
         host: ${connector}://localhost:9500
-semantic:
-    service:
-        host: ${connector}://localhost:9200
 security:
     service:
         host: ${connector}://localhost:9000/saw-security
@@ -105,15 +102,6 @@ api:
         -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]dslanalysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: GET
-            path: '[/]analysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: POST
-            path: '[/]analysis*'
-        -   location: ${semantic.service.host}
-            method: POST
-            path: '[/]semantic*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
@@ -141,10 +129,10 @@ api:
         -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]observe.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]filters.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]kpi.*'
         -   location: ${workbench.service.host}

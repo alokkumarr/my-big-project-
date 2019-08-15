@@ -18,6 +18,7 @@ import * as get from 'lodash/get';
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { checkNullinReportData } from './../../../common/utils/dataFlattener';
+import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
 export class AnalyzeExportService {
@@ -98,7 +99,13 @@ export class AnalyzeExportService {
 
   getCheckedFieldsForExport(analysis, data) {
     /* If report was using designer mode, find checked columns */
-    if (!analysis.edit) {
+    if (!analysis.designerEdit && isDSLAnalysis(analysis)) {
+      return flatMap(analysis.sipQuery.artifacts, artifact =>
+        fpPipe(
+          fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
+        )(artifact.fields)
+      );
+    } else if (!analysis.designerEdit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
         fpPipe(
           fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))

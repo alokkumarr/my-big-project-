@@ -31,13 +31,17 @@ export class ImportService {
     const metricArray: any[] = values(metrics);
     return analyses.reduce((acc, analysis) => {
       const metric = find(metricArray, m => m.id === analysis.semanticId);
+
+      if (!metric) {
+        return acc;
+      }
       acc[`${analysis.name}:${metric.metricName}:${analysis.type}`] = analysis;
       return acc;
     }, {});
   }
 
   createAnalysis(semanticId, type) {
-    return this._analyzeService.createAnalysis(semanticId, type);
+    return this._analyzeService.newAnalysisModel(semanticId, type);
   }
 
   updateAnalysis(

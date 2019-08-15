@@ -124,7 +124,7 @@
     ],
     "sorts": [
       {
-        "artifacts": "sample",
+        "artifactsName": "sample",
         "columnName": "long",
         "type": "long",
         "order": "asc"

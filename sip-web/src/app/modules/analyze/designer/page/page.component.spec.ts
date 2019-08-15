@@ -10,6 +10,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
 import { Observable } from 'rxjs';
+import { AnalysisDSL } from '../../models';
 
 class LocationStub {}
 class AnalysisStubService {
@@ -91,5 +92,40 @@ describe('DesignerPageComponent', () => {
 
   it('should read analysis if mode is not new', () => {
     expect(readAnalysisSpy).toHaveBeenCalled();
+  });
+
+  describe('forkIfNecessary', () => {
+    it('should not fork if analysis is in users private category', () => {
+      component.designerMode = 'edit';
+      const analysis = component.forkIfNecessary({
+        type: 'report',
+        category: new JwtServiceStub().userAnalysisCategoryId,
+        id: '2',
+        sipQuery: {}
+      } as AnalysisDSL);
+      expect(analysis.parentAnalysisId).toBeUndefined();
+    });
+
+    it('should not fork if mode is not edit', () => {
+      component.designerMode = 'fork';
+      const analysis = component.forkIfNecessary({
+        type: 'report',
+        category: new JwtServiceStub().userAnalysisCategoryId + '1',
+        id: '2',
+        sipQuery: {}
+      } as AnalysisDSL);
+      expect(analysis.parentAnalysisId).toBeUndefined();
+    });
+
+    it('should fork if mode is edit and analysis is not in users private category', () => {
+      component.designerMode = 'edit';
+      const analysis = component.forkIfNecessary({
+        type: 'report',
+        category: new JwtServiceStub().userAnalysisCategoryId + '1',
+        id: '2',
+        sipQuery: {}
+      } as AnalysisDSL);
+      expect(analysis.parentAnalysisId).not.toBeUndefined();
+    });
   });
 });

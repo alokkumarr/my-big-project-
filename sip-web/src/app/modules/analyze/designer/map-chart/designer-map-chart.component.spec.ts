@@ -59,6 +59,8 @@ const normalSipQuery = {
   filters: [],
   booleanCriteria: 'AND',
   sorts: [],
+  joins: [],
+  semanticId: '',
   store: {
     dataStore: '',
     storageType: ''
@@ -99,6 +101,8 @@ const sipQueryWithXFieldContainingRegion = {
   filters: [],
   booleanCriteria: 'AND',
   sorts: [],
+  joins: [],
+  semanticId: 'workbench::sample-elasticsearch',
   store: {
     dataStore: '',
     storageType: ''

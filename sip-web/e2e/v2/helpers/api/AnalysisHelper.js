@@ -10,6 +10,7 @@ const Constants = require('../Constants');
 let Utils = require('../Utils');
 let AdminHelper = require('./AdminHelper');
 const logger = require('../../conf/logger')(__filename);
+
 class AnalysisHelper {
   /**
    * @description Deletes analysis based on id for given customer
@@ -19,18 +20,24 @@ class AnalysisHelper {
    * @param {String} id
    * @returns {Object}
    */
-  deleteAnalysis(host, token, customerCode, id) {
-    let deletePayload = new RequestModel().getAnalyzeDeletePayload(
-      customerCode,
-      id
-    );
-    // Make a delete api call, actually it should be DELETE but our api's are like that
-    // they do delete operation in POST call
-    return new RestClient().post(
-      host + Constants.API_ROUTES.ANALYSIS,
-      deletePayload,
-      token
-    );
+  deleteAnalysis(host, token, customerCode, id, analysisType = null) {
+    if (Constants.REPORT === analysisType) {
+      let deletePayload = new RequestModel().getAnalyzeDeletePayload(
+        customerCode,
+        id
+      );
+      // Make a delete api call, actually it should be DELETE but our api's are like that
+      // they do delete operation in POST call
+      return new RestClient().post(
+        host + Constants.API_ROUTES.ANALYSIS,
+        deletePayload,
+        token
+      );
+    } else {
+      // DSL analysis
+      const url = `${host}${Constants.API_ROUTES.DSL_ANALYSIS}${id}`;
+      return new RestClient().delete(url, token);
+    }
   }
 
   /**
@@ -227,7 +234,10 @@ class AnalysisHelper {
 
     // Get ID
     const createAnalysisResponse = new RestClient().post(
-      analysisType === Constants.CHART || analysisType == Constants.PIVOT
+      analysisType === Constants.CHART ||
+        analysisType == Constants.PIVOT ||
+        analysisType == Constants.ES_REPORT ||
+          analysisType == Constants.REPORT
         ? url + Constants.API_ROUTES.DSL_ANALYSIS
         : url + Constants.API_ROUTES.ANALYSIS,
       createPayload,
@@ -238,7 +248,10 @@ class AnalysisHelper {
       return null;
     }
     const id =
-      analysisType === Constants.CHART || analysisType == Constants.PIVOT
+      analysisType === Constants.CHART ||
+      analysisType == Constants.PIVOT ||
+      analysisType == Constants.ES_REPORT ||
+      analysisType == Constants.REPORT
         ? createAnalysisResponse.analysisId
         : createAnalysisResponse.contents.analyze[0].id;
     //Update analysis with fields
@@ -272,23 +285,6 @@ class AnalysisHelper {
         customerCode,
         id,
         'update',
-        dataSetName,
-        semanticId,
-        user.userId,
-        user.loginId,
-        name,
-        description,
-        subCategoryId,
-        currentTimeStamp,
-        analysisType,
-        subType,
-        filters
-      );
-
-      executePayload = new RequestModel().getEsReportBody(
-        customerCode,
-        id,
-        'execute',
         dataSetName,
         semanticId,
         user.userId,
@@ -335,7 +331,8 @@ class AnalysisHelper {
         subType,
         filters
       );
-    } else if (analysisType === Constants.REPORT) {
+    }
+    else if (analysisType === Constants.REPORT) {
       updatePayload = new RequestModel().getReportBody(
         customerCode,
         id,
@@ -353,29 +350,18 @@ class AnalysisHelper {
         filters
       );
 
-      executePayload = new RequestModel().getReportBody(
-        customerCode,
-        id,
-        'execute',
-        dataSetName,
-        semanticId,
-        user.userId,
-        user.loginId,
-        name,
-        description,
-        subCategoryId,
-        currentTimeStamp,
-        analysisType,
-        subType,
-        filters
-      );
     } else {
       logger.info('Invalid analysis type, please check the logs.');
       return null;
     }
 
     //Update
-    if (analysisType === Constants.CHART || analysisType == Constants.PIVOT) {
+    if (
+      analysisType === Constants.CHART ||
+      analysisType == Constants.PIVOT ||
+      analysisType == Constants.ES_REPORT ||
+      analysisType == Constants.REPORT
+    ) {
       const updateResponse = new RestClient().put(
         url + Constants.API_ROUTES.DSL_ANALYSIS + id,
         updatePayload,

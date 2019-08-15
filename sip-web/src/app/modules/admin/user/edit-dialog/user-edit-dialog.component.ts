@@ -79,20 +79,6 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       });
   }
 
-  onPasswordFocus(event) {
-    if (this.data.mode === 'edit' && event.target.value === dummyPassword) {
-      const password = '';
-      this.formGroup.patchValue({ password });
-    }
-  }
-
-  onPasswordBlur(event) {
-    if (this.data.mode === 'edit' && event.target.value === '') {
-      const password = dummyPassword;
-      this.formGroup.patchValue({ password });
-    }
-  }
-
   createForm(model) {
     const mode = this.data.mode;
     if (mode === 'edit') {
@@ -154,5 +140,11 @@ export class UserEditDialogComponent extends BaseDialogComponent {
         this.formIsValid = false;
       }
     });
+  }
+
+  createUserPasswordChange(event) {
+    const password =
+      event.target.value === '' ? dummyPassword : event.target.value;
+    this.formGroup.patchValue({ password });
   }
 }
