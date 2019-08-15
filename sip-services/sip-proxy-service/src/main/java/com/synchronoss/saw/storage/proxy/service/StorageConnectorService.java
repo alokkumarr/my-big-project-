@@ -12,7 +12,7 @@ import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 public interface StorageConnectorService {
   
   public Object searchDocuments(String query,StorageProxy proxyDetails) throws Exception;
-  JsonNode ExecuteESQuery(String query, Store store) throws Exception;
+  JsonNode executeESQuery(String query, Store store) throws Exception;
   public Object deleteDocumentById(String id, StorageProxy proxyDetails)throws Exception;
   public Object createDocument(String query, StorageProxy proxyDetails)throws Exception;
   public Object countDocument(String query, StorageProxy proxyDetails)throws Exception;

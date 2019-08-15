@@ -276,7 +276,7 @@ export class FilterService {
   getRuntimeFilterValues(analysis, navigateBack: string = null) {
     const clone = cloneDeep(analysis);
     const runtimeFilters = this.getRuntimeFiltersFrom(
-      get(clone, 'sqlBuilder.filters', get(clone, 'sipQuery.filters', []))
+      get(clone, 'sipQuery.filters', get(clone, 'sqlBuilder.filters', []))
     );
 
     if (!runtimeFilters.length) {

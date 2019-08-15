@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { Analysis, DesignerToolbarAciton } from '../types';
+import { AnalysisDSL, DesignerToolbarAciton } from '../types';
 import { DesignerStates } from '../consts';
 import { DesignerChangeEvent } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
@@ -19,7 +19,7 @@ export class DesignerHeaderComponent {
   @Output() public change: EventEmitter<
     DesignerChangeEvent
   > = new EventEmitter();
-  @Input() public analysis: Analysis;
+  @Input() public analysis: AnalysisDSL;
   @Input() public isInDraftMode: boolean;
   @Input() public isInQueryMode: boolean;
   @Input() public designerState: DesignerStates;
