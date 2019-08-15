@@ -37,6 +37,9 @@ class ExecutePage extends ConfirmationModel {
         `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
       )
     );
+    this._toastSuccess = element(by.css(`[class*='toast-success']`));
+
+    this._aggregate = name => element(by.css(`[class*=' icon-${name}']`));
   }
 
   verifyTitle(title) {
@@ -132,6 +135,13 @@ class ExecutePage extends ConfirmationModel {
       commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
     });
+  }
+
+  aggregationVerification(aggregation) {
+    commonFunctions.waitFor.elementToBeVisible(this._aggregate(aggregation));
+  }
+  clickOnToastSuccessMessage() {
+    commonFunctions.clickOnElement(this._toastSuccess);
   }
 }
 module.exports = ExecutePage;
