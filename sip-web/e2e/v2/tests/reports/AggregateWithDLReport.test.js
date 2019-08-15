@@ -91,7 +91,7 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithDLRe
         const executePage = new ExecutePage();
         executePage.verifyTitle(reportName);
         analysisId = executePage.getAnalysisId();
-        executePage.clickOnToastSuccessMessage();
+        //executePage.clickOnToastSuccessMessage();
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(reportDescription);
