@@ -92,88 +92,88 @@ public class RTPSPipelineProcessor {
 	}
 
 
-	public int processParser(Map<String, Object> parameters, String configPath, boolean persistFlag) {
-		int ret = 0;
-		try {
-			String configAsStr = ConfigLoader.loadConfiguration(configPath);
+    public int processParser(Map<String, Object> parameters, String configPath, boolean persistFlag) {
+        int ret = 0;
+        try {
+            String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
-			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
-			}
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
 
-			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
-			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
-			}
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
 
-			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
-			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
-			}
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
 
-			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
-			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
-			}
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
 
-			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
-					ComponentServices.TransformationMetadata, ComponentServices.Spark };
+            ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
+                ComponentServices.TransformationMetadata, ComponentServices.Spark };
 
-			ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
-			NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser",
-					batchId);
-			ngParserCtxSvc.initContext();
-			ngParserCtxSvc.registerOutputDataSet();
+            ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser",
+                batchId);
+            ngParserCtxSvc.initContext();
+            ngParserCtxSvc.registerOutputDataSet();
 
-			logger.warn("Output datasets:");
+            logger.warn("Output datasets:");
 
-			ngParserCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.warn(id));
+            ngParserCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.warn(id));
 
-			logger.warn(ngParserCtxSvc.getNgctx().toString());
+            logger.warn(ngParserCtxSvc.getNgctx().toString());
 
+            String parserKey = "DATA_STREAM";
 
-			ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
-			String parserKey = null;
+            NGParser component = null;
 
-			parserKey = ngParserCtxSvc.getNgctx().dataSetName;
+            Dataset dataset = datafileDFmap.get("DATA_STREAM");
+            logger.debug("######Retrived dataset and passing to parser #####");
+            dataset.printSchema();
+            dataset.show();
 
-			ngParserCtxSvc.getNgctx().dataSetName = parserKey;
-			ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-			ngParserCtxSvc.getNgctx().persistMode = persistFlag;
+            ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
+            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
+            ngParserCtxSvc.getNgctx().datafileDFmap.put(parserKey, dataset );
+            ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
+            ngParserCtxSvc.getNgctx().persistMode = persistFlag;
+            logger.debug("dataset count in transformer ::" + datafileDFmap.get(parserKey).count());
 
-			NGParser component = null;
+            component = new NGParser(ngParserCtxSvc.getNgctx());
 
-			Dataset dataset = datafileDFmap.get("DATA_STREAM");
-			logger.debug("######Retrived dataset and passing to parser #####");
-			dataset.show();
-			component = new NGParser(ngParserCtxSvc.getNgctx(), pcs, dataset);
+            if (!component.initComponent(null)) {
+                logger.error("Unable to initialize Parser component");
+                return 1;
+            }
 
-			if (!component.initComponent(null)) {
-				logger.error("Unable to initialize Parser component");
-				return 1;
-			}
-			
+            ret = component.run();
 
-			ret = component.run();
+            if (ret != 0) {
+                error = "Could not complete Parser component " + "entry";
+                throw new Exception(error);
+            }
 
-			if (ret != 0) {
-				error = "Could not complete Parser component " + "entry";
-				throw new Exception(error);
-			}
+            datafileDFmap = new HashMap<>();
+            datafileDFmap.put(parserKey,
+                ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
+            dataSetName = parserKey;
 
-			datafileDFmap = new HashMap<>();
-			datafileDFmap.put(parserKey,
-					ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
-			dataSetName = parserKey;
-
-			logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()
-					+ "\n");
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
-			System.exit(-1);
-		}
-		return ret;
-	}
+            logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()
+                + "\n");
+        } catch (Exception e) {
+            logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
+            System.exit(-1);
+        }
+        return ret;
+    }
 
 	public int processTransformer(Map<String, Object> parameters, String configPath, boolean persistFlag) {
 		int ret = 0;
