@@ -6,20 +6,21 @@ import {
   ViewChild,
   ElementRef
 } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
+import { Select } from '@ngxs/store';
 
 import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { QueryDSL } from 'src/app/models';
 import { setReverseProperty } from './../../../../common/utils/dataFlattener';
-
+import { DesignerState } from '../state/designer.state';
 @Component({
   selector: 'designer-chart',
   templateUrl: './designer-chart.component.html',
@@ -33,6 +34,8 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   chartOptions: any;
   @Input() updater;
+  @Select(DesignerState.isDataTooMuchForChart)
+  isDataTooMuchForChart$: Observable<Boolean>;
 
   @ViewChild('chartContainer') chartContainer: ElementRef;
   chartHgt = {

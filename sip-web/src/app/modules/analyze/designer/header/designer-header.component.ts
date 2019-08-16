@@ -5,6 +5,7 @@ import { AnalysisDSL, DesignerToolbarAciton } from '../types';
 import { DesignerStates } from '../consts';
 import { DesignerChangeEvent } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
+import { DesignerState } from '../state/designer.state';
 
 @Component({
   selector: 'designer-header',
@@ -24,8 +25,10 @@ export class DesignerHeaderComponent {
   @Input() public designerState: DesignerStates;
   @Input() public areMinRequirmentsMet: boolean;
 
-  @Select(state => state.designerState.metric.metricName)
+  @Select(DesignerState.metricName)
   metricName$: Observable<string>;
+  @Select(DesignerState.isDataTooMuchForChart)
+  isDataTooMuchForChart$: Observable<Boolean>;
 
   public DesignerStates = DesignerStates;
   public progressSub;
