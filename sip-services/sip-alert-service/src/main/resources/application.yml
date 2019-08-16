@@ -44,4 +44,17 @@ server:
 sip:
   service:
     index: 0
-
+  ssl:
+    enable : false
+mail:
+  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+  subject : "Alert Notification"
+alert:
+  dashborad:
+    url: http://35.175.174.29/sip/web/#/alerts/view
+transport:
+  service:
+    host: http://localhost:9400
+metastore:
+  base:  maprfs:///var/sip/
+  notificationTable : alertNoficationLog
