@@ -27,19 +27,19 @@
               <input
                 matInput
                 placeholder="Alert Name"
-                formControlName="alertName"
+                formControlName="alertRuleName"
                 maxlength="18"
-                e2e="alertName"
+                e2e="alertRuleName"
               />
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertName.hasError('required')
+                  alertDefFormGroup.controls.alertRuleName.hasError('required')
                 "
                 >This field is required</mat-error
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertName.hasError('maxlength')
+                  alertDefFormGroup.controls.alertRuleName.hasError('maxlength')
                 "
                 >Alert Name cannot exceed 18 characters</mat-error
               >
@@ -62,6 +62,23 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
+              <mat-label>Notification</mat-label>
+              <mat-select
+                formControlName="notification"
+                required
+                multiple
+                e2e="notification"
+              >
+                <mat-option
+                  *ngFor="let notification of notifications$ | async"
+                  [value]="notification.value"
+                  >{{ notification.label }}</mat-option
+                >
+              </mat-select>
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
               <mat-label>Alert Status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
                 <mat-option
@@ -76,13 +93,13 @@
               <mat-label>Alert Description</mat-label>
               <textarea
                 matInput
-                formControlName="alertDescription"
+                formControlName="alertRuleDescription"
                 maxlength="36"
-                e2e="alertDescription"
+                e2e="alertRuleDescription"
               ></textarea>
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertDescription.hasError(
+                  alertDefFormGroup.controls.alertRuleDescription.hasError(
                     'required'
                   )
                 "
@@ -90,7 +107,7 @@
               >
               <mat-error
                 *ngIf="
-                  alertDefFormGroup.controls.alertDescription.hasError(
+                  alertDefFormGroup.controls.alertRuleDescription.hasError(
                     'maxlength'
                   )
                 "
@@ -154,7 +171,7 @@
               appearance="outline"
               class="add-container__body__stepper__dxselect padtop10"
             >
-              <mat-label>Metric Name</mat-label>
+              <mat-label>Monitoring Entity</mat-label>
               <input
                 hidden="true"
                 value="dummy"
@@ -165,15 +182,18 @@
                 ngDefaultControl
                 required
                 formControlName="monitoringEntity"
-                [items]="metricsList$ | async"
+                [items]="metricsListWithoutEntity"
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
-                placeholder="Select a Metric"
+                placeholder="Select a monitoring entity"
+                (onSelectionChanged)="
+                  onSelectedMonitoringEntity($event?.selectedItem)
+                "
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
-                e2e="metricName"
+                e2e="monitoringEntity"
               ></dx-select-box>
             </mat-form-field>
             <mat-error
@@ -186,7 +206,115 @@
               "
               ><small>This field is required </small></mat-error
             >
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Entity name</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                required
+                formControlName="entityName"
+                [items]="metricsListWithoutMonitoringEntity"
+                displayExpr="displayName"
+                valueExpr="columnName"
+                [searchEnabled]="true"
+                placeholder="Select an Entity"
+                (onSelectionChanged)="
+                  onSelectedEntityName($event?.selectedItem)
+                "
+                [readOnly]="
+                  alertMetricFormGroup.controls.datapodId.hasError('required')
+                "
+                e2e="entityName"
+              ></dx-select-box>
+            </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertMetricFormGroup.controls.entityName.hasError('required')
+              "
+              ><small>This field is required </small></mat-error
+            >
 
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Lookback column</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                required
+                formControlName="lookbackColumn"
+                [items]="metricsList$ | async | filterFn: dateMetricFilter"
+                displayExpr="displayName"
+                valueExpr="columnName"
+                [searchEnabled]="true"
+                placeholder="Select a column"
+                [readonly]="!alertMetricFormGroup.controls.datapodId.value"
+                e2e="lookbackColumn"
+              ></dx-select-box>
+            </mat-form-field>
+            <mat-error
+              class="add-container__body__stepper__errmsg"
+              fxFlex
+              *ngIf="
+                alertMetricFormGroup.controls.lookbackColumn.hasError(
+                  'required'
+                )
+              "
+              ><small>This field is required </small></mat-error
+            >
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-label>Lookback period</mat-label>
+                <input
+                  matInput
+                  placeholder="Loockback period"
+                  formControlName="lookbackPeriod"
+                  [readonly]="
+                    !alertMetricFormGroup.controls.lookbackColumn.value
+                  "
+                  maxlength="20"
+                  (blur)="onLookbackPeriodBlur()"
+                  e2e="lookbackPeriod"
+                />
+                <mat-error
+                  *ngIf="
+                    alertMetricFormGroup.controls.lookbackPeriod.hasError(
+                      'required'
+                    )
+                  "
+                  >This field is required</mat-error
+                >
+                <mat-error
+                  *ngIf="
+                    alertMetricFormGroup.controls.lookbackPeriod.hasError(
+                      'maxlength'
+                    )
+                  "
+                  >Alert Name cannot exceed 20 characters</mat-error
+                >
+              </mat-form-field>
+              <mat-icon
+                class="lookback-period__info-icon"
+                fontIcon="icon-info"
+                matTooltip="Interval made of weeks, days, hours, minutes. Ex: '2w 3d', '3h', '1w 10m'"
+              ></mat-icon>
+            </div>
             <div
               fxFlex="45px"
               fxLayout="row"

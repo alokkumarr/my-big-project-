@@ -8,17 +8,17 @@ import { Observable } from 'rxjs';
 
 export const alertPayload: AlertConfig = {
   activeInd: true,
-  aggregation: 'AVG',
   alertSeverity: 'CRITICAL',
-  category: 'string',
+  categoryId: 'string',
   datapodId: 'string',
   datapodName: 'string',
-  monitoringEntity: 'string',
-  operator: 'GT',
   product: 'string',
-  alertDescription: 'string',
-  alertName: 'string',
-  thresholdValue: 0
+  alertRuleDescription: 'string',
+  alertRuleName: 'string',
+  lookbackColumn: '',
+  lookbackPeriod: '',
+  notification: [],
+  sipQuery: { artifacts: [], filters: [] }
 };
 
 describe('ConfigureAlertService', () => {
@@ -40,9 +40,9 @@ describe('ConfigureAlertService', () => {
     ).toBeTruthy();
   });
 
-  it('getMetricsInDatapod should return an Observable', () => {
+  it('getDatapod should return an Observable', () => {
     expect(
-      configureAlertService.getMetricsInDatapod$('1') instanceof Observable
+      configureAlertService.getDatapod$('1') instanceof Observable
     ).toBeTruthy();
   });
 

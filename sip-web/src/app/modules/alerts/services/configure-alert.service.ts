@@ -6,7 +6,7 @@ import * as fpGet from 'lodash/fp/get';
 import { map } from 'rxjs/operators';
 
 import APP_CONFIG from '../../../../../appConfig';
-import { AlertConfig, DatapodMetric } from '../alerts.interface';
+import { AlertConfig } from '../alerts.interface';
 
 export const PROJECTID = 'workbench';
 
@@ -47,16 +47,8 @@ export class ConfigureAlertService {
    * @returns {Observable<any>}
    * @memberof ConfigureAlertService
    */
-  getMetricsInDatapod$(id: string): Observable<any> {
-    const NON_NUMERIC_TYPES = ['string', 'date'];
-    return this.http
-      .get(`${this.api}/internal/semantic/${PROJECTID}/${id}`)
-      .pipe(
-        map(fpGet('artifacts.[0].columns')),
-        map((columns: Array<DatapodMetric>) =>
-          columns.filter(col => !NON_NUMERIC_TYPES.includes(col.type))
-        )
-      );
+  getDatapod$(id: string): Observable<any> {
+    return this.http.get(`${this.api}/internal/semantic/${PROJECTID}/${id}`);
   }
 
   /**
