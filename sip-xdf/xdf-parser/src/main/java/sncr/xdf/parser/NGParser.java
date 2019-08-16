@@ -98,8 +98,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         super(ngctx);
     }
     
-    public NGParser(NGContext ngctx, ComponentServices[] pcs, Dataset dataset) {
-		super( ngctx, pcs, dataset);
+    public NGParser(NGContext ngctx,  Dataset dataset) {
+		super( ngctx, dataset);
+		logger.debug("Parser constructor with dataset "+ dataset);
+		logger.debug(":::: parser constructor services parser :::"+ ngctx.componentConfiguration.getParser());
 	}
     
     public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealtime) {
@@ -116,6 +118,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 	@SuppressWarnings("unchecked")
 	@Override
     protected int execute(){
+		
+		
+		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
         int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
@@ -141,41 +146,59 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
 
-        try {
-            if (pkeys.size() <= 0 ) {
-                if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation)) {
-                    logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for " + outputDataSetMode);
-                    HFileOperations.deleteEnt(outputDataSetLocation);
-                }
-            }
+        if (this.inputDataFrame == null) {
+			try {
+				if (pkeys != null && pkeys.size() <= 0) {
+					logger.debug("checking pkeys" + pkeys);
+					logger.debug("outputlocation" + outputDataSetLocation);
+					logger.debug("replace".equalsIgnoreCase(outputDataSetMode));
+					logger.debug(HFileOperations.exists(outputDataSetLocation));
+					if ("replace".equalsIgnoreCase(outputDataSetMode)
+							&& HFileOperations.exists(outputDataSetLocation)) {
+						logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for "
+								+ outputDataSetMode);
+						HFileOperations.deleteEnt(outputDataSetLocation);
+					}
+				}
 
-            FileSystem fs = HFileOperations.getFileSystem();
-            FileStatus[] files = fs.globStatus(new Path(sourcePath));
+				FileSystem fs = HFileOperations.getFileSystem();
+				FileStatus[] files = fs.globStatus(new Path(sourcePath));
 
-            if (files.length <= 0 ) {
-                return 0;
-            }
+				if (files.length <= 0) {
+					return 0;
+				}
 
-        }catch(Exception e)
-        {
-            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-            logger.error(e.getMessage());
-        }
+			} catch (Exception e) {
+				logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
+				logger.error(e.getMessage());
+			} 
+		}
+		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+			logger.debug("format csv");
+			
+			logger.debug("#####Component config:: " + ngctx.componentConfiguration);
+			logger.debug("#####Component config parser :: " +ngctx.componentConfiguration.getParser());
 
-        if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
-
-            headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
+            headerSize = 0; //ngctx.componentConfiguration.getParser().getHeaderSize();
+            //logger.debug("header size"+ headerSize);
 
             lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
+            logger.debug("lineSeparator"+ lineSeparator);
             delimiter = (ngctx.componentConfiguration.getParser().getDelimiter() != null)? ngctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+            logger.debug("delimiter"+ delimiter);
             quoteChar = (ngctx.componentConfiguration.getParser().getQuoteChar() != null)? ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+            logger.debug("quoteChar"+ quoteChar);
             quoteEscapeChar = (ngctx.componentConfiguration.getParser().getQuoteEscape() != null)? ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
+            logger.debug("quoteEscapeChar"+ quoteEscapeChar);
 
             schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
+            logger.debug("schema"+ schema);
             tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
+            logger.debug("tsFormats"+ tsFormats);
             logger.info(tsFormats);
 
             internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
+            logger.debug("internalSchema"+internalSchema);
 
             // Output data set
             if (ngctx.outputDataSets.size() == 0) {
@@ -276,7 +299,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
-        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
+        } else if (this.inputDataFrame != null || parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 

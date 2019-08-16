@@ -48,7 +48,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     public NGContextServices( ComponentServices[] cs, String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName, String batchID){
         ngctx = new NGContext(xdfRoot, componentConfiguration, applicationID, componentName, batchID);
         for (int i = 0; i < cs.length; i++) {
+        	logger.debug("Inside NG context services putting in service status");
             this.ngctx.serviceStatus.put(cs[i], false);
+            logger.debug("##### service status length"+  this.ngctx.serviceStatus.size());
         }
     }
 
@@ -69,6 +71,8 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
 
     public int initContext(){
+    	
+    	logger.debug("#### Inside init context ::"+ ngctx.serviceStatus );
 
         try {
 
@@ -77,11 +81,16 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
+            	
+            	logger.debug("#### Inside if all ::" );
+
                 services.md = new DLDataSetService(ngctx.xdfDataRootSys);
                 services.als = new AuditLogService(services.md.getRoot());
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.Project)){
+            	logger.debug("#### Inside if project::" );
+
                 services.prj =  this;
                 if (initProject() != 0){
                     logger.error("Could not init project data");
@@ -90,6 +99,7 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
+            	logger.debug("#### Inside if TransformationMetadata ::" );
                 services.transformationMD = new TransformationService(ngctx.xdfDataRootSys);
                 if (initTransformation() != 0){
                     logger.error("Could not init transformation data");
@@ -189,15 +199,20 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     }
 
     private int initTransformation(){
+    	logger.debug("######### Inside init transformation");
         if (services.transformationMD == null ||
             !ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
             logger.error("Incorrect initialization sequence or service is not available");
             return -1;
         }
+        logger.debug("######### setting transformation metadata");
         try {
             ngctx.transformationID =
                     services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
             ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
+            logger.debug("######### is transform metadata set??"+  ngctx.serviceStatus.
+            		get(ComponentServices.TransformationMetadata));
+            
         } catch (Exception e) {
             String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
             logger.error(error);

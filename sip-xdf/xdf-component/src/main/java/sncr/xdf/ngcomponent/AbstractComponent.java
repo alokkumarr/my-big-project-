@@ -86,7 +86,12 @@ public abstract class AbstractComponent implements WithContext{
      * @param inputDataFrame
      * This has been added as a part of SIP-7758
      */
-    public AbstractComponent(NGContext ngctx, ComponentServices[] cs, Dataset<?> inputDataFrame){
+    /**
+     * @param ngctx
+     * @param cs
+     * @param inputDataFrame
+     */
+    public AbstractComponent(NGContext ngctx,  Dataset<?> inputDataFrame){
         if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
         if (inputDataFrame == null)
@@ -94,9 +99,11 @@ public abstract class AbstractComponent implements WithContext{
 
         this.ngctx = ngctx;
         this.inputDataFrame = inputDataFrame;
-        for (int i = 0; i < cs.length; i++) {
+        if (this.ngctx.serviceStatus.isEmpty())
+            throw new IllegalArgumentException("NGContext is not initialized correctly");
+        /*for (int i = 0; i < cs.length; i++) {
             this.ngctx.serviceStatus.put(cs[i], false);
-        }
+        }*/
     }
     
     
@@ -254,11 +261,13 @@ public abstract class AbstractComponent implements WithContext{
     private int initServices(){
 
         try {
+        	logger.debug("### Inside init services");
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.InputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
+            	logger.debug("### Inside init services if for 3 services");
                 services.md = new DLDataSetService(ngctx.xdfDataRootSys);
                 services.als = new AuditLogService(services.md.getRoot());
             }
@@ -286,6 +295,7 @@ public abstract class AbstractComponent implements WithContext{
     }
 
     private int initInputDataSets() {
+    	logger.debug("#### Input datasets start ###");
         int rc = 0;
         try {
 
@@ -294,11 +304,13 @@ public abstract class AbstractComponent implements WithContext{
 
                 if (ngctx.componentConfiguration.getInputs() != null &&
                     ngctx.componentConfiguration.getInputs().size() > 0) {
-                    logger.warn("Extracting meta data");
+                    logger.debug("Extracting meta data");
 
                     WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ngctx, services.md);
 
                     if (ngctx.serviceStatus.containsKey(ComponentServices.InputDSMetadata)) {
+                    	logger.debug("#### Inside InputDS Metadata ###");
+                    	
                         ngctx.inputDataSets = services.mddl.discoverInputDataSetsWithMetadata(dsaux);
                         ngctx.inputs = services.mddl.discoverDataParametersWithMetaData(dsaux);
 
@@ -450,6 +462,7 @@ public abstract class AbstractComponent implements WithContext{
      * @throws Exception
      */
     public final boolean initComponent(JavaSparkContext jsc) throws Exception {
+    	logger.debug("Inside init component");
 
         if (ngctx == null){
             throw new Exception("Incorrect call, the method can be called only NGContext is initialized");
@@ -466,9 +479,10 @@ public abstract class AbstractComponent implements WithContext{
             logger.error("Could not create internal context: ", e);
             return false;
         }
-
+        logger.debug("initializing services");
         //Initialization part-3: Initialize services.
         int rc = initServices();
+        logger.debug("initializing services completed");
         if (rc != 0) {
             error = "Could not initialize component services.";
             logger.error(error);
@@ -476,10 +490,19 @@ public abstract class AbstractComponent implements WithContext{
         }
 
         //Initialization part-4: Initialize trasnsformation metadata.
+        logger.debug("####### Initialize transformation metadata###" +  ngctx.serviceStatus);
+        logger.debug("transformationMD is null??"+ services.transformationMD);
+        logger.debug("Has TransformationMetdata????"+ ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
+        logger.debug(services.transformationMD == null &&
+            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
+        
         if (services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
 
             try {
+            	
+            	  logger.debug("####### Trying transformation metadata###");
+            	  
                 ngctx.transformationID =
                     services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
                 ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);

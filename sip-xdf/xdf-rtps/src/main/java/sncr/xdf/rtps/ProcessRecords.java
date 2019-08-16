@@ -233,8 +233,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         
         
         if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
-      	  logger.debug("######## Triggering pipeline as part of RTPS listener ##########");
-      	  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
+      	  logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
+      	  logger.debug("####"+ this.ngctx.pipelineConfig);
+      	  
+      	logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
+    	  logger.debug("####"+ this.ngctx.pipelineConfigParams);
+    	  
+      	  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.cache());
            processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams );
       }
 

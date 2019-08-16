@@ -33,8 +33,11 @@ public class RTPSPipelineProcessor {
 	}
 
 	public RTPSPipelineProcessor(Dataset<Row> dataset) {
-		Map<String, Dataset> datafileDFmap = new HashMap<>();
-		datafileDFmap.put("DATA_STREAM", dataset);
+		logger.debug("### creating parser with dataset ###");
+		dataset.show();
+	    this.datafileDFmap = new HashMap<>();
+		this.datafileDFmap.put("DATA_STREAM", dataset.cache());
+		
 	}
 
 	private String PIPELINE_CONFIG;
@@ -42,12 +45,17 @@ public class RTPSPipelineProcessor {
 	private Map<String, Object> pipelineConfigParams;
 	private boolean RUNNING_MODE = true;
 	private static final Logger logger = Logger.getLogger(RTPSPipelineProcessor.class);
-	Map<String, Dataset> datafileDFmap = new HashMap<>();
+	Map<String, Dataset> datafileDFmap;
 	String dataSetName = "";
 	String error;
 	String[] args;
 
 	public void processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams) {
+		
+		logger.debug("###### Starting pipeline with dataset.....:)");
+		Dataset<Row> dataset = this.datafileDFmap.get("DATA_STREAM");
+		dataset.show();
+		logger.debug("###### Dataset display completed.....:)");
 		int ret = 0;
 
 		try {
@@ -58,7 +66,13 @@ public class RTPSPipelineProcessor {
 
 				String component = pipeObj.get("component").toString();
 				boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-				logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+				logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+				
+				logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString() );
+				
+				logger.debug("######## Params   ---> " + pipelineParams );
+				
+				
 				switch (component) {
 
 				case "parser":
@@ -93,6 +107,7 @@ public class RTPSPipelineProcessor {
 
 
 	public int processParser(Map<String, Object> parameters, String configPath, boolean persistFlag) {
+		logger.debug("###### Starting parser in pipe line with dataset.....");
 		int ret = 0;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -120,9 +135,15 @@ public class RTPSPipelineProcessor {
 					ComponentServices.TransformationMetadata, ComponentServices.Spark };
 
 			ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+			logger.debug("#### After reading config:: Parser "+ cfg.getParser());
+			logger.debug("###### Setting up ngContext services with dataset.....");
 			NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser",
 					batchId);
+			logger.debug("#### services :: "+ pcs.length);
 			ngParserCtxSvc.initContext();
+			
+			
+			logger.debug("#### starting register outputdatset :: "+ pcs.length);
 			ngParserCtxSvc.registerOutputDataSet();
 
 			logger.warn("Output datasets:");
@@ -130,7 +151,8 @@ public class RTPSPipelineProcessor {
 			ngParserCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.warn(id));
 
 			logger.warn(ngParserCtxSvc.getNgctx().toString());
-
+			logger.debug("###### Registered outputs.....");
+			this.datafileDFmap.get("DATA_STREAM").show();
 
 			ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			String parserKey = null;
@@ -146,8 +168,9 @@ public class RTPSPipelineProcessor {
 			Dataset dataset = datafileDFmap.get("DATA_STREAM");
 			logger.debug("######Retrived dataset and passing to parser #####");
 			dataset.show();
-			component = new NGParser(ngParserCtxSvc.getNgctx(), pcs, dataset);
+			component = new NGParser(ngParserCtxSvc.getNgctx(),  dataset);
 
+			logger.debug("######Starting init component #####");
 			if (!component.initComponent(null)) {
 				logger.error("Unable to initialize Parser component");
 				return 1;

@@ -50,6 +50,7 @@ public class GenericJsonModel {
         JsonArray objects = jo.get(CONF_OBJECTS).getAsJsonArray();
         AtomicReference<JsonObject> rules = new AtomicReference<>(null);
         if (jo.has(CONF_TRANSFORMATIONS)) {
+        	logger.debug("####Transformations :: "+ jo.get(CONF_TRANSFORMATIONS).getAsJsonObject());
             rules.set(jo.get(CONF_TRANSFORMATIONS).getAsJsonObject());
         }
 
@@ -58,8 +59,10 @@ public class GenericJsonModel {
                     JsonObject object = v.getAsJsonObject();
                     JsonArray fields = object.getAsJsonArray(CONF_FIELDS);
                     List<Transform> transformatoins = new ArrayList<>(fields.size());
-                    fields.forEach((f) ->
-                            transformatoins.add(create(f.getAsJsonObject(), rules.get()))
+                    fields.forEach((f) ->{
+                            transformatoins.add(create(f.getAsJsonObject(), rules.get()));
+                            logger.debug("creating transformation ::"+ f.getAsJsonObject() + "rules::"+ rules.get() );
+                    }
                     );
                     ret.put(object.get(CONF_NAME).getAsString(), transformatoins);
                 }
