@@ -20,6 +20,7 @@
         <start-class>com.synchronoss.saw.SipAlertServiceApplication</start-class>
         <java.version>1.8</java.version>
         <jackson-coreutils>1.8</jackson-coreutils>
+        <mapr.db.version>6.1.0-mapr</mapr.db.version>
         <json-core>1.2.5</json-core>
     </properties>
     <repositories>
@@ -83,12 +84,34 @@
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
         </dependency>
+      <dependency>
+        <groupId>com.mapr.db</groupId>
+        <artifactId>maprdb</artifactId>
+        <version>${mapr.db.version}</version>
+        <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.slf4j</groupId>
+          </exclusion>
+        </exclusions>
 
+      </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <dependency>
+      <dependency>
+        <groupId>com.synchronoss.bda</groupId>
+        <artifactId>meta-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+      </dependency>
+
+      <dependency>
             <groupId>com.synchronoss.bda.sip</groupId>
             <artifactId>sip-common-components</artifactId>
             <version>${revision}</version>
