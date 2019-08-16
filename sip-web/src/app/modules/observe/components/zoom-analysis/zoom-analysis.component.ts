@@ -3,6 +3,7 @@ import {
   Inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ElementRef
 } from '@angular/core';
@@ -33,7 +34,7 @@ let initialChartHeight = 0;
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-export class ZoomAnalysisComponent implements OnInit, OnDestroy {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public nameMap;
@@ -67,9 +68,9 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    const sub = this.displayNameBuilder$.subscribe();
+    this.subscriptions.push(sub);
     setTimeout(() => {
-      const sub = this.displayNameBuilder$.subscribe();
-      this.subscriptions.push(sub);
       // defer updating the chart so that the chart has time to initialize
       fpPipe(
         fpMap(val => {
@@ -78,43 +79,32 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy {
           }
         })
       )(this.data.updater.getValue());
-      // map-chart-viewer component is floating to left
-      // When analysis is loaded for the fisrt time.
-      // Due to which updating the map-chart-viewer height here.
-      if (this.data.analysis.type === 'map') {
-        this.data.updater.next([
-          {
-            path: 'chart.height',
-            data: 700
-          }
-        ]);
-      }
     });
   }
 
-  // ngAfterViewInit(): void {
-  //   console.log(this.data.analysis.type);
-  //   if (this.data.analysis.type !== 'map') {
-  //     console.log('insied');
-  //     setTimeout(() => {
-  //       this.data.updater.next([
-  //         {
-  //           path: 'chart.height',
-  //           data: this.getChartHeight(initialChartHeight)
-  //         }
-  //       ]);
-  //     });
-  //   }
-  // }
+  ngAfterViewInit(): void {
+    if (this.data.analysis.type !== 'map') {
+      setTimeout(() => {
+        this.data.updater.next([
+          {
+            path: 'chart.height',
+            data: this.getChartHeight(initialChartHeight)
+          }
+        ]);
+      });
+    }
+  }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.data.updater.next([
-      {
-        path: 'chart.height',
-        data: initialChartHeight
-      }
-    ]);
+    if (this.data.analysis.type !== 'map') {
+      this.subscriptions.forEach(sub => sub.unsubscribe());
+      this.data.updater.next([
+        {
+          path: 'chart.height',
+          data: initialChartHeight
+        }
+      ]);
+    }
   }
 
   generateDSLDateFilters(filters) {
