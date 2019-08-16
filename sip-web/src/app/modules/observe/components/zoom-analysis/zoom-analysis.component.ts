@@ -34,7 +34,7 @@ let initialChartHeight = 0;
   templateUrl: './zoom-analysis.component.html',
   styleUrls: ['./zoom-analysis.component.scss']
 })
-export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ZoomAnalysisComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   public analysisData: Array<any>;
   public nameMap;
@@ -68,9 +68,9 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    const sub = this.displayNameBuilder$.subscribe();
-    this.subscriptions.push(sub);
     setTimeout(() => {
+      const sub = this.displayNameBuilder$.subscribe();
+      this.subscriptions.push(sub);
       // defer updating the chart so that the chart has time to initialize
       fpPipe(
         fpMap(val => {
@@ -93,18 +93,20 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    if (this.data.analysis.type !== 'map') {
-      setTimeout(() => {
-        this.data.updater.next([
-          {
-            path: 'chart.height',
-            data: this.getChartHeight(initialChartHeight)
-          }
-        ]);
-      });
-    }
-  }
+  // ngAfterViewInit(): void {
+  //   console.log(this.data.analysis.type);
+  //   if (this.data.analysis.type !== 'map') {
+  //     console.log('insied');
+  //     setTimeout(() => {
+  //       this.data.updater.next([
+  //         {
+  //           path: 'chart.height',
+  //           data: this.getChartHeight(initialChartHeight)
+  //         }
+  //       ]);
+  //     });
+  //   }
+  // }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
