@@ -3,7 +3,6 @@ import {
   Inject,
   OnInit,
   OnDestroy,
-  AfterViewInit,
   ViewChild,
   ElementRef
 } from '@angular/core';
