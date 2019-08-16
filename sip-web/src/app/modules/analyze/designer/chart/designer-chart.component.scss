@@ -1,3 +1,5 @@
+@import 'src/themes/base/colors';
+
 :host {
   display: block;
   height: 100% !important;
@@ -12,4 +14,9 @@
   chart {
     height: 100%;
   }
+}
+
+.too-much-data-message {
+  color: $primary-grey-g3;
+  font-size: 26px;
 }
