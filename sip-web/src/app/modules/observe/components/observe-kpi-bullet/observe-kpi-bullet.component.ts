@@ -101,7 +101,7 @@ export class ObserveKPIBulletComponent
       if (tileSizeChanged) {
         const { rows, cols, bullet } = this.item;
         const isTileSizeOk = this.areTileDimensionsOk(
-          bullet.kpiDisplay,
+          bullet.kpiDisplay || 'bullet',
           cols,
           rows
         );
