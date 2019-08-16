@@ -1237,6 +1237,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         value: to === 'pie' ? 'percentage' : ''
       }
     };
+    this.resetArtifacts();
     // this.artifacts = [...this.artifacts];
   }
 
