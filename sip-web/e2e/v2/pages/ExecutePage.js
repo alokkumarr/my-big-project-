@@ -40,6 +40,13 @@ class ExecutePage extends ConfirmationModel {
     this._toastSuccess = element(by.css(`[class*='toast-success']`));
 
     this._aggregate = name => element(by.css(`[class*=' icon-${name}']`));
+    this._previousVersion = element(
+      by.xpath(`//span[text()='Previous Versions']`)
+    );
+    this._firstHistory = element(by.xpath(`(//tr)[2]`));
+    this._executeButtonInDetailPage = element(
+      by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
+    );
   }
 
   verifyTitle(title) {
@@ -140,8 +147,24 @@ class ExecutePage extends ConfirmationModel {
   aggregationVerification(aggregation) {
     commonFunctions.waitFor.elementToBeVisible(this._aggregate(aggregation));
   }
-  clickOnToastSuccessMessage() {
-    commonFunctions.clickOnElement(this._toastSuccess);
+
+  clickOnToastSuccessMessage(designerLabel = null) {
+    if (designerLabel === 'Distinct Count') {
+      // Handle one special case where some issues
+      commonFunctions.elementToBeClickableAndClickByMouseMove(
+        this._toastSuccess
+      );
+    }
+  }
+
+  goToPreviousHistory() {
+    commonFunctions.clickOnElement(this._previousVersion);
+    commonFunctions.waitFor.elementToBeVisible(this._firstHistory);
+    browser
+      .actions()
+      .mouseMove(this._firstHistory)
+      .click()
+      .perform();
   }
 }
 module.exports = ExecutePage;
