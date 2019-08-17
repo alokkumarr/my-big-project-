@@ -154,6 +154,7 @@ export interface DesignerSaveEvent {
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
   analysis: AnalysisDSL;
+  data: any[];
   metric: {
     metricName: string;
     artifacts: Artifact[];

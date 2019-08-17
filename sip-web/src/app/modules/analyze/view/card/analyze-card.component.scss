@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   display: block;
@@ -25,6 +25,10 @@
   }
 
   &.m-chart-bubble {
+    background-image: url('/assets/img/charts/chart-bubble.png');
+  }
+
+  &.m-chart-packedbubble {
     background-image: url('/assets/img/charts/chart-bubble.png');
   }
 
