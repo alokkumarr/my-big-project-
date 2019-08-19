@@ -10,6 +10,8 @@ import com.synchronoss.saw.apipull.pojo.QueryParameter;
 import com.synchronoss.saw.apipull.pojo.RouteMetadata;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
 import com.synchronoss.saw.apipull.service.HttpClient;
+import com.synchronoss.saw.apipull.service.contentwriters.ContentWriter;
+import com.synchronoss.saw.apipull.service.contentwriters.TextContentWriter;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -18,20 +20,67 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import java.io.IOException;
+import java.net.URI;
+
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
+import javax.validation.constraints.NotNull;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sncr.bda.core.file.FileProcessor;
+import sncr.bda.core.file.FileProcessorFactory;
 
 @Service("apipullService")
 public class ApiPullServiceImpl extends SipPluginContract {
 
+  private static final Logger logger = LoggerFactory.getLogger(ApiPullServiceImpl.class);
   @Autowired private BisChannelDataRestRepository bisChannelDataRestRepository;
 
   @Autowired private BisRouteDataRestRepository bisRouteDataRestRepository;
+
+  @Value("${bis.default-data-drop-location}")
+  @NotNull
+  private String defaultDestinationLocation;
+
+  @Value("${bis.destination-fs-user}")
+  @NotNull
+  private String mapRfsUser;
+
+  private FileProcessor processor;
+  FileSystem fs;
+  Configuration conf;
   /** This method is to test connect the route. */
+  @PostConstruct
+  private void init() throws Exception {
+
+    processor = FileProcessorFactory.getFileProcessor(defaultDestinationLocation);
+
+    if (!processor.isDestinationExists(defaultDestinationLocation)) {
+      logger.trace("Defautl drop location not found");
+      logger.trace("Creating folders for default drop location :: " + defaultDestinationLocation);
+
+      processor.createDestination(defaultDestinationLocation, new StringBuffer());
+
+      logger.trace(
+          "Default drop location folders created? :: "
+              + processor.isDestinationExists(defaultDestinationLocation));
+    }
+
+    String location = defaultDestinationLocation.replace(FileProcessor.maprFsPrefix, "");
+    conf = new Configuration();
+    conf.set("hadoop.job.ugi", mapRfsUser);
+    fs = FileSystem.get(URI.create(location), conf);
+  }
+
   @Override
   public String connectRoute(Long entityId) throws SipNestedRuntimeException {
     Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(entityId);
@@ -89,7 +138,21 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       String responseContentType = response.getContentType();
 
-      //TODO: Handle api response
+      Object content = response.getResponseBody();
+
+      try {
+
+        ContentWriter contentWriter = null;
+        if (responseContentType == "application/json" || responseContentType == "text/plain") {
+          contentWriter = new TextContentWriter(content.toString(), responseContentType);
+        } else {
+          // Yet to implement
+        }
+
+        contentWriter.write("");
+      } catch (IOException exception) {
+        throw new SipNestedRuntimeException(ExceptionUtils.getFullStackTrace(exception));
+      }
     } else {
       // TODO: Throw exception here
     }
