@@ -112,8 +112,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     public NGParser() {  super(); }
 
-    
-   
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -229,9 +227,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
                     + " with format " + rejectedDataFormat);
             }
-
-            // TODO: If data set exists and flag is not append - error
-            // TODO: This is good for UI what about pipeline? Talk to Suren
 
             // Check what sourcePath referring
             FileSystem fs = HFileOperations.getFileSystem();
@@ -402,45 +397,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
 
-//    protected int archive(){
-//        int result = 0;
-//        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
-//
-//        try {
-//            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
-//
-//            if (files != null && files.length != 0) {
-//                //Create archive directory
-//
-//                logger.debug("Total files = " + files.length);
-//
-//                int archiveCounter = 0;
-//
-//                for(FileStatus fiile: files) {
-//                    String currentTimestamp = LocalDateTime.now()
-//                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-//
-//                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-//                    ctx.fs.mkdirs(archivePath);
-//
-//                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
-//                        archiveCounter++;
-//                    }
-//                }
-//
-//                logger.info("Total files archived = " + archiveCounter);
-//            }
-//        } catch (IOException e) {
-//            logger.error("Archival failed");
-//
-//            logger.error(ExceptionUtils.getStackTrace(e));
-//
-//            result = 1;
-//        }
-//
-//        return result;
-//    }
-
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
         return ctx.fs.rename(sourceFilePath, archiveLocation);
@@ -607,7 +563,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return rc;
     }
 
-
     private boolean collectAcceptedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
         boolean status = true;
 
@@ -742,8 +697,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             status = false;
         }
-
-
 
         return status;
     }
@@ -904,6 +857,5 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             System.exit(-1);
         }
     }
-
 
 }
