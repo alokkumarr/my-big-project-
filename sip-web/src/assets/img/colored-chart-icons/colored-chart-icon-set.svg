@@ -194,6 +194,23 @@
       </g>
     </svg>
 
+    <svg id="packed-bubble-chart-col" xmlns="http://www.w3.org/2000/svg" width="61" height="60" viewBox="0 0 61 60">
+      <g fill="none" fill-rule="evenodd" transform="translate(.21)">
+        <path fill="#C6C6C6" fill-rule="nonzero" d="M1.79 59.022h59.452v1h-60V60H.79V0h1v59.022z"/>
+        <circle cx="31" cy="30" r="28" stroke="#C6C6C6"/>
+        <circle cx="22.289" cy="50.5" r="4.5" fill="#F59736" fill-rule="nonzero"/>
+        <circle cx="52.289" cy="25.5" r="6.5" fill="#F59736" fill-rule="nonzero"/>
+        <circle cx="26.289" cy="7.5" r="4.5" fill="#F59736" fill-rule="nonzero"/>
+        <circle cx="21.289" cy="14.5" r="3.5" fill="#50B38B" fill-rule="nonzero"/>
+        <circle cx="13.789" cy="15" r="3" fill="#F59736" fill-rule="nonzero"/>
+        <circle cx="10.289" cy="24.5" r="5.5" fill="#F59736" fill-rule="nonzero"/>
+        <circle cx="24.289" cy="25.5" r="7.5" fill="#C9E5FE" fill-rule="nonzero"/>
+        <circle cx="14.289" cy="38.5" r="8.5" fill="#4596B4" fill-rule="nonzero"/>
+        <circle cx="39.289" cy="15.5" r="9.5" fill="#F96657" fill-rule="nonzero"/>
+        <circle cx="38.289" cy="41.5" r="13.5" fill="#26D990" fill-rule="nonzero"/>
+      </g>
+    </svg>
+
   </defs>
 </svg>
 

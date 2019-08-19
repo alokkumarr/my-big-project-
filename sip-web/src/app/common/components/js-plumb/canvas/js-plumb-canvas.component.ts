@@ -13,8 +13,10 @@ import * as get from 'lodash/get';
 import * as jsPlumb from 'jsplumb';
 import * as find from 'lodash/find';
 import * as isEqual from 'lodash/isEqual';
+import * as isEmpty from 'lodash/isEmpty';
 import * as findIndex from 'lodash/findIndex';
 import { tap } from 'rxjs/operators';
+import { Store } from '@ngxs/store';
 
 import {
   Artifact,
@@ -23,7 +25,7 @@ import {
   EndpointPayload,
   JoinChangeEvent,
   ConnectionPayload,
-  JsPlumbCanvasChangeEvent
+  JoinEventData
 } from '../types';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -32,6 +34,9 @@ import {
   ArtifactColumnDSL,
   ArtifactColumnReport
 } from 'src/app/models';
+import {
+  DesignerJoinsArray
+} from './../../../../modules/analyze/designer/actions/designer.actions';
 
 @Component({
   selector: 'js-plumb-canvas-u',
@@ -46,7 +51,7 @@ import {
 })
 export class JsPlumbCanvasComponent
   implements OnInit, AfterViewInit, OnDestroy {
-  @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
+  @Output() change: EventEmitter<JoinEventData> = new EventEmitter();
   @Input() useAggregate: boolean;
   @Input() artifacts: Artifact[];
   @Input() joins: Join[] = [];
@@ -95,7 +100,7 @@ export class JsPlumbCanvasComponent
     })
   );
 
-  constructor(public _elementRef: ElementRef) {
+  constructor(public _elementRef: ElementRef, private _store: Store) {
     this.onConnection = this.onConnection.bind(this);
     this.onConnectionDetached = this.onConnectionDetached.bind(this);
   }
@@ -103,7 +108,9 @@ export class JsPlumbCanvasComponent
   ngOnInit() {
     this._jsPlumbInst = jsPlumb.getInstance();
     this._jsPlumbInst.setContainer(this._elementRef.nativeElement);
-
+    if (!isEmpty(this.joins)) {
+      this._store.dispatch(new DesignerJoinsArray(this.joins));
+    }
     this.listeners.push(this.syncCheckedField.subscribe());
   }
 
@@ -119,7 +126,7 @@ export class JsPlumbCanvasComponent
     return index;
   }
 
-  onChange(event: JsPlumbCanvasChangeEvent) {
+  onChange(event: JoinEventData) {
     this.change.emit(event);
   }
 
@@ -244,12 +251,12 @@ export class JsPlumbCanvasComponent
       criteria: [sourceCriterion, targetCriterion]
     };
     this.joins.push(join);
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 
   changeJoin(index, newJoin) {
     this.joins[index] = newJoin;
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 
   removeJoin(join) {
@@ -258,6 +265,6 @@ export class JsPlumbCanvasComponent
     if (index >= 0) {
       this.joins.splice(index, 1);
     }
-    this.onChange({ subject: 'joins' });
+    this.onChange({ subject: 'joins', data: this.joins });
   }
 }

@@ -47,6 +47,13 @@ gridster.dashboard-gridster {
       }
     }
 
+    @media (hover: none) {
+      .backdrop {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+
     .dashboard-item-error-message {
       align-items: center;
       display: flex;

@@ -8,6 +8,7 @@ import com.synchronoss.saw.exceptions.MissingFieldException;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.Join.JoinType;
 import com.synchronoss.saw.model.JoinCondition;
@@ -18,6 +19,7 @@ import com.synchronoss.saw.model.Sort;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.util.StringUtils;
 
 public class DlReportConverter implements AnalysisSipDslConverter {
 
@@ -85,6 +87,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     sipQuery.setBooleanCriteria(booleanCriteria);
 
     sipQuery.setFilters(generateFilters(sqlQueryBuilder));
+    sipQuery = removeEpochFromFilter(sipQuery);
     sipQuery.setSorts(buildOrderbyCols(sqlQueryBuilder));
     sipQuery.setJoins(buildJoins(sqlQueryBuilder));
     return sipQuery;
@@ -266,9 +269,35 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     if (sortObject.has("tableName")) {
       String tableName = sortObject.get("tableName").getAsString();
 
-      sort.setArtifacts(tableName);
+      sort.setArtifactsName(tableName);
+    }
+
+    if (sortObject.has("aggregate")) {
+      String aggregate = sortObject.get("aggregate").getAsString();
+
+      sort.setAggregate(Sort.Aggregate.fromValue(aggregate));
     }
 
     return sort;
+  }
+
+  /**
+   * DL didn't had support of epoch earlier but FE had sent format as epoch milli, need to remove it
+   * to avoid confusions.
+   *
+   * @param sipQuery SipQuery obj.
+   * @return SipQuery obj
+   */
+  public SipQuery removeEpochFromFilter(SipQuery sipQuery) {
+    for (Filter filter : sipQuery.getFilters()) {
+      if (filter != null
+          && filter.getModel() != null
+          && !StringUtils.isEmpty(filter.getModel().getFormat())) {
+        if (filter.getModel().getFormat().equalsIgnoreCase("epoch_millis")) {
+          filter.getModel().setFormat("yyyy-MM-dd");
+        }
+      }
+    }
+    return sipQuery;
   }
 }

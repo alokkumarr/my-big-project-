@@ -78,13 +78,18 @@ public class DataExportController {
                                 RequestEntity request, HttpServletResponse response){
     logger.debug("executionId in dispatch {}", executionId);
     logger.debug("Request body {}", request.getBody());
+    logger.debug("Analysis type = " + analysisType);
 
     Object dispatchBean = request.getBody();
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
       Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
       Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
-      if (s3Obj == null && ftpObj == null && recipientsObj == null) {
+      String type = (String) ((LinkedHashMap) dispatchBean).get("type");
+      if (s3Obj == null
+          && ftpObj == null
+          && recipientsObj == null
+          && !type.equalsIgnoreCase("chart")) {
         throw new RuntimeException("Either one of the dispatcher(S3, ftp, email) is mandatory!!.");
       }
     } else {
