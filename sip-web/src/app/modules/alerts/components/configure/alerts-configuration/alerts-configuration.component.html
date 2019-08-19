@@ -1,0 +1,189 @@
+<mat-sidenav-container fxFlex fxFill hasBackdrop="false" class="conf-container">
+  <mat-sidenav
+    #alertSidenav
+    position="end"
+    [mode]="addAlertPanelMode"
+    autoFocus="false"
+  >
+    <div fxFlex fxLayout="column" class="conf-container__add">
+      <div
+        fxFlex="45px"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        class="conf-container__add__header"
+      >
+        <span fxFlex class="conf-container__add__header__title" i18n
+          >{{ navTitle }}
+        </span>
+        <button
+          mat-icon-button
+          color="warn"
+          e2e="cancel-add-alert"
+          (click)="cancelAddalert()"
+        >
+          <mat-icon fontIcon="icon-close"></mat-icon>
+        </button>
+      </div>
+      <add-alert
+        *ngIf="alertSidenav.opened"
+        [alertDefinition]="alertDefInput"
+        (onAddAlert)="onAddAlert()"
+      ></add-alert>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlex fxLayout="column" class="conf-container-content">
+    <div
+      fxFlex="45px"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="conf-container-content__header"
+    >
+      <span fxFlex class="conf-container-content__header__title" i18n
+        >Configure Alerts
+      </span>
+      <button
+        *ngIf="!sidenav.opened"
+        i18n
+        class="conf-container-content__header__addBtn"
+        color="primary"
+        mat-raised-button
+        e2e="open-add-alert"
+        (click)="alertSidenav.open()"
+      >
+        + Alert
+      </button>
+    </div>
+    <div fxFlex class="conf-container-content__body mat-elevation-z3">
+      <dx-data-grid
+        fxFlex
+        e2e="conf-alerts"
+        [dataSource]="configuredAlerts$ | async"
+        [allowColumnReordering]="true"
+        [allowColumnResizing]="true"
+        [showBorders]="false"
+        [columnAutoWidth]="false"
+        [showColumnLines]="false"
+        [showRowLines]="false"
+        keyExpr="alertRulesSysId"
+        [rowAlternationEnabled]="true"
+      >
+        <dxo-selection mode="none"></dxo-selection>
+        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
+        <dxo-search-panel
+          [visible]="false"
+          [width]="220"
+          placeholder="Search..."
+        ></dxo-search-panel>
+        <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+        <dxi-column caption="Alert Name" dataField="alertName"></dxi-column>
+        <dxi-column
+          caption="Alert Description"
+          dataField="alertDescription"
+        ></dxi-column>
+        <dxi-column
+          caption="Severity"
+          dataField="alertSeverity"
+          cellTemplate="severityTemplate"
+        ></dxi-column>
+        <dxi-column dataField="datapodName"></dxi-column>
+        <dxi-column caption="Metric" dataField="monitoringEntity"></dxi-column>
+        <dxi-column dataField="operator"></dxi-column>
+        <dxi-column dataField="aggregation"></dxi-column>
+        <dxi-column dataField="thresholdValue" alignment="center"></dxi-column>
+        <dxi-column
+          caption="Is Active"
+          dataField="activeInd"
+          alignment="center"
+          cellTemplate="statusTemplate"
+        >
+        </dxi-column>
+
+        <dxi-column
+          caption="Edit"
+          dataField="alertRulesSysId"
+          alignment="center"
+          cellTemplate="editTemplate"
+          [allowFiltering]="false"
+          [allowSorting]="false"
+        >
+        </dxi-column>
+
+        <dxi-column
+          caption="Delete"
+          dataField="alertRulesSysId"
+          alignment="center"
+          cellTemplate="deleteTemplate"
+          [allowFiltering]="false"
+          [allowSorting]="false"
+        >
+        </dxi-column>
+
+        <div
+          *dxTemplate="let data of 'statusTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <mat-icon
+            i18n-matTooltip
+            class="conf-container-content__body__statusIcon"
+            [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
+            fontIcon="icon-logout"
+            [matTooltip]="data.data.activeInd ? 'Active' : 'Inactive'"
+          ></mat-icon>
+        </div>
+
+        <div
+          *dxTemplate="let data of 'editTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            color="primary"
+            e2e="edit-alert"
+            class="conf-container-content__body__gridBtn"
+            matTooltip="Edit"
+            (click)="editAlert(data.data)"
+          >
+            <mat-icon fontIcon="icon-edit"></mat-icon>
+          </button>
+        </div>
+
+        <div
+          *dxTemplate="let data of 'deleteTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          <button
+            mat-icon-button
+            i18n-matTooltip
+            color="warn"
+            e2e="delete-alert"
+            class="conf-container-content__body__gridBtn"
+            matTooltip="Delete"
+            (click)="deleteAlert(data.data)"
+          >
+            <mat-icon fontIcon="icon-delete"></mat-icon>
+          </button>
+        </div>
+
+        <div
+          *dxTemplate="let data of 'severityTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          fxLayoutGap="5px"
+        >
+          <mat-icon
+            class="conf-container-content__body__gridIcon"
+            [ngClass]="data.data.alertSeverity"
+            fontIcon="icon-uniE901"
+          ></mat-icon>
+          <span fxFelx="50px" i18n>{{
+            data.data.alertSeverity | titlecase
+          }}</span>
+        </div>
+      </dx-data-grid>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
