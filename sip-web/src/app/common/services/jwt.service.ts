@@ -141,6 +141,27 @@ export class JwtService {
     // TODO remove alertsModule when it's added into saw_security DB
     parsedJwt.ticket.products[0].productModules.push(ALERTS_MODULE_MENU);
 
+    const jobsSubFeature = {
+      defaultFeature: '0',
+      defaultURL: 'datasource/jobs',
+      privilegeCode: 128,
+      prodCode: 'SAWD000001',
+      prodModCode: 'WRK000001',
+      prodModFeatrCode: 'JOBS001',
+      prodModFeatureDesc: 'Jobs',
+      prodModFeatureID: 416,
+      prodModFeatureName: 'Jobs',
+      prodModFeatureType: 'CHILD_DIS0000001',
+      productModuleSubFeatures: null,
+      roleId: 1
+    };
+    const subFeatures = get(
+      parsedJwt,
+      'ticket.products[0].productModules[2].prodModFeature[2].productModuleSubFeatures'
+    );
+    if (subFeatures) {
+      subFeatures.push(jobsSubFeature);
+    }
     return parsedJwt;
   }
 

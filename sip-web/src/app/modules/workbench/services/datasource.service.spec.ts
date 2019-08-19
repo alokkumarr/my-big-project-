@@ -101,4 +101,16 @@ describe('DatasourceService', () => {
   it('testRoute should exist and return an Observable', () => {
     expect(datasourceService.testRoute('1') instanceof Observable).toBeTruthy();
   });
+
+  it('getChannelListForJobs API should exist and return an Observablet', () => {
+    expect(
+      datasourceService.getChannelListForJobs() instanceof Observable
+    ).toBeTruthy();
+  });
+
+  it('getRouteListForJobs API should exist and return an Observablet', () => {
+    expect(
+      datasourceService.getRouteListForJobs(123) instanceof Observable
+    ).toBeTruthy();
+  });
 });
