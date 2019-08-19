@@ -173,14 +173,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 				logger.error(e.getMessage());
 			} 
 		}
+
 		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
 			logger.debug("format csv");
 			
 			logger.debug("#####Component config:: " + ngctx.componentConfiguration);
 			logger.debug("#####Component config parser :: " +ngctx.componentConfiguration.getParser());
 
-            headerSize = 0; //ngctx.componentConfiguration.getParser().getHeaderSize();
-            //logger.debug("header size"+ headerSize);
+            headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
+            logger.debug("header size"+ headerSize);
 
             lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
             logger.debug("lineSeparator"+ lineSeparator);

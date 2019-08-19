@@ -193,7 +193,7 @@ public class RTPSPipelineProcessor {
 					+ "\n");
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		return ret;
 	}
@@ -272,7 +272,7 @@ public class RTPSPipelineProcessor {
 
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processTransformer() Exception is : " + e + "\n");
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		return ret;
 	}
@@ -355,7 +355,7 @@ public class RTPSPipelineProcessor {
 
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		return ret;
 	}
@@ -426,7 +426,7 @@ public class RTPSPipelineProcessor {
 
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processESLoader() Exception is : " + e + "\n");
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		return ret;
 	}
