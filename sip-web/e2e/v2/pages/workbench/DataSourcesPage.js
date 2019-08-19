@@ -1,6 +1,7 @@
 'use strict';
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
+const Header = require('../../pages/components/Header');
 
 class DataSourcesPage extends DeleteModel {
   constructor() {
@@ -53,6 +54,46 @@ class DataSourcesPage extends DeleteModel {
     this._closeRouteLogsModel = element(
       by.xpath(`//button[contains(@class,"close-button")]`)
     );
+    this._routeName = value =>
+      element(by.css(`[e2e='route-routeName-${value}']`));
+    this._filePattern = value =>
+      element(by.css(`[e2e='route-filePattern-${value}']`));
+    this._sourceLocation = value =>
+      element(by.css(`[e2e='route-sourceLocation-${value}']`));
+    this._destLocation = value =>
+      element(by.css(`[e2e='route-destinationLocation-${value}']`));
+    this._description = value =>
+      element(by.css(`[e2e='route-description-${value}']`));
+
+    //Jobs page
+    this._channelName = value =>
+      element(by.css(`[e2e='job-channelName-${value}']`));
+    this._jobRouteName = value =>
+      element(by.css(`[e2e='job-routeName-${value}']`));
+    this._jobFilePattern = value =>
+      element(by.css(`[e2e='job-filePattern-${value}']`));
+    this._jobIdByRouteName = value =>
+      element(
+        by.xpath(
+          `(//*[@e2e='job-routeName-${value}'])[1]/preceding::div[contains(@e2e,'job-jobId')]/a`
+        )
+      );
+
+    //Job details
+    this._jobLogFilePattern = value =>
+      element(by.css(`[e2e='job-log-filePattern-${value}']`));
+    this._jobLogFileName = value =>
+      element(by.css(`[e2e='job-log-fileName-${value}']`));
+    this._jobLogProcessState = value =>
+      element(by.css(`[e2e='job-log-bisProcessState-${value}']`));
+    this._jobLogFileStatus = value =>
+      element(by.css(`[e2e='job-log-mflFileStatus-${value}']`));
+
+    this._backBtn = element(by.css(`[class='mat-icon-button']`));
+  }
+
+  clickOnJobIdByRouteName(name) {
+    commonFunctions.clickOnElement(this._jobIdByRouteName(name));
   }
 
   clickOnAddChannelButton() {
@@ -146,6 +187,7 @@ class DataSourcesPage extends DeleteModel {
     commonFunctions.clickOnElement(this._routeAction(name));
     browser.sleep(2000); // some time takes time to load
   }
+
   clickOnDeleteRoute() {
     commonFunctions.clickOnElement(this._deleteRoute);
   }
@@ -158,74 +200,67 @@ class DataSourcesPage extends DeleteModel {
   closeRouteLogModel() {
     commonFunctions.clickOnElement(this._closeRouteLogsModel);
   }
+
   verifyRouteDetails(routeInfo) {
     commonFunctions.waitFor.elementToBeVisible(
-      this._routeItems(routeInfo.routeName)
+      this._routeName(routeInfo.routeName)
     );
     commonFunctions.waitFor.elementToBeVisible(
-      this._routeItems(routeInfo.source)
+      this._sourceLocation(routeInfo.source)
     );
     commonFunctions.waitFor.elementToBeVisible(
-      this._routeItems(routeInfo.filePattern)
+      this._filePattern(routeInfo.filePattern)
     );
     commonFunctions.waitFor.elementToBeVisible(
-      this._routeItems(routeInfo.destination)
+      this._destLocation(routeInfo.destination)
     );
     commonFunctions.waitFor.elementToBeVisible(
-      this._routeItems(routeInfo.desc)
+      this._description(routeInfo.desc)
     );
   }
 
   clickOnActivateDeActiveRoute() {
     commonFunctions.clickOnElement(this._routeStatusBtn);
   }
+
   verifyRouteStatus(status) {
     commonFunctions.waitFor.elementToBeVisible(this._routeStatus(status));
   }
+
   clickOnViewRouteLogs() {
     commonFunctions.clickOnElement(this._routeLogs);
   }
 
-  verifyRouteScheduleInformation(routeInfo) {
+  clickOnBackButton() {
+    commonFunctions.clickOnElement(this._backBtn);
+  }
+  verifyRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
     let attempts = 15;
     (function process(index) {
       if (index >= attempts) {
         return;
       }
-
+      _self.clickOnCreatedChannelName(channelName);
       _self.clickOnRouteAction(routeInfo.routeName);
       _self.clickOnViewRouteLogs();
       browser.sleep(2000);
 
       element(
         _self
-          ._getRouteScheduleRowValueOf('fileName')
+          ._jobFilePattern(routeInfo.filePattern)
           .isPresent()
           .then(present => {
             if (present) {
-              _self
-                ._getRouteScheduleRowValueOf('fileName')
-                .getText()
-                .then(text => {
-                  if (text === `${routeInfo.source}/${routeInfo.fileName}`) {
-                    expect(
-                      _self._getRouteScheduleRowValueOf('fileName').getText()
-                    ).toEqual(`${routeInfo.source}/${routeInfo.fileName}`);
-                    _self.scheduleVerification(routeInfo);
-                    _self.closeRouteLogModel();
-                  } else {
-                    _self.closeRouteLogModel();
-                    console.log(
-                      `Element present, Attempt:${index} done but content is the one which wee need`
-                    );
-                    console.log(`waiting for 20 seconds and check again`);
-                    browser.sleep(20000);
-                    process(index + 1);
-                  }
-                });
+              console.log('Element found...');
+              _self.clickOnJobIdByRouteName(routeInfo.routeName);
+              _self.scheduleVerification(routeInfo);
+              // go to channel management
+              _self.clickOnBackButton();
+              _self.clickOnBackButton();
             } else {
-              _self.closeRouteLogModel();
+              // go to channel management
+              _self.clickOnBackButton();
               console.log(`Element not present Attempt:${index} done`);
               console.log(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
@@ -236,71 +271,25 @@ class DataSourcesPage extends DeleteModel {
     })(1);
   }
 
+  goToSubCat(cat, subCat) {
+    const header = new Header();
+    header.openCategoryMenu();
+    header.selectCategory(cat);
+    header.selectSubCategory(subCat);
+  }
   scheduleVerification(routeInfo) {
-    expect(this._getRouteScheduleRowValueOf('filePattern').getText()).toEqual(
-      routeInfo.filePattern
-    );
-    expect(this._getRouteScheduleRowValueOf('fileName').getText()).toContain(
-      `${routeInfo.source}/${routeInfo.fileName}`
-    );
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('actualFileRecDate')
-    );
     expect(
-      this._getRouteScheduleRowValueOf('actualFileRecDate')
-    ).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('recdFileName')
-    );
+      this._jobLogFilePattern(routeInfo.filePattern).isDisplayed()
+    ).toBeTruthy();
     expect(
-      this._getRouteScheduleRowValueOf('recdFileName').getText()
-    ).toContain(routeInfo.destination);
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('recdFileSize')
-    );
-    expect(this._getRouteScheduleRowValueOf('recdFileSize')).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('mflFileStatus')
-    );
+      this._jobLogFileName(
+        `${routeInfo.source}/${routeInfo.fileName}`
+      ).isDisplayed()
+    ).toBeTruthy();
+    expect(this._jobLogFileStatus(`SUCCESS`).isDisplayed()).toBeTruthy();
     expect(
-      this._getRouteScheduleRowValueOf('mflFileStatus').getText()
-    ).toContain('SUCCESS');
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('bisProcessState')
-    );
-    expect(
-      this._getRouteScheduleRowValueOf('bisProcessState').getText()
-    ).toContain('DATA_RECEIVED');
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('transferStartTime')
-    );
-    expect(
-      this._getRouteScheduleRowValueOf('transferStartTime')
-    ).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('transferEndTime')
-    );
-    expect(this._getRouteScheduleRowValueOf('transferEndTime')).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('transferDuration')
-    );
-    expect(this._getRouteScheduleRowValueOf('transferDuration')).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('modifiedDate')
-    );
-    expect(this._getRouteScheduleRowValueOf('modifiedDate')).not.toBeNull();
-
-    commonFunctions.scrollIntoView(
-      this._getRouteScheduleRowValueOf('createdDate')
-    );
-    expect(this._getRouteScheduleRowValueOf('createdDate')).not.toBeNull();
+      this._jobLogProcessState(`DATA_RECEIVED`).isDisplayed()
+    ).toBeTruthy();
   }
 }
 

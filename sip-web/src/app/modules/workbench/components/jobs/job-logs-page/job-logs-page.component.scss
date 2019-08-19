@@ -1,0 +1,30 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  height: calc(100vh - 51px - 63px);
+  overflow: hidden;
+
+  mat-toolbar {
+    background-color: $primary-white;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .job-logs__details {
+    padding: 5px;
+    margin: 10px;
+  }
+
+  .job-logs__details__cell {
+    padding: 5px;
+
+    & > span:first-child {
+      padding-right: 10px;
+    }
+  }
+
+  .job-logs__data-grid {
+    margin: 10px;
+  }
+}
