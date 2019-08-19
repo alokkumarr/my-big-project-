@@ -60,19 +60,19 @@ public class SipGlobalFilterController {
     if (globalFilters == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-   /* Ticket authTicket = getTicket(request);
+    Ticket authTicket = getTicket(request);
     if (authTicket == null) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
-    }*/
-   /* List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();*/
+    }
+    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     Object responseObject = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
-   /* dataSecurityKey.setDataSecuritykey(getDsks(dskList));*/
+    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     try {
       logger.trace(
           "Storage Proxy sync request object : {} ",
