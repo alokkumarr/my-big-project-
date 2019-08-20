@@ -18,7 +18,7 @@ import { isDSLAnalysis } from '../designer/types';
 import {
   CommonLoadAllMetrics,
   CommonStateScheuleJobs
-} from 'src/app/common/actions/menu.actions';
+} from 'src/app/common/actions/common.actions';
 import { first, map, tap, switchMap } from 'rxjs/operators';
 
 const VIEW_KEY = 'analyseReportView';
@@ -178,14 +178,13 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    const categroyID = isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId;
+    const categroyID = isDSLAnalysis(analysis)
+      ? analysis.category
+      : analysis.categoryId;
     this.getCronJobs(categroyID).then(() => {
       // Wait till cron job and schedule is created or updated or deleted successfully.
       /* Update the new analysis in the current list */
-      this._router.navigate([
-        'analyze',
-        categroyID
-      ]);
+      this._router.navigate(['analyze', categroyID]);
     });
   }
 
