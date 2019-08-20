@@ -88,6 +88,7 @@ import {
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState,
+  DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
@@ -114,9 +115,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
-  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
-    AnalysisDSL
-  >;
+  @Select(DesignerState.data) data$: Observable<any[]>;
+  @Select(DesignerState.analysis) dslAnalysis$: Observable<AnalysisDSL>;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
   );
@@ -224,6 +224,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       break;
     }
+    this.data$.subscribe(data => (this.data = data));
     this.dslAnalysis$.subscribe(analysis => {
       if (!analysis || ['report'].includes(analysisType)) {
         return;
@@ -720,11 +721,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
           this.dataCount = 0;
-          this.data = this.setEmptyData();
+          this._store.dispatch(new DesignerSetData(this.setEmptyData()));
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.flattenData(response.data, this.analysis);
+          this._store.dispatch(
+            new DesignerSetData(this.flattenData(response.data, this.analysis))
+          );
           if (this.analysis.type === 'report' && response.designerQuery) {
             if (!this.isInQueryMode) {
               this._store.dispatch(
@@ -736,7 +739,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       },
       err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-        this.data = [];
+        this._store.dispatch(new DesignerSetData([]));
       }
     );
   }

@@ -5,6 +5,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../../material.module';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
+import { Router } from '@angular/router';
 import { DatasourceService } from '../../services/datasource.service';
 import { DatasourceComponent } from './datasource-page.component';
 import { ToastService } from '../../../../common/services/toastMessage.service';
@@ -16,6 +17,8 @@ const DatasourceServiceStub = {
   }
 };
 const ToastServiceStub: Partial<ToastService> = {};
+
+class RouterServiceStub {}
 
 describe('DatasourcePageComponent', () => {
   let component: DatasourceComponent;
@@ -33,7 +36,8 @@ describe('DatasourcePageComponent', () => {
       declarations: [DatasourceComponent],
       providers: [
         { provide: DatasourceService, useValue: DatasourceServiceStub },
-        { provide: ToastService, useValue: ToastServiceStub }
+        { provide: ToastService, useValue: ToastServiceStub },
+        { provide: Router, useClass: RouterServiceStub }
       ]
     }).compileComponents();
   }));
