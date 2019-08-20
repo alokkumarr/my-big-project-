@@ -1,0 +1,185 @@
+<div>
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav position="end" mode="over" autoFocus="false">
+      <job-filters></job-filters>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <mat-toolbar>
+        <mat-toolbar-row fxLayoutGap="5px">
+          <button
+            (click)="goBack()"
+            mat-icon-button
+            style="margin-right: 10px;"
+          >
+            <mat-icon
+              class="back-button-icon"
+              fontIcon="icon-arrow-left"
+            ></mat-icon>
+          </button>
+          <div fxFlex fxLayout="row" fxLayoutAlign="start space-between">
+            <span i18n>Jobs</span>
+          </div>
+          <mat-chip-list fxFlex>
+            <mat-chip
+              class="tag-chip"
+              *ngFor="let jobFilter of jobFilters$ | async"
+              >{{ jobFilter }}</mat-chip
+            >
+          </mat-chip-list>
+          <button
+            mat-icon-button
+            color="secondary"
+            (click)="sidenav.toggle()"
+            matTooltip="Toggle Filter Pannel"
+          >
+            <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+          </button>
+        </mat-toolbar-row>
+      </mat-toolbar>
+
+      <dx-data-grid
+        class="jobs-grid"
+        [dataSource]="data"
+        [showBorders]="false"
+        [columnAutoWidth]="false"
+        [showColumnLines]="false"
+        [rowAlternationEnabled]="true"
+        [width]="'100%'"
+        [height]="'calc(100% - 40px)'"
+        [allowColumnResizing]="true"
+        [paging]="paging"
+        [pager]="pager"
+        [remoteOperations]="remoteOperations"
+        e2e="jobs-container"
+      >
+        <dxo-pager
+          [showPageSizeSelector]="true"
+          [showNavigationButtons]="true"
+          [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 50, 75, 100]"
+          [showInfo]="true"
+          [visible]="pagingEnabled"
+        >
+        </dxo-pager>
+        <dxi-column
+          caption="Job Id"
+          dataField="jobId"
+          alignment="left"
+          cellTemplate="linkCellTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Channel name"
+          dataField="channelName"
+          alignment="left"
+          cellTemplate="nameTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Route name"
+          dataField="routeName"
+          alignment="left"
+          cellTemplate="nameTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Start time"
+          dataField="startTime"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="End time"
+          dataField="endTime"
+          alignment="left"
+          cellTemplate="dateTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Duration (Seconds)"
+          dataField="duration"
+          alignment="left"
+          cellTemplate="durationTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Job status"
+          dataField="jobStatus"
+          alignment="left"
+          cellTemplate="e2eTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Total count"
+          dataField="totalCount"
+          alignment="left"
+          cellTemplate="e2eTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Success count"
+          dataField="successCount"
+          alignment="left"
+          cellTemplate="e2eTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="File pattern"
+          dataField="filePattern"
+          alignment="left"
+          cellTemplate="e2eTemplate"
+        ></dxi-column>
+        <dxi-column
+          caption="Source type"
+          dataField="sourceType"
+          alignment="left"
+          cellTemplate="e2eTemplate"
+        ></dxi-column>
+
+        <div
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
+          *dxTemplate="let cell of 'linkCellTemplate'"
+        >
+          <a routerLink="../joblogs/{{ cell.data.jobId }}">
+            {{ cell.data.jobId }}
+          </a>
+        </div>
+        <div
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
+            (cell.data.endTime - cell.data.startTime) / 1000
+          "
+          *dxTemplate="let cell of 'durationTemplate'"
+        >
+          <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
+            {{ (cell.data.endTime - cell.data.startTime) / 1000 }}
+          </ng-container>
+          <ng-template #defaultTemplate>
+            N/A
+          </ng-template>
+        </div>
+
+        <div
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
+          *dxTemplate="let cell of 'e2eTemplate'"
+        >
+          {{ cell.text }}
+        </div>
+
+        <div
+          style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.value"
+          *dxTemplate="let cell of 'nameTemplate'"
+          [matTooltip]="cell.value"
+        >
+          {{ cell.value }}
+        </div>
+
+        <div
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
+            (cell.text ? (cell.text | date: 'short') : 'N/A')
+          "
+          *dxTemplate="let cell of 'dateTemplate'"
+        >
+          {{ cell.text ? (cell.text | date: 'short') : 'N/A' }}
+        </div>
+      </dx-data-grid>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
