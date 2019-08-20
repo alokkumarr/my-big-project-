@@ -160,5 +160,19 @@ module.exports = {
     browser.getCurrentUrl().then(url => {
       return url.split('=')[1];
     });
+  },
+  elementToBeClickableAndClickByMouseMove(element) {
+    this.waitFor.elementToBePresent(element);
+    this.waitFor.elementToBeVisible(element);
+    browser.wait(
+      EC.elementToBeClickable(element),
+      fluentWait,
+      'Element "' + element.locator() + '" is not clickable'
+    );
+    browser
+      .actions()
+      .mouseMove(element)
+      .click()
+      .perform();
   }
 };
