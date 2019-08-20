@@ -328,6 +328,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     fpPipe(
       fpFlatMap(artifact => artifact.columns || artifact.fields),
       fpReduce((accumulator, column) => {
+        if (column.type === 'date') {
+          column.dateFormat = 'MMM d YYYY';
+        }
         delete column.checked;
         return accumulator;
       }, {})
@@ -436,7 +439,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           value: ''
         };
     }
-
     this._store.dispatch(
       new DesignerUpdateAnalysisChartLabelOptions(labelOptions)
     );
@@ -696,7 +698,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
     // because these properties are not part of dsl analysis definition
@@ -1234,6 +1235,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<any>this.analysis).isInverted = to === 'bar';
     }
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
+    this.auxSettings = { ...this.auxSettings, labelOptions: {
+        enabled: to === 'pie',
+        value: to === 'pie' ? 'percentage' : ''
+      }
+    };
+    this.resetArtifacts();
     // this.artifacts = [...this.artifacts];
   }
 
