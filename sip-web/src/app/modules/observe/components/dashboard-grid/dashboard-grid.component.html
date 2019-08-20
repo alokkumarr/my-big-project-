@@ -7,9 +7,10 @@
   >
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="backdrop" *ngIf="!isViewMode()">
-      <div class="tile-actions gridster-item-content">
+      <div class="tile-actions">
         <button
           mat-icon-button
+          class="gridster-item-content"
           [attr.e2e]="'dashboard-edit-tile-button-' + idx"
           (click)="editTile(item)"
           *ngIf="item.kpi || item.bullet"
@@ -18,6 +19,7 @@
         </button>
         <button
           mat-icon-button
+          class="gridster-item-content"
           [attr.e2e]="'dashboard-remove-tile-button-' + idx"
           (click)="removeTile(item)"
         >
