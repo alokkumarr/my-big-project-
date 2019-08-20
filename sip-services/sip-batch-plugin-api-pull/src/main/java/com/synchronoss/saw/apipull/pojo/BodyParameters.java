@@ -16,6 +16,10 @@ public class BodyParameters {
   private Object content;
 
   /** (Required) */
+  @JsonProperty("type")
+  private String type;
+
+  /** (Required) */
   @JsonProperty("content")
   public Object getContent() {
     return content;
@@ -27,14 +31,26 @@ public class BodyParameters {
     this.content = content;
   }
 
+  /** (Required) */
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
+
+  /** (Required) */
+  @JsonProperty("type")
+  public void setType(String type) {
+    this.type = type;
+  }
+
   @Override
   public String toString() {
-    return new ToStringBuilder(this).append("content", content).toString();
+    return new ToStringBuilder(this).append("content", content).append("type", type).toString();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder().append(content).toHashCode();
+    return new HashCodeBuilder().append(content).append(type).toHashCode();
   }
 
   @Override
@@ -46,6 +62,6 @@ public class BodyParameters {
       return false;
     }
     BodyParameters rhs = ((BodyParameters) other);
-    return new EqualsBuilder().append(content, rhs.content).isEquals();
+    return new EqualsBuilder().append(content, rhs.content).append(type, rhs.type).isEquals();
   }
 }

@@ -1,10 +1,12 @@
 package com.synchronoss.saw.apipull.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,8 +30,14 @@ public class HttpClientGet extends SncrBaseHttpClient {
     url = this.generateUrl(apiEndPoint, queryParams);
 
     try {
-      apiResponse.setResponseBody(restTemplate.getForObject(url, JsonNode.class));
-      HttpHeaders httpHeaders = restTemplate.headForHeaders(url);
+        HttpHeaders headers = new HttpHeaders();
+        headerParams.entrySet().stream()
+            .forEach(entry -> headers.set(entry.getKey(), entry.getValue().toString()));
+        HttpEntity httpEntity = new HttpEntity("parameters",headers);
+        ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET,httpEntity, Object.class);
+
+      apiResponse.setResponseBody(response.getBody());
+      HttpHeaders httpHeaders =  response.getHeaders();
       apiResponse.setHttpHeaders(httpHeaders);
       if (httpHeaders.getContentType() != null) {
         apiResponse.setContentType(httpHeaders.getContentType().toString());
