@@ -357,8 +357,10 @@ public class StorageProxyController {
                 executionType,
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
-      } else if (tempExecutionType) {
-        if (!analysis.getType().equalsIgnoreCase("report")) {
+      }
+      if (!analysis.getType().equalsIgnoreCase("report")) {
+          logger.info("analysis ."+"not a DL report");
+        if (tempExecutionType) {
           ExecutionResult executionResult =
               buildExecutionResult(
                   executeResponse.getExecutionId(),
@@ -370,6 +372,15 @@ public class StorageProxyController {
                   (List<Object>) executeResponse.getData());
           proxyService.saveTtlExecutionResult(executionResult);
         }
+        // return only requested data based on page no and page size, only for FE
+        List<Object> pagingData =
+            proxyService.pagingData(page, pageSize, (List<Object>) executeResponse.getData());
+        /* If FE is sending the page no and page size then we are setting only   data that
+         * corresponds to page no and page size in response instead of  total data.
+         * For DL reports skipping this step as response from DL is already paginated.
+         * */
+        executeResponse.setData(
+            pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
