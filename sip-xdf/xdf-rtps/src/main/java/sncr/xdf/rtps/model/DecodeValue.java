@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import sncr.xdf.rtps.transform.Transform;
 
-import static sncr.xdf.rtps.GenericJsonModel.*;
+import static sncr.xdf.rtps.model.GenericJsonModel.*;
 
 /**
  * Created by asor0002 on 10/5/2016.

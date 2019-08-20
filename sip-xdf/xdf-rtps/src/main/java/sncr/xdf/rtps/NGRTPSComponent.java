@@ -1,4 +1,4 @@
-package sncr.xdf.rtps.driver;
+package sncr.xdf.rtps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,8 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.exceptions.XDFException.ErrorCodes;
+import sncr.xdf.rtps.driver.EventProcessingApplicationDriver;
+
 
 public class NGRTPSComponent extends AbstractComponent
 		implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {

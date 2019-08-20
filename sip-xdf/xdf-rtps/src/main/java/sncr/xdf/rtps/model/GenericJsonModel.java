@@ -15,7 +15,6 @@ import org.apache.spark.sql.types.StructType;
 
 import sncr.xdf.rtps.transform.Transform;
 
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 

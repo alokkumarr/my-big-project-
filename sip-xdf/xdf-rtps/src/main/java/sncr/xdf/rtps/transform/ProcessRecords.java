@@ -40,10 +40,10 @@ import sncr.xdf.rtps.model.GenericJsonModel;
 
 import sncr.xdf.rtps.driver.RTPSPipelineProcessor;
 
-import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_GENERIC;
-import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_GENERIC;
-import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_SIMPLE;
-import static sncr.xdf.rtps.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
 
 
 /**

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import static sncr.xdf.rtps.GenericJsonModel.*;
+import static sncr.xdf.rtps.model.GenericJsonModel.*;
 
 
 

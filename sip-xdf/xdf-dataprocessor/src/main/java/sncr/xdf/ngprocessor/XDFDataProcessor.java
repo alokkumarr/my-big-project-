@@ -22,7 +22,7 @@ import java.util.Map;
 
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.parser.NGParser;
-import sncr.xdf.rtps.NGRTPSComponent;
+import sncr.xdf.rtps.driver.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
 
