@@ -13,9 +13,6 @@ public class ParserFieldsOutput {
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("type")
-    @Expose
-    private String type;
     @SerializedName("format")
     @Expose
     private String format;
@@ -36,9 +33,8 @@ public class ParserFieldsOutput {
      * @param format
      * @param type
      */
-    public ParserFieldsOutput(String name, String type, String format, String destinationName) {
+    public ParserFieldsOutput(String name, String format, String destinationName) {
         this.name = name;
-        this.type = type;
         this.format = format;
         this.destinationName = destinationName;
     }
@@ -63,29 +59,6 @@ public class ParserFieldsOutput {
 
     public ParserFieldsOutput withName(String name) {
         this.name = name;
-        return this;
-    }
-
-    /**
-     *
-     * @return
-     *     The type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     *
-     * @param type
-     *     The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public ParserFieldsOutput withType(String type) {
-        this.type = type;
         return this;
     }
 
@@ -142,7 +115,7 @@ public class ParserFieldsOutput {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(type).append(format).toHashCode();
+        return new HashCodeBuilder().append(name).append(format).toHashCode();
     }
 
     @Override
@@ -154,7 +127,7 @@ public class ParserFieldsOutput {
             return false;
         }
         ParserFieldsOutput rhs = ((ParserFieldsOutput) other);
-        return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).append(format, rhs.format).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(format, rhs.format).isEquals();
     }
 
 }
