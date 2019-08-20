@@ -8,7 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ParserFieldsOutput {
+public class OutputFiledsList {
 
     @SerializedName("name")
     @Expose
@@ -24,7 +24,7 @@ public class ParserFieldsOutput {
      * No args constructor for use in serialization
      *
      */
-    public ParserFieldsOutput() {
+    public OutputFiledsList() {
     }
 
     /**
@@ -33,7 +33,7 @@ public class ParserFieldsOutput {
      * @param format
      * @param type
      */
-    public ParserFieldsOutput(String name, String format, String destinationName) {
+    public OutputFiledsList(String name, String format, String destinationName) {
         this.name = name;
         this.format = format;
         this.destinationName = destinationName;
@@ -57,7 +57,7 @@ public class ParserFieldsOutput {
         this.name = name;
     }
 
-    public ParserFieldsOutput withName(String name) {
+    public OutputFiledsList withName(String name) {
         this.name = name;
         return this;
     }
@@ -80,7 +80,7 @@ public class ParserFieldsOutput {
         this.format = format;
     }
 
-    public ParserFieldsOutput withFormat(String format) {
+    public OutputFiledsList withFormat(String format) {
         this.format = format;
         return this;
     }
@@ -103,7 +103,7 @@ public class ParserFieldsOutput {
         this.destinationName = destinationName;
     }
 
-    public ParserFieldsOutput withDestinationName(String destinationName) {
+    public OutputFiledsList withDestinationName(String destinationName) {
         this.destinationName = destinationName;
         return this;
     }
@@ -123,10 +123,10 @@ public class ParserFieldsOutput {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ParserFieldsOutput) == false) {
+        if ((other instanceof OutputFiledsList) == false) {
             return false;
         }
-        ParserFieldsOutput rhs = ((ParserFieldsOutput) other);
+        OutputFiledsList rhs = ((OutputFiledsList) other);
         return new EqualsBuilder().append(name, rhs.name).append(format, rhs.format).isEquals();
     }
 

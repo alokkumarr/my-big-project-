@@ -227,7 +227,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 if (this.acceptedDataCollector != null) {
 
                     scala.collection.Seq<Column> outputColumns = null;
-                    if (ngctx.componentConfiguration.getParser().getParserFieldsOutputs().size() <= 0)
+                    if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
                     {
                         outputColumns =
                             scala.collection.JavaConversions.asScalaBuffer(
@@ -241,11 +241,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     else {
                         outputColumns =
                             scala.collection.JavaConversions.asScalaBuffer(
-                                createParserOutputFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs())).toList();
+                                createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
 
                         Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
 
-                        Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs());
+                        Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
 
                         Dataset filterOutputDS = null;
                         Dataset renameOutputDS = outputDS;
@@ -409,7 +409,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
 
         scala.collection.Seq<Column> outputColumns = null;
-        if (ngctx.componentConfiguration.getParser().getParserFieldsOutputs().size() <= 0)
+        if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
@@ -425,11 +425,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         else {
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
-                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs())).toList();
+                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
 
             Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
-            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs());
+            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
 
             Dataset filterOutputDS = null;
             Dataset renameOutputDS = outputDataset;
@@ -508,7 +508,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Create output dataset
         scala.collection.Seq<Column> outputColumns = null;
 
-        if (ngctx.componentConfiguration.getParser().getParserFieldsOutputs().size() <= 0)
+        if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
@@ -529,11 +529,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         else {
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
-                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs())).toList();
+                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
 
             Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
-            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getParserFieldsOutputs());
+            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
 
             logger.debug("####### columnRenameList is :: "+ columnRenameList.toString());
 
@@ -715,19 +715,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 
-    private static List<Column> createParserOutputFieldList(List<ParserFieldsOutput> outputs){
+    private static List<Column> createParserOutputFieldList(List<OutputFiledsList> outputs){
 
         List<Column> retval = new ArrayList<>(outputs.size());
-        for(ParserFieldsOutput output : outputs){
+        for(OutputFiledsList output : outputs){
             retval.add(new Column(output.getName()));
         }
         return retval;
     }
 
-    private static Map createDestinationFieldList(List<ParserFieldsOutput> outputs){
+    private static Map createDestinationFieldList(List<OutputFiledsList> outputs){
 
         Map<String,String> hmap = new HashMap();
-        for(ParserFieldsOutput output : outputs){
+        for(OutputFiledsList output : outputs){
             if (output.getDestinationName() != null ) {
                 hmap.put(output.getName(),output.getDestinationName());
             }

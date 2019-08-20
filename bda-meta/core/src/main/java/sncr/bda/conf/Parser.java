@@ -31,7 +31,7 @@ public class Parser {
 
   @SerializedName("parserOutputs")
   @Expose
-  private List<ParserFieldsOutput> parserFieldsOutputs = new ArrayList<ParserFieldsOutput>();
+  private List<OutputFiledsList> outputFiledsList = new ArrayList<OutputFiledsList>();
 
   @SerializedName("lineSeparator")
   @Expose
@@ -73,7 +73,7 @@ public class Parser {
   public Parser(
       String file,
       List<Field> fields,
-      List<ParserFieldsOutput> parserOutputs,
+      List<OutputFiledsList> parserOutputs,
       String lineSeparator,
       String delimiter,
       String quoteChar,
@@ -82,7 +82,7 @@ public class Parser {
       Integer numberOfFiles) {
     this.file = file;
     this.fields = fields;
-    this.parserFieldsOutputs = parserFieldsOutputs;
+    this.outputFiledsList = outputFiledsList;
     this.lineSeparator = lineSeparator;
     this.delimiter = delimiter;
     this.quoteChar = quoteChar;
@@ -149,18 +149,18 @@ public class Parser {
     return this;
   }
 
-    /** @return The parserFieldsOutputs */
-    public List<ParserFieldsOutput> getParserFieldsOutputs() {
-        return parserFieldsOutputs;
+    /** @return The outputFiledsList */
+    public List<OutputFiledsList> getOutputFieldsList() {
+        return outputFiledsList;
     }
 
-    /** @param fields The parserFieldsOutputs */
-    public void setParserFieldsOutputs(List<ParserFieldsOutput> parserFieldsOutputs) {
-        this.parserFieldsOutputs = parserFieldsOutputs;
+    /** @param fields The outputFiledsList */
+    public void setOutputFieldsList(List<OutputFiledsList> outputFiledsList) {
+        this.outputFiledsList = outputFiledsList;
     }
 
-    public Parser withParserFieldsOutputs(List<ParserFieldsOutput> parserFieldsOutputs) {
-        this.parserFieldsOutputs = parserFieldsOutputs;
+    public Parser withOutputFieldsList(List<OutputFiledsList> outputFiledsList) {
+        this.outputFiledsList = outputFiledsList;
         return this;
     }
 
@@ -275,7 +275,7 @@ public class Parser {
         .append(parserInputFileFormat)
         .append(schemaValidationRequired)
         .append(fields)
-        .append(parserFieldsOutputs)
+        .append(outputFiledsList)
         .append(lineSeparator)
         .append(delimiter)
         .append(quoteChar)
@@ -299,7 +299,7 @@ public class Parser {
         .append(parserInputFileFormat, rhs.parserInputFileFormat)
         .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
-        .append(parserFieldsOutputs,rhs.parserFieldsOutputs)
+        .append(outputFiledsList,rhs.outputFiledsList)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
         .append(quoteChar, rhs.quoteChar)
