@@ -37,6 +37,16 @@ class ExecutePage extends ConfirmationModel {
         `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
       )
     );
+    this._toastSuccess = element(by.css(`[class*='toast-success']`));
+
+    this._aggregate = name => element(by.css(`[class*=' icon-${name}']`));
+    this._previousVersion = element(
+      by.xpath(`//span[text()='Previous Versions']`)
+    );
+    this._firstHistory = element(by.xpath(`(//tr)[2]`));
+    this._executeButtonInDetailPage = element(
+      by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
+    );
   }
 
   verifyTitle(title) {
@@ -132,6 +142,29 @@ class ExecutePage extends ConfirmationModel {
       commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
     });
+  }
+
+  aggregationVerification(aggregation) {
+    commonFunctions.waitFor.elementToBeVisible(this._aggregate(aggregation));
+  }
+
+  clickOnToastSuccessMessage(designerLabel = null) {
+    if (designerLabel === 'Distinct Count') {
+      // Handle one special case where some issues
+      commonFunctions.elementToBeClickableAndClickByMouseMove(
+        this._toastSuccess
+      );
+    }
+  }
+
+  goToPreviousHistory() {
+    commonFunctions.clickOnElement(this._previousVersion);
+    commonFunctions.waitFor.elementToBeVisible(this._firstHistory);
+    browser
+      .actions()
+      .mouseMove(this._firstHistory)
+      .click()
+      .perform();
   }
 }
 module.exports = ExecutePage;

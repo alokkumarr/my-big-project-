@@ -1,26 +1,26 @@
-import { State, Action, StateContext, Selector } from '@ngxs/store';
-import * as cloneDeep from 'lodash/cloneDeep';
-import * as get from 'lodash/get';
-import * as unset from 'lodash/unset';
-import * as findIndex from 'lodash/findIndex';
-import * as forEach from 'lodash/forEach';
-import * as set from 'lodash/set';
-import * as remove from 'lodash/remove';
-import * as lowerCase from 'lodash/lowerCase';
-import * as isEmpty from 'lodash/isEmpty';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpReduce from 'lodash/fp/reduce';
-import * as fpFilter from 'lodash/fp/filter';
+import { State, Action, StateContext, Selector } from "@ngxs/store";
+import * as cloneDeep from "lodash/cloneDeep";
+import * as get from "lodash/get";
+import * as unset from "lodash/unset";
+import * as findIndex from "lodash/findIndex";
+import * as forEach from "lodash/forEach";
+import * as set from "lodash/set";
+import * as remove from "lodash/remove";
+import * as lowerCase from "lodash/lowerCase";
+import * as isEmpty from "lodash/isEmpty";
+import * as fpPipe from "lodash/fp/pipe";
+import * as fpFlatMap from "lodash/fp/flatMap";
+import * as fpReduce from "lodash/fp/reduce";
+import * as fpFilter from "lodash/fp/filter";
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
-import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { moveItemInArray } from "@angular/cdk/drag-drop";
 import {
   DesignerStateModel,
   DSLChartOptionsModel,
   AnalysisChartDSL,
   AnalysisMapDSL
-} from '../types';
+} from "../types";
 import {
   DesignerInitGroupAdapters,
   DesignerAddColumnToGroupAdapter,
@@ -50,28 +50,30 @@ import {
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
   DesignerResetState,
+  DesignerSetData,
   DesignerUpdateEditMode,
   DesignerUpdateQuery,
   DesignerJoinsArray,
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts
-} from '../actions/designer.actions';
-import { DesignerService } from '../designer.service';
-import { AnalyzeService } from '../../services/analyze.service';
+} from "../actions/designer.actions";
+import { DesignerService } from "../designer.service";
+import { AnalyzeService } from "../../services/analyze.service";
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
-} from '../../consts';
-import { AnalysisDSL } from 'src/app/models';
+} from "../../consts";
+import { AnalysisDSL } from "src/app/models";
 
 // setAutoFreeze(false);
 
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null,
-  metric: null
+  metric: null,
+  data: null
 };
 
 const defaultDSLChartOptions: DSLChartOptionsModel = {
@@ -79,12 +81,12 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   chartType: null,
   isInverted: false,
   legend: {
-    align: '',
-    layout: ''
+    align: "",
+    layout: ""
   },
   labelOptions: {
     enabled: false,
-    value: ''
+    value: ""
   },
   xAxis: {
     title: null
@@ -94,8 +96,10 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
   }
 };
 
+const MAX_PACKED_BUBBLE_CHART_DATA = 20;
+
 @State<DesignerStateModel>({
-  name: 'designerState',
+  name: "designerState",
   defaults: <DesignerStateModel>cloneDeep(defaultDesignerState)
 })
 export class DesignerState {
@@ -118,7 +122,7 @@ export class DesignerState {
     }
 
     /* If this is a report, and query is present, we can request data */
-    if (analysis.type === 'report' && !!sipQuery.query) {
+    if (analysis.type === "report" && !!sipQuery.query) {
       return true;
     } else {
       /* Else, there should be at least one field selected in artifacts */
@@ -126,7 +130,7 @@ export class DesignerState {
         (
           fpFlatMap(
             artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
+            get(state, "analysis.sipQuery.artifacts")
           ) || []
         ).length > 0
       );
@@ -137,8 +141,42 @@ export class DesignerState {
   static artifactFields(state: DesignerStateModel) {
     return fpFlatMap(
       artifact => artifact.fields,
-      get(state, 'analysis.sipQuery.artifacts')
+      get(state, "analysis.sipQuery.artifacts")
     );
+  }
+
+  @Selector()
+  static analysis(state: DesignerStateModel) {
+    return state.analysis;
+  }
+
+  @Selector()
+  static data(state: DesignerStateModel) {
+    return state.data;
+  }
+
+  @Selector()
+  static metricName(state: DesignerStateModel) {
+    return state.metric.metricName;
+  }
+
+  @Selector()
+  static isDataTooMuchForChart(state: DesignerStateModel) {
+    const chartType = get(state, "analysis.chartOptions.chartType");
+    return (
+      chartType === "packedbubble" &&
+      state.data.length > MAX_PACKED_BUBBLE_CHART_DATA
+    );
+  }
+
+  @Action(DesignerSetData)
+  setData(
+    { patchState }: StateContext<DesignerStateModel>,
+    { data }: DesignerSetData
+  ) {
+    return patchState({
+      data
+    });
   }
 
   @Action(DesignerMergeSupportsIntoAnalysis)
@@ -148,7 +186,7 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
 
-    set(analysis, 'supports', supports);
+    set(analysis, "supports", supports);
 
     return patchState({
       analysis: { ...analysis }
@@ -194,22 +232,22 @@ export class DesignerState {
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
     const fillMissingDataWithZeros =
-      analysis.type === 'chart' && artifactColumn.type === 'date';
+      analysis.type === "chart" && artifactColumn.type === "date";
 
     /* If analysis is chart and this is a date field, assign a default
       groupInterval. For pivots, use dateInterval if available */
     const groupInterval = { groupInterval: null };
 
-    if (artifactColumn.type === 'date') {
+    if (artifactColumn.type === "date") {
       switch (analysis.type) {
-        case 'chart':
+        case "chart":
           groupInterval.groupInterval =
             CHART_DATE_FORMATS_OBJ[
               artifactColumn.dateFormat || <string>artifactColumn.format
             ].groupInterval;
           break;
-        case 'pivot':
-          groupInterval.groupInterval = 'day';
+        case "pivot":
+          groupInterval.groupInterval = "day";
           break;
         default:
           break;
@@ -311,7 +349,7 @@ export class DesignerState {
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
     const fillMissingDataWithZeros =
-      analysis.type === 'chart' && artifactColumn.type === 'date';
+      analysis.type === "chart" && artifactColumn.type === "date";
 
     /* Find the artifact inside sipQuery of analysis stored in state */
     const artifactsName =
@@ -391,13 +429,13 @@ export class DesignerState {
 
     const dataFields = fpPipe(
       fpFlatMap(artifact => artifact.fields),
-      fpFilter(field => field.area === 'y')
+      fpFilter(field => field.area === "y")
     )(artifacts);
 
     if (dataFields.length === 2) {
       forEach(dataFields, field => {
-        unset(field, 'limitType');
-        unset(field, 'limitValue');
+        unset(field, "limitType");
+        unset(field, "limitValue");
       });
     }
   }
@@ -466,7 +504,7 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     switch (analysis.type) {
-      case 'chart':
+      case "chart":
         const chartOptions =
           (<AnalysisChartDSL>analysis).chartOptions || defaultDSLChartOptions;
         return patchState({
@@ -476,7 +514,7 @@ export class DesignerState {
             chartOptions: { ...chartOptions, chartType: subType }
           }
         });
-      case 'map':
+      case "map":
         const mapOptions = (<AnalysisMapDSL>analysis).mapOptions;
         return patchState({
           analysis: {
@@ -614,20 +652,20 @@ export class DesignerState {
   initGroupAdapter({ patchState, getState }: StateContext<DesignerStateModel>) {
     const analysis = getState().analysis;
     const { type } = analysis;
-    const fields = get(analysis, 'artifacts[0].columns', []);
+    const fields = get(analysis, "artifacts[0].columns", []);
     let groupAdapters;
     switch (type) {
-      case 'pivot':
+      case "pivot":
         groupAdapters = this._designerService.getPivotGroupAdapters(fields);
         break;
-      case 'chart':
+      case "chart":
         const { chartOptions } = <AnalysisChartDSL>analysis;
         groupAdapters = this._designerService.getChartGroupAdapters(
           fields,
           chartOptions.chartType
         );
         break;
-      case 'map':
+      case "map":
         const { mapOptions } = <AnalysisMapDSL>analysis;
         groupAdapters = this._designerService.getMapGroupAdapters(
           fields,
@@ -740,7 +778,7 @@ export class DesignerState {
     filters.forEach(filter => {
       filter.artifactsName = filter.tableName;
       if (
-        filter.type === 'date' &&
+        filter.type === "date" &&
         !filter.isRuntimeFilter &&
         !filter.isGlobalFilter &&
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE
@@ -748,7 +786,7 @@ export class DesignerState {
         filter.model = {
           gte: filter.model.gte,
           lte: filter.model.lte,
-          format: 'yyyy-MM-dd',
+          format: "yyyy-MM-dd",
           preset: CUSTOM_DATE_PRESET_VALUE
         };
       }
@@ -790,14 +828,14 @@ export class DesignerState {
       let leftJoin = {};
       let rightJoin = {};
       join.criteria.forEach(crt => {
-        if (crt.side === 'left') {
+        if (crt.side === "left") {
           leftJoin = {
             artifactsName: crt.tableName,
             columnName: crt.columnName
           };
         }
 
-        if (crt.side === 'right') {
+        if (crt.side === "right") {
           rightJoin = {
             artifactsName: crt.tableName,
             columnName: crt.columnName
@@ -805,7 +843,7 @@ export class DesignerState {
         }
       });
       const joinCondition = {
-        operator: 'EQ',
+        operator: "EQ",
         left: leftJoin,
         right: rightJoin
       };
@@ -838,14 +876,14 @@ export class DesignerState {
       const DSLCriteria = [];
       join.criteria.forEach(dslCRT => {
         DSLCriteria.push({
-          tableName: dslCRT.joinCondition['left'].artifactsName,
-          columnName: dslCRT.joinCondition['left'].columnName,
-          side: 'left'
+          tableName: dslCRT.joinCondition["left"].artifactsName,
+          columnName: dslCRT.joinCondition["left"].columnName,
+          side: "left"
         });
         DSLCriteria.push({
-          tableName: dslCRT.joinCondition['right'].artifactsName,
-          columnName: dslCRT.joinCondition['right'].columnName,
-          side: 'right'
+          tableName: dslCRT.joinCondition["right"].artifactsName,
+          columnName: dslCRT.joinCondition["right"].columnName,
+          side: "right"
         });
       });
       const dslJoin = {
