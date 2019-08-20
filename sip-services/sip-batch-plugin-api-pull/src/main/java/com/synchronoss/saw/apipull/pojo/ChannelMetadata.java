@@ -35,7 +35,7 @@ public class ChannelMetadata {
   private String apiEndPoint;
   /** (Required) */
   @JsonProperty("httpMethod")
-  private RouteMetadata.HttpMethod httpMethod = RouteMetadata.HttpMethod.fromValue("GET");
+  private HttpMethod httpMethod = HttpMethod.fromValue("GET");
   /** (Required) */
   @JsonProperty("queryParameters")
   private List<QueryParameter> queryParameters = null;
@@ -83,13 +83,13 @@ public class ChannelMetadata {
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public RouteMetadata.HttpMethod getHttpMethod() {
+  public HttpMethod getHttpMethod() {
     return httpMethod;
   }
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public void setHttpMethod(RouteMetadata.HttpMethod httpMethod) {
+  public void setHttpMethod(HttpMethod httpMethod) {
     this.httpMethod = httpMethod;
   }
 

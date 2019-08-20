@@ -19,6 +19,8 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
@@ -83,6 +85,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
   @Override
   public String connectRoute(Long entityId) throws SipNestedRuntimeException {
+    logger.trace("Connecting to route :" + entityId);
+    StringBuffer connectionLogs = new StringBuffer();
     Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(entityId);
 
     if (bisRouteEntity.isPresent()) {
@@ -91,7 +95,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
       Optional<BisChannelEntity> bisChannelEntity = this.findChannelById(channelId);
 
       if (!bisChannelEntity.isPresent()) {
-        // TODO: Throw exception here
+        throw new SipNestedRuntimeException(
+            "Unable to extract channel information for channel id: " + channelId);
       }
 
       Gson gson = new Gson();
@@ -102,38 +107,36 @@ public class ApiPullServiceImpl extends SipPluginContract {
       ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
 
       String hostAddress = channelMetadata.getHostAddress();
-      int port = channelMetadata.getPort();
+      Integer port = channelMetadata.getPort();
 
       String routeMetadataStr = entity.getRouteMetadata();
       RouteMetadata routeMetadata = gson.fromJson(routeMetadataStr, RouteMetadata.class);
 
-      List<QueryParameter> queryParameters = routeMetadata.getQueryParameters();
-      List<HeaderParameter> headerParameters = routeMetadata.getHeaderParameters();
-      BodyParameters bodyParameters = routeMetadata.getBodyParameters();
-
       String apiEndPoint = routeMetadata.getApiEndPoint();
       String destinationLocation = routeMetadata.getDestinationLocation();
       HttpMethod method = routeMetadata.getHttpMethod();
-
-      HttpClient httpClient = new HttpClient();
 
       SipApiRequest apiRequest = new SipApiRequest();
       apiRequest.setUrl(generateUrl(hostAddress, port, apiEndPoint));
 
       apiRequest.setHttpMethod(method != null ? method : HttpMethod.GET);
 
+      List<QueryParameter> queryParameters = routeMetadata.getQueryParameters();
       if (queryParameters != null && queryParameters.size() != 0) {
         apiRequest.setQueryParameters(queryParameters);
       }
 
+      List<HeaderParameter> headerParameters = routeMetadata.getHeaderParameters();
       if (headerParameters != null && headerParameters.size() != 0) {
         apiRequest.setHeaderParameters(headerParameters);
       }
 
+      BodyParameters bodyParameters = routeMetadata.getBodyParameters();
       if (bodyParameters != null) {
         apiRequest.setBodyParameters(bodyParameters);
       }
 
+      HttpClient httpClient = new HttpClient();
       ApiResponse response = httpClient.execute(apiRequest);
 
       String responseContentType = response.getContentType();
@@ -142,6 +145,11 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       try {
 
+        String destination = this.constructDestinationPath(destinationLocation);
+        String path =
+            processor.getFilePath(
+                defaultDestinationLocation, destination, File.separator + getBatchId());
+
         ContentWriter contentWriter = null;
         if (responseContentType == "application/json" || responseContentType == "text/plain") {
           contentWriter = new TextContentWriter(content.toString(), responseContentType);
@@ -149,15 +157,22 @@ public class ApiPullServiceImpl extends SipPluginContract {
           // Yet to implement
         }
 
-        contentWriter.write("");
+//        File file = new File(path);
+//
+//        FileInputStream stream = new FileInputStream(file);
+//
+//        processor.transferFile(stream, file, defaultDestinationLocation, mapRfsUser);
+
+                contentWriter.write(path);
       } catch (IOException exception) {
-        throw new SipNestedRuntimeException(ExceptionUtils.getFullStackTrace(exception));
+        throw new SipNestedRuntimeException(exception.getMessage(), exception);
       }
     } else {
-      // TODO: Throw exception here
+      throw new SipNestedRuntimeException(
+          "Unable to find route information for route id: " + entityId);
     }
 
-    return null;
+    return connectionLogs.toString();
   }
 
   /** This method is to test connect the source. */
@@ -218,5 +233,26 @@ public class ApiPullServiceImpl extends SipPluginContract {
     }
 
     return builder.toString();
+  }
+
+  /**
+   * Checks and adds if '/' is missing in beginning. Returns default drop location if destination is
+   * null.
+   *
+   * @param destinationLoc destination path.
+   * @return destination location
+   */
+  private String constructDestinationPath(String destinationLoc) {
+    String destinationPath = "";
+    if (destinationLoc == null) {
+      destinationPath = this.defaultDestinationLocation;
+    } else {
+      if (destinationLoc.startsWith(File.separator)) {
+        destinationPath = destinationLoc;
+      } else {
+        destinationPath = File.separator + destinationLoc;
+      }
+    }
+    return destinationPath;
   }
 }
