@@ -527,6 +527,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Write dataset status = " + rc);
         }
         else {
+
             outputColumns =
                 scala.collection.JavaConversions.asScalaBuffer(
                     createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
@@ -534,8 +535,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
 
             Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
-
-            logger.debug("####### columnRenameList is :: "+ columnRenameList.toString());
 
             Dataset filterOutputDS = null;
             Dataset renameOutputDS = df;
@@ -552,6 +551,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
 
             logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
+
+            filterOutputDS.printSchema();
+            filterOutputDS.show(5);
 
             rc = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, destDir.toString(), "append");
 
@@ -715,19 +717,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 
-    private static List<Column> createParserOutputFieldList(List<OutputFiledsList> outputs){
+    private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
 
         List<Column> retval = new ArrayList<>(outputs.size());
-        for(OutputFiledsList output : outputs){
+        for(OutputFieldsList output : outputs){
             retval.add(new Column(output.getName()));
         }
         return retval;
     }
 
-    private static Map createDestinationFieldList(List<OutputFiledsList> outputs){
+    private static Map createDestinationFieldList(List<OutputFieldsList> outputs){
 
         Map<String,String> hmap = new HashMap();
-        for(OutputFiledsList output : outputs){
+        for(OutputFieldsList output : outputs){
             if (output.getDestinationName() != null ) {
                 hmap.put(output.getName(),output.getDestinationName());
             }

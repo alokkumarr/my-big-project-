@@ -8,7 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class OutputFiledsList {
+public class OutputFieldsList {
 
     @SerializedName("name")
     @Expose
@@ -24,7 +24,7 @@ public class OutputFiledsList {
      * No args constructor for use in serialization
      *
      */
-    public OutputFiledsList() {
+    public OutputFieldsList() {
     }
 
     /**
@@ -33,7 +33,7 @@ public class OutputFiledsList {
      * @param format
      * @param type
      */
-    public OutputFiledsList(String name, String format, String destinationName) {
+    public OutputFieldsList(String name, String format, String destinationName) {
         this.name = name;
         this.format = format;
         this.destinationName = destinationName;
@@ -57,7 +57,7 @@ public class OutputFiledsList {
         this.name = name;
     }
 
-    public OutputFiledsList withName(String name) {
+    public OutputFieldsList withName(String name) {
         this.name = name;
         return this;
     }
@@ -80,7 +80,7 @@ public class OutputFiledsList {
         this.format = format;
     }
 
-    public OutputFiledsList withFormat(String format) {
+    public OutputFieldsList withFormat(String format) {
         this.format = format;
         return this;
     }
@@ -103,7 +103,7 @@ public class OutputFiledsList {
         this.destinationName = destinationName;
     }
 
-    public OutputFiledsList withDestinationName(String destinationName) {
+    public OutputFieldsList withDestinationName(String destinationName) {
         this.destinationName = destinationName;
         return this;
     }
@@ -123,10 +123,10 @@ public class OutputFiledsList {
         if (other == this) {
             return true;
         }
-        if ((other instanceof OutputFiledsList) == false) {
+        if ((other instanceof OutputFieldsList) == false) {
             return false;
         }
-        OutputFiledsList rhs = ((OutputFiledsList) other);
+        OutputFieldsList rhs = ((OutputFieldsList) other);
         return new EqualsBuilder().append(name, rhs.name).append(format, rhs.format).isEquals();
     }
 
