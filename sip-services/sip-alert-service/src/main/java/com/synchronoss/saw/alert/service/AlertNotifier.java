@@ -33,7 +33,7 @@ public class AlertNotifier {
   private String mailBody;
   @Value("${alert.dashborad.url}")
   private String alertDashboardPath;
-  @Value("${transport.service.host}")
+  @Value("${storage-proxy.service.host}")
   private String transportUrl;
   @Value("${mail.subject}")
   private String mailSubject;

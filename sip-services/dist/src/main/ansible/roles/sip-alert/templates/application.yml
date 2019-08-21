@@ -75,12 +75,14 @@ alert:
   dashborad:
     url: ${connector}://35.175.174.29/sip/web/#/alerts/view
 
-transport:
+storage-proxy:
   service:
     host: ${connector}://localhost:9400
 
 metastore:
   base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
+  alertRulesTable: alertRulesMetadata
+  alertResults: alertResults
   notificationTable : alertNoficationLog
 
 
