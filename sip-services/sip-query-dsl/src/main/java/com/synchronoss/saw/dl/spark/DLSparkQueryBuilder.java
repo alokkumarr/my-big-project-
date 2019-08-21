@@ -1,12 +1,12 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.JoinCondition;

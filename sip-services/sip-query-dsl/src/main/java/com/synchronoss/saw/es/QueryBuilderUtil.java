@@ -360,7 +360,7 @@ public class QueryBuilderUtil {
     for (Object dataField : dataFields) {
       if (dataField instanceof com.synchronoss.saw.model.Field) {
         Field field = (Field) dataField;
-        if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+        if (field.getAggregate() == Aggregate.PERCENTAGE) {
           String aggDataField =
               field.getDataField() == null ? field.getColumnName() : field.getDataField();
           preSearchSourceBuilder.aggregation(

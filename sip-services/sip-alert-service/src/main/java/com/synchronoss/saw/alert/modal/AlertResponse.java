@@ -2,7 +2,7 @@ package com.synchronoss.saw.alert.modal;
 
 public class AlertResponse {
 
-  private Alert alert;
+  private AlertRuleDetails alertRuleDetails;
   private String message;
 
   /**
@@ -10,13 +10,13 @@ public class AlertResponse {
    *
    * @return value of alert
    */
-  public Alert getAlert() {
-    return alert;
+  public AlertRuleDetails getAlert() {
+    return alertRuleDetails;
   }
 
   /** Sets alert. */
-  public void setAlert(Alert alert) {
-    this.alert = alert;
+  public void setAlert(AlertRuleDetails alertRuleDetails) {
+    this.alertRuleDetails = alertRuleDetails;
   }
 
   /**

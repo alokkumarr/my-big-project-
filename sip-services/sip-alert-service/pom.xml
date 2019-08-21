@@ -20,6 +20,7 @@
         <start-class>com.synchronoss.saw.SipAlertServiceApplication</start-class>
         <java.version>1.8</java.version>
         <jackson-coreutils>1.8</jackson-coreutils>
+        <mapr.db.version>6.1.0-mapr</mapr.db.version>
         <json-core>1.2.5</json-core>
     </properties>
     <repositories>
@@ -63,12 +64,7 @@
             <artifactId>SDNotify</artifactId>
             <version>1.1</version>
         </dependency>
-        <!-- flyway dependency to execute sql files automatically on server startup. -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>5.2.0</version>
-        </dependency>
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
@@ -79,15 +75,35 @@
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+      <dependency>
+      <groupId>com.mapr.db</groupId>
+      <artifactId>maprdb</artifactId>
+      <version>${mapr.db.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>slf4j-log4j12</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+      </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.synchronoss.bda</groupId>
+        <artifactId>meta-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>com.synchronoss</groupId>
+        <artifactId>sip-query-dsl</artifactId>
+        <version>${revision}</version>
+      </dependency>
         <dependency>
             <groupId>com.synchronoss.bda.sip</groupId>
             <artifactId>sip-common-components</artifactId>
@@ -139,6 +155,7 @@
                             </configLocation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <violationSeverity>warning</violationSeverity>
+                          <excludes>**/alert/service/AlertServiceImpl.java</excludes>
                         </configuration>
                         <goals>
                             <goal>check</goal>

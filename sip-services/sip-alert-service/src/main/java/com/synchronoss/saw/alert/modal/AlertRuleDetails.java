@@ -1,32 +1,32 @@
 package com.synchronoss.saw.alert.modal;
 
-public class Alert {
+import com.synchronoss.saw.model.SipQuery;
 
-  Long alertRulesSysId;
-  String datapodId;
-  String datapodName;
-  String categoryId;
-  String product;
-  String alertName;
-  String alertDescription;
-  String monitoringEntity;
-  Aggregation aggregation;
-  Operator operator;
-  AlertSeverity alertSeverity;
-  Double thresholdValue;
-  Boolean activeInd;
+public class AlertRuleDetails {
+
+  private String alertRulesSysId;
+  private String datapodId;
+  private String datapodName;
+  private String categoryId;
+  private String product;
+  private String alertName;
+  private String alertDescription;
+  private AlertSeverity alertSeverity;
+  private Boolean activeInd;
+  private String customerCode;
+  private SipQuery sipQuery;
 
   /**
    * Gets alertRulesSysId.
    *
    * @return value of alertRulesSysId
    */
-  public Long getAlertRulesSysId() {
+  public String getAlertRulesSysId() {
     return alertRulesSysId;
   }
 
   /** Sets alertRulesSysId. */
-  public void setAlertRulesSysId(Long alertRulesSysId) {
+  public void setAlertRulesSysId(String alertRulesSysId) {
     this.alertRulesSysId = alertRulesSysId;
   }
 
@@ -115,48 +115,6 @@ public class Alert {
   }
 
   /**
-   * Gets monitoringEntity.
-   *
-   * @return value of monitoringEntity
-   */
-  public String getMonitoringEntity() {
-    return monitoringEntity;
-  }
-
-  /** Sets monitoringEntity. */
-  public void setMonitoringEntity(String monitoringEntity) {
-    this.monitoringEntity = monitoringEntity;
-  }
-
-  /**
-   * Gets aggregation.
-   *
-   * @return value of aggregation
-   */
-  public Aggregation getAggregation() {
-    return aggregation;
-  }
-
-  /** Sets aggregation. */
-  public void setAggregation(Aggregation aggregation) {
-    this.aggregation = aggregation;
-  }
-
-  /**
-   * Gets operator.
-   *
-   * @return value of operator
-   */
-  public Operator getOperator() {
-    return operator;
-  }
-
-  /** Sets operator. */
-  public void setOperator(Operator operator) {
-    this.operator = operator;
-  }
-
-  /**
    * Gets alertSeverity.
    *
    * @return value of alertSeverity
@@ -171,20 +129,6 @@ public class Alert {
   }
 
   /**
-   * Gets thresholdValue.
-   *
-   * @return value of thresholdValue
-   */
-  public Double getThresholdValue() {
-    return thresholdValue;
-  }
-
-  /** Sets thresholdValue. */
-  public void setThresholdValue(Double thresholdValue) {
-    this.thresholdValue = thresholdValue;
-  }
-
-  /**
    * Gets activeInd.
    *
    * @return value of activeInd
@@ -196,5 +140,33 @@ public class Alert {
   /** Sets activeInd. */
   public void setActiveInd(Boolean activeInd) {
     this.activeInd = activeInd;
+  }
+
+  /**
+   * Gets customerCode.
+   *
+   * @return value of customerCode
+   */
+  public String getCustomerCode() {
+    return customerCode;
+  }
+
+  /** Sets customerCode. */
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
+  }
+
+  /**
+   * Gets sipQuery.
+   *
+   * @return value of sipQuery
+   */
+  public SipQuery getSipQuery() {
+    return sipQuery;
+  }
+
+  /** Sets sipQuery. */
+  public void setSipQuery(SipQuery sipQuery) {
+    this.sipQuery = sipQuery;
   }
 }

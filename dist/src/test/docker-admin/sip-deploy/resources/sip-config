@@ -43,8 +43,8 @@ sip_var_path=/var/sip
 #
 # Spark configuration
 #
-saw_spark_master_url=local[*]
-#saw_spark_master_url=yarn
+#saw_spark_master_url=local[*]
+saw_spark_master_url=yarn
 #saw_spark_yarn_queue_regular=saw-regular
 #saw_spark_yarn_queue_fast=saw-fast
 #saw_spark_yarn_jars=/opt/mapr/spark/spark-2.3.2/jars

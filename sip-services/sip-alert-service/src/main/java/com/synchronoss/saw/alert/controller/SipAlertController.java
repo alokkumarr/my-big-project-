@@ -2,11 +2,10 @@ package com.synchronoss.saw.alert.controller;
 
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.saw.alert.entities.AlertRulesDetails;
-import com.synchronoss.saw.alert.modal.Alert;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertResponse;
+import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
@@ -70,7 +69,7 @@ public class SipAlertController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @param alert alert definition
+   * @param alertRuleDetails Alert Rule Details definition
    * @return Alert
    */
   @ApiOperation(value = "", nickname = "createAlertRule", notes = "", response = Object.class)
@@ -80,12 +79,14 @@ public class SipAlertController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AlertResponse createAlertRule(
-      HttpServletRequest request, HttpServletResponse response, @RequestBody Alert alert) {
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = getTicket(request);
     if (ticket != null) {
-      alertResponse.setAlert(alertService.createAlertRule(alert, ticket));
-      if (alert == null) {
+      alertResponse.setAlert(alertService.createAlertRule(alertRuleDetails, ticket));
+      if (alertRuleDetails == null) {
         alertResponse.setMessage("Alert rule definition can't be null for create request");
         response.setStatus(400);
         return alertResponse;
@@ -101,7 +102,7 @@ public class SipAlertController {
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
-   * @param alert alert definition
+   * @param alertRuleDetails AlertRuleDetails definition
    * @return Alert
    */
   @ApiOperation(value = "/{id}", nickname = "updateAlertRule", notes = "", response = Object.class)
@@ -113,13 +114,13 @@ public class SipAlertController {
   public AlertResponse updateAlertRule(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") Long id,
-      @RequestBody Alert alert) {
+      @PathVariable(name = "id") String id,
+      @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = getTicket(request);
     if (ticket != null) {
-      alertResponse.setAlert(alertService.updateAlertRule(alert, id, ticket));
-      if (alert == null) {
+      alertResponse.setAlert(alertService.updateAlertRule(alertRuleDetails, id, ticket));
+      if (alertRuleDetails == null) {
         alertResponse.setMessage("Alert rule definition can't be null for create request");
         response.setStatus(400);
         return alertResponse;
@@ -142,7 +143,7 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<Alert> listAlertRules(HttpServletRequest request) {
+  public List<AlertRuleDetails> listAlertRules(HttpServletRequest request) {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.retrieveAllAlerts(ticket) : null;
   }
@@ -206,7 +207,7 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRulesDetails> listAlertRulesByCategory(
+  public List<AlertRuleDetails> listAlertRulesByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "categoryId") String categoryId) {
@@ -235,7 +236,7 @@ public class SipAlertController {
   public AlertResponse getAlertRules(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") Long id) {
+      @PathVariable(name = "id") String id) {
 
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = getTicket(request);
@@ -266,7 +267,7 @@ public class SipAlertController {
   public AlertResponse deleteAlertRules(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") Long id) {
+      @PathVariable(name = "id") String id) {
 
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = getTicket(request);
