@@ -18,6 +18,11 @@ class JwtServiceStub {
 class ToastServiceStub {}
 class MenuServiceStub {}
 const StoreStub = {};
+const analysis = {
+  schedule: {
+    scheduleState: 'new'
+  }
+};
 
 describe('Analyze Service', () => {
   let service: AnalyzeService;
@@ -42,6 +47,18 @@ describe('Analyze Service', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should read a non DSL analysis', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
+      .readAnalysisNonDSL('abc', {})
+      .then((res: any) => expect(res).toEqual({}));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
   it('should read analysis', () => {
     spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
       asyncData({ contents: { analyze: [{}] } } as any)
@@ -50,6 +67,42 @@ describe('Analyze Service', () => {
     service
       .readAnalysis('abc', false)
       .then((res: any) => expect(res).toEqual({}));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
+  it('should fetch cron details', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
+      .getCronDetails({})
+      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
+  it('should fetch all cron jobs', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
+      .getAllCronJobs({})
+      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
+  it('create or update an existing analysis', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
+      .changeSchedule(analysis)
+      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
 
     expect(spy.calls.count()).toEqual(1);
   });
