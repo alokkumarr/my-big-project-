@@ -454,8 +454,7 @@ public class ExportServiceImpl implements ExportService {
             storageProxyUrl
                 + "/internal/proxy/storage/"
                 + executionId
-                + "/executions/data?page=1&pageSize="
-                + emailExportSize;
+                + "/executions/data";
 
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
             asyncRestTemplate.getForEntity(url, JsonNode.class);
@@ -505,6 +504,7 @@ public class ExportServiceImpl implements ExportService {
 
                   List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
                   logger.trace("Parse data for workbook writing : " + dataObj);
+                  logger.trace("Data size = " + dataObj.size());
 
                   Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
                   logger.debug("workbook created with DSL : " + workbook);
@@ -625,6 +625,7 @@ public class ExportServiceImpl implements ExportService {
 
                 List<Object> dataObj = responseParser.parsePivotData(jsonNode);
                 logger.trace("Parse data for workbook writing : " + dataObj);
+                logger.trace("Data size = " + dataObj.size());
 
                 Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
                 logger.debug("workbook successfully with DSL" + workbook);
