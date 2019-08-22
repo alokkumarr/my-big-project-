@@ -1,12 +1,13 @@
 package com.synchronoss.saw.apipull.service;
 
 import com.google.gson.Gson;
+import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,22 +17,18 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 public class HttpClientPost extends SncrBaseHttpClient {
+  private static final Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
+  public static final String CONTENT_TYPE = "Content-Type";
+  public static final String ACCEPT = "Accept";
 
   Map<String, Object> formData;
   String textData;
-
-  HttpPost httpPost;
 
   RestTemplate restTemplate = new RestTemplate();
   ApiResponse apiResponse = new ApiResponse();
 
   public HttpClientPost(String host) {
     super(host);
-  }
-
-  private void setPostHeaders() {
-    headerParams.entrySet().stream()
-        .forEach(entry -> httpPost.setHeader(entry.getKey(), entry.getValue().toString()));
   }
 
   /**
@@ -42,9 +39,10 @@ public class HttpClientPost extends SncrBaseHttpClient {
    * @throws Exception
    */
   public void setRawData(String content, String contentType) throws Exception {
+    logger.debug("Setting RequestBody : Content-Type = " + contentType + " \t Body : " + content);
     textData = content;
-    this.setHeaderParam("Content-Type", contentType);
-    this.setHeaderParam("Accept", contentType);
+    this.setHeaderParam(CONTENT_TYPE, contentType);
+    this.setHeaderParam(ACCEPT, contentType);
   }
 
   /**
@@ -57,8 +55,10 @@ public class HttpClientPost extends SncrBaseHttpClient {
     try {
       Gson gson = new Gson();
       gson.fromJson(jsonInString, Object.class);
+      logger.debug("Request body is a Valid Json");
       return true;
     } catch (com.google.gson.JsonSyntaxException ex) {
+      logger.error("Request body is not a Valid Json");
       return false;
     }
   }
@@ -69,8 +69,7 @@ public class HttpClientPost extends SncrBaseHttpClient {
       // TODO : validate against request body
       return true;
     } catch (Exception e) {
-      System.out.println("Invalid XML");
-      e.printStackTrace();
+      logger.error("Invalid XML", e.getMessage());
     }
     return false;
   }
@@ -87,86 +86,121 @@ public class HttpClientPost extends SncrBaseHttpClient {
 
   @Override
   public ApiResponse execute() throws Exception {
+    logger.trace("Inside Post Execute method !!");
     url = this.generateUrl(apiEndPoint, queryParams);
-    httpPost = new HttpPost(url);
-
-    if (this.headerParams.size() != 0) {
-      setPostHeaders();
-    }
+    logger.info("Url : {}", url);
 
     HttpHeaders httpHeaders = new HttpHeaders();
-    String contentType = (String) headerParams.get("Content-Type");
+    if (headerParams != null && headerParams.get(CONTENT_TYPE) != null) {
 
-    if (contentType == ContentType.MULTIPART_FORM_DATA.getMimeType()) {
+      String contentType = (String) headerParams.get(CONTENT_TYPE);
+      logger.info(CONTENT_TYPE + " : ", contentType);
 
-      if (formData != null && formData.size() > 0) {
+      headerParams.entrySet().stream()
+          .forEach(entry -> httpHeaders.set(entry.getKey(), entry.getValue().toString()));
+
+      if (contentType == ContentType.MULTIPART_FORM_DATA.getMimeType()) {
+
+        if (formData == null || !(formData.size() > 0)) {
+          throw new SipApiPullExecption("Missing Form data..!!");
+        }
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, Object>> httpEntity =
             new HttpEntity(formData, httpHeaders);
-        apiResponse.setResponseBody(restTemplate.postForEntity(url, httpEntity, Object.class));
-        HttpHeaders resHeaders = restTemplate.headForHeaders(url);
-        apiResponse.setHttpHeaders(resHeaders);
-      }
-    } else if (contentType == ContentType.APPLICATION_JSON.getMimeType()) {
-      if (textData != null && textData.length() > 0) {
-        headerParams.entrySet().stream()
-            .forEach(entry -> httpHeaders.set(entry.getKey(), entry.getValue().toString()));
-
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        if (!isJSONValid(textData)) {
-          throw new RuntimeException("Not a valid Json!!");
-        }
-        HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
         ResponseEntity<Object> response =
             restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+        logger.info("Response Code : {}", response.getStatusCode());
+        logger.info("Response Body : {}", response.getBody());
+        apiResponse.setResponseBody(response.getBody().toString());
+        logger.info("Response headers : {}", response.getHeaders().toString());
+        HttpHeaders resHeaders = response.getHeaders();
+        apiResponse.setHttpHeaders(resHeaders);
+        apiResponse.setHttpStatus(response.getStatusCode());
+        return apiResponse;
 
-        apiResponse.setResponseBody(response.getBody());
-        HttpHeaders responseHeaders = response.getHeaders();
-        apiResponse.setHttpHeaders(responseHeaders);
-        if (responseHeaders.getContentType() != null) {
-          apiResponse.setContentType(httpHeaders.getContentType().toString());
+      } else if (contentType == ContentType.APPLICATION_JSON.getMimeType()) {
+        if (textData != null && textData.length() > 0) {
+
+          httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+          if (!isJSONValid(textData)) {
+            throw new SipApiPullExecption("Not a valid Json!!");
+          }
+          HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
+          ResponseEntity<Object> response =
+              restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+          logger.info("Response Code : {}", response.getStatusCode());
+          logger.info("Response Body : {}", response.getBody());
+          apiResponse.setResponseBody(response.getBody());
+          logger.info("Response headers : {}", response.getHeaders().toString());
+          HttpHeaders responseHeaders = response.getHeaders();
+          apiResponse.setHttpHeaders(responseHeaders);
+          apiResponse.setHttpStatus(response.getStatusCode());
         }
-      }
-    } else if (contentType == ContentType.TEXT_PLAIN.getMimeType()) {
-      if (textData != null && textData.length() > 0) {
-        StringEntity stringEntity = new StringEntity(textData);
-        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
-        apiResponse.setResponseBody(restTemplate.postForObject(url, stringEntity, Object.class));
-        HttpHeaders resHeaders = restTemplate.headForHeaders(url);
-        apiResponse.setHttpHeaders(resHeaders);
-      }
-    } else if (contentType == ContentType.APPLICATION_XML.getMimeType()) {
-      if (textData != null && textData.length() > 0) {
-        StringEntity stringEntity = new StringEntity(textData);
-        if (!isApplicationXmlValid(textData)) {
-          throw new RuntimeException("Not a valid XML!!");
+      } else if (contentType == ContentType.TEXT_PLAIN.getMimeType()) {
+        if (textData != null && textData.length() > 0) {
+          httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+          HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
+          ResponseEntity<Object> response =
+              restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+          logger.info("Response Code : {}", response.getStatusCode());
+          logger.info("Response Body : {}", response.getBody());
+          apiResponse.setResponseBody(response.getBody());
+          logger.info("Response headers : {}", response.getHeaders().toString());
+          HttpHeaders resHeaders = response.getHeaders();
+          apiResponse.setHttpHeaders(resHeaders);
+          apiResponse.setHttpStatus(response.getStatusCode());
         }
-        httpHeaders.setContentType(MediaType.APPLICATION_XML);
-        apiResponse.setResponseBody(restTemplate.postForObject(url, stringEntity, Object.class));
-        HttpHeaders resHeaders = restTemplate.headForHeaders(url);
-        apiResponse.setHttpHeaders(resHeaders);
-      }
-    } else if (contentType == ContentType.TEXT_XML.getMimeType()) {
-      if (textData != null && textData.length() > 0) {
-        StringEntity stringEntity = new StringEntity(textData);
-        if (!isTextXmlValid(textData)) {
-          throw new RuntimeException("Not a valid XML!!");
+      } else if (contentType == ContentType.APPLICATION_XML.getMimeType()) {
+        if (textData != null && textData.length() > 0) {
+          if (!isApplicationXmlValid(textData)) {
+            throw new SipApiPullExecption("Not a valid XML!!");
+          }
+          httpHeaders.setContentType(MediaType.APPLICATION_XML);
+          HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
+          ResponseEntity<Object> response =
+              restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+          logger.info("Response Code : {}", response.getStatusCode());
+          logger.info("Response Body : {}", response.getBody());
+          apiResponse.setResponseBody(response.getBody());
+          logger.info("Response headers : {}", response.getHeaders().toString());
+          HttpHeaders resHeaders = response.getHeaders();
+          apiResponse.setHttpHeaders(resHeaders);
+          apiResponse.setHttpStatus(response.getStatusCode());
         }
-        httpHeaders.setContentType(MediaType.TEXT_XML);
-        apiResponse.setResponseBody(restTemplate.postForObject(url, stringEntity, Object.class));
-        HttpHeaders resHeaders = restTemplate.headForHeaders(url);
-        apiResponse.setHttpHeaders(resHeaders);
-      }
-    } else if (contentType == ContentType.TEXT_HTML.getMimeType()) {
-      if (textData != null && textData.length() > 0) {
-        StringEntity stringEntity = new StringEntity(textData);
-        if (!isHtmlValid(textData)) {
-          throw new RuntimeException("Invalid HTML body!!");
+      } else if (contentType == ContentType.TEXT_XML.getMimeType()) {
+        if (textData != null && textData.length() > 0) {
+          if (!isTextXmlValid(textData)) {
+            throw new SipApiPullExecption("Not a valid XML!!");
+          }
+          httpHeaders.setContentType(MediaType.TEXT_XML);
+          HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
+          ResponseEntity<Object> response =
+              restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+          logger.info("Response Code : {}", response.getStatusCode());
+          logger.info("Response Body : {}", response.getBody());
+          apiResponse.setResponseBody(response.getBody());
+          logger.info("Response headers : {}", response.getHeaders().toString());
+          HttpHeaders resHeaders = response.getHeaders();
+          apiResponse.setHttpHeaders(resHeaders);
+          apiResponse.setHttpStatus(response.getStatusCode());
         }
-        httpHeaders.setContentType(MediaType.TEXT_HTML);
-        apiResponse.setResponseBody(restTemplate.postForObject(url, stringEntity, Object.class));
-        HttpHeaders resHeaders = restTemplate.headForHeaders(url);
-        apiResponse.setHttpHeaders(resHeaders);
+      } else if (contentType == ContentType.TEXT_HTML.getMimeType()) {
+        if (textData != null && textData.length() > 0) {
+          if (!isHtmlValid(textData)) {
+            throw new SipApiPullExecption("Invalid HTML body!!");
+          }
+          httpHeaders.setContentType(MediaType.TEXT_HTML);
+          HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
+          ResponseEntity<Object> response =
+              restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+          logger.info("Response Code : {}", response.getStatusCode());
+          logger.info("Response Body : {}", response.getBody());
+          apiResponse.setResponseBody(response.getBody());
+          logger.info("Response headers : {}", response.getHeaders().toString());
+          HttpHeaders resHeaders = response.getHeaders();
+          apiResponse.setHttpHeaders(resHeaders);
+          apiResponse.setHttpStatus(response.getStatusCode());
+        }
       }
     }
 

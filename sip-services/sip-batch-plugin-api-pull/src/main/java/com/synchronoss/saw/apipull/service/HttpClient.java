@@ -1,5 +1,6 @@
 package com.synchronoss.saw.apipull.service;
 
+import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
@@ -72,9 +73,9 @@ public class HttpClient {
       }
     } else {
       if (StringUtils.isEmpty(sipApiRequest.getUrl())) {
-        throw new RuntimeException("Url can't be null or empty!!");
+        throw new SipApiPullExecption("Url can't be null or empty!!");
       } else {
-        throw new RuntimeException(
+        throw new SipApiPullExecption(
             "Invalid HttpMethod, For SIP BIS API - PULL, Http Method supported are GET and POST");
       }
     }

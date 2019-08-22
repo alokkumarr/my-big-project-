@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 @ContextConfiguration(classes = {RestTemplateConfig.class, HttpClientConfig.class})
 public class HttpClientGet extends SncrBaseHttpClient {
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientGet.class);
+  private static final Logger logger = LoggerFactory.getLogger(HttpClientGet.class);
   RestTemplate restTemplate = new RestTemplate();
 
   /**
@@ -28,24 +28,29 @@ public class HttpClientGet extends SncrBaseHttpClient {
   public ApiResponse execute() {
     ApiResponse apiResponse = new ApiResponse();
     url = this.generateUrl(apiEndPoint, queryParams);
+    logger.info("Url : {}", url);
 
     try {
-        HttpHeaders headers = new HttpHeaders();
-        headerParams.entrySet().stream()
-            .forEach(entry -> headers.set(entry.getKey(), entry.getValue().toString()));
-        HttpEntity httpEntity = new HttpEntity("parameters",headers);
-        ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET,httpEntity, Object.class);
+      HttpHeaders headers = new HttpHeaders();
+      headerParams.entrySet().stream()
+          .forEach(entry -> headers.set(entry.getKey(), entry.getValue().toString()));
+      HttpEntity httpEntity = new HttpEntity("parameters", headers);
+      ResponseEntity<Object> response =
+          restTemplate.exchange(url, HttpMethod.GET, httpEntity, Object.class);
 
       apiResponse.setResponseBody(response.getBody());
-      HttpHeaders httpHeaders =  response.getHeaders();
+      HttpHeaders httpHeaders = response.getHeaders();
       apiResponse.setHttpHeaders(httpHeaders);
+      logger.info("Response Code : {}", response.getStatusCode());
+      logger.info("Response Body : {}", response.getBody());
+      logger.info("Response headers : {}", response.getHeaders().toString());
       if (httpHeaders.getContentType() != null) {
         apiResponse.setContentType(httpHeaders.getContentType().toString());
       }
 
     } catch (Exception e) {
-        logger.error("Unable to fetch data for url : {}",url);
-        logger.error("Stacktrace : {}",e.getMessage());
+      logger.error("Unable to fetch data for url : {}", url);
+      logger.error("Stacktrace : {}", e.getMessage());
     }
     return apiResponse;
   }
