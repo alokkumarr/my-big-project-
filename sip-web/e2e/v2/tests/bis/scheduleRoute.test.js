@@ -17,8 +17,7 @@ const logger = require('../../conf/logger')(__filename);
 
 describe('BIS tests: scheduleRoute.test.js', () => {
   beforeAll(function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL =
-      protractorConf.timeouts.timeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
   beforeEach(function(done) {
@@ -111,7 +110,10 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         routeActions.createRoute(routeInfo);
         dataSourcesPage.verifyRouteDetails(routeInfo);
         // Verify schedule logs
-        dataSourcesPage.verifyRouteScheduleInformation(routeInfo);
+        dataSourcesPage.verifyRouteScheduleInformation(
+          channelInfo.channelName,
+          routeInfo
+        );
         dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
         dataSourcesPage.clickOnDeleteRoute();
         dataSourcesPage.clickOnConfirmYesButton();

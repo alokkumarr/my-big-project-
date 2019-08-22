@@ -9,8 +9,9 @@ import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { RouterModule } from '@angular/router';
 import { AngularSplitModule } from 'angular-split';
-import { routes } from './routes';
+import { NgxsModule } from '@ngxs/store';
 
+import { routes } from './routes';
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
 import { SelectRawdataComponent } from './components/create-datasets/select-rawdata/select-rawdata.component';
@@ -46,15 +47,24 @@ import {
   ApiSourceComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,
+  SftpRouteComponent,
+  ApiRouteComponent,
   ConfirmActionDialogComponent,
   LogsDialogComponent,
   SourceFolderDialogComponent
 } from './components/datasource-management/index';
 
+import {
+  JobsPageComponent,
+  JobLogsPageComponent,
+  JobFiltersComponent
+} from './components/jobs';
+
 import { DefaultWorkbenchPageGuard } from './guards';
 import { IsAdminGuard } from '../admin/guards';
 
 import { CommonModuleTs } from '../../common';
+import { WorkbenchState } from './state/workbench.state';
 
 const COMPONENTS = [
   WorkbenchPageComponent,
@@ -88,8 +98,13 @@ const COMPONENTS = [
   HttpMetadataComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,
+  SftpRouteComponent,
+  ApiRouteComponent,
   ConfirmActionDialogComponent,
-  SourceFolderDialogComponent
+  SourceFolderDialogComponent,
+  JobsPageComponent,
+  JobLogsPageComponent,
+  JobFiltersComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
@@ -106,7 +121,8 @@ const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];
     TreeModule,
     AceEditorModule,
     CommonModuleTs,
-    AngularSplitModule.forChild()
+    AngularSplitModule.forChild(),
+    NgxsModule.forFeature([WorkbenchState])
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,

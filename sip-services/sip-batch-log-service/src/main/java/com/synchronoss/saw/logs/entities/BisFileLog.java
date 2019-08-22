@@ -1,5 +1,6 @@
 package com.synchronoss.saw.logs.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -105,12 +106,13 @@ public class BisFileLog implements Serializable {
   @Column(name = "CHECKPOINT_TIMESTAMP")
   @Temporal(TemporalType.TIMESTAMP)
   private Date checkpointDate;
-  
+
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name="JOB_ID")
   private BisJobEntity job;
-  
-   
+
+
   @ApiModelProperty(value = "Indicates the status of the component process", dataType = "String",
   allowEmptyValue = false, allowableValues = "DATA_RECEIVED, DATA_REMOVED, HOST_NOT_REACHABLE")
   @Column(name = "STATE_REASON")

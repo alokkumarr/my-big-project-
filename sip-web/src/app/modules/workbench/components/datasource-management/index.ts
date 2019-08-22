@@ -13,6 +13,14 @@ export {
 export {
   CreateRouteDialogComponent
 } from './create-route-dialog/create-route-dialog.component';
+export {
+  SftpRouteComponent
+} from './create-route-dialog/sftp-route/sftp-route.component';
+
+export {
+  ApiRouteComponent
+} from './create-route-dialog/api-route/api-route.component';
+
 export { DatasourceComponent } from './datasource-page.component';
 export {
   TestConnectivityComponent

@@ -1,21 +1,15 @@
 import { Component, Inject } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  AbstractControl
-} from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
-import * as includes from 'lodash/includes';
 import * as isEmpty from 'lodash/isEmpty';
 import { DatasourceService } from '../../../services/datasource.service';
-import { isUnique } from '../../../../../common/validators';
 
-import { SourceFolderDialogComponent } from '../select-folder-dialog';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 import * as moment from 'moment';
+import { CHANNEL_UID } from '../../../wb-comp-configs';
+import { ROUTE_OPERATION } from '../../../models/workbench.interface';
 
 @Component({
   selector: 'create-route-dialog',
@@ -23,80 +17,38 @@ import * as moment from 'moment';
   styleUrls: ['./create-route-dialog.component.scss']
 })
 export class CreateRouteDialogComponent {
-  public detailsFormGroup: FormGroup;
+  stepControl: FormGroup;
+  uid = CHANNEL_UID;
   crondetails: any = {};
-  opType: 'create' | 'update' = 'create';
+  opType: ROUTE_OPERATION = ROUTE_OPERATION.CREATE;
   channelName = '';
   isCronExpressionValid = false;
   startDateCorrectFlag = true;
 
   constructor(
-    private _formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
     private snackBar: MatSnackBar,
     private datasourceService: DatasourceService,
-    private _dialog: MatDialog,
+    private formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public routeData: any
   ) {
     this.channelName = this.routeData.channelName;
     if (isUndefined(this.routeData.routeMetadata.length)) {
-      this.opType = 'update';
+      this.opType = ROUTE_OPERATION.UPDATE;
     }
-    this.createForm();
     if (isUndefined(this.routeData.routeMetadata.length)) {
-      this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
       this.crondetails = this.routeData.routeMetadata.schedulerExpression;
     }
+
+    this.createForm();
   }
 
   createForm() {
-    const channelId = this.routeData.channelID;
-    const tranformerFn = value => ({ channelId, routeName: value });
-    const oldRouteName =
-      this.opType === 'update' ? this.routeData.routeMetadata.routeName : '';
-    this.detailsFormGroup = this._formBuilder.group({
-      routeName: [
-        '',
-        Validators.required,
-        isUnique(
-          this.datasourceService.isDuplicateRoute,
-          tranformerFn,
-          oldRouteName
-        )
-      ],
-      sourceLocation: ['', Validators.required],
-      destinationLocation: ['', Validators.required],
-      filePattern: ['', [Validators.required, this.validateFilePattern]],
-      description: [''],
-      disableDuplicate: [false],
-      disableConcurrency: [false],
-      batchSize: ['', [Validators.required]],
-      fileExclusions: ['', this.validatefileExclusion],
-      lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
-
-    });
+    this.stepControl = this.formBuilder.group({});
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
-  }
-
-  validateFilePattern(
-    control: AbstractControl
-  ): { [key: string]: boolean } | null {
-    if (includes(control.value, ',')) {
-      return { inValidPattern: true };
-    }
-    return null;
-  }
-
-  validatefileExclusion(
-    control: AbstractControl
-  ): { [key: string]: boolean } | null {
-    if (includes(control.value, ',') || includes(control.value, '.')) {
-      return { inValidPattern: true };
-    }
-    return null;
   }
 
   testRoute(formData) {
@@ -136,7 +88,9 @@ export class CreateRouteDialogComponent {
   }
 
   createRoute(data) {
-    this.startDateCorrectFlag = this.crondetails.activeTab === 'immediate' || moment(this.crondetails.startDate) > moment();
+    this.startDateCorrectFlag =
+      this.crondetails.activeTab === 'immediate' ||
+      moment(this.crondetails.startDate) > moment();
     if (!this.startDateCorrectFlag) {
       return false;
     }
@@ -156,21 +110,8 @@ export class CreateRouteDialogComponent {
       disableConcurrency: data.disableConcurrency,
       batchSize: data.batchSize,
       fileExclusions: data.fileExclusions,
-      lastModifiedLimitHours:data.lastModifiedLimitHours
+      lastModifiedLimitHours: data.lastModifiedLimitHours
     };
     return routeDetails;
-  }
-
-  openSelectSourceFolderDialog() {
-    const dateDialogRef = this._dialog.open(SourceFolderDialogComponent, {
-      hasBackdrop: true,
-      autoFocus: false,
-      closeOnNavigation: true,
-      height: '400px',
-      width: '300px'
-    });
-    dateDialogRef.afterClosed().subscribe(sourcePath => {
-      this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
-    });
   }
 }

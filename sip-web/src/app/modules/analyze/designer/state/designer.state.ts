@@ -1,4 +1,4 @@
-import {State, Action, StateContext, Selector} from "@ngxs/store";
+import { State, Action, StateContext, Selector } from "@ngxs/store";
 import * as cloneDeep from "lodash/cloneDeep";
 import * as get from "lodash/get";
 import * as unset from "lodash/unset";
@@ -14,7 +14,7 @@ import * as fpReduce from "lodash/fp/reduce";
 import * as fpFilter from "lodash/fp/filter";
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
-import {moveItemInArray} from "@angular/cdk/drag-drop";
+import { moveItemInArray } from "@angular/cdk/drag-drop";
 import {
   DesignerStateModel,
   DSLChartOptionsModel,
@@ -57,15 +57,15 @@ import {
   ConstructDesignerJoins,
   DesignerUpdateAggregateInSorts
 } from "../actions/designer.actions";
-import {DesignerService} from "../designer.service";
-import {AnalyzeService} from "../../services/analyze.service";
+import { DesignerService } from "../designer.service";
+import { AnalyzeService } from "../../services/analyze.service";
 import {
   DATE_TYPES,
   DEFAULT_DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from "../../consts";
-import {AnalysisDSL} from "src/app/models";
+import { AnalysisDSL } from "src/app/models";
 
 // setAutoFreeze(false);
 
@@ -106,8 +106,7 @@ export class DesignerState {
   constructor(
     private _designerService: DesignerService,
     private _analyzeService: AnalyzeService
-  ) {
-  }
+  ) {}
 
   @Selector()
   static groupAdapters(state: DesignerStateModel) {
@@ -139,7 +138,6 @@ export class DesignerState {
 
     return false;
   }
-
   static artifactFields(state: DesignerStateModel) {
     return fpFlatMap(
       artifact => artifact.fields,
@@ -173,8 +171,8 @@ export class DesignerState {
 
   @Action(DesignerSetData)
   setData(
-    {patchState}: StateContext<DesignerStateModel>,
-    {data}: DesignerSetData
+    { patchState }: StateContext<DesignerStateModel>,
+    { data }: DesignerSetData
   ) {
     return patchState({
       data
@@ -183,22 +181,22 @@ export class DesignerState {
 
   @Action(DesignerMergeSupportsIntoAnalysis)
   mergeSupportsIntoAnalysis(
-    {getState, patchState}: StateContext<DesignerStateModel>,
-    {supports}: DesignerMergeSupportsIntoAnalysis
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { supports }: DesignerMergeSupportsIntoAnalysis
   ) {
     const analysis = getState().analysis;
 
     set(analysis, "supports", supports);
 
     return patchState({
-      analysis: {...analysis}
+      analysis: { ...analysis }
     });
   }
 
   @Action(DesignerMergeMetricColumns)
   mergeMetricArtifactColumnWithAnalysisArtifactColumns(
-    {getState, patchState}: StateContext<DesignerStateModel>,
-    {metricArtifactColumns}: DesignerMergeMetricColumns
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { metricArtifactColumns }: DesignerMergeMetricColumns
   ) {
     const analysis = getState().analysis;
     const sipQuery = this._analyzeService.copyGeoTypeFromMetric(
@@ -207,14 +205,14 @@ export class DesignerState {
     );
 
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
 
   @Action(DesignerLoadMetric)
   async loadMetrics(
-    {patchState}: StateContext<DesignerStateModel>,
-    {metric}: DesignerLoadMetric
+    { patchState }: StateContext<DesignerStateModel>,
+    { metric }: DesignerLoadMetric
   ) {
     patchState({
       metric: {
@@ -226,8 +224,8 @@ export class DesignerState {
 
   @Action(DesignerAddArtifactColumn)
   addArtifactColumn(
-    {getState, patchState, dispatch}: StateContext<DesignerStateModel>,
-    {artifactColumn}: DesignerAddArtifactColumn
+    { getState, patchState, dispatch }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerAddArtifactColumn
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -238,15 +236,15 @@ export class DesignerState {
 
     /* If analysis is chart and this is a date field, assign a default
       groupInterval. For pivots, use dateInterval if available */
-    const groupInterval = {groupInterval: null};
+    const groupInterval = { groupInterval: null };
 
     if (artifactColumn.type === "date") {
       switch (analysis.type) {
         case "chart":
           groupInterval.groupInterval =
             CHART_DATE_FORMATS_OBJ[
-            artifactColumn.dateFormat || <string>artifactColumn.format
-              ].groupInterval;
+              artifactColumn.dateFormat || <string>artifactColumn.format
+            ].groupInterval;
           break;
         case "pivot":
           groupInterval.groupInterval = "day";
@@ -273,22 +271,22 @@ export class DesignerState {
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
       ...groupInterval,
-      ...(fillMissingDataWithZeros ? {min_doc_count: 0} : {}),
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
       name: artifactColumn.name,
       type: artifactColumn.type,
       geoType: artifactColumn.geoType,
       table: artifactColumn.table || (<any>artifactColumn).tableName,
       ...(isDateType
         ? {
-          dateFormat:
-            <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
-        }
-        : {format: artifactColumn.format})
+            dateFormat:
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+          }
+        : { format: artifactColumn.format })
     };
     if (artifactIndex < 0) {
       artifacts = [
         ...artifacts,
-        {artifactsName, fields: [artifactColumnToBeAdded]}
+        { artifactsName, fields: [artifactColumnToBeAdded] }
       ];
     } else {
       artifacts[artifactIndex].fields = [
@@ -304,15 +302,15 @@ export class DesignerState {
     sipQuery.artifacts = artifacts;
 
     patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerRemoveArtifactColumn)
   removeArtifactColumn(
-    {getState, patchState, dispatch}: StateContext<DesignerStateModel>,
-    {artifactColumn}: DesignerRemoveArtifactColumn
+    { getState, patchState, dispatch }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerRemoveArtifactColumn
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -337,17 +335,17 @@ export class DesignerState {
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
 
     patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, artifacts}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerUpdateArtifactColumn)
   updateArtifactColumn(
-    {getState, patchState}: StateContext<DesignerStateModel>,
-    {artifactColumn}: DesignerUpdateArtifactColumn
+    { getState, patchState }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerUpdateArtifactColumn
   ) {
-    const {analysis, groupAdapters} = getState();
+    const { analysis, groupAdapters } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
     const fillMissingDataWithZeros =
@@ -371,7 +369,7 @@ export class DesignerState {
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
       ...artifactColumn,
-      ...(fillMissingDataWithZeros ? {min_doc_count: 0} : {})
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {})
     };
 
     const targetAdapterIndex = findIndex(
@@ -397,7 +395,7 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        sipQuery: {...sipQuery, artifacts}
+        sipQuery: { ...sipQuery, artifacts }
       },
       groupAdapters: [...groupAdapters]
     });
@@ -405,10 +403,10 @@ export class DesignerState {
 
   @Action(DesignerApplyChangesToArtifactColumns)
   reorderArtifactColumns({
-                           getState,
-                           patchState
-                         }: StateContext<DesignerStateModel>) {
-    const {analysis, groupAdapters} = getState();
+    getState,
+    patchState
+  }: StateContext<DesignerStateModel>) {
+    const { analysis, groupAdapters } = getState();
     const sipQuery = analysis.sipQuery;
     const artifacts = sipQuery.artifacts;
 
@@ -444,9 +442,9 @@ export class DesignerState {
 
   @Action(DesignerRemoveAllArtifactColumns)
   removeAllArtifactColumns({
-                             patchState,
-                             getState
-                           }: StateContext<DesignerStateModel>) {
+    patchState,
+    getState
+  }: StateContext<DesignerStateModel>) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     const artifacts = (sipQuery.artifacts || []).map(artifact => ({
@@ -455,25 +453,25 @@ export class DesignerState {
     }));
 
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, artifacts}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
   }
 
   @Action(DesignerUpdateAnalysisMetadata)
   updateCategoryId(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {metadata}: DesignerUpdateAnalysisMetadata
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { metadata }: DesignerUpdateAnalysisMetadata
   ) {
     const analysis = getState().analysis;
     return patchState({
-      analysis: {...analysis, ...metadata} as AnalysisDSL
+      analysis: { ...analysis, ...metadata } as AnalysisDSL
     });
   }
 
   @Action(DesignerUpdateEditMode)
   updateDesignerEdit(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {designerEdit}: DesignerUpdateEditMode
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { designerEdit }: DesignerUpdateEditMode
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -482,27 +480,27 @@ export class DesignerState {
       sipQuery.sorts = [];
     }
     return patchState({
-      analysis: {...analysis, designerEdit, sipQuery: {...sipQuery}}
+      analysis: { ...analysis, designerEdit, sipQuery: { ...sipQuery } }
     });
   }
 
   @Action(DesignerUpdateQuery)
   updateQuery(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {query}: DesignerUpdateQuery
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { query }: DesignerUpdateQuery
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
 
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, query}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, query } }
     });
   }
 
   @Action(DesignerUpdateAnalysisSubType)
   updateChartType(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {subType}: DesignerUpdateAnalysisSubType
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { subType }: DesignerUpdateAnalysisSubType
   ) {
     const analysis = getState().analysis;
     switch (analysis.type) {
@@ -513,7 +511,7 @@ export class DesignerState {
           analysis: {
             ...analysis,
             chartType: subType,
-            chartOptions: {...chartOptions, chartType: subType}
+            chartOptions: { ...chartOptions, chartType: subType }
           }
         });
       case "map":
@@ -521,7 +519,7 @@ export class DesignerState {
         return patchState({
           analysis: {
             ...analysis,
-            mapOptions: {...mapOptions, mapType: subType}
+            mapOptions: { ...mapOptions, mapType: subType }
           }
         });
     }
@@ -529,8 +527,8 @@ export class DesignerState {
 
   @Action(DesignerUpdateAnalysisChartInversion)
   updateChartInversion(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {isInverted}: DesignerUpdateAnalysisChartInversion
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { isInverted }: DesignerUpdateAnalysisChartInversion
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -538,15 +536,15 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, isInverted}
+        chartOptions: { ...chartOptions, isInverted }
       }
     });
   }
 
   @Action(DesignerUpdateAnalysisChartTitle)
   updateChartTitle(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {chartTitle}: DesignerUpdateAnalysisChartTitle
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { chartTitle }: DesignerUpdateAnalysisChartTitle
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -554,15 +552,15 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, chartTitle}
+        chartOptions: { ...chartOptions, chartTitle }
       }
     });
   }
 
   @Action(DesignerUpdateAnalysisChartLegend)
   updateChartLegend(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {legend}: DesignerUpdateAnalysisChartLegend
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { legend }: DesignerUpdateAnalysisChartLegend
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -570,15 +568,15 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, legend}
+        chartOptions: { ...chartOptions, legend }
       }
     });
   }
 
   @Action(DesignerUpdateAnalysisChartLabelOptions)
   updateChartLabelOptions(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {labelOptions}: DesignerUpdateAnalysisChartLabelOptions
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { labelOptions }: DesignerUpdateAnalysisChartLabelOptions
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -586,15 +584,15 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, labelOptions}
+        chartOptions: { ...chartOptions, labelOptions }
       }
     });
   }
 
   @Action(DesignerUpdateAnalysisChartXAxis)
   updateChartXAxis(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {xAxis}: DesignerUpdateAnalysisChartXAxis
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { xAxis }: DesignerUpdateAnalysisChartXAxis
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -602,15 +600,15 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, xAxis}
+        chartOptions: { ...chartOptions, xAxis }
       }
     });
   }
 
   @Action(DesignerUpdateAnalysisChartYAxis)
   updateChartYAxis(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {yAxis}: DesignerUpdateAnalysisChartYAxis
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { yAxis }: DesignerUpdateAnalysisChartYAxis
   ) {
     const analysis = getState().analysis;
     const chartOptions =
@@ -618,20 +616,20 @@ export class DesignerState {
     return patchState({
       analysis: {
         ...analysis,
-        chartOptions: {...chartOptions, yAxis}
+        chartOptions: { ...chartOptions, yAxis }
       }
     });
   }
 
   @Action(DesignerUpdateSorts)
   updateSorts(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {sorts}: DesignerUpdateSorts
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { sorts }: DesignerUpdateSorts
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, sorts}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, sorts } }
     });
   }
 
@@ -639,7 +637,7 @@ export class DesignerState {
   @Action(DesignerInitForkAnalysis)
   @Action(DesignerInitNewAnalysis)
   initAnalysis(
-    {patchState}: StateContext<DesignerStateModel>,
+    { patchState }: StateContext<DesignerStateModel>,
     {
       analysis
     }:
@@ -647,13 +645,13 @@ export class DesignerState {
       | DesignerInitEditAnalysis
       | DesignerInitForkAnalysis
   ) {
-    return patchState({analysis});
+    return patchState({ analysis });
   }
 
   @Action(DesignerInitGroupAdapters)
-  initGroupAdapter({patchState, getState}: StateContext<DesignerStateModel>) {
+  initGroupAdapter({ patchState, getState }: StateContext<DesignerStateModel>) {
     const analysis = getState().analysis;
-    const {type} = analysis;
+    const { type } = analysis;
     const fields = get(analysis, "artifacts[0].columns", []);
     let groupAdapters;
     switch (type) {
@@ -661,14 +659,14 @@ export class DesignerState {
         groupAdapters = this._designerService.getPivotGroupAdapters(fields);
         break;
       case "chart":
-        const {chartOptions} = <AnalysisChartDSL>analysis;
+        const { chartOptions } = <AnalysisChartDSL>analysis;
         groupAdapters = this._designerService.getChartGroupAdapters(
           fields,
           chartOptions.chartType
         );
         break;
       case "map":
-        const {mapOptions} = <AnalysisMapDSL>analysis;
+        const { mapOptions } = <AnalysisMapDSL>analysis;
         groupAdapters = this._designerService.getMapGroupAdapters(
           fields,
           mapOptions.mapType
@@ -678,12 +676,12 @@ export class DesignerState {
         groupAdapters = [];
         break;
     }
-    return patchState({groupAdapters});
+    return patchState({ groupAdapters });
   }
 
   @Action(DesignerAddColumnToGroupAdapter)
   addColumnToGroupAdapter(
-    {patchState, getState, dispatch}: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     {
       artifactColumn,
       columnIndex,
@@ -706,14 +704,14 @@ export class DesignerState {
 
     adapter.transform(artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
-    patchState({groupAdapters: [...groupAdapters]});
+    patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerAddArtifactColumn(artifactColumn));
   }
 
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
-    {patchState, getState, dispatch}: StateContext<DesignerStateModel>,
-    {}: DesignerClearGroupAdapters
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
+    {  }: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
@@ -724,14 +722,14 @@ export class DesignerState {
 
       adapter.artifactColumns = [];
     });
-    patchState({groupAdapters: [...groupAdapters]});
+    patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerRemoveAllArtifactColumns());
   }
 
   @Action(DesignerRemoveColumnFromGroupAdapter)
   removeColumnFromGroupAdapter(
-    {patchState, getState, dispatch}: StateContext<DesignerStateModel>,
-    {columnIndex, adapterIndex}: DesignerRemoveColumnFromGroupAdapter
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
+    { columnIndex, adapterIndex }: DesignerRemoveColumnFromGroupAdapter
   ) {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
@@ -743,13 +741,13 @@ export class DesignerState {
     // });
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
-    patchState({groupAdapters: [...groupAdapters]});
+    patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerRemoveArtifactColumn(column));
   }
 
   @Action(DesignerMoveColumnInGroupAdapter)
   moveColumnInGroupAdapter(
-    {patchState, getState, dispatch}: StateContext<DesignerStateModel>,
+    { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
     {
       previousColumnIndex,
       currentColumnIndex,
@@ -766,14 +764,14 @@ export class DesignerState {
     //   moveItemInArray(columns, previousColumnIndex, currentColumnIndex);
     // });
     adapter.onReorder(adapter.artifactColumns);
-    patchState({groupAdapters: [...groupAdapters]});
+    patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerUpdateFilters)
   updateFilters(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {filters}: DesignerUpdateFilters
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { filters }: DesignerUpdateFilters
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -794,31 +792,31 @@ export class DesignerState {
       }
     });
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, filters}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, filters } }
     });
   }
 
   @Action(DesignerUpdatebooleanCriteria)
   updatebooleanCriteria(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {booleanCriteria}: DesignerUpdatebooleanCriteria
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { booleanCriteria }: DesignerUpdatebooleanCriteria
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, booleanCriteria}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, booleanCriteria } }
     });
   }
 
   @Action(DesignerResetState)
-  resetState({patchState}: StateContext<DesignerStateModel>) {
+  resetState({ patchState }: StateContext<DesignerStateModel>) {
     patchState(cloneDeep(defaultDesignerState));
   }
 
   @Action(DesignerJoinsArray)
   updateJoins(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {joins}: DesignerJoinsArray
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { joins }: DesignerJoinsArray
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -860,14 +858,14 @@ export class DesignerState {
       sipJoins.push(sipJoin);
     });
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, joins: sipJoins}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: sipJoins } }
     });
   }
 
   @Action(ConstructDesignerJoins)
   updateDesignerJoins(
-    {patchState}: StateContext<ConstructDesignerJoins>,
-    {analysis}
+    { patchState }: StateContext<ConstructDesignerJoins>,
+    { analysis }
   ) {
     const sipQuery = analysis.sipQuery;
     const analysisJoins = [];
@@ -895,14 +893,14 @@ export class DesignerState {
       analysisJoins.push(dslJoin);
     });
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery, joins: analysisJoins}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery, joins: analysisJoins } }
     });
   }
 
   @Action(DesignerUpdateAggregateInSorts)
   updateAggregateInSorts(
-    {patchState, getState}: StateContext<DesignerStateModel>,
-    {column}: DesignerUpdateAggregateInSorts
+    { patchState, getState }: StateContext<DesignerStateModel>,
+    { column }: DesignerUpdateAggregateInSorts
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -915,8 +913,7 @@ export class DesignerState {
       }
     });
     return patchState({
-      analysis: {...analysis, sipQuery: {...sipQuery}}
+      analysis: { ...analysis, sipQuery: { ...sipQuery } }
     });
   }
 }
-

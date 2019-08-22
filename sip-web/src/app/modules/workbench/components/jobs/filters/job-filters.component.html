@@ -1,0 +1,107 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Channel and Route</mat-card-title>
+  </mat-card-header>
+  <mat-card-content fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxLayout="column" fxLayoutAlign="start center">
+      <mat-form-field class="select-form-field" appearance="outline">
+        <mat-label i18n>Source type</mat-label>
+        <mat-select
+          class="form-field"
+          (selectionChange)="onChannelTypeSelected($event.value)"
+          [value]="selectedChannelTypeId$ | async"
+        >
+          <mat-option
+            [disabled]="!type.supported"
+            *ngFor="let type of channelTypeList$ | async"
+            [value]="type.uid"
+          >
+            {{ type.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-icon
+        class="flow-arrow"
+        color="primary"
+        fontIcon="icon-arrow-left"
+      ></mat-icon>
+
+      <div>
+        <mat-form-field class="select-form-field" appearance="outline">
+          <mat-label i18n>Channel name</mat-label>
+          <mat-select
+            class="form-field"
+            (selectionChange)="onChannelSelected($event.value)"
+            [value]="selectedChannelId"
+          >
+            <mat-option
+              *ngFor="let channel of channelList$ | async"
+              [value]="channel.id"
+            >
+              {{ channel.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-icon
+          *ngIf="selectedChannelId"
+          (click)="clearChannel()"
+          fontIcon="icon-close"
+          class="filter__clear--btn"
+        ></mat-icon>
+      </div>
+
+      <mat-icon
+        class="flow-arrow"
+        color="primary"
+        fontIcon="icon-arrow-left"
+      ></mat-icon>
+
+      <div>
+        <mat-form-field class="select-form-field" appearance="outline">
+          <mat-label i18n>Route name</mat-label>
+          <mat-select
+            class="form-field"
+            [disabled]="!selectedChannelId"
+            (selectionChange)="onRouteSelected($event.value)"
+            [value]="selectedRouteId"
+          >
+            <mat-option
+              *ngFor="let route of routeList$ | async"
+              [value]="route.id"
+            >
+              {{ route.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-icon
+          *ngIf="selectedRouteId"
+          (click)="clearRoute()"
+          fontIcon="icon-close"
+          class="filter__clear--btn"
+        ></mat-icon>
+      </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <button
+        mat-button
+        color="secondary"
+        (click)="onReset()"
+        [disabled]="isResetDisabled"
+        i18n
+      >
+        Reset
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onApply()"
+        [disabled]="isApplyDisabled"
+        i18n
+      >
+        Apply
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
