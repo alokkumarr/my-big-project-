@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
@@ -139,14 +140,12 @@ public class ApiPullServiceImpl extends SipPluginContract {
         apiRequest.setBodyParameters(bodyParameters);
       }
 
-      HttpClient httpClient = new HttpClient();
-      ApiResponse response = httpClient.execute(apiRequest);
-
-      String responseContentType = response.getContentType();
-
-      Object content = response.getResponseBody();
-
       try {
+        HttpClient httpClient = new HttpClient();
+        ApiResponse response = httpClient.execute(apiRequest);
+
+        MediaType responseContentType = response.getHttpHeaders().getContentType();
+        Object content = response.getResponseBody();
 
         String destination = this.constructDestinationPath(destinationLocation);
         String path =
@@ -154,8 +153,9 @@ public class ApiPullServiceImpl extends SipPluginContract {
                 defaultDestinationLocation, destination, File.separator + getBatchId());
 
         ContentWriter contentWriter = null;
-        if (responseContentType == "application/json" || responseContentType == "text/plain") {
-          contentWriter = new TextContentWriter(content.toString(), responseContentType);
+        if (responseContentType == MediaType.APPLICATION_JSON
+            || responseContentType == MediaType.TEXT_PLAIN) {
+          contentWriter = new TextContentWriter(content.toString(), responseContentType.getType());
         } else {
           // Yet to implement
         }
@@ -168,6 +168,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         contentWriter.write(path);
       } catch (IOException exception) {
+        throw new SipNestedRuntimeException(exception.getMessage(), exception);
+      } catch (Exception exception) {
         throw new SipNestedRuntimeException(exception.getMessage(), exception);
       }
     } else {

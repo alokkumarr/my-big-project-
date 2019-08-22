@@ -38,7 +38,7 @@ public class HttpClientPost extends SncrBaseHttpClient {
    * @param contentType - Type of the content. E.g.: application/json, text/plain etc
    * @throws Exception
    */
-  public void setRawData(String content, String contentType) throws Exception {
+  public void setRawData(String content, String contentType) {
     logger.debug("Setting RequestBody : Content-Type = " + contentType + " \t Body : " + content);
     textData = content;
     this.setHeaderParam(CONTENT_TYPE, contentType);
