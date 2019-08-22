@@ -284,6 +284,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       panelClass: 'sourceDialogClass',
       data: {
         routeMetadata,
+        channelType: this.selectedSourceData.channelType,
         channelID: this.selectedSourceData.bisChannelSysId,
         channelName: this.selectedSourceData.channelName
       }

@@ -47,6 +47,8 @@ import {
   ApiSourceComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,
+  SftpRouteComponent,
+  ApiRouteComponent,
   ConfirmActionDialogComponent,
   LogsDialogComponent,
   SourceFolderDialogComponent
@@ -96,6 +98,8 @@ const COMPONENTS = [
   HttpMetadataComponent,
   TestConnectivityComponent,
   CreateRouteDialogComponent,
+  SftpRouteComponent,
+  ApiRouteComponent,
   ConfirmActionDialogComponent,
   SourceFolderDialogComponent,
   JobsPageComponent,

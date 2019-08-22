@@ -9,6 +9,11 @@ export enum CHANNEL_OPERATION {
   UPDATE = 'update'
 }
 
+export enum ROUTE_OPERATION {
+  CREATE = 'create',
+  UPDATE = 'update'
+}
+
 export enum CHANNEL_ACCESS {
   READ = 'R',
   READ_WRITE = 'RW'
