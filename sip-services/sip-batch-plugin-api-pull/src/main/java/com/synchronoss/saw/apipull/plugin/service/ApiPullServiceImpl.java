@@ -1,6 +1,7 @@
 package com.synchronoss.saw.apipull.plugin.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.ChannelMetadata;
@@ -20,7 +21,6 @@ import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
@@ -30,9 +30,9 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +99,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
             "Unable to extract channel information for channel id: " + channelId);
       }
 
-      Gson gson = new Gson();
+      GsonBuilder gsonBuilder = new GsonBuilder();
+      gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+      gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
+      Gson gson = gsonBuilder.create();
       BisChannelEntity channelEntity = bisChannelEntity.get();
 
       String channelMetadataStr = channelEntity.getChannelMetadata();
