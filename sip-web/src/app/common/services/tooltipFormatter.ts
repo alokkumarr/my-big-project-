@@ -1,5 +1,5 @@
 import * as Highcharts from 'highcharts/highcharts';
-import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
 
 import {
@@ -75,7 +75,7 @@ function getXValue(point, fields, chartType) {
   }
   if (DATE_TYPES.includes(x.type)) {
     if (hasGroupBy) {
-      return moment(point.category).format(x.dateFormat);
+      return point.category;
     }
     return point.key || point.category;
   }
@@ -122,7 +122,7 @@ export function getTooltipFormatter(fields, chartType) {
       : seriesName;
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
-      <td>${point.y || point.value}</td>
+      <td>${isUndefined(point.value) ? point.y : point.value}</td>
     </tr>`;
 
     const zLabel = fields.z ? getFieldLabelWithAggregateFun(fields.z) : '';
