@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../material.module';
+import { CommonPipesModule } from '../../../../../common/pipes/common-pipes.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddAlertComponent } from './add-alert.component';
 import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
@@ -30,23 +31,22 @@ const confAlertServiceStub = {
   getListOfDatapods$: () => {
     return new Observable();
   },
-  getMetricsInDatapod$: id => {
+  getDatapod$: id => {
     return new Observable();
   }
 };
 
-const payload = {
-  alertName: 'abc',
-  alertDescription: 'abc',
+const payload: AlertConfig = {
+  alertRuleName: 'abc',
+  alertRuleDescription: 'abc',
   alertSeverity: 'CRITICAL',
   activeInd: false,
   datapodId: '1',
   datapodName: 'abc',
   categoryId: '',
-  monitoringEntity: 'abc123',
-  aggregation: 'AVG',
-  operator: 'GT',
-  thresholdValue: 2,
+  notification: [],
+  lookbackColumn: '',
+  lookbackPeriod: '',
   product: 'SAWD000001'
 };
 
@@ -67,7 +67,8 @@ describe('AddAlertComponent', () => {
         ReactiveFormsModule,
         FormsModule,
         NoopAnimationsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        CommonPipesModule
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
@@ -108,6 +109,21 @@ describe('AddAlertComponent', () => {
   });
 
   it('should create alert payload', () => {
+    component.selectedEntityName = {
+      alias: 'aslias',
+      columnName: 'colName',
+      displayName: 'displayName',
+      type: 'string'
+    };
+    component.selectedMonitoringEntity = {
+      alias: 'aslias2',
+      columnName: 'colName2',
+      displayName: 'displayName2',
+      type: 'integer'
+    };
+    component.selectedDatapod = {
+      artifacts: [{ artifactName: 'sample', fields: [] }]
+    };
     component.constructPayload();
     expect(component.endPayload).toEqual(payload);
   });

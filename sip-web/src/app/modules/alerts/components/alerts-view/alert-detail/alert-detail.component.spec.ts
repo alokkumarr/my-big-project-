@@ -7,6 +7,7 @@ import { AlertsService } from '../../../services/alerts.service';
 import { AlertDetailComponent } from './alert-detail.component';
 import { AlertIds } from '../../../alerts.interface';
 import { AlertsState } from '../../../state/alerts.state';
+import { of } from 'rxjs';
 
 const alertIds: AlertIds = {
   alertRulesSysId: 3,
@@ -14,8 +15,20 @@ const alertIds: AlertIds = {
 };
 
 const alertServiceStub = {
-  getAlertRuleDetails: (id: number) => {
+  getAlertRuleDetails(id: number) {
     return new Observable();
+  },
+
+  getAllAlertsCount() {
+    return of([]);
+  },
+
+  getAlertCountById() {
+    return of([]);
+  },
+
+  getAllAlertsSeverity() {
+    return of([]);
   }
 };
 

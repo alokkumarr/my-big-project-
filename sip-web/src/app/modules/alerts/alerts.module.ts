@@ -1,13 +1,13 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModuleTs } from '../../common';
+// import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
-import { DxTemplateModule } from 'devextreme-angular/core/template';
-import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
+// import { DxTemplateModule } from 'devextreme-angular/core/template';
+// import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxSelectBoxModule } from 'devextreme-angular/ui/select-box';
 
-import { MaterialModule } from '../../material.module';
-import { FlexLayoutModule } from '@angular/flex-layout';
+// import { MaterialModule } from '../../material.module';
+// import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
@@ -41,14 +41,14 @@ const components = [
 @NgModule({
   declarations: components,
   imports: [
-    CommonModule,
+    CommonModuleTs,
     RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    FlexLayoutModule,
-    DxTemplateModule,
-    DxDataGridModule,
+    // FormsModule,
+    // ReactiveFormsModule,
+    // MaterialModule,
+    // FlexLayoutModule,
+    // DxTemplateModule,
+    // DxDataGridModule,
     DxSelectBoxModule,
     NgxsModule.forFeature([AlertsState])
   ],

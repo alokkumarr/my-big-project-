@@ -19,6 +19,12 @@
   max-height: 100%;
   overflow: auto;
 
+  .lookback-period__info-icon {
+    position: absolute;
+    margin-top: 12px;
+    font-size: 20px;
+  }
+
   &__body {
     background-color: white;
 

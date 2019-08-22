@@ -36,4 +36,53 @@ server:
 sip:
   service:
     index: 0
+   {% if sip_secure %}
+
+  ssl:
+    enable: true
+
+  trust:
+    store: ${server.ssl.trust-store}
+    password: ${server.ssl.trust-store-password}
+  key:
+    store: ${server.ssl.key-store}
+    password: ${server.ssl.key-store-password}
+    {% else %}
+
+  ssl:
+    enable: false
+
+    {% endif %}
+
+
+{% if sip_secure %}
+
+connector : https
+
+{% else %}
+
+connector : http
+
+{% endif %}
+
+
+
+
+mail:
+  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+  subject : "Alert Notification"
+alert:
+  dashborad:
+    url: ${connector}://35.175.174.29/sip/web/#/alerts/view
+
+storage-proxy:
+  service:
+    host: ${connector}://localhost:9400
+
+metastore:
+  base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
+  alertRulesTable: alertRulesMetadata
+  alertResults: alertResults
+  notificationTable : alertNoficationLog
+
 

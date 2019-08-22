@@ -199,6 +199,10 @@ export class DesignerPageComponent implements OnInit {
       return artifacts;
     }
 
+    if (analysis.designerEdit) {
+      return artifacts;
+    }
+
     analysis.sipQuery.artifacts[0].fields.forEach(field => {
       const artifactColumn = find(
         artifacts[0].columns,

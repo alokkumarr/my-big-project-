@@ -52,7 +52,13 @@ export {
   DEFAULT_PRECISION
 };
 
-export const DSL_ANALYSIS_TYPES = ['chart', 'map', 'pivot', 'esReport'];
+export const DSL_ANALYSIS_TYPES = [
+  'chart',
+  'map',
+  'pivot',
+  'esReport',
+  'report'
+];
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
@@ -256,6 +262,14 @@ export const ANALYSIS_METHODS = [
               svg: 'bubble-chart-col'
             },
             type: 'chart:bubble'
+          },
+          {
+            label: 'Packed Bubble Chart',
+            icon: {
+              font: 'icon-packed-bubble-chart',
+              svg: 'packed-bubble-chart-col'
+            },
+            type: 'chart:packedbubble'
           },
           {
             label: 'Pie Chart',

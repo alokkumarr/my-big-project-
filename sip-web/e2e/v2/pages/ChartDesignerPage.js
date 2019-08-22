@@ -39,15 +39,34 @@ class ChartsDesignerPage extends Designer {
     this._reportSelectedFilters = element.all(
       by.xpath('//filter-chips-u/descendant::mat-chip')
     );
-    this._selectedFiltersText= element(
+    this._selectedFiltersText = element(
       by.xpath('//filter-chips-u/descendant::mat-chip')
-    )
+    );
     this._reportFilterText = element(
       by.xpath('//span[@class="filter-counter"]')
     );
     this._reportFilterClear = element(
       by.xpath('//button[contains(@class,"filter-clear-all")]')
     );
+
+    this._selectAndChooseAggregate = aggregateName =>
+      element(by.css(`button[e2e=${aggregateName}]`));
+
+    this._openChartSettings = element(
+      by.xpath('//button[contains(@class,"options-panel-toggle__btn")]')
+    );
+
+    this._aggregateDataOptions = text =>
+      element(
+        by.css(`mat-expansion-panel[e2e="designer-data-option-${text}"]`)
+      );
+
+    this._verifyMetricAggregate = (metric, text) =>
+      element(
+        by.xpath(
+          `//*mat-chip[e2e="designer-selected-field-'${metric}'"]/descendant::*[contains(text(),"${text}")]`
+        )
+      );
   }
 
   searchAttribute(attribute) {
@@ -143,6 +162,21 @@ class ChartsDesignerPage extends Designer {
     ) {
       this.validateReportSelectedFilters(filters);
     }
+  }
+
+  clickOnSelectAndChooseAggregate(name) {
+    browser.sleep(1000); // Somehow aggregate button was not able to load the aggregate list. So put the browser to sleep.
+    // For aggregate chooser component commonfunction is not able to make the element visible. So using the browser to identify.
+    browser
+      .actions()
+      .mouseMove(this._selectAndChooseAggregate(name))
+      .click()
+      .perform();
+  }
+
+  validateSelectedAggregate(metric, designerLabelText, buttonText) {
+    expect(this._verifyMetricAggregate(metric, designerLabelText)).toBeTruthy();
+    expect(this._selectAndChooseAggregate(buttonText)).toBeTruthy();
   }
 }
 module.exports = ChartsDesignerPage;

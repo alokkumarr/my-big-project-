@@ -3,30 +3,7 @@ info:
 spring:
   application:
     name: sip-alert-service
-  #mariaDB (Alert) DB details
-  datasource:
-    url: jdbc:mariadb://localhost:3306/sip_alert
-    username: root
-    password:
-    driver-class-name: org.mariadb.jdbc.Driver
-    max-active: 25
-    testOnBorrow: true
-    testOnConnect: true
-    testOnReturn: true
-    validationQuery: SELECT 1
-    testWhileIdle: true
-    logValidationErrors: true
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
 
-  flyway:
-    baselineOnMigrate:: true
 logging:
   level:
     com.synchronoss.sip: INFO
@@ -44,4 +21,19 @@ server:
 sip:
   service:
     index: 0
-
+  ssl:
+    enable : false
+mail:
+  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+  subject : "Alert Notification"
+alert:
+  dashborad:
+    url: http://35.175.174.29/sip/web/#/alerts/view
+storage-proxy:
+  service:
+    host: http://localhost:9400
+metastore:
+  base:  maprfs:///var/sip/
+  alertRulesTable: alertRulesMetadata
+  alertResults: alertResults
+  notificationTable : alertNoficationLog
