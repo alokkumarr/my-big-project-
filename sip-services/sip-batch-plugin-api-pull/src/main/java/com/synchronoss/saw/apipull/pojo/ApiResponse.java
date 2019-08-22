@@ -2,11 +2,12 @@ package com.synchronoss.saw.apipull.pojo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse {
   Object responseBody;
-  String contentType;
+  HttpStatus httpStatus;
   HttpHeaders httpHeaders;
 
   /**
@@ -22,15 +23,6 @@ public class ApiResponse {
     this.responseBody = responseBody;
   }
 
-  /** ( Content type of an API response) */
-  public String getContentType() {
-    return contentType;
-  }
-
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
-
   /** Api response headers */
   public HttpHeaders getHttpHeaders() {
     return httpHeaders;
@@ -39,5 +31,15 @@ public class ApiResponse {
   /** Api response headers */
   public void setHttpHeaders(HttpHeaders httpHeaders) {
     this.httpHeaders = httpHeaders;
+  }
+
+  /** HttpStatus code */
+  public HttpStatus getHttpStatus() {
+    return httpStatus;
+  }
+
+  /** HttpStatus code */
+  public void setHttpStatus(HttpStatus httpStatus) {
+    this.httpStatus = httpStatus;
   }
 }

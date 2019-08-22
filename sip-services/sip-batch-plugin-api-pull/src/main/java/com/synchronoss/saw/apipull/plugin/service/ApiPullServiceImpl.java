@@ -160,13 +160,13 @@ public class ApiPullServiceImpl extends SipPluginContract {
           // Yet to implement
         }
 
-//        File file = new File(path);
-//
-//        FileInputStream stream = new FileInputStream(file);
-//
-//        processor.transferFile(stream, file, defaultDestinationLocation, mapRfsUser);
+        //        File file = new File(path);
+        //
+        //        FileInputStream stream = new FileInputStream(file);
+        //
+        //        processor.transferFile(stream, file, defaultDestinationLocation, mapRfsUser);
 
-                contentWriter.write(path);
+        contentWriter.write(path);
       } catch (IOException exception) {
         throw new SipNestedRuntimeException(exception.getMessage(), exception);
       }

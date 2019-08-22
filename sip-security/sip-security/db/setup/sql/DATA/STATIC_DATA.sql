@@ -65,7 +65,8 @@ INSERT INTO `CUSTOMER_PRODUCT_MODULE_FEATURES` (`CUST_PROD_MOD_FEATURE_SYS_ID`,`
 (35,4,'semantic/create','Create Datapod','Create Datapod','CREATEDATAPOD001','CHILD_DPM0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL),
 (36,4,'semantic/update','Update Datapod','Update Datapod','UPDATEDATAPOD001','CHILD_DPM0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL),
 (37,4,'/','Data Ingestion Service','Data Ingestion Service','DIS0000001','PARENT_DIS0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL),
-(38,4,'datasource/create','Channel Management','Channel Management','CHANNELMANAGE001','CHILD_DIS0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL);
+(38,4,'datasource/create','Channel Management','Channel Management','CHANNELMANAGE001','CHILD_DIS0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL),
+(39,4,'datasource/jobs','Jobs','Jobs','JOBS001','CHILD_DIS0000001',0,1,NOW(),'admin',NULL,NULL,NULL,NULL);
 
 INSERT INTO `ROLES_TYPE` (`Roles_Type_Sys_Id`,`Roles_Type_Name`,`Roles_Type_Desc`,`ACTIVE_STATUS_IND`, CREATED_DATE, CREATED_BY) VALUES (1,'ADMIN','Admin',1,NOW(),'admin');
 INSERT INTO `ROLES_TYPE` (`Roles_Type_Sys_Id`,`Roles_Type_Name`,`Roles_Type_Desc`,`ACTIVE_STATUS_IND`, CREATED_DATE, CREATED_BY) VALUES (2,'USER','User',1,NOW(),'admin');
@@ -159,7 +160,8 @@ INSERT INTO `PRIVILEGES` (`PRIVILEGE_SYS_ID`, `CUST_PROD_SYS_ID`, `CUST_PROD_MOD
 ('135', '1', '4', '35', '1', '0', '128', 'All', '1', NOW(), 'admin'),
 ('136', '1', '4', '36', '1', '0', '128', 'All', '1', NOW(), 'admin'),
 ('137', '1', '4', '37', '1', '0', '128', 'All', '1', NOW(), 'admin'),
-('138', '1', '4', '38', '1', '0', '128', 'All', '1', NOW(), 'admin');
+('138', '1', '4', '38', '1', '0', '128', 'All', '1', NOW(), 'admin'),
+('139', '1', '4', '39', '1', '0', '128', 'All', '1', NOW(), 'admin');
 
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'ACCESS';
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ANALYZE' and PC.PRIVILEGE_CODES_NAME = 'EXECUTE';

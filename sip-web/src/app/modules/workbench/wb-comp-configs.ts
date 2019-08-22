@@ -1,3 +1,5 @@
+import { ChannelType } from './models/workbench.interface';
+
 export const CSV_CONFIG = {
   file: '',
   lineSeparator: '\n',
@@ -157,3 +159,5 @@ export const CHANNEL_TYPES: ChannelType[] = [
     supported: false
   }
 ];
+
+export const DEFAULT_CHANNEL_TYPE = CHANNEL_TYPES[0];

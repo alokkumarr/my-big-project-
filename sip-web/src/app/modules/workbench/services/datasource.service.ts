@@ -5,6 +5,25 @@ import { JwtService } from '../../../common/services';
 import APP_CONFIG from '../../../../../appConfig';
 import { of, Observable } from 'rxjs';
 import * as get from 'lodash/get';
+import * as lodashMap from 'lodash/map';
+import {
+  Job,
+  ChannelForJobs,
+  RouteForJobs,
+  JobLog
+} from '../models/workbench.interface';
+
+interface JobsResponse {
+  jobDetails: Job[];
+  numOfPages: number;
+  totalRows: number;
+}
+
+interface JobLogsResponse {
+  bisFileLogs: JobLog[];
+  numOfPages: number;
+  totalRows: number;
+}
 
 const userProject = 'workbench';
 
@@ -58,21 +77,19 @@ export class DatasourceService {
     // This API supports for BE pagination.
     // Refer to JIRA ID: SIP-4615 if more info needed about this API support.
     return this.http
-      .get(
-        `${this.api}/ingestion/batch/logs/${channelID}/${routeID}`
-      )
+      .get(`${this.api}/ingestion/batch/logs/${channelID}/${routeID}`)
       .pipe(catchError(this.handleError('data', {})));
   }
 
   isDuplicateChannel(channelName): Observable<boolean> {
-    const endpoint = `${this.api}/ingestion/batch/channels/duplicate?channelName=${channelName}`;
+    const endpoint = `${
+      this.api
+    }/ingestion/batch/channels/duplicate?channelName=${channelName}`;
 
-    return this.http
-      .get(endpoint)
-      .pipe(
-        map(data => get(data, 'isDuplicate') as boolean),
-        catchError(this.handleError('data', false))
-      );
+    return this.http.get(endpoint).pipe(
+      map(data => get(data, 'isDuplicate') as boolean),
+      catchError(this.handleError('data', false))
+    );
   }
 
   activateRoute(channelId, routeId) {
@@ -84,7 +101,11 @@ export class DatasourceService {
   }
 
   toggleRoute(channelId, routeId, activate: boolean) {
-    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/routes/${routeId}/${activate ? 'activate' : 'deactivate'}`;
+    const endpoint = `${
+      this.api
+    }/ingestion/batch/channels/${channelId}/routes/${routeId}/${
+      activate ? 'activate' : 'deactivate'
+    }`;
     const payload = {
       channelId,
       routeId
@@ -103,7 +124,9 @@ export class DatasourceService {
   }
 
   toggleChannel(channelId, activate: boolean) {
-    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/${activate ? 'activate' : 'deactivate'}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/${
+      activate ? 'activate' : 'deactivate'
+    }`;
     const payload = {
       channelId
     };
@@ -112,15 +135,15 @@ export class DatasourceService {
       .pipe(catchError(this.handleError('data', {})));
   }
 
-  isDuplicateRoute({channelId, routeName}): Observable<boolean> {
-    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
+  isDuplicateRoute({ channelId, routeName }): Observable<boolean> {
+    const endpoint = `${
+      this.api
+    }/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
 
-    return this.http
-      .get(endpoint)
-      .pipe(
-        map(data => get(data, 'isDuplicate') as boolean),
-        catchError(this.handleError('data', false))
-      );
+    return this.http.get(endpoint).pipe(
+      map(data => get(data, 'isDuplicate') as boolean),
+      catchError(this.handleError('data', false))
+    );
   }
 
   /**
@@ -317,5 +340,62 @@ export class DatasourceService {
     return (error: any): Observable<T> => {
       return of(result as T);
     };
+  }
+
+  public getJobLogs(jobId, pagination) {
+    const url = `${this.api}/ingestion/batch/logs/job/${jobId}?${pagination}`;
+    return this.http.get<JobLogsResponse>(url);
+  }
+
+  public getJobs(path) {
+    const url = `${this.api}/ingestion/batch/logs/jobs/${path}`;
+    return this.http.get<JobsResponse>(url).toPromise();
+  }
+
+  public getJobById(id: string) {
+    const url = `${this.api}/ingestion/batch/logs/jobs/${id}`;
+    return this.http.get<Job>(url).toPromise();
+  }
+
+  public getJobsByChannelId(channelId) {
+    const url = `${
+      this.api
+    }/ingestion/batch/logs/jobs/channels/${channelId}?offset=0`;
+    return this.http.get<Job[]>(url);
+  }
+
+  public getJobsByRouteName(channelId) {
+    const url = `${
+      this.api
+    }/ingestion/batch/logs/jobs/${channelId}/{routeId}?offset=0`;
+    return this.http.get<Job[]>(url);
+  }
+
+  public getChannelListForJobs(): Observable<ChannelForJobs[]> {
+    return this.getSourceList().pipe(
+      map(channels =>
+        lodashMap(channels, channel => {
+          const { channelName } = JSON.parse(channel.channelMetadata);
+          return {
+            id: channel.bisChannelSysId,
+            name: channelName
+          };
+        })
+      )
+    );
+  }
+
+  public getRouteListForJobs(channelId): Observable<RouteForJobs[]> {
+    return this.getRoutesList(channelId).pipe(
+      map(routes =>
+        lodashMap(routes, route => {
+          const { routeName } = JSON.parse(route.routeMetadata);
+          return {
+            id: route.bisRouteSysId,
+            name: routeName
+          };
+        })
+      )
+    );
   }
 }

@@ -3,6 +3,15 @@ import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { map as rxMap, finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import * as isUndefined from 'lodash/isUndefined';
+import * as forEach from 'lodash/forEach';
+import * as countBy from 'lodash/countBy';
+import * as get from 'lodash/get';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
+import * as findKey from 'lodash/findKey';
+import * as filter from 'lodash/filter';
 
 import { CHANNEL_TYPES } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
@@ -14,15 +23,6 @@ import { CreateSourceDialogComponent } from './createSource-dialog/createSource-
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
-import { LogsDialogComponent } from './logs-dialog';
-import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
-import * as countBy from 'lodash/countBy';
-import * as get from 'lodash/get';
-import * as map from 'lodash/map';
-import * as find from 'lodash/find';
-import * as findKey from 'lodash/findKey';
-import * as filter from 'lodash/filter';
 
 /* NOTE: In the below channel and source are synonyms and refer to a single connection to a host. */
 @Component({
@@ -49,7 +49,8 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private datasourceService: DatasourceService,
     private notify: ToastService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private _router: Router
   ) {}
 
   ngOnInit() {
@@ -283,6 +284,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       panelClass: 'sourceDialogClass',
       data: {
         routeMetadata,
+        channelType: this.selectedSourceData.channelType,
         channelID: this.selectedSourceData.bisChannelSysId,
         channelName: this.selectedSourceData.channelName
       }
@@ -373,19 +375,10 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   openLogsDialog(routeData) {
-    this.dialog.open(LogsDialogComponent, {
-      hasBackdrop: true,
-      autoFocus: false,
-      closeOnNavigation: true,
-      disableClose: true,
-      height: '80vh',
-      width: '80vw',
-      panelClass: 'sourceDialogClass',
-      data: {
-        ...routeData,
-        channelName: this.selectedSourceData.channelName
-      }
-    });
+    const baseUrl = 'workbench/datasource/jobs?channelTypeId=sftp';
+    const { bisChannelSysId, bisRouteSysId } = routeData;
+    const url = `${baseUrl}&channelId=${bisChannelSysId}&routeId=${bisRouteSysId}`;
+    this._router.navigateByUrl(url);
   }
 
   toggleRouteActivation(route) {
