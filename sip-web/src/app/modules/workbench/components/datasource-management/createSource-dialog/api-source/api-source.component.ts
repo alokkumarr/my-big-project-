@@ -9,10 +9,10 @@ import { isUnique } from 'src/app/common/validators';
 import * as isNil from 'lodash/isNil';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import {
-  DetailFormable,
+  DetailForm,
   CHANNEL_OPERATION,
-  SFTPChannelMetadata,
-  HTTP_METHODS
+  HTTP_METHODS,
+  APIChannelMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
 import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
 
@@ -21,7 +21,7 @@ import { requireIf } from 'src/app/modules/observe/validators/required-if.valida
   templateUrl: './api-source.component.html',
   styleUrls: ['./api-source.component.scss']
 })
-export class ApiSourceComponent implements OnInit, DetailFormable {
+export class ApiSourceComponent implements OnInit, DetailForm {
   public detailsFormGroup: FormGroup;
   httpMethods: HTTP_METHODS[] = [
     HTTP_METHODS.GET,
@@ -84,7 +84,7 @@ export class ApiSourceComponent implements OnInit, DetailFormable {
     });
   }
 
-  get value(): SFTPChannelMetadata {
+  get value(): APIChannelMetadata {
     return this.detailsFormGroup.value;
   }
 

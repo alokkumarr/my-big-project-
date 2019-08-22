@@ -24,7 +24,6 @@
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
       <mat-step label="Route Details" [stepControl]="stepControl">
-        <sftp-route></sftp-route>
         <ng-container [ngSwitch]="routeData.channelType">
           <sftp-route
             #sftpForm
@@ -59,8 +58,8 @@
           <button
             mat-stroked-button
             color="primary"
-            (click)="testRoute(detailsFormGroup.value)"
-            [disabled]="!detailsFormGroup.valid"
+            (click)="testRoute(detailsFormTestValue)"
+            [disabled]="!isDetailsFormValid"
             e2e="route-test-connectivity-btn"
             i18n
           >
@@ -75,7 +74,7 @@
             color="primary"
             e2e="route-next-btn"
             matStepperNext
-            [disabled]="!detailsFormGroup.valid"
+            [disabled]="!isDetailsFormValid"
             i18n
           >
             Next
@@ -112,8 +111,8 @@
           <button
             mat-stroked-button
             color="primary"
-            (click)="testRoute(detailsFormGroup.value)"
-            [disabled]="!detailsFormGroup.valid"
+            (click)="testRoute(detailsFormTestValue)"
+            [disabled]="!isDetailsFormValid"
             e2e="route-schd-test-conn-btn"
             i18n
           >
@@ -127,8 +126,8 @@
             mat-raised-button
             color="primary"
             *ngIf="opType === 'create'"
-            [disabled]="!detailsFormGroup.valid || !isCronExpressionValid"
-            (click)="createRoute(detailsFormGroup.value)"
+            [disabled]="!isDetailsFormValid || !isCronExpressionValid"
+            (click)="createRoute(detailsFormValue)"
             e2e="route-schd-create-btn"
             i18n
           >
@@ -139,8 +138,8 @@
             color="primary"
             e2e="route-schd-update-btn"
             *ngIf="opType === 'update'"
-            [disabled]="!detailsFormGroup.valid"
-            (click)="createRoute(detailsFormGroup.value)"
+            [disabled]="!isDetailsFormValid"
+            (click)="createRoute(detailsFormValue)"
             i18n
           >
             Update
