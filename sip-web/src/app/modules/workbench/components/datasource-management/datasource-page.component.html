@@ -299,6 +299,7 @@
           <mat-divider></mat-divider>
           <dx-data-grid
             class="routes-grid"
+            [columns]="columns"
             [dataSource]="routesData"
             [showBorders]="false"
             [columnAutoWidth]="false"
@@ -325,75 +326,6 @@
               showScrollbar="always"
               [useNative]="false"
             ></dxo-scrolling>
-            <dxi-column
-              caption="Route Name"
-              dataField="routeName"
-              alignment="left"
-              cellTemplate="routeNameTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Created By"
-              dataField="createdBy"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="File Pattern"
-              dataField="filePattern"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Schedule"
-              dataField="schedulerExpression"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-              [calculateCellValue]="calculateScheduleCellValue"
-            ></dxi-column>
-            <dxi-column
-              caption="Next Fire Time"
-              dataField="nextFireTime"
-              alignment="left"
-              cellTemplate="dateTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Last Fire Time"
-              dataField="lastFireTime"
-              alignment="left"
-              cellTemplate="dateTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Source Location"
-              dataField="sourceLocation"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Destination Location"
-              dataField="destinationLocation"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Description"
-              dataField="description"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Last Modified"
-              dataField="createdDate"
-              alignment="left"
-              cellTemplate="modifiedCreatedTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Actions"
-              dataField="bisRouteSysId"
-              alignment="center"
-              cellTemplate="actionsTemplate"
-              [allowFiltering]="false"
-              [allowSorting]="false"
-            ></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
               <div

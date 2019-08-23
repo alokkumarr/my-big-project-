@@ -13,7 +13,7 @@ import * as find from 'lodash/find';
 import * as findKey from 'lodash/findKey';
 import * as filter from 'lodash/filter';
 
-import { CHANNEL_TYPES } from '../../wb-comp-configs';
+import { CHANNEL_TYPES, CHANNEL_UID } from '../../wb-comp-configs';
 import { ChannelObject } from '../../models/workbench.interface';
 
 import { DatasourceService } from '../../services/datasource.service';
@@ -35,12 +35,13 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   routesData = [];
   sourceData = [];
   sourceTypes = CHANNEL_TYPES;
-  selectedSourceType: string;
+  selectedSourceType: CHANNEL_UID;
   selectedSourceData: any;
   // channel activation/deactivation request is pending
   channelToggleRequestPending = false;
   show = false;
   channelEditable = false;
+  columns: Array<any> = [];
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
@@ -264,6 +265,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
       )
       .subscribe(routes => {
         this.routesData = routes;
+        this.columns = this.getGridColumns();
       });
   }
 
@@ -414,5 +416,152 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   reverseStatus(status) {
     return status === 1 ? 0 : 1;
+  }
+
+  getGridColumns() {
+    switch (this.selectedSourceType) {
+      case CHANNEL_UID.SFTP:
+        return this.getSFTPColumns();
+      case CHANNEL_UID.API:
+        return this.getAPIColumns();
+      default:
+        return [];
+    }
+  }
+
+  getSFTPColumns() {
+    return [
+      {
+        caption: 'Route Name',
+        dataField: 'routeName',
+        alignment: 'left',
+        cellTemplate: 'routeNameTemplate'
+      },
+      {
+        caption: 'Created By',
+        dataField: 'createdBy',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'File Pattern',
+        dataField: 'filePattern',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Schedule',
+        dataField: 'schedulerExpression',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate',
+        calculateCellValue: this.calculateScheduleCellValue
+      },
+      {
+        caption: 'Next Fire Time',
+        dataField: 'nextFireTime',
+        alignment: 'left',
+        cellTemplate: 'dateTemplate'
+      },
+      {
+        caption: 'Last Fire Time',
+        dataField: 'lastFireTime',
+        alignment: 'left',
+        cellTemplate: 'dateTemplate'
+      },
+      {
+        caption: 'Source Location',
+        dataField: 'sourceLocation',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Destination Location',
+        dataField: 'destinationLocation',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Description',
+        dataField: 'description',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Last Modified',
+        dataField: 'createdDate',
+        alignment: 'left',
+        cellTemplate: 'modifiedCreatedTemplate'
+      },
+      {
+        caption: 'Actions',
+        dataField: 'bisRouteSysId',
+        alignment: 'center',
+        cellTemplate: 'actionsTemplate',
+        allowFiltering: false,
+        allowSorting: false
+      }
+    ];
+  }
+
+  getAPIColumns() {
+    return [
+      {
+        caption: 'Route Name',
+        dataField: 'routeName',
+        alignment: 'left',
+        cellTemplate: 'routeNameTemplate'
+      },
+      {
+        caption: 'Created By',
+        dataField: 'createdBy',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Schedule',
+        dataField: 'schedulerExpression',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate',
+        calculateCellValue: this.calculateScheduleCellValue
+      },
+      {
+        caption: 'Next Fire Time',
+        dataField: 'nextFireTime',
+        alignment: 'left',
+        cellTemplate: 'dateTemplate'
+      },
+      {
+        caption: 'Last Fire Time',
+        dataField: 'lastFireTime',
+        alignment: 'left',
+        cellTemplate: 'dateTemplate'
+      },
+      {
+        caption: 'Destination Location',
+        dataField: 'destinationLocation',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Description',
+        dataField: 'description',
+        alignment: 'left',
+        cellTemplate: 'e2eTemplate'
+      },
+      {
+        caption: 'Last Modified',
+        dataField: 'createdDate',
+        alignment: 'left',
+        cellTemplate: 'modifiedCreatedTemplate'
+      },
+      {
+        caption: 'Actions',
+        dataField: 'bisRouteSysId',
+        alignment: 'center',
+        cellTemplate: 'actionsTemplate',
+        allowFiltering: false,
+        allowSorting: false
+      }
+    ];
   }
 }
