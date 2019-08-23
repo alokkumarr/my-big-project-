@@ -7,7 +7,8 @@ import {
 } from '@angular/forms';
 import {
   ROUTE_OPERATION,
-  DetailForm
+  DetailForm,
+  SFTPRouteMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
 import { isUnique } from 'src/app/common/validators';
 
@@ -102,7 +103,7 @@ export class SftpRouteComponent implements OnInit, DetailForm {
     });
   }
 
-  get value(): any {
+  get value(): SFTPRouteMetadata {
     return this.detailsFormGroup.value;
   }
 

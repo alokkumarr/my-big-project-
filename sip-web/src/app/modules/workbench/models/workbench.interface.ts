@@ -49,15 +49,15 @@ export interface SFTPChannelMetadata {
 
 export interface SFTPRouteMetadata {
   routeName: string;
+  filePattern: string;
   sourceLocation: string;
   destinationLocation: string;
-  filePattern: string;
-  description: string;
-  disableDuplicate: boolean;
-  disableConcurrency: boolean;
   batchSize: number;
-  fileExclusions: string;
-  lastModifiedLimitHours: string;
+  description?: string;
+  disableDuplicate?: boolean;
+  disableConcurrency?: boolean;
+  fileExclusions?: string;
+  lastModifiedLimitHours?: string;
 }
 
 export interface APIChannelMetadata {
@@ -65,6 +65,21 @@ export interface APIChannelMetadata {
   hostName: string;
   description?: string;
   apiEndPoint?: string;
+  httpMethod: string;
+  bodyParameters?: {
+    content: string;
+  };
+  headerParameters: Array<{ key: string; value: string }>;
+  queryParameters: Array<{ key: string; value: string }>;
+  urlParameters: Array<{ key: string; value: string }>;
+}
+
+export interface APIRouteMetadata {
+  routeName: string;
+  description?: string;
+  destinationLocation: string;
+  lastModifiedLimitHours?: string;
+  apiEndPoint: string;
   httpMethod: string;
   bodyParameters?: {
     content: string;

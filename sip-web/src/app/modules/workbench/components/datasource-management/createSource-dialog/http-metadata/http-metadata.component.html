@@ -25,11 +25,22 @@
       type="text"
       matInput
       placeholder="Endpoint"
+      [required]="isRequired('apiEndPoint')"
       name="api-endpoint"
       e2e="api-endpoint"
       formControlName="apiEndPoint"
       autocomplete="new-password"
     />
+    <mat-error
+      *ngIf="
+        isRequired('apiEndPoint') &&
+        !!parentForm.controls.apiEndPoint.hasError('required')
+      "
+      i18n
+    >
+      Endpoint is
+      <strong>required</strong>
+    </mat-error>
   </mat-form-field>
 
   <section

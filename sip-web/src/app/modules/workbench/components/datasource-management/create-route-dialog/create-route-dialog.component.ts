@@ -30,7 +30,7 @@ export class CreateRouteDialogComponent {
 
   // All route forms implement this interface to guarantee common properties
   @ViewChild('sftpForm') sftpForm: DetailForm;
-  // @ViewChild('apiForm') apiForm: DetailForm;
+  @ViewChild('apiForm') apiForm: DetailForm;
 
   constructor(
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
@@ -59,7 +59,7 @@ export class CreateRouteDialogComponent {
       case CHANNEL_UID.SFTP:
         return this.sftpForm;
       case CHANNEL_UID.API:
-      // return this.apiForm;
+        return this.apiForm;
       default:
         break;
     }
