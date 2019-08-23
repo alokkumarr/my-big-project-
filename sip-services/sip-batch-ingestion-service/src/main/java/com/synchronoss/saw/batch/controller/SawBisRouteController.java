@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -249,7 +250,7 @@ public class SawBisRouteController {
           @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 415,
               message = "Unsupported Type. " + "Representation not supported for the resource")})
   @RequestMapping(value = "/channels/{id}/routes", method = RequestMethod.GET,
-      produces = org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE)
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<List<BisRouteDto>> readRoutes(
       @ApiParam(value = "id", required = true) @PathVariable(name = "id", required = true) Long id,
@@ -264,6 +265,7 @@ public class SawBisRouteController {
       throws NullPointerException, JsonParseException, JsonMappingException, IOException {
     final List<BisRouteDto> routeDtos = new ArrayList<>();
     retryTemplate.execute(context -> routeDtos.addAll(listOfRoutes(id, page, size, sort, column)));
+    bisRouteService.setLastNextFireTime(routeDtos,id);
     return ResponseEntity.ok(routeDtos);
   }
 
