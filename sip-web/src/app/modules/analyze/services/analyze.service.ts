@@ -687,6 +687,7 @@ export class AnalyzeService {
   }
 
   createAnalysisDSL(model: AnalysisDSL): Observable<AnalysisDSL> {
+    model.sipQuery.semanticId = model.semanticId;
     return <Observable<AnalysisDSL>>(
       this._http.post(`${apiUrl}/dslanalysis/`, model).pipe(
         first(),
