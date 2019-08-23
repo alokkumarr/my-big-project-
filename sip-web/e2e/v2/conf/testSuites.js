@@ -46,7 +46,8 @@ const CRITICAL = [
   TEST_BASE_DIR + 'pivots/PivotsWithAggregate.test.js',
   TEST_BASE_DIR + 'reports/AggregateWithESReport.test.js',
   TEST_BASE_DIR + 'reports/AggregateWithESReport.test.js',
-  TEST_BASE_DIR + 'reports/AggregateWithDLReport.test.js'
+  TEST_BASE_DIR + 'reports/AggregateWithDLReport.test.js',
+  TEST_BASE_DIR + 'charts/PaginationInExecutePage.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [
