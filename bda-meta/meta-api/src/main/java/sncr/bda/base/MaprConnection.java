@@ -46,15 +46,7 @@ public class MaprConnection {
    */
   public List<JsonNode> runMaprDBQuery(
       String[] select, String filter, String orderBy, Integer limit) {
-    final Query query =
-        connection
-            .newQuery()
-            .select(select)
-            .orderBy(orderBy, SortOrder.DESC)
-            .limit(limit)
-            .where(filter)
-            .build();
-
+    final Query query = getQuery(select, filter, orderBy, limit);
     final DocumentStream stream = store.find(query);
     List<JsonNode> resultSet = new ArrayList<>();
     ObjectMapper objectMapper = new ObjectMapper();
@@ -66,6 +58,24 @@ public class MaprConnection {
       }
     }
     return resultSet;
+  }
+
+  private Query getQuery(String[] select, String filter, String orderBy, Integer limit) {
+    if (orderBy != null && limit != null) {
+      return connection
+          .newQuery()
+          .select(select)
+          .orderBy(orderBy, SortOrder.DESC)
+          .limit(limit)
+          .where(filter)
+          .build();
+    } else {
+      return connection
+          .newQuery()
+          .select(select)
+          .where(filter)
+          .build();
+    }
   }
 
   /**
