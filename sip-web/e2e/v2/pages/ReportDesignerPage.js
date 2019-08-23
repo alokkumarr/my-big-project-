@@ -17,6 +17,17 @@ class ReportDesignerPage extends Designer {
       element(by.xpath(`//span[@class="column-name" and text()="${name}"]`));
 
     this._reportGrid = element(by.xpath(`//report-grid-upgraded`));
+
+    this._attributeIcon = name =>
+      element(
+        by.xpath(
+          `//span[@class="column-name" and text()="${name}"]/following-sibling::mat-icon`
+        )
+      );
+    this._aggregationOption = element(
+      by.xpath(`//*[contains(text(),'Aggregation')]`)
+    );
+    this._aggregation = name => element(by.xpath(`//span[text()="${name}"]`));
   }
 
   clickOnReportFields(tables) {
@@ -39,6 +50,25 @@ class ReportDesignerPage extends Designer {
         );
       });
     });
+  }
+
+  /**
+     * aggregate": {
+          "designerLabel": "MAX",
+          "value": "max",
+          "field":"Integer"
+        }
+     */
+  applyAggregate(aggregate) {
+    commonFunctions.elementToBeClickableAndClickByMouseMove(
+      this._attributeIcon(aggregate.field)
+    );
+    commonFunctions.elementToBeClickableAndClickByMouseMove(
+      this._aggregationOption
+    );
+    commonFunctions.elementToBeClickableAndClickByMouseMove(
+      this._aggregation(aggregate.designerLabel)
+    );
   }
 }
 module.exports = ReportDesignerPage;

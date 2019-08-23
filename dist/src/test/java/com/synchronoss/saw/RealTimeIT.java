@@ -2,9 +2,12 @@ package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Test;
@@ -22,7 +25,9 @@ public class RealTimeIT extends BaseIT {
   public void testSendEvent() throws JsonProcessingException {
     ObjectNode root = mapper.createObjectNode();
     root.put("metric", 0);
-    given(authSpec)
+    given(new RequestSpecBuilder()
+            .addFilter(documentationConfiguration(restDocumentation))
+            .build())
         .queryParam("APP_KEY", "stream_1")
         .queryParam("APP_VERSION", "1")
         .queryParam("APP_MODULE", "1")

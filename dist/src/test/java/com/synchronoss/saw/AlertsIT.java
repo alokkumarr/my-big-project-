@@ -5,10 +5,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 
 import java.io.IOException;
@@ -34,7 +37,9 @@ public class AlertsIT extends BaseIT {
     String testId = testId();
     ObjectNode root = mapper.createObjectNode();
     root.put("metric", 100);
-    given(authSpec)
+    given(new RequestSpecBuilder()
+            .addFilter(documentationConfiguration(restDocumentation))
+            .build())
         .queryParam("APP_KEY", "stream_1")
         .queryParam("APP_VERSION", "1")
         .queryParam("APP_MODULE", "1")
