@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import java.util.Map;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class HttpClientPost extends SncrBaseHttpClient {
    * @param contentType - Type of the content. E.g.: application/json, text/plain etc
    * @throws Exception
    */
-  public void setRawData(String content, String contentType) throws Exception {
+  public void setRawData(String content, String contentType) {
     logger.debug("Setting RequestBody : Content-Type = " + contentType + " \t Body : " + content);
     textData = content;
     this.setHeaderParam(CONTENT_TYPE, contentType);
@@ -63,10 +63,12 @@ public class HttpClientPost extends SncrBaseHttpClient {
     }
   }
 
-  public static boolean isApplicationXmlValid(String xml) throws ParserConfigurationException {
+  public static boolean isApplicationXmlValid(String xml) throws SipApiPullExecption {
 
     try {
       // TODO : validate against request body
+        SchemaFactory schema = SchemaFactory.newInstance(xml);
+
       return true;
     } catch (Exception e) {
       logger.error("Invalid XML", e.getMessage());
@@ -85,7 +87,7 @@ public class HttpClientPost extends SncrBaseHttpClient {
   }
 
   @Override
-  public ApiResponse execute() throws Exception {
+  public ApiResponse execute() throws SipApiPullExecption {
     logger.trace("Inside Post Execute method !!");
     url = this.generateUrl(apiEndPoint, queryParams);
     logger.info("Url : {}", url);
