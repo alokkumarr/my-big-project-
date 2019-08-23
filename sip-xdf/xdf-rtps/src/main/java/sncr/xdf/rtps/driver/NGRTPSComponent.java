@@ -54,6 +54,7 @@ public class NGRTPSComponent extends AbstractComponent
 	protected int execute() {
 		logger.debug("########rtps execute started#######");
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
+        logger.debug("######## reading config path "+ this.configPath);
         String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
         ComponentConfiguration config = null;
         try {
@@ -87,6 +88,7 @@ public class NGRTPSComponent extends AbstractComponent
 		logger.debug("Inside RTPS main");
 		NGContextServices ngCtxSvc;
 		CliHandler cli = new CliHandler();
+		String cfgLocation;
 		try {
 			long start_time = System.currentTimeMillis();
 
@@ -97,7 +99,7 @@ public class NGRTPSComponent extends AbstractComponent
 
 			logger.debug("Command line arguments parsing completed");
 
-			String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+		    cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
 
 			String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
 			if (configAsStr == null || configAsStr.isEmpty()) {
@@ -143,6 +145,9 @@ public class NGRTPSComponent extends AbstractComponent
         );
         logger.warn(ngCtxSvc.getNgctx().toString());
         NGRTPSComponent component = new NGRTPSComponent(ngCtxSvc.getNgctx());
+        logger.debug("setting config path "+ cfgLocation);
+        component.configPath  = cfgLocation ;
+       
         logger.debug("NGRTPSComponent initialized with NgContext");
         if (!component.initComponent(null))
             System.exit(-1);
