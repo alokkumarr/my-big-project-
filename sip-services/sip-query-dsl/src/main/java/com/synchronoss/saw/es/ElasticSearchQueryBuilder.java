@@ -48,7 +48,11 @@ public class ElasticSearchQueryBuilder {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
     DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
-    if (size == null || size.equals(0)) size = 1000;
+    /*
+    ToDo: when size is -1 need to remove the hard coded size as 1lakh and we need to send the total
+      data  when the size is -1.
+     */
+    if (size == -1) size = 100000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
       throw new NullPointerException(

@@ -44,7 +44,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
   @NotNull
   private String pubSchOutputLocation;
 
-  @Value("${executor.preview-rows-limit}")
+  @Value("${execution.preview-rows-limit}")
   private Integer dlPreviewRowLimit;
 
   /**
