@@ -340,12 +340,10 @@ public class ExportServiceImpl implements ExportService {
                     osw.write(
                         Arrays.stream(exportBean.getColumnHeader())
                             .map(val -> {
-                                    String value;
                                     if (((LinkedHashMap) line).get(val) == null) {
-                                        value = "null";
+                                        return "null";
                                     }
-                                    value="\"" + ((LinkedHashMap) line).get(val) + "\"";
-                                    return value;
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
                                 }
                             )
                             .collect(Collectors.joining(",")));
@@ -359,7 +357,7 @@ public class ExportServiceImpl implements ExportService {
                             .map(val -> {
                                 String value;
                                 if (((LinkedHashMap) line).get(val) == null) {
-                                    value = "null";
+                                   return "null";
                                 }
                                 value="\"" + ((LinkedHashMap) line).get(val) + "\"";
                                 return value;
