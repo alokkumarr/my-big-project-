@@ -55,6 +55,33 @@
         <strong>required</strong>
       </mat-error>
     </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Port Number</mat-label>
+      <input
+        matInput
+        placeholder="Port Number"
+        name="portNo"
+        type="number"
+        e2e="port-no-input"
+        formControlName="portNo"
+        required
+      />
+      <mat-error
+        *ngIf="!!detailsFormGroup.controls.portNo.hasError('required')"
+        i18n
+      >
+        Port Number is
+        <strong>required</strong>
+      </mat-error>
+      <mat-error
+        e2e="port-number-error-msg"
+        *ngIf="!!detailsFormGroup.controls.portNo.hasError('pattern')"
+        i18n
+      >
+        Port Number can consist of only
+        <strong>Numbers</strong>
+      </mat-error>
+    </mat-form-field>
   </section>
   <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
   <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
