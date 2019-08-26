@@ -88,11 +88,15 @@ public class ApiPullServiceImpl extends SipPluginContract {
   public String connectRoute(Long entityId) throws SipNestedRuntimeException {
     logger.trace("Connecting to route :" + entityId);
     StringBuffer connectionLogs = new StringBuffer();
+
+    connectionLogs.append("Fetching route details\n");
     Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(entityId);
 
     if (bisRouteEntity.isPresent()) {
       BisRouteEntity entity = bisRouteEntity.get();
       long channelId = entity.getBisChannelSysId();
+
+      connectionLogs.append("Fetching channel details\n");
       Optional<BisChannelEntity> bisChannelEntity = this.findChannelById(channelId);
 
       if (!bisChannelEntity.isPresent()) {
@@ -121,7 +125,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
       HttpMethod method = routeMetadata.getHttpMethod();
 
       SipApiRequest apiRequest = new SipApiRequest();
-      apiRequest.setUrl(generateUrl(hostAddress, port, apiEndPoint));
+      String url = generateUrl(hostAddress, port, apiEndPoint);
+      apiRequest.setUrl(url);
 
       apiRequest.setHttpMethod(method != null ? method : HttpMethod.GET);
 
@@ -142,8 +147,11 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       try {
         HttpClient httpClient = new HttpClient();
+
+        connectionLogs.append("Connecting to ").append(url).append("\n");
         ApiResponse response = httpClient.execute(apiRequest);
 
+        connectionLogs.append("Fetching data from ").append(url).append("\n");
         MediaType responseContentType = response.getHttpHeaders().getContentType();
         Object content = response.getResponseBody();
 
@@ -155,6 +163,9 @@ public class ApiPullServiceImpl extends SipPluginContract {
         ContentWriter contentWriter = null;
         if (responseContentType == MediaType.APPLICATION_JSON
             || responseContentType == MediaType.TEXT_PLAIN) {
+          connectionLogs.append("Data fetched\n");
+          connectionLogs.append(content.toString()).append("\n");
+
           contentWriter = new TextContentWriter(content.toString(), responseContentType.getType());
         } else {
           // Yet to implement
@@ -166,6 +177,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
         //
         //        processor.transferFile(stream, file, defaultDestinationLocation, mapRfsUser);
 
+        connectionLogs.append("Writing data to destination location\n");
         contentWriter.write(path);
       } catch (IOException exception) {
         throw new SipNestedRuntimeException(exception.getMessage(), exception);
