@@ -339,7 +339,15 @@ public class ExportServiceImpl implements ExportService {
                     osw.write("\n");
                     osw.write(
                         Arrays.stream(exportBean.getColumnHeader())
-                            .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                            .map(val -> {
+                                    String value;
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                        value = "null";
+                                    }
+                                    value="\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                    return value;
+                                }
+                            )
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: " + header);
@@ -348,7 +356,15 @@ public class ExportServiceImpl implements ExportService {
                     // won't hamper memory consumption
                     osw.write(
                         Arrays.stream(exportBean.getColumnHeader())
-                            .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                            .map(val -> {
+                                String value;
+                                if (((LinkedHashMap) line).get(val) == null) {
+                                    value = "null";
+                                }
+                                value="\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                return value;
+                            }
+                            )
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Line Item for report: " + line.toString());
