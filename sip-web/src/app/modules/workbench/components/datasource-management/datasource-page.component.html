@@ -206,26 +206,6 @@
             fxLayout.lt-md="column"
           >
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="access-type" i18n
-                >Access Type :
-              </span>
-              <span>{{ selectedSourceData?.accessType }}</span>
-            </div>
-            <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="description" i18n
-                >Description :
-              </span>
-              <span>{{ selectedSourceData?.description }}</span>
-            </div>
-          </div>
-          <mat-divider></mat-divider>
-          <div
-            fxLayout="row"
-            fxLayoutalign="start center"
-            fxLayout.lt-md="column"
-          >
-            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="created-by" i18n>Created By : </span>
               <span>{{
                 selectedSourceData?.modifiedBy || selectedSourceData?.createdBy
@@ -249,6 +229,32 @@
             fxLayout="row"
             fxLayoutalign="start center"
             fxLayout.lt-md="column"
+          >
+            <div
+              class="details-content"
+              fxFlex="50"
+              fxLayout="row"
+              *ngIf="selectedSourceType === 'sftp'"
+            >
+              <span class="prop-name" e2e="access-type" i18n
+                >Access Type :
+              </span>
+              <span>{{ selectedSourceData?.accessType }}</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="details-content" fxFlex="50" fxLayout="row">
+              <span class="prop-name" e2e="description" i18n
+                >Description :
+              </span>
+              <span>{{ selectedSourceData?.description }}</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+            *ngIf="selectedSourceType === 'sftp'"
           >
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="user-name" i18n>User Name : </span>
