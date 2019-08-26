@@ -28,6 +28,15 @@
     }
   },
   "properties": {
+    "channelName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "channelType": {
+      "type": "string"
+    },
     "hostAddress": {
       "type": "string"
     },
@@ -71,6 +80,8 @@
     }
   },
   "required": [
+    "channelName",
+    "channelType",
     "hostAddress",
     "apiEndPoint",
     "httpMethod",

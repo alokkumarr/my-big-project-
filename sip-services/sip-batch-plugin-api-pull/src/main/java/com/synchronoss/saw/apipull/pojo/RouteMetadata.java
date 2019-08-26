@@ -10,6 +10,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+  "routeName",
+  "description",
   "apiEndPoint",
   "httpMethod",
   "queryParameters",
@@ -21,6 +23,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class RouteMetadata {
 
+  /** (Required) */
+  @JsonProperty("routeName")
+  private String routeName;
+
+  @JsonProperty("description")
+  private String description;
   /** (Required) */
   @JsonProperty("apiEndPoint")
   private String apiEndPoint;
@@ -45,6 +53,28 @@ public class RouteMetadata {
 
   @JsonProperty("schedulerExpression")
   private SchedulerExpression schedulerExpression;
+
+  /** (Required) */
+  @JsonProperty("routeName")
+  public String getRouteName() {
+    return routeName;
+  }
+
+  /** (Required) */
+  @JsonProperty("routeName")
+  public void setRouteName(String routeName) {
+    this.routeName = routeName;
+  }
+
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
   /** (Required) */
   @JsonProperty("apiEndPoint")
@@ -137,6 +167,8 @@ public class RouteMetadata {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
+        .append("routeName", routeName)
+        .append("description", description)
         .append("apiEndPoint", apiEndPoint)
         .append("httpMethod", httpMethod)
         .append("queryParameters", queryParameters)
@@ -156,8 +188,10 @@ public class RouteMetadata {
         .append(bodyParameters)
         .append(httpMethod)
         .append(urlParameters)
+        .append(description)
         .append(schedulerExpression)
         .append(destinationLocation)
+        .append(routeName)
         .append(queryParameters)
         .toHashCode();
   }
@@ -177,8 +211,10 @@ public class RouteMetadata {
         .append(bodyParameters, rhs.bodyParameters)
         .append(httpMethod, rhs.httpMethod)
         .append(urlParameters, rhs.urlParameters)
+        .append(description, rhs.description)
         .append(schedulerExpression, rhs.schedulerExpression)
         .append(destinationLocation, rhs.destinationLocation)
+        .append(routeName, rhs.routeName)
         .append(queryParameters, rhs.queryParameters)
         .isEquals();
   }

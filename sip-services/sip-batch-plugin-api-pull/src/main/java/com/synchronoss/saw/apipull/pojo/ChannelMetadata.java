@@ -1,19 +1,18 @@
 package com.synchronoss.saw.apipull.pojo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+  "channelName",
+  "description",
+  "channelType",
   "hostAddress",
   "port",
   "apiEndPoint",
@@ -25,12 +24,22 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class ChannelMetadata {
 
+  /** (Required) */
+  @JsonProperty("channelName")
+  private String channelName;
+
+  @JsonProperty("description")
+  private String description;
+  /** (Required) */
+  @JsonProperty("channelType")
+  private String channelType;
+  /** (Required) */
   @JsonProperty("hostAddress")
   private String hostAddress;
 
   @JsonProperty("port")
   private Integer port;
-
+  /** (Required) */
   @JsonProperty("apiEndPoint")
   private String apiEndPoint;
   /** (Required) */
@@ -49,11 +58,47 @@ public class ChannelMetadata {
   @JsonProperty("bodyParameters")
   private BodyParameters bodyParameters;
 
+  /** (Required) */
+  @JsonProperty("channelName")
+  public String getChannelName() {
+    return channelName;
+  }
+
+  /** (Required) */
+  @JsonProperty("channelName")
+  public void setChannelName(String channelName) {
+    this.channelName = channelName;
+  }
+
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /** (Required) */
+  @JsonProperty("channelType")
+  public String getChannelType() {
+    return channelType;
+  }
+
+  /** (Required) */
+  @JsonProperty("channelType")
+  public void setChannelType(String channelType) {
+    this.channelType = channelType;
+  }
+
+  /** (Required) */
   @JsonProperty("hostAddress")
   public String getHostAddress() {
     return hostAddress;
   }
 
+  /** (Required) */
   @JsonProperty("hostAddress")
   public void setHostAddress(String hostAddress) {
     this.hostAddress = hostAddress;
@@ -140,6 +185,9 @@ public class ChannelMetadata {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
+        .append("channelName", channelName)
+        .append("description", description)
+        .append("channelType", channelType)
         .append("hostAddress", hostAddress)
         .append("port", port)
         .append("apiEndPoint", apiEndPoint)
@@ -154,13 +202,16 @@ public class ChannelMetadata {
   @Override
   public int hashCode() {
     return new HashCodeBuilder()
-        .append(hostAddress)
         .append(port)
         .append(headerParameters)
         .append(apiEndPoint)
+        .append(channelName)
         .append(bodyParameters)
+        .append(channelType)
         .append(httpMethod)
         .append(urlParameters)
+        .append(description)
+        .append(hostAddress)
         .append(queryParameters)
         .toHashCode();
   }
@@ -170,18 +221,21 @@ public class ChannelMetadata {
     if (other == this) {
       return true;
     }
-    if ((other instanceof RouteMetadata) == false) {
+    if ((other instanceof ChannelMetadata) == false) {
       return false;
     }
     ChannelMetadata rhs = ((ChannelMetadata) other);
     return new EqualsBuilder()
-        .append(hostAddress, rhs.hostAddress)
         .append(port, rhs.port)
         .append(headerParameters, rhs.headerParameters)
         .append(apiEndPoint, rhs.apiEndPoint)
+        .append(channelName, rhs.channelName)
         .append(bodyParameters, rhs.bodyParameters)
+        .append(channelType, rhs.channelType)
         .append(httpMethod, rhs.httpMethod)
         .append(urlParameters, rhs.urlParameters)
+        .append(description, rhs.description)
+        .append(hostAddress, rhs.hostAddress)
         .append(queryParameters, rhs.queryParameters)
         .isEquals();
   }

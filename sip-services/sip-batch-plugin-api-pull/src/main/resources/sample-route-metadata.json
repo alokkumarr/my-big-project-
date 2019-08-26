@@ -1,4 +1,6 @@
 {
+  "routeName": "Sample Route",
+  "description": "Sample Route",
   "apiEndPoint": "/data",
   "httpMethod": "POST",
   "queryParameters": [{

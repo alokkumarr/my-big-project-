@@ -1,4 +1,7 @@
 {
+  "channelName": "Sample Channel",
+  "description": "Sample Channel",
+  "channelType": "apipull",
   "hostAddress": "123.123.123.123",
   "port": 8080,
   "apiEndPoint": "/data",

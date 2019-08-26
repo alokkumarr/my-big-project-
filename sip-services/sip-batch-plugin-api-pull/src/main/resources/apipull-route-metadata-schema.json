@@ -28,6 +28,12 @@
     }
   },
   "properties": {
+    "routeName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
     "apiEndPoint": {
       "type": "string"
     },
@@ -93,6 +99,7 @@
     }
   },
   "required": [
+    "routeName",
     "apiEndPoint",
     "httpMethod",
     "queryParameters",
