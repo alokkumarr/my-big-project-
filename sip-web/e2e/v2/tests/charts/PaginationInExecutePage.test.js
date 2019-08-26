@@ -56,8 +56,8 @@ describe('Executing create and delete chart tests from charts/PaginationInExecut
   });
 
   using(
-    testDataReader.testData['PAGINATION']['charts_exeute']
-      ? testDataReader.testData['PAGINATION']['charts_exeute']
+    testDataReader.testData['PAGINATION']['charts_execute']
+      ? testDataReader.testData['PAGINATION']['charts_execute']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -130,7 +130,7 @@ describe('Executing create and delete chart tests from charts/PaginationInExecut
         testId: id,
         data: data,
         feature: 'PAGINATION',
-        dataProvider: 'charts_exeute'
+        dataProvider: 'charts_execute'
       };
     }
   );

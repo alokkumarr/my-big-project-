@@ -47,7 +47,8 @@ const CRITICAL = [
   TEST_BASE_DIR + 'reports/AggregateWithESReport.test.js',
   TEST_BASE_DIR + 'reports/AggregateWithESReport.test.js',
   TEST_BASE_DIR + 'reports/AggregateWithDLReport.test.js',
-  TEST_BASE_DIR + 'charts/PaginationInExecutePage.test.js'
+  TEST_BASE_DIR + 'charts/PaginationInExecutePage.test.js',
+    TEST_BASE_DIR + 'reports/EsReportPaginationInExecutePage.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [
@@ -58,6 +59,7 @@ const REGRESSION = [
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
+    TEST_BASE_DIR + 'reports/EsReportPaginationInExecutePage.test.js',
 ];
 
 module.exports = {
