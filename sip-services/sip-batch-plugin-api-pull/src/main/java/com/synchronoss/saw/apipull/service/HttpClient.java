@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
 public class HttpClient {
   private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
 
-  public ApiResponse execute(SipApiRequest sipApiRequest) throws Exception {
+  public ApiResponse execute(SipApiRequest sipApiRequest) throws SipApiPullExecption {
     boolean validRequest =
         !StringUtils.isEmpty(sipApiRequest.getUrl())
             && !StringUtils.isEmpty(sipApiRequest.getHttpMethod());
