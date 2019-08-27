@@ -13,7 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 
-describe('Executing pagination in execute page for reports from reports/EsReportPaginationInExecutePage.test.js', () => {
+describe('Executing pagination in preview page for reports from reports/EsReportPaginationInPreviewPage.test.js', () => {
   let analysisId;
   let host;
   let token;
@@ -46,8 +46,8 @@ describe('Executing pagination in execute page for reports from reports/EsReport
   });
 
   using(
-    testDataReader.testData['PAGINATION_ES']['execute_page']
-      ? testDataReader.testData['PAGINATION_ES']['execute_page']
+    testDataReader.testData['PAGINATION_ES']['preview_page']
+      ? testDataReader.testData['PAGINATION_ES']['preview_page']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -71,38 +71,16 @@ describe('Executing pagination in execute page for reports from reports/EsReport
         reportDesignerPage.clickOnReportFields(tables);
         // Verify that all the columns are displayed
         reportDesignerPage.verifyDisplayedColumns(tables);
-        reportDesignerPage.clickOnSave();
-        reportDesignerPage.enterAnalysisName(reportName);
-        reportDesignerPage.enterAnalysisDescription(reportDescription);
-        reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-        // Verify analysis displayed in list and card view
-        analyzePage.goToView('list');
-        analyzePage.verifyElementPresent(
-          analyzePage._analysisTitleLink(reportName),
-          true,
-          'report should be present in list/card view'
-        );
-        analyzePage.goToView('card');
-        // Go to detail page and very details
-        analyzePage.clickOnAnalysisLink(reportName);
-
+        reportDesignerPage.clickOnPreviewButton();
         const executePage = new ExecutePage();
-        executePage.verifyTitle(reportName);
-        analysisId = executePage.getAnalysisId();
         // Pagination section
         executePage.verifyPagination();
         executePage.verifyItemPerPage();
-        // Delete the report
-        executePage.clickOnActionLink();
-        executePage.clickOnDelete();
-        executePage.confirmDelete();
-        analyzePage.verifyToastMessagePresent('Analysis deleted.');
-        analyzePage.verifyAnalysisDeleted();
       }).result.testInfo = {
         testId: id,
         data: data,
         feature: 'PAGINATION_ES',
-        dataProvider: 'execute_page'
+        dataProvider: 'preview_page'
       };
     }
   );
