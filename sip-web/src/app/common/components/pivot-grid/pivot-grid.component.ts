@@ -386,6 +386,8 @@ export class PivotGridComponent implements OnDestroy {
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
 
+        cloned.dataField = cloned.columnName;
+
         if (DATE_TYPES.includes(cloned.type)) {
           // disable sorting for the fields that have a type string because of manual formatting
           // so it doesn't sort the fields accordinbg to the display string
