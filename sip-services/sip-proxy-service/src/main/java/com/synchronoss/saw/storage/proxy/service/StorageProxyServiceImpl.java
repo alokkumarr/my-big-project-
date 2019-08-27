@@ -561,10 +561,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       response = new ExecuteAnalysisResponse();
       List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
       response.setExecutionId(executionId);
-
-      // return only requested data, only for FE
-      List<Object> pagingData = pagingData(page, pageSize, objList);
-      response.setData(pagingData != null && pagingData.size() > 0 ? pagingData : objList);
+      response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
     }
     return response;
@@ -915,7 +912,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @param pageSize
    * @return
    */
-  private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
+  @Override
+  public List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
     logger.trace("Page :" + page + " pageSize :" + pageSize);
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {

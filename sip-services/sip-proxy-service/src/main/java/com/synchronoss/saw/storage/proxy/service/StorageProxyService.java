@@ -46,4 +46,6 @@ public interface StorageProxyService {
 
     Object processKpi(KPIBuilder kpiBuilder, DataSecurityKey dataSecurityKey)
         throws Exception;
+
+  List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj);
 }
