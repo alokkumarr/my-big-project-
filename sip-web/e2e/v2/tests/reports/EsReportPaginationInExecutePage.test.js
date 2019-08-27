@@ -14,10 +14,11 @@ const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 
 describe('Executing pagination in execute page for charts from charts/EsReportPaginationInExecutePage.test.js', () => {
-   let analysisId;
+  let analysisId;
   let host;
   let token;
   beforeAll(() => {
+    console.log('test.......ss.s.s.s.ss.s.s.');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -44,51 +45,51 @@ describe('Executing pagination in execute page for charts from charts/EsReportPa
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
+
   using(
-    testDataReader.testData['PAGINATION']['es_execute']
-      ? testDataReader.testData['PAGINATION']['es_execute']
+    testDataReader.testData['PAGINATION_ES']['execute_page']
+      ? testDataReader.testData['PAGINATION_ES']['execute_page']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
-          logger.info(`Executing test case with id: ${id}`);
-          const reportName = `e2e es report ${new Date().toString()}`;
-          console.log(reportName);
-          const reportDescription = `e2e dl report description ${new Date().toString()}`;
-          const analysisType = 'table:report';
-          const tables = data.tables;
-          const loginPage = new LoginPage();
-          loginPage.loginAs(data.user, /analyze/);
+        logger.info(`Executing test case with id: ${id}`);
+        const reportName = `e2e es report ${new Date().toString()}`;
+        const reportDescription = `e2e es report description ${new Date().toString()}`;
+        const analysisType = 'table:report';
+        const tables = data.tables;
+        const loginPage = new LoginPage();
+        loginPage.loginAs(data.user, /analyze/);
 
-          const analyzePage = new AnalyzePage();
-          analyzePage.goToView('card');
-          analyzePage.clickOnAddAnalysisButton();
-          analyzePage.clickOnAnalysisType(analysisType);
-          analyzePage.clickOnNextButton();
-          analyzePage.clickOnDataPods(dataSets.pivotChart);
-          analyzePage.clickOnCreateButton();
+        const analyzePage = new AnalyzePage();
+        analyzePage.goToView('card');
+        analyzePage.clickOnAddAnalysisButton();
+        analyzePage.clickOnAnalysisType(analysisType);
+        analyzePage.clickOnNextButton();
+        analyzePage.clickOnDataPods(dataSets.pivotChart);
+        analyzePage.clickOnCreateButton();
 
-          const reportDesignerPage = new ReportDesignerPage();
-          reportDesignerPage.clickOnReportFields(tables);
-          // Verify that all the columns are displayed
-          reportDesignerPage.verifyDisplayedColumns(tables);
-          reportDesignerPage.clickOnSave();
-          reportDesignerPage.enterAnalysisName(reportName);
-          reportDesignerPage.enterAnalysisDescription(reportDescription);
-          reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-          // Verify analysis displayed in list and card view
-          analyzePage.goToView('list');
-          analyzePage.verifyElementPresent(
-            analyzePage._analysisTitleLink(reportName),
-            true,
-            'report should be present in list/card view'
-          );
-          analyzePage.goToView('card');
-          // Go to detail page and very details
-          analyzePage.clickOnAnalysisLink(reportName);
+        const reportDesignerPage = new ReportDesignerPage();
+        reportDesignerPage.clickOnReportFields(tables);
+        // Verify that all the columns are displayed
+        reportDesignerPage.verifyDisplayedColumns(tables);
+        reportDesignerPage.clickOnSave();
+        reportDesignerPage.enterAnalysisName(reportName);
+        reportDesignerPage.enterAnalysisDescription(reportDescription);
+        reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+        // Verify analysis displayed in list and card view
+        analyzePage.goToView('list');
+        analyzePage.verifyElementPresent(
+          analyzePage._analysisTitleLink(reportName),
+          true,
+          'report should be present in list/card view'
+        );
+        analyzePage.goToView('card');
+        // Go to detail page and very details
+        analyzePage.clickOnAnalysisLink(reportName);
 
-          const executePage = new ExecutePage();
-          executePage.verifyTitle(reportName);
-          analysisId = executePage.getAnalysisId();
+        const executePage = new ExecutePage();
+        executePage.verifyTitle(reportName);
+        analysisId = executePage.getAnalysisId();
         // Pagination section
         executePage.verifyPagination();
         executePage.verifyItemPerPage();
@@ -101,8 +102,8 @@ describe('Executing pagination in execute page for charts from charts/EsReportPa
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'PAGINATION',
-        dataProvider: 'es_execute'
+        feature: 'PAGINATION_ES',
+        dataProvider: 'execute_page'
       };
     }
   );
