@@ -486,6 +486,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Boolean designerEdit)
       throws Exception {
     List<Object> result = null;
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
+      }
+    }
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       final String executionId = UUID.randomUUID().toString();
       ExecuteAnalysisResponse response;
