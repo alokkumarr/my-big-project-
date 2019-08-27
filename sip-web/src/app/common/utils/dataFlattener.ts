@@ -16,6 +16,7 @@ import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 import * as forEach from 'lodash/forEach';
 import { NUMBER_TYPES } from './../consts';
+import * as moment from 'moment';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -189,10 +190,13 @@ export function flattenChartData(data, sqlBuilder) {
   )(data);
 }
 
-export function checkNullinReportData(data) {
+export function alterReportData(data) {
   return fpPipe(
     fpMap(
       fpMapValues(value => {
+        if (moment(value).isValid()) {
+          return moment(value).utc().format('YYYY-MM-DD hh:mm:ss');
+        }
         return value === null ? 'null' : value;
       })
     )
@@ -204,7 +208,7 @@ export function flattenReportData(data, analysis) {
     return data;
   }
 
-  data = checkNullinReportData(data);
+  data = alterReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
       /* If the column has aggregation, preserve the aggregate name when removing keyword */
