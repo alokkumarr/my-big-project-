@@ -81,7 +81,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
       queryShownTOUser = dlQueryBuilder.buildDataQuery(sipQuery);
     }
-
+    sipQuery.setQuery(queryShownTOUser);
     // Required parameters
     String semanticId = sipQuery.getSemanticId();
 
