@@ -14,7 +14,7 @@ const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Constants = require('../../helpers/Constants');
 
-describe('Executing create and delete chart tests from charts/PaginationInExecutePage.test.js', () => {
+describe('Executing pagination test for charts in grid view from charts/PaginationInExecutePage.test.js', () => {
   let analysisId;
   let host;
   let token;
