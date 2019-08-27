@@ -5,7 +5,11 @@ import {
   Validators,
   AbstractControl
 } from '@angular/forms';
-import { ROUTE_OPERATION } from 'src/app/modules/workbench/models/workbench.interface';
+import {
+  ROUTE_OPERATION,
+  DetailForm,
+  SFTPRouteMetadata
+} from 'src/app/modules/workbench/models/workbench.interface';
 import { isUnique } from 'src/app/common/validators';
 
 import * as includes from 'lodash/includes';
@@ -13,14 +17,14 @@ import * as isUndefined from 'lodash/isUndefined';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { MatDialog } from '@angular/material';
-import { SourceFolderDialogComponent } from '../..';
+import { SourceFolderDialogComponent } from '../../select-folder-dialog';
 
 @Component({
   selector: 'sftp-route',
   templateUrl: './sftp-route.component.html',
   styleUrls: ['./sftp-route.component.scss']
 })
-export class SftpRouteComponent implements OnInit {
+export class SftpRouteComponent implements OnInit, DetailForm {
   @Input() routeData: any;
   @Input() opType: ROUTE_OPERATION;
 
@@ -97,5 +101,22 @@ export class SftpRouteComponent implements OnInit {
     dateDialogRef.afterClosed().subscribe(sourcePath => {
       this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
     });
+  }
+
+  get value(): SFTPRouteMetadata {
+    return this.detailsFormGroup.value;
+  }
+
+  get valid(): boolean {
+    return this.detailsFormGroup.valid;
+  }
+
+  get testConnectivityValue() {
+    return {
+      channelType: 'sftp',
+      channelId: this.routeData.channelID,
+      sourceLocation: this.value.sourceLocation,
+      destinationLocation: this.value.destinationLocation
+    };
   }
 }

@@ -4,7 +4,7 @@ import { isUnique } from 'src/app/common/validators';
 import * as isNil from 'lodash/isNil';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import {
-  DetailFormable,
+  DetailForm,
   CHANNEL_OPERATION,
   SFTPChannelMetadata,
   CHANNEL_ACCESS
@@ -15,7 +15,7 @@ import {
   templateUrl: './sftp-source.component.html',
   styleUrls: ['./sftp-source.component.scss']
 })
-export class SftpSourceComponent implements OnInit, DetailFormable {
+export class SftpSourceComponent implements OnInit, DetailForm {
   public detailsFormGroup: FormGroup;
   show = false;
   accessTypes = CHANNEL_ACCESS;

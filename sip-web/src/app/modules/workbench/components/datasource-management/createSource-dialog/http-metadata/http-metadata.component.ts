@@ -16,11 +16,17 @@ export class HttpMetadataComponent implements OnInit {
     HTTP_METHODS.DELETE
   ];
 
+  @Input() requiredFields: Array<string>;
+
   @Input() parentForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {}
+
+  isRequired(fieldName: string): boolean {
+    return (this.requiredFields || []).includes(fieldName);
+  }
 
   get headerParams() {
     return this.parentForm.get('headerParameters') as FormArray;
