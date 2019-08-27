@@ -3,7 +3,8 @@ import {
   FormGroup,
   FormBuilder,
   Validators,
-  FormControl
+  FormControl,
+  FormArray
 } from '@angular/forms';
 import {
   ROUTE_OPERATION,
@@ -37,8 +38,32 @@ export class ApiRouteComponent implements OnInit, DetailForm {
   ngOnInit() {
     this.createForm();
     if (isUndefined(this.routeData.routeMetadata.length)) {
+      const routeMetadata = <APIRouteMetadata>this.routeData.routeMetadata;
+
+      this.patchFormArray(routeMetadata.headerParameters, 'headerParameters');
+      this.patchFormArray(routeMetadata.queryParameters, 'queryParameters');
+
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
     }
+  }
+
+  /**
+   * Adds form controls for headers and query params for existing data.
+   *
+   * @param {Array<any>} data
+   * @param {string} formKey
+   * @memberof ApiRouteComponent
+   */
+  patchFormArray(data: Array<any>, formKey: string) {
+    const formArray = this.detailsFormGroup.get(formKey) as FormArray;
+    data.forEach(row =>
+      formArray.push(
+        this.formBuilder.group({
+          key: [row.key, Validators.required],
+          value: [row.value, Validators.required]
+        })
+      )
+    );
   }
 
   createForm() {
