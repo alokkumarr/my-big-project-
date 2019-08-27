@@ -1,54 +1,72 @@
-<div [formGroup]="parentForm">
-  <!-- Request Method -->
-  <mat-form-field appearance="outline">
-    <mat-label i18n>Request Method</mat-label>
-    <mat-select
-      formControlName="httpMethod"
-      e2e="http-method-select"
-      (selectionChange)="httpMethodChanged()"
-      required
-    >
-      <mat-option
-        *ngFor="let method of httpMethods"
-        [value]="method"
-        [e2e]="'http-method-' + method"
-        i18n
-        >{{ method }}</mat-option
+<mat-tab-group [formGroup]="parentForm">
+  <mat-tab fxLayout="column" fxLayoutAlign="center start">
+    <ng-template mat-tab-label>
+      <span
+        [ngClass]="{
+          'tab-error':
+            !parentForm.get('apiEndPoint').valid ||
+            !parentForm.get('bodyParameters.content').valid
+        }"
       >
-    </mat-select>
-  </mat-form-field>
+        Request
+      </span>
+    </ng-template>
+    <div fxLayout="row">
+      <!-- Request Method -->
+      <mat-form-field class="left-align" appearance="outline" fxFlex="0 1 auto">
+        <mat-label i18n>Request Method</mat-label>
+        <mat-select
+          formControlName="httpMethod"
+          e2e="http-method-select"
+          (selectionChange)="httpMethodChanged()"
+          required
+        >
+          <mat-option
+            *ngFor="let method of httpMethods"
+            [value]="method"
+            [e2e]="'http-method-' + method"
+            i18n
+            >{{ method }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
 
-  <!-- Endpoint -->
-  <mat-form-field appearance="outline">
-    <mat-label i18n>Endpoint</mat-label>
-    <input
-      type="text"
-      matInput
-      placeholder="Endpoint"
-      [required]="isRequired('apiEndPoint')"
-      name="api-endpoint"
-      e2e="api-endpoint"
-      formControlName="apiEndPoint"
-      autocomplete="new-password"
-    />
-    <mat-error
-      *ngIf="
-        isRequired('apiEndPoint') &&
-        !!parentForm.controls.apiEndPoint.hasError('required')
-      "
-      i18n
+      <!-- Endpoint -->
+      <mat-form-field
+        class="right-align"
+        appearance="outline"
+        fxFlex="10 1 auto"
+      >
+        <mat-label i18n>Endpoint</mat-label>
+        <input
+          type="text"
+          matInput
+          placeholder="Endpoint"
+          [required]="isRequired('apiEndPoint')"
+          name="api-endpoint"
+          e2e="api-endpoint"
+          formControlName="apiEndPoint"
+          autocomplete="new-password"
+        />
+        <mat-error
+          *ngIf="
+            isRequired('apiEndPoint') &&
+            !!parentForm.controls.apiEndPoint.hasError('required')
+          "
+          i18n
+        >
+          Endpoint is
+          <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div
+      formGroupName="bodyParameters"
+      class="parameters body"
+      [style.display]="showBodyParams ? 'inherit' : 'none'"
     >
-      Endpoint is
-      <strong>required</strong>
-    </mat-error>
-  </mat-form-field>
-
-  <section
-    class="parameters body"
-    [style.display]="showBodyParams ? 'inherit' : 'none'"
-  >
-    <div formGroupName="bodyParameters">
-      <mat-form-field style="width: 90%;" appearance="outline">
+      <mat-form-field style="width: 100%;" appearance="outline">
         <mat-label i18n>Request Body</mat-label>
         <textarea
           matInput
@@ -68,12 +86,27 @@
         </mat-error>
       </mat-form-field>
     </div>
-  </section>
+  </mat-tab>
 
-  <!-- Header Parameters form -->
-  <section class="parameters headers">
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-      <h4>Headers</h4>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        [ngClass]="{ 'tab-error': !headerParams.valid }"
+      >
+        Headers &nbsp;
+        <ng-container *ngIf="headerParams.controls.length">
+          <span class="dot"></span>
+        </ng-container>
+      </div>
+    </ng-template>
+    <!-- Header Parameters form -->
+    <div
+      class="parameters headers"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+    >
       <button mat-icon-button (click)="addHeader()">
         <mat-icon fontIcon="icon-plus"></mat-icon>
       </button>
@@ -83,13 +116,9 @@
       formArrayName="headerParameters"
       *ngFor="let item of headerParams.controls; let i = index"
     >
-      <div
-        fxLayout="row"
-        fxLayoutAlign="space-evenly center"
-        [formGroupName]="i"
-      >
+      <div fxLayout="row" fxLayoutAlign="start center" [formGroupName]="i">
         <!-- Header Key -->
-        <mat-form-field>
+        <mat-form-field fxFlex="1 1 auto">
           <mat-label i18n>Header Name</mat-label>
           <input
             matInput
@@ -114,8 +143,7 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Header Value -->
-        <mat-form-field>
+        <mat-form-field fxFlex="5 1 auto">
           <mat-label i18n>Header Value</mat-label>
           <input
             matInput
@@ -139,17 +167,28 @@
             <strong>required</strong>
           </mat-error>
         </mat-form-field>
-        <button mat-icon-button (click)="removeHeader(i)">
+        <button mat-icon-button (click)="removeHeader(i)" fxFlex="0 1 auto">
           <mat-icon fontIcon="icon-Minus"></mat-icon>
         </button>
       </div>
     </div>
-  </section>
+  </mat-tab>
 
-  <!-- Query Parameters form -->
-  <section class="parameters query">
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-      <h4>Query Parameters</h4>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        [ngClass]="{ 'tab-error': !queryParams.valid }"
+      >
+        Params &nbsp;
+        <ng-container *ngIf="queryParams.controls.length">
+          <span class="dot"></span>
+        </ng-container>
+      </div>
+    </ng-template>
+    <!-- Query Parameters form -->
+    <div class="parameters query" fxLayout="row" fxLayoutAlign="center center">
       <button mat-icon-button (click)="addQueryParam()">
         <mat-icon fontIcon="icon-plus"></mat-icon>
       </button>
@@ -159,13 +198,9 @@
       formArrayName="queryParameters"
       *ngFor="let item of queryParams.controls; let i = index"
     >
-      <div
-        fxLayout="row"
-        fxLayoutAlign="space-evenly center"
-        [formGroupName]="i"
-      >
+      <div fxLayout="row" fxLayoutAlign="start center" [formGroupName]="i">
         <!-- Query Param Key -->
-        <mat-form-field>
+        <mat-form-field fxFlex="1 1 auto">
           <mat-label i18n>Parameter Name</mat-label>
           <input
             matInput
@@ -182,7 +217,7 @@
         </mat-form-field>
 
         <!-- Query Param Value -->
-        <mat-form-field>
+        <mat-form-field fxFlex="5 1 auto">
           <mat-label i18n>Parameter Value</mat-label>
           <input
             matInput
@@ -197,10 +232,10 @@
             <strong>required</strong>
           </mat-error>
         </mat-form-field>
-        <button mat-icon-button (click)="removeQueryParam(i)">
+        <button mat-icon-button (click)="removeQueryParam(i)" fxFlex="0 1 auto">
           <mat-icon fontIcon="icon-Minus"></mat-icon>
         </button>
       </div>
     </div>
-  </section>
-</div>
+  </mat-tab>
+</mat-tab-group>

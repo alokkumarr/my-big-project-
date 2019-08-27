@@ -1,14 +1,15 @@
 <form
   fxFlex
-  fxLayout="row wrap"
+  fxLayout="column"
+  fxLayoutAlign="center stretch"
   class="source-container"
   #sourceDetails
   novalidate
   [formGroup]="detailsFormGroup"
   autocomplete="false"
 >
-  <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
-    <mat-form-field appearance="outline">
+  <section fxFlex="1 1 auto" fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field appearance="outline" fxFlex="5 1 auto">
       <mat-label i18n>Name Your Route</mat-label>
       <input
         matInput
@@ -35,7 +36,7 @@
         <strong>already exists</strong>
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" fxFlex="1 1 auto">
       <mat-label i18n>Destination</mat-label>
       <input
         matInput
@@ -57,15 +58,14 @@
       </mat-error>
     </mat-form-field>
   </section>
-  <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
-  <section fxFlex="49" fxLayout="column" fxLayoutAlign="space-around center">
+  <section fxFlex="6 1 auto">
     <http-metadata
       [parentForm]="detailsFormGroup"
       [requiredFields]="['apiEndPoint']"
     ></http-metadata>
   </section>
-  <section fxFlex fxLayout="column" fxLayoutAlign="center center">
-    <mat-form-field style="width: 90%;" appearance="outline">
+  <section fxFlex="2 1 auto">
+    <mat-form-field style="width: 100%" appearance="outline">
       <mat-label i18n>Description about the route</mat-label>
       <textarea
         matInput
