@@ -25,7 +25,7 @@ declare -A COMP_MC=(
     [parser]=sncr.xdf.parser.NGParser
     [pipeline]=sncr.xdf.ngprocessor.XDFDataProcessor
     [transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
-    [rtps]=sncr.xdf.rtps.NGRTPSComponent
+    [rtps]=sncr.xdf.rtps.driver.NGRTPSComponent
 )
 
 function usage()
