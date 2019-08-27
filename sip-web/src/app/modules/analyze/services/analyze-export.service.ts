@@ -65,11 +65,16 @@ export class AnalyzeExportService {
               fields,
               analysis
             );
-            this.exportCSV(csvWithDisplayNames, analysis.name);
+            const csvWithUnwrappedNulls = this.unwrapNulls(csvWithDisplayNames);
+            this.exportCSV(csvWithUnwrappedNulls, analysis.name);
           },
           exportOptions
         );
       });
+  }
+
+  unwrapNulls(csv) {
+    return replace(csv, /"null"/g, 'null');
   }
 
   replaceCSVHeader(csv, fields, analysis) {
