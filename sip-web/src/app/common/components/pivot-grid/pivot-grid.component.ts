@@ -334,7 +334,7 @@ export class PivotGridComponent implements OnDestroy {
         return moment.utc(value).format(formatToApply);
       case 'year':
       default:
-        return value;
+        return moment(value, this.getMomentFormat(format)).toDate();
     }
   }
 
