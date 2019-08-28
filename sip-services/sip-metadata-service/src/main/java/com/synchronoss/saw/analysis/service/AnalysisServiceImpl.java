@@ -8,10 +8,12 @@ import com.google.gson.JsonElement;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
+import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
     analysis.setCreatedTime(Instant.now().toEpochMilli());
     try {
+      if (analysis.getType().equalsIgnoreCase("report")) {
+        addQueryToAnalysis(analysis);
+      }
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
@@ -64,6 +69,9 @@ public class AnalysisServiceImpl implements AnalysisService {
   public Analysis updateAnalysis(Analysis analysis, Ticket ticket) throws SipUpdateEntityException {
     analysis.setModifiedTime(Instant.now().toEpochMilli());
     try {
+      if (analysis.getType().equalsIgnoreCase("report")) {
+        addQueryToAnalysis(analysis);
+      }
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
@@ -195,5 +203,19 @@ public class AnalysisServiceImpl implements AnalysisService {
           "Exception occurred while fetching analysis by category for userId", e);
     }
     return objDocs;
+  }
+
+  /** This method adds query to the analysis definition for dl reports. */
+  private void addQueryToAnalysis(Analysis analysis) {
+    if (analysis != null) {
+      if (analysis.getSipQuery() != null) {
+        List<Artifact> artifactList = analysis.getSipQuery().getArtifacts();
+        if (artifactList != null && !artifactList.isEmpty()) {
+          DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
+          String query = dlQueryBuilder.buildDataQuery(analysis.getSipQuery());
+          analysis.getSipQuery().setQuery(query);
+        }
+      }
+    }
   }
 }
