@@ -1,11 +1,14 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
@@ -19,7 +22,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -41,8 +46,8 @@ public class SipKpiController {
 
   private static final Logger logger = LoggerFactory.getLogger(SipKpiController.class);
 
-    @Value("${metadata.service.host}")
-    private String metaDataServiceUrl;
+  @Value("${metadata.service.host}")
+  private String metaDataServiceUrl;
 
   @Autowired private StorageProxyService proxyService;
 
@@ -64,28 +69,30 @@ public class SipKpiController {
     if (kpiBuilder == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    /* Ticket authTicket = getTicket(request);
+    Ticket authTicket = getTicket(request);
     if (authTicket == null) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
-    }*/
-    /* List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();*/
+    }
+    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     Object responseObject = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
-    /* dataSecurityKey.setDataSecuritykey(getDsks(dskList));*/
+    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     try {
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(kpiBuilder));
       if (kpiBuilder.getAdditionalProperties().get("action").toString().equalsIgnoreCase("fetch")) {
         ArrayList list = (ArrayList) (kpiBuilder.getAdditionalProperties().get("keys"));
-          LinkedHashMap hashMap = (LinkedHashMap)(list.get(0));
-          String semanticId = hashMap.get("semanticId").toString();
-        SemanticNode semanticNode = StorageProxyUtil.fetchSemantic(semanticId, metaDataServiceUrl, restUtil);
-        return StorageProxyUtil.merge(objectMapper.valueToTree(kpiBuilder),objectMapper.valueToTree(semanticNode));
+        LinkedHashMap hashMap = (LinkedHashMap) (list.get(0));
+        String semanticId = hashMap.get("semanticId").toString();
+        SemanticNode semanticNode =
+            StorageProxyUtil.fetchSemantic(semanticId, metaDataServiceUrl, restUtil);
+        return StorageProxyUtil.merge(
+            objectMapper.valueToTree(kpiBuilder), objectMapper.valueToTree(semanticNode));
       }
       responseObject = proxyService.processKpi(kpiBuilder, dataSecurityKey);
     } catch (IOException e) {

@@ -13,7 +13,6 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includeSubModules>false</includeSubModules>
       <includes>
-        <include>${project.groupId}:sip-transport-service</include>
         <include>${project.groupId}:sip-executor-service</include>
         <include>${project.groupId}:sip-gateway-service</include>
         <include>${project.groupId}:sip-export-service</include>
