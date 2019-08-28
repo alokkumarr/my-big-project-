@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as isEmpty from 'lodash/isEmpty';
 import {
@@ -13,12 +13,14 @@ import {
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+  @ViewChild('username') username: ElementRef;
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
     public _configService: ConfigService,
     public _router: Router,
-    public _route: ActivatedRoute
+    public _route: ActivatedRoute,
+    public element: ElementRef<HTMLElement>
   ) {}
 
   public dataHolder = {
@@ -40,6 +42,9 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    if (isEmpty(this.dataHolder.password)) {
+      this.username.nativeElement.blur();
+    }
     if (
       isEmpty(this.dataHolder.username) ||
       isEmpty(this.dataHolder.password)
