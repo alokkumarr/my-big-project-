@@ -85,10 +85,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private Long configExecutionLimit;
 
-  @Value("${executor.preview-rows-limit}")
+  @Value("${execution.preview-rows-limit}")
   private Integer previewRowLimit;
 
-  @Value("${executor.publish-rows-limit}")
+  @Value("${execution.publish-rows-limit}")
   private Integer publishRowLimit;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
@@ -486,6 +486,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Boolean designerEdit)
       throws Exception {
     List<Object> result = null;
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
+      }
+    }
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       final String executionId = UUID.randomUUID().toString();
       ExecuteAnalysisResponse response;
@@ -530,23 +546,23 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     SipQuery sipQuery = analysis.getSipQuery();
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;
-    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
-      if (size == null) {
-        switch (executionType) {
-          case onetime:
-            size = previewRowLimit;
-            break;
-          case regularExecution:
-            size = publishRowLimit;
-            break;
-          case preview:
-            size = previewRowLimit;
-            break;
-          case publish:
-            size = publishRowLimit;
-            break;
-        }
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
       }
+    }
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       response =
           dataLakeExecutionService.executeDataLakeReport(
               sipQuery,

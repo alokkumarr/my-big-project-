@@ -56,7 +56,7 @@ class DataLakeExecution(val execType: ExecutionType, val semanticId :String = nu
       sipExecutionHelper.lastSQLExecRes = 0
       execType match {
         case ExecutionType.scheduled => {
-          dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          dlSession.execute(viewName, sqlRuntime, limit)
           m_log.trace("Location : " + outputLocation)
           dlSession.saveData(viewName, sipExecutionHelper.outputLocation, sipExecutionHelper.outputType)
         }
@@ -71,16 +71,16 @@ class DataLakeExecution(val execType: ExecutionType, val semanticId :String = nu
           dlSession.saveData(viewName, outputLocation, sipExecutionHelper.outputType)
         }
         case ExecutionType.regularExecution => {
-          if (DLConfiguration.publishRowLimit > 0)
-            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          if (limit > 0)
+            dlSession.execute(viewName, sqlRuntime, limit)
           else
             dlSession.execute(viewName, sqlRuntime)
           m_log.trace("Location : " + outputLocation)
           dlSession.saveData(viewName, outputLocation, sipExecutionHelper.outputType)
         }
         case ExecutionType.publish => {
-          if (DLConfiguration.publishRowLimit > 0)
-            dlSession.execute(viewName, sqlRuntime, DLConfiguration.publishRowLimit)
+          if (limit > 0)
+            dlSession.execute(viewName, sqlRuntime, limit)
           else
             dlSession.execute(viewName, sqlRuntime)
           dlSession.saveData(viewName, sipExecutionHelper.outputLocation, sipExecutionHelper.outputType)
