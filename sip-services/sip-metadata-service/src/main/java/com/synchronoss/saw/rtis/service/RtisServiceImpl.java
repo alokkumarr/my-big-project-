@@ -13,6 +13,7 @@ import com.synchronoss.saw.rtis.model.request.SecondaryStreams;
 import com.synchronoss.saw.util.SipMetadataUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -35,6 +36,7 @@ import sncr.bda.base.MaprConnection;
 public class RtisServiceImpl implements RtisService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RtisServiceImpl.class);
+  private static final String BOOTSTRAP_SERVER = "localhost:9092";
 
   @Value("${metastore.base}")
   @NotNull
@@ -47,6 +49,28 @@ public class RtisServiceImpl implements RtisService {
   @Override
   public void createConfig(RtisConfiguration configuration) {
     try {
+      configuration.setBootstrapServers(BOOTSTRAP_SERVER);
+      if (configuration.getId().equalsIgnoreCase("countly")) {
+        configuration.setClazz("synchronoss.handlers.countly.CountlyGenericBridge");
+        configuration.setKeySerializer("org.apache.kafka.common.serialization.StringSerializer");
+        configuration.setValueSerializer("org.apache.kafka.common.serialization.StringSerializer");
+      } else {
+        configuration.setClazz("synchronoss.handlers.GenericEventHandler");
+        configuration.setKeySerializer("org.apache.kafka.common.serialization.ByteArraySerializer");
+        configuration.setValueSerializer("org.apache.kafka.common.serialization.ByteArraySerializer");
+      }
+
+      List<SecondaryStreams> secondaryStreams = new ArrayList<>();
+      List<PrimaryStreams> primaryStreams = configuration.getPrimaryStreams();
+      if (primaryStreams != null && !primaryStreams.isEmpty()) {
+        primaryStreams.forEach(primaryStream -> {
+          SecondaryStreams streams = new SecondaryStreams();
+          streams.setQueue(primaryStream.getQueue());
+          streams.setTopic(primaryStream.getTopic());
+          secondaryStreams.add(streams);
+        });
+      }
+      configuration.setSecondaryStreams(secondaryStreams);
       JsonElement config =
           SipMetadataUtils.toJsonElement(mapper.writeValueAsString(configuration));
       final String configId = UUID.randomUUID().toString();
@@ -66,10 +90,7 @@ public class RtisServiceImpl implements RtisService {
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
 
       String[] fields = {"app_key"};
-      ObjectMapper objectMapper = new ObjectMapper();
-      ObjectNode node = objectMapper.createObjectNode();
-      ObjectNode objectNode = node.putObject("$eq");
-      objectNode.put("customerCode", customerCode);
+      ObjectNode node = getJsonNodes("customerCode", customerCode);
 
       return maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
     } catch (Exception ex) {
@@ -88,9 +109,7 @@ public class RtisServiceImpl implements RtisService {
 
       String[] fields = {"*"};
       ObjectMapper objectMapper = new ObjectMapper();
-      ObjectNode node = objectMapper.createObjectNode();
-      ObjectNode objectNode = node.putObject("$eq");
-      objectNode.put("app_key", appKey);
+      ObjectNode node = getJsonNodes("app_key", appKey);
 
       List<JsonNode> nodeList =
           maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
@@ -160,5 +179,37 @@ public class RtisServiceImpl implements RtisService {
       });
     }
     return steamList;
+  }
+
+  @Override
+  public Boolean deleteConfiguration(@NotNull(message = "Application key cannot be null")
+                                     @Valid String appKey) {
+    try {
+      new RtisMetadata(tableName, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+
+      String[] fields = {"*"};
+      ObjectNode node = getJsonNodes("app_key", appKey);
+
+      return maprConnection.deleteByMaprDBQuery(fields, node.toString());
+    } catch (Exception ex) {
+      LOGGER.error("Error occurred while fetching the app keys data", ex);
+    }
+    return null;
+  }
+
+  /**
+   * Build a query node which need to be executed on mapr db.
+   *
+   * @param columnName
+   * @param columnValue
+   * @return ObjectNode
+   */
+  private ObjectNode getJsonNodes(String columnName, String columnValue) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject("$eq");
+    objectNode.put(columnName, columnValue);
+    return node;
   }
 }

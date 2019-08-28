@@ -237,10 +237,14 @@ object EventHandler {
     if (streamFile == null || streamFile.isEmpty)
       streamFile = "/tmp/frontend-server.stream.checkpoint"
 
-    // hard coded object, this should be a part of API
-    val url = "http://localhost:9400/exports/appKey/?key=" + key;
-    val mapr_cofg: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(url)
-    println(mapr_cofg)
+    val port = conf.getString("rtis.config.host")
+    val connector = conf.getString("rtis.config.connector")
+    val configURL = connector + "://localhost:" + port + "/internal/rtisconfig/fetch/" + key;
+
+    val streamQueue = conf.getString("stream.queue.location") + "/streams/"
+    val result = scala.io.Source.fromURL(configURL).mkString
+
+    val mapr_cofg: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, streamQueue)
 
     // break the event handling processing if key mismatch
     mapr_cofg.foreach(m => {

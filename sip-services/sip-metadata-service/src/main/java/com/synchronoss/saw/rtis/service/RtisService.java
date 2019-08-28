@@ -16,4 +16,7 @@ public interface RtisService {
 
   Object fetchConfigByAppKeys(@NotNull(message = "Application key cannot be null")
                               @Valid String appKey);
+
+  Boolean deleteConfiguration(@NotNull(message = "Application key cannot be null")
+                              @Valid String appKey);
 }

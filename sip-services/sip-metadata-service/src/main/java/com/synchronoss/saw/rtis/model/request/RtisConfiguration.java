@@ -14,6 +14,7 @@ import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "id",
     "customerCode",
     "app_key",
     "streams_1",
@@ -30,6 +31,8 @@ public class RtisConfiguration {
 
   private static final long serialVersionUID = 1L;
 
+  @JsonProperty("id")
+  private String id;
   @JsonProperty("customerCode")
   private String customerCode;
   @JsonProperty("app_key")
@@ -54,6 +57,16 @@ public class RtisConfiguration {
   private Integer timeoutMs;
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(String id) {
+    this.id = id;
+  }
 
   @JsonProperty("customerCode")
   public String getCustomerCode() {
@@ -184,7 +197,8 @@ public class RtisConfiguration {
       return false;
     }
     RtisConfiguration that = (RtisConfiguration) o;
-    return getCustomerCode().equals(that.getCustomerCode())
+    return getId().equals(that.getId())
+        && getCustomerCode().equals(that.getCustomerCode())
         && getAppKey().equals(that.getAppKey())
         && getPrimaryStreams().equals(that.getPrimaryStreams())
         && getSecondaryStreams().equals(that.getSecondaryStreams())
@@ -200,7 +214,7 @@ public class RtisConfiguration {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getCustomerCode(), getAppKey(), getPrimaryStreams(), getSecondaryStreams(),
+    return Objects.hash(getId(), getCustomerCode(), getAppKey(), getPrimaryStreams(), getSecondaryStreams(),
         getClazz(), getBootstrapServers(), getBatchSize(), getKeySerializer(), getValueSerializer(),
         getBlockOnBufferFull(), getTimeoutMs(), getAdditionalProperties());
   }

@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -108,9 +107,8 @@ public class SipRtisController {
   /**
    * Create fetch API to return app keys by customer code.
    *
-   * @param request      HttpServletRequest
-   * @param response     HttpServletResponse
-   * @param customerCode customer code
+   * @param request  HttpServletRequest
+   * @param response HttpServletResponse
    * @return ConfigResponse
    */
   @ApiOperation(
@@ -124,13 +122,12 @@ public class SipRtisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public Object getAppKeysByCustomerCode(
       HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestParam(name = "customerCode") String customerCode) {
+      HttpServletResponse response) {
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
       response.setStatus(401);
     }
-    return rtisService.fetchAppKeys(customerCode);
+    return rtisService.fetchAppKeys(authTicket.getCustCode());
   }
 
   /**
@@ -150,5 +147,35 @@ public class SipRtisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public Object getConfigByAppKey(@PathVariable(name = "appKey") String appKey) {
     return rtisService.fetchConfigByAppKeys(appKey);
+  }
+
+  /**
+   * Create delete API to return configuration by app key.
+   *
+   * @param request  HttpServletRequest
+   * @param response HttpServletResponse
+   * @param appKey   app key
+   * @return Object
+   */
+  @ApiOperation(
+      value = " delete configuration API ",
+      nickname = "FetchConfiguration",
+      notes = "",
+      response = Object.class)
+  @RequestMapping(
+      value = "/delete/{appKey}",
+      method = RequestMethod.DELETE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public Boolean deleteConfigByAppKey(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @PathVariable(name = "appKey") String appKey) {
+
+    Ticket authTicket = getTicket(request);
+    if (authTicket == null) {
+      response.setStatus(401);
+    }
+
+    return rtisService.deleteConfiguration(appKey);
   }
 }

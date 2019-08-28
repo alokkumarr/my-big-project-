@@ -8,6 +8,10 @@ import play.api.libs.functional.syntax._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
+/**
+  * @author alok.kumarr
+  * @since 3.4.0
+  */
 object RTISConfiguration {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[RTISConfiguration].getName)
@@ -42,20 +46,20 @@ object RTISConfiguration {
     ) (Mapping.apply _)
 
 
-  def getConfig(url: String): List[mutable.HashMap[String, Any]] = {
+  def getConfig(result: String, streamLocation: String): List[mutable.HashMap[String, Any]] = {
     val tempList = new ListBuffer[mutable.HashMap[String, Any]]()
     try {
-      val result = scala.io.Source.fromURL(url).mkString
-
       // break if api has empty response
-      if (result.isEmpty) return null
+      if (result.isEmpty || result.size == 0){
+        tempList
+      }
       val jsonList: List[JsObject] = Json.parse(result).as[List[JsObject]]
 
       for (config <- jsonList) {
         val mapping: JsResult[Mapping] = config.validate[Mapping]
 
         mapping.map(conf => {
-          println(conf.app_key)
+          logger debug conf.app_key
 
           val map: mutable.HashMap[String, Any] = new mutable.HashMap[String, Any]()
           map.put("app_key", conf.app_key)
@@ -64,7 +68,7 @@ object RTISConfiguration {
           conf.streams_1.foreach({ p => {
             val pStream = new mutable.HashMap[String, String]
             pStream.put("topic", p.topic)
-            pStream.put("queue", p.queue)
+            pStream.put("queue", streamLocation + p.queue)
             pStreamList += pStream
           }
           })
@@ -74,7 +78,7 @@ object RTISConfiguration {
           conf.streams_2.foreach({ p => {
             val stream = new mutable.HashMap[String, String]
             stream.put("topic", p.topic)
-            stream.put("queue", p.queue)
+            stream.put("queue", streamLocation + p.queue)
             sStreamList += stream
           }
           })
