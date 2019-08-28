@@ -85,10 +85,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private Long configExecutionLimit;
 
-  @Value("${executor.preview-rows-limit}")
+  @Value("${execution.preview-rows-limit}")
   private Integer previewRowLimit;
 
-  @Value("${executor.publish-rows-limit}")
+  @Value("${execution.publish-rows-limit}")
   private Integer publishRowLimit;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
@@ -486,6 +486,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Boolean designerEdit)
       throws Exception {
     List<Object> result = null;
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
+      }
+    }
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       final String executionId = UUID.randomUUID().toString();
       ExecuteAnalysisResponse response;
@@ -530,23 +546,23 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     SipQuery sipQuery = analysis.getSipQuery();
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;
-    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
-      if (size == null) {
-        switch (executionType) {
-          case onetime:
-            size = previewRowLimit;
-            break;
-          case regularExecution:
-            size = publishRowLimit;
-            break;
-          case preview:
-            size = previewRowLimit;
-            break;
-          case publish:
-            size = publishRowLimit;
-            break;
-        }
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
       }
+    }
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       response =
           dataLakeExecutionService.executeDataLakeReport(
               sipQuery,
@@ -561,10 +577,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       response = new ExecuteAnalysisResponse();
       List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
       response.setExecutionId(executionId);
-
-      // return only requested data, only for FE
-      List<Object> pagingData = pagingData(page, pageSize, objList);
-      response.setData(pagingData != null && pagingData.size() > 0 ? pagingData : objList);
+      response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
     }
     return response;
@@ -915,7 +928,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @param pageSize
    * @return
    */
-  private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
+  @Override
+  public List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
     logger.trace("Page :" + page + " pageSize :" + pageSize);
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
