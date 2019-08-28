@@ -49,11 +49,11 @@ object RTISConfiguration {
   def getConfig(result: String, streamLocation: String): List[mutable.HashMap[String, Any]] = {
     val tempList = new ListBuffer[mutable.HashMap[String, Any]]()
     try {
+      val jsonList: List[JsObject] = Json.parse(result).as[List[JsObject]]
       // break if api has empty response
-      if (result.isEmpty || result.size == 0){
+      if (jsonList.isEmpty || result.size == 0){
         tempList
       }
-      val jsonList: List[JsObject] = Json.parse(result).as[List[JsObject]]
 
       for (config <- jsonList) {
         val mapping: JsResult[Mapping] = config.validate[Mapping]
