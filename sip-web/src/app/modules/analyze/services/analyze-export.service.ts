@@ -17,7 +17,7 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { checkNullinReportData } from './../../../common/utils/dataFlattener';
+import { alterReportData } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
@@ -49,7 +49,7 @@ export class AnalyzeExportService {
         };
 
         exportData = ['report', 'esReport'].includes(analysisType)
-          ? checkNullinReportData(exportData)
+          ? alterReportData(exportData)
           : exportData;
 
         json2csv(
