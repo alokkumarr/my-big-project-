@@ -400,7 +400,7 @@ public class StorageProxyController {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
     }
-    logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
+    logger.trace("response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
     return executeResponse;
   }
 
