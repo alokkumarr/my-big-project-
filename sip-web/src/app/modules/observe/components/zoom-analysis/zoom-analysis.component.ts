@@ -70,26 +70,16 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     const sub = this.displayNameBuilder$.subscribe();
     this.subscriptions.push(sub);
-
-    fpPipe(
-      fpMap(val => {
-        if (val.path === 'chart.height') {
-          initialChartHeight = val.data;
-        }
-      })
-    )(this.data.updater.getValue());
-
-    // map-chart-viewer component is floating to left
-    // When analysis is loaded for the fisrt time.
-    // Due to which updating the map-chart-viewer height here.
-    if (this.data.analysis.type === 'map') {
-      this.data.updater.next([
-        {
-          path: 'chart.height',
-          data: 500
-        }
-      ]);
-    }
+    setTimeout(() => {
+      // defer updating the chart so that the chart has time to initialize
+      fpPipe(
+        fpMap(val => {
+          if (val.path === 'chart.height') {
+            initialChartHeight = val.data;
+          }
+        })
+      )(this.data.updater.getValue());
+    });
   }
 
   ngAfterViewInit(): void {
@@ -106,13 +96,15 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.data.updater.next([
-      {
-        path: 'chart.height',
-        data: initialChartHeight
-      }
-    ]);
+    if (this.data.analysis.type !== 'map') {
+      this.subscriptions.forEach(sub => sub.unsubscribe());
+      this.data.updater.next([
+        {
+          path: 'chart.height',
+          data: initialChartHeight
+        }
+      ]);
+    }
   }
 
   generateDSLDateFilters(filters) {
