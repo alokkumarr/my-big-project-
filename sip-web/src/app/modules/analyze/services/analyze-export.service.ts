@@ -91,12 +91,12 @@ export class AnalyzeExportService {
       .map(columnName => {
         const field = fields.find(f => f.columnName === columnName);
         if (!field) {
-          return columnName;
+          return `"${columnName}`;
         }
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
-          return `distinctCount(${field.alias || field.displayName})`;
+          return `"distinctCount(${field.alias || field.displayName})"`;
         }
-        return field.alias || field.displayName;
+        return `"${field.alias || field.displayName}"`;
       })
       .join(',');
     return replace(csv, firstRow, displayNames);
