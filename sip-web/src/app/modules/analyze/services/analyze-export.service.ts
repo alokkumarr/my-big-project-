@@ -17,7 +17,7 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { checkNullinReportData } from './../../../common/utils/dataFlattener';
+import { wrapFieldValues } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
@@ -39,18 +39,16 @@ export class AnalyzeExportService {
         const columnNames = map(fields, 'columnName');
         const exportOptions = {
           trimHeaderFields: false,
-          emptyFieldValue: '',
+          emptyFieldValue: 'null',
           checkSchemaDifferences: false,
           delimiter: {
-            wrap: '"',
+            wrap: '',
             eol: '\r\n'
           },
           columnNames
         };
 
-        exportData = ['report', 'esReport'].includes(analysisType)
-          ? checkNullinReportData(exportData)
-          : exportData;
+        exportData = wrapFieldValues(exportData);
 
         json2csv(
           exportData,
