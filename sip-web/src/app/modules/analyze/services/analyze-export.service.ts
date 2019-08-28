@@ -65,8 +65,8 @@ export class AnalyzeExportService {
               fields,
               analysis
             );
-            const csvWithUnwrappedNulls = this.unwrapNulls(csvWithDisplayNames);
-            this.exportCSV(csvWithUnwrappedNulls, analysis.name);
+            // const csvWithUnwrappedNulls = this.unwrapNulls(csvWithDisplayNames);
+            this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
         );
