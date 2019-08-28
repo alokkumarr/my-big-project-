@@ -24,126 +24,139 @@
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
       <mat-step label="Route Details" [stepControl]="stepControl">
-        <ng-container [ngSwitch]="routeData.channelType">
-          <sftp-route
-            #sftpForm
-            *ngSwitchCase="uid.SFTP"
-            [routeData]="routeData"
-            [opType]="opType"
-          ></sftp-route>
-          <api-route
-            #apiForm
-            *ngSwitchCase="uid.API"
-            [routeData]="routeData"
-            [opType]="opType"
-          ></api-route>
-        </ng-container>
-        <mat-divider></mat-divider>
         <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="space-between center"
-          style="height: 20%;"
+          fxLayout="column"
+          fxLayoutAlign="center stretch"
+          style="height: 100%"
         >
-          <button
-            mat-stroked-button
-            color="primary"
-            color="warn"
-            (click)="onCancelClick()"
-            e2e="route-cancel-btn"
-            i18n
+          <ng-container [ngSwitch]="routeData.channelType">
+            <sftp-route
+              #sftpForm
+              *ngSwitchCase="uid.SFTP"
+              fxFlex="1 1 auto"
+              [routeData]="routeData"
+              [opType]="opType"
+            ></sftp-route>
+            <api-route
+              #apiForm
+              *ngSwitchCase="uid.API"
+              fxFlex="1 1 auto"
+              [routeData]="routeData"
+              [opType]="opType"
+            ></api-route>
+          </ng-container>
+          <div
+            fxFlex="0 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            style="padding-top: 20px;"
           >
-            Cancel
-          </button>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="testRoute(detailsFormTestValue)"
-            [disabled]="!isDetailsFormValid"
-            e2e="route-test-connectivity-btn"
-            i18n
-          >
-            <mat-icon
-              fontIcon="icon-query-mode"
-              style="vertical-align: bottom;"
-            ></mat-icon>
-            Test Connectivity
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-next-btn"
-            matStepperNext
-            [disabled]="!isDetailsFormValid"
-            i18n
-          >
-            Next
-          </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              color="warn"
+              (click)="onCancelClick()"
+              e2e="route-cancel-btn"
+              i18n
+            >
+              Cancel
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="testRoute(detailsFormTestValue)"
+              [disabled]="!isDetailsFormValid"
+              e2e="route-test-connectivity-btn"
+              i18n
+            >
+              <mat-icon
+                fontIcon="icon-query-mode"
+                style="vertical-align: bottom;"
+              ></mat-icon>
+              Test Connectivity
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-next-btn"
+              matStepperNext
+              [disabled]="!isDetailsFormValid"
+              i18n
+            >
+              Next
+            </button>
+          </div>
         </div>
       </mat-step>
       <mat-step label="Schedule Route">
-        <div style="height: 80%;">
-          <cron-job-schedular
-            [crondetails]="crondetails"
-            (onCronChanged)="onCronChanged($event)"
-          ></cron-job-schedular>
-        </div>
-        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n
-          >Start date cannot be in past. Please select a Date that is current or
-          in future.</span
-        >
-        <mat-divider></mat-divider>
         <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="space-between center"
-          style="height: 20%;"
+          fxLayout="column"
+          fxLayoutAlign="start stretch"
+          style="height: 100%"
         >
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-schd-previous-btn"
-            matStepperPrevious
-            i18n
+          <div fxFlex="1 1 auto">
+            <cron-job-schedular
+              [crondetails]="crondetails"
+              (onCronChanged)="onCronChanged($event)"
+            ></cron-job-schedular>
+          </div>
+          <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n
+            >Start date cannot be in past. Please select a Date that is current
+            or in future.</span
           >
-            Previous
-          </button>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="testRoute(detailsFormTestValue)"
-            [disabled]="!isDetailsFormValid"
-            e2e="route-schd-test-conn-btn"
-            i18n
+          <mat-divider></mat-divider>
+          <div
+            fxFlex="0 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            style="padding-top: 20px;"
           >
-            <mat-icon
-              fontIcon="icon-query-mode"
-              style="vertical-align: bottom;"
-            ></mat-icon>
-            Test Connectivity
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            *ngIf="opType === 'create'"
-            [disabled]="!isDetailsFormValid || !isCronExpressionValid"
-            (click)="createRoute(detailsFormValue)"
-            e2e="route-schd-create-btn"
-            i18n
-          >
-            Create
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-schd-update-btn"
-            *ngIf="opType === 'update'"
-            [disabled]="!isDetailsFormValid"
-            (click)="createRoute(detailsFormValue)"
-            i18n
-          >
-            Update
-          </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-schd-previous-btn"
+              matStepperPrevious
+              i18n
+            >
+              Previous
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="testRoute(detailsFormTestValue)"
+              [disabled]="!isDetailsFormValid"
+              e2e="route-schd-test-conn-btn"
+              i18n
+            >
+              <mat-icon
+                fontIcon="icon-query-mode"
+                style="vertical-align: bottom;"
+              ></mat-icon>
+              Test Connectivity
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="opType === 'create'"
+              [disabled]="!isDetailsFormValid || !isCronExpressionValid"
+              (click)="createRoute(detailsFormValue)"
+              e2e="route-schd-create-btn"
+              i18n
+            >
+              Create
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-schd-update-btn"
+              *ngIf="opType === 'update'"
+              [disabled]="!isDetailsFormValid"
+              (click)="createRoute(detailsFormValue)"
+              i18n
+            >
+              Update
+            </button>
+          </div>
         </div>
       </mat-step>
     </mat-horizontal-stepper>
