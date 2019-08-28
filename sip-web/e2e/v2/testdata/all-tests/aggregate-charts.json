@@ -1,0 +1,116 @@
+{
+  "AGGREGATE_CHARTS": {
+    "aggr_charts": {
+      "AGGRC001": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "aggregate": {
+          "designerLabel": "AVG",
+          "value": "avg"
+        },
+        "description": "User should be able to add aggregate for combo charts"
+      },
+      "AGGRC002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "aggregate": {
+          "designerLabel": "MIN",
+          "value": "min"
+        },
+        "description": "Admin should be able to add aggregate for column charts"
+      },
+      "AGGRC003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "aggregate": {
+          "designerLabel": "MAX",
+          "value": "max"
+        },
+        "description": "Admin should be able to add aggregate for bar charts"
+      },
+      "AGGRC004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "aggregate": {
+          "designerLabel": "CNT",
+          "value": "count"
+        },
+        "description": "User should be able to add aggregate for stack charts"
+      },
+      "AGGRC005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "aggregate": {
+          "designerLabel": "CNTD",
+          "value": "distinctcount"
+        },
+        "description": "Admin should be able to add aggregate for line charts"
+      },
+      "AGGRC006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "aggregate": {
+          "designerLabel": "PCTC",
+          "value": "percentage"
+        },
+        "description": "Admin should be able to add aggregate for area charts"
+      },
+      "AGGRC007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "aggregate": {
+          "designerLabel": "AVG",
+          "value": "avg"
+        },
+        "description": "User should be able to add aggregate for scatter charts"
+      },
+      "AGGRC008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "aggregate": {
+          "designerLabel": "MIN",
+          "value": "min"
+        },
+        "description": "Admin should be able to add aggregate for bubble charts"
+      },
+      "AGGRC009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "aggregate": {
+          "designerLabel": "MAX",
+          "value": "max"
+        },
+        "description": "User should be able to add aggregate for pie charts"
+      },
+      "AGGRC010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "aggregate": {
+          "designerLabel": "CNT",
+          "value": "count"
+        },
+        "description": "Admin should be able to add aggregate for tsspline charts"
+      },
+      "AGGRC011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "aggregate": {
+          "designerLabel": "CNTD",
+          "value": "distinctcount"
+        },
+        "description": "User should be able to add aggregate for tsPane charts"
+      }
+    }
+  }
+}

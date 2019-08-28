@@ -631,7 +631,6 @@ public class XDFDataProcessor  extends AbstractComponent {
 
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processESLoader() Exception is : " + e + "\n");
-            System.exit(-1);
         }
         return ret;
     }

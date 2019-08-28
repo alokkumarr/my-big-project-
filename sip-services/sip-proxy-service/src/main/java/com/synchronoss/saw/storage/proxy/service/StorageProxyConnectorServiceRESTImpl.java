@@ -131,7 +131,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   }
 
     @Override
-    public JsonNode ExecuteESQuery(String query, Store store) throws Exception {
+    public JsonNode executeESQuery(String query, Store store) throws Exception {
         Preconditions.checkArgument(query != null && !"".equals(query), "query cannnot be null.");
         logger.debug("Query:", query);
         Response response = null;
@@ -147,15 +147,12 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             HttpEntity entity = response.getEntity();
             jsonNode = objectMapper.readTree(entity.getContent());
-
-            client.close();
         }
         finally{
             if (client !=null){
                 client.close();
             }
         }
-        logger.trace("Search Response", jsonNode.toString());
         return jsonNode;
     }
 

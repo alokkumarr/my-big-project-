@@ -41,6 +41,14 @@ public class BisRouteDto implements Serializable {
   @JsonProperty("createdDate")
   private Long createdDate;
 
+  @ApiModelProperty(value = "job lastFire time", dataType = "Long")
+  @JsonProperty("lastFireTime")
+  private Long lastFireTime;
+
+  @ApiModelProperty(value = "Job nextFire time", dataType = "Long")
+  @JsonProperty("nextFireTime")
+  private Long nextFireTime;
+
   @JsonProperty("modifiedDate")
   public Long getModifiedDate() {
     return modifiedDate;
@@ -119,6 +127,26 @@ public class BisRouteDto implements Serializable {
   @JsonProperty("status")
   public void setStatus(Long status) {
     this.status = status;
+  }
+
+  @JsonProperty("lastFireTime")
+  public Long getLastFireTime() {
+    return lastFireTime;
+  }
+
+  @JsonProperty("lastFireTime")
+  public void setLastFireTime(Long lastFireTime) {
+    this.lastFireTime = lastFireTime;
+  }
+
+  @JsonProperty("nextFireTime")
+  public Long getNextFireTime() {
+    return nextFireTime;
+  }
+
+  @JsonProperty("nextFireTime")
+  public void setNextFireTime(Long nextFireTime) {
+    this.nextFireTime = nextFireTime;
   }
 
   @Override

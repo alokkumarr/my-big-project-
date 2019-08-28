@@ -7,6 +7,11 @@ import {
 import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
+export class DesignerSetData {
+  static readonly type = '[Designer] Set data';
+  constructor(public data: any[]) {}
+}
+
 export class DesignerResetState {
   static readonly type = '[Designer] Reset state on destroy';
   constructor() {}
@@ -79,6 +84,17 @@ export class DesignerUpdateAnalysisSubType {
   /* Use for only new DSL analyses */
   static readonly type = '[Designer] Update subType for analysis';
   constructor(public subType: string) {}
+}
+
+export class DesignerUpdateQuery {
+  static readonly type = '[Designer] Update query string';
+  constructor(public query: string) {}
+}
+
+export class DesignerUpdateEditMode {
+  static readonly type =
+    '[Designer] Update designer mode between query/designer mode';
+  constructor(public designerEdit: boolean) {}
 }
 
 export class DesignerUpdateSorts {
@@ -182,3 +198,18 @@ export class DesignerRemoveAllArtifactColumns {
   constructor() {}
 }
 
+export class DesignerJoinsArray {
+  static readonly type = '[Designer] joins from analysis';
+  constructor(public joins: any) {}
+}
+
+export class ConstructDesignerJoins {
+  static readonly type = '[Designer] construct desinger joins';
+  constructor(public analysis: any) {}
+}
+
+export class DesignerUpdateAggregateInSorts {
+  static readonly type =
+    '[Designer] update aggregate in sorts on change of aggregagte';
+  constructor(public column: any) {}
+}

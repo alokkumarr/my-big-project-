@@ -10,8 +10,6 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
-import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpReduce from 'lodash/fp/reduce';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
@@ -191,6 +189,16 @@ export function flattenChartData(data, sqlBuilder) {
   )(data);
 }
 
+export function wrapFieldValues(data) {
+  return fpPipe(
+    fpMap(
+      fpMapValues(value => {
+        return value === null ? null : `"${value}"`;
+      })
+    )
+  )(data);
+}
+
 export function checkNullinReportData(data) {
   return fpPipe(
     fpMap(
@@ -202,18 +210,10 @@ export function checkNullinReportData(data) {
 }
 
 export function flattenReportData(data, analysis) {
-  if (analysis.edit) {
+  if (analysis.designerEdit) {
     return data;
   }
-  const columnMap = fpPipe(
-    fpFlatMap(artifact => artifact.columns),
-    fpReduce((accumulator, column) => {
-      const { columnName, aggregate } = column;
-      const key = `${columnName}-${aggregate}`;
-      accumulator[key] = column;
-      return accumulator;
-    }, {})
-  )(analysis.artifacts);
+
   data = checkNullinReportData(data);
   return data.map(row => {
     return mapKeys(row, (value, key) => {
@@ -224,15 +224,8 @@ export function flattenReportData(data, analysis) {
         return removeKeyword(key);
       }
 
-      const [aggregate, columnName] = fpPipe(fpSplit('('))(key);
-
-      const columnMapKey = `${columnName}-${aggregate}`;
-      const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
-
-      if (isInArtifactColumn) {
-        return removeKeyword(columnName.split(')')[0]);
-      }
-      return removeKeyword(key);
+      const [, columnName] = fpPipe(fpSplit('('))(key);
+      return removeKeyword(columnName.split(')')[0]);
     });
   });
 }

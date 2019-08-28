@@ -110,7 +110,6 @@ public class MigrateExecutions {
   public static void main(String[] args) throws IOException {
     String analysisFile = args[0];
     System.out.println("Convert analysis from file = " + analysisFile);
-    SipQuery sipQuery1 = new SipQuery();
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     File jsonFile = new File(analysisFile);
     JsonObject jsonObject = gson.fromJson(new FileReader(jsonFile), JsonObject.class);

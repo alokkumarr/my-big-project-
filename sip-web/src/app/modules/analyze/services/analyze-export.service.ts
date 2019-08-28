@@ -17,7 +17,7 @@ import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { checkNullinReportData } from './../../../common/utils/dataFlattener';
+import { wrapFieldValues } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
@@ -39,18 +39,16 @@ export class AnalyzeExportService {
         const columnNames = map(fields, 'columnName');
         const exportOptions = {
           trimHeaderFields: false,
-          emptyFieldValue: '',
+          emptyFieldValue: 'null',
           checkSchemaDifferences: false,
           delimiter: {
-            wrap: '"',
+            wrap: '',
             eol: '\r\n'
           },
           columnNames
         };
 
-        exportData = ['report', 'esReport'].includes(analysisType)
-          ? checkNullinReportData(exportData)
-          : exportData;
+        exportData = wrapFieldValues(exportData);
 
         json2csv(
           exportData,
@@ -65,11 +63,16 @@ export class AnalyzeExportService {
               fields,
               analysis
             );
+            // const csvWithUnwrappedNulls = this.unwrapNulls(csvWithDisplayNames);
             this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
         );
       });
+  }
+
+  unwrapNulls(csv) {
+    return replace(csv, /"null"/g, 'null');
   }
 
   replaceCSVHeader(csv, fields, analysis) {
@@ -86,12 +89,12 @@ export class AnalyzeExportService {
       .map(columnName => {
         const field = fields.find(f => f.columnName === columnName);
         if (!field) {
-          return columnName;
+          return `"${columnName}`;
         }
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
-          return `distinctCount(${field.alias || field.displayName})`;
+          return `"distinctCount(${field.alias || field.displayName})"`;
         }
-        return field.alias || field.displayName;
+        return `"${field.alias || field.displayName}"`;
       })
       .join(',');
     return replace(csv, firstRow, displayNames);
@@ -99,13 +102,13 @@ export class AnalyzeExportService {
 
   getCheckedFieldsForExport(analysis, data) {
     /* If report was using designer mode, find checked columns */
-    if (!analysis.edit && isDSLAnalysis(analysis)) {
+    if (!analysis.designerEdit && isDSLAnalysis(analysis)) {
       return flatMap(analysis.sipQuery.artifacts, artifact =>
         fpPipe(
           fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
         )(artifact.fields)
       );
-    } else if (!analysis.edit) {
+    } else if (!analysis.designerEdit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
         fpPipe(
           fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
