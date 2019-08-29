@@ -334,7 +334,7 @@ export class PivotGridComponent implements OnDestroy {
         return moment.utc(value).format(formatToApply);
       case 'year':
       default:
-        return value;
+        return moment(value, this.getMomentFormat(format)).toDate();
     }
   }
 
@@ -385,6 +385,8 @@ export class PivotGridComponent implements OnDestroy {
           // trim the .keyword suffix from the column name if it is there
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
+
+        cloned.dataField = cloned.columnName;
 
         if (DATE_TYPES.includes(cloned.type)) {
           // disable sorting for the fields that have a type string because of manual formatting

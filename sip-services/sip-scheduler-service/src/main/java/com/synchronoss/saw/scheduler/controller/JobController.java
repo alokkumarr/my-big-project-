@@ -39,7 +39,8 @@ public class JobController extends BaseJobController{
             || !CollectionUtils.isEmpty(jobDetail.getEmailList())
             || !CollectionUtils.isEmpty(jobDetail.getS3());
 
-    if (!isValidDispatch && !jobDetail.getType().equalsIgnoreCase("chart")) {
+    String type = jobDetail.getType();
+    if (!isValidDispatch && !type.matches("chart|map")) {
       return getServerResponse(ServerResponseCode.ATLEAST_ONE_DISPATCHER_IS_MUST, false);
     }
 
