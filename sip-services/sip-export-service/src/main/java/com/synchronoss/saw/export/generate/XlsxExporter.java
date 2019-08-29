@@ -2,6 +2,7 @@ package com.synchronoss.saw.export.generate;
 
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
+import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
@@ -124,13 +125,14 @@ public class XlsxExporter implements IFileExporter {
   /**
    * Added the cells in xlsx workbook with cell style.
    *
+   * @param fields
    * @param exportBean
    * @param workBook
    * @param workSheet
    * @param recordRow
    */
   public void addXlsxRow(
-      ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, Object recordRow) {
+      List<Field> fields, ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, Object recordRow) {
     logger.debug(this.getClass().getName() + " addXlsxRows starts");
     String[] header = null;
 
@@ -141,7 +143,10 @@ public class XlsxExporter implements IFileExporter {
 
     if (data instanceof LinkedHashMap) {
       if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
-        Object[] obj = ((LinkedHashMap) data).keySet().toArray();
+
+        Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
+        Object[] obj = columnHeader != null && columnHeader.length > 0 ?
+            columnHeader : ((LinkedHashMap) data).keySet().toArray();
         header = Arrays.copyOf(obj, obj.length, String[].class);
 
         // set column header to export bean

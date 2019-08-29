@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.export.AmazonS3Handler;
+import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
@@ -16,6 +17,7 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggregationParser;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
+
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
@@ -270,7 +273,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public void streamResponseToFile(
-      ExportBean exportBean, long limitPerPage, ResponseEntity<DataResponse> entity) {
+      String analysisId, ExportBean exportBean, long limitPerPage, ResponseEntity<DataResponse> entity) {
     try {
 
       logger.trace("Inside streamResponseToFile");
@@ -284,15 +287,19 @@ public class ExportServiceImpl implements ExportService {
       OutputStreamWriter osw = new OutputStreamWriter(fos);
       String fileType = exportBean.getFileType();
 
+      final SipQuery sipQuery = getSipQuery(analysisId);
+      List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+      Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
+
       logger.debug("Writing to file");
       logger.debug("Data = " + entity.getBody().getData());
       // stream the page output to file.
       if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
-        streamToCSVReport(entity, limitPerPage, exportBean, osw);
+        streamToCSVReport(columnHeader, entity, limitPerPage, exportBean, osw);
         osw.close();
         fos.close();
       } else {
-        streamToXlsxReport(entity.getBody(), limitPerPage, exportBean);
+        streamToXlsxReport(fields, entity.getBody(), limitPerPage, exportBean);
       }
 
     } catch (IOException e) {
@@ -304,6 +311,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public void streamToCSVReport(
+      Object[] columnHeader,
       ResponseEntity<DataResponse> entity,
       long LimittoExport,
       ExportBean exportBean,
@@ -324,7 +332,12 @@ public class ExportServiceImpl implements ExportService {
                   String[] header = null;
                   if (exportBean.getColumnHeader() == null
                       || exportBean.getColumnHeader().length == 0) {
-                    Object[] obj = ((LinkedHashMap) line).keySet().toArray();
+                    Object[] obj;
+                    if (columnHeader != null && columnHeader.length > 0) {
+                      obj = columnHeader;
+                    } else {
+                      obj = ((LinkedHashMap) line).keySet().toArray();
+                    }
                     if (exportBean.getColumnDataType() != null
                         && exportBean.getColumnDataType().length > 0) {
                       header = exportBean.getColumnHeader();
@@ -381,7 +394,7 @@ public class ExportServiceImpl implements ExportService {
    * @throws IOException
    */
   public Boolean streamToXlsxReport(
-      DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
+      List<Field> fields, DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
 
     List<Object> data = response.getData();
 
@@ -401,11 +414,11 @@ public class ExportServiceImpl implements ExportService {
     workBook.getSpreadsheetVersion();
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      response.getData().stream()
+      data.stream()
           .limit(LimittoExport)
           .forEach(
               line -> {
-                xlsxExporter.addXlsxRow(exportBean, workBook, sheet, line);
+                xlsxExporter.addXlsxRow(fields, exportBean, workBook, sheet, line);
               });
       xlsxExporter.autoSizeColumns(workBook);
       workBook.write(stream);
@@ -832,15 +845,17 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public boolean dispatchMail(
-      ExportBean bean, String recipients, ResponseEntity<DataResponse> entity, boolean zip) {
-    ExportBean exportBean = new ExportBean();
-    exportBean = bean;
+      String analysisId, ExportBean exportBean, String recipients, ResponseEntity<DataResponse> entity, boolean zip) {
 
     String fileType = exportBean.getFileType();
     MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
 
     logger.debug("Email async success");
     logger.debug("[Success] Response :" + entity.getStatusCode());
+
+    final SipQuery sipQuery = getSipQuery(analysisId);
+    List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+    Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
 
     try {
       // create a directory with unique name in published location to avoid file
@@ -861,11 +876,11 @@ public class ExportServiceImpl implements ExportService {
         FileOutputStream fos = new FileOutputStream(file);
         OutputStreamWriter osw = new OutputStreamWriter(fos);
 
-        streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
+        streamToCSVReport(columnHeader, entity, Long.parseLong(emailExportSize), exportBean, osw);
         osw.close();
         fos.close();
       } else {
-        streamToXlsxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+        streamToXlsxReport(fields, entity.getBody(), Long.parseLong(emailExportSize), exportBean);
       }
 
       File cfile = new File(exportBean.getFileName());
@@ -1097,7 +1112,7 @@ public class ExportServiceImpl implements ExportService {
           public void onSuccess(ResponseEntity<DataResponse> entity) {
 
             if (recipients != null && !recipients.equals("")) {
-              dispatchMail(exportBean, recipients, entity, zip);
+              dispatchMail(analysisId, exportBean, recipients, entity, zip);
             }
 
             if (s3 != null && s3 != "") {
@@ -1172,19 +1187,6 @@ public class ExportServiceImpl implements ExportService {
       // This page number will make sure that we process the last bit of info
       page = i;
       // Paginated URL for limitPerPage records till the end of the file.
-      /*String url =
-      apiExportOtherProperties
-          + "/"
-          + analysisId
-          + "/executions/"
-          + executionId
-          + "/data?page="
-          + page
-          + "&pageSize="
-          + limitPerPage
-          + "&analysisType="
-          + analysisType;*/
-
       String url =
           storageProxyUrl
               + "/internal/proxy/storage/"
@@ -1214,7 +1216,7 @@ public class ExportServiceImpl implements ExportService {
         flag = false;
       }
 
-      streamResponseToFile(exportBean, limitPerPage, entity);
+      streamResponseToFile(analysisId, exportBean, limitPerPage, entity);
     }
     // final rows to process
     long leftOutRows = 0;
@@ -1230,18 +1232,6 @@ public class ExportServiceImpl implements ExportService {
     page += 1;
     if (leftOutRows > 0) {
       // Paginated URL for limitPerPage records till the end of the file.
-      /*String url =
-      apiExportOtherProperties
-          + "/"
-          + analysisId
-          + "/executions/"
-          + executionId
-          + "/data?page="
-          + page
-          + "&pageSize="
-          + leftOutRows
-          + "&analysisType="
-          + analysisType;*/
       String url =
           storageProxyUrl
               + "/internal/proxy/storage/"
@@ -1261,7 +1251,7 @@ public class ExportServiceImpl implements ExportService {
 
       logger.debug("Execution response = " + entity);
 
-      streamResponseToFile(exportBean, leftOutRows, entity);
+      streamResponseToFile(analysisId, exportBean, leftOutRows, entity);
 
       logger.debug("File created");
     }
@@ -1337,9 +1327,6 @@ public class ExportServiceImpl implements ExportService {
         } catch (Exception e) {
           logger.error("Error while writing to zip: " + e.getMessage());
         }
-
-        //            byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
-        //            zos.write(bytes, 0, bytes.length);
         zos.closeEntry();
         zos.close();
 
