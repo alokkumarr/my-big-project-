@@ -78,13 +78,16 @@ metastore:
     analysis: analysisMetadata
     execution-result-limit: 5
 
+
+execution:
+  preview-rows-limit: {{ saw_preview_rows_limit | default('10000') }}
+  publish-rows-limit: {{ saw_publish_rows_limit | default('-1') }}
+
 executor:
   streamPath: {{ sip_var_path | default('/var/sip') }}/services/transport/executor
   wait-time: {{ saw_executor_result_wait_time | default('60') }}
   preview-output-location: {{ sip_var_path | default('/var/sip') }}/services/transport/executor/output
   publish-schedule-output-location: {{ sip_var_path | default('/var/sip') }}/services/transport/executor
-  preview-rows-limit: {{ saw_preview_rows_limit | default('10000') }}
-  publish-rows-limit: {{ saw_publish_rows_limit | default('-1') }}
 
 metadata:
   service:

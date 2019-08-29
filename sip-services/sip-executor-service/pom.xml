@@ -214,6 +214,7 @@
                 <entry>
                   <name>/opt/bda/sip-executor</name>
                   <directory>true</directory>
+                  <user>mapr</user>
                 </entry>
                 <entry>
                   <name>/opt/bda/sip-executor/bin</name>
