@@ -13,7 +13,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 
 import { Filter } from './../../../analyze/types';
-import { isDSLAnalysis } from './../../../analyze/types';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import {
   NUMBER_TYPES,
@@ -27,6 +26,7 @@ import * as forEach from 'lodash/forEach';
 import moment from 'moment';
 import { Observable, Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 let initialChartHeight = 0;
 @Component({
