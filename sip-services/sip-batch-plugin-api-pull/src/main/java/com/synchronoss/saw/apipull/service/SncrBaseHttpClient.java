@@ -22,6 +22,9 @@ public abstract class SncrBaseHttpClient implements BaseHttpClient {
   String url = "";
   CloseableHttpClient client;
 
+  public static final String CONTENT_TYPE = "Content-Type";
+  public static final String ACCEPT = "Accept";
+
   /**
    * Parent class constructor accepts host name, which is a mandatory parameter.
    *

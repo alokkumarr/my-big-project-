@@ -34,7 +34,7 @@ public class HttpClientGet extends SncrBaseHttpClient {
       HttpHeaders headers = new HttpHeaders();
       headerParams.entrySet().stream()
           .forEach(entry -> headers.set(entry.getKey(), entry.getValue().toString()));
-      HttpEntity httpEntity = new HttpEntity("parameters", headers);
+      HttpEntity httpEntity = new HttpEntity(headers);
       ResponseEntity<Object> response =
           restTemplate.exchange(url, HttpMethod.GET, httpEntity, Object.class);
 

@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.validation.SchemaFactory;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -18,8 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 public class HttpClientPost extends SncrBaseHttpClient {
   private static final Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
-  public static final String CONTENT_TYPE = "Content-Type";
-  public static final String ACCEPT = "Accept";
 
   Map<String, Object> formData;
   String textData;
@@ -67,7 +67,7 @@ public class HttpClientPost extends SncrBaseHttpClient {
 
     try {
       // TODO : validate against request body
-        SchemaFactory schema = SchemaFactory.newInstance(xml);
+      SchemaFactory schema = SchemaFactory.newInstance(xml);
 
       return true;
     } catch (Exception e) {
@@ -82,8 +82,10 @@ public class HttpClientPost extends SncrBaseHttpClient {
   }
 
   public static boolean isHtmlValid(String html) {
-    // TODO : validate against request body
-    return true;
+    Pattern pattern = Pattern.compile(html);
+    Matcher matcher = pattern.matcher(html);
+
+    return matcher.matches();
   }
 
   @Override
