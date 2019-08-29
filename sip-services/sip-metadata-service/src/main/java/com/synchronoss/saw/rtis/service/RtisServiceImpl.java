@@ -57,7 +57,8 @@ public class RtisServiceImpl implements RtisService {
       } else {
         configuration.setClazz("synchronoss.handlers.GenericEventHandler");
         configuration.setKeySerializer("org.apache.kafka.common.serialization.ByteArraySerializer");
-        configuration.setValueSerializer("org.apache.kafka.common.serialization.ByteArraySerializer");
+        configuration.setValueSerializer(
+            "org.apache.kafka.common.serialization.ByteArraySerializer");
       }
 
       List<SecondaryStreams> secondaryStreams = new ArrayList<>();
@@ -201,8 +202,8 @@ public class RtisServiceImpl implements RtisService {
   /**
    * Build a query node which need to be executed on mapr db.
    *
-   * @param columnName
-   * @param columnValue
+   * @param columnName  column name for the query
+   * @param columnValue column value for the query
    * @return ObjectNode
    */
   private ObjectNode getJsonNodes(String columnName, String columnValue) {

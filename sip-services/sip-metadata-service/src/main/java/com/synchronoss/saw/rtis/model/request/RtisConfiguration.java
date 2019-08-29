@@ -214,8 +214,9 @@ public class RtisConfiguration {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getCustomerCode(), getAppKey(), getPrimaryStreams(), getSecondaryStreams(),
-        getClazz(), getBootstrapServers(), getBatchSize(), getKeySerializer(), getValueSerializer(),
-        getBlockOnBufferFull(), getTimeoutMs(), getAdditionalProperties());
+    return Objects.hash(getId(), getCustomerCode(), getAppKey(), getPrimaryStreams(),
+        getSecondaryStreams(), getClazz(), getBootstrapServers(), getBatchSize(),
+        getKeySerializer(), getValueSerializer(), getBlockOnBufferFull(),
+        getTimeoutMs(), getAdditionalProperties());
   }
 }
