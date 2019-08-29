@@ -208,13 +208,11 @@ public class AnalysisServiceImpl implements AnalysisService {
   /** This method adds query to the analysis definition for dl reports. */
   private void addQueryToAnalysis(Analysis analysis) {
     if (analysis != null) {
-      if (analysis.getSipQuery() != null) {
-        List<Artifact> artifactList = analysis.getSipQuery().getArtifacts();
-        if (artifactList != null && !artifactList.isEmpty()) {
-          DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
-          String query = dlQueryBuilder.buildDataQuery(analysis.getSipQuery());
-          analysis.getSipQuery().setQuery(query);
-        }
+      Boolean designerEdit = analysis.getDesignerEdit();
+      if (designerEdit != null && !designerEdit) {
+        DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
+        String query = dlQueryBuilder.buildDataQuery(analysis.getSipQuery());
+        analysis.getSipQuery().setQuery(query);
       }
     }
   }
