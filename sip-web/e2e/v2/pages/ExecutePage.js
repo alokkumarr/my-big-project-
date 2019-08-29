@@ -1,6 +1,7 @@
 'use strict';
 
 const commonFunctions = require('./utils/commonFunctions');
+const Utils = require('./utils/Utils');
 const ConfirmationModel = require('./components/ConfirmationModel');
 const Constants = require('../helpers/Constants');
 
@@ -47,6 +48,33 @@ class ExecutePage extends ConfirmationModel {
     this._executeButtonInDetailPage = element(
       by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
     );
+    this._gridViewIcon = element(by.css(`[mattooltip='Toggle to Grid']`));
+    this._perPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
+    this._itemPerPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
+    this._totalPerPageOptions = element.all(
+      by.xpath(
+        `//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')]`
+      )
+    );
+    this._itemPerPageOptions = item =>
+      element(
+        by.xpath(
+          `(//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')])[${item}]`
+        )
+      );
+
+    this._pagesSection = element(by.css(`[class='dx-pages']`));
+    this._totalPages = element.all(
+      by.xpath(
+        `//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')]`
+      )
+    );
+    this._paginationPage = number =>
+      element(
+        by.xpath(
+          `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
+        )
+      );
   }
 
   verifyTitle(title) {
@@ -165,6 +193,48 @@ class ExecutePage extends ConfirmationModel {
       .mouseMove(this._firstHistory)
       .click()
       .perform();
+  }
+
+  clickOnGridViewIcon() {
+    commonFunctions.clickOnElement(this._gridViewIcon);
+  }
+
+  verifyItemPerPage() {
+    commonFunctions.waitFor.elementToBeVisible(this._perPageSizeSection);
+    commonFunctions.scrollIntoView(this._perPageSizeSection);
+    let _self = this;
+    this._totalPerPageOptions.count().then(total => {
+      let pos = 1; // 1 is already selected so it should be clickable
+
+      (function loop() {
+        if (pos <= total) {
+          _self._itemPerPageOptions(pos).click();
+          browser.sleep(2000); // Need to add this else getting stale element exception
+          expect(_self._pagesSection.isDisplayed()).toBeTruthy();
+          pos++;
+          loop();
+        }
+      })();
+    });
+  }
+
+  verifyPagination() {
+    commonFunctions.waitFor.elementToBeVisible(this._pagesSection);
+    commonFunctions.scrollIntoView(this._pagesSection);
+    let _self = this;
+    this._totalPages.count().then(total => {
+      let pos = 1; // 1 is already selected so it should be clickable
+
+      (function loop() {
+        if (pos <= total) {
+          _self._paginationPage(pos).click();
+          browser.sleep(2000); // Need to add this else getting stale element exception
+          expect(_self._perPageSizeSection.isDisplayed()).toBeTruthy();
+          pos++;
+          loop();
+        }
+      })();
+    });
   }
 }
 module.exports = ExecutePage;
