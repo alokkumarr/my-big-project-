@@ -1,3 +1,77 @@
-<p>
-  api-route works!
-</p>
+<form
+  fxFlex
+  fxLayout="column"
+  fxLayoutAlign="start stretch"
+  class="source-container"
+  #sourceDetails
+  novalidate
+  [formGroup]="detailsFormGroup"
+  autocomplete="false"
+>
+  <section fxFlex="1 1 auto" fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field appearance="outline" fxFlex="5 1 auto">
+      <mat-label i18n>Name Your Route</mat-label>
+      <input
+        matInput
+        name="name-of-route"
+        e2e="name-of-route"
+        formControlName="routeName"
+        maxlength="18"
+        required
+        autocomplete="off"
+      />
+      <mat-error
+        *ngIf="!!detailsFormGroup.controls.routeName.hasError('required')"
+        i18n
+      >
+        Route Name is
+        <strong>required</strong>
+      </mat-error>
+      <mat-error
+        e2e="route-exist-error-msg"
+        *ngIf="!!detailsFormGroup.controls.routeName.hasError('isUnique')"
+        i18n
+      >
+        Route Name
+        <strong>already exists</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" fxFlex="1 1 auto">
+      <mat-label i18n>Destination</mat-label>
+      <input
+        matInput
+        placeholder="Destination"
+        name="destinationLocation"
+        e2e="destination-location-input"
+        formControlName="destinationLocation"
+        required
+        autocomplete="new-password"
+      />
+      <mat-error
+        *ngIf="
+          !!detailsFormGroup.controls.destinationLocation.hasError('required')
+        "
+        i18n
+      >
+        Destination is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+  </section>
+  <section fxFlex="6 1 auto">
+    <http-metadata
+      [parentForm]="detailsFormGroup"
+      [requiredFields]="['apiEndPoint']"
+    ></http-metadata>
+  </section>
+  <section fxFlex="2 1 auto">
+    <mat-form-field style="width: 100%" appearance="outline">
+      <mat-label i18n>Description about the route</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        e2e="route-description-input"
+      ></textarea>
+    </mat-form-field>
+  </section>
+</form>

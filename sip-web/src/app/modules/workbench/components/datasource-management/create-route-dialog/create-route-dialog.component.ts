@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
@@ -9,7 +9,10 @@ import { DatasourceService } from '../../../services/datasource.service';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 import * as moment from 'moment';
 import { CHANNEL_UID } from '../../../wb-comp-configs';
-import { ROUTE_OPERATION } from '../../../models/workbench.interface';
+import {
+  ROUTE_OPERATION,
+  DetailForm
+} from '../../../models/workbench.interface';
 
 @Component({
   selector: 'create-route-dialog',
@@ -24,6 +27,10 @@ export class CreateRouteDialogComponent {
   channelName = '';
   isCronExpressionValid = false;
   startDateCorrectFlag = true;
+
+  // All route forms implement this interface to guarantee common properties
+  @ViewChild('sftpForm') sftpForm: DetailForm;
+  @ViewChild('apiForm') apiForm: DetailForm;
 
   constructor(
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,
@@ -47,17 +54,34 @@ export class CreateRouteDialogComponent {
     this.stepControl = this.formBuilder.group({});
   }
 
+  get routeDetails(): DetailForm {
+    switch (this.routeData.channelType) {
+      case CHANNEL_UID.SFTP:
+        return this.sftpForm;
+      case CHANNEL_UID.API:
+        return this.apiForm;
+      default:
+        break;
+    }
+  }
+
+  get isDetailsFormValid() {
+    return this.routeDetails && this.routeDetails.valid;
+  }
+
+  get detailsFormValue() {
+    return this.routeDetails && this.routeDetails.value;
+  }
+
+  get detailsFormTestValue() {
+    return this.routeDetails && this.routeDetails.testConnectivityValue;
+  }
+
   onCancelClick(): void {
     this.dialogRef.close();
   }
 
-  testRoute(formData) {
-    const routeInfo = {
-      channelType: 'sftp',
-      channelId: this.routeData.channelID,
-      sourceLocation: formData.sourceLocation,
-      destinationLocation: formData.destinationLocation
-    };
+  testRoute(routeInfo) {
     this.datasourceService.testRouteWithBody(routeInfo).subscribe(data => {
       this.showConnectivityLog(data);
     });
@@ -100,17 +124,8 @@ export class CreateRouteDialogComponent {
 
   mapData(data) {
     const routeDetails = {
-      routeName: data.routeName,
-      sourceLocation: data.sourceLocation,
-      destinationLocation: data.destinationLocation,
-      filePattern: data.filePattern,
-      schedulerExpression: this.crondetails,
-      description: data.description,
-      disableDuplicate: data.disableDuplicate,
-      disableConcurrency: data.disableConcurrency,
-      batchSize: data.batchSize,
-      fileExclusions: data.fileExclusions,
-      lastModifiedLimitHours: data.lastModifiedLimitHours
+      ...this.detailsFormValue,
+      schedulerExpression: this.crondetails
     };
     return routeDetails;
   }

@@ -23,133 +23,140 @@
         [editable]="isTypeEditable"
       >
         <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="center center"
-          class="source-container"
+          fxLayout="column"
+          fxLayoutAlign="start stretch"
+          style="height: 100%"
         >
           <div
-            fxFlex
-            fxLayout="row wrap"
-            fxLayoutAlign="space-around space-around"
-            class="source-list"
+            fxFlex="1 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            class="source-container"
           >
-            <mat-card
-              class="mat-elevation-z3"
-              [class.selected]="selectedSource === source.uid"
-              *ngFor="let source of sources"
-              fxFlex="31"
-              fxLayout="row"
-              [attr.e2e]="source.name"
-              fxLayoutAlign="start center"
-              (click)="sourceSelected(source)"
-              [class.no-click]="source.supported === false"
+            <div
+              fxFlex
+              fxLayout="row wrap"
+              fxLayoutAlign="space-around space-around"
+              class="source-list"
             >
-              <div>{{ source.name }}</div>
-              <div fxFlex></div>
-              <img [src]="source.imgsrc" [attr.alt]="source.name" />
-            </mat-card>
+              <mat-card
+                class="mat-elevation-z3"
+                [class.selected]="selectedSource === source.uid"
+                *ngFor="let source of sources"
+                fxFlex="31"
+                fxLayout="row"
+                [attr.e2e]="source.name"
+                fxLayoutAlign="start center"
+                (click)="sourceSelected(source)"
+                [class.no-click]="source.supported === false"
+              >
+                <div>{{ source.name }}</div>
+                <div fxFlex></div>
+                <img [src]="source.imgsrc" [attr.alt]="source.name" />
+              </mat-card>
+            </div>
           </div>
-        </div>
-        <mat-divider></mat-divider>
-        <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="end center"
-          style="height: 15%;"
-        >
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="create-channel-next-button"
-            matStepperNext
-            [disabled]="selectedSource === ''"
-            i18n
-          >
-            Next
-          </button>
+          <div fxFlex="0 1 15%" fxLayout="row" fxLayoutAlign="end center">
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="create-channel-next-button"
+              matStepperNext
+              [disabled]="selectedSource === ''"
+              i18n
+            >
+              Next
+            </button>
+          </div>
         </div>
       </mat-step>
       <mat-step label="Channel Details">
-        <ng-container [ngSwitch]="selectedSource">
-          <sftp-source
-            #sftpForm
-            *ngSwitchCase="uid.SFTP"
-            [channelData]="channelData"
-            [opType]="opType"
-          ></sftp-source>
-          <api-source
-            #apiForm
-            *ngSwitchCase="uid.API"
-            [channelData]="channelData"
-            [opType]="opType"
-          ></api-source>
-        </ng-container>
-        <mat-divider></mat-divider>
         <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="space-between center"
-          style="height: 20%;"
+          fxLayout="column"
+          fxLayoutAlign="center stretch"
+          style="height: 100%"
         >
-          <button
-            mat-raised-button
-            color="primary"
-            *ngIf="isTypeEditable"
-            matStepperPrevious
-            e2e="channel-prev-btn"
+          <ng-container [ngSwitch]="selectedSource">
+            <sftp-source
+              #sftpForm
+              *ngSwitchCase="uid.SFTP"
+              fxFlex="1 1 auto"
+              [channelData]="channelData"
+              [opType]="opType"
+            ></sftp-source>
+            <api-source
+              #apiForm
+              *ngSwitchCase="uid.API"
+              fxFlex="1 1 auto"
+              [channelData]="channelData"
+              [opType]="opType"
+            ></api-source>
+          </ng-container>
+          <div
+            fxFlex="0 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            style="height: 20%;"
           >
-            Previous
-          </button>
-          <button
-            mat-stroked-button
-            color="primary"
-            *ngIf="!isTypeEditable"
-            (click)="onCancelClick()"
-            color="warn"
-            e2e="channel-cancel-btn"
-            matStepperPrevious
-          >
-            Cancel
-          </button>
-          <button
-            e2e="channel-test-connect-btn-model"
-            mat-stroked-button
-            color="primary"
-            (click)="testChannel(detailsFormTestValue)"
-            i18n
-            [disabled]="!isDetailsFormValid"
-          >
-            <mat-icon
-              fontIcon="icon-query-mode"
-              style="vertical-align: bottom;"
-            ></mat-icon>
-            Test Connectivity
-          </button>
-          <button
-            e2e="channel-create-btn"
-            mat-raised-button
-            *ngIf="opType === 'create'"
-            color="primary"
-            type="submit"
-            [disabled]="!isDetailsFormValid"
-            (click)="createSource(detailsFormValue)"
-            i18n
-          >
-            Create
-          </button>
-          <button
-            e2e="channel-update-btn"
-            mat-raised-button
-            *ngIf="opType === 'update'"
-            color="primary"
-            type="submit"
-            [disabled]="!isDetailsFormValid"
-            (click)="createSource(detailsFormValue)"
-            i18n
-          >
-            Update
-          </button>
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="isTypeEditable"
+              matStepperPrevious
+              e2e="channel-prev-btn"
+            >
+              Previous
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              *ngIf="!isTypeEditable"
+              (click)="onCancelClick()"
+              color="warn"
+              e2e="channel-cancel-btn"
+              matStepperPrevious
+            >
+              Cancel
+            </button>
+            <button
+              e2e="channel-test-connect-btn-model"
+              mat-stroked-button
+              color="primary"
+              (click)="testChannel(detailsFormTestValue)"
+              i18n
+              [disabled]="!isDetailsFormValid"
+            >
+              <mat-icon
+                fontIcon="icon-query-mode"
+                style="vertical-align: bottom;"
+              ></mat-icon>
+              Test Connectivity
+            </button>
+            <button
+              e2e="channel-create-btn"
+              mat-raised-button
+              *ngIf="opType === 'create'"
+              color="primary"
+              type="submit"
+              [disabled]="!isDetailsFormValid"
+              (click)="createSource(detailsFormValue)"
+              i18n
+            >
+              Create
+            </button>
+            <button
+              e2e="channel-update-btn"
+              mat-raised-button
+              *ngIf="opType === 'update'"
+              color="primary"
+              type="submit"
+              [disabled]="!isDetailsFormValid"
+              (click)="createSource(detailsFormValue)"
+              i18n
+            >
+              Update
+            </button>
+          </div>
         </div>
       </mat-step>
     </mat-horizontal-stepper>

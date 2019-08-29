@@ -8,7 +8,7 @@ import { DatasourceService } from '../../../services/datasource.service';
 import { CHANNEL_TYPES, CHANNEL_UID } from '../../../wb-comp-configs';
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
 import {
-  DetailFormable,
+  DetailForm,
   CHANNEL_OPERATION
 } from '../../../models/workbench.interface';
 
@@ -28,8 +28,8 @@ export class CreateSourceDialogComponent {
   isTypeEditable = true;
 
   // All channel forms implement this interface to guarantee common properties
-  @ViewChild('sftpForm') sftpForm: DetailFormable;
-  @ViewChild('apiForm') apiForm: DetailFormable;
+  @ViewChild('sftpForm') sftpForm: DetailForm;
+  @ViewChild('apiForm') apiForm: DetailForm;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -63,7 +63,7 @@ export class CreateSourceDialogComponent {
     return this.channelDetails && this.channelDetails.testConnectivityValue;
   }
 
-  get channelDetails(): DetailFormable {
+  get channelDetails(): DetailForm {
     switch (this.selectedSource) {
       case CHANNEL_UID.SFTP:
         return this.sftpForm;
