@@ -147,15 +147,12 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             HttpEntity entity = response.getEntity();
             jsonNode = objectMapper.readTree(entity.getContent());
-
-            client.close();
         }
         finally{
             if (client !=null){
                 client.close();
             }
         }
-        logger.trace("Search Response", jsonNode.toString());
         return jsonNode;
     }
 
