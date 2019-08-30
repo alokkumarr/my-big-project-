@@ -42,9 +42,9 @@ import { SideNavService } from '../../../../common/services/sidenav.service';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ZoomAnalysisComponent } from './../zoom-analysis/zoom-analysis.component';
-import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 import { ObserveService } from '../../services/observe.service';
 import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 const MARGIN_BETWEEN_TILES = 10;
 

@@ -1,3 +1,5 @@
+import { Analysis, AnalysisDSL } from '../models';
+
 export {
   AnalysisType,
   AnalysisDSL,
@@ -13,3 +15,9 @@ export interface ConfirmDialogData {
   positiveActionLabel: string;
   negativeActionLabel: string;
 }
+
+export const isDSLAnalysis = (
+  analysis: Analysis | AnalysisDSL
+): analysis is AnalysisDSL => {
+  return (<AnalysisDSL>analysis).sipQuery !== undefined;
+};
