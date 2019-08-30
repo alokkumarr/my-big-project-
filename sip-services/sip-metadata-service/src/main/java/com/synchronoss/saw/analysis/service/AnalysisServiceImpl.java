@@ -52,7 +52,10 @@ public class AnalysisServiceImpl implements AnalysisService {
     analysis.setCreatedTime(Instant.now().toEpochMilli());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
-        addQueryToAnalysis(analysis);
+        String query = getDlQuery(analysis);
+        if (query != null) {
+          analysis.getSipQuery().setQuery(query);
+        }
       }
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
@@ -70,7 +73,10 @@ public class AnalysisServiceImpl implements AnalysisService {
     analysis.setModifiedTime(Instant.now().toEpochMilli());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
-        addQueryToAnalysis(analysis);
+        String query = getDlQuery(analysis);
+        if (query != null) {
+          analysis.getSipQuery().setQuery(query);
+        }
       }
       JsonElement parsedAnalysis =
           SipMetadataUtils.toJsonElement(objectMapper.writeValueAsString(analysis));
@@ -205,15 +211,21 @@ public class AnalysisServiceImpl implements AnalysisService {
     return objDocs;
   }
 
-  /** This method adds query to the analysis definition for dl reports. */
-  private void addQueryToAnalysis(Analysis analysis) {
+  /**
+   * forms the dl query from analysis.
+   *
+   * @return query
+   */
+  private String getDlQuery(Analysis analysis) {
     if (analysis != null) {
       Boolean designerEdit = analysis.getDesignerEdit();
       if (designerEdit != null && !designerEdit) {
         DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
         String query = dlQueryBuilder.buildDataQuery(analysis.getSipQuery());
-        analysis.getSipQuery().setQuery(query);
+        return query;
       }
+      return analysis.getSipQuery().getQuery();
     }
+    return null;
   }
 }
