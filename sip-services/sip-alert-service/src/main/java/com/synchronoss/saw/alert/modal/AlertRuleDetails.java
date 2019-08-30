@@ -1,6 +1,7 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.synchronoss.saw.model.SipQuery;
+import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -15,6 +16,7 @@ public class AlertRuleDetails {
   private Boolean activeInd;
   private String customerCode;
   private SipQuery sipQuery;
+  private List<Notification> notification;
 
   /**
    * Gets alertRulesSysId.
@@ -168,5 +170,19 @@ public class AlertRuleDetails {
   /** Sets sipQuery. */
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
+  }
+
+  /**
+   * Gets notification.
+   *
+   * @return list of notification.
+   */
+  public List<Notification> getNotification() {
+    return notification;
+  }
+
+  /** Sets notification. */
+  public void setNotification(List<Notification> notification) {
+    this.notification = notification;
   }
 }
