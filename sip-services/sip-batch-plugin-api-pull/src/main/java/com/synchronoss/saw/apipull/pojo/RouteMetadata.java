@@ -1,19 +1,17 @@
 package com.synchronoss.saw.apipull.pojo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+  "routeName",
+  "description",
   "apiEndPoint",
   "httpMethod",
   "queryParameters",
@@ -26,11 +24,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class RouteMetadata {
 
   /** (Required) */
+  @JsonProperty("routeName")
+  private String routeName;
+
+  @JsonProperty("description")
+  private String description;
+  /** (Required) */
   @JsonProperty("apiEndPoint")
   private String apiEndPoint;
   /** (Required) */
   @JsonProperty("httpMethod")
-  private RouteMetadata.HttpMethod httpMethod = RouteMetadata.HttpMethod.fromValue("GET");
+  private HttpMethod httpMethod = HttpMethod.fromValue("GET");
   /** (Required) */
   @JsonProperty("queryParameters")
   private List<QueryParameter> queryParameters = null;
@@ -51,6 +55,28 @@ public class RouteMetadata {
   private SchedulerExpression schedulerExpression;
 
   /** (Required) */
+  @JsonProperty("routeName")
+  public String getRouteName() {
+    return routeName;
+  }
+
+  /** (Required) */
+  @JsonProperty("routeName")
+  public void setRouteName(String routeName) {
+    this.routeName = routeName;
+  }
+
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /** (Required) */
   @JsonProperty("apiEndPoint")
   public String getApiEndPoint() {
     return apiEndPoint;
@@ -64,13 +90,13 @@ public class RouteMetadata {
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public RouteMetadata.HttpMethod getHttpMethod() {
+  public HttpMethod getHttpMethod() {
     return httpMethod;
   }
 
   /** (Required) */
   @JsonProperty("httpMethod")
-  public void setHttpMethod(RouteMetadata.HttpMethod httpMethod) {
+  public void setHttpMethod(HttpMethod httpMethod) {
     this.httpMethod = httpMethod;
   }
 
@@ -141,6 +167,8 @@ public class RouteMetadata {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
+        .append("routeName", routeName)
+        .append("description", description)
         .append("apiEndPoint", apiEndPoint)
         .append("httpMethod", httpMethod)
         .append("queryParameters", queryParameters)
@@ -160,8 +188,10 @@ public class RouteMetadata {
         .append(bodyParameters)
         .append(httpMethod)
         .append(urlParameters)
+        .append(description)
         .append(schedulerExpression)
         .append(destinationLocation)
+        .append(routeName)
         .append(queryParameters)
         .toHashCode();
   }
@@ -181,49 +211,11 @@ public class RouteMetadata {
         .append(bodyParameters, rhs.bodyParameters)
         .append(httpMethod, rhs.httpMethod)
         .append(urlParameters, rhs.urlParameters)
+        .append(description, rhs.description)
         .append(schedulerExpression, rhs.schedulerExpression)
         .append(destinationLocation, rhs.destinationLocation)
+        .append(routeName, rhs.routeName)
         .append(queryParameters, rhs.queryParameters)
         .isEquals();
-  }
-
-  public enum HttpMethod {
-    GET("GET"),
-    POST("POST"),
-    PUT("PUT"),
-    DELETE("DELETE");
-    private final String value;
-    private static final Map<String, RouteMetadata.HttpMethod> CONSTANTS =
-        new HashMap<String, RouteMetadata.HttpMethod>();
-
-    static {
-      for (RouteMetadata.HttpMethod c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
-    }
-
-    private HttpMethod(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return this.value;
-    }
-
-    @JsonValue
-    public String value() {
-      return this.value;
-    }
-
-    @JsonCreator
-    public static RouteMetadata.HttpMethod fromValue(String value) {
-      RouteMetadata.HttpMethod constant = CONSTANTS.get(value);
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
-    }
   }
 }

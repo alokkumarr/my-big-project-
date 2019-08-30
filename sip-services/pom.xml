@@ -196,9 +196,9 @@
 		<module>sip-batch-plugin-interfaces</module>
 		<module>sip-batch-plugin-sftp</module>
 		<module>sip-batch-plugin-s3</module>
+    <module>sip-batch-plugin-api-pull</module>
     <module>sip-common-components</module>
 		<module>dist</module>
-    <module>sip-batch-plugin-api-pull</module>
   </modules>
   <distributionManagement>
     <repository>

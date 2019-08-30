@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.plugin;
 
+import com.synchronoss.saw.apipull.plugin.service.ApiPullServiceImpl;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.plugin.service.S3ServiceImpl;
@@ -19,6 +20,9 @@ public class SipIngestionPluginFactory {
   @Autowired
   S3ServiceImpl s3ServiceImpl;
 
+  @Autowired
+  private ApiPullServiceImpl apiPullService;
+
   private static final Logger logger = LoggerFactory.getLogger(SipIngestionPluginFactory.class);
 
   /**
@@ -35,6 +39,8 @@ public class SipIngestionPluginFactory {
       sipConnectionService = this.sftpServiceImpl;
     } else if (ingestionType.equals(BisChannelType.S3.value())) {
       sipConnectionService = this.s3ServiceImpl;
+    } else if (ingestionType.equals(BisChannelType.APIPULL.value())) {
+      sipConnectionService = this.apiPullService;
     }
 
     return sipConnectionService;

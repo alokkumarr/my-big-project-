@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
-import com.synchronoss.saw.apipull.pojo.RouteMetadata.HttpMethod;
+import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
 import com.synchronoss.saw.apipull.service.HttpClient;
 import java.util.ArrayList;

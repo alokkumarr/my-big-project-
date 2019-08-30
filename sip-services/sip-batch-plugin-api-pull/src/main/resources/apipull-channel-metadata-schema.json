@@ -28,6 +28,21 @@
     }
   },
   "properties": {
+    "channelName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "channelType": {
+      "type": "string"
+    },
+    "hostAddress": {
+      "type": "string"
+    },
+    "port": {
+      "type": "integer"
+    },
     "apiEndPoint": {
       "type": "string"
     },
@@ -62,37 +77,12 @@
       "required": [
         "content"
       ]
-    },
-    "destinationLocation": {
-      "type": "string"
-    },
-    "schedulerExpression": {
-      "type": "object",
-      "properties" : {
-        "cronexp": {
-          "type": "string"
-        },
-        "activeTab": {
-          "type": "string"
-        },
-        "activeRadio": {
-          "type": "string"
-        },
-        "startDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "endDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "timezone": {
-          "type": "string"
-        }
-      }
     }
   },
   "required": [
+    "channelName",
+    "channelType",
+    "hostAddress",
     "apiEndPoint",
     "httpMethod",
     "queryParameters",

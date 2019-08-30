@@ -1,24 +1,26 @@
-package com.synchronoss.saw.batch.model;
+package com.synchronoss.saw.apipull.pojo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public enum BisChannelType {
-  SFTP("sftp"), SCP("scp"), JDBC("jdbc"), S3("s3"), APIPULL("apipull");
+public enum HttpMethod {
+  GET("GET"),
+  POST("POST"),
+  PUT("PUT"),
+  DELETE("DELETE");
   private final String value;
-  private static final Map<String, BisChannelType> CONSTANTS =
-      new HashMap<String, BisChannelType>();
+  private static final Map<String, HttpMethod> CONSTANTS =
+      new HashMap<String, HttpMethod>();
 
   static {
-    for (BisChannelType c : values()) {
+    for (HttpMethod c : values()) {
       CONSTANTS.put(c.value, c);
     }
   }
 
-  private BisChannelType(String value) {
+  private HttpMethod(String value) {
     this.value = value;
   }
 
@@ -32,12 +34,9 @@ public enum BisChannelType {
     return this.value;
   }
 
-  /**
-   * Getting Enum value.
-   */
   @JsonCreator
-  public static BisChannelType fromValue(String value) {
-    BisChannelType constant = CONSTANTS.get(value);
+  public static HttpMethod fromValue(String value) {
+    HttpMethod constant = CONSTANTS.get(value);
     if (constant == null) {
       throw new IllegalArgumentException(value);
     } else {
