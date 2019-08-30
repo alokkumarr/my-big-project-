@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -289,7 +290,7 @@ public class ExportServiceImpl implements ExportService {
 
       final SipQuery sipQuery = getSipQuery(analysisId);
       List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
-      Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
+      Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
       logger.debug("Writing to file");
       logger.debug("Data = " + entity.getBody().getData());
@@ -311,7 +312,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public void streamToCSVReport(
-      Object[] columnHeader,
+      Map<String, String> columnHeader,
       ResponseEntity<DataResponse> entity,
       long LimittoExport,
       ExportBean exportBean,
@@ -333,8 +334,8 @@ public class ExportServiceImpl implements ExportService {
                   if (exportBean.getColumnHeader() == null
                       || exportBean.getColumnHeader().length == 0) {
                     Object[] obj;
-                    if (columnHeader != null && columnHeader.length > 0) {
-                      obj = columnHeader;
+                    if (columnHeader != null && !columnHeader.isEmpty()) {
+                      obj = columnHeader.keySet().toArray();
                     } else {
                       obj = ((LinkedHashMap) line).keySet().toArray();
                     }
@@ -347,7 +348,11 @@ public class ExportServiceImpl implements ExportService {
                     exportBean.setColumnHeader(header);
                     osw.write(
                         Arrays.stream(header)
-                            .map(i -> "\"" + i + "\"")
+                            .map(i -> {
+                              String colHeader = columnHeader != null && !columnHeader.isEmpty()
+                                  && columnHeader.get(i) != null ? columnHeader.get(i) : i;
+                              return "\"" + colHeader + "\"";
+                            })
                             .collect(Collectors.joining(",")));
                     osw.write("\n");
                     osw.write(
@@ -507,7 +512,7 @@ public class ExportServiceImpl implements ExportService {
                         + File.separator
                         + dir
                         + File.separator
-                        + String.valueOf(((LinkedHashMap) dispatchBean).get("name"))
+                        + ((LinkedHashMap) dispatchBean).get("name")
                         + "."
                         + exportBean.getFileType());
                 exportBean.setReportDesc(
@@ -855,7 +860,7 @@ public class ExportServiceImpl implements ExportService {
 
     final SipQuery sipQuery = getSipQuery(analysisId);
     List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
-    Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
+    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
     try {
       // create a directory with unique name in published location to avoid file

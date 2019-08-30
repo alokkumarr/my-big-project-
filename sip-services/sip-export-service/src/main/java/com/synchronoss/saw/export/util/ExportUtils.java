@@ -3,8 +3,9 @@ package com.synchronoss.saw.export.util;
 import com.synchronoss.saw.model.Field;
 import org.springframework.util.StringUtils;
 
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This utility class used for export services
@@ -20,18 +21,18 @@ public class ExportUtils {
    * @param fields List of field from sip query
    * @return
    */
-  public static Object[] buildColumnHeader(List<Field> fields) {
-    List<String> header = new LinkedList<>();
+  public static Map<String, String> buildColumnHeaderMap(List<Field> fields) {
+    Map<String, String> header = new LinkedHashMap();
     if (fields != null && !fields.isEmpty()) {
       fields.forEach(field -> {
         String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
         if (split != null && split.length >= 2) {
-          header.add(split[0]);
+          header.put(split[0], field.getAlias());
         } else {
-          header.add(field.getColumnName());
+          header.put(field.getColumnName(), field.getAlias());
         }
       });
     }
-    return header.toArray();
+    return header;
   }
 }

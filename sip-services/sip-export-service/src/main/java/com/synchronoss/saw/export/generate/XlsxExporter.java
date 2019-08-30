@@ -53,7 +53,7 @@ public class XlsxExporter implements IFileExporter {
           Object[] obj = ((LinkedHashMap) data).keySet().toArray();
           header = Arrays.copyOf(obj, obj.length, String[].class);
           exportBean.setColumnHeader(header);
-          addHeaderRow(exportBean, workBook, workSheet);
+          addHeaderRow(exportBean, workBook, workSheet, null);
         }
         buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }
@@ -141,12 +141,12 @@ public class XlsxExporter implements IFileExporter {
     XSSFRow excelRow = workSheet.createRow(workSheet.getLastRowNum() + 1);
     Object data = recordRow;
 
+    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
     if (data instanceof LinkedHashMap) {
       if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
 
-        Object[] columnHeader = ExportUtils.buildColumnHeader(fields);
-        Object[] obj = columnHeader != null && columnHeader.length > 0 ?
-            columnHeader : ((LinkedHashMap) data).keySet().toArray();
+        Object[] obj = columnHeader != null && !columnHeader.isEmpty() ?
+            columnHeader.keySet().toArray() : ((LinkedHashMap) data).keySet().toArray();
         header = Arrays.copyOf(obj, obj.length, String[].class);
 
         // set column header to export bean
@@ -177,10 +177,10 @@ public class XlsxExporter implements IFileExporter {
         }
 
         exportBean.setColumnDataType(columnDataType);
-        addHeaderRow(exportBean, workBook, workSheet);
+        addHeaderRow(exportBean, workBook, workSheet, columnHeader);
       } else if (header == null || header.length <= 0) {
         header = exportBean.getColumnHeader();
-        addHeaderRow(exportBean, workBook, workSheet);
+        addHeaderRow(exportBean, workBook, workSheet, columnHeader);
       }
       buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
     }
@@ -272,7 +272,7 @@ public class XlsxExporter implements IFileExporter {
    * @param wb
    * @param sheet
    */
-  public void addHeaderRow(ExportBean exportBean, Workbook wb, Sheet sheet) {
+  public void addHeaderRow(ExportBean exportBean, Workbook wb, Sheet sheet, Map<String, String> columnHeader) {
     logger.debug(this.getClass().getName() + " addHeaderRow starts");
     int col = 0;
     Field.Type[] type = exportBean.getColumnFieldDataType();
@@ -287,6 +287,9 @@ public class XlsxExporter implements IFileExporter {
     Row row = sheet.createRow(0);
     CellStyle cellStyle = wb.createCellStyle();
     for (String colHeader : exportBean.getColumnHeader()) {
+      if (columnHeader != null && !columnHeader.isEmpty() && columnHeader.get(colHeader) != null) {
+        colHeader = columnHeader.get(colHeader);
+      }
       cellStyle.setFont(font);
       Cell cell = row.createCell(col);
       DataFormat format = wb.createDataFormat();
