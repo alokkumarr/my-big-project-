@@ -216,6 +216,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.layoutConfiguration = this.getLayoutConfiguration(
           this.analysis
         );
+        this._analyzeService.getSemanticObject(this.analysis.semanticId).toPromise().then(semanticObj => {
+          this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
+        });
         if (!isReport) {
           this.requestDataIfPossible();
         }
@@ -1235,7 +1238,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<any>this.analysis).isInverted = to === 'bar';
     }
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
-    this.auxSettings = { ...this.auxSettings, labelOptions: {
+    this.auxSettings = {
+      ...this.auxSettings,
+      labelOptions: {
         enabled: to === 'pie',
         value: to === 'pie' ? 'percentage' : ''
       }
