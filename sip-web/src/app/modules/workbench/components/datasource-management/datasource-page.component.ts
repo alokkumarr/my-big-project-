@@ -376,7 +376,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   openLogsDialog(routeData) {
-    const baseUrl = 'workbench/datasource/jobs?channelTypeId=sftp';
+    const baseUrl = `workbench/datasource/jobs?channelTypeId=${this.selectedSourceType}`;
     const { bisChannelSysId, bisRouteSysId } = routeData;
     const url = `${baseUrl}&channelId=${bisChannelSysId}&routeId=${bisRouteSysId}`;
     this._router.navigateByUrl(url);
