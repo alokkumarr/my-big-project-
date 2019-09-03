@@ -78,6 +78,18 @@
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
+            <mat-form-field appearance="outline" *ngIf="showNotificationEmail">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                formControlName="notificationEmail"
+                required
+                type="email"
+                e2e="notificationEmail"
+              />
+              <mat-error>This field is required</mat-error>
+            </mat-form-field>
+
             <mat-form-field appearance="outline">
               <mat-label>Alert Status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
@@ -281,7 +293,7 @@
             <div>
               <mat-form-field appearance="outline">
                 <mat-label>Lookback period</mat-label>
-                <input
+                <!-- <input
                   matInput
                   placeholder="Loockback period"
                   formControlName="lookbackPeriod"
@@ -291,7 +303,22 @@
                   maxlength="20"
                   (blur)="onLookbackPeriodBlur()"
                   e2e="lookbackPeriod"
-                />
+                /> -->
+                <input hidden="true" value="dummy" matInput />
+                <dx-select-box
+                  ngDefaultControl
+                  required
+                  formControlName="lookbackPeriod"
+                  [items]="datePresets"
+                  displayExpr="label"
+                  valueExpr="value"
+                  [searchEnabled]="true"
+                  placeholder="Select a period"
+                  [readonly]="
+                    !alertMetricFormGroup.controls.lookbackColumn.value
+                  "
+                  e2e="lookbackPeriod"
+                ></dx-select-box>
                 <mat-error
                   *ngIf="
                     alertMetricFormGroup.controls.lookbackPeriod.hasError(
@@ -309,11 +336,11 @@
                   >Alert Name cannot exceed 20 characters</mat-error
                 >
               </mat-form-field>
-              <mat-icon
+              <!-- <mat-icon
                 class="lookback-period__info-icon"
                 fontIcon="icon-info"
                 matTooltip="Interval made of weeks, days, hours, minutes. Ex: '2w 3d', '3h', '1w 10m'"
-              ></mat-icon>
+              ></mat-icon> -->
             </div>
             <div
               fxFlex="45px"
