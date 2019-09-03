@@ -34,7 +34,7 @@
     [wordWrapEnabled]="config.wordWrapEnabled"
     [scrolling]="config.scrolling"
     [sorting]="config.sorting"
-    [dataSource]=""
+    [dataSource]="appKeys"
     [columns]="config.columns"
     [pager]="config.pager"
     [paging]="config.paging"
@@ -47,17 +47,17 @@
       [useNative]="false"
     ></dxo-scrolling>
 
-    <div>
+    <div *dxTemplate="let cell of 'actionCellTemplate'">
       <div
         fxLayout="row"
-        fxLayoutAlign="center center"
+        fxLayoutAlign=""
         class="list-action__container"
       >
         <button
           mat-icon-button
-          class="list-action__button"
-          i18n-matTooltip="Delete Key"
-          matTooltip="Delete Key"
+          (click)="deleteAppKey(cell.data)"
+          i18n-matTooltip="Delete App Key"
+          matTooltip="Delete App Key"
         >
           <mat-icon fontIcon="icon-delete"></mat-icon>
         </button>

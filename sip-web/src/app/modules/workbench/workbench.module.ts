@@ -26,6 +26,7 @@ import { DetailsDialogComponent } from './components/sql-executor/dataset-detail
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
 import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
 import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
+import { DeleteDialogComponent } from './../admin/datasecurity/delete-dialog/delete-dialog.component';
 import {
   CreateSemanticComponent,
   ValidateSemanticComponent,
@@ -98,7 +99,8 @@ const COMPONENTS = [
   JobLogsPageComponent,
   JobFiltersComponent,
   NewRegistrationComponent,
-  AppkeysViewComponent
+  AppkeysViewComponent,
+  DeleteDialogComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];

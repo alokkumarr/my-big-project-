@@ -33,6 +33,19 @@ export class RtisService {
     };
   }
 
+  getAppKeys() {
+    const path = `${this.api}/internal/rtisconfig/appKeys`;
+    return this.getRequest(path).toPromise();
+  }
+
+  deleteAppKey(appKey) {
+    return this.deleteRequest(appKey).toPromise();
+  }
+
+  getRequest(path): Observable<any> {
+    return this.http.get(path);
+  }
+
   postRequest(
     path: string,
     params: Object,
@@ -45,6 +58,14 @@ export class RtisService {
       })
     };
     return this.http.post(path, params, httpOptions);
+  }
+
+
+  deleteRequest(key): Observable<any> {
+    const path = `${this.api}/internal/rtisconfig/appKeys/${key}`;
+    return (
+      this.http.delete(path)
+    );
   }
 
 }
