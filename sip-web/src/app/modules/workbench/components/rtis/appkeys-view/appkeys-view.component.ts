@@ -57,7 +57,9 @@ export class AppkeysViewComponent implements OnInit {
       if (result) {
         const DeleteAppKeys = this._rtisService.deleteAppKey(appKeyData.app_key);
         DeleteAppKeys.then(response => {
-          console.log(response);
+          if (response) {
+            this.fetchKeysForGrid();
+          }
         });
       }
     });
