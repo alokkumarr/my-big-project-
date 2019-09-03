@@ -1108,53 +1108,52 @@ public class ExportServiceImpl implements ExportService {
             + "&executionType=scheduled"
             + "&analysisType="
             + analysisType;
+    if (recipients != null && !recipients.equals("")) {
+      ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
+          asyncRestTemplate.getForEntity(url, DataResponse.class);
+      responseStringFuture.addCallback(
+          new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
+            @Override
+            public void onSuccess(ResponseEntity<DataResponse> entity) {
 
-    ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-        asyncRestTemplate.getForEntity(url, DataResponse.class);
-    responseStringFuture.addCallback(
-        new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-          @Override
-          public void onSuccess(ResponseEntity<DataResponse> entity) {
-
-            if (recipients != null && !recipients.equals("")) {
               dispatchMail(analysisId, exportBean, recipients, entity, zip);
             }
 
-            if (s3 != null && s3 != "") {
-              logger.debug("S3 details set. Dispatching to S3");
-              dispatchFileToS3(
-                  analysisId,
-                  executionId,
-                  analysisType,
-                  exportBean,
-                  s3,
-                  zip,
-                  jobGroup,
-                  requestEntity,
-                  restTemplate,
-                  userFileName);
+            @Override
+            public void onFailure(Throwable t) {
+              logger.error("[Failed] Getting string response:" + t);
             }
+          });
+    }
 
-            if (ftp != null && ftp != "") {
-              logger.debug("ftp dispatch started : ");
-              dispatchToFtp(
-                  analysisId,
-                  executionId,
-                  analysisType,
-                  exportBean,
-                  ftp,
-                  jobGroup,
-                  requestEntity,
-                  restTemplate,
-                  userFileName);
-            }
-          }
+      if (s3 != null && s3 != "") {
+          logger.debug("S3 details set. Dispatching to S3");
+          dispatchFileToS3(
+              analysisId,
+              executionId,
+              analysisType,
+              exportBean,
+              s3,
+              zip,
+              jobGroup,
+              requestEntity,
+              restTemplate,
+              userFileName);
+      }
 
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
+      if (ftp != null && ftp != "") {
+          logger.debug("ftp dispatch started : ");
+          dispatchToFtp(
+              analysisId,
+              executionId,
+              analysisType,
+              exportBean,
+              ftp,
+              jobGroup,
+              requestEntity,
+              restTemplate,
+              userFileName);
+      }
   }
 
   public File createFileforDispatch(String fileName) {
