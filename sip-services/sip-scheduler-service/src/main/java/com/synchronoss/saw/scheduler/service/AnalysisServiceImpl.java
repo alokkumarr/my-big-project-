@@ -223,20 +223,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     Analysis analysis = analysisResponse.getAnalysis();
     logger.info("Analysis request body :" + analysisResponse.getAnalysis());
 
-    String url;
-    if (dispatchRowLimit > 0) {
-      url = proxyAnalysisUrl
+    String url = proxyAnalysisUrl
           + "/execute?id="
           + analysisId
           + "&size="
           + dispatchRowLimit
           + "&executionType=scheduled";
-    } else {
-      url = proxyAnalysisUrl
-          + "/execute?id="
-          + analysisId
-          + "&executionType=scheduled";
-    }
+
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
