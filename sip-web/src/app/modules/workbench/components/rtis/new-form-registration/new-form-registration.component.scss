@@ -1,0 +1,18 @@
+.rtis-registration-title {
+  color: #636363;
+  font-weight: bold;
+}
+
+:host {
+  mat-toolbar {
+    background-color: white !important;
+  }
+
+  div form {
+    padding: 0 0 0 20px;
+  }
+
+  mat-slide-toggle {
+    padding: 0 0 0 20px;
+  }
+}

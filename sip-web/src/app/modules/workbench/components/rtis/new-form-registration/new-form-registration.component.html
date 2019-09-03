@@ -1,298 +1,138 @@
-<mat-card>
-  <mat-card-content>
-        <form
-          fxFlex
-          fxLayout="row wrap"
-          class="details-container"
-          #sourceDetails
-          novalidate
-          [formGroup]="detailsFormGroup"
-          autocomplete="false"
+<div fxLayout="column">
+  <mat-toolbar fxLayout="row">
+      <button
+        (click)="gotoRTISPage()"
+        mat-icon-button
+        style="margin-right: 10px;"
+      >
+        <mat-icon
+          class="back-button-icon"
+          fontIcon="icon-arrow-left"
+        ></mat-icon>
+      </button>
+      <div fxLayout="row" fxFlex="40">
+        <div class="rtis-registration-title" e2e="category-title">
+          RTIS REGISTRATION FORM
+        </div>
+      </div>
+    </mat-toolbar>
+</div>
+<div style="height: calc(100vh - 420px);">
+  <form
+    fxFlex
+    fxLayout="row wrap"
+    class="details-container"
+    #sourceDetails
+    novalidate
+    [formGroup]="detailsFormGroup"
+    autocomplete="false"
+  >
+    <section
+      fxFlex="50"
+      fxLayout="column"
+      fxLayoutAlign="space-around left"
+    >
+      <mat-form-field class="select-form-field" appearance="outline">
+        <mat-label i18n>Model</mat-label>
+        <mat-select [(value)]="model">
+          <mat-option value="countly">Countly</mat-option>
+          <mat-option value="generic">Generic</mat-option>
+          <mat-option value="simple-Json">Simple-Json</mat-option>
+          <mat-option value="simple">Simple</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Batch Size</mat-label>
+        <input
+          matInput
+          type="number"
+          name="batchSize"
+          formControlName="batchSize"
+          e2e="batch-size"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.batchSize.hasError('required')"
+          i18n
         >
-          <section
-            fxFlex="33"
-            fxLayout="column"
-            fxLayoutAlign="space-around center"
-          >
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Primary Topic</mat-label>
-              <input
-                matInput
-                name="primaryStreamTopic"
-                formControlName="primaryStreamTopic"
-                e2e="primary-stream-topic"
-                required
-              />
-              <!-- <mat-error
-                e2e="route-name-error"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                i18n
-              >
-                Route Name is <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="route-name-exist"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                i18n
-              >
-                Route Name already <strong>exists</strong>
-              </mat-error> -->
-            </mat-form-field>
+          Batch Size is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+      <div>
+        <mat-label i18n>Buffer Full Size</mat-label>
+        <mat-slide-toggle name="bufferFullSize"
+        formControlName="bufferFullSize"
+        e2e="batch-full-size"></mat-slide-toggle>
+      </div>
 
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Primary Queue</mat-label>
-              <input
-                matInput
-                name="primaryStreamQueue"
-                formControlName="primaryStreamQueue"
-                e2e="primary-stream-queue"
-                required
-              />
-              <!-- <mat-error
-                e2e="route-name-error"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                i18n
-              >
-                Route Name is <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="route-name-exist"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                i18n
-              >
-                Route Name already <strong>exists</strong>
-              </mat-error> -->
-            </mat-form-field>
-          </section>
-          <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
-          <section fxFlex="33"
-          fxLayout="column"
-          fxLayoutAlign="space-around center">
-          <mat-form-field appearance="outline">
-            <mat-label i18n>Secondary Topic</mat-label>
-            <input
-              matInput
-              name="secondaryStreamTopic"
-              formControlName="secondaryStreamTopic"
-              e2e="secondary-stream-topic"
-              required
-            />
-            <!-- <mat-error
-              e2e="route-name-error"
-              *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-              i18n
-            >
-              Route Name is <strong>required</strong>
-            </mat-error>
-            <mat-error
-              e2e="route-name-exist"
-              *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-              i18n
-            >
-              Route Name already <strong>exists</strong>
-            </mat-error> -->
-          </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Timeout</mat-label>
+        <input
+          matInput
+          type="number"
+          name="timeout"
+          formControlName="timeout"
+          e2e="timeout"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.timeout.hasError('required')"
+          i18n
+        >
+          Timeout is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label i18n>Secondary Queue</mat-label>
-            <input
-              matInput
-              name="secondaryStreamQueue"
-              formControlName="secondaryStreamQueue"
-              e2e="secondary-stream-queue"
-              required
-            />
-            <!-- <mat-error
-              e2e="route-name-error"
-              *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-              i18n
-            >
-              Route Name is <strong>required</strong>
-            </mat-error>
-            <mat-error
-              e2e="route-name-exist"
-              *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-              i18n
-            >
-              Route Name already <strong>exists</strong>
-            </mat-error> -->
-          </mat-form-field>
-        </section>
-        <mat-divider></mat-divider>
-        <section fxFlex="33"
-          fxLayout="column"
-          fxLayoutAlign="space-around center">
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Stream/Queue</mat-label>
+        <input
+          matInput
+          name="streamQueue"
+          formControlName="streamQueue"
+          e2e="stream-queue"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.streamQueue.hasError('required')"
+          i18n
+        >
+          Stream/Queue is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <mat-label i18n>Key</mat-label>
-                    <input
-                      matInput
-                      name="serializerKey"
-                      formControlName="serializerKey"
-                      e2e="serializer-key"
-                      required
-                    />
-                    <!-- <mat-error
-                      e2e="route-name-error"
-                      *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                      i18n
-                    >
-                      Route Name is <strong>required</strong>
-                    </mat-error>
-                    <mat-error
-                      e2e="route-name-exist"
-                      *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                      i18n
-                    >
-                      Route Name already <strong>exists</strong>
-                    </mat-error> -->
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                      <mat-label i18n>Value</mat-label>
-                      <input
-                        matInput
-                        name="serializerValue"
-                        formControlName="serializerValue"
-                        e2e="serializer-value"
-                        required
-                      />
-                      <!-- <mat-error
-                        e2e="route-name-error"
-                        *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                        i18n
-                      >
-                        Route Name is <strong>required</strong>
-                      </mat-error>
-                      <mat-error
-                        e2e="route-name-exist"
-                        *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                        i18n
-                      >
-                        Route Name already <strong>exists</strong>
-                      </mat-error> -->
-                    </mat-form-field>
-        </section>
-        <section fxFlex="100"
-          fxLayout="row"
-          fxLayoutAlign="space-around center">
-          <mat-form-field appearance="outline">
-              <mat-label i18n>Handler Class</mat-label>
-              <input
-                matInput
-                name="handlerClass"
-                formControlName="handlerClass"
-                e2e="handler-class"
-                required
-              />
-              <!-- <mat-error
-                e2e="route-name-error"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                i18n
-              >
-                Route Name is <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="route-name-exist"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                i18n
-              >
-                Route Name already <strong>exists</strong>
-              </mat-error> -->
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label i18n>Bootstrap Servers</mat-label>
-                <input
-                  matInput
-                  name="bootstrapServers"
-                  formControlName="bootstrapServers"
-                  e2e="bootstrap-servers"
-                  required
-                />
-                <!-- <mat-error
-                  e2e="route-name-error"
-                  *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                  i18n
-                >
-                  Route Name is <strong>required</strong>
-                </mat-error>
-                <mat-error
-                  e2e="route-name-exist"
-                  *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                  i18n
-                >
-                  Route Name already <strong>exists</strong>
-                </mat-error> -->
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                  <mat-label i18n>Batch Size</mat-label>
-                  <input
-                    matInput
-                    name="batchSize"
-                    formControlName="batchSize"
-                    e2e="batch-size"
-                    required
-                  />
-                  <!-- <mat-error
-                    e2e="route-name-error"
-                    *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                    i18n
-                  >
-                    Route Name is <strong>required</strong>
-                  </mat-error>
-                  <mat-error
-                    e2e="route-name-exist"
-                    *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                    i18n
-                  >
-                    Route Name already <strong>exists</strong>
-                  </mat-error> -->
-                </mat-form-field>
-        </section>
-        <section fxFlex="100"
-          fxLayout="column"
-          fxLayoutAlign="space-around center">
-            <mat-label i18n>Buffer Full Size</mat-label>
-                    <mat-slide-toggle name="bufferFullSize"
-                    formControlName="bufferFullSize"
-                    e2e="batch-full-size"></mat-slide-toggle>
-
-                      <mat-form-field appearance="outline">
-                          <mat-label i18n>Timeout</mat-label>
-                          <input
-                            matInput
-                            name="timeout"
-                            formControlName="timeout"
-                            e2e="timeout"
-                            required
-                          />
-                          <!-- <mat-error
-                            e2e="route-name-error"
-                            *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                            i18n
-                          >
-                            Route Name is <strong>required</strong>
-                          </mat-error>
-                          <mat-error
-                            e2e="route-name-exist"
-                            *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                            i18n
-                          >
-                            Route Name already <strong>exists</strong>
-                          </mat-error> -->
-                        </mat-form-field>
-          </section>
-        </form>
-        <button
-            mat-raised-button
-            color="primary"
-            (click)="createRegistration(detailsFormGroup.value)"
-            e2e="create-rtis-registration"
-            i18n
-          >
-            Create
-          </button>
-  </mat-card-content>
-</mat-card>
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Topic</mat-label>
+        <input
+          matInput
+          name="streamTopic"
+          formControlName="streamTopic"
+          e2e="stream-topic"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.streamTopic.hasError('required')"
+          i18n
+        >
+          Topic is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </section>
+  </form>
+</div>
+<div style="padding-left: 22px;">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!detailsFormGroup.valid"
+      (click)="createRegistration(detailsFormGroup.value)"
+      e2e="create-rtis-registration"
+      i18n
+    >
+      Create
+    </button>
+  </div>
