@@ -10,6 +10,7 @@ import { UpdateSemanticComponent } from './components/semantic-management/update
 import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
 import { JobsPageComponent, JobLogsPageComponent } from './components/jobs';
 import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
+import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
 
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { IsAdminGuard } from '../admin/guards';
@@ -62,8 +63,11 @@ export const routes: Routes = [
       },
       {
         path: 'rtis/registration',
-        component: NewRegistrationComponent,
-        canActivate: [IsAdminGuard]
+        component: NewRegistrationComponent
+      },
+      {
+        path: 'rtis/appkeys',
+        component: AppkeysViewComponent
       },
       {
         path: 'datasource/joblogs/:jobId',

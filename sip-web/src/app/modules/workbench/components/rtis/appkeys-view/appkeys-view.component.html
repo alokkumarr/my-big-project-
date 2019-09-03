@@ -1,0 +1,67 @@
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
+  <div fxLayout="row" fxFlex="40">
+    <div class="rtis-category-title" e2e="category-title">
+      REAL TIME INGESTION SERVICE
+    </div>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
+    <button
+      (click)="navigate()"
+      mat-raised-button
+      e2e="open-new-analysis-modal"
+      color="primary"
+    >
+      + <span i18n>Registration</span>
+    </button>
+  </div>
+</mat-toolbar>
+<div style="height: calc(100vh - 51px - 70px - 65px);">
+  <dx-data-grid
+    #analysesGrid
+    [customizeColumns]="config.customizeColumns"
+    [columnAutoWidth]="config.columnAutoWidth"
+    [columnMinWidth]="config.columnMinWidth"
+    [columnResizingMode]="config.columnResizingMode"
+    [allowColumnReordering]="config.allowColumnReordering"
+    [allowColumnResizing]="config.allowColumnResizing"
+    [showColumnHeaders]="config.showColumnHeaders"
+    [showColumnLines]="config.showColumnLines"
+    [showRowLines]="config.showRowLines"
+    [showBorders]="config.showBorders"
+    [rowAlternationEnabled]="config.rowAlternationEnabled"
+    [hoverStateEnabled]="config.hoverStateEnabled"
+    [wordWrapEnabled]="config.wordWrapEnabled"
+    [scrolling]="config.scrolling"
+    [sorting]="config.sorting"
+    [dataSource]="appKeys"
+    [columns]="config.columns"
+    [pager]="config.pager"
+    [paging]="config.paging"
+    [width]="config.width"
+    [height]="config.height"
+  >
+    <dxo-scrolling
+      mode="virtual"
+      showScrollbar="always"
+      [useNative]="false"
+    ></dxo-scrolling>
+
+    <div *dxTemplate="let cell of 'actionCellTemplate'">
+      <div
+        fxLayout="row"
+        fxLayoutAlign=""
+        class="list-action__container"
+      >
+        <button
+          mat-icon-button
+          (click)="deleteAppKey(cell.data)"
+          i18n-matTooltip="Delete App Key"
+          matTooltip="Delete App Key"
+        >
+          <mat-icon fontIcon="icon-delete"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </dx-data-grid>
+</div>

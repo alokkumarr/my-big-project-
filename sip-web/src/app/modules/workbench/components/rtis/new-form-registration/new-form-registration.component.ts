@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
-  FormGroup
+  FormGroup,
+  Validators
 } from '@angular/forms';
+import { Location } from '@angular/common';
 import { RtisService } from './../../../services/rtis.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'new-registration-form',
@@ -17,50 +20,49 @@ export class NewRegistrationComponent implements OnInit {
     topic: '',
     queue: ''
   };
+  public model: any;
   constructor(
     private _formBuilder: FormBuilder,
     private _rtisService: RtisService,
-    public notify: ToastService
+    public notify: ToastService,
+    private _location: Location,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.detailsFormGroup = this._formBuilder.group({
-      primaryStreamTopic: [''],
-      primaryStreamQueue: [''],
-      secondaryStreamTopic: [''],
-      secondaryStreamQueue: [''],
-      handlerClass: [''],
-      bootstrapServers: [''],
-      batchSize: [],
-      serializerKey: [],
-      serializerValue: [],
-      bufferFullSize: [],
-      timeout: []
+      batchSize: ['', [Validators.required]],
+      bufferFullSize: [''],
+      timeout: [''],
+      streamQueue: [''],
+      streamTopic: [''],
+      secondaryStreamQueue: ['']
     });
+  }
+
+  gotoRTISPage(){
+    this._location.back();
   }
 
   createRegistration(data) {
     const requestBody = {
+      id: this.model,
       app_key: Math.random().toString(36).substring(7),
       streams_1: [{
-         topic: data.primaryStreamTopic,
-         queue: data. primaryStreamQueue
+         topic: data.streamTopic,
+         queue: data. streamQueue
        }],
-      streams_2: [{
-         topic: data.secondaryStreamTopic,
-         queue: data.secondaryStreamQueue
-       }],
-       class: data.handlerClass,
-       bootstrapServers: data.bootstrapServers,
-       batchSize: data.batchSize,
-       keySerializer: data.serializerKey,
-       valueSerializer: data.serializerValue,
+       batchSize: parseInt(data.batchSize),
        blockOnBufferFull: data.bufferFullSize,
        timeoutMs: data.timeout
     };
-    const response = this._rtisService.createRegistration(requestBody);
-    this.notify.info(response.message, '', {
-      hideDelay: 9000
+    const changeSchedule = this._rtisService.createRegistration(requestBody);
+    changeSchedule.then(response => {
+      this.notify.info(response.message, '', {
+        hideDelay: 9000
+      });
+      this.router.navigate(['workbench', 'rtis', 'appkeys']);
     });
+
   }
 }
