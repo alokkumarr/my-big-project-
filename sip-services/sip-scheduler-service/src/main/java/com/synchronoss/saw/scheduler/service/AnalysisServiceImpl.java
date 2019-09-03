@@ -42,7 +42,8 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${sip-dispatch-row-limit}")
   private int dispatchRowLimit;
 
-  @Autowired private RestUtil restUtil;
+  @Autowired
+  private RestUtil restUtil;
 
   private RestTemplate restTemplate;
 
@@ -195,7 +196,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         for (DSLExecutionBean executionBean : dslExecutionBeans) {
           if (Long.parseLong(executionBean.getFinishedTime()) > Long.parseLong(latestFinish)
               && (executionBean.getStatus() == null
-                  || executionBean.getStatus().equalsIgnoreCase("Success"))) {
+              || executionBean.getStatus().equalsIgnoreCase("Success"))) {
             latestExecutionID = executionBean.getExecutionId();
             latestFinish = executionBean.getFinishedTime();
           }
@@ -222,13 +223,20 @@ public class AnalysisServiceImpl implements AnalysisService {
     Analysis analysis = analysisResponse.getAnalysis();
     logger.info("Analysis request body :" + analysisResponse.getAnalysis());
 
-    String url =
-        proxyAnalysisUrl
-            + "/execute?id="
-            + analysisId
-            + "&size="
-            + dispatchRowLimit
-            + "&executionType=scheduled";
+    String url;
+    if (dispatchRowLimit > 0) {
+      url = proxyAnalysisUrl
+          + "/execute?id="
+          + analysisId
+          + "&size="
+          + dispatchRowLimit
+          + "&executionType=scheduled";
+    } else {
+      url = proxyAnalysisUrl
+          + "/execute?id="
+          + analysisId
+          + "&executionType=scheduled";
+    }
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
