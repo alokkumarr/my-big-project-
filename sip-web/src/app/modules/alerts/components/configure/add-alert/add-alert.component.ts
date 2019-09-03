@@ -104,7 +104,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
-      notificationEmail: [''],
+      notificationEmails: [[]],
       activeInd: [true]
     });
 
@@ -127,11 +127,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ]
     });
 
-    // const notificationEmail = this.alertDefFormGroup.get('notificationEmail');
     this.alertDefFormGroup
       .get('notification')
       .valueChanges.subscribe(values => {
-        console.log('values', values);
         if (values.includes('email')) {
           this.showNotificationEmail = true;
         } else {

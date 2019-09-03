@@ -72,23 +72,20 @@
                 <mat-option
                   *ngFor="let notification of notifications$ | async"
                   [value]="notification.value"
+                  [disabled]="!notification.enabled"
                   >{{ notification.label }}</mat-option
                 >
               </mat-select>
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" *ngIf="showNotificationEmail">
-              <mat-label>Email</mat-label>
-              <input
-                matInput
-                formControlName="notificationEmail"
-                required
-                type="email"
-                e2e="notificationEmail"
-              />
-              <mat-error>This field is required</mat-error>
-            </mat-form-field>
+            <div *ngIf="showNotificationEmail" fxLayout="column">
+              <label i18n>Email</label>
+              <email-list
+                formControlName="notificationEmails"
+                [emails]="alertDefFormGroup.controls.notificationEmails.value"
+              ></email-list>
+            </div>
 
             <mat-form-field appearance="outline">
               <mat-label>Alert Status</mat-label>
