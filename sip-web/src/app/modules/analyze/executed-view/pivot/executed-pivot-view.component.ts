@@ -3,19 +3,14 @@ import { Subject } from 'rxjs';
 
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeService } from '../../services/analyze.service';
-import {
-  ArtifactColumn,
-  Sort,
-  isDSLAnalysis,
-  AnalysisDSL,
-  Artifact
-} from '../../types';
+import { ArtifactColumn, Sort, AnalysisDSL, Artifact } from '../../types';
 
 import * as get from 'lodash/get';
 import * as keys from 'lodash/keys';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 @Component({
   selector: 'executed-pivot-view',

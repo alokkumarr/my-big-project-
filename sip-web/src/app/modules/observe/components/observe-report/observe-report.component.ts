@@ -6,17 +6,14 @@ import {
   OnDestroy
 } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
-import {
-  AnalysisReport,
-  AnalysisDSL,
-  isDSLAnalysis
-} from '../../../analyze/types';
+import { AnalysisReport, AnalysisDSL } from '../../../analyze/types';
 
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   AnalyzeService,
   EXECUTION_MODES
 } from '../../../analyze/services/analyze.service';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 @Component({
   selector: 'observe-report',
