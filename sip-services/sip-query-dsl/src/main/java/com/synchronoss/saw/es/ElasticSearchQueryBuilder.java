@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -496,7 +497,7 @@ public class ElasticSearchQueryBuilder {
         dataField -> {
           String columnName = dataField.getColumnName();
           if (dataField.getAggregate() != null
-              && dataField.getAggregate().equals(Field.Aggregate.PERCENTAGE))
+              && dataField.getAggregate().equals(Aggregate.PERCENTAGE))
             dataField
                 .getAdditionalProperties()
                 .put(

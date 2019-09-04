@@ -1,0 +1,73 @@
+<dx-data-grid
+  class="alerts-grid"
+  fxFlex
+  e2e="alert-history-grid"
+  [dataSource]="data"
+  [showBorders]="false"
+  [columnAutoWidth]="false"
+  [allowColumnReordering]="true"
+  [allowColumnResizing]="true"
+  [showColumnLines]="false"
+  [showRowLines]="false"
+  [rowAlternationEnabled]="true"
+  [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
+  (onRowExpanding)="onRowExpanding($event.key)"
+>
+  <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
+  <dxo-paging [pageSize]="50"></dxo-paging>
+  <dxo-pager
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[10, 25, 50]"
+  ></dxo-pager>
+  <dxo-selection mode="none"></dxo-selection>
+  <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
+  <dxo-search-panel
+    [visible]="false"
+    [width]="220"
+    placeholder="Search..."
+  ></dxo-search-panel>
+  <!-- <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling> -->
+  <dxi-column caption="Alert Name" dataField="alertRuleName"></dxi-column>
+  <dxi-column dataField="severity" cellTemplate="severityTemplate">
+  </dxi-column>
+  <dxi-column dataField="category"></dxi-column>
+
+  <dxi-column
+    caption="Time"
+    dataField="startTime"
+    alignment="left"
+    cellTemplate="dateTemplate"
+  ></dxi-column>
+  <dxi-column
+    caption="Metric Value"
+    alignment="center"
+    dataField="metricValue"
+  ></dxi-column>
+  <dxi-column
+    caption="Threshold Value"
+    alignment="center"
+    dataField="thresholdValue"
+  ></dxi-column>
+
+  <div
+    *dxTemplate="let data of 'severityTemplate'"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+    fxLayoutGap="5px"
+  >
+    <mat-icon
+      class="alerts-grid__gridIcon"
+      [ngClass]="data.data.severity"
+      fontIcon="icon-uniE901"
+    ></mat-icon>
+    <span fxFelx="50px" i18n>{{ data.data.severity | titlecase }}</span>
+  </div>
+
+  <div *dxTemplate="let data of 'dateTemplate'">
+    <span>{{ data.data.startTime | date: 'medium' }}</span>
+  </div>
+
+  <div *dxTemplate="let alertDetail of 'detailTemplate'">
+    <alert-detail [alertIds]="selectedAlertIds"></alert-detail>
+  </div>
+</dx-data-grid>

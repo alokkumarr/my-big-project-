@@ -18,6 +18,7 @@ import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
 import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
@@ -601,7 +602,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                         && dataField
                             .getAggregate()
                             .value()
-                            .equalsIgnoreCase(Field.Aggregate.PERCENTAGE.value()));
+                            .equalsIgnoreCase(Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
       SearchSourceBuilder searchSourceBuilder =
           elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);

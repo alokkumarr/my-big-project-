@@ -2,14 +2,13 @@ package sncr.bda.base;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
 import org.ojai.store.Connection;
@@ -22,17 +21,67 @@ import org.slf4j.LoggerFactory;
 
 public class MaprConnection {
 
+  protected static final String METASTORE = "services/metadata";
   private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
-
+  private static final String OJAI_MAPR = "ojai:mapr:";
   private DocumentStore store;
   private Connection connection;
-  private static final String OJAI_MAPR = "ojai:mapr:";
-  protected static final String METASTORE = "services/metadata";
+
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   public MaprConnection(String basePath, String tableName) {
     // Create an OJAI connection to MapR cluster
     connection = DriverManager.getConnection(OJAI_MAPR);
-    store = connection.getStore(basePath + File.separator + METASTORE + File.separator + tableName);
+    String storeName = basePath + File.separator + METASTORE + File.separator + tableName;
+    if (!connection.storeExists(storeName)) {
+      connection.createStore(storeName);
+    }
+    store = connection.getStore(storeName);
+  }
+
+    /**
+     * This method will insert the document in maprDB.
+     * @param id Document Id
+     * @param rowData Row Data
+     */
+  public void insert(String id, Object rowData) {
+    Document document = connection.newDocument(rowData);
+    store.insert(id, document);
+  }
+
+  /**
+   * This method will update the document in maprDB.
+   * @param id Document Id
+   * @param rowData Row Data
+   */
+  public void update(String id, Object rowData) {
+    Document document = connection.newDocument(rowData);
+    store.replace(id, document);
+  }
+
+  /**
+   * Find by document ID.
+   *
+   * @param documentId
+   * @return
+   */
+  public JsonNode findById(String documentId) {
+    Document document = store.findById(documentId);
+    try {
+      return objectMapper.readTree(document.asJsonString());
+    } catch (IOException e) {
+      throw new RuntimeException("error occurred while reading the documents", e);
+    }
+  }
+
+  /**
+   * by document ID.
+   * @param documentId
+   * @return
+   */
+  public boolean deleteById(String documentId) {
+    store.delete(documentId);
+    return true;
   }
 
   /**
@@ -57,7 +106,6 @@ public class MaprConnection {
 
     final DocumentStream stream = store.find(query);
     List<JsonNode> resultSet = new ArrayList<>();
-    ObjectMapper objectMapper = new ObjectMapper();
     for (final Document document : stream) {
       try {
         resultSet.add(objectMapper.readTree(document.asJsonString()));

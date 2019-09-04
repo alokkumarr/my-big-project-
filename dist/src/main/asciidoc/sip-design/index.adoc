@@ -303,6 +303,13 @@ and Observe modules in the store.
   . SIP Analyze Module
   . SIP Workbench Module
 
+=== SIP Alert service
+
+SIP Alert service provides API to manage an alert configurations and receive alerts when it meets
+the alert criteria to the specified channel.
+
+.Figure: SIP Alert ER Diagram
+plantuml::sip-design/figure-alert-ER-diagram.pum[format=svg]
 ==== Apache Spark
 
 The Apache Spark executor supports analyses of type report.

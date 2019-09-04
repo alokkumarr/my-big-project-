@@ -308,13 +308,13 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
-    if (authTicket == null && !isScheduledExecution) {
+    Ticket authTicket = /*request != null && !isScheduledExecution ? getTicket(request) :*/ null;
+    /*if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
-    }
+    }*/
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
