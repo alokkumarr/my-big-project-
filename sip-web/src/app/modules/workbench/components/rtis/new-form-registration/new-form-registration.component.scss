@@ -8,6 +8,11 @@
     background-color: white !important;
   }
 
+  .registration-form {
+    overflow: auto;
+    height: calc(100vh - 270px);
+  }
+
   div form {
     padding: 0 0 0 20px;
   }
