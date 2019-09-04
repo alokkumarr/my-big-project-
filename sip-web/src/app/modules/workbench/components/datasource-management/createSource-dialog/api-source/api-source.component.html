@@ -16,7 +16,6 @@
         name="name-of-channel"
         e2e="name-of-channel"
         formControlName="channelName"
-        maxlength="18"
         required
         autocomplete="off"
       />
@@ -40,19 +39,19 @@
       <mat-label i18n>Hostname</mat-label>
       <input
         matInput
-        placeholder="Host Name"
-        name="hostName"
-        e2e="host-name-input"
-        formControlName="hostName"
+        placeholder="Host Address"
+        name="hostAddress"
+        e2e="host-address-input"
+        formControlName="hostAddress"
         required
-        name="name-of-host"
+        name="address-of-host"
         autocomplete="new-password"
       />
       <mat-error
-        *ngIf="!!detailsFormGroup.controls.hostName.hasError('required')"
+        *ngIf="!!detailsFormGroup.controls.hostAddress.hasError('required')"
         i18n
       >
-        Host Name is
+        Host Address is
         <strong>required</strong>
       </mat-error>
     </mat-form-field>
@@ -61,14 +60,14 @@
       <input
         matInput
         placeholder="Port Number"
-        name="portNo"
+        name="port"
         type="number"
         e2e="port-no-input"
-        formControlName="portNo"
+        formControlName="port"
         required
       />
       <mat-error
-        *ngIf="!!detailsFormGroup.controls.portNo.hasError('required')"
+        *ngIf="!!detailsFormGroup.controls.port.hasError('required')"
         i18n
       >
         Port Number is
@@ -76,7 +75,7 @@
       </mat-error>
       <mat-error
         e2e="port-number-error-msg"
-        *ngIf="!!detailsFormGroup.controls.portNo.hasError('pattern')"
+        *ngIf="!!detailsFormGroup.controls.port.hasError('pattern')"
         i18n
       >
         Port Number can consist of only

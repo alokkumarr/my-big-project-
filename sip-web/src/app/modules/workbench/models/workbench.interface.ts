@@ -62,8 +62,8 @@ export interface SFTPRouteMetadata {
 
 export interface APIChannelMetadata {
   channelName: string;
-  hostName: string;
-  portNo: number;
+  hostAddress: string;
+  port: number;
   description?: string;
   apiEndPoint?: string;
   httpMethod: string;

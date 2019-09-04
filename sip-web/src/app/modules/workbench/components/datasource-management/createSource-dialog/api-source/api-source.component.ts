@@ -60,8 +60,8 @@ export class ApiSourceComponent implements OnInit, DetailForm {
           oldChannelName
         )
       ],
-      hostName: ['', Validators.required],
-      portNo: [
+      hostAddress: ['', Validators.required],
+      port: [
         null,
         Validators.compose([
           Validators.required,
