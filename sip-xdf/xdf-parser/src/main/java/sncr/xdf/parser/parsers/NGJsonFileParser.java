@@ -14,7 +14,7 @@ public class NGJsonFileParser implements FileParser {
 
   @Override
   public Dataset<Row> parseInput(String inputLocation) {
-    Dataset<Row> inputDataset = iCtx.sparkSession.read().json(inputLocation);
+    Dataset<Row> inputDataset = iCtx.sparkSession.read().option("multiLine", true).json(inputLocation);
 
     return inputDataset;
   }
