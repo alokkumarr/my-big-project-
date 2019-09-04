@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { RtisService } from './../../../services/rtis.service';
 import { DeleteDialogComponent } from './../../../../admin/datasecurity/delete-dialog/delete-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-// import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
+import { ToastService } from '../../../../../common/services/toastMessage.service';
 
 @Component({
   selector: 'appkeys-view',
@@ -21,7 +21,8 @@ export class AppkeysViewComponent implements OnInit {
     public _DxDataGridService: DxDataGridService,
     private router: Router,
     private _rtisService: RtisService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    public notify: ToastService
   ) {}
 
   ngOnInit() {
@@ -59,6 +60,9 @@ export class AppkeysViewComponent implements OnInit {
         DeleteAppKeys.then(response => {
           if (response) {
             this.fetchKeysForGrid();
+            this.notify.info('App Key Deleted Successfully', '', {
+              hideDelay: 9000
+            });
           }
         });
       }
