@@ -8,7 +8,7 @@
 # Use CentOS base image.  Note: The version should follow the CentOS
 # version requirement stated in the SIP Operations Guide, which in
 # turn depends on the MapR Operating System Support Matrix.
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
 # initilize the arugument to download and install corretto (Java).
 ARG rpm=java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
@@ -19,7 +19,7 @@ ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
 # fix the version to the release chosen above.
-RUN echo "7.5.1804" > /etc/yum/vars/releasever
+# RUN echo "7.6.1810" > /etc/yum/vars/releasever
 RUN rm /etc/yum.repos.d/*.repo
 COPY centos.repo /etc/yum.repos.d
 
