@@ -68,7 +68,7 @@ object RTISConfiguration {
           conf.streams_1.foreach({ p => {
             val pStream = new mutable.HashMap[String, String]
             pStream.put("topic", p.topic)
-            pStream.put("queue", streamLocation + p.queue)
+            pStream.put("queue", streamLocation.concat("/").concat(p.queue))
             pStreamList += pStream
           }
           })
@@ -78,7 +78,7 @@ object RTISConfiguration {
           conf.streams_2.foreach({ p => {
             val stream = new mutable.HashMap[String, String]
             stream.put("topic", p.topic)
-            stream.put("queue", streamLocation + p.queue)
+            stream.put("queue", streamLocation.concat("/").concat(p.queue))
             sStreamList += stream
           }
           })

@@ -1,15 +1,20 @@
 package mapr.streaming
 
+import java.io.IOException
 import java.util
 import java.util.Map.Entry
-import java.util.{Properties}
+import java.util.Properties
 import java.util.concurrent.{ExecutionException, TimeoutException}
 
+import com.mapr.db.exceptions.TableExistsException
+import com.mapr.streams.Streams
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue}
 import exceptions.{ErrorCodes, RTException}
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.hadoop.conf.Configuration
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsObject, Json}
+import sncr.bda.core.file.HFileOperations
 
 import scala.collection.{Seq, mutable}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,6 +28,7 @@ object EventHandler {
 
   private var streamFile: String = null
   var streamWaitTime: Int = 0
+  val retrySeconds = 5
 
   val debugMode = System.getProperty("processing.mode", "normal").equalsIgnoreCase("debug")
 
@@ -241,22 +247,38 @@ object EventHandler {
     val connector = conf.getString("rtis.config.connector")
     val configURL = connector + "://localhost:" + port + "/internal/rtisconfig/fetch/" + key;
 
-    val streamQueue = conf.getString("stream.queue.location") + "/streams/"
+    val mainPath = conf.getString("stream.queue.location") + "/streams/"
     val result = scala.io.Source.fromURL(configURL).mkString
 
-    val mapr_cofg: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, streamQueue)
+    val maprConfig: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, mainPath)
 
+    var streamList: List[mutable.HashMap[String, Any]] = null;
     // break the event handling processing if key mismatch
-    mapr_cofg.foreach(m => {
+    maprConfig.foreach(m => {
       m.entrySet().foreach(c => {
         if (c.getValue.equals(key)) {
           validKey = c.getValue.equals(key)
+        }
+
+        if (c.getKey.equals(StreamHelper.primaryStreamsKey)) {
+          streamList = c.getValue.asInstanceOf[List[mutable.HashMap[String, Any]]]
+        } else if (streamList != null && !streamList.isEmpty && c.getKey.equals(StreamHelper.secondaryStreamsKey)) {
+          streamList = c.getValue.asInstanceOf[List[mutable.HashMap[String, Any]]]
         }
       })
     })
     if (!validKey) return validKey
 
-    for (c <- mapr_cofg) {
+    var topicStream: String = null
+    streamList.foreach(p => {
+      p.get("queue") != null
+      topicStream = p.get("queue").toString
+    })
+
+    // create stream if not exist
+    createIfNotExists(12, topicStream, mainPath)
+
+    for (c <- maprConfig) {
       var key: String = null
       val properties: Properties = new Properties
       var p_list, s_list: Array[mutable.HashMap[String, String]] = null
@@ -337,6 +359,54 @@ object EventHandler {
     ).toArray
     m_log.debug(key + ": " + res.mkString("[", ",", "]"))
     Option(res)
+  }
+
+  /**
+    * Create required MapR streams if they do not exist
+    */
+  def createIfNotExists(retries: Int, RTISStream: String, mainPath: String) {
+    /* Create the parent directory of the stream if it does not exist */
+    try
+        if (!HFileOperations.exists(mainPath)) {
+          HFileOperations.createDir(mainPath)
+        }
+    catch {
+      case e: IOException => {
+        m_log.debug("Failed creating main directory: {}", mainPath)
+        /* Retry creating directory for some time, as the MapR-FS connection
+         * might be intermittently unavailable at system startup */
+        retryCreateIfNotExists(e, retries, RTISStream, mainPath)
+      }
+    }
+    /* Create the queue stream */
+    m_log.debug("Creating stream for rtis queue: {}", RTISStream)
+    val conf = new Configuration()
+    val streamAdmin = Streams.newAdmin(conf)
+    val desc = Streams.newStreamDescriptor()
+    try {
+      streamAdmin.createStream(RTISStream, desc)
+      m_log.info("Stream created: {}", RTISStream)
+    } catch {
+      case e: TableExistsException =>
+        m_log.debug("Stream already exists, so not creating: {}", RTISStream)
+      case e: Exception => {
+        m_log.debug("Failed creating stream: {}", RTISStream)
+        /* Retry creating stream for some time, as the MapR-FS connection
+         * might be intermittently unavailable at system startup */
+        retryCreateIfNotExists(e, retries, RTISStream, mainPath)
+      }
+    } finally {
+      streamAdmin.close()
+    }
+  }
+
+  private def retryCreateIfNotExists(exception: Exception, retries: Int, RTISStream: String, mainPath: String) {
+    if (retries == 0) {
+      throw exception
+    }
+    m_log.debug("Waiting for {} seconds and retrying", retrySeconds)
+    Thread.sleep(retrySeconds * 1000)
+    createIfNotExists(retries - 1, RTISStream, mainPath)
   }
 }
 
