@@ -5,6 +5,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as mapValues from 'lodash/mapValues';
 import * as orderBy from 'lodash/orderBy';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
@@ -16,6 +17,9 @@ import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 import * as forEach from 'lodash/forEach';
 import { NUMBER_TYPES } from './../consts';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPick from 'lodash/fp/pick';
+import * as moment from 'moment';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -199,14 +203,28 @@ export function wrapFieldValues(data) {
   )(data);
 }
 
-export function checkNullinReportData(data) {
-  return fpPipe(
-    fpMap(
-      fpMapValues(value => {
-        return value === null ? 'null' : value;
+export function alterReportData(data, analysis) {
+  const dateFields = [];
+  flatMap(analysis.sipQuery.artifacts, artifact =>
+    fpPipe(
+      fpMap(fpPick(['columnName', 'type'])),
+      fpFilter(({ type, columnName }) => {
+        if (type === 'date') {
+          dateFields.push(columnName);
+          return;
+        }
       })
-    )
-  )(data);
+    )(artifact.fields)
+  );
+  return data.map(row => {
+    return mapValues(row, (value, key) => {
+      if (dateFields.includes(key)) {
+        value = moment(value).utc().format('YYYY-MM-DD hh:mm:ss');
+      }
+
+      return value;
+    });
+  });
 }
 
 export function flattenReportData(data, analysis) {
@@ -214,7 +232,8 @@ export function flattenReportData(data, analysis) {
     return data;
   }
 
-  data = checkNullinReportData(data);
+  data = alterReportData(data, analysis);
+
   return data.map(row => {
     return mapKeys(row, (value, key) => {
       /* If the column has aggregation, preserve the aggregate name when removing keyword */
