@@ -441,4 +441,55 @@ public class BuilderUtil {
 
     return dynamicConvertor;
   }
+
+  /**
+   * calulates lte date and gte date based on presetCal and forms dynamicConverter.
+   *
+   * @param presetCal
+   * @return Dynamic Converter
+   */
+  public static DynamicConvertor getDynamicConvertForPresetCal(String presetCal) {
+
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DynamicConvertor dynamicConvertor = new DynamicConvertor();
+      LocalDateTime now = LocalDateTime.now();
+      Character lastChar = presetCal.charAt(presetCal.length() - 1);
+    switch (Character.toUpperCase(lastChar)) {
+      case 'D':
+          Long noOfDays=extractNumber(presetCal);
+          LocalDateTime frm=now.minusDays(noOfDays);
+          dynamicConvertor.setGte(frm.format(dateTimeFormatter));
+          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case 'H':
+          Long noOfHours=extractNumber(presetCal);
+          LocalDateTime fromDateTime=now.minusHours(noOfHours);
+          dynamicConvertor.setGte(fromDateTime.format(dateTimeFormatter));
+          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case 'M':
+          Long noOfMinutes=extractNumber(presetCal);
+          LocalDateTime fromDate=now.minusMinutes(noOfMinutes);
+          dynamicConvertor.setGte(fromDate.format(dateTimeFormatter));
+          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      default:
+        throw new IllegalArgumentException("presetCal "+presetCal + " not present");
+    }
+    return dynamicConvertor;
+  }
+
+  /**
+   * return the number from the presetcal .
+   *
+   * @param presetCal
+   * @return long value
+   */
+  private static Long extractNumber(String presetCal) {
+    try {
+      return Long.valueOf(presetCal.substring(0, presetCal.length() - 1));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("presetCal "+presetCal + " is invalid");
+    }
+  }
 }
