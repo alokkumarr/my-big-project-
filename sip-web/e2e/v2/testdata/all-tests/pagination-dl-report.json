@@ -12,10 +12,34 @@
           }
         ]
       },
-       "PGDL002": {
+      "PGDL002": {
         "suites": ["development"],
         "user": "userOne",
         "description": "userOne should be able to paginate in execute page",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      }
+    },
+    "preview_page": {
+      "PGDL003": {
+        "suites": ["development"],
+        "user": "admin",
+        "description": "Admin should be able to paginate in preview page",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "PGDL004": {
+        "suites": ["development"],
+        "user": "userOne",
+        "description": "userOne should be able to paginate in preview page",
         "tables": [
           {
             "name": "SALES",
