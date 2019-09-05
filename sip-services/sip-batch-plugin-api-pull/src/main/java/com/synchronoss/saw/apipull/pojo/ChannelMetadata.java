@@ -1,5 +1,7 @@
 package com.synchronoss.saw.apipull.pojo;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,9 +37,13 @@ public class ChannelMetadata {
   private String channelType;
   /** (Required) */
   @JsonProperty("hostAddress")
+  @JsonAlias("hostName")
+  @SerializedName(value = "hostAddress", alternate = "hostName")
   private String hostAddress;
 
   @JsonProperty("port")
+  @JsonAlias("portNo")
+  @SerializedName(value = "port", alternate = "portNo")
   private Integer port;
   /** (Required) */
   @JsonProperty("apiEndPoint")

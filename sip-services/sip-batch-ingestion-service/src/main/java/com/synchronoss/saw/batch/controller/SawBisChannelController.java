@@ -14,6 +14,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
@@ -117,7 +118,7 @@ public class SawBisChannelController {
 
     String channelType = requestBody.getChannelType();
 
-    if (channelType.equals("sftp")) {
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
       SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
       String secretPhrase = rootNode.get("password").asText();
       String passwordPhrase = obfuscator.encrypt(secretPhrase);
@@ -190,7 +191,7 @@ public class SawBisChannelController {
 
         String channelType = rootNode.get("channelType").textValue();
 
-        if (channelType.equals("sftp")) {
+        if (channelType.equals(BisChannelType.SFTP.toString())) {
           SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
           String secretPhrase = rootNode.get("password").asText();
           secretPhrase = obfuscator.decrypt(secretPhrase);
@@ -254,7 +255,7 @@ public class SawBisChannelController {
 
       String channelType = rootNode.get("channelType").textValue();
 
-      if (channelType.equals("sftp")) {
+      if (channelType.equals(BisChannelType.SFTP.toString())) {
         SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String secretPhrase = rootNode.get("password").asText();
         secretPhrase = obfuscator.decrypt(secretPhrase);
@@ -311,7 +312,7 @@ public class SawBisChannelController {
 
     String channelType = requestBody.getChannelType();
 
-    if (channelType.equals("sftp")) {
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
       SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
       String secretPhrase = rootNode.get("password").asText();
       secretPhrase = obfuscator.encrypt(secretPhrase);
@@ -455,7 +456,7 @@ public class SawBisChannelController {
 
     String channelType = requestBody.getChannelType();
 
-    if (channelType.equals("sftp")) {
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get("password").asText();
       String passwordPhrase = encryptPassword(secretPhrase);
       channelMetadata.put("password", passwordPhrase);

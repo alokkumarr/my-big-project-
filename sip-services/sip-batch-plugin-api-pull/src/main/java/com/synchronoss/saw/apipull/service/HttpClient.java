@@ -38,35 +38,33 @@ public class HttpClient {
           for (HeaderParameter hp : sipApiRequest.getHeaderParameters()) {
             get.setHeaderParams(hp.getKey(), hp.getValue());
           }
-
-          apiResponse = get.execute();
-          logger.info("Response Body to be returned :{}", apiResponse.getResponseBody());
-          return apiResponse;
-        } else {
-          logger.debug("HttpMethod : {POST}");
-          HttpClientPost post = new HttpClientPost(url);
-          if (!CollectionUtils.isEmpty(sipApiRequest.getQueryParameters())) {
-            for (QueryParameter qp : sipApiRequest.getQueryParameters()) {
-              post.setQueryParam(qp.getKey(), qp.getValue());
-            }
-          }
-
-          if (!CollectionUtils.isEmpty(sipApiRequest.getHeaderParameters())) {
-            for (HeaderParameter hp : sipApiRequest.getHeaderParameters()) {
-              post.setHeaderParams(hp.getKey(), hp.getValue());
-            }
-          }
-
-          if (sipApiRequest.getBodyParameters() != null) {
-            BodyParameters body = sipApiRequest.getBodyParameters();
-            post.setRawData(body.getContent().toString(), body.getType().trim());
-          }
-
-          apiResponse = post.execute();
-          logger.info("Response Body to be returned :{}", apiResponse.getResponseBody());
-          return apiResponse;
         }
+        apiResponse = get.execute();
+        return apiResponse;
+      } else {
+        logger.debug("HttpMethod : {POST}");
+        HttpClientPost post = new HttpClientPost(url);
+        if (!CollectionUtils.isEmpty(sipApiRequest.getQueryParameters())) {
+          for (QueryParameter qp : sipApiRequest.getQueryParameters()) {
+            post.setQueryParam(qp.getKey(), qp.getValue());
+          }
+        }
+
+        if (!CollectionUtils.isEmpty(sipApiRequest.getHeaderParameters())) {
+          for (HeaderParameter hp : sipApiRequest.getHeaderParameters()) {
+            post.setHeaderParams(hp.getKey(), hp.getValue());
+          }
+        }
+
+        if (sipApiRequest.getBodyParameters() != null) {
+          BodyParameters body = sipApiRequest.getBodyParameters();
+          post.setRawData(body.getContent().toString(), body.getType().trim());
+        }
+
+        apiResponse = post.execute();
+        return apiResponse;
       }
+
     } else {
       if (StringUtils.isEmpty(sipApiRequest.getUrl())) {
         throw new SipApiPullExecption("Url can't be null or empty!!");
@@ -75,6 +73,5 @@ public class HttpClient {
             "Invalid HttpMethod, For SIP BIS API - PULL, Http Method supported are GET and POST");
       }
     }
-    return apiResponse;
   }
 }
