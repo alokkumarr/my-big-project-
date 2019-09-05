@@ -92,10 +92,18 @@ export class JobFiltersComponent implements OnInit {
       this.selectedChannelId = null;
       this.onFilterChange();
     }
+    this.clearRoute();
   }
 
   clearRoute() {
-    this.selectedRouteId = null;
+    const isRouteChanged =
+      this._store.snapshot().workbench.selectedRouteId !== this.selectedRouteId;
+    if (isRouteChanged) {
+      this.selectedRouteId = null;
+    } else {
+      this.selectedRouteId = null;
+      this.onFilterChange();
+    }
   }
 
   onFilterChange() {

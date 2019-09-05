@@ -25,18 +25,14 @@ export class JobLogsPageComponent implements OnInit {
 
   @Select(state => state.workbench.jobs) jobs$: Observable<Job[]>;
 
-  public pager = {
-    showNavigationButtons: true,
-    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
-    showPageSizeSelector: true,
-    visible: true
-  };
   public paging = { enabled: true, pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
   public remoteOperations = { paging: true };
   public job: Job;
+  public pagingEnabled = false;
+  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
   public jobDetails = [
     [
-      { label: 'Job Name', prop: 'jobName' },
+      { label: 'Job Id', prop: 'jobId' },
       { label: 'Job Status', prop: 'jobStatus' }
     ],
     [
@@ -70,7 +66,7 @@ export class JobLogsPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadJobsIfNeeded();
+    this.loadJobIfNeeded();
 
     this._route.params.subscribe(({ jobId }) => {
       this.data = new CustomStore({
@@ -82,6 +78,7 @@ export class JobLogsPageComponent implements OnInit {
             .toPromise()
             .then(({ bisFileLogs, totalRows }) => {
               this._store.dispatch(new SetJobLogs(bisFileLogs));
+              this.pagingEnabled = totalRows > DEFAULT_PAGE_SIZE;
               return { data: bisFileLogs, totalCount: totalRows };
             });
         }
@@ -96,7 +93,7 @@ export class JobLogsPageComponent implements OnInit {
     );
   }
 
-  loadJobsIfNeeded() {
+  loadJobIfNeeded() {
     const jobs = this._store.selectSnapshot(state => state.workbench.jobs);
     const { jobId } = this._route.snapshot.params;
 

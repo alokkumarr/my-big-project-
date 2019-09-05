@@ -6,16 +6,26 @@
     <mat-sidenav-content>
       <mat-toolbar>
         <mat-toolbar-row fxLayoutGap="5px">
+          <button
+            (click)="goBack()"
+            mat-icon-button
+            style="margin-right: 10px;"
+          >
+            <mat-icon
+              class="back-button-icon"
+              fontIcon="icon-arrow-left"
+            ></mat-icon>
+          </button>
           <div fxFlex fxLayout="row" fxLayoutAlign="start space-between">
             <span i18n>Jobs</span>
           </div>
-          <div fxFlex>
+          <mat-chip-list fxFlex>
             <mat-chip
               class="tag-chip"
               *ngFor="let jobFilter of jobFilters$ | async"
               >{{ jobFilter }}</mat-chip
             >
-          </div>
+          </mat-chip-list>
           <button
             mat-icon-button
             color="secondary"
@@ -42,9 +52,17 @@
         [remoteOperations]="remoteOperations"
         e2e="jobs-container"
       >
+        <dxo-pager
+          [showPageSizeSelector]="true"
+          [showNavigationButtons]="true"
+          [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 50, 75, 100]"
+          [showInfo]="true"
+          [visible]="pagingEnabled"
+        >
+        </dxo-pager>
         <dxi-column
-          caption="Job name"
-          dataField="jobName"
+          caption="Job Id"
+          dataField="jobId"
           alignment="left"
           cellTemplate="linkCellTemplate"
         ></dxi-column>
@@ -52,11 +70,13 @@
           caption="Channel name"
           dataField="channelName"
           alignment="left"
+          cellTemplate="nameTemplate"
         ></dxi-column>
         <dxi-column
           caption="Route name"
           dataField="routeName"
           alignment="left"
+          cellTemplate="nameTemplate"
         ></dxi-column>
         <dxi-column
           caption="Start time"
@@ -71,44 +91,93 @@
           cellTemplate="dateTemplate"
         ></dxi-column>
         <dxi-column
-          caption="Duration"
+          caption="Duration (Seconds)"
           dataField="duration"
           alignment="left"
+          cellTemplate="durationTemplate"
         ></dxi-column>
         <dxi-column
           caption="Job status"
           dataField="jobStatus"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Total count"
           dataField="totalCount"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Success count"
           dataField="successCount"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="File pattern"
           dataField="filePattern"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
         <dxi-column
           caption="Source type"
           dataField="sourceType"
           alignment="left"
+          cellTemplate="e2eTemplate"
         ></dxi-column>
 
-        <div *dxTemplate="let cell of 'linkCellTemplate'">
+        <div
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
+          *dxTemplate="let cell of 'linkCellTemplate'"
+        >
           <a routerLink="../joblogs/{{ cell.data.jobId }}">
-            {{ cell.data.jobName }}
+            {{ cell.data.jobId }}
           </a>
         </div>
+        <div
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
+            (cell.data.endTime - cell.data.startTime) / 1000
+          "
+          *dxTemplate="let cell of 'durationTemplate'"
+        >
+          <ng-container *ngIf="cell.data.endTime; else defaultTemplate">
+            {{ (cell.data.endTime - cell.data.startTime) / 1000 }}
+          </ng-container>
+          <ng-template #defaultTemplate>
+            N/A
+          </ng-template>
+        </div>
 
-        <div *dxTemplate="let cell of 'dateTemplate'">
-          {{ cell.text | date: 'short' }}
+        <div
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
+          *dxTemplate="let cell of 'e2eTemplate'"
+        >
+          {{ cell.text }}
+        </div>
+
+        <div
+          style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.value"
+          *dxTemplate="let cell of 'nameTemplate'"
+          [matTooltip]="cell.value"
+        >
+          {{ cell.value }}
+        </div>
+
+        <div
+          [attr.e2e]="
+            'job-' +
+            cell.column.dataField +
+            '-' +
+            (cell.text ? (cell.text | date: 'short') : 'N/A')
+          "
+          *dxTemplate="let cell of 'dateTemplate'"
+        >
+          {{ cell.text ? (cell.text | date: 'short') : 'N/A' }}
         </div>
       </dx-data-grid>
     </mat-sidenav-content>

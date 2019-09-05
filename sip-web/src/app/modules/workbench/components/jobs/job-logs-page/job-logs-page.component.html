@@ -40,13 +40,20 @@
   [showRowLines]="false"
   [showColumnLines]="false"
   [paging]="paging"
-  [pager]="pager"
   [remoteOperations]="remoteOperations"
   [height]="'calc(100% - 40px)'"
   [rowAlternationEnabled]="true"
   rowTemplate="logTableRowTemplate"
   e2e="job-logs-container"
 >
+  <dxo-pager
+    [showPageSizeSelector]="true"
+    [showNavigationButtons]="true"
+    [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 50, 75, 100]"
+    [showInfo]="true"
+    [visible]="pagingEnabled"
+  >
+  </dxo-pager>
   <dxi-column
     caption="File Pattern"
     dataField="filePattern"
@@ -106,6 +113,7 @@
     caption="Created at"
     dataField="createdDate"
     alignment="left"
+    cellTemplate="e2eTemplate"
   ></dxi-column>
 
   <tbody
@@ -114,35 +122,74 @@
     *dxTemplate="let logRow of 'logTableRowTemplate'"
   >
     <tr class="tr-row" e2e="job-log-row-tr">
-      <td e2e="job-log-filePattern">{{ logRow.data.filePattern }}</td>
-      <td e2e="job-log-fileName" [matTooltip]="logRow.data.fileName">
+      <td [attr.e2e]="'job-log-filePattern-' + logRow.data.filePattern">
+        {{ logRow.data.filePattern }}
+      </td>
+      <td
+        [attr.e2e]="'job-log-fileName-' + logRow.data.fileName"
+        [matTooltip]="logRow.data.fileName"
+        style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"
+        [matTooltip]="logRow.data.fileName"
+      >
         {{ logRow.data.fileName }}
       </td>
-      <td e2e="job-log-actualFileRecDate">
+      <td
+        [attr.e2e]="
+          'job-log-actualFileRecDate-' +
+          (logRow.data.actualFileRecDate | date: 'short')
+        "
+      >
         {{ logRow.data.actualFileRecDate | date: 'short' }}
       </td>
-      <td e2e="job-log-recdFileName" [matTooltip]="logRow.data.recdFileName">
+      <td
+        [attr.e2e]="'job-log-recdFileName-' + logRow.data.recdFileName"
+        [matTooltip]="logRow.data.recdFileName"
+      >
         {{ logRow.data.recdFileName }}
       </td>
-      <td e2e="job-log-recdFileSize">{{ logRow.data.recdFileSize }}</td>
-      <td e2e="job-log-mflFileStatus">{{ logRow.data.mflFileStatus }}</td>
-      <td e2e="job-log-bisProcessState">
+      <td [attr.e2e]="'job-log-recdFileSize-' + logRow.data.recdFileSize">
+        {{ logRow.data.recdFileSize }}
+      </td>
+      <td [attr.e2e]="'job-log-mflFileStatus-' + logRow.data.mflFileStatus">
+        {{ logRow.data.mflFileStatus }}
+      </td>
+      <td [attr.e2e]="'job-log-bisProcessState-' + logRow.data.bisProcessState">
         {{ logRow.data.bisProcessState }}
       </td>
-      <td e2e="job-log-transferStartTime">
+      <td
+        [attr.e2e]="
+          'job-log-transferStartTime-' +
+          (logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS')
+        "
+      >
         {{ logRow.data.transferStartTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
       </td>
-      <td e2e="job-log-transferEndTime">
+      <td
+        [attr.e2e]="
+          'job-log-transferEndTime-' +
+          (logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS')
+        "
+      >
         {{ logRow.data.transferEndTime | date: 'MM/dd/yyyy, HH:mm:ss.SSS' }}
       </td>
 
-      <td e2e="job-log-transferDuration">
+      <td
+        [attr.e2e]="'job-log-transferDuration-' + logRow.data.transferDuration"
+      >
         {{ logRow.data.transferDuration }}
       </td>
-      <td e2e="job-log-modifiedDate">
+      <td
+        [attr.e2e]="
+          'job-log-modifiedDate-' + (logRow.data.modifiedDate | date: 'short')
+        "
+      >
         {{ logRow.data.modifiedDate | date: 'short' }}
       </td>
-      <td e2e="job-log-createdDate">
+      <td
+        [attr.e2e]="
+          'job-log-createdDate-' + (logRow.data.createdDate | date: 'short')
+        "
+      >
         {{ logRow.data.createdDate | date: 'short' }}
       </td>
     </tr>

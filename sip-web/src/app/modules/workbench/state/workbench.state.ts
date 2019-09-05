@@ -57,6 +57,7 @@ export class WorkbenchState {
     if (selectedChannelTypeId) {
       return `channelTypes/${selectedChannelTypeId}`;
     }
+    return `channelTypes/${DEFAULT_CHANNEL_TYPE.uid}`;
   }
 
   @Selector()

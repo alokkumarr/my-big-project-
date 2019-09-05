@@ -10,14 +10,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as filter from 'lodash/filter';
 import * as split from 'lodash/split';
 import * as fpGet from 'lodash/fp/get';
+import * as dropRight from 'lodash/dropRight';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
-import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
+// import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
 import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
-import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
+import { ALERT_SEVERITY, ALERT_STATUS, DATE_PRESETS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
@@ -51,6 +52,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   selectedDatapod;
   selectedMonitoringEntity;
   selectedEntityName;
+  datePresets = dropRight(DATE_PRESETS);
   metricsList$;
   metricsListWithoutMonitoringEntity;
   metricsListWithoutEntity;
@@ -62,6 +64,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   subscriptions: SubscriptionLike[] = [];
   endActionText = 'Add';
   endPayload: AlertConfig;
+  showNotificationEmail = false;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -100,7 +103,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.maxLength(36)]
       ],
       alertSeverity: ['', [Validators.required]],
-      notification: ['', [Validators.required]],
+      notification: [[], [Validators.required]],
+      notificationEmails: [[]],
       activeInd: [true]
     });
 
@@ -111,7 +115,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       monitoringEntity: ['', Validators.required],
       entityName: ['', Validators.required],
       lookbackColumn: ['', Validators.required],
-      lookbackPeriod: ['', [Validators.required, Validators.maxLength(20)]]
+      lookbackPeriod: ['', Validators.required]
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
@@ -122,14 +126,24 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern('^[0-9]*$')]
       ]
     });
+
+    this.alertDefFormGroup
+      .get('notification')
+      .valueChanges.subscribe(values => {
+        if (values.includes('email')) {
+          this.showNotificationEmail = true;
+        } else {
+          this.showNotificationEmail = false;
+        }
+      });
   }
 
-  onLookbackPeriodBlur() {
-    const control = this.alertMetricFormGroup.get('lookbackPeriod');
-    const controlValue = control.value;
-    const correctedValue = correctTimeInterval(controlValue);
-    control.setValue(correctedValue);
-  }
+  // onLookbackPeriodBlur() {
+  //   const control = this.alertMetricFormGroup.get('lookbackPeriod');
+  //   const controlValue = control.value;
+  //   const correctedValue = correctTimeInterval(controlValue);
+  //   control.setValue(correctedValue);
+  // }
 
   onDatapodChanged() {
     this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
