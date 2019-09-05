@@ -81,18 +81,21 @@ public class XlsxExporterTest {
     field.setDataField("COORDINATES");
     field.setDisplayName("COORDINATES.keyword");
     field.setColumnName("COORDINATES");
+    field.setVisibleIndex(0);
     fields.add(field);
 
     field = new Field();
     field.setDataField("date");
     field.setDisplayName("Date");
     field.setColumnName("date");
+    field.setVisibleIndex(1);
     fields.add(field);
 
     field = new Field();
     field.setDataField("integer");
     field.setDisplayName("Integer");
     field.setColumnName("integer");
+    field.setVisibleIndex(2);
     fields.add(field);
   }
 
