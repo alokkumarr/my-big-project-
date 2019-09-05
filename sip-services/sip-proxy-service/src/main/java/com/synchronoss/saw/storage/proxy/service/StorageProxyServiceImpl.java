@@ -711,10 +711,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           logger.debug("Page size not null = " + pageSize);
           data =
               maprConnection.fetchPagingData(
-                  "data", executionResult.getExecutionId(), page, pageSize, executionResult.getRecordCount());
+                  "data", executionResult.getExecutionId(), page, pageSize);
         }
-
-        logger.trace("Paging data fetched = "+executionResult.getRecordCount());
+        logger.trace("Paging data fetched = "+pageSize);
         executionResponse.setData(data != null ? data : executionResult.getData());
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -812,7 +811,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       // paginated execution data
       Object data =
           maprConnection.fetchPagingData(
-              "data", executionResult.getExecutionId(), page, pageSize, executionResult.getRecordCount());
+              "data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());

@@ -89,7 +89,7 @@
         <button
           class="report-options"
           mat-menu-item
-          *ngFor="let aggregateType of aggregates; trackBy: index"
+          *ngFor="let aggregateType of aggregates; index as i; trackBy: i"
           (click)="aggregateColumn(cell.column.payload, aggregateType.value)"
           [ngClass]="
             cell.column.payload.aggregate &&
