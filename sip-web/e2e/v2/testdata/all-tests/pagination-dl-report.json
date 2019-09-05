@@ -2,7 +2,7 @@
   "PAGINATION_DL": {
     "execute_page": {
       "PGDL001": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to paginate in execute page",
         "tables": [
@@ -13,7 +13,7 @@
         ]
       },
       "PGDL002": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "userOne should be able to paginate in execute page",
         "tables": [
@@ -26,7 +26,7 @@
     },
     "preview_page": {
       "PGDL003": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to paginate in preview page",
         "tables": [
@@ -37,7 +37,7 @@
         ]
       },
       "PGDL004": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "userOne",
         "description": "userOne should be able to paginate in preview page",
         "tables": [
