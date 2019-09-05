@@ -62,7 +62,7 @@ export class RtisService {
 
 
   deleteRequest(key): Observable<any> {
-    const path = `${this.api}/internal/rtisconfig/delete/${key}`;
+    const path = `${this.api}/internal/rtisconfig/${key}`;
     return (
       this.http.delete(path)
     );
