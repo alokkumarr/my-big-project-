@@ -19,7 +19,7 @@ ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
 # fix the version to the release chosen above.
-# RUN echo "7.6.1810" > /etc/yum/vars/releasever
+RUN echo "7.6.1810" > /etc/yum/vars/releasever
 RUN rm /etc/yum.repos.d/*.repo
 COPY centos.repo /etc/yum.repos.d
 
@@ -113,3 +113,4 @@ COPY sip-health-check /root/
 
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD /root/sip-health-check
+
