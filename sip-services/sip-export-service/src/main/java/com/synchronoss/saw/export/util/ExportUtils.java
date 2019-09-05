@@ -55,14 +55,19 @@ public class ExportUtils {
   public static Map<String, String> buildColumnHeaderMap(List<Field> fields) {
     Map<String, String> header = new LinkedHashMap();
     if (fields != null && !fields.isEmpty()) {
-      fields.forEach(field -> {
-        String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
-        if (split != null && split.length >= 2) {
-          header.put(split[0], field.getAlias());
-        } else {
-          header.put(field.getColumnName(), field.getAlias());
+      for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
+        for (Field field : fields) {
+          if (field.getVisibleIndex().equals(visibleIndex)) {
+            String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
+            if (split != null && split.length >= 2) {
+              header.put(split[0], field.getAlias());
+            } else {
+              header.put(field.getColumnName(), field.getAlias());
+            }
+            break;
+          }
         }
-      });
+      }
     }
     return header;
   }

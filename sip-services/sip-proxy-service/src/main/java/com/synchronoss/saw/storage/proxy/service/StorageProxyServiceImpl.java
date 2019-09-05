@@ -697,7 +697,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-        ExecutionResult executionResult = fetchExecutionResult(executionId, maprConnection);
+      ExecutionResult executionResult = fetchExecutionResult(executionId, maprConnection);
       if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
         logger.trace("Inside fetchExecutionsData totalrows = " + executionResult.getRecordCount());
         executionResponse.setTotalRows(executionResult.getRecordCount());
@@ -713,7 +713,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               maprConnection.fetchPagingData(
                   "data", executionResult.getExecutionId(), page, pageSize);
         }
-        logger.trace("Paging data fetched = "+pageSize);
+        logger.trace("Paging data fetched = " + pageSize);
         executionResponse.setData(data != null ? data : executionResult.getData());
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -727,6 +727,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   ExecutionResult fetchLastExecutionResult(String dslQueryId, MaprConnection maprConnection) {
+    ExecutionResult executionResult = null;
     try {
       String fields[] = {
         "executionId",
@@ -752,16 +753,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       // its last execution for the for Query Id , So consider 0 index.
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-      ExecutionResult executionResult =
+      executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       return executionResult;
     } catch (Exception e) {
       logger.error("Error occurred while fetching the execution result data", e);
     }
-    return null;
+    return executionResult;
   }
 
     ExecutionResult fetchExecutionResult(String executionId, MaprConnection maprConnection) {
+      ExecutionResult executionResult = null;
         try {
             String fields[] = {
                 "executionId",
@@ -787,13 +789,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             // its last execution for the for Query Id , So consider 0 index.
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-            ExecutionResult executionResult =
+            executionResult =
                 objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
             return executionResult;
         } catch (Exception e) {
             logger.error("Error occurred while fetching the execution result data", e);
         }
-        return null;
+        return executionResult;
     }
 
   @Override
