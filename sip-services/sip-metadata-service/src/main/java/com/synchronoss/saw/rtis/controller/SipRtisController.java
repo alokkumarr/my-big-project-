@@ -142,7 +142,7 @@ public class SipRtisController {
       notes = "",
       response = Object.class)
   @RequestMapping(
-      value = "/fetch/{appKey}",
+      value = "/config/{appKey}",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public Object getConfigByAppKey(@PathVariable(name = "appKey") String appKey) {
@@ -163,7 +163,7 @@ public class SipRtisController {
       notes = "",
       response = Object.class)
   @RequestMapping(
-      value = "/delete/{appKey}",
+      value = "/{appKey}",
       method = RequestMethod.DELETE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public Boolean deleteConfigByAppKey(

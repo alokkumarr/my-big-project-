@@ -245,7 +245,7 @@ object EventHandler {
 
     val port = conf.getString("rtis.config.host")
     val connector = conf.getString("rtis.config.connector")
-    val configURL = connector + "://localhost:" + port + "/internal/rtisconfig/fetch/" + key;
+    val configURL = connector + "://localhost:" + port + "/internal/rtisconfig/config/" + key;
 
     val mainPath = conf.getString("stream.queue.location") + "/streams/"
     val result = scala.io.Source.fromURL(configURL).mkString
