@@ -37,9 +37,7 @@ public class AlertsIT extends BaseIT {
     String testId = testId();
     ObjectNode root = mapper.createObjectNode();
     root.put("metric", 100);
-    given(new RequestSpecBuilder()
-            .addFilter(documentationConfiguration(restDocumentation))
-            .build())
+    given(new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)).build())
         .queryParam("APP_KEY", "stream_1")
         .queryParam("APP_VERSION", "1")
         .queryParam("APP_MODULE", "1")
@@ -78,9 +76,9 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
     log.debug("alertRulesSysId : " + alertRulesSysId);
-    assertFalse(alertRulesSysId <= 0);
+    assertFalse(alertRulesSysId == null);
 
     // delete alert after testing
     this.tearDownAlert(alertRulesSysId);
@@ -136,7 +134,7 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
     log.debug("alertRulesSysId : " + alertRulesSysId);
 
     given(authSpec)
@@ -186,9 +184,9 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
     log.debug("alertRulesSysId : " + alertRulesSysId);
-    assertFalse(alertRulesSysId <= 0);
+    assertFalse(alertRulesSysId == null);
 
     String urlForThatoUpdate = ALERT_PATH + "/" + alertRulesSysId;
     log.debug("updateAlerts urlForThetoUpdate : " + urlForThatoUpdate);
@@ -216,8 +214,8 @@ public class AlertsIT extends BaseIT {
   }
 
   /** This method is used to tear down the alert after each test case executes. */
-  public void tearDownAlert(Long alertRulesSysId) throws JsonProcessingException {
-    assertFalse(alertRulesSysId <= 0);
+  public void tearDownAlert(String alertRulesSysId) throws JsonProcessingException {
+    assertFalse(alertRulesSysId == null);
     String urlForDelete = ALERT_PATH + "/" + alertRulesSysId;
     log.debug("deleteAlert urlForDelete : " + urlForDelete);
     given(authSpec).when().delete(urlForDelete).then().assertThat().statusCode(200);
@@ -244,10 +242,10 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
 
     log.debug("alertRulesSysId : " + alertRulesSysId);
-    assertFalse(alertRulesSysId <= 0);
+    assertFalse(alertRulesSysId == null);
 
     String urlForOperators = ALERT_PATH + "/" + OPERATORS;
     log.debug("operators url to get list : " + urlForOperators);
@@ -291,10 +289,10 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
 
     log.debug("alertRulesSysId : " + alertRulesSysId);
-    assertFalse(alertRulesSysId <= 0);
+    assertFalse(alertRulesSysId == null);
 
     List<?> listOfAlerts =
         given(authSpec)

@@ -382,7 +382,7 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody AlertCount alertCount,
-      @RequestParam(name = "alertRuleId", required = false) Long alertRuleId) {
+      @RequestParam(name = "alertRuleId", required = false) String alertRuleId) {
     Ticket ticket = getTicket(request);
     return ticket != null ? alertService.alertCount(alertCount, alertRuleId) : null;
   }

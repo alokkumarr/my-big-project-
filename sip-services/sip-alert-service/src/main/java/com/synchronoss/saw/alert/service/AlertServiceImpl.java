@@ -272,7 +272,7 @@ public class AlertServiceImpl implements AlertService {
    * @return AlertCountResponse
    */
   @Override
-  public List<AlertCountResponse> alertCount(AlertCount alertCount, Long alertRuleSysId) {
+  public List<AlertCountResponse> alertCount(AlertCount alertCount, String alertRuleSysId) {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String dateFormatLte = "23:59:59";
     String dateFormatGte = "00:00:00";

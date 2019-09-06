@@ -45,5 +45,5 @@ public interface AlertService {
 
   AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
 
-  List<AlertCountResponse> alertCount(AlertCount alertCount, Long alertRuleSysId);
+  List<AlertCountResponse> alertCount(AlertCount alertCount, String alertRuleSysId);
 }
