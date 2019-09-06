@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Analysis, Sort, isDSLAnalysis, AnalysisDSL } from './../../../analyze/types';
+import { Analysis, Sort, AnalysisDSL } from './../../../analyze/types';
 import { GridsterItem } from 'angular-gridster2';
 import { BehaviorSubject } from 'rxjs';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -10,6 +10,7 @@ import {
   EXECUTION_MODES
 } from '../../../analyze/services/analyze.service';
 import { flattenPivotData } from '../../../../common/utils/dataFlattener';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 @Component({
   selector: 'observe-pivot',
@@ -29,8 +30,12 @@ export class ObservePivotComponent implements OnInit {
   constructor(public analyzeService: AnalyzeService) {}
 
   ngOnInit() {
-    this.artifactColumns = this.configureArtifacts((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
-    this.sorts = isDSLAnalysis(this.analysis) ? this.analysis.sipQuery.sorts : this.analysis.sqlBuilder.sorts;
+    this.artifactColumns = this.configureArtifacts(
+      (<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields
+    );
+    this.sorts = isDSLAnalysis(this.analysis)
+      ? this.analysis.sipQuery.sorts
+      : this.analysis.sqlBuilder.sorts;
     if (this.analysis._executeTile === false) {
       return;
     }
@@ -38,7 +43,11 @@ export class ObservePivotComponent implements OnInit {
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
       .then(
         ({ data }) => {
-          this.data = flattenPivotData(data, (<AnalysisDSL>this.analysis).sipQuery || (<Analysis>this.analysis).sqlBuilder);
+          this.data = flattenPivotData(
+            data,
+            (<AnalysisDSL>this.analysis).sipQuery ||
+              (<Analysis>this.analysis).sqlBuilder
+          );
         },
         err => {
           throw err;
@@ -49,8 +58,8 @@ export class ObservePivotComponent implements OnInit {
   configureArtifacts(fields) {
     return fpPipe(
       fpMap(value => {
-          value.checked = true;
-          return value;
+        value.checked = true;
+        return value;
       })
     )(fields);
   }

@@ -34,9 +34,7 @@ import {
   ArtifactColumnDSL,
   ArtifactColumnReport
 } from 'src/app/models';
-import {
-  DesignerJoinsArray
-} from './../../../../modules/analyze/designer/actions/designer.actions';
+import { CommonDesignerJoinsArray } from '../../../actions/common.actions';
 
 @Component({
   selector: 'js-plumb-canvas-u',
@@ -109,7 +107,7 @@ export class JsPlumbCanvasComponent
     this._jsPlumbInst = jsPlumb.getInstance();
     this._jsPlumbInst.setContainer(this._elementRef.nativeElement);
     if (!isEmpty(this.joins)) {
-      this._store.dispatch(new DesignerJoinsArray(this.joins));
+      this._store.dispatch(new CommonDesignerJoinsArray(this.joins));
     }
     this.listeners.push(this.syncCheckedField.subscribe());
   }

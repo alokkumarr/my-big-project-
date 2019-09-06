@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { Artifact, isDSLAnalysis } from '../../types';
+import { Artifact } from '../../types';
 import * as get from 'lodash/get';
 import { AnalysisDSL } from '../../models';
+import { isDSLAnalysis } from 'src/app/common/types';
 @Component({
   selector: 'executed-report-view',
   templateUrl: 'executed-report-view.component.html'

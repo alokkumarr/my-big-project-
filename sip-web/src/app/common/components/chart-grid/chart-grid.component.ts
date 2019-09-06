@@ -16,9 +16,9 @@ import {
   ArtifactColumnReport,
   AnalysisDSL,
   SqlBuilderChart,
-  AnalysisChartDSL
+  AnalysisChartDSL,
+  isDSLAnalysis
 } from '../../types';
-import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 
 interface ReportGridField {
   caption: string;
@@ -70,8 +70,10 @@ export class ChartGridComponent implements OnInit {
   public updates: any;
   public data: any[];
 
-  constructor(private _chartService: ChartService,
-    private _headerProgress: HeaderProgressService) {
+  constructor(
+    private _chartService: ChartService,
+    private _headerProgress: HeaderProgressService
+  ) {
     this.customizeColumns = this.customizeColumns.bind(this);
   }
 
@@ -151,31 +153,37 @@ export class ChartGridComponent implements OnInit {
       isDSLAnalysis(analysis) ? chartType : analysis.chartType,
       { chart, legend }
     );
-    this.chartOptions = setReverseProperty(this.chartOptions, analysis.sipQuery);
+    this.chartOptions = setReverseProperty(
+      this.chartOptions,
+      analysis.sipQuery
+    );
   }
 
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
     forEach(columns, column => {
-      if (axisName === column.name || axisName === column.columnName.split('.keyword')[0]) {
+      if (
+        axisName === column.name ||
+        axisName === column.columnName.split('.keyword')[0]
+      ) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
         alias = column.alias || column.displayName;
         value =
           column.type === 'date'
             ? moment
-            .utc(
-              value,
-              this._chartService.getMomentDateFormat(columnFormat)
-            )
-            .format(
-              columnFormat === 'MMM d YYYY'
-                ? 'MMM DD YYYY'
-                : columnFormat === 'MMMM d YYYY, h:mm:ss a'
-                ? 'MMMM DD YYYY, h:mm:ss a'
-                : columnFormat
-            )
+                .utc(
+                  value,
+                  this._chartService.getMomentDateFormat(columnFormat)
+                )
+                .format(
+                  columnFormat === 'MMM d YYYY'
+                    ? 'MMM DD YYYY'
+                    : columnFormat === 'MMMM d YYYY, h:mm:ss a'
+                    ? 'MMMM DD YYYY, h:mm:ss a'
+                    : columnFormat
+                )
             : value;
         if (
           value &&
@@ -254,13 +262,13 @@ export class ChartGridComponent implements OnInit {
         map(sorts, sort =>
           sort.type === 'date'
             ? row =>
-              /* If the sort is for date column, parse dates to timestamp to make sure sorting is correct */
-              moment(
-                row[sort.columnName],
-                dateFormats[sort.columnName]
-              ).valueOf()
+                /* If the sort is for date column, parse dates to timestamp to make sure sorting is correct */
+                moment(
+                  row[sort.columnName],
+                  dateFormats[sort.columnName]
+                ).valueOf()
             : /* Otherwise, sort normally */
-            row => row[sort.columnName]
+              row => row[sort.columnName]
         ),
         map(sorts, 'order')
       );
