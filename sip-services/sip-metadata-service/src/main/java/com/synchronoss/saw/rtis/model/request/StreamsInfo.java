@@ -15,7 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"topic", "queue"})
-public class SecondaryStreams {
+public class StreamsInfo {
 
   private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,8 @@ public class SecondaryStreams {
 
   @Override
   public String toString() {
-    return new ToStringBuilder(this).append("topic", topic).append("queue", queue).toString();
+    return new ToStringBuilder(this).append("topic", topic).append("queue", queue)
+        .append("additionalProperties", additionalProperties).toString();
   }
 
   @Override
@@ -66,10 +67,10 @@ public class SecondaryStreams {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SecondaryStreams)) {
+    if (!(o instanceof StreamsInfo)) {
       return false;
     }
-    SecondaryStreams that = (SecondaryStreams) o;
+    StreamsInfo that = (StreamsInfo) o;
     return getTopic().equals(that.getTopic()) && getQueue().equals(that.getQueue());
   }
 

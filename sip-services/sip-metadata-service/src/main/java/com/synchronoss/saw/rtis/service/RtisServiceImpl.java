@@ -7,9 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.rtis.metadata.RtisMetadata;
-import com.synchronoss.saw.rtis.model.request.PrimaryStreams;
 import com.synchronoss.saw.rtis.model.request.RtisConfiguration;
-import com.synchronoss.saw.rtis.model.request.SecondaryStreams;
+import com.synchronoss.saw.rtis.model.request.StreamsInfo;
 import com.synchronoss.saw.util.SipMetadataUtils;
 
 import java.io.IOException;
@@ -36,7 +35,15 @@ import sncr.bda.base.MaprConnection;
 public class RtisServiceImpl implements RtisService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RtisServiceImpl.class);
+
   private static final String BOOTSTRAP_SERVER = "localhost:9092";
+  private static final String TABLE_NAME = "rtisConfiguration";
+  private static final String GENERIC_HANDLER = "synchronoss.handlers.GenericEventHandler";
+  private static final String COUNTLY_HANDLER = "synchronoss.handlers.countly.CountlyGenericBridge";
+  private static final String STRING_SERIALIZER =
+      "org.apache.kafka.common.serialization.StringSerializer";
+  private static final String BYTE_SERIALIZER =
+      "org.apache.kafka.common.serialization.ByteArraySerializer";
 
   @Value("${metastore.base}")
   @NotNull
@@ -44,28 +51,26 @@ public class RtisServiceImpl implements RtisService {
 
   private RtisMetadata rtisMetadataStore;
   private ObjectMapper mapper = new ObjectMapper();
-  private final String tableName = "rtisConfiguration";
 
   @Override
   public void createConfig(RtisConfiguration configuration) {
     try {
       configuration.setBootstrapServers(BOOTSTRAP_SERVER);
       if (configuration.getId().equalsIgnoreCase("countly")) {
-        configuration.setClazz("synchronoss.handlers.countly.CountlyGenericBridge");
-        configuration.setKeySerializer("org.apache.kafka.common.serialization.StringSerializer");
-        configuration.setValueSerializer("org.apache.kafka.common.serialization.StringSerializer");
+        configuration.setClazz(COUNTLY_HANDLER);
+        configuration.setKeySerializer(STRING_SERIALIZER);
+        configuration.setValueSerializer(STRING_SERIALIZER);
       } else {
-        configuration.setClazz("synchronoss.handlers.GenericEventHandler");
-        configuration.setKeySerializer("org.apache.kafka.common.serialization.ByteArraySerializer");
-        configuration.setValueSerializer(
-            "org.apache.kafka.common.serialization.ByteArraySerializer");
+        configuration.setClazz(GENERIC_HANDLER);
+        configuration.setKeySerializer(BYTE_SERIALIZER);
+        configuration.setValueSerializer(BYTE_SERIALIZER);
       }
 
-      List<SecondaryStreams> secondaryStreams = new ArrayList<>();
-      List<PrimaryStreams> primaryStreams = configuration.getPrimaryStreams();
+      List<StreamsInfo> secondaryStreams = new ArrayList<>();
+      List<StreamsInfo> primaryStreams = configuration.getPrimaryStreams();
       if (primaryStreams != null && !primaryStreams.isEmpty()) {
         primaryStreams.forEach(primaryStream -> {
-          SecondaryStreams streams = new SecondaryStreams();
+          StreamsInfo streams = new StreamsInfo();
           streams.setQueue(primaryStream.getQueue());
           streams.setTopic(primaryStream.getTopic());
           secondaryStreams.add(streams);
@@ -75,7 +80,7 @@ public class RtisServiceImpl implements RtisService {
       JsonElement config =
           SipMetadataUtils.toJsonElement(mapper.writeValueAsString(configuration));
       final String configId = UUID.randomUUID().toString();
-      rtisMetadataStore = new RtisMetadata(tableName, basePath);
+      rtisMetadataStore = new RtisMetadata(TABLE_NAME, basePath);
       rtisMetadataStore.create(configId, config);
     } catch (Exception ex) {
       LOGGER.error("Exception occurred while creating configuration", ex);
@@ -87,10 +92,10 @@ public class RtisServiceImpl implements RtisService {
   public Object fetchAppKeys(@NotNull(message = "Customer code cannot be null")
                              @Valid String customerCode) {
     try {
-      new RtisMetadata(tableName, basePath);
-      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      new RtisMetadata(TABLE_NAME, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
 
-      String[] fields = {"app_key"};
+      String[] fields = {"app_key", "eventUrl"};
       ObjectNode node = getJsonNodes("customerCode", customerCode);
 
       return maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
@@ -105,8 +110,8 @@ public class RtisServiceImpl implements RtisService {
   public Object fetchConfigByAppKeys(@NotNull(message = "Application key cannot be null")
                                      @Valid String appKey) {
     try {
-      new RtisMetadata(tableName, basePath);
-      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      new RtisMetadata(TABLE_NAME, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
 
       String[] fields = {"*"};
       ObjectMapper objectMapper = new ObjectMapper();
@@ -161,8 +166,8 @@ public class RtisServiceImpl implements RtisService {
    * @param secondaryStreams secondary stream
    * @return nodes of array
    */
-  private ArrayNode buildStreams(List<PrimaryStreams> primaryStreams,
-                                 List<SecondaryStreams> secondaryStreams) {
+  private ArrayNode buildStreams(List<StreamsInfo> primaryStreams,
+                                 List<StreamsInfo> secondaryStreams) {
     ArrayNode steamList = mapper.createArrayNode();
     if (primaryStreams != null && !primaryStreams.isEmpty()) {
       primaryStreams.forEach(primaryStream -> {
@@ -186,8 +191,8 @@ public class RtisServiceImpl implements RtisService {
   public Boolean deleteConfiguration(@NotNull(message = "Application key cannot be null")
                                      @Valid String appKey) {
     try {
-      new RtisMetadata(tableName, basePath);
-      MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+      new RtisMetadata(TABLE_NAME, basePath);
+      MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
 
       String[] fields = {"*"};
       ObjectNode node = getJsonNodes("app_key", appKey);

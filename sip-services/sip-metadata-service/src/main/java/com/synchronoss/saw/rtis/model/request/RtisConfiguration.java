@@ -25,7 +25,8 @@ import java.util.Objects;
     "keySerializer",
     "valueSerializer",
     "blockOnBufferFull",
-    "timeoutMs"
+    "timeoutMs",
+    "eventUrl"
 })
 public class RtisConfiguration {
 
@@ -38,9 +39,9 @@ public class RtisConfiguration {
   @JsonProperty("app_key")
   private String appKey;
   @JsonProperty("streams_1")
-  private List<PrimaryStreams> primaryStreams = null;
+  private List<StreamsInfo> primaryStreams = null;
   @JsonProperty("streams_2")
-  private List<SecondaryStreams> secondaryStreams = null;
+  private List<StreamsInfo> secondaryStreams = null;
   @JsonProperty("class")
   private String clazz;
   @JsonProperty("bootstrapServers")
@@ -55,6 +56,9 @@ public class RtisConfiguration {
   private Boolean blockOnBufferFull;
   @JsonProperty("timeoutMs")
   private Integer timeoutMs;
+  @JsonProperty("eventUrl")
+  private String eventUrl;
+
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -89,22 +93,22 @@ public class RtisConfiguration {
   }
 
   @JsonProperty("streams_1")
-  public List<PrimaryStreams> getPrimaryStreams() {
+  public List<StreamsInfo> getPrimaryStreams() {
     return primaryStreams;
   }
 
   @JsonProperty("streams_1")
-  public void setPrimaryStreams(List<PrimaryStreams> primaryStreams) {
+  public void setPrimaryStreams(List<StreamsInfo> primaryStreams) {
     this.primaryStreams = primaryStreams;
   }
 
   @JsonProperty("streams_2")
-  public List<SecondaryStreams> getSecondaryStreams() {
+  public List<StreamsInfo> getSecondaryStreams() {
     return secondaryStreams;
   }
 
   @JsonProperty("streams_2")
-  public void setSecondaryStreams(List<SecondaryStreams> secondaryStreams) {
+  public void setSecondaryStreams(List<StreamsInfo> secondaryStreams) {
     this.secondaryStreams = secondaryStreams;
   }
 
@@ -178,6 +182,16 @@ public class RtisConfiguration {
     this.timeoutMs = timeoutMs;
   }
 
+  @JsonProperty("eventUrl")
+  public String getEventUrl() {
+    return eventUrl;
+  }
+
+  @JsonProperty("eventUrl")
+  public void setEventUrl(String eventUrl) {
+    this.eventUrl = eventUrl;
+  }
+
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
@@ -209,6 +223,7 @@ public class RtisConfiguration {
         && getValueSerializer().equals(that.getValueSerializer())
         && getBlockOnBufferFull().equals(that.getBlockOnBufferFull())
         && getTimeoutMs().equals(that.getTimeoutMs())
+        && getEventUrl().equals(that.getEventUrl())
         && Objects.equals(getAdditionalProperties(), that.getAdditionalProperties());
   }
 
@@ -217,6 +232,6 @@ public class RtisConfiguration {
     return Objects.hash(getId(), getCustomerCode(), getAppKey(), getPrimaryStreams(),
         getSecondaryStreams(), getClazz(), getBootstrapServers(), getBatchSize(),
         getKeySerializer(), getValueSerializer(), getBlockOnBufferFull(),
-        getTimeoutMs(), getAdditionalProperties());
+        getTimeoutMs(), getEventUrl(), getAdditionalProperties());
   }
 }
