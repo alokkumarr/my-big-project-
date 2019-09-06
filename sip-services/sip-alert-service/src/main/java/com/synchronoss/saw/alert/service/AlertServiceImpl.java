@@ -1,5 +1,11 @@
 package com.synchronoss.saw.alert.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -83,8 +89,16 @@ public class AlertServiceImpl implements AlertService {
    * @return AlertRulesDetails
    */
   @Override
-  public List<AlertRuleDetails> retrieveAllAlerts(Ticket ticket) {
-
+  public List<AlertRuleDetails> retrieveAllAlerts(
+      Integer pageNumber, Integer pageSize, Ticket ticket) {
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(
+            objectNode.toString(), pageNumber, pageSize, "createdTime");
     return null;
   }
 
@@ -110,23 +124,45 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public AlertRuleDetails getAlertRule(
       @NotNull(message = "alertRuleID cannot be null") @NotNull String alertRuleId, Ticket ticket) {
-
-    return null;
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    JsonNode document = connection.findById(alertRuleId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    AlertRuleDetails alertRule = null;
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    try {
+      alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return alertRule;
   }
 
   /**
    * Get Alert Rules By Category.
    *
-   * @param category Category Id
+   * @param categoryId Category Id
    * @return
    */
   @Override
   public List<AlertRuleDetails> getAlertRulesByCategory(
-      @NotNull(message = "categoryId cannot be null") @NotNull String category, Ticket ticket) {
-
-    /* Optional<AlertCustomerDetails> alertCustomerDetails =
-        alertCustomerRepository.findByCustomerCode(ticket.getCustCode());
-    List<AlertRulesDetails> alertRulesDetails = alertRulesRepository.findByCategory(category);*/
+      @NotNull(message = "categoryId cannot be null") @NotNull String categoryId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket ticket) {
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put("categoryId", categoryId);
+    ObjectNode objectNode1 = node.putObject(MaprConnection.EQ);
+    objectNode1.put("categoryId", ticket.getCustCode());
+    ObjectNode filter = node.putObject(MaprConnection.AND);
+    ArrayNode arrayNode = objectMapper.createArrayNode();
+    arrayNode.add(objectNode);
+    arrayNode.add(objectNode1);
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(
+            arrayNode.toString(), pageNumber, pageSize, "createdTime");
     return null;
   }
 

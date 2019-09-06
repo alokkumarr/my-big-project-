@@ -26,6 +26,8 @@ public class MaprConnection {
   private static final String OJAI_MAPR = "ojai:mapr:";
   private DocumentStore store;
   private Connection connection;
+  public static final String EQ ="$eq";
+  public static final String AND ="$and";
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -109,6 +111,39 @@ public class MaprConnection {
     for (final Document document : stream) {
       try {
         resultSet.add(objectMapper.readTree(document.asJsonString()));
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param filter
+   * @param orderBy
+   * @return list
+   */
+  public List<JsonNode> runMaprDbQueryWithFilter(
+      String filter, Integer pageNumber, Integer pageSize, String orderBy) {
+    Integer limit = (pageNumber * pageSize);
+    final Query query =
+        connection.newQuery().orderBy(orderBy, SortOrder.DESC).limit(limit).where(filter).build();
+
+    final DocumentStream stream = store.find(query);
+    List<JsonNode> resultSet = new ArrayList<>();
+    Integer count = 0;
+    for (final Document document : stream) {
+      try {
+        // MaprDB document stream doesn't supports the stream skip, considered the additional
+        // logic to ignore additional documents.
+        if (pageNumber > 1 && count < (pageNumber - 1 * pageSize)) {
+            // ignore the document
+          count++;
+        } else {
+          resultSet.add(objectMapper.readTree(document.asJsonString()));
+        }
       } catch (IOException e) {
         throw new RuntimeException("error occurred while reading the documents", e);
       }

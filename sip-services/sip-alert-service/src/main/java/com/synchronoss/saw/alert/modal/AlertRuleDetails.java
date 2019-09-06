@@ -15,6 +15,10 @@ public class AlertRuleDetails {
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
+  private Long createdTime;
+  private Long modifiedTime;
+  private String createdBy;
+  private String updatedBy;
   private SipQuery sipQuery;
   private List<Notification> notification;
 
@@ -156,6 +160,62 @@ public class AlertRuleDetails {
   /** Sets customerCode. */
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
+  }
+
+  /**
+   * Gets createdTime.
+   *
+   * @return value of createdTime
+   */
+  public Long getCreatedTime() {
+    return createdTime;
+  }
+
+  /** Sets createdTime . */
+  public void setCreatedTime(Long createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  /**
+   * Gets modifiedTime.
+   *
+   * @return value of modifiedTime
+   */
+  public Long getModifiedTime() {
+    return modifiedTime;
+  }
+
+  /** Sets modifiedTime. */
+  public void setModifiedTime(Long modifiedTime) {
+    this.modifiedTime = modifiedTime;
+  }
+
+  /**
+   * Gets createdBy.
+   *
+   * @return value of createdBy.
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /** Sets createdBy. */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  /**
+   * Gets updatedBy.
+   *
+   * @return value of updatedBy
+   */
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  /** Sets updatedBy. */
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
   }
 
   /**

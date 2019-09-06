@@ -13,10 +13,11 @@ public interface AlertService {
 
   AlertRuleDetails createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
-      Ticket token);
+      Ticket ticket);
 
   List<AlertRuleDetails> retrieveAllAlerts(
-      @NotNull(message = "Fetch all alerts rule details") Ticket token);
+      @NotNull(message = "Fetch all alerts rule details") Integer pageNumber,
+      Integer pageSize, Ticket ticket);
 
   AlertRuleDetails updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
@@ -24,16 +25,17 @@ public interface AlertService {
       Ticket token);
 
   Boolean deleteAlertRule(
-      @NotNull(message = "Alert Id cannot be null") String alertRuleId, Ticket token);
+      @NotNull(message = "Alert Id cannot be null") String alertRuleId, Ticket ticket);
 
   AlertRuleDetails getAlertRule(
-      @NotNull(message = "alertRuleId cannot be null") String alertRuleId, Ticket token);
+      @NotNull(message = "alertRuleId cannot be null") String alertRuleId, Ticket ticket);
 
   List<AlertRuleDetails> getAlertRulesByCategory(
-      @NotNull(message = "categoryID cannot be null") String categoryId, Ticket token);
+      @NotNull(message = "categoryID cannot be null") String categoryId, Integer pageNumber,
+      Integer pageSize,Ticket token);
 
   String retrieveOperatorsDetails(
-      @NotNull(message = "Fetch all alerts rule operators details") Ticket token);
+      @NotNull(message = "Fetch all alerts rule operators details") Ticket ticket);
 
   String retrieveAggregations(Ticket ticket);
 
