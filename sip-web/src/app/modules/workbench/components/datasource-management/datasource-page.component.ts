@@ -35,6 +35,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   routesData = [];
   sourceData = [];
   sourceTypes = CHANNEL_TYPES;
+  sourceUIDs = CHANNEL_UID;
   selectedSourceType: CHANNEL_UID;
   selectedSourceData: any;
   // channel activation/deactivation request is pending
