@@ -149,9 +149,8 @@ export class DatasetsGridPageComponent
   }
 
   sizeCalculator(size) {
-    let a = size;
+    const a = size;
 
-
-    return a + " B";
+    return a + ' B';
   }
 }

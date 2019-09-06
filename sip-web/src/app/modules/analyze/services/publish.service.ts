@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 
-import { Analysis, isDSLAnalysis } from '../types';
+import { Analysis } from '../types';
 import { AnalysisDSL } from '../../../models';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import { ExecuteService } from './execute.service';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 @Injectable()
 export class PublishService {

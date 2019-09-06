@@ -189,6 +189,16 @@ export function flattenChartData(data, sqlBuilder) {
   )(data);
 }
 
+export function wrapFieldValues(data) {
+  return fpPipe(
+    fpMap(
+      fpMapValues(value => {
+        return value === null ? null : `"${value}"`;
+      })
+    )
+  )(data);
+}
+
 export function checkNullinReportData(data) {
   return fpPipe(
     fpMap(

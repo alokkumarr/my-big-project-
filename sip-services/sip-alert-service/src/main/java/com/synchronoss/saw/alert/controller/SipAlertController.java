@@ -9,6 +9,7 @@ import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
@@ -137,15 +138,33 @@ public class SipAlertController {
    * @param request HttpServletRequest
    * @return AlertRulesDetails
    */
-  @ApiOperation(value = "", nickname = "List All Alert Rules", notes = "", response = Object.class)
+  @ApiOperation(
+      value = "/listAlerts",
+      nickname = "List All Alert Rules",
+      notes = "",
+      response = Object.class)
   @RequestMapping(
       value = "",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRuleDetails> listAlertRules(HttpServletRequest request) {
+  public List<AlertRuleDetails> listAlertRules(
+      HttpServletRequest request,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize) {
     Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.retrieveAllAlerts(ticket) : null;
+    if (pageNumber == null || pageNumber < 1) {
+      pageNumber = 1;
+    }
+    if (pageSize == null || pageSize < 1) {
+      // Default the value with 1000 .
+      pageNumber = 1000;
+    }
+    return ticket != null ? alertService.retrieveAllAlerts(pageNumber, pageSize, ticket) : null;
   }
 
   /**
@@ -210,10 +229,25 @@ public class SipAlertController {
   public List<AlertRuleDetails> listAlertRulesByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
       @PathVariable(name = "categoryId") String categoryId) {
 
     Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.getAlertRulesByCategory(categoryId, ticket) : null;
+    if (pageNumber == null || pageNumber < 1) {
+      pageNumber = 1;
+    }
+    if (pageSize == null || pageSize < 1) {
+      // Default the value with 1000 .
+      pageNumber = 1000;
+    }
+    return ticket != null
+        ? alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket)
+        : null;
   }
 
   /**

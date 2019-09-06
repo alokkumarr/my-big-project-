@@ -8,9 +8,11 @@ public class AlertNotificationLog {
 
   Long alertTriggerSysId;
 
-  Boolean isNotified;
+  Boolean notified;
 
   Date createdTime;
+
+  String message;
 
   public String getNotificationId() {
     return notificationId;
@@ -28,12 +30,12 @@ public class AlertNotificationLog {
     this.alertTriggerSysId = alertTriggerSysId;
   }
 
-  public Boolean getIsNotified() {
-    return isNotified;
+  public Boolean getNotified() {
+    return notified;
   }
 
-  public void setIsNotified(Boolean isNotified) {
-    this.isNotified = isNotified;
+  public void setNotified(Boolean notified) {
+    this.notified = notified;
   }
 
   public Date getCreatedTime() {
@@ -42,5 +44,13 @@ public class AlertNotificationLog {
 
   public void setCreatedTime(Date createdTime) {
     this.createdTime = createdTime;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

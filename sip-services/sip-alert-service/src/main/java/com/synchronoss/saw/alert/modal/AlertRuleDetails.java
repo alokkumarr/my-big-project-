@@ -1,6 +1,7 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.synchronoss.saw.model.SipQuery;
+import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -14,7 +15,12 @@ public class AlertRuleDetails {
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
+  private Long createdTime;
+  private Long modifiedTime;
+  private String createdBy;
+  private String updatedBy;
   private SipQuery sipQuery;
+  private List<Notification> notification;
 
   /**
    * Gets alertRulesSysId.
@@ -157,6 +163,62 @@ public class AlertRuleDetails {
   }
 
   /**
+   * Gets createdTime.
+   *
+   * @return value of createdTime
+   */
+  public Long getCreatedTime() {
+    return createdTime;
+  }
+
+  /** Sets createdTime . */
+  public void setCreatedTime(Long createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  /**
+   * Gets modifiedTime.
+   *
+   * @return value of modifiedTime
+   */
+  public Long getModifiedTime() {
+    return modifiedTime;
+  }
+
+  /** Sets modifiedTime. */
+  public void setModifiedTime(Long modifiedTime) {
+    this.modifiedTime = modifiedTime;
+  }
+
+  /**
+   * Gets createdBy.
+   *
+   * @return value of createdBy.
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /** Sets createdBy. */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  /**
+   * Gets updatedBy.
+   *
+   * @return value of updatedBy
+   */
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  /** Sets updatedBy. */
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
+  /**
    * Gets sipQuery.
    *
    * @return value of sipQuery
@@ -168,5 +230,19 @@ public class AlertRuleDetails {
   /** Sets sipQuery. */
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
+  }
+
+  /**
+   * Gets notification.
+   *
+   * @return list of notification.
+   */
+  public List<Notification> getNotification() {
+    return notification;
+  }
+
+  /** Sets notification. */
+  public void setNotification(List<Notification> notification) {
+    this.notification = notification;
   }
 }

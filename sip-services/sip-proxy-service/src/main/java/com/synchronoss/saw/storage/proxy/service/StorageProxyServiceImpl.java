@@ -86,10 +86,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @NotNull
   private Long configExecutionLimit;
 
-  @Value("${executor.preview-rows-limit}")
+  @Value("${execution.preview-rows-limit}")
   private Integer previewRowLimit;
 
-  @Value("${executor.publish-rows-limit}")
+  @Value("${execution.publish-rows-limit}")
   private Integer publishRowLimit;
 
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
@@ -103,8 +103,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @PostConstruct
   public void init() throws Exception {
-      //Create directory if doesn't exist
-      StorageProxyUtil.createDirIfNotExists(basePath + File.separator + METASTORE ,10);
+    // Create directory if doesn't exist
+    StorageProxyUtil.createDirIfNotExists(basePath + File.separator + METASTORE, 10);
     tablePath = basePath + File.separator + METASTORE + File.separator + tempResultTable;
     logger.trace("Create Table path :" + tablePath);
 
@@ -487,6 +487,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Boolean designerEdit)
       throws Exception {
     List<Object> result = null;
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
+      }
+    }
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       final String executionId = UUID.randomUUID().toString();
       ExecuteAnalysisResponse response;
@@ -531,23 +547,23 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     SipQuery sipQuery = analysis.getSipQuery();
     final String executionId = UUID.randomUUID().toString();
     ExecuteAnalysisResponse response;
-    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
-      if (size == null) {
-        switch (executionType) {
-          case onetime:
-            size = previewRowLimit;
-            break;
-          case regularExecution:
-            size = publishRowLimit;
-            break;
-          case preview:
-            size = previewRowLimit;
-            break;
-          case publish:
-            size = publishRowLimit;
-            break;
-        }
+    if (size == null) {
+      switch (executionType) {
+        case onetime:
+          size = previewRowLimit;
+          break;
+        case regularExecution:
+          size = publishRowLimit;
+          break;
+        case preview:
+          size = previewRowLimit;
+          break;
+        case publish:
+          size = publishRowLimit;
+          break;
       }
+    }
+    if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
       response =
           dataLakeExecutionService.executeDataLakeReport(
               sipQuery,
@@ -562,10 +578,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       response = new ExecuteAnalysisResponse();
       List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
       response.setExecutionId(executionId);
-
-      // return only requested data, only for FE
-      List<Object> pagingData = pagingData(page, pageSize, objList);
-      response.setData(pagingData != null && pagingData.size() > 0 ? pagingData : objList);
+      response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
     }
     return response;
@@ -660,7 +673,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectNode.put("dslQueryId", dslQueryId);
 
       List<?> executionLists =
-          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", configExecutionLimit.intValue());
+          maprConnection.runMaprDBQuery(
+              fields, node.toString(), "finishedTime", configExecutionLimit.intValue());
       // method call to be asynchronossly
       CompletableFuture.runAsync(
           () -> {
@@ -690,22 +704,32 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionResult executionResult =
           objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
       if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
-          Long totalRows = getTotalRows(doc, null);
-          executionResponse.setTotalRows(totalRows);
+        Long totalRows = getTotalRows(doc, null);
+        logger.trace("Inside fetchExecutionsData totalrows = " + totalRows);
+        executionResponse.setTotalRows(totalRows);
 
+        logger.trace(
+            "Fetching pagination data for execution id " + executionResult.getExecutionId());
+        // paginated execution data
 
-          // paginated execution data
-          Object data =
+        Object data = null;
+        if (pageSize != null && pageSize > 0) {
+          logger.debug("Page size not null = " + pageSize);
+          data =
               maprConnection.fetchPagingData(
                   "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
-          executionResponse.setData(data != null ? data : executionResult.getData());
+        }
 
+        logger.trace("Paging data fetched = " + data);
+        executionResponse.setData(data != null ? data : executionResult.getData());
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
       logger.error("Error occurred while fetching the execution result data", e);
     }
+
+    logger.trace("Returning execution response");
     return executionResponse;
   }
 
@@ -752,14 +776,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      ExecutionResult executionResult=fetchLastExecutionResult(dslQueryId,maprConnection);
-      List<Object> objList=(List<Object>)executionResult.getData();
+      ExecutionResult executionResult = fetchLastExecutionResult(dslQueryId, maprConnection);
+      List<Object> objList = (List<Object>) executionResult.getData();
       Long totalRows = getTotalRows(null, objList);
-			executionResponse.setTotalRows(totalRows);
+      logger.trace("Inside fetchLastExecutionsData totalRow = " + totalRows);
+      executionResponse.setTotalRows(totalRows);
 
       // paginated execution data
       Object data =
-          maprConnection.fetchPagingData("data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+          maprConnection.fetchPagingData(
+              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
       executionResponse.setData(data != null ? data : executionResult.getData());
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
@@ -867,7 +893,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return result;
   }
 
-    /**
+  /**
    * Check for temp execution type.
    *
    * @param executionType
@@ -890,16 +916,17 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private long getTotalRows(Document doc, List<Object> objList) {
     try {
       if (doc != null) {
-        logger.debug("Data = " + doc.getValue("data"));
 
         if (doc.getValue("data").getType() == org.ojai.Value.Type.NULL) {
           return 0l;
         }
 
         List<Object> totalRows = doc.getList("data");
+        logger.debug("Inside if");
         logger.debug("Total number of rows :" + totalRows.size());
         return totalRows.size() > 0 ? totalRows.size() : 0l;
       } else if (objList != null && objList.size() > 0) {
+        logger.debug("Inside else");
         logger.debug("Total number of rows :" + objList.size());
         return objList.size();
       }
@@ -916,7 +943,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @param pageSize
    * @return
    */
-  private List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
+  @Override
+  public List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj) {
     logger.trace("Page :" + page + " pageSize :" + pageSize);
     // pagination logic
     if (page != null && pageSize != null && dataObj != null && dataObj.size() > 0) {
