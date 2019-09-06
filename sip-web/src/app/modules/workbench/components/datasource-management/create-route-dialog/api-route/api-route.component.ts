@@ -18,6 +18,7 @@ import * as isUndefined from 'lodash/isUndefined';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
+import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
 
 @Component({
   selector: 'api-route',
@@ -117,7 +118,7 @@ export class ApiRouteComponent implements OnInit, DetailForm {
 
   get testConnectivityValue() {
     return {
-      channelType: 'sftp',
+      channelType: CHANNEL_UID.API,
       channelId: this.routeData.channelID,
       ...this.value
     };
