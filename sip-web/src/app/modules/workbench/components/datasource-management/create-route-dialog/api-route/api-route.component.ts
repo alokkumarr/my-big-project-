@@ -86,7 +86,7 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       ],
       destinationLocation: ['', Validators.required],
       description: [''],
-      apiEndPoint: ['', Validators.required],
+      apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
       bodyParameters: this.formBuilder.group({
         content: [
