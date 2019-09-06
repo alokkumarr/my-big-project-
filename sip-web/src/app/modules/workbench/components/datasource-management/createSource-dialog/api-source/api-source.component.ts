@@ -61,13 +61,7 @@ export class ApiSourceComponent implements OnInit, DetailForm {
         )
       ],
       hostAddress: ['', Validators.required],
-      port: [
-        null,
-        Validators.compose([
-          Validators.required,
-          Validators.pattern('^[0-9]*$')
-        ])
-      ],
+      port: [null, [Validators.pattern('^[0-9]*$')]],
       description: [''],
       apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
