@@ -5,9 +5,10 @@ import {
 import { DxDataGridService } from './../../../../../common/services/dxDataGrid.service';
 import { Router } from '@angular/router';
 import { RtisService } from './../../../services/rtis.service';
-import { DeleteDialogComponent } from './../../../../admin/datasecurity/delete-dialog/delete-dialog.component';
+import { DeleteDialogComponent } from './../../../../../common/components/delete-dialog/delete-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
+import * as isEmpty from 'lodash/isEmpty';
 
 @Component({
   selector: 'appkeys-view',
@@ -15,8 +16,9 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
   styleUrls: ['./appkeys-view.component.scss']
 })
 export class AppkeysViewComponent implements OnInit {
-  public config: any;
-  public appKeys: any;
+  public config: [];
+  public appKeys: [];
+  public custEventUrl: string;
   constructor(
     public _DxDataGridService: DxDataGridService,
     private router: Router,
@@ -37,6 +39,7 @@ export class AppkeysViewComponent implements OnInit {
   fetchKeysForGrid() {
     const fetchAppKeys = this._rtisService.getAppKeys();
     fetchAppKeys.then(response => {
+      this.custEventUrl = isEmpty(response) ? '' : response[0].eventUrl;
       this.appKeys = response;
     });
   }
@@ -74,12 +77,12 @@ export class AppkeysViewComponent implements OnInit {
       {
         caption: 'APP KEYS',
         dataField: 'app_key',
-        width: '80%'
+        width: '70%'
       },
       {
         caption: 'ACTIONS',
         cellTemplate: 'actionCellTemplate',
-        width: '20%'
+        width: '30%'
       }
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({

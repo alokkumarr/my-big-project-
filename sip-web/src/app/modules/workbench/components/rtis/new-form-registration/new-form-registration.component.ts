@@ -8,6 +8,7 @@ import { Location } from '@angular/common';
 import { RtisService } from './../../../services/rtis.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { Router } from '@angular/router';
+import * as isEmpty from 'lodash/isEmpty';
 
 @Component({
   selector: 'new-registration-form',
@@ -20,6 +21,7 @@ export class NewRegistrationComponent implements OnInit {
     topic: '',
     queue: ''
   };
+  public showEventUrl: boolean;
   public model: any;
   constructor(
     private _formBuilder: FormBuilder,
@@ -30,8 +32,13 @@ export class NewRegistrationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const fetchAppKeys = this._rtisService.getAppKeys();
+    fetchAppKeys.then(response => {
+      this.showEventUrl = isEmpty(response);
+    });
     this.detailsFormGroup = this._formBuilder.group({
       batchSize: ['', [Validators.required]],
+      eventUrl: [''],
       bufferFullSize: [''],
       timeout: [''],
       streamQueue: [''],
@@ -52,6 +59,7 @@ export class NewRegistrationComponent implements OnInit {
          topic: data.streamTopic,
          queue: data. streamQueue
        }],
+       eventUrl: data.eventUrl,
        batchSize: parseInt(data.batchSize),
        blockOnBufferFull: data.bufferFullSize,
        timeoutMs: data.timeout

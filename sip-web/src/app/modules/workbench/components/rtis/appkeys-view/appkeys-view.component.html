@@ -4,7 +4,6 @@
       REAL TIME INGESTION SERVICE
     </div>
   </div>
-
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
     <button
       (click)="navigate()"
@@ -16,7 +15,12 @@
     </button>
   </div>
 </mat-toolbar>
-<div style="height: calc(100vh - 51px - 70px - 65px);">
+
+<div class="app-key-grid">
+  <div class="disply-url" *ngIf="custEventUrl">
+      <label><b>Event URL: </b> {{custEventUrl}}</label>
+  </div>
+
   <dx-data-grid
     #analysesGrid
     [customizeColumns]="config.customizeColumns"
@@ -65,3 +69,4 @@
     </div>
   </dx-data-grid>
 </div>
+
