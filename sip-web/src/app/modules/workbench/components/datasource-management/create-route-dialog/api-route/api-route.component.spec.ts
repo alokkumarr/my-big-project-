@@ -24,7 +24,12 @@ describe('ApiRouteComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ApiRouteComponent);
     component = fixture.componentInstance;
-    component.routeData = { routeMetadata: {} };
+    component.routeData = {
+      routeMetadata: {
+        headerParameters: [],
+        queryParameters: []
+      }
+    };
     component.opType = ROUTE_OPERATION.CREATE;
     fixture.detectChanges();
   });
