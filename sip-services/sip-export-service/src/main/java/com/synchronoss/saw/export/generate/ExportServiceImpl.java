@@ -44,8 +44,8 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -315,9 +315,12 @@ public class ExportServiceImpl implements ExportService {
 
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
-
       return;
     }
+
+    // clear export bean column header before building csv header
+    exportBean.setColumnHeader(null);
+
     data.stream()
         .limit(LimittoExport)
         .forEach(
@@ -406,17 +409,11 @@ public class ExportServiceImpl implements ExportService {
     xlsxFile.createNewFile();
     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
     XlsxExporter xlsxExporter = new XlsxExporter();
-    Workbook workBook = new XSSFWorkbook();
+    Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
-    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
+    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      data.stream()
-          .limit(LimittoExport)
-          .forEach(
-              line -> {
-                xlsxExporter.addXlsxRow(fields, exportBean, workBook, sheet, line);
-              });
-      xlsxExporter.autoSizeColumns(workBook);
+      xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, data);
       workBook.write(stream);
     } finally {
       stream.flush();
@@ -495,7 +492,16 @@ public class ExportServiceImpl implements ExportService {
                 IFileExporter iFileExporter = new XlsxExporter();
 
                 // build export bean to process file
-                ExportUtils.buildExportBean(exportBean, dispatchBean, publishedPath);
+                ExportUtils.buildExportBean(exportBean, dispatchBean);
+                String dir = UUID.randomUUID().toString();
+                exportBean.setFileName(
+                    publishedPath
+                        + File.separator
+                        + dir
+                        + File.separator
+                        + ((LinkedHashMap) dispatchBean).get("name")
+                        + "."
+                        + exportBean.getFileType());
 
                 try {
                   // create a directory with unique name in published location to avoid file
@@ -592,7 +598,16 @@ public class ExportServiceImpl implements ExportService {
               ExportBean exportBean = new ExportBean();
 
               // build export bean to process file
-              ExportUtils.buildExportBean(exportBean, dispatchBean, publishedPath);
+              ExportUtils.buildExportBean(exportBean, dispatchBean);
+              String dir = UUID.randomUUID().toString();
+              exportBean.setFileName(
+                  publishedPath
+                      + File.separator
+                      + dir
+                      + File.separator
+                      + ((LinkedHashMap) dispatchBean).get("name")
+                      + "."
+                      + exportBean.getFileType());
 
               File cfile = new File(exportBean.getFileName());
               String zipFileName = cfile.getAbsolutePath().concat(".zip");
@@ -776,7 +791,7 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public boolean dispatchMail(
-      String analysisId, ExportBean exportBean, String recipients, ResponseEntity<DataResponse> entity, boolean zip) {
+      String analysisId, ExportBean exportBean, String recipients, ResponseEntity<DataResponse> entity, boolean zip, String fileName) {
 
     String fileType = exportBean.getFileType();
     MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
@@ -791,14 +806,8 @@ public class ExportServiceImpl implements ExportService {
     try {
       // create a directory with unique name in published location to avoid file
       // conflict for dispatch.
-      String mailDispatchFileName =
-          publishedPath
-              + File.separator
-              + "mail"
-              + ExportUtils.generateRandomStringDir()
-              + File.separator
-              + exportBean.getFileName();
 
+      final String mailDispatchFileName = filePath("mail", fileName);
       exportBean.setFileName(mailDispatchFileName);
 
       if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
@@ -822,7 +831,7 @@ public class ExportServiceImpl implements ExportService {
             exportBean.getReportName() + " | " + exportBean.getPublishDate(),
             serviceUtils.prepareMailBody(exportBean, mailBody),
             zipFileName);
-        logger.debug("Email sent successfully");
+        logger.info("Email sent successfully");
 
         logger.debug("Deleting exported file.");
         try {
@@ -843,7 +852,7 @@ public class ExportServiceImpl implements ExportService {
             exportBean.getReportName() + " | " + exportBean.getPublishDate(),
             serviceUtils.prepareMailBody(exportBean, mailBody),
             exportBean.getFileName());
-        logger.debug("Email sent successfully");
+        logger.info("Email sent successfully");
 
         logger.debug("Deleting exported file.");
         try {
@@ -874,22 +883,12 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate,
       String userFileName) {
     logger.trace("Inside S3 dispatcher");
-
     ExportBean exportBean = bean;
 
     // create a directory with unique name in published location to avoid file
     // conflict for dispatch.
-    String mailDispatchFileName =
-        publishedPath
-            + File.separator
-            + "s3"
-            + ExportUtils.generateRandomStringDir()
-            + File.separator
-            + userFileName;
-    logger.debug("File name = " + mailDispatchFileName);
-
-    exportBean.setFileName(mailDispatchFileName);
-
+    final String s3FileName = filePath("s3", userFileName);
+    exportBean.setFileName(s3FileName);
     logger.debug("Export Bean = " + exportBean);
 
     prepareFileWithSize(
@@ -984,23 +983,6 @@ public class ExportServiceImpl implements ExportService {
             + "&executionType=scheduled"
             + "&analysisType="
             + analysisType;
-    if (recipients != null && !recipients.equals("")) {
-      ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-          asyncRestTemplate.getForEntity(url, DataResponse.class);
-      responseStringFuture.addCallback(
-          new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-            @Override
-            public void onSuccess(ResponseEntity<DataResponse> entity) {
-              dispatchMail(analysisId, exportBean, recipients, entity, zip);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              logger.error("[Failed] Getting string response:" + t);
-            }
-          });
-    }
-
     if (s3 != null && s3 != "") {
       logger.debug("S3 details set. Dispatching to S3");
       dispatchFileToS3(
@@ -1029,6 +1011,23 @@ public class ExportServiceImpl implements ExportService {
           requestEntity,
           restTemplate,
           userFileName);
+    }
+
+    if (recipients != null && !recipients.equals("")) {
+      ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
+          asyncRestTemplate.getForEntity(url, DataResponse.class);
+      responseStringFuture.addCallback(
+          new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
+            @Override
+            public void onSuccess(ResponseEntity<DataResponse> entity) {
+              dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+              logger.error("[Failed] Getting string response:" + t);
+            }
+          });
     }
   }
 
@@ -1150,14 +1149,7 @@ public class ExportServiceImpl implements ExportService {
 
     // create a directory with unique name in published location to avoid file
     // conflict for dispatch.
-    String mailDispatchFileName =
-        publishedPath
-            + File.separator
-            + "ftp"
-            + ExportUtils.generateRandomStringDir()
-            + File.separator
-            + userFileName;
-
+    final String mailDispatchFileName = filePath("ftp", userFileName);
     exportBean.setFileName(mailDispatchFileName);
 
     prepareFileWithSize(
@@ -1322,5 +1314,10 @@ public class ExportServiceImpl implements ExportService {
       }
     }
     return fieldList;
+  }
+
+  private String filePath(String type, String fileName) {
+    return publishedPath + File.separator + type
+        + ExportUtils.generateRandomStringDir() + File.separator + fileName;
   }
 }

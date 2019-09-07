@@ -127,20 +127,10 @@ public class ExportUtils {
    *
    * @param exportBean
    * @param dispatchBean
-   * @param publishedPath
    */
-  public static void buildExportBean(ExportBean exportBean, Object dispatchBean, String publishedPath) {
-    String dir = UUID.randomUUID().toString();
+  public static void buildExportBean(ExportBean exportBean, Object dispatchBean) {
     exportBean.setFileType(
         String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-    exportBean.setFileName(
-        publishedPath
-            + File.separator
-            + dir
-            + File.separator
-            + ((LinkedHashMap) dispatchBean).get("name")
-            + "."
-            + exportBean.getFileType());
     exportBean.setReportDesc(
         String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
     exportBean.setReportName(

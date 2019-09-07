@@ -7,7 +7,7 @@ import com.synchronoss.saw.export.model.DataResponse;
 import com.synchronoss.saw.model.Field;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.junit.Before;
@@ -103,22 +103,8 @@ public class XlsxExporterTest {
   public void mockTest() {
     Workbook workBook = new XSSFWorkbook();
     workBook.getSpreadsheetVersion();
-    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
-
-    dataResponse.getData().stream()
-        .limit(LimittoExport)
-        .forEach(
-            line -> {
-              try {
-                xlsxExporter.addXlsxRow(fields, exportBean, workBook, sheet, line);
-
-              } catch (Exception e) {
-                logger.error(
-                    this.getClass().getName()
-                        + " Error in adding xlsxsRow : "
-                        + ExceptionUtils.getStackTrace(e));
-              }
-            });
+    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+    xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, dataResponse.getData());
     assertEquals(sheet.getPhysicalNumberOfRows(), 4);
   }
 
