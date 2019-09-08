@@ -1,5 +1,8 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.synchronoss.saw.model.Aggregate;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 import java.util.List;
 
@@ -15,6 +18,14 @@ public class AlertRuleDetails {
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
+  private String attributeName;
+  private String lookbackColumn;
+  private String lookbackPeriod;
+  private Aggregate aggregationType;
+  private Operator operator;
+  private String metricsColumn;
+  private String thresholdValue;
+  private List<Filter> filters;
   private Long createdTime;
   private Long modifiedTime;
   private String createdBy;
@@ -160,6 +171,118 @@ public class AlertRuleDetails {
   /** Sets customerCode. */
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
+  }
+
+  /**
+   * Gets attributeName.
+   *
+   * @return value of attributeName
+   */
+  public String getAttributeName() {
+    return attributeName;
+  }
+
+  /** Sets attributeName. */
+  public void setAttributeName(String attributeName) {
+    this.attributeName = attributeName;
+  }
+
+  /**
+   * Gets lookbackColumn.
+   *
+   * @return value of lookbackColumn
+   */
+  public String getLookbackColumn() {
+    return lookbackColumn;
+  }
+
+  /** Sets lookbackColumn. */
+  public void setLookbackColumn(String lookbackColumn) {
+    this.lookbackColumn = lookbackColumn;
+  }
+
+  /**
+   * Gets lookbackPeriod.
+   *
+   * @return value of lookbackPeriod
+   */
+  public String getLookbackPeriod() {
+    return lookbackPeriod;
+  }
+
+  /** Sets lookbackPeriod. */
+  public void setLookbackPeriod(String lookbackPeriod) {
+    this.lookbackPeriod = lookbackPeriod;
+  }
+
+  /**
+   * Gets aggregationType.
+   *
+   * @return value of aggregationType
+   */
+  public Aggregate getAggregationType() {
+    return aggregationType;
+  }
+
+  /** Sets aggregationType. */
+  public void setAggregationType(Aggregate aggregationType) {
+    this.aggregationType = aggregationType;
+  }
+
+  /**
+   * Gets operator.
+   *
+   * @return value of operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
+
+  /** Sets operator. */
+  public void setOperator(Operator operator) {
+    this.operator = operator;
+  }
+
+  /**
+   * Gets metricsColumn.
+   *
+   * @return value of metricsColumn
+   */
+  public String getMetricsColumn() {
+    return metricsColumn;
+  }
+
+  /** Sets metricsColumn. */
+  public void setMetricsColumn(String metricsColumn) {
+    this.metricsColumn = metricsColumn;
+  }
+
+  /**
+   * Gets thresholdValue.
+   *
+   * @return value of thresholdValue
+   */
+  public String getThresholdValue() {
+    return thresholdValue;
+  }
+
+  /** Sets thresholdValue. */
+  public void setThresholdValue(String thresholdValue) {
+    this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets filters.
+   *
+   * @return value of filters
+   */
+  public List<Filter> getFilters() {
+    return filters;
+  }
+
+  /** Sets filters. */
+  public void setFilters(List<Filter> filters) {
+    this.filters = filters;
   }
 
   /**

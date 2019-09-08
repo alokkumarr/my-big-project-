@@ -24,6 +24,8 @@ public class AlertTriggerLog {
 
   private String categoryId;
 
+  private String sipQuery;
+
   /**
    * Gets alertTriggerSysId.
    *
@@ -176,5 +178,19 @@ public class AlertTriggerLog {
   /** Sets category id. */
   public void setCategoryId(String categoryId) {
     this.categoryId = categoryId;
+  }
+
+  /**
+   * Gets sipQuery.
+   *
+   * @return value of sipQuery
+   */
+  public String getSipQuery() {
+    return sipQuery;
+  }
+
+  /** Sets sipQuery. */
+  public void setSipQuery(String sipQuery) {
+    this.sipQuery = sipQuery;
   }
 }
