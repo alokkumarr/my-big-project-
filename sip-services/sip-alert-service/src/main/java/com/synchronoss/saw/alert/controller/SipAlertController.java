@@ -6,9 +6,11 @@ import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
+import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
@@ -137,15 +139,33 @@ public class SipAlertController {
    * @param request HttpServletRequest
    * @return AlertRulesDetails
    */
-  @ApiOperation(value = "", nickname = "List All Alert Rules", notes = "", response = Object.class)
+  @ApiOperation(
+      value = "/listAlerts",
+      nickname = "List All Alert Rules",
+      notes = "",
+      response = Object.class)
   @RequestMapping(
       value = "",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRuleDetails> listAlertRules(HttpServletRequest request) {
+  public AlertRuleResponse listAlertRules(
+      HttpServletRequest request,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize) {
     Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.retrieveAllAlerts(ticket) : null;
+    if (pageNumber == null || pageNumber < 1) {
+      pageNumber = 1;
+    }
+    if (pageSize == null || pageSize < 1) {
+      // Default the value with 1000 .
+      pageSize = 1000;
+    }
+    return ticket != null ? alertService.retrieveAllAlerts(pageNumber, pageSize, ticket) : null;
   }
 
   /**
@@ -207,13 +227,28 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public List<AlertRuleDetails> listAlertRulesByCategory(
+  public AlertRuleResponse listAlertRulesByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize,
       @PathVariable(name = "categoryId") String categoryId) {
 
     Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.getAlertRulesByCategory(categoryId, ticket) : null;
+    if (pageNumber == null || pageNumber < 1) {
+      pageNumber = 1;
+    }
+    if (pageSize == null || pageSize < 1) {
+      // Default the value with 1000 .
+      pageSize = 1000;
+    }
+    return ticket != null
+        ? alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket)
+        : null;
   }
 
   /**
@@ -303,13 +338,13 @@ public class SipAlertController {
   public AlertStatesResponse getAlertState(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") Long id,
+      @PathVariable(name = "id") String id,
       @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
       @RequestParam(name = "pageSize", required = false) Integer pageSize) {
     Ticket ticket = getTicket(request);
     if (ticket != null) {
       if (pageNumber == null) {
-        pageNumber = 0;
+        pageNumber = 1;
       }
       if (pageSize == null) {
         pageSize = 25;
@@ -351,7 +386,7 @@ public class SipAlertController {
     Ticket ticket = getTicket(request);
     if (ticket != null) {
       if (pageNumber == null) {
-        pageNumber = 0;
+        pageNumber = 1;
       }
       if (pageSize == null) {
         pageSize = 25;
@@ -382,9 +417,20 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody AlertCount alertCount,
-      @RequestParam(name = "alertRuleId", required = false) Long alertRuleId) {
+      @RequestParam(name = "alertRuleId", required = false) String alertRuleId,
+      @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
+      @RequestParam(name = "pageSize", required = false) Integer pageSize) {
     Ticket ticket = getTicket(request);
-    return ticket != null ? alertService.alertCount(alertCount, alertRuleId) : null;
+    if (ticket != null) {
+      if (pageNumber == null) {
+        pageNumber = 1;
+      }
+      if (pageSize == null) {
+        pageSize = 1000;
+      }
+      return alertService.alertCount(alertCount, pageNumber, pageSize, alertRuleId, ticket);
+    }
+    return null;
   }
 
   /**

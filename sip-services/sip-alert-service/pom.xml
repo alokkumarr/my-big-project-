@@ -20,7 +20,7 @@
         <start-class>com.synchronoss.saw.SipAlertServiceApplication</start-class>
         <java.version>1.8</java.version>
         <jackson-coreutils>1.8</jackson-coreutils>
-        <mapr.db.version>6.1.0-mapr</mapr.db.version>
+        <mapr.version>6.1.0-mapr</mapr.version>
         <json-core>1.2.5</json-core>
     </properties>
     <repositories>
@@ -79,7 +79,7 @@
       <dependency>
       <groupId>com.mapr.db</groupId>
       <artifactId>maprdb</artifactId>
-      <version>${mapr.db.version}</version>
+      <version>${mapr.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -91,7 +91,7 @@
       <dependency>
         <groupId>com.mapr.ojai</groupId>
         <artifactId>mapr-ojai-driver</artifactId>
-        <version>${mapr.db.version}</version>
+        <version>${mapr.version}</version>
         <scope>provided</scope>
         <exclusions>
           <exclusion>
@@ -105,6 +105,23 @@
         <groupId>com.synchronoss.bda</groupId>
         <artifactId>meta-api</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mapr.streams</groupId>
+        <artifactId>mapr-streams</artifactId>
+        <version>${mapr.version}</version>
+        <exclusions>
+        <exclusion>
+          <artifactId>slf4j-log4j12</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>1.0.1-mapr-1803</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>

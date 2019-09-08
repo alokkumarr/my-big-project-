@@ -26,6 +26,12 @@ public class MaprConnection {
   private static final String OJAI_MAPR = "ojai:mapr:";
   private DocumentStore store;
   private Connection connection;
+  public static final String EQ = "$eq";
+  public static final String AND = "$and";
+  public static final String GTE = "$ge";
+  public static final String LTE = "$le";
+  public static final String GT = "$gt";
+  public static final String LT = "$lt";
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -114,6 +120,55 @@ public class MaprConnection {
       }
     }
     return resultSet;
+  }
+
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param filter
+   * @param orderBy
+   * @return list
+   */
+  public List<JsonNode> runMaprDbQueryWithFilter(
+      String filter, Integer pageNumber, Integer pageSize, String orderBy) {
+    Integer limit = (pageNumber * pageSize);
+    final Query query =
+        connection.newQuery().orderBy(orderBy, SortOrder.DESC).limit(limit).where(filter).build();
+
+    final DocumentStream stream = store.find(query);
+    List<JsonNode> resultSet = new ArrayList<>();
+    Integer count = 0;
+    for (final Document document : stream) {
+      try {
+        // MaprDB document stream doesn't supports the stream skip, considered the additional
+        // logic to ignore additional documents.
+        if (pageNumber > 1 && count < (pageNumber - 1 * pageSize)) {
+            // ignore the document
+          count++;
+        } else {
+          resultSet.add(objectMapper.readTree(document.asJsonString()));
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * calculates count for a query with filters.
+   *
+   * @param filter
+   * @return count of no of documents
+   */
+  public Long getCountForQueryWithFilter(String filter) {
+    final Query query = connection.newQuery().where(filter).build();
+    final DocumentStream stream = store.find(query);
+    Long count = 0L;
+    for (Document document : stream) {
+      count++;
+    }
+    return count;
   }
 
   /**

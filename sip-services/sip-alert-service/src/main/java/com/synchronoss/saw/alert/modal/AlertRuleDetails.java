@@ -1,6 +1,10 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.synchronoss.saw.model.Aggregate;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
+import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -14,7 +18,20 @@ public class AlertRuleDetails {
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
+  private String attributeName;
+  private String lookbackColumn;
+  private String lookbackPeriod;
+  private Aggregate aggregationType;
+  private Operator operator;
+  private String metricsColumn;
+  private String thresholdValue;
+  private List<Filter> filters;
+  private Long createdTime;
+  private Long modifiedTime;
+  private String createdBy;
+  private String updatedBy;
   private SipQuery sipQuery;
+  private List<Notification> notification;
 
   /**
    * Gets alertRulesSysId.
@@ -157,6 +174,174 @@ public class AlertRuleDetails {
   }
 
   /**
+   * Gets attributeName.
+   *
+   * @return value of attributeName
+   */
+  public String getAttributeName() {
+    return attributeName;
+  }
+
+  /** Sets attributeName. */
+  public void setAttributeName(String attributeName) {
+    this.attributeName = attributeName;
+  }
+
+  /**
+   * Gets lookbackColumn.
+   *
+   * @return value of lookbackColumn
+   */
+  public String getLookbackColumn() {
+    return lookbackColumn;
+  }
+
+  /** Sets lookbackColumn. */
+  public void setLookbackColumn(String lookbackColumn) {
+    this.lookbackColumn = lookbackColumn;
+  }
+
+  /**
+   * Gets lookbackPeriod.
+   *
+   * @return value of lookbackPeriod
+   */
+  public String getLookbackPeriod() {
+    return lookbackPeriod;
+  }
+
+  /** Sets lookbackPeriod. */
+  public void setLookbackPeriod(String lookbackPeriod) {
+    this.lookbackPeriod = lookbackPeriod;
+  }
+
+  /**
+   * Gets aggregationType.
+   *
+   * @return value of aggregationType
+   */
+  public Aggregate getAggregationType() {
+    return aggregationType;
+  }
+
+  /** Sets aggregationType. */
+  public void setAggregationType(Aggregate aggregationType) {
+    this.aggregationType = aggregationType;
+  }
+
+  /**
+   * Gets operator.
+   *
+   * @return value of operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
+
+  /** Sets operator. */
+  public void setOperator(Operator operator) {
+    this.operator = operator;
+  }
+
+  /**
+   * Gets metricsColumn.
+   *
+   * @return value of metricsColumn
+   */
+  public String getMetricsColumn() {
+    return metricsColumn;
+  }
+
+  /** Sets metricsColumn. */
+  public void setMetricsColumn(String metricsColumn) {
+    this.metricsColumn = metricsColumn;
+  }
+
+  /**
+   * Gets thresholdValue.
+   *
+   * @return value of thresholdValue
+   */
+  public String getThresholdValue() {
+    return thresholdValue;
+  }
+
+  /** Sets thresholdValue. */
+  public void setThresholdValue(String thresholdValue) {
+    this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets filters.
+   *
+   * @return value of filters
+   */
+  public List<Filter> getFilters() {
+    return filters;
+  }
+
+  /** Sets filters. */
+  public void setFilters(List<Filter> filters) {
+    this.filters = filters;
+  }
+
+  /**
+   * Gets createdTime.
+   *
+   * @return value of createdTime
+   */
+  public Long getCreatedTime() {
+    return createdTime;
+  }
+
+  /** Sets createdTime . */
+  public void setCreatedTime(Long createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  /**
+   * Gets modifiedTime.
+   *
+   * @return value of modifiedTime
+   */
+  public Long getModifiedTime() {
+    return modifiedTime;
+  }
+
+  /** Sets modifiedTime. */
+  public void setModifiedTime(Long modifiedTime) {
+    this.modifiedTime = modifiedTime;
+  }
+
+  /**
+   * Gets createdBy.
+   *
+   * @return value of createdBy.
+   */
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  /** Sets createdBy. */
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  /**
+   * Gets updatedBy.
+   *
+   * @return value of updatedBy
+   */
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  /** Sets updatedBy. */
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
+  /**
    * Gets sipQuery.
    *
    * @return value of sipQuery
@@ -168,5 +353,19 @@ public class AlertRuleDetails {
   /** Sets sipQuery. */
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
+  }
+
+  /**
+   * Gets notification.
+   *
+   * @return list of notification.
+   */
+  public List<Notification> getNotification() {
+    return notification;
+  }
+
+  /** Sets notification. */
+  public void setNotification(List<Notification> notification) {
+    this.notification = notification;
   }
 }

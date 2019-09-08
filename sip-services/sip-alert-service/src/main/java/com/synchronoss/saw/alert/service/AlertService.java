@@ -4,6 +4,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
+import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import java.util.List;
 import javax.validation.Valid;
@@ -13,10 +14,12 @@ public interface AlertService {
 
   AlertRuleDetails createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
-      Ticket token);
+      Ticket ticket);
 
-  List<AlertRuleDetails> retrieveAllAlerts(
-      @NotNull(message = "Fetch all alerts rule details") Ticket token);
+  AlertRuleResponse retrieveAllAlerts(
+      @NotNull(message = "Fetch all alerts rule details") Integer pageNumber,
+      Integer pageSize,
+      Ticket ticket);
 
   AlertRuleDetails updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
@@ -24,26 +27,34 @@ public interface AlertService {
       Ticket token);
 
   Boolean deleteAlertRule(
-      @NotNull(message = "Alert Id cannot be null") String alertRuleId, Ticket token);
+      @NotNull(message = "Alert Id cannot be null") String alertRuleId, Ticket ticket);
 
   AlertRuleDetails getAlertRule(
-      @NotNull(message = "alertRuleId cannot be null") String alertRuleId, Ticket token);
+      @NotNull(message = "alertRuleId cannot be null") String alertRuleId, Ticket ticket);
 
-  List<AlertRuleDetails> getAlertRulesByCategory(
-      @NotNull(message = "categoryID cannot be null") String categoryId, Ticket token);
+  AlertRuleResponse getAlertRulesByCategory(
+      @NotNull(message = "categoryID cannot be null") String categoryId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket token);
 
   String retrieveOperatorsDetails(
-      @NotNull(message = "Fetch all alerts rule operators details") Ticket token);
+      @NotNull(message = "Fetch all alerts rule operators details") Ticket ticket);
 
   String retrieveAggregations(Ticket ticket);
 
   AlertStatesResponse getAlertStates(
-      @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
+      @NotNull(message = "alertRuleId cannot be null") String alertRuleId,
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket);
 
   AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
 
-  List<AlertCountResponse> alertCount(AlertCount alertCount, Long alertRuleSysId);
+  List<AlertCountResponse> alertCount(
+      AlertCount alertCount,
+      Integer pageNumber,
+      Integer pageSize,
+      String alertRuleSysId,
+      Ticket ticket);
 }

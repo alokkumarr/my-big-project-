@@ -25,7 +25,10 @@ import {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   DEFAULT_PRECISION,
-  EMAIL_REGEX
+  EMAIL_REGEX,
+  DATE_INTERVALS,
+  DATE_INTERVALS_OBJ,
+  DEFAULT_DATE_INTERVAL
 } from '../../common/consts';
 
 export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
@@ -51,7 +54,10 @@ export {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   DEFAULT_PRECISION,
-  EMAIL_REGEX
+  EMAIL_REGEX,
+  DATE_INTERVALS,
+  DATE_INTERVALS_OBJ,
+  DEFAULT_DATE_INTERVAL
 };
 
 export const DSL_ANALYSIS_TYPES = [
@@ -363,44 +369,6 @@ export const AREA_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(AREA_TYPES);
-
-export const DATE_INTERVALS = [
-  {
-    label: 'All',
-    value: 'all'
-  },
-  {
-    label: 'Year',
-    value: 'year',
-    format: 'yyyy',
-    momentFormat: 'yyyy'
-  },
-  {
-    label: 'Quarter',
-    value: 'quarter',
-    format: 'yyyy-QQQ',
-    momentFormat: 'YYYY-[Q]Q'
-  },
-  {
-    label: 'Month',
-    value: 'month',
-    format: 'yyyy-MM',
-    momentFormat: 'YYYY-MM'
-  },
-  {
-    label: 'Date',
-    value: 'day',
-    format: 'yyyy-MM-dd',
-    momentFormat: 'YYYY-MM-DD'
-  }
-];
-
-export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
-
-export const DATE_INTERVALS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(DATE_INTERVALS);
 
 export const CUSTOM_DATE_PRESET_VALUE = 'NA';
 export const DATE_PRESETS = [

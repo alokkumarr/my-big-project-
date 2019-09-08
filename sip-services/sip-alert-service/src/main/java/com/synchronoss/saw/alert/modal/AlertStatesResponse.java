@@ -4,35 +4,21 @@ import java.util.List;
 
 public class AlertStatesResponse {
 
-  Long numberOfRecords;
-  List<AlertStates> alertStatesList;
-  String message;
+  private List<AlertTriggerLog> alertStatesList;
+  private String message;
+  private Long numberOfRecords;
 
   /**
-   * Gets numberOfRecords.
+   * Gets alertstatesList.
    *
-   * @return value of numberOfRecords
+   * @return alertstatesList
    */
-  public Long getNumberOfRecords() {
-    return numberOfRecords;
-  }
-
-  /** Sets numberOfRecords. */
-  public void setNumberOfRecords(Long numberOfRecords) {
-    this.numberOfRecords = numberOfRecords;
-  }
-
-  /**
-   * Gets alertStatesList.
-   *
-   * @return value of alertStatesList
-   */
-  public List<AlertStates> getAlertStatesList() {
+  public List<AlertTriggerLog> getAlertStatesList() {
     return alertStatesList;
   }
 
-  /** Sets alertStatesList. */
-  public void setAlertStatesList(List<AlertStates> alertStatesList) {
+  /** Sets alertstatesList. */
+  public void setAlertStatesList(List<AlertTriggerLog> alertStatesList) {
     this.alertStatesList = alertStatesList;
   }
 
@@ -48,5 +34,19 @@ public class AlertStatesResponse {
   /** Sets message. */
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  /**
+   * Gets numberOfRecords.
+   *
+   * @return value of numberOfRecords
+   */
+  public Long getNumberOfRecords() {
+    return numberOfRecords;
+  }
+
+  /** Sets numberOfRecords. */
+  public void setNumberOfRecords(Long numberOfRecords) {
+    this.numberOfRecords = numberOfRecords;
   }
 }

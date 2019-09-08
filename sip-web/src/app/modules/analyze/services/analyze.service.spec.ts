@@ -101,6 +101,31 @@ describe('Analyze Service', () => {
     );
 
     service
+      .getAllCronJobs(analysis)
+      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
+  it('fetch list of all gtp locations', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
+      .getlistFTP('SYNC')
+      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+
+    expect(spy.calls.count()).toEqual(1);
+  });
+
+
+  it('fetch all cron detials', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
+      asyncData({ contents: { analyze: [{}] } } as any)
+    );
+
+    service
       .changeSchedule(analysis)
       .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
 

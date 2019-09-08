@@ -1,35 +1,50 @@
 package com.synchronoss.saw.alert.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCount.GroupBy;
-import com.synchronoss.saw.alert.modal.AlertCount.Preset;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
+import com.synchronoss.saw.alert.modal.AlertRuleResponse;
+import com.synchronoss.saw.alert.modal.AlertSeverity;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
+import com.synchronoss.saw.alert.modal.AlertTriggerLog;
+import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.threeten.extra.YearQuarter;
+import org.springframework.util.StringUtils;
 import sncr.bda.base.MaprConnection;
 
 @Service
 public class AlertServiceImpl implements AlertService {
+  private static final Logger logger = LoggerFactory.getLogger(AlertServiceImpl.class);
+
   private static final String ID = "id";
   private static final String NAME = "name";
 
@@ -41,6 +56,10 @@ public class AlertServiceImpl implements AlertService {
   @NotNull
   private String alertRulesMetadata;
 
+  @Value("${metastore.alertResults}")
+  @NotNull
+  private String alertTriggerLog;
+
   /**
    * Create Alert rule.
    *
@@ -51,10 +70,13 @@ public class AlertServiceImpl implements AlertService {
   public AlertRuleDetails createAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
       Ticket ticket) {
+    logger.info("Inside create alert rule");
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-
     String id = UUID.randomUUID().toString();
     alert.setAlertRulesSysId(id);
+    alert.setCustomerCode(ticket.getCustCode());
+    Long createdTime = System.currentTimeMillis();
+    alert.setCreatedTime(createdTime);
     connection.insert(id, alert);
     return alert;
   }
@@ -72,6 +94,8 @@ public class AlertServiceImpl implements AlertService {
       String alertRuleId,
       Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    Long modifiedTime = System.currentTimeMillis();
+    alertRuleDetails.setModifiedTime(modifiedTime);
     connection.update(alertRuleId, alertRuleDetails);
     return alertRuleDetails;
   }
@@ -83,9 +107,20 @@ public class AlertServiceImpl implements AlertService {
    * @return AlertRulesDetails
    */
   @Override
-  public List<AlertRuleDetails> retrieveAllAlerts(Ticket ticket) {
-
-    return null;
+  public AlertRuleResponse retrieveAllAlerts(Integer pageNumber, Integer pageSize, Ticket ticket) {
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
+    List<AlertRuleDetails> alertRuleList = convertJsonListToAlertRuleList(alertLists);
+    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
+    alertRuleResponse.setAlertRuleDetailsList(alertRuleList);
+    alertRuleResponse.setNumberOfRecords(noOfRecords);
+    return alertRuleResponse;
   }
 
   /**
@@ -97,8 +132,7 @@ public class AlertServiceImpl implements AlertService {
   public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId, Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-    connection.deleteById(alertRuleId);
-    return true;
+      return connection.deleteById(alertRuleId);
   }
 
   /**
@@ -110,24 +144,54 @@ public class AlertServiceImpl implements AlertService {
   @Override
   public AlertRuleDetails getAlertRule(
       @NotNull(message = "alertRuleID cannot be null") @NotNull String alertRuleId, Ticket ticket) {
-
-    return null;
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    JsonNode document = connection.findById(alertRuleId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    AlertRuleDetails alertRule = null;
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    try {
+      alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
+    } catch (JsonProcessingException e) {
+        logger.error("error occured while converting json to alertRuledetails  ");
+      e.printStackTrace();
+    }
+    return alertRule;
   }
 
   /**
    * Get Alert Rules By Category.
    *
-   * @param category Category Id
+   * @param categoryId Category Id
    * @return
    */
   @Override
-  public List<AlertRuleDetails> getAlertRulesByCategory(
-      @NotNull(message = "categoryId cannot be null") @NotNull String category, Ticket ticket) {
-
-    /* Optional<AlertCustomerDetails> alertCustomerDetails =
-        alertCustomerRepository.findByCustomerCode(ticket.getCustCode());
-    List<AlertRulesDetails> alertRulesDetails = alertRulesRepository.findByCategory(category);*/
-    return null;
+  public AlertRuleResponse getAlertRulesByCategory(
+      @NotNull(message = "categoryId cannot be null") @NotNull String categoryId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket ticket) {
+      logger.info("Inside get alert rule by category");
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+    ObjectNode node1 = objectMapper.createObjectNode();
+    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
+    objectNode.put("categoryId", categoryId);
+    ObjectNode node2 = objectMapper.createObjectNode();
+    ObjectNode objectNode1 = node2.putObject(MaprConnection.EQ);
+    objectNode1.put("customerCode", ticket.getCustCode());
+    arrayNode.add(node1);
+    arrayNode.add(node2);
+    logger.debug("Mapr Filter query for alert rule by category:{}", node.toString());
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
+    List<AlertRuleDetails> alertList = convertJsonListToAlertRuleList(alertLists);
+    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
+    alertRuleResponse.setNumberOfRecords(noOfRecords);
+    alertRuleResponse.setAlertRuleDetailsList(alertList);
+    return alertRuleResponse;
   }
 
   /**
@@ -177,20 +241,31 @@ public class AlertServiceImpl implements AlertService {
    */
   @Override
   public AlertStatesResponse getAlertStates(
-      @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
+      @NotNull(message = "alertRuleId cannot be null") String alertRuleId,
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket) {
-    AlertStatesResponse alertStatesResponse = null;
-    /*Long alertRuleSysId =
-        alertRulesRepository.findAlertByCustomer(ticket.getCustCode(), alertRuleId);
-    if (alertRuleSysId != null) {
-      alertStatesResponse = new AlertStatesResponse();
-      Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
-      Page<AlertStates> alertStates = alertTriggerLog.findByAlertRulesSysId(alertRuleId, pageable);
-      alertStatesResponse.setAlertStatesList(alertStates.getContent());
-      alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
-    }*/
+    AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
+    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+    ObjectNode node1 = objectMapper.createObjectNode();
+    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    ObjectNode node2 = objectMapper.createObjectNode();
+    ObjectNode objectNode1 = node2.putObject(MaprConnection.EQ);
+    objectNode1.put("alertRulesSysId", alertRuleId);
+    arrayNode.add(node1);
+    arrayNode.add(node2);
+    logger.info("query :::" + node.toString());
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
+    List<AlertTriggerLog> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setMessage("Success");
+    alertStatesResponse.setNumberOfRecords(noOfRecords);
     return alertStatesResponse;
   }
 
@@ -202,13 +277,20 @@ public class AlertServiceImpl implements AlertService {
    */
   @Override
   public AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket) {
-    /* Pageable pageable = PageRequest.of(pageNumber, pageSize, Direction.DESC, "START_TIME");
+    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    List<JsonNode> alertLists =
+        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
+    List<AlertTriggerLog> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    Page<AlertStates> alertStates = alertTriggerLog.findByAlertStates(pageable);
-    alertStatesResponse.setAlertStatesList(alertStates.getContent());
-    alertStatesResponse.setNumberOfRecords(alertStates.getTotalElements());
-    alertStatesResponse.setMessage("Success");*/
-    return null;
+    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setMessage("Success");
+    alertStatesResponse.setNumberOfRecords(noOfRecords);
+    return alertStatesResponse;
   }
 
   /**
@@ -272,208 +354,163 @@ public class AlertServiceImpl implements AlertService {
    * @return AlertCountResponse
    */
   @Override
-  public List<AlertCountResponse> alertCount(AlertCount alertCount, Long alertRuleSysId) {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    String dateFormatLte = "23:59:59";
-    String dateFormatGte = "00:00:00";
-    String space = " ";
-    Long epochGte = null;
-    Long epochLte = null;
-    String startDate = null;
-    String endDate = null;
-    LocalDateTime now = LocalDateTime.now();
-    if (alertCount.getPreset() == null) {
-      throw new IllegalArgumentException("Preset cannot be null");
-    }
+  public List<AlertCountResponse> alertCount(
+      AlertCount alertCount,
+      Integer pageNumber,
+      Integer pageSize,
+      String alertRuleSysId,
+      Ticket ticket) {
     if (alertCount.getGroupBy() == null) {
       throw new IllegalArgumentException("GroupBy cannot be null");
     }
-    switch (alertCount.getPreset().value()) {
-      case "Yesterday":
-        {
-          LocalDateTime yesterday = now.minusDays(1);
-          endDate = yesterday.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = yesterday.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "Today":
-        {
-          LocalDateTime today = now;
-          endDate = today.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = today.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "YTD":
-        {
-          LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = firstDay.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "MTD":
-        {
-          LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          startDate = firstDayOfMonth.format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "LW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime priorLastWeek = now.minusWeeks(1);
-          LocalDateTime startOfWeek =
-              priorLastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-          LocalDateTime endOfWeek =
-              priorLastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-          startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
-          endDate = (endOfWeek.format(dateTimeFormatter) + space + dateFormatLte);
-          break;
-        }
-      case "TW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime lastWeek = now;
-          LocalDateTime startOfWeek =
-              lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-          startDate = startOfWeek.format(dateTimeFormatter) + space + dateFormatGte;
-          endDate = now.format(dateTimeFormatter) + space + dateFormatLte;
-          break;
-        }
-      case "LTW":
-        {
-          LocalDateTime last2Week = now.minusWeeks(2);
-          endDate =
-              now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-      case "LSW":
-        {
-          DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-          LocalDateTime lastWeek = now.minusWeeks(6);
-          endDate =
-              now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              lastWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter) + space + dateFormatGte;
-          break;
-        }
-
-      case "LQ":
-        {
-          YearQuarter quarter = YearQuarter.now();
-          endDate = quarter.minusQuarters(1).atEndOfQuarter().toString() + space + dateFormatLte;
-          startDate = quarter.minusQuarters(1).atDay(1).toString() + space + dateFormatGte;
-          break;
-        }
-      case "LM":
-        {
-          LocalDateTime lastMonth = now.minusMonths(1);
-          startDate =
-              lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          endDate =
-              lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          break;
-        }
-      case "LTM":
-        {
-          LocalDateTime last3Month = now.minusMonths(3);
-          endDate =
-              now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "LSM":
-        {
-          LocalDateTime last6Months = now.minusMonths(6);
-          endDate =
-              now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "LY":
-        {
-          LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
-          endDate =
-              currentDayOflastYearDate
-                      .with(TemporalAdjusters.lastDayOfYear())
-                      .format(dateTimeFormatter)
-                  + space
-                  + dateFormatLte;
-          startDate =
-              currentDayOflastYearDate
-                      .with(TemporalAdjusters.firstDayOfYear())
-                      .format(dateTimeFormatter)
-                  + space
-                  + dateFormatGte;
-          break;
-        }
-      case "BTW":
-        {
-          if (alertCount.getStartTime() == null) {
-            throw new IllegalArgumentException("Start time is missing for custom date filter");
-          } else if (alertCount.getEndTime() == null) {
-            throw new IllegalArgumentException("End date is missing for custom date filter");
-          }
-          break;
-        }
-      default:
-        throw new IllegalArgumentException(alertCount.getPreset() + " not present");
-    }
-    if (!(alertCount.getPreset() == Preset.BTW)) {
-      epochGte = getEpochFromDateTime(startDate);
-      epochLte = getEpochFromDateTime(endDate);
-    } else {
-      epochGte = alertCount.getStartTime();
-      epochLte = alertCount.getEndTime();
-    }
-
+    Map<String, Long> epochTimeMap =
+        AlertUtils.getEpochTimeForPreset(
+            alertCount.getPreset(), alertCount.getStartTime(), alertCount.getEndTime());
+    Long epochGte = epochTimeMap.get("startTime");
+    Long epochLte = epochTimeMap.get("endTime");
+    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
+    String query;
     if (alertCount.getGroupBy() == GroupBy.SEVERITY) {
-      if (alertRuleSysId != null) {
-        return null;
-        // alertTriggerLog.alertCountBySeverityForAlertId(epochGte, epochLte, alertRuleSysId);
+      if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
+        query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
+        List<JsonNode> result =
+            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
+        List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+        return groupByseverity(list);
       }
-      return null;
-      // alertTriggerLog.alertCountBySeverity(epochGte, epochLte);
+      query = getQueryForAlertCount(epochGte, epochLte, ticket);
+      List<JsonNode> result =
+          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
+      List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+      return groupByseverity(list);
+
     } else {
-      if (alertRuleSysId != null) {
-        return null;
-        // alertTriggerLog.alertCountByDateForAlertId(epochGte, epochLte, alertRuleSysId);
+      if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
+        query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
+        List<JsonNode> result =
+            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
+        List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+        return groupByDate(list);
       }
-      return null;
-      // alertTriggerLog.alertCountByDate(epochGte, epochLte);
+      query = getQueryForAlertCount(epochGte, epochLte, ticket);
+      List<JsonNode> result =
+          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
+      List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+      return groupByDate(list);
     }
   }
 
-  /**
-   * Return timestamp from the given date.
-   *
-   * @param date String
-   * @return Long
-   */
-  private Long getEpochFromDateTime(String date) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    LocalDateTime ldt = LocalDateTime.parse(date, formatter);
-    ZoneId zoneId = ZoneId.systemDefault();
-    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
-    return epochValue;
+  private List<AlertCountResponse> groupByseverity(List<AlertTriggerLog> list) {
+    List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
+    Map<AlertSeverity, Long> groupByServrity =
+        list.stream()
+            .collect(
+                Collectors.groupingBy(AlertTriggerLog::getAlertSeverity, Collectors.counting()));
+    groupByServrity.forEach(
+        (severity, count) -> {
+          AlertCountResponse countResponse = new AlertCountResponse(null, count, severity);
+          response.add(countResponse);
+        });
+    return response;
+  }
+
+  private List<AlertCountResponse> groupByDate(List<AlertTriggerLog> list) {
+    List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
+    Map<String, Long> groupByServrity =
+        list.stream()
+            .collect(
+                Collectors.groupingBy(
+                    alertTriggerLog -> {
+                      Long startTime = alertTriggerLog.getStartTime();
+                      Date date = new Date(startTime);
+                      DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                      return df.format(date);
+                    },
+                    Collectors.counting()));
+    groupByServrity.forEach(
+        (date, count) -> {
+          AlertCountResponse countResponse = new AlertCountResponse(date, count, null);
+          response.add(countResponse);
+        });
+    return response;
+  }
+
+  private String getQueryForAlertCountByAlertRuleId(
+      Long epochGte, Long epochLte, Ticket ticket, String alertRuleSysId) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+    ObjectNode node1 = objectMapper.createObjectNode();
+    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    ObjectNode node2 = objectMapper.createObjectNode();
+    ObjectNode objectNode1 = node2.putObject(MaprConnection.GTE);
+    objectNode1.put("startTime", epochGte);
+    ObjectNode node3 = objectMapper.createObjectNode();
+    ObjectNode objectNode2 = node3.putObject(MaprConnection.LTE);
+    objectNode2.put("startTime", epochLte);
+    ObjectNode node4 = objectMapper.createObjectNode();
+    ObjectNode objectNode3 = node4.putObject(MaprConnection.EQ);
+    objectNode3.put("alertRulesSysId", alertRuleSysId);
+    arrayNode.add(node1);
+    arrayNode.add(node2);
+    arrayNode.add(node3);
+    arrayNode.add(node4);
+    return node.toString();
+  }
+
+  private String getQueryForAlertCount(Long epochGte, Long epochLte, Ticket ticket) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+    ObjectNode node1 = objectMapper.createObjectNode();
+    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
+    objectNode.put("customerCode", ticket.getCustCode());
+    ObjectNode node2 = objectMapper.createObjectNode();
+    ObjectNode objectNode1 = node2.putObject(MaprConnection.GTE);
+    objectNode1.put("startTime", epochGte);
+    ObjectNode node3 = objectMapper.createObjectNode();
+    ObjectNode objectNode2 = node3.putObject(MaprConnection.LTE);
+    objectNode2.put("startTime", epochLte);
+    arrayNode.add(node1);
+    arrayNode.add(node2);
+    arrayNode.add(node3);
+    return node.toString();
+  }
+
+  private List<AlertRuleDetails> convertJsonListToAlertRuleList(List<JsonNode> alertLists) {
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
+    ObjectReader reader =
+        mapper
+            .readerFor(new TypeReference<List<AlertRuleDetails>>() {})
+            .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    List<AlertRuleDetails> alertList = null;
+    try {
+      reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      alertList = reader.readValue(jsonNode);
+      return alertList;
+    } catch (IOException e) {
+      logger.error("exeception e" + e);
+      throw new RuntimeException("Exeception occured while parsing the results");
+    }
+  }
+
+  private List<AlertTriggerLog> convertJsonListToAlertTriggerList(List<JsonNode> alertLists) {
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
+    ObjectReader reader =
+        mapper
+            .readerFor(new TypeReference<List<AlertTriggerLog>>() {})
+            .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    List<AlertTriggerLog> alertTriggerList = null;
+    try {
+      reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      alertTriggerList = reader.readValue(jsonNode);
+      return alertTriggerList;
+    } catch (IOException e) {
+      logger.error("exeception e" + e);
+      throw new RuntimeException("Exeception occured while parsing the results");
+    }
   }
 }

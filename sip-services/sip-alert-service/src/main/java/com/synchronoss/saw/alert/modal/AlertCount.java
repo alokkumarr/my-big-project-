@@ -100,7 +100,7 @@ public class AlertCount {
   }
 
   public enum GroupBy {
-    DATE("StartTime"),
+    STARTTIME("StartTime"),
     SEVERITY("Severity");
     private final String value;
     private static final Map<String, AlertCount.GroupBy> CONSTANTS =
