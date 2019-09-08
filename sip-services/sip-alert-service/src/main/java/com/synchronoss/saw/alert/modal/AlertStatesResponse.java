@@ -4,7 +4,7 @@ import java.util.List;
 
 public class AlertStatesResponse {
 
-  private List<AlertTriggerLog> alertStatesList;
+  private List<AlertResult> alertStatesList;
   private String message;
   private Long numberOfRecords;
 
@@ -13,12 +13,12 @@ public class AlertStatesResponse {
    *
    * @return alertstatesList
    */
-  public List<AlertTriggerLog> getAlertStatesList() {
+  public List<AlertResult> getAlertStatesList() {
     return alertStatesList;
   }
 
   /** Sets alertstatesList. */
-  public void setAlertStatesList(List<AlertTriggerLog> alertStatesList) {
+  public void setAlertStatesList(List<AlertResult> alertStatesList) {
     this.alertStatesList = alertStatesList;
   }
 
