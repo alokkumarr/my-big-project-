@@ -110,6 +110,12 @@
         <groupId>com.mapr.streams</groupId>
         <artifactId>mapr-streams</artifactId>
         <version>${mapr.version}</version>
+        <exclusions>
+        <exclusion>
+          <artifactId>slf4j-log4j12</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
