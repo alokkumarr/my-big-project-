@@ -2,21 +2,27 @@ package com.synchronoss.saw.alert.modal;
 
 public class AlertTriggerLog {
 
-  String alertTriggerSysId;
+  private String alertTriggerSysId;
 
-  String alertRulesSysId;
+  private String alertRulesSysId;
 
-  AlertState alertState;
+  private AlertState alertState;
 
-  AlertSeverity alertSeverity;
+  private AlertSeverity alertSeverity;
 
-  Long startTime;
+  private Long startTime;
 
-  Double thresholdValue;
+  private Double thresholdValue;
 
-  Double metricValue;
+  private Double metricValue;
 
-  Long lastUpdatedTime;
+  private Long lastUpdatedTime;
+
+  private String alertName;
+
+  private String alertDescription;
+
+  private String categoryId;
 
   /**
    * Gets alertTriggerSysId.
@@ -128,5 +134,47 @@ public class AlertTriggerLog {
   /** Sets lastUpdatedTime. */
   public void setLastUpdatedTime(Long lastUpdatedTime) {
     this.lastUpdatedTime = lastUpdatedTime;
+  }
+
+  /**
+   * Gets alert name.
+   *
+   * @return alert name
+   */
+  public String getAlertName() {
+    return alertName;
+  }
+
+  /** Sets alert name. */
+  public void setAlertName(String alertName) {
+    this.alertName = alertName;
+  }
+
+  /**
+   * Gets Alert Description.
+   *
+   * @return alert description
+   */
+  public String getAlertDescription() {
+    return alertDescription;
+  }
+
+  /** Sets alert description. */
+  public void setAlertDescription(String alertDescription) {
+    this.alertDescription = alertDescription;
+  }
+
+  /**
+   * Gets category id.
+   *
+   * @return category id
+   */
+  public String getCategoryId() {
+    return categoryId;
+  }
+
+  /** Sets category id. */
+  public void setCategoryId(String categoryId) {
+    this.categoryId = categoryId;
   }
 }

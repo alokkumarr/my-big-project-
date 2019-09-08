@@ -4,6 +4,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
+import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import java.util.List;
 import javax.validation.Valid;
@@ -15,9 +16,10 @@ public interface AlertService {
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
       Ticket ticket);
 
-  List<AlertRuleDetails> retrieveAllAlerts(
+  AlertRuleResponse retrieveAllAlerts(
       @NotNull(message = "Fetch all alerts rule details") Integer pageNumber,
-      Integer pageSize, Ticket ticket);
+      Integer pageSize,
+      Ticket ticket);
 
   AlertRuleDetails updateAlertRule(
       @NotNull(message = "Alert definition cannot be null") @Valid AlertRuleDetails alert,
@@ -30,9 +32,11 @@ public interface AlertService {
   AlertRuleDetails getAlertRule(
       @NotNull(message = "alertRuleId cannot be null") String alertRuleId, Ticket ticket);
 
-  List<AlertRuleDetails> getAlertRulesByCategory(
-      @NotNull(message = "categoryID cannot be null") String categoryId, Integer pageNumber,
-      Integer pageSize,Ticket token);
+  AlertRuleResponse getAlertRulesByCategory(
+      @NotNull(message = "categoryID cannot be null") String categoryId,
+      Integer pageNumber,
+      Integer pageSize,
+      Ticket token);
 
   String retrieveOperatorsDetails(
       @NotNull(message = "Fetch all alerts rule operators details") Ticket ticket);
@@ -40,12 +44,17 @@ public interface AlertService {
   String retrieveAggregations(Ticket ticket);
 
   AlertStatesResponse getAlertStates(
-      @NotNull(message = "alertRuleId cannot be null") Long alertRuleId,
+      @NotNull(message = "alertRuleId cannot be null") String alertRuleId,
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket);
 
   AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
 
-  List<AlertCountResponse> alertCount(AlertCount alertCount, String alertRuleSysId);
+  List<AlertCountResponse> alertCount(
+      AlertCount alertCount,
+      Integer pageNumber,
+      Integer pageSize,
+      String alertRuleSysId,
+      Ticket ticket);
 }

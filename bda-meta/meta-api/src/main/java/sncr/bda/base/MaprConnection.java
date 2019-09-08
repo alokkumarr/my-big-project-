@@ -26,8 +26,12 @@ public class MaprConnection {
   private static final String OJAI_MAPR = "ojai:mapr:";
   private DocumentStore store;
   private Connection connection;
-  public static final String EQ ="$eq";
-  public static final String AND ="$and";
+  public static final String EQ = "$eq";
+  public static final String AND = "$and";
+  public static final String GTE = "$ge";
+  public static final String LTE = "$le";
+  public static final String GT = "$gt";
+  public static final String LT = "$lt";
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -149,6 +153,22 @@ public class MaprConnection {
       }
     }
     return resultSet;
+  }
+
+  /**
+   * calculates count for a query with filters.
+   *
+   * @param filter
+   * @return count of no of documents
+   */
+  public Long getCountForQueryWithFilter(String filter) {
+    final Query query = connection.newQuery().where(filter).build();
+    final DocumentStream stream = store.find(query);
+    Long count = 0L;
+    for (Document document : stream) {
+      count++;
+    }
+    return count;
   }
 
   /**
