@@ -1,11 +1,9 @@
 package com.synchronoss.saw.alert.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonArray;
@@ -22,7 +20,6 @@ import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,9 +112,9 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertRuleList = convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertRuleList =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setAlertRuleDetailsList(alertRuleList);
@@ -134,7 +131,7 @@ public class AlertServiceImpl implements AlertService {
   public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId, Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-      return connection.deleteById(alertRuleId);
+    return connection.deleteById(alertRuleId);
   }
 
   /**
@@ -154,7 +151,7 @@ public class AlertServiceImpl implements AlertService {
     try {
       alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
     } catch (JsonProcessingException e) {
-        logger.error("error occured while converting json to alertRuledetails  ");
+      logger.error("error occured while converting json to alertRuledetails  ");
       e.printStackTrace();
     }
     return alertRule;
@@ -172,7 +169,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket) {
-      logger.info("Inside get alert rule by category");
+    logger.info("Inside get alert rule by category");
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
@@ -186,9 +183,9 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node1);
     arrayNode.add(node2);
     logger.debug("Mapr Filter query for alert rule by category:{}", node.toString());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertList = convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertList =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setNumberOfRecords(noOfRecords);
@@ -261,11 +258,11 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node1);
     arrayNode.add(node2);
     logger.info("query :::" + node.toString());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertResultLists =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
-    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
     return alertStatesResponse;
@@ -284,12 +281,12 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertResultLists =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
     return alertStatesResponse;
@@ -375,30 +372,30 @@ public class AlertServiceImpl implements AlertService {
     if (alertCount.getGroupBy() == GroupBy.SEVERITY) {
       if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<JsonNode> result =
-            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
+        List<AlertResult> list =
+            connection.runMaprDbQueryWithFilter(
+                query, pageNumber, pageSize, "createdTime", AlertResult.class);
         return groupByseverity(list);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<JsonNode> result =
-          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-      return groupByseverity(list);
+      List<AlertResult> result =
+          connection.runMaprDbQueryWithFilter(
+              query, pageNumber, pageSize, "createdTime", AlertResult.class);
+      return groupByseverity(result);
 
     } else {
       if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<JsonNode> result =
-            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-        return groupByDate(list);
+        List<AlertResult> result =
+            connection.runMaprDbQueryWithFilter(
+                query, pageNumber, pageSize, "createdTime", AlertResult.class);
+        return groupByDate(result);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<JsonNode> result =
-          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-      return groupByDate(list);
+      List<AlertResult> result =
+          connection.runMaprDbQueryWithFilter(
+              query, pageNumber, pageSize, "createdTime", AlertResult.class);
+      return groupByDate(result);
     }
   }
 
@@ -406,8 +403,7 @@ public class AlertServiceImpl implements AlertService {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<AlertSeverity, Long> groupByServrity =
         list.stream()
-            .collect(
-                Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
+            .collect(Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
     groupByServrity.forEach(
         (severity, count) -> {
           AlertCountResponse countResponse = new AlertCountResponse(null, count, severity);
@@ -478,41 +474,5 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node2);
     arrayNode.add(node3);
     return node.toString();
-  }
-
-  private List<AlertRuleDetails> convertJsonListToAlertRuleList(List<JsonNode> alertLists) {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
-    ObjectReader reader =
-        mapper
-            .readerFor(new TypeReference<List<AlertRuleDetails>>() {})
-            .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    List<AlertRuleDetails> alertList = null;
-    try {
-      reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      alertList = reader.readValue(jsonNode);
-      return alertList;
-    } catch (IOException e) {
-      logger.error("exeception e" + e);
-      throw new RuntimeException("Exeception occured while parsing the results");
-    }
-  }
-
-  private List<AlertResult> convertJsonListToAlertTriggerList(List<JsonNode> alertLists) {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
-    ObjectReader reader =
-        mapper
-            .readerFor(new TypeReference<List<AlertResult>>() {})
-            .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    List<AlertResult> alertTriggerList = null;
-    try {
-      reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      alertTriggerList = reader.readValue(jsonNode);
-      return alertTriggerList;
-    } catch (IOException e) {
-      logger.error("exeception e" + e);
-      throw new RuntimeException("Exeception occured while parsing the results");
-    }
   }
 }
