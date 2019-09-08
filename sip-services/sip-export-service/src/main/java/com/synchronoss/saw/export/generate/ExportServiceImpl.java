@@ -391,12 +391,12 @@ public class ExportServiceImpl implements ExportService {
 
   /**
    * @param response
-   * @param LimittoExport
+   * @param limitToExport
    * @param exportBean
    * @throws IOException
    */
   public Boolean streamToXlsxReport(
-      List<Field> fields, DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
+      List<Field> fields, DataResponse response, long limitToExport, ExportBean exportBean) throws IOException {
 
     List<Object> data = response.getData();
     if (data == null || data.size() == 0) {
@@ -413,7 +413,7 @@ public class ExportServiceImpl implements ExportService {
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, data);
+      xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, data, limitToExport);
       workBook.write(stream);
     } finally {
       stream.flush();

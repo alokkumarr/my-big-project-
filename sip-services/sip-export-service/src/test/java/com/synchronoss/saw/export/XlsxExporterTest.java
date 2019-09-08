@@ -8,7 +8,7 @@ import com.synchronoss.saw.model.Field;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -101,10 +101,10 @@ public class XlsxExporterTest {
 
   @Test
   public void mockTest() {
-    Workbook workBook = new XSSFWorkbook();
+    Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
-    xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, dataResponse.getData());
+    xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, dataResponse.getData(), 3l);
     assertEquals(sheet.getPhysicalNumberOfRows(), 4);
   }
 

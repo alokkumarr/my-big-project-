@@ -135,14 +135,14 @@ public class XlsxExporter implements IFileExporter {
    * @param recordRow
    */
   public void buildXlsxSheet(
-      List<Field> fields, ExportBean exportBean, Workbook workBook, SXSSFSheet workSheet, List<Object> recordRow) {
+      List<Field> fields, ExportBean exportBean, Workbook workBook, SXSSFSheet workSheet, List<Object> recordRow, Long limitToExport) {
     logger.debug(this.getClass().getName() + " addXlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     String[] header = null;
     CellStyle cellStyle = workBook.createCellStyle();
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
-    for (int rowNum = 0; rowNum < recordRow.size(); rowNum++) {
+    for (int rowNum = 0; rowNum < recordRow.size() && recordRow.size() <= limitToExport; rowNum++) {
       SXSSFRow excelRow = workSheet.createRow(rowNum + 1);
       Object data = recordRow.get(rowNum);
 
