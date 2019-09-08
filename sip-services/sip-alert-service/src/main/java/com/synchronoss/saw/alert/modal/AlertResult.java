@@ -1,6 +1,6 @@
 package com.synchronoss.saw.alert.modal;
 
-public class AlertTriggerLog {
+public class AlertResult {
 
   private String alertTriggerSysId;
 

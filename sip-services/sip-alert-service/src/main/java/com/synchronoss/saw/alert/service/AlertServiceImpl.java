@@ -18,7 +18,7 @@ import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertSeverity;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
-import com.synchronoss.saw.alert.modal.AlertTriggerLog;
+import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
@@ -261,7 +261,7 @@ public class AlertServiceImpl implements AlertService {
     logger.info("query :::" + node.toString());
     List<JsonNode> alertLists =
         connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertTriggerLog> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     alertStatesResponse.setAlertStatesList(alertTriggerList);
     alertStatesResponse.setMessage("Success");
@@ -284,7 +284,7 @@ public class AlertServiceImpl implements AlertService {
     objectNode.put("customerCode", ticket.getCustCode());
     List<JsonNode> alertLists =
         connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertTriggerLog> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
     alertStatesResponse.setAlertStatesList(alertTriggerList);
@@ -375,13 +375,13 @@ public class AlertServiceImpl implements AlertService {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
         List<JsonNode> result =
             connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
         return groupByseverity(list);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
       List<JsonNode> result =
           connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
       return groupByseverity(list);
 
     } else {
@@ -389,23 +389,23 @@ public class AlertServiceImpl implements AlertService {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
         List<JsonNode> result =
             connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
         return groupByDate(list);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
       List<JsonNode> result =
           connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertTriggerLog> list = convertJsonListToAlertTriggerList(result);
+      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
       return groupByDate(list);
     }
   }
 
-  private List<AlertCountResponse> groupByseverity(List<AlertTriggerLog> list) {
+  private List<AlertCountResponse> groupByseverity(List<AlertResult> list) {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<AlertSeverity, Long> groupByServrity =
         list.stream()
             .collect(
-                Collectors.groupingBy(AlertTriggerLog::getAlertSeverity, Collectors.counting()));
+                Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
     groupByServrity.forEach(
         (severity, count) -> {
           AlertCountResponse countResponse = new AlertCountResponse(null, count, severity);
@@ -414,7 +414,7 @@ public class AlertServiceImpl implements AlertService {
     return response;
   }
 
-  private List<AlertCountResponse> groupByDate(List<AlertTriggerLog> list) {
+  private List<AlertCountResponse> groupByDate(List<AlertResult> list) {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<String, Long> groupByServrity =
         list.stream()
@@ -496,14 +496,14 @@ public class AlertServiceImpl implements AlertService {
     }
   }
 
-  private List<AlertTriggerLog> convertJsonListToAlertTriggerList(List<JsonNode> alertLists) {
+  private List<AlertResult> convertJsonListToAlertTriggerList(List<JsonNode> alertLists) {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
     ObjectReader reader =
         mapper
-            .readerFor(new TypeReference<List<AlertTriggerLog>>() {})
+            .readerFor(new TypeReference<List<AlertResult>>() {})
             .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    List<AlertTriggerLog> alertTriggerList = null;
+    List<AlertResult> alertTriggerList = null;
     try {
       reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       alertTriggerList = reader.readValue(jsonNode);
