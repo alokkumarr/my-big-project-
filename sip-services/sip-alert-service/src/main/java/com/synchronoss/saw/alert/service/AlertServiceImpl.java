@@ -77,6 +77,7 @@ public class AlertServiceImpl implements AlertService {
     alert.setCustomerCode(ticket.getCustCode());
     Long createdTime = System.currentTimeMillis();
     alert.setCreatedTime(createdTime);
+    alert.setCreatedBy(ticket.getUserFullName());
     connection.insert(id, alert);
     return alert;
   }
@@ -96,6 +97,7 @@ public class AlertServiceImpl implements AlertService {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     Long modifiedTime = System.currentTimeMillis();
     alertRuleDetails.setModifiedTime(modifiedTime);
+    alertRuleDetails.setUpdatedBy(ticket.getUserFullName());
     connection.update(alertRuleId, alertRuleDetails);
     return alertRuleDetails;
   }

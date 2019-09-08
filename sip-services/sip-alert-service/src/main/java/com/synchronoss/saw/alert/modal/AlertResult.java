@@ -1,5 +1,7 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.synchronoss.saw.model.SipQuery;
+
 public class AlertResult {
 
   private String alertTriggerSysId;
@@ -24,7 +26,7 @@ public class AlertResult {
 
   private String categoryId;
 
-  private String sipQuery;
+  private SipQuery sipQuery;
 
   /**
    * Gets alertTriggerSysId.
@@ -185,12 +187,12 @@ public class AlertResult {
    *
    * @return value of sipQuery
    */
-  public String getSipQuery() {
+  public SipQuery getSipQuery() {
     return sipQuery;
   }
 
   /** Sets sipQuery. */
-  public void setSipQuery(String sipQuery) {
+  public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
   }
 }
