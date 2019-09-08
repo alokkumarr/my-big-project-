@@ -77,10 +77,11 @@ public class ElasticSearchQueryBuilder {
 
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
+    List <Filter> aggregationFilter = SIPAggregationBuilder.getAggregationFilter(sipQuery.getFilters());
 
     // Generated Query
     searchSourceBuilder =
-        buildAggregations(dataFields, aggregationFields, searchSourceBuilder, size);
+        buildAggregations(dataFields, aggregationFields,aggregationFilter, searchSourceBuilder, size);
     return searchSourceBuilder.toString();
   }
 
@@ -214,6 +215,7 @@ public class ElasticSearchQueryBuilder {
   public SearchSourceBuilder buildAggregations(
       List<Field> dataFields,
       List<Field> aggregationFields,
+      List<Filter> aggregationFilter,
       SearchSourceBuilder searchSourceBuilder,
       Integer size) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
@@ -230,7 +232,7 @@ public class ElasticSearchQueryBuilder {
       } else {
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, 0, 0, aggregationBuilder);
+                dataFields, aggregationFields, aggregationFilter,0, 0, aggregationBuilder);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
@@ -247,7 +249,9 @@ public class ElasticSearchQueryBuilder {
   public List<QueryBuilder> buildFilters(List<Filter> filters, List<QueryBuilder> builder) {
     for (Filter item : filters) {
       if ((item.getIsRuntimeFilter() == null || !item.getIsRuntimeFilter())
-          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())) {
+          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())
+          // skip the Aggregated filter since it will added based on aggregated data.
+          && (item.getAggregationFilter() == null || !item.getAggregationFilter())) {
 
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
