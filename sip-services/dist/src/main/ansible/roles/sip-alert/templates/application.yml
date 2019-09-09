@@ -3,27 +3,10 @@ info:
 spring:
   application:
     name: sip-alert-service
-  #mariaDB (Alert) DB details
-  datasource:
-    url: jdbc:mariadb://localhost:3306/sip_alert
-    username: sip_alert
-    password: {{ sip_alert_db_password }}
-    driver-class-name: org.mariadb.jdbc.Driver
-    max-active: 25
-    testOnBorrow: true
-    testOnConnect: true
-    testOnReturn: true
-    validationQuery: SELECT 1
-    testWhileIdle: true
-    logValidationErrors: true
-
-  flyway:
-    baselineOnMigrate:: true
 logging:
   level:
     com.synchronoss.sip: INFO
     org.springframework: INFO
-    org.hibernate.type : INFO
 
 server:
   address: localhost
@@ -84,5 +67,7 @@ metastore:
   alertRulesTable: alertRulesMetadata
   alertResults: alertResults
   notificationTable : alertNoficationLog
+
+sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
 
 

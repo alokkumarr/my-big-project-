@@ -14,11 +14,11 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCount.GroupBy;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
+import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertSeverity;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
-import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
@@ -115,7 +115,7 @@ public class AlertServiceImpl implements AlertService {
     objectNode.put("customerCode", ticket.getCustCode());
     List<JsonNode> alertLists =
         connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertRuleList = convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertRuleList = AlertUtils.convertJsonListToAlertRuleList(alertLists);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setAlertRuleDetailsList(alertRuleList);
@@ -132,7 +132,7 @@ public class AlertServiceImpl implements AlertService {
   public Boolean deleteAlertRule(
       @NotNull(message = "Alert Id cannot be null") @NotNull String alertRuleId, Ticket ticket) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-      return connection.deleteById(alertRuleId);
+    return connection.deleteById(alertRuleId);
   }
 
   /**
@@ -152,7 +152,7 @@ public class AlertServiceImpl implements AlertService {
     try {
       alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
     } catch (JsonProcessingException e) {
-        logger.error("error occured while converting json to alertRuledetails  ");
+      logger.error("error occured while converting json to alertRuledetails  ");
       e.printStackTrace();
     }
     return alertRule;
@@ -170,7 +170,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageNumber,
       Integer pageSize,
       Ticket ticket) {
-      logger.info("Inside get alert rule by category");
+    logger.info("Inside get alert rule by category");
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
@@ -186,7 +186,7 @@ public class AlertServiceImpl implements AlertService {
     logger.debug("Mapr Filter query for alert rule by category:{}", node.toString());
     List<JsonNode> alertLists =
         connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertList = convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertList = AlertUtils.convertJsonListToAlertRuleList(alertLists);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setNumberOfRecords(noOfRecords);
@@ -246,7 +246,6 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       Ticket ticket) {
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
     ArrayNode arrayNode = node.putArray(MaprConnection.AND);
@@ -259,6 +258,7 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node1);
     arrayNode.add(node2);
     logger.info("query :::" + node.toString());
+    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
     List<JsonNode> alertLists =
         connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
     List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
@@ -404,8 +404,7 @@ public class AlertServiceImpl implements AlertService {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<AlertSeverity, Long> groupByServrity =
         list.stream()
-            .collect(
-                Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
+            .collect(Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
     groupByServrity.forEach(
         (severity, count) -> {
           AlertCountResponse countResponse = new AlertCountResponse(null, count, severity);
@@ -439,7 +438,6 @@ public class AlertServiceImpl implements AlertService {
       Long epochGte, Long epochLte, Ticket ticket, String alertRuleSysId) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
-    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     ObjectNode node1 = objectMapper.createObjectNode();
     ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
@@ -452,6 +450,7 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node4 = objectMapper.createObjectNode();
     ObjectNode objectNode3 = node4.putObject(MaprConnection.EQ);
     objectNode3.put("alertRulesSysId", alertRuleSysId);
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     arrayNode.add(node1);
     arrayNode.add(node2);
     arrayNode.add(node3);
@@ -462,7 +461,6 @@ public class AlertServiceImpl implements AlertService {
   private String getQueryForAlertCount(Long epochGte, Long epochLte, Ticket ticket) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
-    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     ObjectNode node1 = objectMapper.createObjectNode();
     ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
@@ -472,28 +470,11 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node3 = objectMapper.createObjectNode();
     ObjectNode objectNode2 = node3.putObject(MaprConnection.LTE);
     objectNode2.put("startTime", epochLte);
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     arrayNode.add(node1);
     arrayNode.add(node2);
     arrayNode.add(node3);
     return node.toString();
-  }
-
-  private List<AlertRuleDetails> convertJsonListToAlertRuleList(List<JsonNode> alertLists) {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode jsonNode = mapper.createArrayNode().addAll(alertLists);
-    ObjectReader reader =
-        mapper
-            .readerFor(new TypeReference<List<AlertRuleDetails>>() {})
-            .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    List<AlertRuleDetails> alertList = null;
-    try {
-      reader.without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      alertList = reader.readValue(jsonNode);
-      return alertList;
-    } catch (IOException e) {
-      logger.error("exeception e" + e);
-      throw new RuntimeException("Exeception occured while parsing the results");
-    }
   }
 
   private List<AlertResult> convertJsonListToAlertTriggerList(List<JsonNode> alertLists) {

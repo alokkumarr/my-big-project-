@@ -24,7 +24,7 @@ public class AlertRuleDetails {
   private Aggregate aggregationType;
   private Operator operator;
   private String metricsColumn;
-  private String thresholdValue;
+  private Double thresholdValue;
   private List<Filter> filters;
   private Long createdTime;
   private Long modifiedTime;
@@ -262,12 +262,12 @@ public class AlertRuleDetails {
    *
    * @return value of thresholdValue
    */
-  public String getThresholdValue() {
+  public Double getThresholdValue() {
     return thresholdValue;
   }
 
   /** Sets thresholdValue. */
-  public void setThresholdValue(String thresholdValue) {
+  public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
   }
 

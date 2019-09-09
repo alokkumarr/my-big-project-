@@ -33,7 +33,12 @@ storage-proxy:
   service:
     host: http://localhost:9400
 metastore:
-  base:  maprfs:///var/sip/
+  base:  hdfs:///var/sip/
   alertRulesTable: alertRulesMetadata
   alertResults: alertResults
   notificationTable : alertNoficationLog
+
+connector: http
+
+sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
+max-number-of-alert-per-rules: 10000

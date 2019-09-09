@@ -225,13 +225,15 @@ public class StorageProxyController {
     if (sipdsl == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
+    Boolean isAlert = sipdsl.getType().equalsIgnoreCase("alert");
+    Ticket authTicket = request != null && !isAlert ? getTicket(request) : null;
+    if (authTicket == null && !isAlert) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+      List<TicketDSKDetails> dskList =
+          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -239,6 +241,7 @@ public class StorageProxyController {
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     String analysisType = sipdsl.getType();
+
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
@@ -359,7 +362,7 @@ public class StorageProxyController {
         proxyService.saveDslExecutionResult(executionResult);
       }
       if (!analysis.getType().equalsIgnoreCase("report")) {
-          logger.info("analysis ."+"not a DL report");
+        logger.info("analysis ." + "not a DL report");
         if (tempExecutionType) {
           ExecutionResult executionResult =
               buildExecutionResult(
@@ -400,7 +403,8 @@ public class StorageProxyController {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
     }
-    logger.trace("response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
+    logger.trace(
+        "response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
     return executeResponse;
   }
 

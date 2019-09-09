@@ -21,18 +21,17 @@ import org.slf4j.LoggerFactory;
 
 public class MaprConnection {
 
-  protected static final String METASTORE = "services/metadata";
-  private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
-  private static final String OJAI_MAPR = "ojai:mapr:";
-  private DocumentStore store;
-  private Connection connection;
   public static final String EQ = "$eq";
   public static final String AND = "$and";
   public static final String GTE = "$ge";
   public static final String LTE = "$le";
   public static final String GT = "$gt";
   public static final String LT = "$lt";
-
+  protected static final String METASTORE = "services/metadata";
+  private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
+  private static final String OJAI_MAPR = "ojai:mapr:";
+  private DocumentStore store;
+  private Connection connection;
   private ObjectMapper objectMapper = new ObjectMapper();
 
   public MaprConnection(String basePath, String tableName) {
@@ -45,11 +44,12 @@ public class MaprConnection {
     store = connection.getStore(storeName);
   }
 
-    /**
-     * This method will insert the document in maprDB.
-     * @param id Document Id
-     * @param rowData Row Data
-     */
+  /**
+   * This method will insert the document in maprDB.
+   *
+   * @param id Document Id
+   * @param rowData Row Data
+   */
   public void insert(String id, Object rowData) {
     Document document = connection.newDocument(rowData);
     store.insert(id, document);
@@ -57,6 +57,7 @@ public class MaprConnection {
 
   /**
    * This method will update the document in maprDB.
+   *
    * @param id Document Id
    * @param rowData Row Data
    */
@@ -82,6 +83,7 @@ public class MaprConnection {
 
   /**
    * by document ID.
+   *
    * @param documentId
    * @return
    */
@@ -143,11 +145,35 @@ public class MaprConnection {
         // MaprDB document stream doesn't supports the stream skip, considered the additional
         // logic to ignore additional documents.
         if (pageNumber > 1 && count < (pageNumber - 1 * pageSize)) {
-            // ignore the document
+          // ignore the document
           count++;
         } else {
           resultSet.add(objectMapper.readTree(document.asJsonString()));
         }
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param filter
+   * @param orderBy
+   * @return list
+   */
+  public List<JsonNode> runMaprDbQueryWithFilter(String filter, String orderBy) {
+    final Query query =
+        connection.newQuery().orderBy(orderBy, SortOrder.DESC).where(filter).build();
+
+    final DocumentStream stream = store.find(query);
+    List<JsonNode> resultSet = new ArrayList<>();
+    Integer count = 0;
+    for (final Document document : stream) {
+      try {
+        resultSet.add(objectMapper.readTree(document.asJsonString()));
       } catch (IOException e) {
         throw new RuntimeException("error occurred while reading the documents", e);
       }
