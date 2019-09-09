@@ -81,6 +81,10 @@
   command: systemctl stop sip-transport*.socket
 - name: Stop systemd units with old sip-transport-service before upgrading
   command: systemctl stop sip-transport*
+- name: Uninstall and Remove transport Service
+  yum: name=sip-transport* state=absent
+- name: Run command to remove the failed status for old sip-transport-service before upgrading
+  command: systemctl reset-failed
 - name: Ensure a list of packages installed
   yum:
     name: "{{ packages }}"
