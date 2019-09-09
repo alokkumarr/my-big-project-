@@ -54,7 +54,6 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -738,7 +737,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         "executedBy",
         "executionType",
         "analysis",
-          "recordCount"
+        "data",
+        "recordCount"
       };
       if (maprConnection == null) {
         maprConnection = new MaprConnection(basePath, executionResultTable);
@@ -774,6 +774,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                 "executedBy",
                 "executionType",
                 "analysis",
+                "data",
                 "recordCount"
             };
             if (maprConnection == null) {
