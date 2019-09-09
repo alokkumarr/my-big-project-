@@ -449,47 +449,42 @@ public class BuilderUtil {
    * @return Dynamic Converter
    */
   public static DynamicConvertor getDynamicConvertForPresetCal(String presetCal) {
-
+      presetCal=presetCal.trim();
+    final String hypen = "-";
+    if (!presetCal.contains(hypen)) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid");
+    }
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
-      LocalDateTime now = LocalDateTime.now();
-      Character lastChar = presetCal.charAt(presetCal.length() - 1);
-    switch (Character.toUpperCase(lastChar)) {
-      case 'D':
-          Long noOfDays=extractNumber(presetCal);
-          LocalDateTime frm=now.minusDays(noOfDays);
-          dynamicConvertor.setGte(frm.format(dateTimeFormatter));
-          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+    LocalDateTime now = LocalDateTime.now();
+    int indexOfHyphen = presetCal.indexOf(hypen);
+    int length = presetCal.length();
+    String presetType = presetCal.substring(indexOfHyphen+1, length);
+    Long presetNumber;
+    try {
+         presetNumber = Long.valueOf(presetCal.substring(0, indexOfHyphen));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid format");
+    }
+    switch (presetType.toUpperCase()) {
+      case "DAY":
+        LocalDateTime frm = now.minusDays(presetNumber);
+        dynamicConvertor.setGte(frm.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
         break;
-      case 'H':
-          Long noOfHours=extractNumber(presetCal);
-          LocalDateTime fromDateTime=now.minusHours(noOfHours);
-          dynamicConvertor.setGte(fromDateTime.format(dateTimeFormatter));
-          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+      case "HOUR":
+        LocalDateTime fromDateTime = now.minusHours(presetNumber);
+        dynamicConvertor.setGte(fromDateTime.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
         break;
-      case 'M':
-          Long noOfMinutes=extractNumber(presetCal);
-          LocalDateTime fromDate=now.minusMinutes(noOfMinutes);
-          dynamicConvertor.setGte(fromDate.format(dateTimeFormatter));
-          dynamicConvertor.setLte(now.format(dateTimeFormatter));
+      case "MINUTE":
+        LocalDateTime fromDate = now.minusMinutes(presetNumber);
+        dynamicConvertor.setGte(fromDate.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
         break;
       default:
-        throw new IllegalArgumentException("presetCal "+presetCal + " not present");
+        throw new IllegalArgumentException("presetCal " + presetCal + " not present");
     }
     return dynamicConvertor;
-  }
-
-  /**
-   * return the number from the presetcal .
-   *
-   * @param presetCal
-   * @return long value
-   */
-  private static Long extractNumber(String presetCal) {
-    try {
-      return Long.valueOf(presetCal.substring(0, presetCal.length() - 1));
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("presetCal "+presetCal + " is invalid");
-    }
   }
 }

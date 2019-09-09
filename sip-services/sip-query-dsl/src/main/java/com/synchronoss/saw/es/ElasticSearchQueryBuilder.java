@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -446,7 +447,8 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
 
-          } else if (item.getModel().getPresetCal() != null) {
+          } else if (item.getModel().getPresetCal() != null
+              && !StringUtils.isEmpty(item.getModel().getPresetCal())) {
             DynamicConvertor dynamicConvertor =
                 BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
