@@ -3,7 +3,10 @@ package sncr.xdf.ngcomponent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -23,10 +26,6 @@ import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -228,18 +227,15 @@ public abstract class AbstractComponent implements WithContext{
         return true;
     }
 
-    /**
-     * Send the notification to evaluate the data based on configured alert rules.
-     * @return boolean
-     */
-    private boolean sendAlertNotification()
-    {
-        // Todo: This is placeholder for the alert notification , will be triggered.
-        //  based on alert configuration.
-        AlertQueueManager alertQueueManager = new AlertQueueManager("dummy");
-        return alertQueueManager.sendMessageToStream("baseLocation", new Date().getTime());
-
-    }
+  /**
+   * Send the notification to evaluate the data based on configured alert rules.
+   *
+   * @return boolean
+   */
+  private boolean sendToAlertStream(String basePath , String datapodId) {
+    AlertQueueManager alertQueueManager = new AlertQueueManager(basePath);
+    return alertQueueManager.sendMessageToStream(datapodId, System.currentTimeMillis());
+  }
 
     private int initServices(){
 

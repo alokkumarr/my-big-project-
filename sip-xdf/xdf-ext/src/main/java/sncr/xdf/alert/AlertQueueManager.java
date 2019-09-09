@@ -23,11 +23,10 @@ public class AlertQueueManager {
   private String alertStream;
   private String alertTopic;
 
-  public AlertQueueManager(String streamBasePath) {
-    this.streamBasePath = streamBasePath;
-
-    this.alertStream = this.streamBasePath + File.separator + "sip-alert-stream";
-    this.alertTopic = alertStream + ":alertTopic";
+  public AlertQueueManager(String BasePath) {
+      this.streamBasePath = BasePath + File.separator + "services/alert/evaluator";
+      this.alertStream = this.streamBasePath + File.separator + "sip-alert-evaluator-stream";
+      this.alertTopic = this.alertStream + ":alerts";
     try {
       createIfNotExists(10);
     } catch (Exception e) {
