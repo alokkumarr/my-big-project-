@@ -300,7 +300,7 @@ public class StorageProxyController {
           ExecutionType executionType,
       HttpServletRequest request,
       HttpServletResponse response)
-      throws JsonProcessingException {
+      throws JsonProcessingException ,IllegalAccessException{
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
@@ -396,6 +396,8 @@ public class StorageProxyController {
       throw sipExeception;
     } catch (RuntimeException runTimeExecption) {
       throw runTimeExecption;
+    } catch (IllegalAccessException illegalArgumentException) {
+      throw illegalArgumentException;
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");

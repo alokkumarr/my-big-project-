@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -263,6 +264,17 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
+          } else if (item.getModel().getPresetCal() != null) {
+            DynamicConvertor dynamicConvertor =
+                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            if (item.getType().value().equals(Filter.Type.DATE.value())) {
+              rangeQueryBuilder.format(DATE_FORMAT);
+            }
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
+            break;
           } else if ((item.getModel().getFormat() != null)
               && ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
                   || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {
@@ -436,6 +448,17 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
 
+          } else if (item.getModel().getPresetCal() != null
+              && !StringUtils.isEmpty(item.getModel().getPresetCal())) {
+            DynamicConvertor dynamicConvertor =
+                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            if (item.getType().value().equals(Filter.Type.DATE.value())) {
+              rangeQueryBuilder.format(DATE_FORMAT);
+            }
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
           } else {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if (item.getType().value().equals(Filter.Type.DATE.value())) {
