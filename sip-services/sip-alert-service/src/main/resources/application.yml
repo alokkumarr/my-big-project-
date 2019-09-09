@@ -24,7 +24,7 @@ sip:
   ssl:
     enable : false
 mail:
-  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertRuleName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
   subject : "Alert Notification"
 alert:
   dashborad:
