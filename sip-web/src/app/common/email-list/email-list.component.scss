@@ -1,16 +1,7 @@
 @import 'src/themes/base/colors';
 
 :host {
-  .errorMsg {
-    color: $primary-white;
-    background-color: $secondary-orange;
-    border-radius: 14px;
-    float: left;
-    height: 26px;
-    width: 24px;
-    text-align: center;
-    font-size: larger;
-    margin-top: 3px;
-    margin-right: 2px;
+  .email__chip {
+    font-size: 11px;
   }
 }

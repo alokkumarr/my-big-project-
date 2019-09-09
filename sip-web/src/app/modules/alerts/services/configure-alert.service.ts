@@ -9,7 +9,10 @@ import APP_CONFIG from '../../../../../appConfig';
 import { AlertConfig } from '../alerts.interface';
 
 export const PROJECTID = 'workbench';
-
+interface AllAlertsResponse {
+  alertRuleDetailsList: any[];
+  numberOfRecords: number;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -119,6 +122,8 @@ export class ConfigureAlertService {
    */
   getAllAlerts(): Observable<any> {
     const endpoint = `${this.api}/alerts`;
-    return this.http.get(endpoint);
+    return this.http
+      .get<AllAlertsResponse>(endpoint)
+      .pipe(map(({ alertRuleDetailsList }) => alertRuleDetailsList));
   }
 }

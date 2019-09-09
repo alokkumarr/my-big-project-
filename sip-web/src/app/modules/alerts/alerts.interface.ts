@@ -1,20 +1,25 @@
+export interface AlertArtifact {
+  dataField: string;
+  area: string;
+  alias: string;
+  columnName: string;
+  name?: string;
+  displayName: String;
+  type: string;
+  aggregate?: string;
+}
 export interface AlertSipQuery {
   artifacts: {
-    dataField: string;
-    area: string;
-    alias: string;
-    columnName: string;
-    name: string;
-    displayName: String;
-    type: string;
-    aggregate?: string;
+    artifactName: string;
+    fields: AlertArtifact[];
   }[];
   filters: {
     type: string;
     artifactsName: string;
     model: {
-      operator: string;
-      value: number;
+      operator?: string;
+      value?: number;
+      presetCal?: string;
     };
   }[];
 }
@@ -26,8 +31,6 @@ export interface AlertConfig {
   datapodId: string;
   datapodName: string;
   activeInd: boolean;
-  lookbackColumn: string;
-  lookbackPeriod: string;
   notification: string[];
   categoryId?: string;
   product?: string;

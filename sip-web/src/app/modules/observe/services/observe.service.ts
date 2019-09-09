@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map as mapObservable } from 'rxjs/operators';
+import { map as mapObservable, tap } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Analysis, AnalysisDSL } from '../../analyze/types';
 import { AnalysisMapDSL } from '../../analyze/models';
@@ -183,10 +183,12 @@ export class ObserveService {
         }
       ]
     };
+    console.log('payload', payload);
 
-    return this.http
-      .post(`${this.api}/filters`, payload)
-      .pipe(mapObservable(fpGet(filter.columnName)));
+    return this.http.post(`${this.api}/filters`, payload).pipe(
+      tap(wat => console.log('wat', wat)),
+      mapObservable(fpGet(filter.columnName))
+    );
   }
 
   reloadMenu() {
