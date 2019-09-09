@@ -251,6 +251,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
                 retval =  -1;
             }
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
@@ -267,7 +268,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
-
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
             if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
@@ -282,6 +283,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
                 ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             }
 

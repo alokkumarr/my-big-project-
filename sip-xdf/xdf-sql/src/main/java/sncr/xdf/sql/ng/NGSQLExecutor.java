@@ -143,9 +143,9 @@ public class NGSQLExecutor implements Serializable {
                     parent.getNgctx().datafileDFmap.forEach((key, value) -> {
                     
                     	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
-                    	logger.info("#### dataset count ::"+ parent.getNgctx().datafileDFmap.get(key).count());
-                        logger.info("#### dataset name ::"+ key);
-                        logger.info("#### dataset columns ::");
+                    	//logger.info("#### dataset count ::"+ parent.getNgctx().datafileDFmap.get(key).count());
+                       // logger.info("#### dataset name ::"+ key);
+                       // logger.info("#### dataset columns ::");
                         StructField[] fields = parent.getNgctx().datafileDFmap.get(key).schema().fields();
                         Arrays.asList(fields).forEach((x)->logger.info(x));
                         
@@ -173,7 +173,10 @@ public class NGSQLExecutor implements Serializable {
                 logger.debug(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.transactionalLocation);
 
                 String loc = descriptor.transactionalLocation + Path.SEPARATOR +  descriptor.targetTableName;
-
+                
+                logger.debug("### Adding dynamic SQL Dataset with name ::"+ descriptor.targetTableName);
+                parent.getNgctx().datafileDFmap.put(descriptor.targetTableName,finalResult);
+                
                 if(!descriptor.isTemporaryTable) {
                 	
                 	logger.info("Final result schema :: ");
