@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
   "booleanCriteria",
   "operator",
   "preset",
+  "presetCal",
   "value",
   "otherValue",
   "gte",
@@ -32,6 +33,9 @@ public class Model {
 
   @JsonProperty("preset")
   private Model.Preset preset;
+
+  @JsonProperty("presetCal")
+  private String presetCal;
 
   @JsonProperty("value")
   private Double value;
@@ -85,6 +89,16 @@ public class Model {
   @JsonProperty("preset")
   public void setPreset(Model.Preset preset) {
     this.preset = preset;
+  }
+
+  @JsonProperty("presetCal ")
+  public String getPresetCal() {
+    return presetCal;
+  }
+
+  @JsonProperty("presetCal ")
+  public void setPresetCal(String presetCal) {
+    this.presetCal = presetCal;
   }
 
   @JsonProperty("value")
@@ -325,6 +339,7 @@ public class Model {
    */
   public Boolean isEmpty() {
     return this.preset == null
+        && this.presetCal==null
         && StringUtils.isEmpty(this.getLte())
         && StringUtils.isEmpty(this.getGte())
         && StringUtils.isEmpty(this.getGt())
