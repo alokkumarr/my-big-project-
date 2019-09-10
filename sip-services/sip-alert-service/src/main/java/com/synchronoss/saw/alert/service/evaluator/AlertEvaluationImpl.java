@@ -69,8 +69,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     List<AlertRuleDetails> alertRuleDetailsList = fetchAlertDetailsByDataPod(dataPodId);
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
       AlertResult alertResult = new AlertResult();
-      alertResult.setAlertName(alertRuleDetails.getAlertName());
-      alertResult.setAlertDescription(alertRuleDetails.getAlertDescription());
+      alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
+      alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
       alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
       alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
       alertResult.setAlertState(AlertState.ALARM);
