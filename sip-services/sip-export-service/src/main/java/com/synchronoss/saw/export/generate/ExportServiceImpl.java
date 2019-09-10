@@ -133,7 +133,7 @@ public class ExportServiceImpl implements ExportService {
       url =
           storageProxyUrl
               + "/internal/proxy/storage/"
-              + executionId
+              + analysisId
               + "/executions/data?page=1&pageSize="
               + sizOfExport
               + "&analysisType="
