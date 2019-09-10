@@ -555,7 +555,8 @@ public class ExportServiceImpl implements ExportService {
                       asyncRestTemplate,
                       dispatchBean,
                       finalJobGroup,
-                      sipQuery);
+                      sipQuery,
+                      isZip);
                 }
               }
 
@@ -574,7 +575,8 @@ public class ExportServiceImpl implements ExportService {
       AsyncRestTemplate asyncRestTemplate,
       Object dispatchBean,
       String jobGroup,
-      SipQuery sipQuery) {
+      SipQuery sipQuery,
+      boolean isZip) {
     if (ftp != null && !ftp.equals("")) {
       String url =
           storageProxyUrl
@@ -594,6 +596,7 @@ public class ExportServiceImpl implements ExportService {
             public void onSuccess(ResponseEntity<JsonNode> entity) {
               JsonNode jsonNode = entity.getBody().get("data");
               logger.debug("In FTP dispatcher: [Success] Response :" + entity.getStatusCode());
+
               IFileExporter iFileExporter = new XlsxExporter();
               ExportBean exportBean = new ExportBean();
 
@@ -610,7 +613,7 @@ public class ExportServiceImpl implements ExportService {
                       + exportBean.getFileType());
 
               File cfile = new File(exportBean.getFileName());
-              String zipFileName = cfile.getAbsolutePath().concat(".zip");
+              String fileName = cfile.getAbsolutePath();
               try {
                 // create a directory with unique name in published location to avoid file conflict
                 // for dispatch.
@@ -635,42 +638,46 @@ public class ExportServiceImpl implements ExportService {
                 LocalDateTime now = LocalDateTime.now();
 
                 try {
-                  FileOutputStream fos = new FileOutputStream(zipFileName);
-                  ZipOutputStream zos = new ZipOutputStream(fos);
 
-                  zos.putNextEntry(new ZipEntry(cfile.getName()));
-
-                  byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
-                  zos.write(bytes, 0, bytes.length);
-                  zos.closeEntry();
-                  zos.close();
+                  if (isZip) {
+                    fileName = fileName.concat(".zip");
+                    FileOutputStream fos = new FileOutputStream(fileName);
+                    ZipOutputStream zos = new ZipOutputStream(fos);
+                    zos.putNextEntry(new ZipEntry(cfile.getName()));
+                    byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                    zos.close();
+                  }
 
                   logger.debug("ftp servers: " + finalFtp);
 
-                  for (String aliastemp : finalFtp.split(",")) {
+                  for (String tempAlias : finalFtp.split(",")) {
                     ObjectMapper jsonMapper = new ObjectMapper();
                     try {
-                      FtpCustomer obj =
-                          jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
+                      FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
                       for (FTPDetails alias : obj.getFtpList()) {
                         logger.debug("Processing Host: " + alias.getHost());
                         logger.debug("jobGroup: " + alias.getCustomerName());
-                        logger.debug("Alias: " + aliastemp.equals(alias.getAlias()));
-                        if (alias.getCustomerName().equals(finalJobGroup)
-                            && aliastemp.equals(alias.getAlias())) {
+                        logger.debug("Alias: " + tempAlias.equals(alias.getAlias()));
+
+                        if (alias.getCustomerName().equals(finalJobGroup) && tempAlias.equals(alias.getAlias()) || true) {
                           logger.debug("Inside If");
+
+                          String destinationFileName = file.getName().substring(0, cfile.getName().lastIndexOf(".") + 1)
+                              + dtf.format(now).concat(".").concat(exportBean.getFileType());
+                          if (isZip) {
+                            destinationFileName = destinationFileName.concat(".zip");
+                          }
+
                           serviceUtils.uploadToFtp(
                               alias.getHost(),
                               alias.getPort(),
                               alias.getUsername(),
                               alias.getPassword(),
-                              zipFileName,
+                              fileName,
                               alias.getLocation(),
-                              cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1)
-                                  + dtf.format(now).toString()
-                                  + "."
-                                  + exportBean.getFileType()
-                                  + ".zip",
+                              destinationFileName,
                               alias.getType());
                           logger.debug(
                               "Uploaded to ftp alias: "
@@ -694,7 +701,7 @@ public class ExportServiceImpl implements ExportService {
                 logger.debug("Removing the file from published location");
 
                 ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-                ExportUtils.deleteDispatchedFile(zipFileName, serviceUtils);
+                ExportUtils.deleteDispatchedFile(fileName, serviceUtils);
               } catch (IOException e) {
                 logger.error(
                     "Exception occurred while dispatching pivot :"
