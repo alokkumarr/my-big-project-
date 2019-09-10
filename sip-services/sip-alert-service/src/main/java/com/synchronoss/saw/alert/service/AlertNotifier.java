@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.alert.modal.AlertNotificationLog;
+import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.Notification;
 import com.synchronoss.sip.utils.RestUtil;
@@ -61,10 +62,10 @@ public class AlertNotifier {
 
   private RestTemplate restTemplate = null;
 
-  void sendNotification(String alertRuleSysId) {
+  void sendNotification(String alertTriggerSysId) {
     logger.info("Inside send notification method");
     try {
-      AlertRuleDetails alertRule = getAlertRuleDetails(alertRuleSysId);
+      AlertRuleDetails alertRule = getAlertRuleDetails(alertTriggerSysId);
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
         List<Notification> notificationList = alertRule.getNotification();
@@ -89,17 +90,17 @@ public class AlertNotifier {
 
         } else {
           String msg =
-              "Notification mechanism is not configured for alertRulesSysId:" + alertRuleSysId;
+              "Notification mechanism is not configured for alertRulesSysId:" + alertTriggerSysId;
           logger.error(msg);
-          notificationLog.setNotified(false);
+          notificationLog.setNotifiedStatus(false);
           notificationLog.setMessage(msg);
           notificationLog.setCreatedTime(new Date());
           saveNotificationStatus(notificationLog);
         }
       } else {
-        String msg = "Unable to read alert rule details for alertRulesSysId" + alertRuleSysId;
+        String msg = "Unable to read alert rule details for alertRulesSysId" + alertTriggerSysId;
         logger.error(msg);
-        notificationLog.setNotified(false);
+        notificationLog.setNotifiedStatus(false);
         notificationLog.setMessage(msg);
         notificationLog.setCreatedTime(new Date());
         saveNotificationStatus(notificationLog);
@@ -122,6 +123,20 @@ public class AlertNotifier {
     return alertRule;
   }
 
+
+  private AlertResult getAlertResult(String alertTriggerSysId) {
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+    JsonNode jsonAlertRule = connection.findById(alertTriggerSysId);
+    AlertResult alertResult = null;
+    try {
+      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      alertResult = objectMapper.treeToValue(jsonAlertRule, AlertResult.class);
+    } catch (JsonProcessingException e) {
+      logger.error("Error occured while parsing the alert rule details :" + e);
+    }
+    return alertResult;
+  }
+
   /**
    * Sends email notification.
    *
@@ -136,7 +151,7 @@ public class AlertNotifier {
       if (recipientsList != null) {
         String recipients = String.join(",", recipientsList);
         Boolean notifiedStatus = sendMail(alertRulesDetails, recipients);
-        notificationLog.setNotified(notifiedStatus);
+        notificationLog.setNotifiedStatus(notifiedStatus);
         if (notifiedStatus) {
           notificationLog.setMessage("Successfully sent email notification");
         } else {
@@ -200,8 +215,10 @@ public class AlertNotifier {
    */
   public String prepareMailBody(AlertRuleDetails alertRulesDetails, String body, String alertLink) {
     logger.debug("prepare mail body starts here :" + body);
-    if (body.contains(MailBodyResolver.ALERT_NAME)) {
-      body = body.replaceAll("\\" + MailBodyResolver.ALERT_NAME, alertRulesDetails.getAlertName());
+    if (body.contains(MailBodyResolver.ALERT_RULE_NAME)) {
+      body =
+          body.replaceAll(
+              "\\" + MailBodyResolver.ALERT_RULE_NAME, alertRulesDetails.getAlertRuleName());
     }
     if (body.contains(MailBodyResolver.CATEGORY)) {
       body = body.replaceAll("\\" + MailBodyResolver.CATEGORY, alertRulesDetails.getCategoryId());
@@ -223,7 +240,7 @@ public class AlertNotifier {
     try {
       MaprConnection connection = new MaprConnection(basePath, notificationLogTable);
       String id = UUID.randomUUID().toString();
-      notificationLog.setNotificationId(id);
+      notificationLog.setNotificationSysId(id);
       connection.insert(id, notificationLog);
     } catch (Exception e) {
       logger.error("Exception occured while writing the notificaton status." + e);
@@ -231,7 +248,7 @@ public class AlertNotifier {
   }
 
   interface MailBodyResolver {
-    String ALERT_NAME = "$alertName";
+    String ALERT_RULE_NAME = "$alertRuleName";
     String CATEGORY = "$category";
     String LINK_FOR_ALERT = "$link";
     String ALERT_SEVERITY = "$alertSeverity";
