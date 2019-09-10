@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
-import * as get from 'lodash/get';
 
 import { DashboardService } from '../../../services/dashboard.service';
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
@@ -16,7 +15,6 @@ import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot', 'map'];
-const EXCLUDE_MAPTYPE = ['map'];
 
 @Component({
   selector: 'widget-analysis',
@@ -85,8 +83,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
             result,
             analysis =>
               analysis &&
-              ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
-              !EXCLUDE_MAPTYPE.includes(get(analysis, 'mapOptions.mapType'))
+              ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
           );
         },
         () => {
