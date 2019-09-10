@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { Store } from '@ngxs/store';
-import { CommonLoadAllMetrics } from 'src/app/common/actions/menu.actions';
+import { CommonLoadAllMetrics } from 'src/app/common/actions/common.actions';
 
 @Component({
   selector: 'observe-page',

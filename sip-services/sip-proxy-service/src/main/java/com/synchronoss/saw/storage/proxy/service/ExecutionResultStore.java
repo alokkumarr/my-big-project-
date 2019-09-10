@@ -36,7 +36,6 @@ public class ExecutionResultStore extends MetadataStore
 
   protected void _saveNew(Table table, String id, Document doc) {
     doc.setId(id);
-    logger.debug("Final document to be saved: " + doc.toString());
     table.insert(doc);
     table.flush();
   }
