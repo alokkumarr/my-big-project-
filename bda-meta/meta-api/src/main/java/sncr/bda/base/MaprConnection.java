@@ -1,5 +1,6 @@
 package sncr.bda.base;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -128,17 +129,20 @@ public class MaprConnection {
    * Run mapr db query with specific fields.
    *
    * @param filter
+   * @param pageNumber
+   * @param pageSize
    * @param orderBy
+   * @param classType
    * @return list
    */
-  public List<JsonNode> runMaprDbQueryWithFilter(
-      String filter, Integer pageNumber, Integer pageSize, String orderBy) {
+  public <T> List<T> runMaprDbQueryWithFilter(
+      String filter, Integer pageNumber, Integer pageSize, String orderBy,Class<T> classType) {
     Integer limit = (pageNumber * pageSize);
     final Query query =
         connection.newQuery().orderBy(orderBy, SortOrder.DESC).limit(limit).where(filter).build();
-
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     final DocumentStream stream = store.find(query);
-    List<JsonNode> resultSet = new ArrayList<>();
+    List<T> resultSet = new ArrayList<>();
     Integer count = 0;
     for (final Document document : stream) {
       try {
@@ -148,7 +152,7 @@ public class MaprConnection {
           // ignore the document
           count++;
         } else {
-          resultSet.add(objectMapper.readTree(document.asJsonString()));
+          resultSet.add(objectMapper.readValue(document.asJsonString(),classType));
         }
       } catch (IOException e) {
         throw new RuntimeException("error occurred while reading the documents", e);

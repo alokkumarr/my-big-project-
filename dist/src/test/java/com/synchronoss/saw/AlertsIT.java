@@ -104,10 +104,10 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    Long alertRulesSysId = Long.valueOf(jsonNode.get("alertRulesSysId").toString());
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").asText();
     log.debug("alertRulesSysId : " + alertRulesSysId);
 
-    assertFalse(alertRulesSysId <= 0);
+    assertTrue(alertRulesSysId != null);
 
     String urlForDelete = ALERT_PATH + "/" + alertRulesSysId;
     log.debug("deleteAlerts urlForDelete : " + urlForDelete);
@@ -155,7 +155,7 @@ public class AlertsIT extends BaseIT {
             .extract()
             .response()
             .jsonPath()
-            .getList("$");
+            .getList("alertRuleDetailsList");
 
     log.debug("readAlert :" + listOfAlerts);
     assertTrue(listOfAlerts.size() > 0);
@@ -184,7 +184,7 @@ public class AlertsIT extends BaseIT {
     log.debug("alertObject : " + alertObject);
 
     JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-    String alertRulesSysId = jsonNode.get("alertRulesSysId").toString();
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").asText();
     log.debug("alertRulesSysId : " + alertRulesSysId);
     assertFalse(alertRulesSysId == null);
 
@@ -305,7 +305,7 @@ public class AlertsIT extends BaseIT {
             .extract()
             .response()
             .jsonPath()
-            .get("$");
+            .get("alertRuleDetailsList");
 
     log.debug("listOfAlerts : " + listOfAlerts.size());
     assertTrue(listOfAlerts.size() > 0);

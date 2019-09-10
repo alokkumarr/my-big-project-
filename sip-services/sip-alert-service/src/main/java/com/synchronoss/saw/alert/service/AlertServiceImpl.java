@@ -77,6 +77,7 @@ public class AlertServiceImpl implements AlertService {
     alert.setCustomerCode(ticket.getCustCode());
     Long createdTime = System.currentTimeMillis();
     alert.setCreatedTime(createdTime);
+    alert.setCreatedBy(ticket.getUserFullName());
     connection.insert(id, alert);
     return alert;
   }
@@ -96,6 +97,7 @@ public class AlertServiceImpl implements AlertService {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     Long modifiedTime = System.currentTimeMillis();
     alertRuleDetails.setModifiedTime(modifiedTime);
+    alertRuleDetails.setUpdatedBy(ticket.getUserFullName());
     connection.update(alertRuleId, alertRuleDetails);
     return alertRuleDetails;
   }
@@ -113,9 +115,9 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertRuleList = AlertUtils.convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertRuleList =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setAlertRuleDetailsList(alertRuleList);
@@ -184,9 +186,9 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node1);
     arrayNode.add(node2);
     logger.debug("Mapr Filter query for alert rule by category:{}", node.toString());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertRuleDetails> alertList = AlertUtils.convertJsonListToAlertRuleList(alertLists);
+    List<AlertRuleDetails> alertList =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setNumberOfRecords(noOfRecords);
@@ -246,6 +248,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       Ticket ticket) {
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
+    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
     ArrayNode arrayNode = node.putArray(MaprConnection.AND);
@@ -258,12 +261,11 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node1);
     arrayNode.add(node2);
     logger.info("query :::" + node.toString());
-    MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertResultLists =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
-    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
     return alertStatesResponse;
@@ -282,12 +284,12 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
-    List<JsonNode> alertLists =
-        connection.runMaprDbQueryWithFilter(node.toString(), pageNumber, pageSize, "createdTime");
-    List<AlertResult> alertTriggerList = convertJsonListToAlertTriggerList(alertLists);
+    List<AlertResult> alertResultLists =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
     Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
-    alertStatesResponse.setAlertStatesList(alertTriggerList);
+    alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
     return alertStatesResponse;
@@ -373,30 +375,30 @@ public class AlertServiceImpl implements AlertService {
     if (alertCount.getGroupBy() == GroupBy.SEVERITY) {
       if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<JsonNode> result =
-            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
+        List<AlertResult> list =
+            connection.runMaprDbQueryWithFilter(
+                query, pageNumber, pageSize, "createdTime", AlertResult.class);
         return groupByseverity(list);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<JsonNode> result =
-          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-      return groupByseverity(list);
+      List<AlertResult> result =
+          connection.runMaprDbQueryWithFilter(
+              query, pageNumber, pageSize, "createdTime", AlertResult.class);
+      return groupByseverity(result);
 
     } else {
       if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
         query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<JsonNode> result =
-            connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-        List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-        return groupByDate(list);
+        List<AlertResult> result =
+            connection.runMaprDbQueryWithFilter(
+                query, pageNumber, pageSize, "createdTime", AlertResult.class);
+        return groupByDate(result);
       }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<JsonNode> result =
-          connection.runMaprDbQueryWithFilter(query, pageNumber, pageSize, "createdTime");
-      List<AlertResult> list = convertJsonListToAlertTriggerList(result);
-      return groupByDate(list);
+      List<AlertResult> result =
+          connection.runMaprDbQueryWithFilter(
+              query, pageNumber, pageSize, "createdTime", AlertResult.class);
+      return groupByDate(result);
     }
   }
 
@@ -438,6 +440,7 @@ public class AlertServiceImpl implements AlertService {
       Long epochGte, Long epochLte, Ticket ticket, String alertRuleSysId) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     ObjectNode node1 = objectMapper.createObjectNode();
     ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
@@ -450,7 +453,6 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node4 = objectMapper.createObjectNode();
     ObjectNode objectNode3 = node4.putObject(MaprConnection.EQ);
     objectNode3.put("alertRulesSysId", alertRuleSysId);
-    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     arrayNode.add(node1);
     arrayNode.add(node2);
     arrayNode.add(node3);
@@ -461,6 +463,7 @@ public class AlertServiceImpl implements AlertService {
   private String getQueryForAlertCount(Long epochGte, Long epochLte, Ticket ticket) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     ObjectNode node1 = objectMapper.createObjectNode();
     ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
     objectNode.put("customerCode", ticket.getCustCode());
@@ -470,7 +473,6 @@ public class AlertServiceImpl implements AlertService {
     ObjectNode node3 = objectMapper.createObjectNode();
     ObjectNode objectNode2 = node3.putObject(MaprConnection.LTE);
     objectNode2.put("startTime", epochLte);
-    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
     arrayNode.add(node1);
     arrayNode.add(node2);
     arrayNode.add(node3);
@@ -490,7 +492,7 @@ public class AlertServiceImpl implements AlertService {
       alertTriggerList = reader.readValue(jsonNode);
       return alertTriggerList;
     } catch (IOException e) {
-      logger.error("exeception e" + e);
+      logger.error("exception e" + e);
       throw new RuntimeException("Exeception occured while parsing the results");
     }
   }

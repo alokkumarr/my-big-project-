@@ -13,8 +13,8 @@ public class AlertRuleDetails {
   private String datapodName;
   private String categoryId;
   private String product;
-  private String alertName;
-  private String alertDescription;
+  private String alertRuleName;
+  private String alertRuleDescription;
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
@@ -104,31 +104,31 @@ public class AlertRuleDetails {
   }
 
   /**
-   * Gets alertName.
+   * Gets alertRuleName.
    *
-   * @return value of alertName
+   * @return alertRuleName
    */
-  public String getAlertName() {
-    return alertName;
+  public String getAlertRuleName() {
+    return alertRuleName;
   }
 
-  /** Sets alertName. */
-  public void setAlertName(String alertName) {
-    this.alertName = alertName;
+  /** Sets alertRuleName. */
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
   }
 
   /**
-   * Gets alertDescription.
+   * Gets alertRuleDescription.
    *
-   * @return value of alertDescription
+   * @return alertRuleDescription
    */
-  public String getAlertDescription() {
-    return alertDescription;
+  public String getAlertRuleDescription() {
+    return alertRuleDescription;
   }
 
-  /** Sets alertDescription. */
-  public void setAlertDescription(String alertDescription) {
-    this.alertDescription = alertDescription;
+  /** Sets alertRuleDescription. */
+  public void setAlertRuleDescription(String alertRuleDescription) {
+    this.alertRuleDescription = alertRuleDescription;
   }
 
   /**

@@ -1,5 +1,7 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.synchronoss.saw.model.SipQuery;
+
 public class AlertResult {
 
   private String alertTriggerSysId;
@@ -18,13 +20,13 @@ public class AlertResult {
 
   private Long lastUpdatedTime;
 
-  private String alertName;
+  private String alertRuleName;
 
-  private String alertDescription;
+  private String alertRuleDescription;
 
   private String categoryId;
 
-  private String sipQuery;
+  private SipQuery sipQuery;
 
   /**
    * Gets alertTriggerSysId.
@@ -139,31 +141,31 @@ public class AlertResult {
   }
 
   /**
-   * Gets alert name.
+   * Gets alertRuleName.
    *
-   * @return alert name
+   * @return alertRuleName
    */
-  public String getAlertName() {
-    return alertName;
+  public String getAlertRuleName() {
+    return alertRuleName;
   }
 
-  /** Sets alert name. */
-  public void setAlertName(String alertName) {
-    this.alertName = alertName;
+  /** Sets alertRuleName. */
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
   }
 
   /**
-   * Gets Alert Description.
+   * Gets alertRuleDescription.
    *
-   * @return alert description
+   * @return alertRuleDescription
    */
-  public String getAlertDescription() {
-    return alertDescription;
+  public String getAlertRuleDescription() {
+    return alertRuleDescription;
   }
 
-  /** Sets alert description. */
-  public void setAlertDescription(String alertDescription) {
-    this.alertDescription = alertDescription;
+  /** Sets alertRuleDescription. */
+  public void setAlertRuleDescription(String alertRuleDescription) {
+    this.alertRuleDescription = alertRuleDescription;
   }
 
   /**
@@ -185,12 +187,12 @@ public class AlertResult {
    *
    * @return value of sipQuery
    */
-  public String getSipQuery() {
+  public SipQuery getSipQuery() {
     return sipQuery;
   }
 
   /** Sets sipQuery. */
-  public void setSipQuery(String sipQuery) {
+  public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
   }
 }
