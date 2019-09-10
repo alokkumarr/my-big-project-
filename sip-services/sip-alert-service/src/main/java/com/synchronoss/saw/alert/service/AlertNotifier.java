@@ -69,7 +69,7 @@ public class AlertNotifier {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
         List<Notification> notificationList = alertRule.getNotification();
-        if (notificationList != null) {
+        if (notificationList != null && !notificationList.isEmpty()) {
           notificationList.forEach(
               notification -> {
                 switch (notification.getType()) {
@@ -153,8 +153,10 @@ public class AlertNotifier {
         Boolean notifiedStatus = sendMail(alertRulesDetails, recipients);
         notificationLog.setNotifiedStatus(notifiedStatus);
         if (notifiedStatus) {
+          logger.debug("Successfully sent email notification");
           notificationLog.setMessage("Successfully sent email notification");
         } else {
+          logger.debug("error occured while sending email notification");
           notificationLog.setMessage("error occured while sending email notification");
         }
       } else {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -134,24 +135,28 @@ public class MaprConnection {
    * @return list
    */
   public <T> List<T> runMaprDbQueryWithFilter(
-      String filter, Integer pageNumber, Integer pageSize, String orderBy,Class<T> classType) {
-    Integer limit = (pageNumber * pageSize);
-    final Query query =
-        connection.newQuery().orderBy(orderBy, SortOrder.DESC).limit(limit).where(filter).build();
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    final DocumentStream stream = store.find(query);
+      String filter, Integer pageNumber, Integer pageSize, String orderBy, Class<T> classType) {
     List<T> resultSet = new ArrayList<>();
-    Integer count = 0;
+    Query query;
+    if (pageNumber != null && pageSize != null) {
+      int documentsToskip = (pageNumber - 1) * pageSize;
+      query =
+          connection
+              .newQuery()
+              .orderBy(orderBy, SortOrder.DESC)
+              .offset(documentsToskip)
+              .limit(pageSize)
+              .where(filter)
+              .build();
+    } else {
+      query = connection.newQuery().orderBy(orderBy, SortOrder.DESC).where(filter).build();
+    }
+    LOGGER.debug("Mapr Query with filer:{}", query);
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    DocumentStream stream = store.find(query);
     for (final Document document : stream) {
       try {
-        // MaprDB document stream doesn't supports the stream skip, considered the additional
-        // logic to ignore additional documents.
-        if (pageNumber > 1 && count < (pageNumber - 1 * pageSize)) {
-            // ignore the document
-          count++;
-        } else {
-          resultSet.add(objectMapper.readValue(document.asJsonString(),classType));
-        }
+        resultSet.add(objectMapper.readValue(document.asJsonString(), classType));
       } catch (IOException e) {
         throw new RuntimeException("error occurred while reading the documents", e);
       }
@@ -160,19 +165,26 @@ public class MaprConnection {
   }
 
   /**
-   * calculates count for a query with filters.
+   * calculates count for a query with or withour filters.
    *
    * @param filter
    * @return count of no of documents
    */
-  public Long getCountForQueryWithFilter(String filter) {
-    final Query query = connection.newQuery().where(filter).build();
-    final DocumentStream stream = store.find(query);
-    Long count = 0L;
-    for (Document document : stream) {
-      count++;
+  public Long runMapDbQueryForCount(String filter) {
+    final Query query;
+    if (filter != null) {
+      query = connection.newQuery().select("_id").where(filter).build();
+    } else {
+      query = connection.newQuery().select("_id").build();
     }
-    return count;
+    Long countOfDocuments = 0L;
+    final DocumentStream stream = store.find(query);
+    Iterator<Document> itr = stream.iterator();
+    while (itr.hasNext()) {
+      itr.next();
+      countOfDocuments++;
+    }
+    return countOfDocuments;
   }
 
   /**

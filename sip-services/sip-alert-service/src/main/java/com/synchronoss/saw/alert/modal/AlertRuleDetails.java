@@ -19,13 +19,13 @@ public class AlertRuleDetails {
   private Boolean activeInd;
   private String customerCode;
   private String attributeName;
+  private String attributeValue;
   private String lookbackColumn;
   private String lookbackPeriod;
   private Aggregate aggregationType;
   private Operator operator;
   private String metricsColumn;
   private String thresholdValue;
-  private List<Filter> filters;
   private Long createdTime;
   private Long modifiedTime;
   private String createdBy;
@@ -188,6 +188,20 @@ public class AlertRuleDetails {
   }
 
   /**
+   * Gets attributeValue.
+   *
+   * @return value of attributeValue
+   */
+  public String getAttributeValue() {
+    return attributeValue;
+  }
+
+  /** Sets attributeValue. */
+  public void setAttributeValue(String attributeValue) {
+    this.attributeValue = attributeValue;
+  }
+
+  /**
    * Gets lookbackColumn.
    *
    * @return value of lookbackColumn
@@ -269,20 +283,6 @@ public class AlertRuleDetails {
   /** Sets thresholdValue. */
   public void setThresholdValue(String thresholdValue) {
     this.thresholdValue = thresholdValue;
-  }
-
-  /**
-   * Gets filters.
-   *
-   * @return value of filters
-   */
-  public List<Filter> getFilters() {
-    return filters;
-  }
-
-  /** Sets filters. */
-  public void setFilters(List<Filter> filters) {
-    this.filters = filters;
   }
 
   /**
