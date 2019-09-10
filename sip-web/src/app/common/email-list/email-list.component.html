@@ -1,0 +1,30 @@
+<mat-form-field flex="20">
+  <mat-chip-list #chipList>
+    <mat-chip
+      *ngFor="let email of emails; trackBy: trackByIndex; let i = index"
+      (removed)="removeEmail(i)"
+      [attr.e2e]="'email-address-' + email"
+    >
+      {{ email }}
+      <mat-icon
+        matChipRemove
+        fontIcon="icon-close"
+        [attr.e2e]="'remove-email-' + email"
+      ></mat-icon>
+    </mat-chip>
+    <input
+      class="email__chip"
+      placeholder="Emails separate by ';'"
+      type="text"
+      [formControl]="emailField"
+      [matChipInputFor]="chipList"
+      [matChipInputSeparatorKeyCodes]="separatorKeys"
+      [matChipInputAddOnBlur]="true"
+      (matChipInputTokenEnd)="addEmailIfCorrect($event.value)"
+      [attr.e2e]="'email-list-input'"
+    />
+  </mat-chip-list>
+</mat-form-field>
+<mat-error *ngIf="emailField?.errors?.pattern">
+  <strong>Invalid</strong> email!
+</mat-error>

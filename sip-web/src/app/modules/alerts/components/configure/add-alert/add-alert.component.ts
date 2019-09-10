@@ -10,32 +10,31 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as filter from 'lodash/filter';
 import * as split from 'lodash/split';
 import * as fpGet from 'lodash/fp/get';
+import * as includes from 'lodash/includes';
+import * as compact from 'lodash/compact';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
+import { ObserveService } from '../../../../observe/services/observe.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
-import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
+// import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
-import { AlertConfig, AlertDefinition } from '../../../alerts.interface';
+import {
+  AlertConfig,
+  AlertDefinition,
+  AlertArtifact
+} from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+
+const LAST_STEP_INDEX = 3;
 
 const notifications = [
   {
     value: 'email',
     label: 'email',
     enabled: true
-  },
-  {
-    value: 'slack',
-    label: 'slack',
-    enabled: false
-  },
-  {
-    value: 'webhook',
-    label: 'web hooks',
-    enabled: false
   }
 ];
 @Component({
@@ -48,6 +47,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
   datapods$: Observable<any>;
+  attributeFilterValues$: Observable<any>;
   selectedDatapod;
   selectedMonitoringEntity;
   selectedEntityName;
@@ -62,11 +62,14 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   subscriptions: SubscriptionLike[] = [];
   endActionText = 'Add';
   endPayload: AlertConfig;
+  showNotificationEmail = false;
+  lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
 
   constructor(
     private _formBuilder: FormBuilder,
     public _configureAlertService: ConfigureAlertService,
-    public _notify: ToastService
+    public _notify: ToastService,
+    public _observeService: ObserveService
   ) {
     this.createAlertForm();
   }
@@ -83,7 +86,14 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       this.endActionText = 'Update';
     }
     this.datapods$ = this._configureAlertService.getListOfDatapods$();
-    this.aggregations$ = this._configureAlertService.getAggregations();
+    this.aggregations$ = this._configureAlertService
+      .getAggregations()
+      .pipe(
+        map((aggregations: any[]) => [
+          { id: 'none', name: 'None' },
+          ...aggregations
+        ])
+      );
     this.operators$ = this._configureAlertService.getOperators();
     this.notifications$ = of(notifications);
   }
@@ -100,7 +110,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.maxLength(36)]
       ],
       alertSeverity: ['', [Validators.required]],
-      notification: ['', [Validators.required]],
+      notification: [[], [Validators.required]],
+      notificationEmails: [[]],
       activeInd: [true]
     });
 
@@ -109,12 +120,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodName: [''],
       categoryId: [''],
       monitoringEntity: ['', Validators.required],
-      entityName: ['', Validators.required],
-      lookbackColumn: ['', Validators.required],
-      lookbackPeriod: ['', [Validators.required, Validators.maxLength(20)]]
-    });
-
-    this.alertRuleFormGroup = this._formBuilder.group({
       aggregation: ['', Validators.required],
       operator: ['', Validators.required],
       thresholdValue: [
@@ -122,14 +127,52 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern('^[0-9]*$')]
       ]
     });
+
+    this.alertRuleFormGroup = this._formBuilder.group({
+      entityName: ['', Validators.required],
+      lookbackColumn: ['', Validators.required],
+      lookbackPeriodValue: ['', Validators.required],
+      lookbackPeriodType: ['', Validators.required],
+      attributeFilterColumn: [''],
+      attributeFilterValue: ['']
+    });
+
+    this.alertDefFormGroup
+      .get('notification')
+      .valueChanges.subscribe(values => {
+        if (values.includes('email')) {
+          this.showNotificationEmail = true;
+        } else {
+          this.showNotificationEmail = false;
+        }
+      });
+
+    this.alertRuleFormGroup
+      .get('attributeFilterColumn')
+      .valueChanges.subscribe(column => {
+        if (!column) {
+          return;
+        }
+        const { artifacts, id, esRepository } = this.selectedDatapod;
+        const targetFilter = {
+          artifactsName: artifacts[0].artifactName,
+          semanticId: id,
+          columnName: column.columnName,
+          type: column.type,
+          esRepository
+        };
+        this.attributeFilterValues$ = this._observeService.getModelValues(
+          targetFilter
+        );
+      });
   }
 
-  onLookbackPeriodBlur() {
-    const control = this.alertMetricFormGroup.get('lookbackPeriod');
-    const controlValue = control.value;
-    const correctedValue = correctTimeInterval(controlValue);
-    control.setValue(correctedValue);
-  }
+  // onLookbackPeriodBlur() {
+  //   const control = this.alertMetricFormGroup.get('lookbackPeriod');
+  //   const controlValue = control.value;
+  //   const correctedValue = correctTimeInterval(controlValue);
+  //   control.setValue(correctedValue);
+  // }
 
   onDatapodChanged() {
     this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
@@ -172,7 +215,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         .subscribe(
           metrics => (this.metricsListWithoutMonitoringEntity = metrics)
         );
-      const entityNameControl = this.alertMetricFormGroup.get('entityName');
+      const entityNameControl = this.alertRuleFormGroup.get('entityName');
       combineLatest(this.metricsList$, entityNameControl.valueChanges)
         .pipe(
           map(([columns, entityName]) =>
@@ -193,22 +236,60 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const {
       datapodId,
       datapodName,
-      categoryId,
-      lookbackColumn,
-      lookbackPeriod
+      categoryId
     } = this.alertMetricFormGroup.value;
 
-    const sipQuery = this.generateSipQuery();
+    const {
+      lookbackColumn,
+      lookbackPeriodValue,
+      lookbackPeriodType,
+      attributeFilterColumn,
+      attributeFilterValue
+    } = this.alertRuleFormGroup.value;
+
+    const sipQueryInfo = {
+      lookbackPeriod: {
+        value: `${lookbackPeriodValue}-${lookbackPeriodType}`,
+        column: lookbackColumn
+      },
+      attributeFilter: {
+        value: attributeFilterValue,
+        column: attributeFilterColumn
+      }
+    };
+
+    const sipQuery = this.generateSipQuery(sipQueryInfo);
+
+    const {
+      alertRuleName,
+      alertRuleDescription,
+      alertSeverity,
+      notification: selectedNotifications,
+      notificationEmails,
+      activeInd
+    } = this.alertDefFormGroup.value;
+
+    const notification = [];
+
+    if (includes(selectedNotifications, 'email')) {
+      notification.push({
+        type: 'email',
+        recipients: notificationEmails
+      });
+    }
 
     const alertConfigWithoutSipQuery = {
-      ...this.alertDefFormGroup.value,
+      alertRuleName,
+      alertRuleDescription,
+      alertSeverity,
+      notification,
+      activeInd,
       datapodId,
       datapodName,
       categoryId,
-      lookbackColumn,
-      lookbackPeriod,
       product: 'SAWD000001'
     };
+    console.log({ sipQuery });
 
     const alertConfig: AlertConfig = {
       ...alertConfigWithoutSipQuery,
@@ -219,52 +300,91 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return alertConfig;
   }
 
-  generateSipQuery() {
+  generateSipQuery(sipQueryInfo) {
     const {
       aggregation,
       operator,
       thresholdValue
-    } = this.alertRuleFormGroup.value;
+    } = this.alertMetricFormGroup.value;
+
+    const aggregate = aggregation === 'none' ? null : aggregation;
+    const {
+      lookbackPeriod
+      // attributeFilter
+    } = sipQueryInfo;
 
     const selectedEntityName = this.selectedEntityName;
 
-    const entityName = {
+    const entityName: AlertArtifact = {
       dataField: split(selectedEntityName.columnName, '.')[0],
       area: 'x-axis',
       alias: selectedEntityName.alias,
       columnName: selectedEntityName.columnName,
-      // name: string, // take out name, and see if it works
+      // name: '', // take out name, and see if it works
       displayName: selectedEntityName.displayName,
       type: selectedEntityName.type
     };
 
     const selectedMonitoringEntity = this.selectedMonitoringEntity;
 
-    const monitoringEntity = {
+    const monitoringEntity: AlertArtifact = {
       dataField: selectedMonitoringEntity.columnName,
       area: 'y-axis',
+      alias: selectedEntityName.alias,
       columnName: selectedMonitoringEntity.columnName,
-      // name: integer,  // take out name, and see if it works
+      // name: '', // take out name, and see if it works
       displayName: selectedMonitoringEntity.displayName,
       type: selectedMonitoringEntity.type,
-      aggregate: aggregation
+      aggregate
     };
 
     const { artifactName } = this.selectedDatapod.artifacts[0];
 
     const alertFilter = {
       type: selectedMonitoringEntity.type,
-      artifactName,
+      artifactsName: artifactName,
       model: {
         operator,
         value: thresholdValue
       }
     };
 
+    const lookbackPeriodCol = lookbackPeriod.column;
+    const lookbackFilter = {
+      type: lookbackPeriodCol.type,
+      artifactsName: artifactName,
+      model: {
+        presetCal: lookbackPeriod.value
+      }
+    };
+
+    // const attributeFilterCol = attributeFilter.column;
+    // const hasAttributeFilter = attributeFilter.column && attributeFilter.value;
+    // const stringFilter = hasAttributeFilter
+    //   ? {
+    //       type: attributeFilterCol.type,
+    //       artifactsName: artifactName,
+    //       model: {
+    //         operator: 'EQ',
+    //         value: attributeFilter.value
+    //       }
+    //     }
+    //   : null;
+
     return {
       artifacts: [{ artifactName, fields: [entityName, monitoringEntity] }],
-      filters: [alertFilter]
+      filters: compact([
+        alertFilter,
+        lookbackFilter
+        // stringFilter
+      ])
     };
+  }
+
+  onStepperSelectionChange(event) {
+    if (event.selectedIndex === LAST_STEP_INDEX) {
+      this.constructPayload();
+    }
   }
 
   createAlert() {
@@ -299,5 +419,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   dateMetricFilter(metric) {
     return DATE_TYPES.includes(metric.type);
+  }
+
+  stringMetricFilter(metric) {
+    return 'string' === metric.type;
   }
 }

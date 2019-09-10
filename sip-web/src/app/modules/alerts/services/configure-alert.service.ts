@@ -2,14 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as get from 'lodash/get';
+import * as lodashMap from 'lodash/map';
 import * as fpGet from 'lodash/fp/get';
 import { map } from 'rxjs/operators';
 
 import APP_CONFIG from '../../../../../appConfig';
 import { AlertConfig } from '../alerts.interface';
+import { transformAlertForGridView } from './alert-transforms';
 
 export const PROJECTID = 'workbench';
-
+interface AllAlertsResponse {
+  alertRuleDetailsList: any[];
+  numberOfRecords: number;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -119,6 +124,11 @@ export class ConfigureAlertService {
    */
   getAllAlerts(): Observable<any> {
     const endpoint = `${this.api}/alerts`;
-    return this.http.get(endpoint);
+    return this.http.get<AllAlertsResponse>(endpoint).pipe(
+      map(({ alertRuleDetailsList }) => alertRuleDetailsList),
+      map(alertRuleDetailsList =>
+        lodashMap(alertRuleDetailsList, transformAlertForGridView)
+      )
+    );
   }
 }
