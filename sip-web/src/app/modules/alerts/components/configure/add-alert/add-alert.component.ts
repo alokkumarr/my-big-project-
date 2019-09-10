@@ -11,6 +11,7 @@ import * as filter from 'lodash/filter';
 import * as split from 'lodash/split';
 import * as fpGet from 'lodash/fp/get';
 import * as includes from 'lodash/includes';
+import * as compact from 'lodash/compact';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
@@ -149,6 +150,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.alertRuleFormGroup
       .get('attributeFilterColumn')
       .valueChanges.subscribe(column => {
+        if (!column) {
+          return;
+        }
         const { artifacts, id, esRepository } = this.selectedDatapod;
         const targetFilter = {
           artifactsName: artifacts[0].artifactName,
@@ -303,6 +307,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       thresholdValue
     } = this.alertMetricFormGroup.value;
 
+    const aggregate = aggregation === 'none' ? null : aggregation;
     const {
       lookbackPeriod
       // attributeFilter
@@ -330,7 +335,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       // name: '', // take out name, and see if it works
       displayName: selectedMonitoringEntity.displayName,
       type: selectedMonitoringEntity.type,
-      aggregate: aggregation
+      aggregate
     };
 
     const { artifactName } = this.selectedDatapod.artifacts[0];
@@ -354,18 +359,25 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     };
 
     // const attributeFilterCol = attributeFilter.column;
-    // const attributeFilter = {
-    //   type: attributeFilterCol.type,
-    //   artifactsName: artifactName,
-    //   model: {
-    //     operator,
-    //     value: thresholdValue
-    //   }
-    // };
+    // const hasAttributeFilter = attributeFilter.column && attributeFilter.value;
+    // const stringFilter = hasAttributeFilter
+    //   ? {
+    //       type: attributeFilterCol.type,
+    //       artifactsName: artifactName,
+    //       model: {
+    //         operator: 'EQ',
+    //         value: attributeFilter.value
+    //       }
+    //     }
+    //   : null;
 
     return {
       artifacts: [{ artifactName, fields: [entityName, monitoringEntity] }],
-      filters: [alertFilter, lookbackFilter]
+      filters: compact([
+        alertFilter,
+        lookbackFilter
+        // stringFilter
+      ])
     };
   }
 

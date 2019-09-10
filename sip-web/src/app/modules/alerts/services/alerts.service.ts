@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import * as floor from 'lodash/floor';
+import * as ceil from 'lodash/ceil';
 import * as get from 'lodash/get';
 import { map } from 'rxjs/operators';
 
 import { GridPagingOptions, AlertFilterModel } from '../alerts.interface';
 import AppConfig from '../../../../../appConfig';
 import { CUSTOM_DATE_PRESET_VALUE } from '../consts';
+import { transformAlertForGridView } from './alert-transforms';
 import {
   AlertDateCount,
   AlertDateSeverity,
@@ -45,9 +46,9 @@ export class AlertsService {
   }
 
   getAlertsStatesForGrid(options: GridPagingOptions = {}) {
-    options.skip = options.skip || 0;
+    options.skip = options.skip || 1;
     options.take = options.take || 10;
-    const pageNumber = floor(options.skip / options.take);
+    const pageNumber = ceil(options.skip / options.take);
 
     const basePath = `alerts/states`;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
@@ -64,9 +65,10 @@ export class AlertsService {
 
   getAlertRuleDetails(id: number) {
     const url = `${apiUrl}/alerts/${id}`;
-    return this._http
-      .get<{ alert: AlertConfig; message: string }>(url)
-      .pipe(map(({ alert }) => alert));
+    return this._http.get<{ alert: AlertConfig; message: string }>(url).pipe(
+      map(({ alert }) => alert),
+      map(transformAlertForGridView)
+    );
   }
 
   getAllAlertsCount(dateFilter: AlertFilterModel) {

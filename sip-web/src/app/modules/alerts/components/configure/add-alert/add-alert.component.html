@@ -437,13 +437,11 @@
               />
               <dx-select-box
                 ngDefaultControl
-                required
                 formControlName="attributeFilterColumn"
                 [items]="metricsList$ | async | filterFn: stringMetricFilter"
                 displayExpr="displayName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
-                [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="attributeFilterColumn"
               ></dx-select-box>
             </mat-form-field>
@@ -452,7 +450,7 @@
               appearance="outline"
               class="add-container__body__stepper__dxselect padtop10"
             >
-              <mat-label>Attribute filter column</mat-label>
+              <mat-label>Attribute filter value</mat-label>
               <input
                 hidden="true"
                 value="dummy"
@@ -461,12 +459,10 @@
               />
               <dx-select-box
                 ngDefaultControl
-                required
                 formControlName="attributeFilterValue"
                 [items]="attributeFilterValues$ | async"
                 [searchEnabled]="true"
                 placeholder="Select a value"
-                [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="attributeFilterValue"
               ></dx-select-box>
             </mat-form-field>
