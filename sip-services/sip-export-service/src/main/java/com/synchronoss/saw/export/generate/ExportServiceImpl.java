@@ -661,7 +661,7 @@ public class ExportServiceImpl implements ExportService {
                         logger.debug("jobGroup: " + alias.getCustomerName());
                         logger.debug("Alias: " + tempAlias.equals(alias.getAlias()));
 
-                        if (alias.getCustomerName().equals(finalJobGroup) && tempAlias.equals(alias.getAlias()) || true) {
+                        if (alias.getCustomerName().equals(finalJobGroup) && tempAlias.equals(alias.getAlias())) {
                           logger.debug("Inside If");
 
                           String destinationFileName = file.getName().substring(0, cfile.getName().lastIndexOf(".") + 1)
