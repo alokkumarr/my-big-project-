@@ -50,6 +50,7 @@ import {
   DesignerRemoveAllArtifactColumns,
   DesignerLoadMetric,
   DesignerResetState,
+  DesignerSetData,
   DesignerUpdateEditMode,
   DesignerUpdateQuery,
   DesignerJoinsArray,
@@ -65,13 +66,15 @@ import {
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
 import { AnalysisDSL } from 'src/app/models';
+import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 
 // setAutoFreeze(false);
 
 const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null,
-  metric: null
+  metric: null,
+  data: null
 };
 
 const defaultDSLChartOptions: DSLChartOptionsModel = {
@@ -93,6 +96,8 @@ const defaultDSLChartOptions: DSLChartOptionsModel = {
     title: null
   }
 };
+
+const MAX_PACKED_BUBBLE_CHART_DATA = 20;
 
 @State<DesignerStateModel>({
   name: 'designerState',
@@ -139,6 +144,40 @@ export class DesignerState {
       artifact => artifact.fields,
       get(state, 'analysis.sipQuery.artifacts')
     );
+  }
+
+  @Selector()
+  static analysis(state: DesignerStateModel) {
+    return state.analysis;
+  }
+
+  @Selector()
+  static data(state: DesignerStateModel) {
+    return state.data;
+  }
+
+  @Selector()
+  static metricName(state: DesignerStateModel) {
+    return state.metric.metricName;
+  }
+
+  @Selector()
+  static isDataTooMuchForChart(state: DesignerStateModel) {
+    const chartType = get(state, 'analysis.chartOptions.chartType');
+    return (
+      chartType === 'packedbubble' &&
+      state.data.length > MAX_PACKED_BUBBLE_CHART_DATA
+    );
+  }
+
+  @Action(DesignerSetData)
+  setData(
+    { patchState }: StateContext<DesignerStateModel>,
+    { data }: DesignerSetData
+  ) {
+    return patchState({
+      data
+    });
   }
 
   @Action(DesignerMergeSupportsIntoAnalysis)
@@ -775,6 +814,7 @@ export class DesignerState {
     patchState(cloneDeep(defaultDesignerState));
   }
 
+  @Action(CommonDesignerJoinsArray)
   @Action(DesignerJoinsArray)
   updateJoins(
     { patchState, getState }: StateContext<DesignerStateModel>,

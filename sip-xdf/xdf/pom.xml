@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
   <!--name>xdf</name-->
   <properties>
-
+    <xdf.package.name>sip-xdf</xdf.package.name>
   </properties>
 
   <dependencies>
@@ -116,7 +116,7 @@
               <goal>rpm</goal>
             </goals>
             <configuration>
-              <packageName>sip-xdf</packageName>
+              <packageName>${xdf.package.name}</packageName>
               <version>${revision.nodash}</version>
               <requires>
                 <require>jq &gt;= 1.5</require>
@@ -127,19 +127,19 @@
                   <rules>
                     <rule>
                       <when>
-                        <prefix>/opt/sip/sip-xdf/bin/</prefix>
+                        <prefix>/opt/sip/${xdf.package.name}/bin/</prefix>
                       </when>
                       <mode>0755</mode>
                     </rule>
                     <rule>
                       <when>
-                        <prefix>/opt/sip/sip-xdf/test/</prefix>
+                        <prefix>/opt/sip/${xdf.package.name}/test/</prefix>
                       </when>
                       <mode>0755</mode>
                     </rule>
                     <rule>
                       <when>
-                        <prefix>/var/opt/sip/sip-xdf/log</prefix>
+                        <prefix>/var/opt/sip/${xdf.package.name}/log</prefix>
                       </when>
                       <user>mapr</user>
                       <group>mapr</group>
@@ -149,15 +149,15 @@
               </rulesets>
               <entries>
                 <entry>
-                  <name>/opt/sip/sip-xdf</name>
+                  <name>/opt/sip/${xdf.package.name}</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/bin</name>
+                  <name>/opt/sip/${xdf.package.name}/bin</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/bin</name>
+                  <name>/opt/sip/${xdf.package.name}/bin</name>
                   <collect>
                     <from>bin</from>
                     <excludes>
@@ -167,36 +167,36 @@
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/conf</name>
+                  <name>/opt/sip/${xdf.package.name}/conf</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/conf</name>
+                  <name>/opt/sip/${xdf.package.name}/conf</name>
                   <collect>
                     <from>conf</from>
                   </collect>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/lib</name>
+                  <name>/opt/sip/${xdf.package.name}/lib</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/lib/xdf-full.jar</name>
+                  <name>/opt/sip/${xdf.package.name}/lib/xdf-full.jar</name>
                   <file>${project.build.directory}/${project.artifactId}-${project.version}-full.jar</file>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/test</name>
+                  <name>/opt/sip/${xdf.package.name}/test</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/sip/sip-xdf/test</name>
+                  <name>/opt/sip/${xdf.package.name}/test</name>
                   <collect>
                     <from>test</from>
                   </collect>
                   <ruleset>default</ruleset>
                 </entry>
                 <entry>
-                  <name>/var/opt/sip/sip-xdf/log</name>
+                  <name>/var/opt/sip/${xdf.package.name}/log</name>
                   <directory>true</directory>
                   <ruleset>default</ruleset>
                 </entry>
@@ -223,7 +223,7 @@
               <descriptors>
                 <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
               </descriptors>
-              <finalName>sip-xdf-${project.version}</finalName>
+              <finalName>${xdf.package.name}-${project.version}</finalName>
               <!-- Enable long file names without Maven warning -->
               <tarLongFileMode>posix</tarLongFileMode>
             </configuration>

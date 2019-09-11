@@ -1,9 +1,19 @@
 <div class="designer-chart-container" #chartContainer>
   <chart
+    *ngIf="!(isDataTooMuchForChart$ | async)"
     [updater]="updater"
     [attr.e2e]="'chart-type:' + chartType"
     [options]="chartOptions"
     [chartType]="chartType"
   >
   </chart>
+  <div fxLayout="column" fxLayoutAlign="space-between center">
+    <span
+      class="too-much-data-message"
+      *ngIf="isDataTooMuchForChart$ | async"
+      i18n
+    >
+      There is too much data for packed bubble chart. Choose a different metric
+    </span>
+  </div>
 </div>

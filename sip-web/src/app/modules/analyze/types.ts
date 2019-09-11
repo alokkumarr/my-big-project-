@@ -49,11 +49,6 @@ export type ChartType =
   | 'bubble';
 
 export type Analysis = AnalysisChart | AnalysisReport;
-export const isDSLAnalysis = (
-  analysis: Analysis | AnalysisDSL
-): analysis is AnalysisDSL => {
-  return (<AnalysisDSL>analysis).sipQuery !== undefined;
-};
 
 export interface AnalysisStarter {
   name?: string;

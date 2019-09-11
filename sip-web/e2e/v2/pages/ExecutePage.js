@@ -1,6 +1,7 @@
 'use strict';
 
 const commonFunctions = require('./utils/commonFunctions');
+const Utils = require('./utils/Utils');
 const ConfirmationModel = require('./components/ConfirmationModel');
 const Constants = require('../helpers/Constants');
 
@@ -37,6 +38,43 @@ class ExecutePage extends ConfirmationModel {
         `//executed-chart-view[contains(@class,'executed-chart-analysis')]`
       )
     );
+    this._toastSuccess = element(by.css(`[class*='toast-success']`));
+
+    this._aggregate = name => element(by.css(`[class*=' icon-${name}']`));
+    this._previousVersion = element(
+      by.xpath(`//span[text()='Previous Versions']`)
+    );
+    this._firstHistory = element(by.xpath(`(//tr)[2]`));
+    this._executeButtonInDetailPage = element(
+      by.xpath(`//span[contains(text(),'Execute')]/parent::button`)
+    );
+    this._gridViewIcon = element(by.css(`[mattooltip='Toggle to Grid']`));
+    this._perPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
+    this._itemPerPageSizeSection = element(by.css(`[class='dx-page-sizes']`));
+    this._totalPerPageOptions = element.all(
+      by.xpath(
+        `//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')]`
+      )
+    );
+    this._itemPerPageOptions = item =>
+      element(
+        by.xpath(
+          `(//div[@class='dx-page-sizes']/descendant::div[contains(@class,'dx-page-size')])[${item}]`
+        )
+      );
+
+    this._pagesSection = element(by.css(`[class='dx-pages']`));
+    this._totalPages = element.all(
+      by.xpath(
+        `//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')]`
+      )
+    );
+    this._paginationPage = number =>
+      element(
+        by.xpath(
+          `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
+        )
+      );
   }
 
   verifyTitle(title) {
@@ -131,6 +169,71 @@ class ExecutePage extends ConfirmationModel {
       browser.sleep(1500); // Some how this need to be added
       commonFunctions.waitFor.elementToBePresent(this._selectedFilter(value));
       commonFunctions.waitFor.elementToBeVisible(this._selectedFilter(value));
+    });
+  }
+
+  aggregationVerification(aggregation) {
+    commonFunctions.waitFor.elementToBeVisible(this._aggregate(aggregation));
+  }
+
+  clickOnToastSuccessMessage(designerLabel = null) {
+    if (designerLabel === 'Distinct Count') {
+      // Handle one special case where some issues
+      commonFunctions.elementToBeClickableAndClickByMouseMove(
+        this._toastSuccess
+      );
+    }
+  }
+
+  goToPreviousHistory() {
+    commonFunctions.clickOnElement(this._previousVersion);
+    commonFunctions.waitFor.elementToBeVisible(this._firstHistory);
+    browser
+      .actions()
+      .mouseMove(this._firstHistory)
+      .click()
+      .perform();
+  }
+
+  clickOnGridViewIcon() {
+    commonFunctions.clickOnElement(this._gridViewIcon);
+  }
+
+  verifyItemPerPage() {
+    commonFunctions.waitFor.elementToBeVisible(this._perPageSizeSection);
+    commonFunctions.scrollIntoView(this._perPageSizeSection);
+    let _self = this;
+    this._totalPerPageOptions.count().then(total => {
+      let pos = 1; // 1 is already selected so it should be clickable
+
+      (function loop() {
+        if (pos <= total) {
+          _self._itemPerPageOptions(pos).click();
+          browser.sleep(2000); // Need to add this else getting stale element exception
+          expect(_self._pagesSection.isDisplayed()).toBeTruthy();
+          pos++;
+          loop();
+        }
+      })();
+    });
+  }
+
+  verifyPagination() {
+    commonFunctions.waitFor.elementToBeVisible(this._pagesSection);
+    commonFunctions.scrollIntoView(this._pagesSection);
+    let _self = this;
+    this._totalPages.count().then(total => {
+      let pos = 1; // 1 is already selected so it should be clickable
+
+      (function loop() {
+        if (pos <= total) {
+          _self._paginationPage(pos).click();
+          browser.sleep(2000); // Need to add this else getting stale element exception
+          expect(_self._perPageSizeSection.isDisplayed()).toBeTruthy();
+          pos++;
+          loop();
+        }
+      })();
     });
   }
 }

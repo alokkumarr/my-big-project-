@@ -24,7 +24,10 @@ import {
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
-  DEFAULT_PRECISION
+  DEFAULT_PRECISION,
+  DATE_INTERVALS,
+  DATE_INTERVALS_OBJ,
+  DEFAULT_DATE_INTERVAL
 } from '../../common/consts';
 
 export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
@@ -49,7 +52,10 @@ export {
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
-  DEFAULT_PRECISION
+  DEFAULT_PRECISION,
+  DATE_INTERVALS,
+  DATE_INTERVALS_OBJ,
+  DEFAULT_DATE_INTERVAL
 };
 
 export const DSL_ANALYSIS_TYPES = [
@@ -264,6 +270,14 @@ export const ANALYSIS_METHODS = [
             type: 'chart:bubble'
           },
           {
+            label: 'Packed Bubble Chart',
+            icon: {
+              font: 'icon-packed-bubble-chart',
+              svg: 'packed-bubble-chart-col'
+            },
+            type: 'chart:packedbubble'
+          },
+          {
             label: 'Pie Chart',
             icon: {
               font: 'icon-pie-chart',
@@ -353,44 +367,6 @@ export const AREA_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(AREA_TYPES);
-
-export const DATE_INTERVALS = [
-  {
-    label: 'All',
-    value: 'all'
-  },
-  {
-    label: 'Year',
-    value: 'year',
-    format: 'yyyy',
-    momentFormat: 'yyyy'
-  },
-  {
-    label: 'Quarter',
-    value: 'quarter',
-    format: 'yyyy-QQQ',
-    momentFormat: 'YYYY-[Q]Q'
-  },
-  {
-    label: 'Month',
-    value: 'month',
-    format: 'yyyy-MM',
-    momentFormat: 'YYYY-MM'
-  },
-  {
-    label: 'Date',
-    value: 'day',
-    format: 'yyyy-MM-dd',
-    momentFormat: 'YYYY-MM-DD'
-  }
-];
-
-export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
-
-export const DATE_INTERVALS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(DATE_INTERVALS);
 
 export const CUSTOM_DATE_PRESET_VALUE = 'NA';
 export const DATE_PRESETS = [

@@ -1,0 +1,52 @@
+{
+  "PAGINATION_ES": {
+    "execute_page": {
+      "PGES001": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to paginate in execute page",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "PGES002": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able paginate in execute page",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Long", "Float", "Double"]
+          }
+        ]
+      }
+    },
+    "preview_page": {
+      "PGES003": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to paginate in preview page",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "PGES004": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able paginate in preview page",
+        "tables": [
+          {
+            "name": "sample",
+            "fields": ["Long", "Float", "Double"]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -88,6 +88,7 @@ import {
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState,
+  DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
@@ -114,9 +115,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
-  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
-    AnalysisDSL
-  >;
+  @Select(DesignerState.data) data$: Observable<any[]>;
+  @Select(DesignerState.analysis) dslAnalysis$: Observable<AnalysisDSL>;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
   );
@@ -224,6 +224,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       break;
     }
+    this.data$.subscribe(data => (this.data = data));
     this.dslAnalysis$.subscribe(analysis => {
       if (!analysis || ['report'].includes(analysisType)) {
         return;
@@ -327,6 +328,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     fpPipe(
       fpFlatMap(artifact => artifact.columns || artifact.fields),
       fpReduce((accumulator, column) => {
+        if (column.type === 'date') {
+          column.dateFormat = 'MMM d YYYY';
+        }
         delete column.checked;
         return accumulator;
       }, {})
@@ -435,7 +439,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           value: ''
         };
     }
-
     this._store.dispatch(
       new DesignerUpdateAnalysisChartLabelOptions(labelOptions)
     );
@@ -695,7 +698,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
     // because these properties are not part of dsl analysis definition
@@ -720,11 +722,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
           this.dataCount = 0;
-          this.data = this.setEmptyData();
+          this._store.dispatch(new DesignerSetData(this.setEmptyData()));
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.flattenData(response.data, this.analysis);
+          this._store.dispatch(
+            new DesignerSetData(this.flattenData(response.data, this.analysis))
+          );
           if (this.analysis.type === 'report' && response.designerQuery) {
             if (!this.isInQueryMode) {
               this._store.dispatch(
@@ -736,7 +740,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       },
       err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-        this.data = [];
+        this._store.dispatch(new DesignerSetData([]));
       }
     );
   }
@@ -1231,6 +1235,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<any>this.analysis).isInverted = to === 'bar';
     }
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
+    this.auxSettings = { ...this.auxSettings, labelOptions: {
+        enabled: to === 'pie',
+        value: to === 'pie' ? 'percentage' : ''
+      }
+    };
+    this.resetArtifacts();
     // this.artifacts = [...this.artifacts];
   }
 

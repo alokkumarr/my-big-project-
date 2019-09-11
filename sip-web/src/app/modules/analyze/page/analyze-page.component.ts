@@ -5,7 +5,7 @@ import * as split from 'lodash/split';
 
 import { LAST_ANALYSES_CATEGORY_ID } from '../../../common/local-storage-keys';
 import { JwtService } from '../../../common/services';
-import { CommonLoadAllMetrics } from 'src/app/common/actions/menu.actions';
+import { CommonLoadAllMetrics } from 'src/app/common/actions/common.actions';
 
 @Component({
   selector: 'analyze-page',

@@ -1,0 +1,72 @@
+{
+  "PAGINATION": {
+    "charts_execute": {
+      "PGC001": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to create and delete combo charts"
+      },
+      "PGC002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to create and delete column charts"
+      },
+      "PGC003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to create and delete bar charts"
+      },
+      "PGC004": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to create and delete stack charts"
+      },
+      "PGC005": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to create and delete line charts"
+      },
+      "PGC006": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to create and delete area charts"
+      },
+      "PGC007": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to create and delete scatter charts"
+      },
+      "PGC008": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to create and delete bubble charts"
+      },
+      "PGC009": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to create and delete pie charts"
+      },
+      "PGC010": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to create and delete tsspline charts"
+      },
+      "PGC011": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to create and delete tsPane charts"
+      }
+    }
+  }
+}

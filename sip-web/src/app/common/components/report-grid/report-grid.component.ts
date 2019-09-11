@@ -41,7 +41,7 @@ import {
   Sort,
   ReportGridChangeEvent
 } from './types';
-import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
+import { DATE_TYPES, NUMBER_TYPES } from '../../consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 import { flattenReportData } from '../../../common/utils/dataFlattener';

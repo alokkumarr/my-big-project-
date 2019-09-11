@@ -339,7 +339,13 @@ public class ExportServiceImpl implements ExportService {
                     osw.write("\n");
                     osw.write(
                         Arrays.stream(exportBean.getColumnHeader())
-                            .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                            .map(val -> {
+                                    if (((LinkedHashMap) line).get(val) == null) {
+                                        return "null";
+                                    }
+                                    return "\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                }
+                            )
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Header for csv file: " + header);
@@ -348,7 +354,15 @@ public class ExportServiceImpl implements ExportService {
                     // won't hamper memory consumption
                     osw.write(
                         Arrays.stream(exportBean.getColumnHeader())
-                            .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                            .map(val -> {
+                                String value;
+                                if (((LinkedHashMap) line).get(val) == null) {
+                                   return "null";
+                                }
+                                value="\"" + ((LinkedHashMap) line).get(val) + "\"";
+                                return value;
+                            }
+                            )
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
                     logger.debug("Line Item for report: " + line.toString());
@@ -454,8 +468,7 @@ public class ExportServiceImpl implements ExportService {
             storageProxyUrl
                 + "/internal/proxy/storage/"
                 + executionId
-                + "/executions/data?page=1&pageSize="
-                + emailExportSize;
+                + "/executions/data";
 
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
             asyncRestTemplate.getForEntity(url, JsonNode.class);
@@ -505,6 +518,7 @@ public class ExportServiceImpl implements ExportService {
 
                   List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
                   logger.trace("Parse data for workbook writing : " + dataObj);
+                  logger.trace("Data size = " + dataObj.size());
 
                   Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
                   logger.debug("workbook created with DSL : " + workbook);
@@ -625,6 +639,7 @@ public class ExportServiceImpl implements ExportService {
 
                 List<Object> dataObj = responseParser.parsePivotData(jsonNode);
                 logger.trace("Parse data for workbook writing : " + dataObj);
+                logger.trace("Data size = " + dataObj.size());
 
                 Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
                 logger.debug("workbook successfully with DSL" + workbook);

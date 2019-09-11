@@ -36,14 +36,9 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import {
-  NUMBER_TYPES,
-  FLOAT_TYPES,
-  DATE_TYPES,
-  AGGREGATE_TYPES_OBJ,
-  CHART_COLORS
-} from '../../modules/analyze/consts';
 import { QueryDSL } from 'src/app/models';
+import { getTooltipFormats } from './tooltipFormatter';
+import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -491,10 +486,9 @@ export class ChartService {
     if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
       aggrSymbol = '%';
     }
-    const nameWithAggregate =
-      aggregate === 'sum'
-        ? `Total ${displayName}`
-        : `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`;
+    const nameWithAggregate = `${
+      AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+    }(${displayName})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -627,7 +621,7 @@ export class ChartService {
     return isCategoryAxis;
   }
 
-  dataToNestedDonut(series, categories) {
+  dataToNestedDonut(series, categories, fields) {
     /* Group by option forms the inner circle. X axis option forms the outer region
        This logic is adapted from https://www.highcharts.com/demo/pie-donut */
     const colors = this._Highcharts.getOptions().colors;
@@ -680,6 +674,7 @@ export class ChartService {
 
     const chartSeries = [
       {
+        name: fields.g.displayName,
         data: innerData,
         aggrSymbol,
         dataType,
@@ -691,6 +686,7 @@ export class ChartService {
         size: '60%'
       },
       {
+        name: fields.x.displayName,
         aggrSymbol,
         dataType,
         aggregate,
@@ -733,7 +729,7 @@ export class ChartService {
         });
         chartSeries = series;
       } else {
-        chartSeries = this.dataToNestedDonut(series, categories);
+        chartSeries = this.dataToNestedDonut(series, categories, fields);
       }
       return { chartSeries };
 
@@ -744,12 +740,6 @@ export class ChartService {
 
   getPieChangeConfig(type, fields, gridData, opts) {
     const changes = [];
-    const yField = get(fields, 'y.0', {});
-    const yLabel =
-      get(opts, 'labels.y') ||
-      yField.alias ||
-      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
-
     const labelOptions = get(opts, 'labelOptions', {
       enabled: true,
       value: 'percentage'
@@ -768,7 +758,6 @@ export class ChartService {
     );
 
     forEach(chartSeries, seriesData => {
-      seriesData.name = yLabel;
       seriesData.dataLabels = seriesData.dataLabels || {};
       seriesData.dataLabels.enabled = labelOptions.enabled;
 
@@ -806,16 +795,16 @@ export class ChartService {
             if (!isUndefined(field.alias)) {
               return (
                 field.alias ||
-                `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
+                `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
                   field.displayName
-                }`
+                })`
               );
             }
             return (
               opts.labels.y ||
-              `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
+              `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
                 field.displayName
-              }`
+              })`
             );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
@@ -858,7 +847,9 @@ export class ChartService {
     forEach(axisFields, (field, index) => {
       const titleText =
         field.alias ||
-        `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+        `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
+          field.displayName
+        })`;
       chartChanges.push({
         labels: {
           align: 'right',
@@ -960,6 +951,9 @@ export class ChartService {
     };
 
     switch (type) {
+      case 'packedbubble':
+        changes = this.getPackedBubbleChartConfig(fields, gridData);
+        break;
       case 'pie':
         changes = this.getPieChangeConfig(type, fields, gridData, opts);
         break;
@@ -976,171 +970,91 @@ export class ChartService {
         changes = this.getBarChangeConfig(type, fields, gridData, opts);
         break;
     }
-    return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
+
+    return concat(changes, this.addTooltipsAndLegend(fields, type));
   }
 
-  addTooltipsAndLegend(fields, chartType, opts) {
-    const changes = [];
+  getPackedBubbleChartConfig(fields, gridData) {
+    const groupField = fields.g;
+    const hasGroupBy = Boolean(groupField);
 
+    const dataMapper = dataPoint => {
+      const valueProp = fields.y[0].columnName;
+      const nameProp = fields.x.dataField;
+      return { name: dataPoint[nameProp], value: dataPoint[valueProp] };
+    };
+
+    const packedBubble = {
+      minSize: '30%',
+      maxSize: '120%',
+      zMin: 0,
+      zMax: 1000,
+      layoutAlgorithm: {
+        splitSeries: false,
+        gravitationalConstant: 0.02
+      },
+      dataLabels: {
+        enabled: true,
+        format: '{point.name}',
+        style: {
+          color: 'black',
+          textOutline: 'none',
+          fontWeight: 'normal'
+        }
+      }
+    };
+
+    if (hasGroupBy) {
+      const groupProp = groupField.dataField;
+      const series = fpPipe(
+        fpGroupBy(fields.g.dataField),
+        fpMap(group => {
+          const name = group[0][groupProp];
+          return { name, data: map(group, dataMapper) };
+        })
+      )(gridData);
+      return [
+        { path: 'series', data: series },
+        { path: 'plotOptions.packedbubble', data: packedBubble }
+      ];
+    }
+
+    const data = map(gridData, dataMapper);
+    return [
+      { path: 'series', data: [{ data: data }] },
+      { path: 'plotOptions.packedbubble', data: packedBubble }
+    ];
+  }
+
+  addTooltipsAndLegend(fields, chartType) {
+    const changes = [];
+    const yIsSingle = fields.y.length === 1;
     if (!this.getViewOptionsFor(chartType).customTooltip) {
       return changes;
     }
 
-    const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
-    const xIsString = fields.x.type === 'string';
-    const yIsSingle = fields.y.length === 1;
+    const { headerFormat, pointFormatter, footerFormat } = getTooltipFormats(
+      fields,
+      chartType
+    );
 
-    /**
-     * If the data type is float OR aggregate is percentage or average, we
-     * show two decimal places. Else, no decimal places.
-     *
-     * @returns {undefined}
-     */
-    const getPrecision = (aggregate, type) => {
-      return ['percentage', 'avg', 'percentagebyrow'].includes(aggregate) ||
-        FLOAT_TYPES.includes(type)
-        ? 2
-        : 0;
-    };
-
-    const handleNaNIssue = (point, options) => {
-      /**
-       * In some cases point.value or point.y is received as 0. Which was causing the round()
-       * to return NaN . So making sure that if value received is 0 then
-       * it should return as it is. Also checking if option datatype
-       * is float or double return the value with correct decimal precision.
-       *
-       */
-      return point
-        ? point.value === 0 || point.y === 0
-          ? point.value
-            ? point.value.toFixed(
-                getPrecision(options.aggregate, options.dataType)
-              )
-            : (point.y || 0).toFixed(
-                getPrecision(options.aggregate, options.dataType)
-              )
-          : round(
-              options.aggregate === 'percentagebyrow'
-                ? round(point.percentage, 2)
-                : point.y
-                ? point.y
-                : point.value,
-              getPrecision(options.aggregate, options.dataType)
-            ).toLocaleString()
-        : '{point.y:,.2f}';
-    };
-
-    /**
-     * If point is provided as paramter, this function returns the formatted tooltip.
-     * If point is not provided, it replaces the point values with appropriate format strings.
-     *
-     * Point is supposed to be provided when we're dynamically using pointFormatter in our
-     * tooltip.
-     *
-     * @returns {string}
-     */
-    const tooltipFormatter = (point = null) => {
-      // eslint-disable-line
-      const options = point ? point.series.userOptions : {};
-      //
-      // x can be either a string, a number or a date
-      // string -> use the value from categories
-      // number -> restrict the number to 2 decimals
-      // date -> just show the date
-      const xStringValue = point
-        ? xIsString
-          ? point.key
-          : xIsNumber
-          ? point.x
-            ? point.x
-            : point.total
-            ? round(point.total, 2)
-            : round(point.x, 2)
-          : point.x
-        : xIsString
-        ? '{point.key}'
-        : xIsNumber
-        ? '{point.x:,.2f}'
-        : '{point.x}';
-      const xString = `<tr>
-        <th>${fields.x.alias ||
-          get(opts, 'labels.x', '') ||
-          fields.x.displayName}:</th>
-        <td>${xStringValue}</td>
-      </tr>`;
-
-      const yString = `<tr>
-        <th>${fields.y.alias ||
-          get(opts, 'labels.y', '') ||
-          (point ? point.series.name : '{series.name}')}:</th>
-        <td>${handleNaNIssue(point, options)}${
-        point
-          ? point.series.userOptions.aggrSymbol
-          : '{point.series.userOptions.aggrSymbol}'
-      }</td>
-      </tr>`;
-
-      const zString = fields.z
-        ? `<tr><th>${AGGREGATE_TYPES_OBJ[fields.z.aggregate].label} ${fields.z
-            .alias ||
-            get(opts, 'labels.z', '') ||
-            fields.z.displayName}:</th><td>${
-            point ? round(point.z, 2) : '{point.z:,.2f}'
-          }</td></tr>`
-        : '';
-
-      const gString = fields.g
-        ? `<tr><th>Group:</th><td>${
-            point ? point.g || point.name : '{point.g}'
-          }</td></tr>`
-        : '';
-
-      return {
-        xAxisString: xString,
-        yAxisString: yString,
-        zAxisString: zString,
-        groupString: gString
-      };
-    };
-
-    const {
-      xAxisString,
-      yAxisString,
-      zAxisString,
-      groupString
-    } = tooltipFormatter();
+    const isStockChart = chartType.substring(0, 2) === 'ts';
 
     let tooltipObj = {
+      enabled: true,
       useHTML: true,
-      headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
-      pointFormat: `${xIsNumber ? xAxisString : ''}
-        ${yAxisString}
-        ${zAxisString}
-        ${groupString}`,
-      pointFormatter: function() {
-        // tslint-disable-line
-        const axisStrings = tooltipFormatter(this);
-        return `${xIsNumber ? axisStrings.xAxisString : ''}
-          ${axisStrings.yAxisString}
-          ${axisStrings.zAxisString}
-          ${axisStrings.groupString}`;
-      },
-      footerFormat: '</table>',
+      headerFormat,
+      pointFormatter,
+      footerFormat,
       followPointer: true
     };
 
-    if (chartType.substring(0, 2) === 'ts') {
+    if (isStockChart) {
       tooltipObj = {
-        enabled: true,
-        useHTML: true,
+        ...tooltipObj,
         valueDecimals: 3,
         split: true,
         shared: false,
-        // headerFormat: `<table>`,
-        pointFormat: `<table> ${yAxisString}
-          ${zAxisString}`,
-        footerFormat: '</table>',
         followPointer: true
       } as any;
     }
