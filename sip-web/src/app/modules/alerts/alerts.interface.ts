@@ -27,6 +27,12 @@ export interface AlertConfig {
   alertRuleDescription: any;
   alertSeverity: string;
   alertRulesSysId?: string;
+  metricsColumn: string;
+  aggregationType: string;
+  operator: string;
+  thresholdValue: string;
+  attributeName: string;
+  attributeValue: string;
   datapodId: string;
   datapodName: string;
   activeInd: boolean;
@@ -35,6 +41,8 @@ export interface AlertConfig {
   product?: string;
   createdBy?: any;
   createdTime?: any;
+  lookbackColumn?: string;
+  lookbackPeriod?: string;
   modifiedTime?: any;
   modifiedBy?: any;
   sipQuery?: AlertSipQuery;

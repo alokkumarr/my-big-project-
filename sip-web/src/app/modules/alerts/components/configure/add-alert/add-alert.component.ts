@@ -273,7 +273,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       notificationEmails
     );
     const lookbackPeriod = `${lookbackPeriodValue}-${lookbackPeriodType}`;
-    const alertConfigWithoutSipQuery = {
+
+    const alertConfigWithoutSipQuery: AlertConfig = {
       alertRuleName,
       alertRuleDescription,
       alertSeverity,
@@ -291,10 +292,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       attributeName,
       attributeValue
     };
-    const alertConfig: AlertConfig = {
-      ...alertConfigWithoutSipQuery,
-      sipQuery
-    };
 
     if (this.alertDefinition.action === 'update') {
       const {
@@ -302,13 +299,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         createdTime,
         product
       } = this.alertDefinition.alertConfig;
-      alertConfig.createdBy = createdBy;
-      alertConfig.createdTime = createdTime;
-      alertConfig.product = product;
+      alertConfigWithoutSipQuery.createdBy = createdBy;
+      alertConfigWithoutSipQuery.createdTime = createdTime;
+      alertConfigWithoutSipQuery.product = product;
     } else {
-      alertConfig.product = 'SAWD000001';
+      alertConfigWithoutSipQuery.product = 'SAWD000001';
     }
 
+    const alertConfig: AlertConfig = {
+      ...alertConfigWithoutSipQuery,
+      sipQuery
+    };
     this.endPayload = alertConfigWithoutSipQuery;
     return alertConfig;
   }

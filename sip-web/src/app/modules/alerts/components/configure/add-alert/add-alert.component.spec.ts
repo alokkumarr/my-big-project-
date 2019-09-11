@@ -2,18 +2,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Observable } from 'rxjs';
 import { MaterialModule } from '../../../../../material.module';
 import { CommonPipesModule } from '../../../../../common/pipes/common-pipes.module';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddAlertComponent } from './add-alert.component';
 import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
-import { Observable } from 'rxjs';
+import { ObserveService } from '../../../../observe/services/observe.service';
 
 const ToastServiceStub: Partial<ToastService> = {
   success(msg, title = '', options = {}) {}
 };
+
+const ObserveServiceStub = {};
 
 const confAlertServiceStub = {
   createAlert: () => {
@@ -37,17 +40,25 @@ const confAlertServiceStub = {
 };
 
 const payload: AlertConfig = {
-  alertRuleName: 'abc',
-  alertRuleDescription: 'abc',
-  alertSeverity: 'CRITICAL',
-  activeInd: false,
-  datapodId: '1',
-  datapodName: 'abc',
+  alertRuleName: '',
+  alertRuleDescription: '',
+  alertSeverity: '',
+  activeInd: true,
+  datapodId: '',
+  datapodName: '',
   categoryId: '',
   notification: [],
   lookbackColumn: '',
-  lookbackPeriod: '',
-  product: 'SAWD000001'
+  lookbackPeriod: '-',
+  product: 'SAWD000001',
+  metricsColumn: '',
+  aggregationType: '',
+  operator: '',
+  thresholdValue: '',
+  attributeName: '',
+  attributeValue: '',
+  createdBy: undefined,
+  createdTime: undefined
 };
 
 const alertDefinitionStub: AlertDefinition = {
@@ -73,7 +84,8 @@ describe('AddAlertComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: ConfigureAlertService, useValue: confAlertServiceStub },
-        { provide: ToastService, useValue: ToastServiceStub }
+        { provide: ToastService, useValue: ToastServiceStub },
+        { provide: ObserveService, useValue: ObserveServiceStub }
       ]
     }).compileComponents();
   }));
@@ -101,28 +113,22 @@ describe('AddAlertComponent', () => {
     expect(component.metricsList$ instanceof Observable).toBe(true);
   });
 
-  it('should reset monitoringEntity formControl value', () => {
+  it('should reset metricsColumn formControl value', () => {
     component.onDatapodChanged();
     expect(
-      component.alertMetricFormGroup.controls['monitoringEntity'].value
+      component.alertMetricFormGroup.controls['metricsColumn'].value
     ).toEqual('');
   });
 
   it('should create alert payload', () => {
-    component.selectedEntityName = {
-      alias: 'aslias',
-      columnName: 'colName',
-      displayName: 'displayName',
-      type: 'string'
-    };
-    component.selectedMonitoringEntity = {
-      alias: 'aslias2',
-      columnName: 'colName2',
-      displayName: 'displayName2',
-      type: 'integer'
-    };
     component.selectedDatapod = {
       artifacts: [{ artifactName: 'sample', fields: [] }]
+    };
+    component.selectedMetricsColumn = {
+      columnName: '',
+      alias: '',
+      displayName: '',
+      type: ''
     };
     component.constructPayload();
     expect(component.endPayload).toEqual(payload);
