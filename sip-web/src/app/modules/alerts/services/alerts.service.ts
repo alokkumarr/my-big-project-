@@ -8,7 +8,6 @@ import { map } from 'rxjs/operators';
 import { GridPagingOptions, AlertFilterModel } from '../alerts.interface';
 import AppConfig from '../../../../../appConfig';
 import { CUSTOM_DATE_PRESET_VALUE } from '../consts';
-import { transformAlertForGridView } from './alert-transforms';
 import {
   AlertDateCount,
   AlertDateSeverity,
@@ -65,10 +64,9 @@ export class AlertsService {
 
   getAlertRuleDetails(id: number) {
     const url = `${apiUrl}/alerts/${id}`;
-    return this._http.get<{ alert: AlertConfig; message: string }>(url).pipe(
-      map(({ alert }) => alert),
-      map(transformAlertForGridView)
-    );
+    return this._http
+      .get<{ alert: AlertConfig; message: string }>(url)
+      .pipe(map(({ alert }) => alert));
   }
 
   getAllAlertsCount(dateFilter: AlertFilterModel) {

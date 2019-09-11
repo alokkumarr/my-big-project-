@@ -20,10 +20,10 @@
 
       <mat-step [stepControl]="alertDefFormGroup">
         <form [formGroup]="alertDefFormGroup">
-          <ng-template matStepLabel>Name Your Alert</ng-template>
+          <ng-template matStepLabel>Name your alert</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
             <mat-form-field appearance="outline">
-              <mat-label>Alert Name</mat-label>
+              <mat-label>Alert name</mat-label>
               <input
                 matInput
                 placeholder="Alert Name"
@@ -41,12 +41,12 @@
                 *ngIf="
                   alertDefFormGroup.controls.alertRuleName.hasError('maxlength')
                 "
-                >Alert Name cannot exceed 18 characters</mat-error
+                >Alert name cannot exceed 18 characters</mat-error
               >
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Alert Severity Level</mat-label>
+              <mat-label>Alert severity level</mat-label>
               <mat-select
                 formControlName="alertSeverity"
                 required
@@ -88,7 +88,7 @@
             </div>
 
             <mat-form-field appearance="outline">
-              <mat-label>Alert Status</mat-label>
+              <mat-label>Alert status</mat-label>
               <mat-select formControlName="activeInd" e2e="alertStatus">
                 <mat-option
                   *ngFor="let stat of alertStatus"
@@ -99,7 +99,7 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Alert Description</mat-label>
+              <mat-label>Alert description</mat-label>
               <textarea
                 matInput
                 formControlName="alertRuleDescription"
@@ -120,7 +120,7 @@
                     'maxlength'
                   )
                 "
-                >Alert Description cannot exceed 36 characters</mat-error
+                >Alert description cannot exceed 36 characters</mat-error
               >
             </mat-form-field>
 
@@ -190,34 +190,35 @@
               <dx-select-box
                 ngDefaultControl
                 required
-                formControlName="monitoringEntity"
-                [items]="metricsListWithoutEntity"
+                formControlName="metricsColumn"
+                [items]="metricsList$ | async | filterFn: numericMetricFilter"
                 displayExpr="displayName"
                 valueExpr="columnName"
                 [searchEnabled]="true"
-                placeholder="Select a monitoring entity"
+                placeholder="Select a metric"
                 (onSelectionChanged)="
-                  onSelectedMonitoringEntity($event?.selectedItem)
+                  onSelectedMetricsColumn($event?.selectedItem)
                 "
                 [readOnly]="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
-                e2e="monitoringEntity"
+                e2e="metricsColumn"
               ></dx-select-box>
             </mat-form-field>
             <mat-error
               class="add-container__body__stepper__errmsg"
               fxFlex
               *ngIf="
-                alertMetricFormGroup.controls.monitoringEntity.hasError(
-                  'required'
-                )
+                alertMetricFormGroup.controls.metricsColumn.hasError('required')
               "
               ><small>This field is required </small></mat-error
             >
             <mat-form-field appearance="outline">
-              <mat-label>Aggregation </mat-label>
-              <mat-select formControlName="aggregation" e2e="alertAggregation">
+              <mat-label>Aggregation</mat-label>
+              <mat-select
+                formControlName="aggregationType"
+                e2e="aggregationType"
+              >
                 <mat-option
                   *ngFor="let aggr of aggregations$ | async"
                   [value]="aggr.id"
@@ -244,7 +245,7 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Threshold Value</mat-label>
+              <mat-label>Threshold value</mat-label>
               <input
                 matInput
                 placeholder="Threshold Value"
@@ -267,7 +268,7 @@
                     'pattern'
                   )
                 "
-                >Only numbers are allowed for Threshold Value.</mat-error
+                >Only numbers are allowed for Threshold value.</mat-error
               >
             </mat-form-field>
             <div
@@ -305,44 +306,6 @@
               appearance="outline"
               class="add-container__body__stepper__dxselect padtop10"
             >
-              <mat-label>Entity name</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                matInput
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
-                required
-                formControlName="entityName"
-                [items]="metricsListWithoutMonitoringEntity"
-                displayExpr="displayName"
-                valueExpr="columnName"
-                [searchEnabled]="true"
-                placeholder="Select an Entity"
-                (onSelectionChanged)="
-                  onSelectedEntityName($event?.selectedItem)
-                "
-                [readOnly]="
-                  alertMetricFormGroup.controls.datapodId.hasError('required')
-                "
-                e2e="entityName"
-              ></dx-select-box>
-            </mat-form-field>
-            <mat-error
-              class="add-container__body__stepper__errmsg"
-              fxFlex
-              *ngIf="
-                alertRuleFormGroup.controls.entityName.hasError('required')
-              "
-              ><small>This field is required </small></mat-error
-            >
-
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
               <mat-label>Lookback column</mat-label>
               <input
                 hidden="true"
@@ -356,6 +319,7 @@
                 formControlName="lookbackColumn"
                 [items]="metricsList$ | async | filterFn: dateMetricFilter"
                 displayExpr="displayName"
+                valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
                 [readonly]="!alertMetricFormGroup.controls.datapodId.value"
@@ -437,12 +401,13 @@
               />
               <dx-select-box
                 ngDefaultControl
-                formControlName="attributeFilterColumn"
+                formControlName="attributeName"
                 [items]="metricsList$ | async | filterFn: stringMetricFilter"
                 displayExpr="displayName"
+                valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
-                e2e="attributeFilterColumn"
+                e2e="attributeName"
               ></dx-select-box>
             </mat-form-field>
 
@@ -459,11 +424,11 @@
               />
               <dx-select-box
                 ngDefaultControl
-                formControlName="attributeFilterValue"
-                [items]="attributeFilterValues$ | async"
+                formControlName="attributeValue"
+                [items]="attributeValues$ | async"
                 [searchEnabled]="true"
                 placeholder="Select a value"
-                e2e="attributeFilterValue"
+                e2e="attributeValue"
               ></dx-select-box>
             </mat-form-field>
             <div
@@ -496,7 +461,7 @@
       </mat-step>
 
       <mat-step style="max-height: 100px;">
-        <ng-template matStepLabel>Validate and Create</ng-template>
+        <ng-template matStepLabel>Validate and create</ng-template>
         <code>
           <pre class="add-container__body__stepper__validate">{{
             endPayload | json

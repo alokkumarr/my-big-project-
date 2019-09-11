@@ -1,6 +1,5 @@
 export interface AlertArtifact {
   dataField: string;
-  area: string;
   alias: string;
   columnName: string;
   name?: string;
