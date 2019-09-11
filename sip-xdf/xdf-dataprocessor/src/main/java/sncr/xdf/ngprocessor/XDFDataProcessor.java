@@ -204,19 +204,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             //datafileDFmap =  new HashMap<>();
             datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
             
-            logger.debug("##### Printing hashmap aftern0 parser #######");
-            for (String name: ngParserCtxSvc.getNgctx().datafileDFmap.keySet()){
-                String key = name.toString();
-                Dataset dataset = ngParserCtxSvc.getNgctx().datafileDFmap.get(name);  
-                logger.debug("#### key:: " + key ); 
-                logger.debug("####count ::"+ dataset.count());
-                //logger.info("SCHEMA ::");
-                //dataset.printSchema();
-            	} 
-
-            
-            
-            //dataSetName = parserKey;
 
             logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
@@ -386,15 +373,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             if (!sqlcomponent.initComponent(null))
                 System.exit(-1);
             
-            logger.warn("##### Printing hashmap #######");
-            for (String name: ngSQLCtxSvc.getNgctx().datafileDFmap.keySet()){
-                String key = name.toString();
-                Dataset dataset = ngSQLCtxSvc.getNgctx().datafileDFmap.get(name);  
-                logger.warn("#### key:: " + key ); 
-                logger.info("####count ::"+ dataset.count());
-                //logger.info("SCHEMA ::");
-                //dataset.printSchema();
-            	} 
 
             ret = sqlcomponent.run();
 
@@ -412,14 +390,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("End Of SQL Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
             
-            for (String name: datafileDFmap.keySet()){
-                String key = name.toString();
-                Dataset dataset = datafileDFmap.get(name);  
-                logger.warn("#### key:: " + key ); 
-                logger.info("####count ::"+ dataset.count());
-                //logger.info("SCHEMA ::");
-                //dataset.printSchema();
-            	} 
+            
 
 
         } catch (Exception e) {
@@ -478,17 +449,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngESCtxSvc.registerOutputDataSet();
             
 
-           // String dataSetInKey =  config.getInputs().get(0).getDataSet();
-
-            //logger.debug("ES loader Dataset Name is    " + dataSetInKey);
-            for (String name: datafileDFmap.keySet()){
-                String key = name.toString();
-                Dataset dataset = datafileDFmap.get(name);  
-                logger.warn("#### key:: " + key ); 
-                logger.info("####count ::"+ dataset.count());
-                //logger.info("SCHEMA ::");
-                //dataset.printSchema();
-            	} 
 
             
 

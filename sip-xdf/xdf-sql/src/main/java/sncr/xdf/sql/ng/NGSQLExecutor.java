@@ -45,7 +45,7 @@ public class NGSQLExecutor implements Serializable {
     }
 
     public int run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
-        jobDataFrames.forEach((t, df) -> logger.info("Registered DF so far: " + t ));
+        jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
 
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
@@ -91,7 +91,7 @@ public class NGSQLExecutor implements Serializable {
                                 return -1;
                             }
 
-                                logger.info("Load data from: " + location + ", registered table name: " + tn);
+                                logger.debug("Load data from: " + location + ", registered table name: " + tn);
 
                                 if (jobDataFrames.get(tn) != null) {
                                     continue;
@@ -133,19 +133,10 @@ public class NGSQLExecutor implements Serializable {
                 	
                 	
                 	
-                    //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
-                   // df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);
-                   // Dataset data = df;
-                   // logger.info("#### dataset count"+ df.count());
-                   // logger.info("#### dataset name"+ parent.getNgctx().dataSetName);
-                    //df.createOrReplaceTempView(parent.getNgctx().dataSetName);
                     
                     parent.getNgctx().datafileDFmap.forEach((key, value) -> {
                     
                     	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
-                    	//logger.info("#### dataset count ::"+ parent.getNgctx().datafileDFmap.get(key).count());
-                       // logger.info("#### dataset name ::"+ key);
-                       // logger.info("#### dataset columns ::");
                         StructField[] fields = parent.getNgctx().datafileDFmap.get(key).schema().fields();
                         Arrays.asList(fields).forEach((x)->logger.info(x));
                         

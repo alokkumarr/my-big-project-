@@ -53,16 +53,16 @@ public class SQLExecutor implements Serializable {
 
                     TableDescriptor tb = allTables.get(tn);
                     if (tb.isTargetTable){
-                        logger.info("Do not load data of target table: " + tn);
+                        logger.trace("Do not load data of target table: " + tn);
                         continue;
                     }
 
                     if (!tb.asReference.contains(descriptor.index)){
-                        logger.info("Do not load data not needed for this statement: " + tn);
+                        logger.trace("Do not load data not needed for this statement: " + tn);
                         continue;
                     }
 
-                    logger.info ("Attempt to load data for table: " + tn);
+                    logger.debug("Attempt to load data for table: " + tn);
                     String location;
                     if (allTables.get(tn) != null){
                         location = allTables.get(tn).getLocation();
@@ -83,7 +83,7 @@ public class SQLExecutor implements Serializable {
                         continue;
                     }
 
-                    logger.info("Load data from: " + location  + ", registered table name: " + tn );
+                    logger.debug("Load data from: " + location  + ", registered table name: " + tn );
 
                     //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
                     Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
@@ -92,7 +92,7 @@ public class SQLExecutor implements Serializable {
                     if (loc_desc == null)
                         throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
 
-                    logger.info("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
+                    logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
                     Dataset<Row> df = null;
                     boolean loaded = false;
 
