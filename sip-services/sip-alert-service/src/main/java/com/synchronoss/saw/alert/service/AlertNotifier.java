@@ -227,21 +227,21 @@ public class AlertNotifier {
     if (body.contains(MailBodyResolver.ALERT_RULE_NAME)) {
       String alertRuleName = alertRulesDetails.getAlertRuleName();
       if (alertRuleName == null) {
-        alertRuleName = "null";
+        alertRuleName = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.ALERT_RULE_NAME, alertRuleName);
     }
     if (body.contains(MailBodyResolver.CATEGORY)) {
       String category = alertRulesDetails.getCategoryId();
       if (category == null) {
-        category = "null";
+        category = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.CATEGORY, category);
     }
     if (body.contains(MailBodyResolver.LINK_FOR_ALERT)) {
       String link = alertLink;
       if (link == null) {
-        link = "null";
+        link = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.LINK_FOR_ALERT, link);
     }
@@ -250,28 +250,28 @@ public class AlertNotifier {
       if (alertRulesDetails.getAlertSeverity() != null) {
         severity = alertRulesDetails.getAlertSeverity().value();
       } else {
-        severity = "null";
+        severity = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.ALERT_SEVERITY, severity);
     }
     if (body.contains(MailBodyResolver.ALERT_RULE_DESCRIPTION)) {
       String alertDescrptn = alertRulesDetails.getAlertRuleDescription();
       if (alertDescrptn == null) {
-        alertDescrptn = "null";
+        alertDescrptn = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.ALERT_RULE_DESCRIPTION, alertDescrptn);
     }
     if (body.contains(MailBodyResolver.ATTRIBUTE_NAME)) {
       String attrName = alertRulesDetails.getAttributeName();
       if (attrName == null) {
-        attrName = "null";
+        attrName = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_NAME, attrName);
     }
     if (body.contains(MailBodyResolver.ATTRIBUTE_VALUE)) {
       String attributeValue = alertRulesDetails.getAttributeValue();
       if (attributeValue == null) {
-        attributeValue = "null";
+        attributeValue = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_VALUE, attributeValue);
     }
@@ -280,14 +280,14 @@ public class AlertNotifier {
       if (alertRulesDetails.getThresholdValue() != null) {
         threshold = alertRulesDetails.getThresholdValue().toString();
       } else {
-        threshold = "null";
+        threshold = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.THRESHOLD_VALUE, threshold);
     }
     if (body.contains(MailBodyResolver.LOOKBACK_PERIOD)) {
       String lookBackperiod = alertRulesDetails.getLookbackPeriod();
       if (lookBackperiod == null) {
-        lookBackperiod = "null";
+        lookBackperiod = "";
       }
       body = body.replaceAll("\\" + MailBodyResolver.LOOKBACK_PERIOD, lookBackperiod);
     }
