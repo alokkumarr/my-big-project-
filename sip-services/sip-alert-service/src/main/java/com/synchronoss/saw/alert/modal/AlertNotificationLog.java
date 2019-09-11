@@ -14,6 +14,14 @@ public class AlertNotificationLog {
 
   private String message;
 
+  private String alertRuleName;
+
+  private String attributeName;
+
+  private Double thresholdValue;
+
+  private AlertSeverity alertSeverity;
+
   /**
    * Gets notificationSysId.
    *
@@ -82,5 +90,61 @@ public class AlertNotificationLog {
   /** Sets message. */
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  /**
+   * Gets alertRuleName.
+   *
+   * @return alertRuleName
+   */
+  public String getAlertRuleName() {
+    return alertRuleName;
+  }
+
+  /** Sets alertRuleName. */
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
+  }
+
+  /**
+   * Gets alertSeverity.
+   *
+   * @return value of alertSeverity
+   */
+  public AlertSeverity getAlertSeverity() {
+    return alertSeverity;
+  }
+
+  /** Sets alertSeverity. */
+  public void setAlertSeverity(AlertSeverity alertSeverity) {
+    this.alertSeverity = alertSeverity;
+  }
+
+  /**
+   * Gets thresholdValue.
+   *
+   * @return value of thresholdValue
+   */
+  public Double getThresholdValue() {
+    return thresholdValue;
+  }
+
+  /** Sets thresholdValue. */
+  public void setThresholdValue(Double thresholdValue) {
+    this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets attributeName.
+   *
+   * @return value of attributeName
+   */
+  public String getAttributeName() {
+    return attributeName;
+  }
+
+  /** Sets attributeName. */
+  public void setAttributeName(String attributeName) {
+    this.attributeName = attributeName;
   }
 }

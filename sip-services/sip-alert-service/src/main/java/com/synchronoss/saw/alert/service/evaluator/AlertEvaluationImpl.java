@@ -58,8 +58,8 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     restTemplate = restUtil.restTemplate();
     EvaluatorListenerImpl evaluatorListener = new EvaluatorListenerImpl();
     // evaluatorListener.initStream(basePath);
-   // evaluatorListener.recieve();
-   // evaluateAlert("workbench::sample-elasticsearch", System.currentTimeMillis());
+    // evaluatorListener.recieve();
+    // evaluateAlert("workbench::sample-elasticsearch", System.currentTimeMillis());
   }
 
   @Override
@@ -115,7 +115,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
-      objectNode.put("datapodId", dataPodId);
+    objectNode.put("datapodId", dataPodId);
     List<AlertRuleDetails> alertRuleDetails =
         connection.runMaprDbQueryWithFilter(
             node.toString(), 1, 10, "createdTime", AlertRuleDetails.class);
