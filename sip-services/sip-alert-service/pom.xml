@@ -184,7 +184,7 @@
                             </configLocation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <violationSeverity>warning</violationSeverity>
-                          <excludes>**/alert/service/AlertServiceImpl.java</excludes>
+                          <excludes>**/alert/service/AlertServiceImpl.java,**/alert/util/AlertUtils.java</excludes>
                         </configuration>
                         <goals>
                             <goal>check</goal>

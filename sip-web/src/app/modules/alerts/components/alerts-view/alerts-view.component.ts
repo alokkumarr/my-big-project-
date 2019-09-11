@@ -80,7 +80,7 @@ export class AlertsViewComponent implements OnInit {
   }
 
   setAlertLoaderForGrid() {
-    this.alertsDataLoader = (options: {}) => {
+    this.alertsDataLoader = options => {
       return this._alertService
         .getAlertsStatesForGrid(options)
         .then(result => ({

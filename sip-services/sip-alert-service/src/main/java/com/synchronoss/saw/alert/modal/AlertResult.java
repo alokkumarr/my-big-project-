@@ -28,6 +28,8 @@ public class AlertResult {
 
   private SipQuery sipQuery;
 
+  private Integer alertCount;
+
   /**
    * Gets alertTriggerSysId.
    *

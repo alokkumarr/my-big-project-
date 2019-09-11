@@ -25,13 +25,14 @@ public class AlertRuleDetails {
   private Aggregate aggregationType;
   private Operator operator;
   private String metricsColumn;
-  private String thresholdValue;
+  private Double thresholdValue;
   private Long createdTime;
   private Long modifiedTime;
   private String createdBy;
   private String updatedBy;
   private SipQuery sipQuery;
   private List<Notification> notification;
+  private MonitoringType monitoringType;
 
   /**
    * Gets alertRulesSysId.
@@ -276,12 +277,12 @@ public class AlertRuleDetails {
    *
    * @return value of thresholdValue
    */
-  public String getThresholdValue() {
+  public Double getThresholdValue() {
     return thresholdValue;
   }
 
   /** Sets thresholdValue. */
-  public void setThresholdValue(String thresholdValue) {
+  public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
   }
 
@@ -367,5 +368,19 @@ public class AlertRuleDetails {
   /** Sets notification. */
   public void setNotification(List<Notification> notification) {
     this.notification = notification;
+  }
+
+  /**
+   * Gets monitoringType.
+   *
+   * @return value of monitoringType
+   */
+  public MonitoringType getMonitoringType() {
+    return monitoringType;
+  }
+
+  /** Sets monitoringType. */
+  public void setMonitoringType(MonitoringType monitoringType) {
+    this.monitoringType = monitoringType;
   }
 }

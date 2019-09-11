@@ -331,8 +331,8 @@ public class AlertsIT extends BaseIT {
     root.put("datapodName", "ABc");
     root.put("monitoringEntity", "abc123");
     root.put("operator", "LT");
-    root.put("alertDescription", "Tests");
-    root.put("alertName", "myName");
+    root.put("alertRuleDescription", "Tests");
+    root.put("alertRuleName", "myName");
     root.put("thresholdValue", "2");
     return root;
   }
@@ -354,8 +354,8 @@ public class AlertsIT extends BaseIT {
     root.put("datapodName", "ABc");
     root.put("monitoringEntity", "abc123");
     root.put("operator", "GT");
-    root.put("alertDescription", "Tests");
-    root.put("alertName", "myName");
+    root.put("alertRuleDescription", "Tests");
+    root.put("alertRuleName", "myName");
     root.put("thresholdValue", "2");
     return root;
   }
