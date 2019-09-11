@@ -7,7 +7,7 @@ import {
   NUMBER_TYPES,
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ
-} from '../../modules/analyze/consts';
+} from '../consts';
 
 /**
  * If the data type is float OR aggregate is percentage or average, we

@@ -11,7 +11,7 @@ import {
   RemoveAllAnalysesFromExport
 } from './actions/export-page.actions';
 import { MenuItem } from '../../../common/state/common.state.model';
-import { AdminExportLoadMenu } from '../../../common/actions/menu.actions';
+import { AdminExportLoadMenu } from '../../../common/actions/common.actions';
 import { ExportPageState } from './state/export-page.state';
 import { ExportService } from './export.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
