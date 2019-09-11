@@ -32,6 +32,7 @@ public class AlertRuleDetails {
   private String updatedBy;
   private SipQuery sipQuery;
   private List<Notification> notification;
+  private MonitoringType monitoringType;
 
   /**
    * Gets alertRulesSysId.
@@ -367,5 +368,19 @@ public class AlertRuleDetails {
   /** Sets notification. */
   public void setNotification(List<Notification> notification) {
     this.notification = notification;
+  }
+
+  /**
+   * Gets monitoringType.
+   *
+   * @return value of monitoringType
+   */
+  public MonitoringType getMonitoringType() {
+    return monitoringType;
+  }
+
+  /** Sets monitoringType. */
+  public void setMonitoringType(MonitoringType monitoringType) {
+    this.monitoringType = monitoringType;
   }
 }
