@@ -2,6 +2,7 @@ import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenav, MatDialog } from '@angular/material';
 import { SubscriptionLike } from 'rxjs';
+import CustomStore from 'devextreme/data/custom_store';
 
 import { ConfirmActionDialogComponent } from '../confirm-action-dialog/confirm-action-dialog.component';
 
@@ -15,6 +16,7 @@ import { ConfigureAlertService } from '../../../services/configure-alert.service
   styleUrls: ['./alerts-configuration.component.scss']
 })
 export class AlertsConfigurationComponent implements OnDestroy {
+  public data;
   subscriptions: SubscriptionLike[] = [];
   addAlertPanelMode: 'side' | 'over' = 'side';
   isInTabletMode = false;
@@ -41,7 +43,7 @@ export class AlertsConfigurationComponent implements OnDestroy {
         }
       });
     this.subscriptions.push(breakpointObserverSub);
-    this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
+    this.setAlertLoaderForGrid();
   }
 
   @ViewChild('alertSidenav') sidenav: MatSidenav;
@@ -56,7 +58,7 @@ export class AlertsConfigurationComponent implements OnDestroy {
   }
 
   onAddAlert() {
-    this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
+    this.setAlertLoaderForGrid();
     this.sidenav.close();
     this.resetAlertDefInput();
   }
@@ -89,10 +91,23 @@ export class AlertsConfigurationComponent implements OnDestroy {
           .deleteAlert(alertConfig.alertRulesSysId)
           .subscribe((data: any) => {
             this._notify.success(data.message);
-            this.configuredAlerts$ = this._configureAlertService.getAllAlerts();
+            this.setAlertLoaderForGrid();
           });
         this.subscriptions.push(delConfirmSubscription);
       }
+    });
+  }
+
+  setAlertLoaderForGrid() {
+    const alertsDataLoader = options => {
+      return this._configureAlertService.getAllAlerts(options).then(result => ({
+        data: result.alertRuleDetailsList,
+        totalCount: result.numberOfRecords
+      }));
+    };
+
+    this.data = new CustomStore({
+      load: options => alertsDataLoader(options)
     });
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as get from 'lodash/get';
+import * as ceil from 'lodash/ceil';
 import * as fpGet from 'lodash/fp/get';
 import { map } from 'rxjs/operators';
 
@@ -120,10 +121,12 @@ export class ConfigureAlertService {
    * @returns {Observable<any>}
    * @memberof ConfigureAlertService
    */
-  getAllAlerts(): Observable<any> {
-    const endpoint = `${this.api}/alerts`;
-    return this.http
-      .get<AllAlertsResponse>(endpoint)
-      .pipe(map(({ alertRuleDetailsList }) => alertRuleDetailsList));
+  getAllAlerts(options): Promise<any> {
+    options.skip = options.skip || 1;
+    options.take = options.take || 10;
+    const pageNumber = ceil(options.skip / options.take);
+    const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
+    const endpoint = `${this.api}/alerts${queryParams}`;
+    return this.http.get<AllAlertsResponse>(endpoint).toPromise();
   }
 }
