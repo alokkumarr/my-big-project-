@@ -1,12 +1,11 @@
 package com.synchronoss.saw.alert.service.evaluator;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertState;
-import com.synchronoss.saw.alert.util.AlertUtils;
+import com.synchronoss.saw.alert.service.AlertNotifier;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.sip.utils.RestUtil;
@@ -27,9 +26,8 @@ import sncr.bda.base.MaprConnection;
 public class AlertEvaluationImpl implements AlertEvaluation {
 
   private static final Logger logger = LoggerFactory.getLogger(AlertEvaluationImpl.class);
-  @Autowired EvaluatorListener evaluatorListener;
+  @Autowired AlertNotifier alertNotifier;
   private RestTemplate restTemplate;
-
   @Autowired private RestUtil restUtil;
 
   @Value("${metastore.base}")
@@ -58,8 +56,10 @@ public class AlertEvaluationImpl implements AlertEvaluation {
   @PostConstruct
   public void init() throws Exception {
     restTemplate = restUtil.restTemplate();
-    evaluatorListener.recieve();
-    // evaluateAlert("6623ce60-7fb4-437a-a3b2-2d48c43f9928", System.currentTimeMillis());
+    EvaluatorListenerImpl evaluatorListener = new EvaluatorListenerImpl();
+    // evaluatorListener.initStream(basePath);
+   // evaluatorListener.recieve();
+   // evaluateAlert("workbench::sample-elasticsearch", System.currentTimeMillis());
   }
 
   @Override
@@ -76,14 +76,20 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setAlertState(AlertState.ALARM);
       alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
       alertResult.setCategoryId(alertRuleDetails.getCategoryId());
-      alertResult.setStartTime(System.currentTimeMillis());
+      alertResult.setStartTime(requestTime);
       String alertResultId = UUID.randomUUID().toString();
       alertResult.setAlertTriggerSysId(alertResultId);
+      alertResult.setSipQuery(alertRuleDetails.getSipQuery());
       List<?> alertResultList = evaluateAlertRules(alertRuleDetails.getSipQuery());
       alertResultList.forEach(
           obj -> {
             connection.insert(alertResultId, alertResult);
           });
+      if (alertResultList.size() > 0) {
+        logger.info("Send Email for Alert: " + alertRuleDetails.getAlertRuleName());
+        alertNotifier.sendMail(
+            alertRuleDetails, alertRuleDetails.getNotification().get(0).getRecipients().get(0));
+      }
     }
     return true;
   }
@@ -109,11 +115,10 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
     ObjectNode objectNode = node.putObject(MaprConnection.EQ);
-    objectNode.put("datapodId", dataPodId);
-    List<JsonNode> alertRuleDetails =
-        connection.runMaprDbQueryWithFilter(node.toString(), "createdTime");
-    List<AlertRuleDetails> alertRuleDetailsList =
-        AlertUtils.convertJsonListToAlertRuleList(alertRuleDetails);
-    return alertRuleDetailsList;
+      objectNode.put("datapodId", dataPodId);
+    List<AlertRuleDetails> alertRuleDetails =
+        connection.runMaprDbQueryWithFilter(
+            node.toString(), 1, 10, "createdTime", AlertRuleDetails.class);
+    return alertRuleDetails;
   }
 }

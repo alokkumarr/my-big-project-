@@ -69,5 +69,5 @@ metastore:
   notificationTable : alertNoficationLog
 
 sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
-
+max-number-of-alert-per-rules: 10000
 

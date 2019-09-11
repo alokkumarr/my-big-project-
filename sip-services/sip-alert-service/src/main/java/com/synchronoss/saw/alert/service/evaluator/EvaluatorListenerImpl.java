@@ -150,7 +150,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
     Long createdTime = System.currentTimeMillis();
     String recordContent = String.format("%s˜˜%d", datapaodId, createdTime);
 
-    logger.debug("Record content = " + recordContent);
+    logger.info("Record content = " + recordContent);
 
     ProducerRecord<String, String> record = new ProducerRecord<>(this.alertTopics, recordContent);
 
