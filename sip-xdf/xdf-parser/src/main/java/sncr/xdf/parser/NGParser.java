@@ -498,8 +498,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
         }
 
-        Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-        
         collectAcceptedData(parsedRdd,outputRdd);
         
 
@@ -557,13 +555,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         
      // Create output dataset
-        scala.collection.Seq<Column> outputColumns =
-            scala.collection.JavaConversions.asScalaBuffer(
-                createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
         logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
         int rc = 0;
+        scala.collection.Seq<Column> outputColumns = null;
         if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
             outputColumns =
