@@ -20,7 +20,7 @@ object RTISConfiguration {
 
   case class Mapping(app_key: String, streams_1: List[Streams], streams_2: List[Streams], `class`: String, `bootstrap.servers`: String, `batch.size`: Long, `key.serializer`: String, `value.serializer`: String, `block.on.buffer.full`: Boolean, `timeout.ms`: Long)
 
-  implicit val stream_1: Reads[Streams] = (
+  implicit val streams: Reads[Streams] = (
     (JsPath \ "topic").read[String] and
       (JsPath \ "queue").read[String]
     ) (Streams.apply _)
@@ -39,12 +39,12 @@ object RTISConfiguration {
     ) (Mapping.apply _)
 
 
-  def getConfig(result: String): List[mutable.HashMap[String, Any]] = {
+  def getConfig(result: String, mainPath: String): List[mutable.HashMap[String, Any]] = {
     val tempList = new ListBuffer[mutable.HashMap[String, Any]]()
     try {
       val jsonList: List[JsObject] = Json.parse(result).as[List[JsObject]]
       // break if api has empty response
-      if (jsonList.isEmpty || result.size == 0){
+      if (jsonList.isEmpty || result.size == 0) {
         tempList
       }
 
@@ -61,7 +61,7 @@ object RTISConfiguration {
           conf.streams_1.foreach({ p => {
             val pStream = new mutable.HashMap[String, String]
             pStream.put("topic", p.topic)
-            pStream.put("queue", p.queue)
+            pStream.put("queue", mainPath + "/" + p.queue)
             pStreamList += pStream
           }
           })
@@ -71,7 +71,7 @@ object RTISConfiguration {
           conf.streams_2.foreach({ p => {
             val stream = new mutable.HashMap[String, String]
             stream.put("topic", p.topic)
-            stream.put("queue", p.queue)
+            stream.put("queue", mainPath + "/" + p.queue)
             sStreamList += stream
           }
           })

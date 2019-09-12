@@ -249,10 +249,10 @@ object EventHandler {
     val configURL = connector + "://localhost:" + host + "/internal/rtisconfig/config/" + key;
 
     val mainPath = if (conf.hasPath("stream.queue.location"))
-      conf.getString("stream.queue.location") + "/stream" else "/main/stream"
+      conf.getString("stream.queue.location") + "/streams" else "/main/streams"
 
     val result = scala.io.Source.fromURL(configURL).mkString
-    val config: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result)
+    val config: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, mainPath)
 
     var streamList: List[mutable.HashMap[String, Any]] = null;
     // break the event handling processing if key mismatch
@@ -276,7 +276,7 @@ object EventHandler {
       p.get("queue") != null
       queue = p.get("queue").get
     }
-    val RtisStream: String = mainPath + File.separator + queue.toString
+    val RtisStream: String = queue.toString
 
     // create stream if not exist
     createIfNotExists(12, RtisStream, mainPath)
