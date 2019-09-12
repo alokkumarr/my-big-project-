@@ -91,7 +91,7 @@ public class RtisServiceImpl implements RtisService {
   @Override
   public Object fetchAppKeys(@NotNull(message = "Customer code cannot be null")
                              @Valid String customerCode) {
-    List<JsonNode> appKeys = null;
+    List<JsonNode> appKeys = new ArrayList<>();
     try {
       new RtisMetadata(TABLE_NAME, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
@@ -111,7 +111,7 @@ public class RtisServiceImpl implements RtisService {
   @Override
   public Object fetchConfigByAppKeys(@NotNull(message = "Application key cannot be null")
                                      @Valid String appKey) {
-    Object config = null;
+    Object config = new ArrayList<JsonNode>();
     try {
       new RtisMetadata(TABLE_NAME, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
@@ -143,19 +143,21 @@ public class RtisServiceImpl implements RtisService {
       try {
         JsonElement config = SipMetadataUtils.toJsonElement(mapper.writeValueAsString(jNode));
         ObjectNode node = mapper.createObjectNode();
-        RtisConfiguration configuration =
-            objectMapper.readValue(config.toString(), RtisConfiguration.class);
-        node.put("class", configuration.getClazz());
-        node.put("app_key", configuration.getAppKey());
-        node.put("key.serializer", configuration.getKeySerializer());
-        node.put("timeout.ms", configuration.getTimeoutMs().intValue());
-        node.put("batch.size", configuration.getBatchSize().intValue());
-        node.put("value.serializer", configuration.getValueSerializer());
-        node.put("bootstrap.servers", configuration.getBootstrapServers());
-        node.set("streams_1", buildStreams(configuration.getPrimaryStreams(), null));
-        node.set("streams_2", buildStreams(null, configuration.getSecondaryStreams()));
-        node.put("block.on.buffer.full", configuration.getBlockOnBufferFull().booleanValue());
-        arrayNode.add(node);
+        if (config != null) {
+          RtisConfiguration configuration =
+              objectMapper.readValue(config.toString(), RtisConfiguration.class);
+          node.put("class", configuration.getClazz());
+          node.put("app_key", configuration.getAppKey());
+          node.put("key.serializer", configuration.getKeySerializer());
+          node.put("timeout.ms", configuration.getTimeoutMs().intValue());
+          node.put("batch.size", configuration.getBatchSize().intValue());
+          node.put("value.serializer", configuration.getValueSerializer());
+          node.put("bootstrap.servers", configuration.getBootstrapServers());
+          node.set("streams_1", buildStreams(configuration.getPrimaryStreams(), null));
+          node.set("streams_2", buildStreams(null, configuration.getSecondaryStreams()));
+          node.put("block.on.buffer.full", configuration.getBlockOnBufferFull().booleanValue());
+          arrayNode.add(node);
+        }
       } catch (IOException ex) {
         LOGGER.error("Error occurred while building the config", ex);
       }
