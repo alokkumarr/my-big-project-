@@ -225,6 +225,14 @@ object EventHandler {
     eh.asInstanceOf[T]
   }
 
+  /**
+    * This method to upload app key configuration if app key not found in the
+    * context. Also, this method calls rtis config registration api to fetch
+    * the config details which was saved at the time of registration .
+    *
+    * @param key app_key
+    * @return boolean true if key uploaded successfully.
+    */
   def buildOnDemandEventHandlerList(key: String): Boolean = {
     import scala.collection.JavaConversions._
 
@@ -249,7 +257,7 @@ object EventHandler {
     val configURL = connector + "://localhost:" + host + "/internal/rtisconfig/config/" + key;
 
     val mainPath = if (conf.hasPath("stream.queue.location"))
-      conf.getString("stream.queue.location") + "/streams" else "/main/streams"
+      conf.getString("stream.queue.location") else "/main"
 
     val result = scala.io.Source.fromURL(configURL).mkString
     val config: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, mainPath)
@@ -272,7 +280,7 @@ object EventHandler {
     if (!validKey) return validKey
 
     var queue: Any = null
-    for(p <- streamList) {
+    for (p <- streamList) {
       p.get("queue") != null
       queue = p.get("queue").get
     }
@@ -281,6 +289,17 @@ object EventHandler {
     // create stream if not exist
     createIfNotExists(12, RtisStream, mainPath)
 
+    // load on demand configuration which fetched from the api
+    loadConfiguration(config)
+    validKey
+  }
+
+  /**
+    * Method to load the configuration, stream, topic etc..
+    *
+    * @param config
+    */
+  private def loadConfiguration(config: List[mutable.HashMap[String, Any]]): Unit = {
     for (c <- config) {
       var key: String = null
       val properties: Properties = new Properties
@@ -347,8 +366,8 @@ object EventHandler {
       eventHandlerProperties(key) = properties
       StreamHelper.loadActiveStreams
     }
-    validKey
   }
+
 
   import scala.collection.JavaConversions._
 

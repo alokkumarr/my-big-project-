@@ -1,4 +1,4 @@
-package com.synchronoss.saw.rtis.metadata;
+package sncr.bda.metastore;
 
 import org.apache.log4j.Logger;
 import sncr.bda.base.DocumentConverter;

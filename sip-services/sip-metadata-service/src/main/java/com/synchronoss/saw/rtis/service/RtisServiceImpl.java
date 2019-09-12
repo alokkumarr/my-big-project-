@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonElement;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
-import com.synchronoss.saw.rtis.metadata.RtisMetadata;
 import com.synchronoss.saw.rtis.model.request.RtisConfiguration;
 import com.synchronoss.saw.rtis.model.request.StreamsInfo;
 import com.synchronoss.saw.util.SipMetadataUtils;
@@ -24,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import sncr.bda.base.MaprConnection;
+import sncr.bda.metastore.RtisMetadata;
 
 /**
  * ServiceImpl class for rtis config service.
@@ -91,6 +91,7 @@ public class RtisServiceImpl implements RtisService {
   @Override
   public Object fetchAppKeys(@NotNull(message = "Customer code cannot be null")
                              @Valid String customerCode) {
+    List<JsonNode> appKeys = null;
     try {
       new RtisMetadata(TABLE_NAME, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
@@ -98,17 +99,19 @@ public class RtisServiceImpl implements RtisService {
       String[] fields = {"app_key", "eventUrl"};
       ObjectNode node = getJsonNodes("customerCode", customerCode);
 
-      return maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
+      appKeys = maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
+      return appKeys;
     } catch (Exception ex) {
       LOGGER.error("Error occurred while fetching the app keys data", ex);
     }
-    return null;
+    return appKeys;
   }
 
 
   @Override
   public Object fetchConfigByAppKeys(@NotNull(message = "Application key cannot be null")
                                      @Valid String appKey) {
+    Object config = null;
     try {
       new RtisMetadata(TABLE_NAME, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
@@ -119,11 +122,12 @@ public class RtisServiceImpl implements RtisService {
 
       List<JsonNode> nodeList =
           maprConnection.runMaprDBQuery(fields, node.toString(), null, null);
-      return nodeList != null && !nodeList.isEmpty() ? buildConfig(objectMapper, nodeList) : null;
+      config = nodeList != null && !nodeList.isEmpty() ? buildConfig(objectMapper, nodeList) : null;
+      return config;
     } catch (Exception ex) {
       LOGGER.error("Error occurred while fetching the app keys data", ex);
     }
-    return null;
+    return config;
   }
 
   /**
@@ -190,6 +194,7 @@ public class RtisServiceImpl implements RtisService {
   @Override
   public Boolean deleteConfiguration(@NotNull(message = "Application key cannot be null")
                                      @Valid String appKey) {
+    boolean isDeleted = false;
     try {
       new RtisMetadata(TABLE_NAME, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, TABLE_NAME);
@@ -197,11 +202,12 @@ public class RtisServiceImpl implements RtisService {
       String[] fields = {"*"};
       ObjectNode node = getJsonNodes("app_key", appKey);
 
-      return maprConnection.deleteByMaprDBQuery(fields, node.toString());
+      isDeleted = maprConnection.deleteByMaprDBQuery(fields, node.toString());
+      return isDeleted;
     } catch (Exception ex) {
       LOGGER.error("Error occurred while fetching the app keys data", ex);
     }
-    return null;
+    return isDeleted;
   }
 
   /**

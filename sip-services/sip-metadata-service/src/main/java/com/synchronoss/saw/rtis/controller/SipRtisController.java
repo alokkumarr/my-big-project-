@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
         "The controller provides operations perform to on demand RTIS ")
 @ApiResponses(
     value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 200, message = "Request has been accepted without any error"),
         @ApiResponse(code = 400, message = "Bad Request"),
         @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
         @ApiResponse(
@@ -146,7 +146,9 @@ public class SipRtisController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public Object getConfigByAppKey(@PathVariable(name = "appKey") String appKey) {
-    return rtisService.fetchConfigByAppKeys(appKey);
+    Object appKeyConfig = rtisService.fetchConfigByAppKeys(appKey);
+    logger.debug("Configuration of the app key : {}", appKeyConfig);
+    return appKeyConfig;
   }
 
   /**
@@ -175,7 +177,8 @@ public class SipRtisController {
     if (authTicket == null) {
       response.setStatus(401);
     }
-
-    return rtisService.deleteConfiguration(appKey);
+    boolean haveDeleted = rtisService.deleteConfiguration(appKey);
+    logger.debug("App key deleted ? : {}", haveDeleted);
+    return haveDeleted;
   }
 }
