@@ -207,11 +207,7 @@ public class NGSQLScriptDescriptor {
 
                             Pattern pattern = Pattern.compile(withRegex, Pattern.CASE_INSENSITIVE);
                             Matcher matcher = pattern.matcher(s.trim());
-
-//                            pos = s..indexOf("with");
-
                             while(matcher.find()) {
-                                //start index of the "with" keyword match.
                                 pos = matcher.start();
                             }
 
@@ -223,22 +219,6 @@ public class NGSQLScriptDescriptor {
                             sqlDesc.SQL = stmt.toString().substring(pos);
                             logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
                             sqlDesc.tableDescriptor = targetTable;
-
-//                            /**
-//                             * Fix for SIP-7744.  To avoid
-//                             * splitting queries which has key word 'WITH'
-//                             * any where in middle. Using trim to be
-//                             * safe with leading empty spaces
-//                             */
-//                            if(s.trim().startsWith("with")) {
-//                                pos = s.indexOf("with");
-//                            }
-//                            // pos = s.indexOf("with");
-//                            if(pos < 0)
-//                                pos = s.indexOf("select");
-//                            if (pos < 0)
-//                                throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
-
                         }
                     break;
 
