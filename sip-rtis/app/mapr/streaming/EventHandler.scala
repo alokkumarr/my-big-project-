@@ -19,6 +19,7 @@ import sncr.bda.core.file.HFileOperations
 import scala.collection.{Seq, mutable}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.reflect.io.File
 import scala.util.Random
 
 object EventHandler {
@@ -243,18 +244,19 @@ object EventHandler {
     if (streamFile == null || streamFile.isEmpty)
       streamFile = "/tmp/frontend-server.stream.checkpoint"
 
-    val port = conf.getString("rtis.config.host")
-    val connector = conf.getString("rtis.config.connector")
-    val configURL = connector + "://localhost:" + port + "/internal/rtisconfig/config/" + key;
+    val host = conf.getString("rtis.config.host")
+    val connector = if (conf.hasPath("rtis.config.connector")) conf.getString("rtis.config.connector") else "http"
+    val configURL = connector + "://localhost:" + host + "/internal/rtisconfig/config/" + key;
 
-    val mainPath = conf.getString("stream.queue.location") + "/streams/"
+    val mainPath = if (conf.hasPath("stream.queue.location"))
+      conf.getString("stream.queue.location") + "/stream" else "/main/stream"
+
     val result = scala.io.Source.fromURL(configURL).mkString
-
-    val maprConfig: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, mainPath)
+    val config: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result)
 
     var streamList: List[mutable.HashMap[String, Any]] = null;
     // break the event handling processing if key mismatch
-    maprConfig.foreach(m => {
+    config.foreach(m => {
       m.entrySet().foreach(c => {
         if (c.getValue.equals(key)) {
           validKey = c.getValue.equals(key)
@@ -269,16 +271,17 @@ object EventHandler {
     })
     if (!validKey) return validKey
 
-    var topicStream: String = null
-    streamList.foreach(p => {
+    var queue: Any = null
+    for(p <- streamList) {
       p.get("queue") != null
-      topicStream = p.get("queue").toString
-    })
+      queue = p.get("queue").get
+    }
+    val RtisStream: String = mainPath + File.separator + queue.toString
 
     // create stream if not exist
-    createIfNotExists(12, topicStream, mainPath)
+    createIfNotExists(12, RtisStream, mainPath)
 
-    for (c <- maprConfig) {
+    for (c <- config) {
       var key: String = null
       val properties: Properties = new Properties
       var p_list, s_list: Array[mutable.HashMap[String, String]] = null

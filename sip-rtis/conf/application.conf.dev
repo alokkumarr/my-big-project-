@@ -209,10 +209,10 @@ genericlog = {
 
 }
 
+# registration port number where to get config detail on demand
 rtis.config.host=9501
 rtis.config.connector=http
 stream.queue.location=/var/sip
-stream.data.location=bda/data/streams/
 
 stream.file.location=/opt/bda/rtis/var/run/stream.${http.port}.dump
 
