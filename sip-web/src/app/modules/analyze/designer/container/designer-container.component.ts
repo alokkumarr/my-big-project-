@@ -87,7 +87,7 @@ import {
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
-  DesignerResetState,
+  // DesignerResetState,
   DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
@@ -168,8 +168,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // this._store.dispatch(new DesignerResetState());
     this.subscriptions.forEach(s => s.unsubscribe());
-    this._store.dispatch(new DesignerResetState());
   }
 
   ngOnInit() {
@@ -1235,7 +1235,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<any>this.analysis).isInverted = to === 'bar';
     }
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
-    this.auxSettings = { ...this.auxSettings, labelOptions: {
+    this.auxSettings = {
+      ...this.auxSettings,
+      labelOptions: {
         enabled: to === 'pie',
         value: to === 'pie' ? 'percentage' : ''
       }

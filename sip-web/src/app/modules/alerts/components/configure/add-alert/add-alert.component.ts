@@ -169,7 +169,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       operator: ['', Validators.required],
       thresholdValue: [
         '',
-        [Validators.required, Validators.pattern('^[0-9]*$')]
+        [Validators.required, Validators.pattern('^-?[0-9]*$')]
       ]
     });
 
