@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.export.AmazonS3Handler;
-import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
@@ -17,10 +16,13 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggregationParser;
-
+import com.synchronoss.saw.export.util.ExportUtils;
+import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,10 +42,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
-
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SipQuery;
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -275,8 +273,11 @@ public class ExportServiceImpl implements ExportService {
       OutputStreamWriter osw = new OutputStreamWriter(fos);
       String fileType = exportBean.getFileType();
 
+      List<Field> fields = new ArrayList<>();
       final SipQuery sipQuery = getSipQuery(analysisId);
-      List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+      for (Artifact artifact : sipQuery.getArtifacts()) {
+        fields.addAll(artifact.getFields());
+      }
       Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
       logger.debug("Writing to file");
@@ -799,8 +800,11 @@ public class ExportServiceImpl implements ExportService {
     logger.debug("Email async success");
     logger.debug("[Success] Response :" + entity.getStatusCode());
 
+    List<Field> fields = new ArrayList<>();
     final SipQuery sipQuery = getSipQuery(analysisId);
-    List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+    for (Artifact artifact : sipQuery.getArtifacts()) {
+      fields.addAll(artifact.getFields());
+    }
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
     try {
