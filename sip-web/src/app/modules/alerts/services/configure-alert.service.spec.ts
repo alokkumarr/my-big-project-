@@ -14,7 +14,7 @@ export const alertPayload: AlertConfig = {
   datapodId: '1',
   datapodName: 'abc',
   categoryId: '',
-  notification: [],
+  notification: {},
   lookbackColumn: '',
   lookbackPeriod: '',
   product: 'SAWD000001',

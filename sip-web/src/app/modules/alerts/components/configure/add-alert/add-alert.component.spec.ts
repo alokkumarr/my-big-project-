@@ -47,7 +47,7 @@ const payload: AlertConfig = {
   datapodId: '',
   datapodName: '',
   categoryId: '',
-  notification: [],
+  notification: {},
   lookbackColumn: '',
   lookbackPeriod: '-',
   product: 'SAWD000001',
