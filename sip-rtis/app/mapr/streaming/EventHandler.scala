@@ -254,7 +254,7 @@ object EventHandler {
 
     val host = conf.getString("rtis.config.host")
     val connector = if (conf.hasPath("rtis.config.connector")) conf.getString("rtis.config.connector") else "http"
-    val configURL = connector + "://localhost:" + host + "/internal/rtisconfig/config/" + key;
+    val configURL = connector + "://" + host + "/internal/rtisconfig/config/" + key;
 
     val mainPath = if (conf.hasPath("stream.queue.location"))
       conf.getString("stream.queue.location") else "/main"

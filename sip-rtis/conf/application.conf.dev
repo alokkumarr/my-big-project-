@@ -210,7 +210,7 @@ genericlog = {
 }
 
 # registration port number where to get config detail on demand
-rtis.config.host=9501
+rtis.config.host=localhost:9501
 rtis.config.connector=http
 stream.queue.location=/var/sip/streams
 
