@@ -489,7 +489,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         // and the paginated data after that
         this.executedAnalysis = {
           ...this.analysis,
-          ...(isDSLAnalysis(this.executedAnalysis || this.analysis) && this.executedAnalysis.type === 'map'
+          ...(isDSLAnalysis(this.executedAnalysis || this.analysis) &&
+          this.executedAnalysis.type === 'map'
             ? {
                 sipQuery: this._analyzeService.copyGeoTypeFromMetric(
                   get(this.metric, 'artifacts.0.columns', []),
@@ -631,7 +632,10 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         }
         const isReportType = ['report', 'esReport'].includes(analysisType);
         if (isReportType) {
-          const requestAnalysis = {...this.analysis, artifacts: get(this.analysis, 'sipQuery.artifacts')};
+          const requestAnalysis = {
+            ...this.executedAnalysis,
+            artifacts: get(this.executedAnalysis, 'sipQuery.artifacts')
+          };
           data = clone(flattenReportData(data, requestAnalysis));
         }
 
