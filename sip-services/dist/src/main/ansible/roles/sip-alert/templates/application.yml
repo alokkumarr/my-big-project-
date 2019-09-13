@@ -63,7 +63,7 @@ storage-proxy:
     host: ${connector}://localhost:9400
 
 metastore:
-  base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
+  base:  {{  sip_var_path  | default('/var/sip/') }}
   alertRulesTable: alertRulesMetadata
   alertResults: alertResults
   notificationTable : alertNoficationLog

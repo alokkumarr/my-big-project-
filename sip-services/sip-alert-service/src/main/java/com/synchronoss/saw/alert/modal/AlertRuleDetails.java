@@ -1,10 +1,8 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
-import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -31,7 +29,7 @@ public class AlertRuleDetails {
   private String createdBy;
   private String updatedBy;
   private SipQuery sipQuery;
-  private List<Notification> notification;
+  private Notification notification;
   private MonitoringType monitoringType;
 
   /**
@@ -359,14 +357,14 @@ public class AlertRuleDetails {
   /**
    * Gets notification.
    *
-   * @return list of notification.
+   * @return value of notification
    */
-  public List<Notification> getNotification() {
+  public Notification getNotification() {
     return notification;
   }
 
   /** Sets notification. */
-  public void setNotification(List<Notification> notification) {
+  public void setNotification(Notification notification) {
     this.notification = notification;
   }
 

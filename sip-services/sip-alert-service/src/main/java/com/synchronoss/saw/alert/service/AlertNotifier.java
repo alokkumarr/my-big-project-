@@ -62,35 +62,20 @@ public class AlertNotifier {
 
   private RestTemplate restTemplate = null;
 
-  void sendNotification(String alertRuleSysId) {
+  public void sendNotification(AlertRuleDetails alertRule) {
     logger.info("Inside send notification method");
     try {
-      AlertRuleDetails alertRule = getAlertRuleDetails(alertRuleSysId);
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
-        List<Notification> notificationList = alertRule.getNotification();
-        if (notificationList != null && !notificationList.isEmpty()) {
-          notificationList.forEach(
-              notification -> {
-                switch (notification.getType()) {
-                  case EMAIL:
-                    sendMailNotification(alertRule, notification.getRecipients());
-                    break;
-                  case SLACK:
-                    logger.error("Notification mechanism SLACK is not yet supported");
-                    break;
-                  case WEBHOOK:
-                    logger.error("Notification mechanism WEBHOOK is not yet supported");
-                    break;
-                  default:
-                    throw new RuntimeException(
-                        "Unsupported Notication mechanism" + notification.getType());
-                }
-              });
+        Notification notification = alertRule.getNotification();
+        if (notification != null) {
+          if (notification.getEmail() != null) sendMailNotification(alertRule);
+          // Slack/Webhooks and other notification channel can be added here.
 
         } else {
           String msg =
-              "Notification mechanism is not configured for alertRulesSysId:" + alertRuleSysId;
+              "Notification mechanism is not configured for alertRule :"
+                  + alertRule.getAlertRuleName();
           logger.error(msg);
           notificationLog.setNotifiedStatus(false);
           notificationLog.setMessage(msg);
@@ -98,7 +83,8 @@ public class AlertNotifier {
           saveNotificationStatus(notificationLog);
         }
       } else {
-        String msg = "Unable to read alert rule details for alertRulesSysId" + alertRuleSysId;
+        String msg =
+            "Unable to read alert rule details for alertRule" + alertRule.getAlertRuleName();
         logger.error(msg);
         notificationLog.setNotifiedStatus(false);
         notificationLog.setMessage(msg);
@@ -109,20 +95,6 @@ public class AlertNotifier {
       logger.error("Exeception occured while sending notification" + e);
     }
   }
-
-  AlertRuleDetails getAlertRuleDetails(String alertRuleSysId) {
-    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
-    JsonNode jsonAlertRule = connection.findById(alertRuleSysId);
-    AlertRuleDetails alertRule = null;
-    try {
-      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      alertRule = objectMapper.treeToValue(jsonAlertRule, AlertRuleDetails.class);
-    } catch (JsonProcessingException e) {
-      logger.error("Error occured while parsing the alert rule details :" + e);
-    }
-    return alertRule;
-  }
-
 
   private AlertResult getAlertResult(String alertTriggerSysId) {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
@@ -141,16 +113,15 @@ public class AlertNotifier {
    * Sends email notification.
    *
    * @param alertRulesDetails AlertRulesDetails
-   * @param recipientsList recepients list
    */
-  public void sendMailNotification(
-      AlertRuleDetails alertRulesDetails, List<String> recipientsList) {
+  public void sendMailNotification(AlertRuleDetails alertRulesDetails) {
     logger.info("sending email notification");
     AlertNotificationLog notificationLog = new AlertNotificationLog();
     notificationLog.setAlertRuleName(alertRulesDetails.getAlertRuleName());
     notificationLog.setThresholdValue(alertRulesDetails.getThresholdValue());
     notificationLog.setAttributeName(alertRulesDetails.getAttributeName());
     notificationLog.setAlertSeverity(alertRulesDetails.getAlertSeverity());
+    List<String> recipientsList = alertRulesDetails.getNotification().getEmail().getRecipients();
     try {
       if (recipientsList != null) {
         String recipients = String.join(",", recipientsList);
@@ -224,6 +195,10 @@ public class AlertNotifier {
    */
   public String prepareMailBody(AlertRuleDetails alertRulesDetails, String body, String alertLink) {
     logger.debug("prepare mail body starts here :" + body);
+    if (alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
+       // override the Body template if its configured for specific alerts.
+      body = alertRulesDetails.getNotification().getEmail().getTemplate();
+    }
     if (body.contains(MailBodyResolver.ALERT_RULE_NAME)) {
       String alertRuleName = alertRulesDetails.getAlertRuleName();
       if (alertRuleName == null) {

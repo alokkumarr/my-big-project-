@@ -12,7 +12,7 @@ logging:
 
 server:
   address: localhost
-  port: 9621
+  port: 9625
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
@@ -33,7 +33,7 @@ storage-proxy:
   service:
     host: http://localhost:9400
 metastore:
-  base:  hdfs:///var/sip/
+  base: /var/sip/
   alertRulesTable: alertRulesMetadata
   alertResults: alertResults
   notificationTable : alertNoficationLog

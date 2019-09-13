@@ -151,7 +151,7 @@ public class MaprConnection {
               .where(filter)
               .build();
     } else {
-      query = connection.newQuery().orderBy(orderBy, SortOrder.DESC).where(filter).build();
+      query = connection.newQuery().where(filter).build();
     }
     LOGGER.debug("Mapr Query with filer:{}", query);
     objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

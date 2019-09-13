@@ -33,9 +33,9 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
   @NotNull
   private String basePath;
 
-  private String streamPath;
-  private String evaluatorstream;
-  private String alertTopics;
+  private String streamPath = null;
+  private String evaluatorstream = null;
+  private String alertTopics = null;
 
   /**
    * Init method for listener.
@@ -44,9 +44,9 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
    */
   @PostConstruct
   public void init() {
-    this.streamPath = this.basePath + File.separator + "services/alert/evaluator";
-    this.evaluatorstream = this.streamPath + File.separator + "sip-alert-evaluator-stream";
-    this.alertTopics = this.evaluatorstream + ":alerts";
+    streamPath = basePath + File.separator + "services/alert/evaluator";
+    evaluatorstream = streamPath + File.separator + "sip-alert-evaluator-stream";
+    alertTopics = evaluatorstream + ":alerts";
   }
 
   /**
@@ -72,6 +72,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
       StreamDescriptor streamDescriptor = Streams.newStreamDescriptor();
       try {
         streamAdmin.createStream(evaluatorstream, streamDescriptor);
+        streamAdmin.createTopic(evaluatorstream, "alerts");
       } catch (Exception e) {
 
         if (retries == 0) {
@@ -89,10 +90,9 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
 
   /** This method is listener on messages for evaluators. */
   @Override
-  public void recieve() throws Exception {
+  public void runStreamConsumer() throws Exception {
     try {
       createIfNotExists(10);
-      sendMessageToStream();
     } catch (Exception e) {
       logger.error("Error occurred while initializing the AlertEvaluator stream ", e);
     }
@@ -119,17 +119,20 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
    */
   private void receiveMessages(KafkaConsumer<String, String> consumer) throws Exception {
     long pollTimeout = 60 * 60 * 1000;
-    ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
-    records.forEach(
-        record -> {
-          logger.debug(
-              "AlertMetricsId Record:(%s, %s, %d, %d)",
-              record.key(), record.value(), record.partition(), record.offset());
-          String[] queueContent = record.value().split("˜˜");
-          if (queueContent.length == 2) {
-            alertEvaluation.evaluateAlert(queueContent[0], Long.valueOf(queueContent[1]));
-          }
-        });
+    while (true) {
+      ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+      records.forEach(
+          record -> {
+            logger.debug(
+                "AlertMetricsId Record:(%s, %s, %d, %d)",
+                record.key(), record.value(), record.partition(), record.offset());
+            String[] queueContent = record.value().split("˜˜");
+            if (queueContent.length == 2) {
+              alertEvaluation.evaluateAlert(queueContent[0], Long.valueOf(queueContent[1]));
+            }
+          });
+      consumer.commitAsync();
+    }
   }
 
   /**
@@ -146,13 +149,13 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
         "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
     KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
-    String datapaodId = "6623ce60-7fb4-437a-a3b2-2d48c43f9928";
+    String datapaodId = "workbench::sample-elasticsearch";
     Long createdTime = System.currentTimeMillis();
     String recordContent = String.format("%s˜˜%d", datapaodId, createdTime);
 
-    logger.info("Record content = " + recordContent);
+    logger.info("Record content = " + recordContent + alertTopics);
 
-    ProducerRecord<String, String> record = new ProducerRecord<>(this.alertTopics, recordContent);
+    ProducerRecord<String, String> record = new ProducerRecord<>(alertTopics, recordContent);
 
     logger.debug("Writing data to stream " + record);
     producer.send(record);

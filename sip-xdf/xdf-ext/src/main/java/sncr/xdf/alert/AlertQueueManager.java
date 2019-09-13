@@ -46,6 +46,7 @@ public class AlertQueueManager {
     } catch (Exception e) {
       if (retries == 0) {
         logger.error("unable to create path for alert stream for path : " + streamBasePath);
+        throw e;
       }
       Thread.sleep(5 * 1000);
       createIfNotExists(retries - 1);
