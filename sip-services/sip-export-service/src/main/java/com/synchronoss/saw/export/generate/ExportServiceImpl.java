@@ -117,7 +117,6 @@ public class ExportServiceImpl implements ExportService {
   private RestUtil restUtil;
 
   @Override
-  @Async
   public ResponseEntity<DataResponse> dataToBeExportedAsync(
       String executionId,
       HttpServletRequest request,
@@ -165,7 +164,6 @@ public class ExportServiceImpl implements ExportService {
     /**
      * The AsyncRestTemplate api deprecated with spring(WebClient) which is having erroneous method,
      * So instead of calling asyncTemplate will call RestTemplate to perform UI export.
-     * // TODO: 9/12/2019 - Async Template need to implement with spring webclient API in future release
      */
     RestTemplate restTemplate = restUtil.restTemplate();
     ResponseEntity<DataResponse> responseStringFuture =
