@@ -12,8 +12,10 @@ import * as includes from 'lodash/includes';
 import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
 import * as omit from 'lodash/omit';
-import * as find from 'lodash/find';
-import * as lodashMap from 'lodash/map';
+import * as get from 'lodash/get';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpMap from 'lodash/fp/map';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
@@ -115,17 +117,15 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const [stringValue, lookbackPeriodType] = split(lookbackPeriod, '-');
     const lookbackPeriodValue = parseInt(stringValue, 10);
 
-    const notification = lodashMap(
-      notificationsFromBackend,
-      ({ type }) => type
+    const notification = fpPipe(fpToPairs, fpMap(([key]) => key))(
+      notificationsFromBackend
     );
-    const emailNotification = find(
+
+    const notificationEmails = get(
       notificationsFromBackend,
-      ({ type }) => type === 'email'
+      'email.recipients',
+      []
     );
-    const notificationEmails = emailNotification
-      ? emailNotification.recipients
-      : [];
 
     return {
       ...omit(alert, ['notification', 'lookbackPeriod', 'sipQuery']),
@@ -134,6 +134,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       notification,
       notificationEmails
     };
+  }
+
+  generateNotificationsForBackend(selectedNotifications, notificationEmails) {
+    const notifications: any = {};
+
+    if (includes(selectedNotifications, 'email')) {
+      notifications.email = {
+        recipients: notificationEmails
+      };
+    }
+    return notifications;
   }
 
   createAlertForm() {
@@ -312,18 +323,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     };
     this.endPayload = alertConfigWithoutSipQuery;
     return alertConfig;
-  }
-
-  generateNotificationsForBackend(selectedNotifications, notificationEmails) {
-    const notifications = [];
-
-    if (includes(selectedNotifications, 'email')) {
-      notifications.push({
-        type: 'email',
-        recipients: notificationEmails
-      });
-    }
-    return notifications;
   }
 
   generateSipQuery() {
