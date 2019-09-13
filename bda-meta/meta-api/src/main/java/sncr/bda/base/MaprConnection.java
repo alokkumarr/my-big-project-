@@ -61,8 +61,9 @@ public class MaprConnection {
   }
 
   private Query getQuery(String[] select, String filter, String orderBy, Integer limit) {
+    Query query = null;
     if (orderBy != null && limit != null) {
-      return connection
+      query = connection
           .newQuery()
           .select(select)
           .orderBy(orderBy, SortOrder.DESC)
@@ -70,12 +71,14 @@ public class MaprConnection {
           .where(filter)
           .build();
     } else {
-      return connection
+      query = connection
           .newQuery()
           .select(select)
           .where(filter)
           .build();
     }
+
+    return query;
   }
 
   /**
