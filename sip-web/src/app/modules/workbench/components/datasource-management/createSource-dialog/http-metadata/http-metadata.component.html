@@ -102,13 +102,9 @@
       </div>
     </ng-template>
     <!-- Header Parameters form -->
-    <div
-      class="parameters headers"
-      fxLayout="row"
-      fxLayoutAlign="center center"
-    >
-      <button mat-icon-button (click)="addHeader()">
-        <mat-icon fontIcon="icon-plus"></mat-icon>
+    <div class="parameters headers" fxLayout="row" fxLayoutAlign="end center">
+      <button mat-stroked-button color="primary" (click)="addHeader()">
+        + Header
       </button>
     </div>
 
@@ -181,16 +177,16 @@
         fxLayoutAlign="center center"
         [ngClass]="{ 'tab-error': !queryParams.valid }"
       >
-        Params &nbsp;
+        Query Params &nbsp;
         <ng-container *ngIf="queryParams.controls.length">
           <span class="dot"></span>
         </ng-container>
       </div>
     </ng-template>
     <!-- Query Parameters form -->
-    <div class="parameters query" fxLayout="row" fxLayoutAlign="center center">
-      <button mat-icon-button (click)="addQueryParam()">
-        <mat-icon fontIcon="icon-plus"></mat-icon>
+    <div class="parameters query" fxLayout="row" fxLayoutAlign="end center">
+      <button mat-stroked-button color="primary" (click)="addQueryParam()">
+        + Parameter
       </button>
     </div>
 
