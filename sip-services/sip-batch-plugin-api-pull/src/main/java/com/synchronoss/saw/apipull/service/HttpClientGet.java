@@ -45,8 +45,7 @@ public class HttpClientGet extends SncrBaseHttpClient {
       logger.info("Response Body : {}", response.getBody());
       logger.info("Response headers : {}", response.getHeaders().toString());
     } catch (Exception e) {
-      logger.error("Unable to fetch data for url : {}", url);
-      logger.error("Stacktrace : {}", e.getMessage());
+      logger.error("Unable to fetch data for url : " + url, e);
     }
     return apiResponse;
   }

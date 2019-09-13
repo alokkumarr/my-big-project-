@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -59,16 +60,16 @@ public class BisConnectionTestPayload {
   private Object bodyParameters;
 
   @JsonProperty("queryParameters")
-  private Object queryParameters;
+  private List<Object> queryParameters;
 
   @JsonProperty("headerParameters")
-  private Object headerParameters;
+  private List<Object> headerParameters;
 
   @JsonProperty("urlParameters")
-  private Object urlParameters;
+  private List<Object> urlParameters;
 
   @JsonProperty("httpMethod")
-  private Object httpMethod;
+  private String httpMethod;
 
   @JsonProperty("channelType")
   public BisChannelType getChannelType() {
@@ -225,42 +226,42 @@ public class BisConnectionTestPayload {
   }
 
   @JsonProperty("queryParameters")
-  public Object getQueryParameters() {
+  public List<Object> getQueryParameters() {
     return queryParameters;
   }
 
   @JsonProperty("queryParameters")
-  public void setQueryParameters(Object queryParameters) {
+  public void setQueryParameters(List<Object> queryParameters) {
     this.queryParameters = queryParameters;
   }
 
   @JsonProperty("headerParameters")
-  public Object getHeaderParameters() {
+  public List<Object> getHeaderParameters() {
     return headerParameters;
   }
 
   @JsonProperty("headerParameters")
-  public void setHeaderParameters(Object headerParameters) {
+  public void setHeaderParameters(List<Object> headerParameters) {
     this.headerParameters = headerParameters;
   }
 
   @JsonProperty("urlParameters")
-  public Object getUrlParameters() {
+  public List<Object> getUrlParameters() {
     return urlParameters;
   }
 
   @JsonProperty("urlParameters")
-  public void setUrlParameters(Object urlParameters) {
+  public void setUrlParameters(List<Object> urlParameters) {
     this.urlParameters = urlParameters;
   }
 
   @JsonProperty("httpMethod")
-  public Object getHttpMethod() {
+  public String getHttpMethod() {
     return httpMethod;
   }
 
   @JsonProperty("httpMethod")
-  public void setHttpMethod(Object httpMethod) {
+  public void setHttpMethod(String httpMethod) {
     this.httpMethod = httpMethod;
   }
 

@@ -20,6 +20,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepositor
 import com.synchronoss.saw.batch.exceptions.SipNestedRuntimeException;
 import com.synchronoss.saw.batch.extensions.SipPluginContract;
 import com.synchronoss.saw.batch.model.BisChannelType;
+import com.synchronoss.saw.batch.model.BisComponentState;
 import com.synchronoss.saw.batch.model.BisConnectionTestPayload;
 import com.synchronoss.saw.batch.model.BisDataMetaInfo;
 import com.synchronoss.saw.batch.model.BisProcessState;
@@ -32,9 +33,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -52,6 +57,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
+import sncr.bda.core.file.HFileOperations;
 
 @Service("apipullService")
 public class ApiPullServiceImpl extends SipPluginContract {
@@ -209,17 +215,101 @@ public class ApiPullServiceImpl extends SipPluginContract {
   public String immediateConnectChannel(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
     logger.info("Inside immediateConnectChannel");
+    StringBuilder connectionLogs = new StringBuilder();
 
-    Object queryParamObj = payload.getQueryParameters();
-    List<QueryParameter> queryParameters = null;
-
-    if (queryParamObj != null) {
-      queryParameters = (List<QueryParameter>) queryParamObj;
-      logger.debug("Query Params = " + queryParameters);
+    String hostName = payload.getHostName();
+    if (hostName == null || hostName.length() == 0) {
+      throw new SipNestedRuntimeException("Host name is mandatory");
     }
 
-//    Object headerParamObj = payload.get
-    //    List<HeaderParameter> headerParameters = (List<HeaderParameter>)
+    Integer port = payload.getPortNo();
+    String apiEndPoint = payload.getApiEndPoint() != null ? payload.getApiEndPoint() : "/";
+    String url = generateUrl(hostName, port, apiEndPoint);
+
+    SipApiRequest apiRequest = new SipApiRequest();
+    apiRequest.setUrl(url);
+
+    String httpMethodStr = payload.getHttpMethod();
+    if (httpMethodStr != null) {
+      HttpMethod method = HttpMethod.fromValue(httpMethodStr);
+
+      apiRequest.setHttpMethod(method);
+    }
+
+    List<Object> queryParamObj = payload.getQueryParameters();
+    List<QueryParameter> queryParameters = new ArrayList<>();
+
+    if (queryParamObj != null) {
+
+      logger.debug("Query Params = " + queryParameters);
+      logger.debug("Query Param Type = " + queryParameters.getClass().getName());
+
+      for (Object paramObject : queryParamObj) {
+        LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) paramObject;
+        QueryParameter param = new QueryParameter();
+
+        for (Entry<String, String> entry : map.entrySet()) {
+          param.setKey(entry.getKey());
+          param.setValue(entry.getValue());
+        }
+
+        logger.debug("Param = " + param);
+
+        queryParameters.add(param);
+      }
+      //      for (QueryParameter param : queryParameters) {
+      //        logger.debug("Param = " + param);
+      //      }
+
+      apiRequest.setQueryParameters(queryParameters);
+    }
+
+    List<Object> headerParamObj = payload.getHeaderParameters();
+    List<HeaderParameter> headerParameters = new ArrayList<>();
+
+    if (headerParamObj != null) {
+      for (Object headerObject : headerParamObj) {
+        HeaderParameter headerParameter = (HeaderParameter) headerObject;
+        logger.debug("Header Param = " + headerParameter);
+
+        headerParameters.add(headerParameter);
+      }
+      logger.debug("Header Params = " + headerParameters);
+
+      apiRequest.setHeaderParameters(headerParameters);
+    }
+
+    Object bodyParamsObj = payload.getBodyParameters();
+    BodyParameters bodyParameters = null;
+
+    if (bodyParameters != null) {
+      bodyParameters = (BodyParameters) bodyParamsObj;
+      logger.debug("Body Params = " + bodyParameters);
+
+      apiRequest.setBodyParameters(bodyParameters);
+    }
+
+    try {
+      HttpClient httpClient = new HttpClient();
+
+      connectionLogs.append("Connecting to ").append(url).append("\n");
+      ApiResponse response = httpClient.execute(apiRequest);
+
+      connectionLogs.append("Fetching data from ").append(url).append("\n");
+      HttpStatus httpStatus = response.getHttpStatus();
+      logger.info("Http Status = " + httpStatus);
+
+      connectionLogs.append("Connection Status = " + httpStatus).append("\n");
+
+      Object content = response.getResponseBody();
+
+      if (content != null && content.toString().length() != 0) {
+        connectionLogs.append(content.toString()).append("\n");
+      }
+
+    } catch (Exception exception) {
+      throw new SipNestedRuntimeException(exception.getMessage(), exception);
+    }
 
     return null;
   }
@@ -256,6 +346,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
       throws SipNestedRuntimeException {
     logger.trace("Inside API Pull scanFilesForPattern");
 
+    filePattern = "N/A";
+
     logger.debug(
         "Channel ID = "
             + channelId
@@ -281,144 +373,34 @@ public class ApiPullServiceImpl extends SipPluginContract {
       }
     }
 
+    List<BisDataMetaInfo> infoList = new ArrayList<>();
     logger.debug("JobEntity = " + jobEntity);
 
-    List<BisDataMetaInfo> infoList = new ArrayList<>();
+    BisDataMetaInfo bisDataMetaInfo =
+        prepareLogInfo(
+            filePattern,
+            "",
+            source,
+            new Date(),
+            0L,
+            "N/A",
+            channelId,
+            routeId,
+            "",
+            jobEntity.getJobId());
 
-    try {
-      Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(routeId);
+    // Set job status to In Progress
+    BisJobEntity job = sipLogService.retriveJobById(jobEntity.getJobId());
+    logger.debug("Job Entity = " + job);
 
-      if (bisRouteEntity.isPresent()) {
-        BisRouteEntity routeEntity = bisRouteEntity.get();
+    // For API jobs, total file count is always one as one job contains one HTTP request, which
+    // results to a single file
+    job.setTotalCount(1);
+    job.setJobStatus("INPROGRESS");
+    sipLogService.saveJob(job);
 
-        logger.debug("Route Entity = " + routeEntity);
-        long channelIdNew = routeEntity.getBisChannelSysId();
-
-        Optional<BisChannelEntity> bisChannelEntity = this.findChannelById(channelIdNew);
-
-        if (!bisChannelEntity.isPresent()) {
-          throw new SipNestedRuntimeException(
-              "Unable to extract channel information for channel id: " + channelIdNew);
-        }
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
-        Gson gson = gsonBuilder.create();
-        BisChannelEntity channelEntity = bisChannelEntity.get();
-
-        logger.debug("Channel Entity = " + channelEntity);
-
-        String channelMetadataStr = channelEntity.getChannelMetadata();
-
-        ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
-
-        String hostAddress = channelMetadata.getHostAddress();
-        Integer port = channelMetadata.getPort();
-
-        String routeMetadataStr = routeEntity.getRouteMetadata();
-        RouteMetadata routeMetadata = gson.fromJson(routeMetadataStr, RouteMetadata.class);
-
-        String apiEndPoint = routeMetadata.getApiEndPoint();
-        String destinationLocation = routeMetadata.getDestinationLocation();
-        HttpMethod method = routeMetadata.getHttpMethod();
-
-        SipApiRequest apiRequest = new SipApiRequest();
-        String url = generateUrl(hostAddress, port, apiEndPoint);
-
-        logger.debug("URL = " + url);
-        apiRequest.setUrl(url);
-
-        apiRequest.setHttpMethod(method != null ? method : HttpMethod.GET);
-
-        List<QueryParameter> queryParameters = routeMetadata.getQueryParameters();
-        if (queryParameters != null && queryParameters.size() != 0) {
-          apiRequest.setQueryParameters(queryParameters);
-        }
-
-        List<HeaderParameter> headerParameters = routeMetadata.getHeaderParameters();
-        if (headerParameters != null && headerParameters.size() != 0) {
-          apiRequest.setHeaderParameters(headerParameters);
-        }
-
-        BodyParameters bodyParameters = routeMetadata.getBodyParameters();
-        if (bodyParameters != null) {
-          apiRequest.setBodyParameters(bodyParameters);
-        }
-
-        try {
-          HttpClient httpClient = new HttpClient();
-
-          logger.debug("Fetching API data");
-
-          ApiResponse response = httpClient.execute(apiRequest);
-
-          logger.debug("API Response = " + response);
-
-          MediaType responseContentType = response.getHttpHeaders().getContentType();
-          Object content = response.getResponseBody();
-
-          logger.debug("API Response data = " + content);
-
-          String destination = this.constructDestinationPath(destinationLocation);
-          logger.debug("Destination = " + destination);
-          logger.debug("Default destination location = " + defaultDestinationLocation);
-
-          String path =
-              processor.getFilePath(
-                  defaultDestinationLocation, destination, File.separator + getBatchId());
-
-          String fileName = null;
-
-          logger.debug("Path from processor = " + path);
-          logger.debug("Content Type = " + responseContentType);
-
-          logger.debug("Creating destination directory " + path);
-          processor.createDestination(path, new StringBuffer());
-
-          if (responseContentType.equals(MediaType.APPLICATION_JSON)
-              || responseContentType.equals(MediaType.APPLICATION_JSON_UTF8)) {
-            logger.debug("Content type json");
-            fileName = "data_" + getBatchId() + ".json";
-          } else if (responseContentType.equals(MediaType.TEXT_XML)
-              || responseContentType.equals(MediaType.APPLICATION_XML)) {
-            fileName = "data_" + getBatchId() + ".xml";
-          } else if (responseContentType.equals(MediaType.TEXT_HTML)) {
-            fileName = "data_" + getBatchId() + ".html";
-          } else if (responseContentType.equals(MediaType.TEXT_PLAIN)) {
-            logger.debug("Content type is text");
-            fileName = "data_" + getBatchId() + ".txt";
-          } else {
-            // Not implemented yet
-          }
-          String destinationFilePath = path + fileName;
-          logger.info("Writing data to " + destinationFilePath);
-
-          writeDataToLocation(content.toString(), destinationFilePath);
-
-        } catch (IOException exception) {
-          logger.error("IO Error occurred ", exception);
-          throw new SipNestedRuntimeException(exception.getMessage(), exception);
-        } catch (Exception exception) {
-          logger.error("Error occurred ", exception);
-          throw new SipNestedRuntimeException(exception.getMessage(), exception);
-        }
-      } else {
-        throw new SipNestedRuntimeException(
-            "Unable to find route information for route id: " + routeId);
-      }
-    } catch (Exception ex) {
-
-    }
-
-    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
-    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
-    bisDataMetaInfo.setDataSizeInBytes(1024l);
-    bisDataMetaInfo.setActualDataName("location" + File.separator + "newFile.json");
-    bisDataMetaInfo.setReceivedDataName("newFile.json");
-    bisDataMetaInfo.setChannelType(BisChannelType.APIPULL);
-    bisDataMetaInfo.setProcessState(BisProcessState.SUCCESS.value());
-    bisDataMetaInfo.setActualReceiveDate(new Date());
+    logger.debug("Adding file log entry");
+    sipLogService.upsert(bisDataMetaInfo, bisDataMetaInfo.getProcessId());
 
     infoList.add(bisDataMetaInfo);
 
@@ -430,9 +412,14 @@ public class ApiPullServiceImpl extends SipPluginContract {
   public void executeFileTransfer(
       String logId, Long jobId, Long channelId, Long routeId, String fileName) {
     logger.info("Inside executeFileTransfer");
+    sipLogService.upsertInProgressStatus(logId);
+    BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
 
     try {
       Optional<BisRouteEntity> bisRouteEntity = this.findRouteById(routeId);
+
+      final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+      bisDataMetaInfo.setProcessId(logId);
 
       if (bisRouteEntity.isPresent()) {
         BisRouteEntity routeEntity = bisRouteEntity.get();
@@ -493,6 +480,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
         }
 
         try {
+          ZonedDateTime fileTransStartTime = ZonedDateTime.now();
+          logger.trace("File" + fileName + " transfer strat time:: " + fileTransStartTime);
           HttpClient httpClient = new HttpClient();
 
           logger.debug("Fetching API data");
@@ -520,25 +509,53 @@ public class ApiPullServiceImpl extends SipPluginContract {
           logger.debug("Creating destination directory " + path);
           processor.createDestination(path, new StringBuffer());
 
+          StringBuilder fileNameBuilder = new StringBuilder();
+
+          String routeName = routeMetadata.getRouteName();
+
+          fileNameBuilder.append(routeName.toLowerCase()).append("_").append(getBatchId());
+
           if (responseContentType.equals(MediaType.APPLICATION_JSON)
               || responseContentType.equals(MediaType.APPLICATION_JSON_UTF8)) {
             logger.debug("Content type json");
-            fileName = "data_" + getBatchId() + ".json";
+            fileNameBuilder.append(".json");
           } else if (responseContentType.equals(MediaType.TEXT_XML)
               || responseContentType.equals(MediaType.APPLICATION_XML)) {
-            fileName = "data_" + getBatchId() + ".xml";
-          } else if (responseContentType.equals(MediaType.TEXT_HTML)) {
-            fileName = "data_" + getBatchId() + ".html";
+            fileNameBuilder.append(".xml");
+          } else if (responseContentType.equals(MediaType.TEXT_HTML)
+              || responseContentType.equals("text/html;charset=UTF-8")) {
+            fileNameBuilder.append(".html");
           } else if (responseContentType.equals(MediaType.TEXT_PLAIN)) {
             logger.debug("Content type is text");
-            fileName = "data_" + getBatchId() + ".txt";
+            fileNameBuilder.append(".txt");
           } else {
             // Not implemented yet
           }
+
+          fileName = fileNameBuilder.toString();
+
           String destinationFilePath = path + fileName;
           logger.info("Writing data to " + destinationFilePath);
 
           writeDataToLocation(content.toString(), destinationFilePath);
+
+          logger.trace(
+              "Streaming the content of " + "the file in the directory " + "ends here " + fileName);
+          ZonedDateTime fileTransEndTime = ZonedDateTime.now();
+          logger.trace("File" + fileName + "transfer end time:: " + fileTransEndTime);
+          bisDataMetaInfo.setFileTransferStartTime(Date.from(fileTransStartTime.toInstant()));
+          bisDataMetaInfo.setFileTransferEndTime(Date.from(fileTransEndTime.toInstant()));
+          bisDataMetaInfo.setFileTransferDuration(
+              Duration.between(fileTransStartTime, fileTransEndTime).toMillis());
+          bisDataMetaInfo.setReceivedDataName(fileName);
+
+          sipLogService.upsertSuccessStatus(logId, bisDataMetaInfo);
+          logger.trace("File transfer duration :: " + bisDataMetaInfo.getFileTransferDuration());
+
+          //          bisJobEntity.setSuccessCount(bisJobEntity.getSuccessCount() + 1);
+          //          sipLogService.saveJob(bisJobEntity);
+          sipLogService.updateSuccessCnt(jobId);
+          sipLogService.updateJobStatus(jobId);
 
         } catch (IOException exception) {
           logger.error("IO Error occurred ", exception);
@@ -626,22 +643,35 @@ public class ApiPullServiceImpl extends SipPluginContract {
       Long channelId, Long routeId, String filePattern, String channelType) {
     logger.debug("Inside executeSipJob");
     logger.debug("File Pattern = " + filePattern);
-    //    if (filePattern == null) {
-    //      Optional<BisRouteEntity> routeInfo = this.findRouteById(routeId);
-    //
-    //      if (routeInfo.isPresent()) {
-    //        BisRouteEntity route = routeInfo.get();
-    //        ObjectMapper objectMapper = new ObjectMapper();
-    //        JsonNode rootNode;
-    //        try {
-    //          rootNode = objectMapper.readTree(route.getRouteMetadata());
-    //          filePattern = rootNode.get("filePattern").asText();
-    //          logger.trace("File pattern::" + filePattern);
-    //        } catch (IOException exception) {
-    //          logger.error("Exception during parsing" + exception.getMessage());
-    //        }
-    //      }
-    //    }
     return sipLogService.createJobLog(channelId, routeId, filePattern, channelType);
+  }
+
+  private BisDataMetaInfo prepareLogInfo(
+      String pattern,
+      String localFilePath,
+      String source,
+      Date receiveDate,
+      Long size,
+      String actualDataName,
+      Long channelId,
+      Long routeId,
+      String destinationPath,
+      long jobId) {
+    BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
+    bisDataMetaInfo.setFilePattern(pattern);
+    bisDataMetaInfo.setSource(source);
+    bisDataMetaInfo.setProcessId(new UUIDGenerator().generateId(bisDataMetaInfo).toString());
+    bisDataMetaInfo.setReceivedDataName(localFilePath);
+    bisDataMetaInfo.setDataSizeInBytes(size);
+    bisDataMetaInfo.setActualDataName(actualDataName);
+    bisDataMetaInfo.setChannelType(BisChannelType.APIPULL);
+    bisDataMetaInfo.setProcessState(BisProcessState.OPEN.value());
+    bisDataMetaInfo.setComponentState(BisComponentState.OPEN.value());
+    bisDataMetaInfo.setActualReceiveDate(receiveDate);
+    bisDataMetaInfo.setChannelId(channelId);
+    bisDataMetaInfo.setRouteId(routeId);
+    bisDataMetaInfo.setDestinationPath(destinationPath);
+    bisDataMetaInfo.setJobId(jobId);
+    return bisDataMetaInfo;
   }
 }
