@@ -18,12 +18,14 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.
  */
+@Ignore
 public class WorkbenchIT extends BaseIT {
   private static final String WORKBENCH_PROJECT = "workbench";
   private static final String WORKBENCH_PATH =
