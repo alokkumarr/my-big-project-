@@ -111,7 +111,7 @@ class Application extends Controller {
       // on demand app key reload to RTIS context
       if (!EventHandler.getAppKeys.contains(appKey)) {
         val appKeyLoaded = EventHandler.buildOnDemandEventHandlerList(appKey)
-        if (appKeyLoaded) throw new RTException(ErrorCodes.valueOf("Application key does not exists"))
+        if (!appKeyLoaded) throw new RTException(ErrorCodes.InvalidAppConf)
       }
 
       m_log.debug("APP KEY = " + appKey)
