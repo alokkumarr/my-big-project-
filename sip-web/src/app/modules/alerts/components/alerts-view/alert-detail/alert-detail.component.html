@@ -25,8 +25,8 @@
         fxLayoutAlign="start start"
       >
         <strong>Monitoring Metric: </strong>
-        <span e2e="alert-monitoringEntity">{{
-          alertRuleDetails?.monitoringEntity
+        <span e2e="alert-metricsColumn">{{
+          alertRuleDetails?.metricsColumn
         }}</span>
       </div>
       <div
@@ -57,7 +57,9 @@
         fxLayoutAlign="start start"
       >
         <strong>Aggregation: </strong>
-        <span e2e="alert-aggregation">{{ alertRuleDetails?.aggregation }}</span>
+        <span e2e="alert-aggregationType">{{
+          alertRuleDetails?.aggregationType
+        }}</span>
       </div>
     </div>
   </div>

@@ -7,17 +7,23 @@ import { AlertConfig } from '../alerts.interface';
 import { Observable } from 'rxjs';
 
 export const alertPayload: AlertConfig = {
-  activeInd: true,
+  alertRuleName: 'abc',
+  alertRuleDescription: 'abc',
   alertSeverity: 'CRITICAL',
-  categoryId: 'string',
-  datapodId: 'string',
-  datapodName: 'string',
-  product: 'string',
-  alertRuleDescription: 'string',
-  alertRuleName: 'string',
+  activeInd: false,
+  datapodId: '1',
+  datapodName: 'abc',
+  categoryId: '',
+  notification: [],
   lookbackColumn: '',
   lookbackPeriod: '',
-  notification: [],
+  product: 'SAWD000001',
+  metricsColumn: '',
+  aggregationType: '',
+  operator: '',
+  thresholdValue: '',
+  attributeName: '',
+  attributeValue: '',
   sipQuery: { artifacts: [], filters: [] }
 };
 
@@ -66,7 +72,7 @@ describe('ConfigureAlertService', () => {
 
   it('getAllAlerts should return an Observable', () => {
     expect(
-      configureAlertService.getAllAlerts() instanceof Observable
+      configureAlertService.getAllAlerts({}) instanceof Promise
     ).toBeTruthy();
   });
 

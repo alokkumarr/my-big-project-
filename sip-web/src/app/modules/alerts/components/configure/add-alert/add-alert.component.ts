@@ -7,11 +7,15 @@ import {
   Input
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as filter from 'lodash/filter';
-import * as split from 'lodash/split';
 import * as fpGet from 'lodash/fp/get';
 import * as includes from 'lodash/includes';
+import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
+import * as omit from 'lodash/omit';
+import * as get from 'lodash/get';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpMap from 'lodash/fp/map';
 
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
@@ -25,12 +29,12 @@ import {
   AlertArtifact
 } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
-import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
+import { SubscriptionLike, of, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 const LAST_STEP_INDEX = 3;
 
-const notifications = [
+const notificationsOptions = [
   {
     value: 'email',
     label: 'email',
@@ -47,13 +51,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
   datapods$: Observable<any>;
-  attributeFilterValues$: Observable<any>;
+  attributeValues$: Observable<any>;
   selectedDatapod;
-  selectedMonitoringEntity;
-  selectedEntityName;
+  selectedMetricsColumn;
   metricsList$;
-  metricsListWithoutMonitoringEntity;
-  metricsListWithoutEntity;
   operators$;
   aggregations$;
   notifications$;
@@ -80,9 +81,17 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.alertDefinition.action === 'update') {
       this.endActionText = 'Update';
-      this.alertDefFormGroup.patchValue(this.alertDefinition.alertConfig);
-      this.alertMetricFormGroup.patchValue(this.alertDefinition.alertConfig);
-      this.alertRuleFormGroup.patchValue(this.alertDefinition.alertConfig);
+      const alertForm = this.transformAlertToFormObject(
+        this.alertDefinition.alertConfig
+      );
+      const { datapodId } = alertForm;
+      // update value of attributeName so the request gets sent for the values
+      this.loadMetrics(datapodId).then(() => {
+        this.alertRuleFormGroup.get('attributeName').updateValueAndValidity();
+        this.alertDefFormGroup.patchValue(alertForm);
+        this.alertMetricFormGroup.patchValue(alertForm);
+        this.alertRuleFormGroup.patchValue(alertForm);
+      });
       this.endActionText = 'Update';
     }
     this.datapods$ = this._configureAlertService.getListOfDatapods$();
@@ -95,11 +104,47 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         ])
       );
     this.operators$ = this._configureAlertService.getOperators();
-    this.notifications$ = of(notifications);
+    this.notifications$ = of(notificationsOptions);
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  transformAlertToFormObject(alert) {
+    const { notification: notificationsFromBackend, lookbackPeriod } = alert;
+
+    const [stringValue, lookbackPeriodType] = split(lookbackPeriod, '-');
+    const lookbackPeriodValue = parseInt(stringValue, 10);
+
+    const notification = fpPipe(fpToPairs, fpMap(([key]) => key))(
+      notificationsFromBackend
+    );
+
+    const notificationEmails = get(
+      notificationsFromBackend,
+      'email.recipients',
+      []
+    );
+
+    return {
+      ...omit(alert, ['notification', 'lookbackPeriod', 'sipQuery']),
+      lookbackPeriodType,
+      lookbackPeriodValue,
+      notification,
+      notificationEmails
+    };
+  }
+
+  generateNotificationsForBackend(selectedNotifications, notificationEmails) {
+    const notifications: any = {};
+
+    if (includes(selectedNotifications, 'email')) {
+      notifications.email = {
+        recipients: notificationEmails
+      };
+    }
+    return notifications;
   }
 
   createAlertForm() {
@@ -119,8 +164,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodId: ['', Validators.required],
       datapodName: [''],
       categoryId: [''],
-      monitoringEntity: ['', Validators.required],
-      aggregation: ['', Validators.required],
+      metricsColumn: ['', Validators.required],
+      aggregationType: ['', Validators.required],
       operator: ['', Validators.required],
       thresholdValue: [
         '',
@@ -129,12 +174,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
-      entityName: ['', Validators.required],
       lookbackColumn: ['', Validators.required],
       lookbackPeriodValue: ['', Validators.required],
       lookbackPeriodType: ['', Validators.required],
-      attributeFilterColumn: [''],
-      attributeFilterValue: ['']
+      attributeName: [''],
+      attributeValue: ['']
     });
 
     this.alertDefFormGroup
@@ -148,20 +192,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       });
 
     this.alertRuleFormGroup
-      .get('attributeFilterColumn')
-      .valueChanges.subscribe(column => {
-        if (!column) {
+      .get('attributeName')
+      .valueChanges.subscribe(columnName => {
+        if (!columnName) {
           return;
         }
         const { artifacts, id, esRepository } = this.selectedDatapod;
         const targetFilter = {
           artifactsName: artifacts[0].artifactName,
           semanticId: id,
-          columnName: column.columnName,
-          type: column.type,
+          columnName: columnName,
+          type: 'string',
           esRepository
         };
-        this.attributeFilterValues$ = this._observeService.getModelValues(
+        this.attributeValues$ = this._observeService.getModelValues(
           targetFilter
         );
       });
@@ -175,15 +219,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   // }
 
   onDatapodChanged() {
-    this.alertMetricFormGroup.controls.monitoringEntity.setValue('');
+    this.alertMetricFormGroup.controls.metricsColumn.setValue('');
   }
 
-  onSelectedMonitoringEntity(selectedItem) {
-    this.selectedMonitoringEntity = selectedItem;
-  }
-
-  onSelectedEntityName(selectedItem) {
-    this.selectedEntityName = selectedItem;
+  onSelectedMetricsColumn(selectedItem) {
+    this.selectedMetricsColumn = selectedItem;
   }
 
   onDatapodSelected(selectedItem) {
@@ -196,70 +236,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         selectedItem.categoryId || 'Default'
       );
 
-      this.metricsList$ = this._configureAlertService
-        .getDatapod$(selectedItem.id)
-        .pipe(
-          tap(datapod => (this.selectedDatapod = datapod)),
-          map(fpGet('artifacts.[0].columns'))
-        );
-
-      const monitoringEntityControl = this.alertMetricFormGroup.get(
-        'monitoringEntity'
-      );
-      combineLatest(this.metricsList$, monitoringEntityControl.valueChanges)
-        .pipe(
-          map(([columns, monitoringEntity]) =>
-            filter(columns, col => col.columnName !== monitoringEntity)
-          )
-        )
-        .subscribe(
-          metrics => (this.metricsListWithoutMonitoringEntity = metrics)
-        );
-      const entityNameControl = this.alertRuleFormGroup.get('entityName');
-      combineLatest(this.metricsList$, entityNameControl.valueChanges)
-        .pipe(
-          map(([columns, entityName]) =>
-            filter(
-              columns,
-              col =>
-                col.columnName !== entityName && this.numericMetricFilter(col)
-            )
-          )
-        )
-        .subscribe(metrics => (this.metricsListWithoutEntity = metrics));
-      monitoringEntityControl.updateValueAndValidity();
-      entityNameControl.updateValueAndValidity();
+      this.loadMetrics(selectedItem.id);
     }
   }
 
+  loadMetrics(datapodId) {
+    const metricsList = this._configureAlertService.getDatapod$(datapodId).pipe(
+      tap(datapod => (this.selectedDatapod = datapod)),
+      map(fpGet('artifacts.[0].columns'))
+    );
+    this.metricsList$ = metricsList;
+    return metricsList.toPromise();
+  }
+
   constructPayload() {
-    const {
-      datapodId,
-      datapodName,
-      categoryId
-    } = this.alertMetricFormGroup.value;
-
-    const {
-      lookbackColumn,
-      lookbackPeriodValue,
-      lookbackPeriodType,
-      attributeFilterColumn,
-      attributeFilterValue
-    } = this.alertRuleFormGroup.value;
-
-    const sipQueryInfo = {
-      lookbackPeriod: {
-        value: `${lookbackPeriodValue}-${lookbackPeriodType}`,
-        column: lookbackColumn
-      },
-      attributeFilter: {
-        value: attributeFilterValue,
-        column: attributeFilterColumn
-      }
-    };
-
-    const sipQuery = this.generateSipQuery(sipQueryInfo);
-
     const {
       alertRuleName,
       alertRuleDescription,
@@ -269,16 +259,33 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       activeInd
     } = this.alertDefFormGroup.value;
 
-    const notification = [];
+    const {
+      datapodId,
+      datapodName,
+      categoryId,
+      metricsColumn,
+      aggregationType,
+      operator,
+      thresholdValue
+    } = this.alertMetricFormGroup.value;
 
-    if (includes(selectedNotifications, 'email')) {
-      notification.push({
-        type: 'email',
-        recipients: notificationEmails
-      });
-    }
+    const {
+      lookbackColumn,
+      lookbackPeriodValue,
+      lookbackPeriodType,
+      attributeName,
+      attributeValue
+    } = this.alertRuleFormGroup.value;
 
-    const alertConfigWithoutSipQuery = {
+    const sipQuery = this.generateSipQuery();
+
+    const notification = this.generateNotificationsForBackend(
+      selectedNotifications,
+      notificationEmails
+    );
+    const lookbackPeriod = `${lookbackPeriodValue}-${lookbackPeriodType}`;
+
+    const alertConfigWithoutSipQuery: AlertConfig = {
       alertRuleName,
       alertRuleDescription,
       alertSeverity,
@@ -287,61 +294,68 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodId,
       datapodName,
       categoryId,
-      product: 'SAWD000001'
+      metricsColumn,
+      aggregationType,
+      operator,
+      thresholdValue,
+      lookbackColumn,
+      lookbackPeriod,
+      attributeName,
+      attributeValue
     };
-    console.log({ sipQuery });
+
+    if (this.alertDefinition.action === 'update') {
+      const {
+        createdBy,
+        createdTime,
+        product
+      } = this.alertDefinition.alertConfig;
+      alertConfigWithoutSipQuery.createdBy = createdBy;
+      alertConfigWithoutSipQuery.createdTime = createdTime;
+      alertConfigWithoutSipQuery.product = product;
+    } else {
+      alertConfigWithoutSipQuery.product = 'SAWD000001';
+    }
 
     const alertConfig: AlertConfig = {
       ...alertConfigWithoutSipQuery,
       sipQuery
     };
-
     this.endPayload = alertConfigWithoutSipQuery;
     return alertConfig;
   }
 
-  generateSipQuery(sipQueryInfo) {
+  generateSipQuery() {
     const {
-      aggregation,
+      aggregationType,
       operator,
       thresholdValue
     } = this.alertMetricFormGroup.value;
 
-    const aggregate = aggregation === 'none' ? null : aggregation;
     const {
-      lookbackPeriod
-      // attributeFilter
-    } = sipQueryInfo;
+      lookbackPeriodValue,
+      lookbackPeriodType,
+      attributeName,
+      attributeValue
+    } = this.alertRuleFormGroup.value;
 
-    const selectedEntityName = this.selectedEntityName;
+    const aggregate = aggregationType === 'none' ? null : aggregationType;
 
-    const entityName: AlertArtifact = {
-      dataField: split(selectedEntityName.columnName, '.')[0],
-      area: 'x-axis',
-      alias: selectedEntityName.alias,
-      columnName: selectedEntityName.columnName,
-      // name: '', // take out name, and see if it works
-      displayName: selectedEntityName.displayName,
-      type: selectedEntityName.type
-    };
+    const selectedMetricsColumn = this.selectedMetricsColumn;
 
-    const selectedMonitoringEntity = this.selectedMonitoringEntity;
-
-    const monitoringEntity: AlertArtifact = {
-      dataField: selectedMonitoringEntity.columnName,
-      area: 'y-axis',
-      alias: selectedEntityName.alias,
-      columnName: selectedMonitoringEntity.columnName,
-      // name: '', // take out name, and see if it works
-      displayName: selectedMonitoringEntity.displayName,
-      type: selectedMonitoringEntity.type,
+    const metricsColumn: AlertArtifact = {
+      dataField: selectedMetricsColumn.columnName,
+      alias: selectedMetricsColumn.alias,
+      columnName: selectedMetricsColumn.columnName,
+      displayName: selectedMetricsColumn.displayName,
+      type: selectedMetricsColumn.type,
       aggregate
     };
 
     const { artifactName } = this.selectedDatapod.artifacts[0];
 
     const alertFilter = {
-      type: selectedMonitoringEntity.type,
+      type: selectedMetricsColumn.type,
       artifactsName: artifactName,
       model: {
         operator,
@@ -349,35 +363,29 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       }
     };
 
-    const lookbackPeriodCol = lookbackPeriod.column;
     const lookbackFilter = {
-      type: lookbackPeriodCol.type,
+      type: 'date',
       artifactsName: artifactName,
       model: {
-        presetCal: lookbackPeriod.value
+        presetCal: `${lookbackPeriodValue}-${lookbackPeriodType}`
       }
     };
 
-    // const attributeFilterCol = attributeFilter.column;
-    // const hasAttributeFilter = attributeFilter.column && attributeFilter.value;
-    // const stringFilter = hasAttributeFilter
-    //   ? {
-    //       type: attributeFilterCol.type,
-    //       artifactsName: artifactName,
-    //       model: {
-    //         operator: 'EQ',
-    //         value: attributeFilter.value
-    //       }
-    //     }
-    //   : null;
+    const hasAttributeFilter = attributeName && attributeValue;
+    const stringFilter = hasAttributeFilter
+      ? {
+          type: 'string',
+          artifactsName: artifactName,
+          model: {
+            operator: 'EQ',
+            modelValues: [attributeValue]
+          }
+        }
+      : null;
 
     return {
-      artifacts: [{ artifactName, fields: [entityName, monitoringEntity] }],
-      filters: compact([
-        alertFilter,
-        lookbackFilter
-        // stringFilter
-      ])
+      artifacts: [{ artifactName, fields: [metricsColumn] }],
+      filters: compact([alertFilter, lookbackFilter, stringFilter])
     };
   }
 

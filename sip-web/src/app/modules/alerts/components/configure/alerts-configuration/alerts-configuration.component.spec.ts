@@ -24,21 +24,23 @@ const confAlertServiceStub = {
 const alertDefinitionStub: AlertDefinition = {
   action: 'create',
   alertConfig: {
-    alertRulesSysId: '1',
-    datapodId: '1',
-    datapodName: 'abc',
     alertRuleName: 'abc',
     alertRuleDescription: 'abc',
-    categoryId: '1',
     alertSeverity: 'CRITICAL',
     activeInd: false,
-    createdBy: 'admin',
-    createdTime: 1555524407000,
-    modifiedTime: null,
-    modifiedBy: null,
+    datapodId: '1',
+    datapodName: 'abc',
+    categoryId: '',
+    notification: [],
     lookbackColumn: '',
     lookbackPeriod: '',
-    notification: [],
+    product: 'SAWD000001',
+    metricsColumn: '',
+    aggregationType: '',
+    operator: '',
+    thresholdValue: '',
+    attributeName: '',
+    attributeValue: '',
     sipQuery: { artifacts: [], filters: [] }
   }
 };
