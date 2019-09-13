@@ -17,6 +17,7 @@
       </div>
     </mat-toolbar>
 </div>
+<mat-divider></mat-divider>
 <div class="registration-form">
   <form
     fxFlex
@@ -28,9 +29,9 @@
     autocomplete="false"
   >
     <section
-      fxFlex="50"
+      fxFlex="100"
       fxLayout="column"
-      fxLayoutAlign="space-around left"
+      fxLayoutAlign="space-around center"
     >
       <mat-form-field class="select-form-field" appearance="outline">
         <mat-label i18n>Model</mat-label>
@@ -67,7 +68,7 @@
         e2e="batch-full-size"></mat-slide-toggle>
       </div>
 
-      <mat-form-field *ngIf="showEventUrl" appearance="outline">
+      <mat-form-field appearance="outline">
         <mat-label i18n>Event URL</mat-label>
         <input
           matInput
@@ -86,7 +87,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label i18n>Timeout</mat-label>
+        <mat-label i18n>Timeout In MS</mat-label>
         <input
           matInput
           type="number"
@@ -142,7 +143,8 @@
     </section>
   </form>
 </div>
-<div style="padding-left: 22px;">
+<mat-divider></mat-divider>
+<div style="padding: 10px 0px 0px 22px;">
     <button
       mat-raised-button
       color="primary"

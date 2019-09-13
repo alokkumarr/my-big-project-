@@ -36,6 +36,7 @@ export class NewRegistrationComponent implements OnInit {
     fetchAppKeys.then(response => {
       this.showEventUrl = isEmpty(response);
     });
+    this.model = 'countly';
     this.detailsFormGroup = this._formBuilder.group({
       batchSize: ['', [Validators.required]],
       eventUrl: [''],

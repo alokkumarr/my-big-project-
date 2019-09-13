@@ -10,7 +10,12 @@
 
   .registration-form {
     overflow: auto;
-    height: calc(100vh - 270px);
+    padding: 30px;
+    height: calc(100vh - 35%);
+
+    section mat-form-field {
+      width: 50%;
+    }
   }
 
   div form {
