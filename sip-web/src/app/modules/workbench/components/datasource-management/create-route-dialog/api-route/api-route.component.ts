@@ -19,6 +19,8 @@ import * as isUndefined from 'lodash/isUndefined';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
+import { SourceFolderDialogComponent } from '../../select-folder-dialog';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'api-route',
@@ -33,7 +35,8 @@ export class ApiRouteComponent implements OnInit, DetailForm {
 
   constructor(
     private formBuilder: FormBuilder,
-    private datasourceService: DatasourceService
+    private datasourceService: DatasourceService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -105,6 +108,19 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       headerParameters: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),
       urlParameters: this.formBuilder.array([])
+    });
+  }
+
+  openSelectSourceFolderDialog() {
+    const dateDialogRef = this.dialog.open(SourceFolderDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      height: '400px',
+      width: '300px'
+    });
+    dateDialogRef.afterClosed().subscribe(sourcePath => {
+      this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
     });
   }
 

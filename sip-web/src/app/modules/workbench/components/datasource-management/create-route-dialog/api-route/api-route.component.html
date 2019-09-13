@@ -46,6 +46,14 @@
         required
         autocomplete="new-password"
       />
+      <button
+        mat-button
+        matSuffix
+        mat-icon-button
+        (click)="openSelectSourceFolderDialog()"
+      >
+        <mat-icon matTooltip="Browse" fontIcon="icon-folder-solid"></mat-icon>
+      </button>
       <mat-error
         *ngIf="
           !!detailsFormGroup.controls.destinationLocation.hasError('required')
