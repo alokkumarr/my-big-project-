@@ -81,10 +81,9 @@ public class AlertEvaluationImpl implements AlertEvaluation {
           obj -> {
             connection.insert(alertResultId, alertResult);
           });
-      if (alertResultList.size() > 0 ) {
+      if (alertResultList.size() > 0) {
         logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-        alertNotifier.sendNotification(
-            alertRuleDetails);
+        alertNotifier.sendNotification(alertRuleDetails);
       }
     }
     return true;

@@ -7,8 +7,8 @@ import java.util.List;
 public class Email {
 
   @JsonPropertyOrder({
-    "template",
-    "recipients",
+      "template",
+      "recipients",
   })
   @JsonProperty("recipients")
   List<String> recipients;

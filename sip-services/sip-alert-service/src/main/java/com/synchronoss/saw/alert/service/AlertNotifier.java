@@ -62,6 +62,11 @@ public class AlertNotifier {
 
   private RestTemplate restTemplate = null;
 
+  /**
+   * Send Alert notification.
+   *
+   * @param alertRule Alert Rule.
+   */
   public void sendNotification(AlertRuleDetails alertRule) {
     logger.info("Inside send notification method");
     try {
@@ -69,7 +74,9 @@ public class AlertNotifier {
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
         if (notification != null) {
-          if (notification.getEmail() != null) sendMailNotification(alertRule);
+          if (notification.getEmail() != null) {
+            sendMailNotification(alertRule);
+          }
           // Slack/Webhooks and other notification channel can be added here.
 
         } else {
@@ -196,7 +203,7 @@ public class AlertNotifier {
   public String prepareMailBody(AlertRuleDetails alertRulesDetails, String body, String alertLink) {
     logger.debug("prepare mail body starts here :" + body);
     if (alertRulesDetails.getNotification().getEmail().getTemplate() != null) {
-       // override the Body template if its configured for specific alerts.
+      // override the Body template if its configured for specific alerts.
       body = alertRulesDetails.getNotification().getEmail().getTemplate();
     }
     if (body.contains(MailBodyResolver.ALERT_RULE_NAME)) {
