@@ -40,7 +40,7 @@ export class NewRegistrationComponent implements OnInit {
     this.detailsFormGroup = this._formBuilder.group({
       batchSize: ['', [Validators.required]],
       eventUrl: [''],
-      bufferFullSize: [''],
+      bufferFullSize: [false],
       timeout: [''],
       streamQueue: [''],
       streamTopic: [''],
