@@ -13,7 +13,6 @@ import { Store } from '@ngxs/store';
   selector: 'designer-container',
   template: 'DesignerContainer'
 })
-
 class DesignerStubComponent {
   @Input() public analysisStarter;
   @Input() public analysis;
@@ -32,7 +31,7 @@ describe('Designer Component', () => {
         { provide: ChartService, useValue: {} },
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
-        { provide: Store, useValue: {} }
+        { provide: Store, useValue: { dispatch: () => {} } }
       ],
       declarations: [DesignerContainerComponent, DesignerStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -50,36 +49,40 @@ describe('Designer Component', () => {
   });
 
   it('should construct filters for DSL format', () => {
-    const filters = [{
-      'type': 'date',
-      'artifactsName': 'SALES',
-      'isOptional': false,
-      'columnName': 'date',
-      'isRuntimeFilter': false,
-      'isGlobalFilter': false,
-      'model': {
-        'operator': 'BTW',
-        'value': '01-01-2017',
-        'otherValue': '01-31-2017'
+    const filters = [
+      {
+        type: 'date',
+        artifactsName: 'SALES',
+        isOptional: false,
+        columnName: 'date',
+        isRuntimeFilter: false,
+        isGlobalFilter: false,
+        model: {
+          operator: 'BTW',
+          value: '2017-01-01',
+          otherValue: '2017-01-31'
+        }
       }
-    }];
+    ];
 
-    const output = [{
-      type: 'date',
-      artifactsName: 'SALES',
-      isOptional: false,
-      columnName: 'date',
-      isRuntimeFilter: false,
-      isGlobalFilter: false,
-      model: {
-        operator: 'BTW',
-        value: '01-01-2017',
-        otherValue: '01-31-2017',
-        gte: '2017-01-01',
-        lte: '2017-01-31',
-        preset: 'NA'
+    const output = [
+      {
+        type: 'date',
+        artifactsName: 'SALES',
+        isOptional: false,
+        columnName: 'date',
+        isRuntimeFilter: false,
+        isGlobalFilter: false,
+        model: {
+          operator: 'BTW',
+          value: '2017-01-01',
+          otherValue: '2017-01-31',
+          gte: '2017-01-01',
+          lte: '2017-01-31',
+          preset: 'NA'
+        }
       }
-    }];
+    ];
     const DSLFilters = component.generateDSLDateFilters(filters);
     expect(DSLFilters).toEqual(output);
   });

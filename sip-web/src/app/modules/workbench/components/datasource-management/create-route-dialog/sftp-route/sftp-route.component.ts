@@ -29,11 +29,11 @@ export class SftpRouteComponent implements OnInit, DetailForm {
   @Input() opType: ROUTE_OPERATION;
 
   detailsFormGroup: FormGroup;
-  private _dialog: MatDialog;
 
   constructor(
     private formBuilder: FormBuilder,
-    private datasourceService: DatasourceService
+    private datasourceService: DatasourceService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -91,7 +91,7 @@ export class SftpRouteComponent implements OnInit, DetailForm {
   }
 
   openSelectSourceFolderDialog() {
-    const dateDialogRef = this._dialog.open(SourceFolderDialogComponent, {
+    const dateDialogRef = this.dialog.open(SourceFolderDialogComponent, {
       hasBackdrop: true,
       autoFocus: false,
       closeOnNavigation: true,

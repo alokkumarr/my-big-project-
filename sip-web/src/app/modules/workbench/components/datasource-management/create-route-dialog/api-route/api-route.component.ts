@@ -18,6 +18,9 @@ import * as isUndefined from 'lodash/isUndefined';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
+import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
+import { SourceFolderDialogComponent } from '../../select-folder-dialog';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'api-route',
@@ -32,7 +35,8 @@ export class ApiRouteComponent implements OnInit, DetailForm {
 
   constructor(
     private formBuilder: FormBuilder,
-    private datasourceService: DatasourceService
+    private datasourceService: DatasourceService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -85,7 +89,7 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       ],
       destinationLocation: ['', Validators.required],
       description: [''],
-      apiEndPoint: ['', Validators.required],
+      apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
       bodyParameters: this.formBuilder.group({
         content: [
@@ -107,6 +111,19 @@ export class ApiRouteComponent implements OnInit, DetailForm {
     });
   }
 
+  openSelectSourceFolderDialog() {
+    const dateDialogRef = this.dialog.open(SourceFolderDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      height: '400px',
+      width: '300px'
+    });
+    dateDialogRef.afterClosed().subscribe(sourcePath => {
+      this.detailsFormGroup.controls.destinationLocation.setValue(sourcePath);
+    });
+  }
+
   get value(): APIRouteMetadata {
     return this.detailsFormGroup.value;
   }
@@ -117,7 +134,7 @@ export class ApiRouteComponent implements OnInit, DetailForm {
 
   get testConnectivityValue() {
     return {
-      channelType: 'sftp',
+      channelType: CHANNEL_UID.API,
       channelId: this.routeData.channelID,
       ...this.value
     };

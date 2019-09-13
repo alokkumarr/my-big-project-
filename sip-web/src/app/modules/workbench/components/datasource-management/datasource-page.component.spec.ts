@@ -45,10 +45,21 @@ describe('DatasourcePageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DatasourceComponent);
     component = fixture.componentInstance;
+    component.show = true;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('togglePWD', () => {
+    it('should toggle password show status', () => {
+      component.togglePWD();
+      expect(component.show).toBeFalsy();
+
+      component.togglePWD();
+      expect(component.show).toBeTruthy();
+    });
   });
 });

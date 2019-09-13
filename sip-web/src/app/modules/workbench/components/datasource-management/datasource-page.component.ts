@@ -35,6 +35,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   routesData = [];
   sourceData = [];
   sourceTypes = CHANNEL_TYPES;
+  sourceUIDs = CHANNEL_UID;
   selectedSourceType: CHANNEL_UID;
   selectedSourceData: any;
   // channel activation/deactivation request is pending
@@ -376,7 +377,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   openLogsDialog(routeData) {
-    const baseUrl = 'workbench/datasource/jobs?channelTypeId=sftp';
+    const baseUrl = `workbench/datasource/jobs?channelTypeId=${this.selectedSourceType}`;
     const { bisChannelSysId, bisRouteSysId } = routeData;
     const url = `${baseUrl}&channelId=${bisChannelSysId}&routeId=${bisRouteSysId}`;
     this._router.navigateByUrl(url);

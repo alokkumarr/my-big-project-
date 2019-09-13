@@ -16,7 +16,6 @@
         name="name-of-channel"
         e2e="name-of-channel"
         formControlName="channelName"
-        maxlength="18"
         required
         autocomplete="off"
       />
@@ -37,7 +36,7 @@
       </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline" fxFlex="1 1 auto">
-      <mat-label i18n>Hostname</mat-label>
+      <mat-label i18n>Host Name</mat-label>
       <input
         matInput
         placeholder="Host Name"
@@ -65,15 +64,7 @@
         type="number"
         e2e="port-no-input"
         formControlName="portNo"
-        required
       />
-      <mat-error
-        *ngIf="!!detailsFormGroup.controls.portNo.hasError('required')"
-        i18n
-      >
-        Port Number is
-        <strong>required</strong>
-      </mat-error>
       <mat-error
         e2e="port-number-error-msg"
         *ngIf="!!detailsFormGroup.controls.portNo.hasError('pattern')"
