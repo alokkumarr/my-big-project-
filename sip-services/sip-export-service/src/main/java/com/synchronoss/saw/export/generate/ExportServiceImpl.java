@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -116,8 +117,7 @@ public class ExportServiceImpl implements ExportService {
   private RestUtil restUtil;
 
   @Override
-  @Async
-  public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(
+  public ResponseEntity<DataResponse> dataToBeExportedAsync(
       String executionId,
       HttpServletRequest request,
       String analysisId,
@@ -160,22 +160,15 @@ public class ExportServiceImpl implements ExportService {
               + "&analysisType="
               + analysisType;
     }
-    HttpEntity<?> requestEntity = new HttpEntity<Object>(ExportUtils.setRequestHeader(request));
-    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
-    ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-        asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
-    responseStringFuture.addCallback(
-        new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-          @Override
-          public void onSuccess(ResponseEntity<DataResponse> entity) {
-            logger.debug("[Success] Response string:" + entity);
-          }
+    HttpEntity<?> requestEntity = new HttpEntity<>(ExportUtils.setRequestHeader(request));
+    /**
+     * The AsyncRestTemplate api deprecated with spring(WebClient) which is having erroneous method,
+     * So instead of calling asyncTemplate will call RestTemplate to perform UI export.
+     */
+    RestTemplate restTemplate = restUtil.restTemplate();
+    ResponseEntity<DataResponse> responseStringFuture =
+        restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
 
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
     return responseStringFuture;
   }
 
@@ -979,7 +972,6 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
-    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
 
     String url =
         storageProxyUrl
@@ -1020,21 +1012,10 @@ public class ExportServiceImpl implements ExportService {
           userFileName);
     }
 
+    // mail should send asynchronous
     if (recipients != null && !recipients.equals("")) {
-      ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-          asyncRestTemplate.getForEntity(url, DataResponse.class);
-      responseStringFuture.addCallback(
-          new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-            @Override
-            public void onSuccess(ResponseEntity<DataResponse> entity) {
-              dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              logger.error("[Failed] Getting string response:" + t);
-            }
-          });
+      ResponseEntity<DataResponse> entity = restTemplate.getForEntity(url, DataResponse.class);
+      CompletableFuture.runAsync(() -> dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName));
     }
   }
 
