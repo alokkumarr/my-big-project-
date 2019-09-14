@@ -63,4 +63,12 @@ describe('Designer Chart Component', () => {
       expect(format.precision).toBeFalsy();
     });
   });
+
+  describe('customizeColumns', () => {
+    it('should align columns to left', () => {
+      const cols: any[] = [{}];
+      component.customizeColumns(cols);
+      expect(cols[0].alignment).toBeDefined();
+    });
+  });
 });

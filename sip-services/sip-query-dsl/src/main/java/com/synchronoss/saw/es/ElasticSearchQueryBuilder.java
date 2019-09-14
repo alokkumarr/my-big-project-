@@ -82,7 +82,8 @@ public class ElasticSearchQueryBuilder {
 
     // Generated Query
     searchSourceBuilder =
-        buildAggregations(dataFields, aggregationFields,aggregationFilter, searchSourceBuilder, size);
+        buildAggregations(dataFields, aggregationFields,aggregationFilter, searchSourceBuilder,
+            size,sipQuery.getSorts());
     return searchSourceBuilder.toString();
   }
 
@@ -218,7 +219,8 @@ public class ElasticSearchQueryBuilder {
       List<Field> aggregationFields,
       List<Filter> aggregationFilter,
       SearchSourceBuilder searchSourceBuilder,
-      Integer size) {
+      Integer size,
+      List<Sort> sorts) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
     if (aggregationFields.size() == 0) {
@@ -233,7 +235,7 @@ public class ElasticSearchQueryBuilder {
       } else {
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, aggregationFilter,0, 0, aggregationBuilder);
+                dataFields, aggregationFields, aggregationFilter,0, 0, aggregationBuilder,sorts);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
@@ -278,7 +280,6 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
-            break;
           } else if ((item.getModel().getFormat() != null)
               && ((item.getModel().getFormat().equalsIgnoreCase(EPOCH_MILLIS))
                   || (item.getModel().getFormat().equalsIgnoreCase(EPOCH_SECOND)))) {

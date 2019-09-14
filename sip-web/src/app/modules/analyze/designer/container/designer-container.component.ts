@@ -1055,6 +1055,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.requestDataIfPossible();
       break;
     // only front end data refresh needed
+    case 'reorder':
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      if (isDSLAnalysis(this.analysis)) {
+        this._store.dispatch(new DesignerUpdateArtifactColumn({
+          columnName: event.column.columnName,
+          table: event.column.table || event.column['tableName'],
+          visibleIndex: event.column['visibleIndex']
+        }));
+      }
+      break;
     case 'format':
     case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -1073,7 +1083,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
-    case 'visibleIndex':
     }
   }
 

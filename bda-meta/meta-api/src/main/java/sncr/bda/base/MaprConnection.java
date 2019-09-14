@@ -222,21 +222,24 @@ public class MaprConnection {
    * @return Object
    */
   public Object fetchPagingData(
-      String columnName, String executionId, Integer page, Integer pageSize, Integer totalRows) {
+      String columnName, String executionId, Integer page, Integer pageSize) {
     if (pageSize != null && pageSize > 0) {
       try {
         ObjectMapper objectMapper = new ObjectMapper();
         Query query =
-            buildDataQuery(connection, columnName, executionId, page, pageSize, totalRows);
+            buildDataQuery(connection, columnName, executionId);
         if (query != null) {
           final DocumentStream stream = store.find(query);
+            int startIndex = (page-1) * pageSize;
           for (final Document document : stream) {
             List<Object> objectList =
                 document.getList(columnName).stream()
+                    .skip(startIndex)
+                    .limit(pageSize)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-
-            return objectMapper.readTree(objectList.toString());
+              Object obj =  objectMapper.readTree(objectList.toString());
+              return obj;
           }
         }
       } catch (Exception ex) {
@@ -251,43 +254,20 @@ public class MaprConnection {
    * number and page size.
    *
    * @param executionId
-   * @param page
-   * @param pageSize
    * @return query
    */
   public Query buildDataQuery(
       Connection connection,
       String columnName,
-      String executionId,
-      Integer page,
-      Integer pageSize,
-      Integer totalRows) {
+      String executionId) {
     try {
-      // pagination logic
-      Integer startIndex, endIndex;
-      pageSize = pageSize > totalRows ? totalRows : pageSize;
-      if (page != null && page > 1) {
-        startIndex = (page - 1) * pageSize;
-        endIndex = startIndex + pageSize;
-      } else {
-        startIndex = page != null && page > 0 ? (page - 1) : 0;
-        endIndex = startIndex + pageSize;
-      }
-      LOGGER.trace(String.format("Start Index : %s  End Index : %s", startIndex, endIndex));
-
-      String[] select = new String[pageSize];
-      for (int i = 0; startIndex < endIndex; i++) {
-        select[i] = String.format("%s[%s]", columnName, startIndex);
-        ++startIndex;
-      }
-
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("executionId", executionId);
 
       // build execution data query
-      final Query query = connection.newQuery().select(select).where(node.toString()).build();
+      final Query query = connection.newQuery().select(columnName).where(node.toString()).build();
       LOGGER.trace(String.format("Query for the paginating data : %s", query.asJsonString()));
       return query;
     } catch (Exception ex) {

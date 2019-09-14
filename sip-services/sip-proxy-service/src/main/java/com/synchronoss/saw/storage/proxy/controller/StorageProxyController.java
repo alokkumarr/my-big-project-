@@ -441,6 +441,7 @@ public class StorageProxyController {
     executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
     executionResult.setStatus("success");
     executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    executionResult.setRecordCount(data.size());
     return executionResult;
   }
 
