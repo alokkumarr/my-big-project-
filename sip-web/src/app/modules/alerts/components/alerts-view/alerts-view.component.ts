@@ -70,6 +70,7 @@ export class AlertsViewComponent implements OnInit {
 
   ngOnInit() {
     this.filterString$.subscribe(() => {
+      this.setAlertLoaderForGrid();
       this._store.dispatch(new LoadAllAlertCount());
       this._store.dispatch(new LoadAllAlertSeverity());
     });
@@ -77,6 +78,8 @@ export class AlertsViewComponent implements OnInit {
 
   fetchLateshAlerts() {
     this.setAlertLoaderForGrid();
+    this._store.dispatch(new LoadAllAlertCount());
+    this._store.dispatch(new LoadAllAlertSeverity());
   }
 
   setAlertLoaderForGrid() {

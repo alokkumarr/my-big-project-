@@ -19,6 +19,23 @@
   max-height: 100%;
   overflow: auto;
 
+  .mat-form-field {
+    width: 80%;
+  }
+
+  .lookbackperiodtype-field.mat-form-field {
+    padding-top: 0;
+
+    .dx-selectbox {
+      height: 26px;
+
+      input.dx-texteditor-input {
+        padding: 0;
+        height: 20px;
+      }
+    }
+  }
+
   .lookback-period__info-icon {
     position: absolute;
     margin-top: 12px;

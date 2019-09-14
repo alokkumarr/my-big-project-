@@ -151,11 +151,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
-      alertRuleName: ['', [Validators.required, Validators.maxLength(18)]],
-      alertRuleDescription: [
-        '',
-        [Validators.required, Validators.maxLength(36)]
-      ],
+      alertRuleName: ['', Validators.required],
+      alertRuleDescription: ['', Validators.required],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
       notificationEmails: [[]],
@@ -354,7 +351,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const {
       aggregationType,
       operator,
-      thresholdValue
+      thresholdValue,
+      otherThresholdValue
     } = this.alertMetricFormGroup.value;
 
     const {
@@ -384,7 +382,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       artifactsName: artifactName,
       model: {
         operator,
-        value: thresholdValue
+        value: thresholdValue,
+        otherValue: operator === 'BTW' ? otherThresholdValue : null
       }
     };
 
