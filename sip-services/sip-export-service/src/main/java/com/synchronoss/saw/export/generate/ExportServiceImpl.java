@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.export.AmazonS3Handler;
-import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
@@ -17,10 +16,13 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggregationParser;
-
+import com.synchronoss.saw.export.util.ExportUtils;
+import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,14 +37,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
-
-import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.SipQuery;
-import com.synchronoss.sip.utils.RestUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -116,8 +115,7 @@ public class ExportServiceImpl implements ExportService {
   private RestUtil restUtil;
 
   @Override
-  @Async
-  public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(
+  public ResponseEntity<DataResponse> dataToBeExportedAsync(
       String executionId,
       HttpServletRequest request,
       String analysisId,
@@ -160,22 +158,15 @@ public class ExportServiceImpl implements ExportService {
               + "&analysisType="
               + analysisType;
     }
-    HttpEntity<?> requestEntity = new HttpEntity<Object>(ExportUtils.setRequestHeader(request));
-    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
-    ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-        asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
-    responseStringFuture.addCallback(
-        new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-          @Override
-          public void onSuccess(ResponseEntity<DataResponse> entity) {
-            logger.debug("[Success] Response string:" + entity);
-          }
+    HttpEntity<?> requestEntity = new HttpEntity<>(ExportUtils.setRequestHeader(request));
+    /**
+     * The AsyncRestTemplate api deprecated with spring(WebClient) which is having erroneous method,
+     * So instead of calling asyncTemplate will call RestTemplate to perform UI export.
+     */
+    RestTemplate restTemplate = restUtil.restTemplate();
+    ResponseEntity<DataResponse> responseStringFuture =
+        restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
 
-          @Override
-          public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
-          }
-        });
     return responseStringFuture;
   }
 
@@ -282,8 +273,11 @@ public class ExportServiceImpl implements ExportService {
       OutputStreamWriter osw = new OutputStreamWriter(fos);
       String fileType = exportBean.getFileType();
 
+      List<Field> fields = new ArrayList<>();
       final SipQuery sipQuery = getSipQuery(analysisId);
-      List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+      for (Artifact artifact : sipQuery.getArtifacts()) {
+        fields.addAll(artifact.getFields());
+      }
       Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
       logger.debug("Writing to file");
@@ -806,8 +800,11 @@ public class ExportServiceImpl implements ExportService {
     logger.debug("Email async success");
     logger.debug("[Success] Response :" + entity.getStatusCode());
 
+    List<Field> fields = new ArrayList<>();
     final SipQuery sipQuery = getSipQuery(analysisId);
-    List<Field> fields = sipQuery.getArtifacts().get(0).getFields();
+    for (Artifact artifact : sipQuery.getArtifacts()) {
+      fields.addAll(artifact.getFields());
+    }
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
 
     try {
@@ -979,7 +976,6 @@ public class ExportServiceImpl implements ExportService {
       String jobGroup,
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
-    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
 
     String url =
         storageProxyUrl
@@ -1020,21 +1016,10 @@ public class ExportServiceImpl implements ExportService {
           userFileName);
     }
 
+    // mail should send asynchronous
     if (recipients != null && !recipients.equals("")) {
-      ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture =
-          asyncRestTemplate.getForEntity(url, DataResponse.class);
-      responseStringFuture.addCallback(
-          new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
-            @Override
-            public void onSuccess(ResponseEntity<DataResponse> entity) {
-              dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              logger.error("[Failed] Getting string response:" + t);
-            }
-          });
+      ResponseEntity<DataResponse> entity = restTemplate.getForEntity(url, DataResponse.class);
+      CompletableFuture.runAsync(() -> dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName));
     }
   }
 
