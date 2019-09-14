@@ -2,13 +2,14 @@ package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.synchronoss.saw.model.Model.Preset;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AlertCount {
-  private AlertCount.Preset preset;
-  private Long startTime;
-  private Long endTime;
+  private Preset preset;
+  private String startTime;
+  private String endTime;
   private AlertCount.GroupBy groupBy;
 
   public Preset getPreset() {
@@ -19,19 +20,19 @@ public class AlertCount {
     this.preset = preset;
   }
 
-  public Long getStartTime() {
+  public String getStartTime() {
     return startTime;
   }
 
-  public void setStartTime(Long startTime) {
+  public void setStartTime(String startTime) {
     this.startTime = startTime;
   }
 
-  public Long getEndTime() {
+  public String getEndTime() {
     return endTime;
   }
 
-  public void setEndTime(Long endTime) {
+  public void setEndTime(String endTime) {
     this.endTime = endTime;
   }
 
@@ -43,61 +44,6 @@ public class AlertCount {
     this.groupBy = groupBy;
   }
 
-  public enum Preset {
-    YESTERDAY("Yesterday"),
-    TODAY("Today"),
-    YTD("YTD"),
-    MTD("MTD"),
-    LTM("LTM"),
-    LSM("LSM"),
-    LM("LM"),
-    LQ("LQ"),
-    LY("LY"),
-    LW("LW"),
-    TW("TW"),
-    LSW("LSW"),
-    LTW("LTW"),
-    BTW("BTW");
-    private final String value;
-    private static final Map<String, AlertCount.Preset> CONSTANTS =
-        new HashMap<String, AlertCount.Preset>();
-
-    static {
-      for (AlertCount.Preset c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
-    }
-
-    private Preset(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return this.value;
-    }
-
-    @JsonValue
-    public String value() {
-      return this.value;
-    }
-
-    /**
-     * Creates Preset Object from a string value.
-     *
-     * @param value Enum value in String
-     * @return
-     */
-    @JsonCreator
-    public static AlertCount.Preset fromValue(String value) {
-      AlertCount.Preset constant = CONSTANTS.get(value);
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
-    }
-  }
 
   public enum GroupBy {
     STARTTIME("StartTime"),

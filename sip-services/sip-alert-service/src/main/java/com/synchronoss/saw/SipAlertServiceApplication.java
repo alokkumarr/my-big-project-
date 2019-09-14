@@ -1,5 +1,6 @@
 package com.synchronoss.saw;
 
+import com.synchronoss.saw.alert.service.evaluator.EvaluatorListener;
 import info.faljse.SDNotify.SDNotify;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
 public class SipAlertServiceApplication {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SipAlertServiceApplication.class);
+  private static final Logger logger = LoggerFactory.getLogger(SipAlertServiceApplication.class);
 
   /**
    * Start sip-semantic-service.
@@ -30,9 +31,20 @@ public class SipAlertServiceApplication {
    * @param args Arguments
    */
   public static void main(String[] args) {
-    ConfigurableApplicationContext ctx =
+    ConfigurableApplicationContext context =
         SpringApplication.run(SipAlertServiceApplication.class, args);
-    LOG.info(ctx.getApplicationName() + " has started.");
+    logger.info(context.getApplicationName() + " has started.");
+    Runnable r =
+        () -> {
+          try {
+            EvaluatorListener evaluatorListener = context.getBean(EvaluatorListener.class);
+            evaluatorListener.runStreamConsumer();
+          } catch (Exception e) {
+            logger.error("Error occurred while running the stream consumer : " + e.toString());
+          }
+        };
+    new Thread(r).start();
+    logger.info(context.getApplicationName() + " started the StreamConsumer thread ");
   }
 
   /**
@@ -41,14 +53,14 @@ public class SipAlertServiceApplication {
    * @return TaskExecutor
    */
   @Bean(name = "workExecutor")
-  public TaskExecutor taskExecutor() {
+  public TaskExecutor asyncExecutor() {
     ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
     taskExecutor.setMaxPoolSize(10);
     taskExecutor.setQueueCapacity(10);
     taskExecutor.afterPropertiesSet();
     return taskExecutor;
   }
-  
+
   /**
    *  tomcatEmbedded.
    * @return TomcatServletWebServerFactory
@@ -64,9 +76,12 @@ public class SipAlertServiceApplication {
     return tomcat;
   }
 
+  /**
+   * Listener.
+   *  @param event event */
   @EventListener
   public void onApplicationEvent(ApplicationReadyEvent event) {
-    LOG.info("Notifying service manager about start-up completion");
+    logger.info("Notifying service manager about start-up completion");
     SDNotify.sendNotify();
   }
 }

@@ -4,53 +4,147 @@ import java.util.Date;
 
 public class AlertNotificationLog {
 
-  String notificationId;
+  private String notificationSysId;
 
-  Long alertTriggerSysId;
+  private String alertTriggerSysId;
 
-  Boolean notified;
+  private Boolean notifiedStatus;
 
-  Date createdTime;
+  private Date createdTime;
 
-  String message;
+  private String message;
 
-  public String getNotificationId() {
-    return notificationId;
+  private String alertRuleName;
+
+  private String attributeName;
+
+  private Double thresholdValue;
+
+  private AlertSeverity alertSeverity;
+
+  /**
+   * Gets notificationSysId.
+   *
+   * @return notificationSysId
+   */
+  public String getNotificationSysId() {
+    return notificationSysId;
   }
 
-  public void setNotificationId(String notificationId) {
-    this.notificationId = notificationId;
+  /** Sets notificationSysId. */
+  public void setNotificationSysId(String notificationSysId) {
+    this.notificationSysId = notificationSysId;
   }
 
-  public Long getAlertTriggerSysId() {
+  /**
+   * Gets alertTriggerSysId.
+   *
+   * @return alertTriggerSysId
+   */
+  public String getAlertTriggerSysId() {
     return alertTriggerSysId;
   }
 
-  public void setAlertTriggerSysId(Long alertTriggerSysId) {
+  /** Sets alertTriggerSysId. */
+  public void setAlertTriggerSysId(String alertTriggerSysId) {
     this.alertTriggerSysId = alertTriggerSysId;
   }
 
-  public Boolean getNotified() {
-    return notified;
+  /**
+   * Gets notifiedStatus.
+   *
+   * @return notifiedStatus
+   */
+  public Boolean getNotifiedStatus() {
+    return notifiedStatus;
   }
 
-  public void setNotified(Boolean notified) {
-    this.notified = notified;
+  /** Sets notifiedStatus. */
+  public void setNotifiedStatus(Boolean notifiedStatus) {
+    this.notifiedStatus = notifiedStatus;
   }
 
+  /**
+   * Gets createdTime.
+   *
+   * @return createdTime
+   */
   public Date getCreatedTime() {
     return createdTime;
   }
 
+  /** Sets createdTime. */
   public void setCreatedTime(Date createdTime) {
     this.createdTime = createdTime;
   }
 
+  /**
+   * Gets message.
+   *
+   * @return message
+   */
   public String getMessage() {
     return message;
   }
 
+  /** Sets message. */
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  /**
+   * Gets alertRuleName.
+   *
+   * @return alertRuleName
+   */
+  public String getAlertRuleName() {
+    return alertRuleName;
+  }
+
+  /** Sets alertRuleName. */
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
+  }
+
+  /**
+   * Gets alertSeverity.
+   *
+   * @return value of alertSeverity
+   */
+  public AlertSeverity getAlertSeverity() {
+    return alertSeverity;
+  }
+
+  /** Sets alertSeverity. */
+  public void setAlertSeverity(AlertSeverity alertSeverity) {
+    this.alertSeverity = alertSeverity;
+  }
+
+  /**
+   * Gets thresholdValue.
+   *
+   * @return value of thresholdValue
+   */
+  public Double getThresholdValue() {
+    return thresholdValue;
+  }
+
+  /** Sets thresholdValue. */
+  public void setThresholdValue(Double thresholdValue) {
+    this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets attributeName.
+   *
+   * @return value of attributeName
+   */
+  public String getAttributeName() {
+    return attributeName;
+  }
+
+  /** Sets attributeName. */
+  public void setAttributeName(String attributeName) {
+    this.attributeName = attributeName;
   }
 }
