@@ -79,7 +79,11 @@
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
-            <div *ngIf="showNotificationEmail" fxLayout="column">
+            <div
+              *ngIf="showNotificationEmail"
+              fxLayout="column"
+              style="width: 80%;"
+            >
               <label i18n>Email</label>
               <email-list
                 formControlName="notificationEmails"
@@ -271,6 +275,45 @@
                 >Only numbers are allowed for Threshold value.</mat-error
               >
             </mat-form-field>
+            <mat-form-field
+              appearance="outline"
+              *ngIf="showOtherThresholdValue"
+            >
+              <mat-label>Other threshold value</mat-label>
+              <input
+                matInput
+                placeholder="Other threshold Value"
+                formControlName="otherThresholdValue"
+                required
+                type="number"
+                e2e="otherThresholdValue"
+              />
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.otherThresholdValue.hasError(
+                    'required'
+                  )
+                "
+                >This field is required</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.otherThresholdValue.hasError(
+                    'pattern'
+                  )
+                "
+                >Only numbers are allowed for other threshold value.</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.otherThresholdValue.hasError(
+                    'lessThan'
+                  )
+                "
+                >Threshold value should be greater than other threshold
+                value.</mat-error
+              >
+            </mat-form-field>
             <div
               fxFlex="45px"
               fxLayout="row"
@@ -334,11 +377,15 @@
               "
               ><small>This field is required </small></mat-error
             >
-            <div layoutAlign="row">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="center center"
+              style="width: 80%;"
+            >
               <mat-form-field
                 appearance="outline"
                 class="padtop10"
-                style="width: 98px;"
+                style="width: 50%;"
               >
                 <mat-label>Lookback period</mat-label>
                 <input
@@ -361,8 +408,8 @@
 
               <mat-form-field
                 appearance="outline"
-                style="width: 98px;"
-                class="add-container__body__stepper__dxselect padtop10"
+                class="add-container__body__stepper__dxselect padtop10 lookbackperiodtype-field"
+                style="width: 50%;"
               >
                 <mat-label>Lookback period type</mat-label>
                 <input

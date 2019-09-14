@@ -39,6 +39,7 @@ const alertDefinitionStub: AlertDefinition = {
     aggregationType: '',
     operator: '',
     thresholdValue: '',
+    otherThresholdValue: null,
     attributeName: '',
     attributeValue: '',
     sipQuery: { artifacts: [], filters: [] }

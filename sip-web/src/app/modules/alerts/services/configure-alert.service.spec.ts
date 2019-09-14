@@ -22,6 +22,7 @@ export const alertPayload: AlertConfig = {
   aggregationType: '',
   operator: '',
   thresholdValue: '',
+  otherThresholdValue: null,
   attributeName: '',
   attributeValue: '',
   sipQuery: { artifacts: [], filters: [] }
