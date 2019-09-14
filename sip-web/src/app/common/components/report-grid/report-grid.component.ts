@@ -307,21 +307,26 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (!this.columns) {
       return;
     }
+    const colsAffectedFromReorder = [];
+
     const cols = component.getVisibleColumns();
-    let isVisibleIndexChanged = false;
     forEach(cols, (col: ReportGridField) => {
       if (col.visibleIndex !== col.payload.visibleIndex) {
         col.changeColumnProp('visibleIndex', col.visibleIndex);
-        isVisibleIndexChanged = true;
-      }
-      if (isVisibleIndexChanged) {
-        // disabled this event so that refreshing data does not fire this event and triggers draft mode
-        // TODO find a better way to trigger this, and not on onContentReady
-        // currently devextreme has no event for when the columns of the grid get reordered
-        // so the onContentReady event was used for that
-        // this.change.emit({ subject: 'visibleIndex' });
+        colsAffectedFromReorder.push({
+          columnName: col.payload.columnName,
+          table: col.payload.table || col.payload['tableName'],
+          visibleIndex: col.visibleIndex
+        });
       }
     });
+
+    colsAffectedFromReorder.forEach(col =>
+      this.change.emit({
+        subject: 'reorder',
+        column: col
+      })
+    );
   }
 
   /** Column chooser should be closed when a click outside of it appears */
