@@ -24,6 +24,7 @@ public class AlertRuleDetails {
   private Operator operator;
   private String metricsColumn;
   private Double thresholdValue;
+  private Double otherThresholdValue;
   private Long createdTime;
   private Long modifiedTime;
   private String createdBy;
@@ -282,6 +283,20 @@ public class AlertRuleDetails {
   /** Sets thresholdValue. */
   public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets otherThresholdValue.
+   *
+   * @return value of otherThresholdValue
+   */
+  public Double getOtherThresholdValue() {
+    return otherThresholdValue;
+  }
+
+  /** Sets otherThresholdValue. */
+  public void setOtherThresholdValue(Double otherThresholdValue) {
+    this.otherThresholdValue = otherThresholdValue;
   }
 
   /**

@@ -56,7 +56,7 @@ mail:
   subject : "Alert Notification"
 alert:
   dashborad:
-    url: ${connector}://35.175.174.29/sip/web/#/alerts/view
+    url: {{ alert_dashboard_link }}
 
 storage-proxy:
   service:
@@ -70,4 +70,3 @@ metastore:
 
 sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
 max-number-of-alert-per-rules: 10000
-
