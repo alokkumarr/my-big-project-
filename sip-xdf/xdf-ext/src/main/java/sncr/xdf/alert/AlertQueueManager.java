@@ -23,8 +23,14 @@ public class AlertQueueManager {
   private String alertStream;
   private String alertTopic;
 
-  public AlertQueueManager(String BasePath) {
-      this.streamBasePath = BasePath + File.separator + "services/alert/evaluator";
+  public AlertQueueManager(String basePath) {
+      String sipBasePath = null;
+      // Mapr stream having issue with path prefixed in HDFS /MAPRFS removing the maprfs
+      // from the basepath.
+      if (basePath.contains(":///")){
+       sipBasePath = basePath.substring(basePath.indexOf(":")+3);
+      }
+      this.streamBasePath = sipBasePath + File.separator + "services/alert/evaluator";
       this.alertStream = this.streamBasePath + File.separator + "sip-alert-evaluator-stream";
       this.alertTopic = this.alertStream + ":alerts";
     try {
@@ -81,7 +87,7 @@ public class AlertQueueManager {
 
     KafkaProducer<String, String> producer = new KafkaProducer(properties);
 
-    String recordContent = String.format("%s,%d", datapod, processedTime);
+    String recordContent = String.format("%s˜˜%d", datapod, processedTime);
     logger.debug("Record content = " + recordContent);
 
     ProducerRecord<String, String> record = new ProducerRecord<>(this.alertTopic, recordContent);

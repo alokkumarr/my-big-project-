@@ -227,16 +227,6 @@ public abstract class AbstractComponent implements WithContext{
         return true;
     }
 
-  /**
-   * Send the notification to evaluate the data based on configured alert rules.
-   *
-   * @return boolean
-   */
-  private boolean sendToAlertStream(String basePath , String datapodId) {
-    AlertQueueManager alertQueueManager = new AlertQueueManager(basePath);
-    return alertQueueManager.sendMessageToStream(datapodId, System.currentTimeMillis());
-  }
-
     private int initServices(){
 
         try {

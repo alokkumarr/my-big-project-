@@ -32,25 +32,6 @@ public class Output {
     private String dataSet;
 
     /**
-     * Alert
-     * (optional)
-     *
-     */
-    @SerializedName("alert")
-    @Expose
-    private Boolean alert;
-
-
-    /**
-     * DataPod name
-     * (Optional)
-     * Datapod was introduced as optional parameter for backward compatibility.
-     */
-    @SerializedName("datapod")
-    @Expose
-    private String datapod;
-
-    /**
      * Description of dataset
      */
     @SerializedName("desc")
@@ -144,8 +125,6 @@ public class Output {
       Object userdata) {
     this.name = name;
     this.dataSet = dataSet;
-    this.alert = alert;
-    this.datapod= datapod;
     this.description = description;
     this.format = format;
     this.mode = mode;
