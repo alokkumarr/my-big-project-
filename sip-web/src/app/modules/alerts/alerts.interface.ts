@@ -31,6 +31,7 @@ export interface AlertConfig {
   aggregationType: string;
   operator: string;
   thresholdValue: string;
+  otherThresholdValue: string;
   attributeName: string;
   attributeValue: string;
   datapodId: string;

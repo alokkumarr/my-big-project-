@@ -55,6 +55,7 @@ const payload: AlertConfig = {
   aggregationType: '',
   operator: '',
   thresholdValue: '',
+  otherThresholdValue: null,
   attributeName: '',
   attributeValue: '',
   createdBy: undefined,

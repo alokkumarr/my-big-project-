@@ -20,6 +20,7 @@ import * as fpMap from 'lodash/fp/map';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
+import { lessThan } from '../../../../../common/validators/less-than.validator';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
@@ -64,6 +65,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   endActionText = 'Add';
   endPayload: AlertConfig;
   showNotificationEmail = false;
+  showOtherThresholdValue = false;
   lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
 
   constructor(
@@ -160,6 +162,15 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       activeInd: [true]
     });
 
+    const thresholdValuevalidators = [
+      Validators.required,
+      Validators.pattern('^-?[0-9]*$')
+    ];
+    const otherThresholdValuevalidators = [
+      Validators.required,
+      Validators.pattern('^-?[0-9]*$'),
+      lessThan('thresholdValue')
+    ];
     this.alertMetricFormGroup = this._formBuilder.group({
       datapodId: ['', Validators.required],
       datapodName: [''],
@@ -167,10 +178,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       metricsColumn: ['', Validators.required],
       aggregationType: ['', Validators.required],
       operator: ['', Validators.required],
-      thresholdValue: [
-        '',
-        [Validators.required, Validators.pattern('^-?[0-9]*$')]
-      ]
+      thresholdValue: ['', thresholdValuevalidators],
+      otherThresholdValue: ['', otherThresholdValuevalidators]
     });
 
     this.alertRuleFormGroup = this._formBuilder.group({
@@ -184,11 +193,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.alertDefFormGroup
       .get('notification')
       .valueChanges.subscribe(values => {
-        if (values.includes('email')) {
-          this.showNotificationEmail = true;
-        } else {
-          this.showNotificationEmail = false;
-        }
+        this.showNotificationEmail = values.includes('email');
       });
 
     this.alertRuleFormGroup
@@ -208,6 +213,24 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.attributeValues$ = this._observeService.getModelValues(
           targetFilter
         );
+      });
+    const otherThresholdValueControl = this.alertMetricFormGroup.get(
+      'otherThresholdValue'
+    );
+    this.alertMetricFormGroup
+      .get('operator')
+      .valueChanges.subscribe(operator => {
+        const isBetweenSelected = operator === 'BTW';
+        this.showOtherThresholdValue = isBetweenSelected;
+        if (isBetweenSelected) {
+          otherThresholdValueControl.setValidators(
+            otherThresholdValuevalidators
+          );
+          otherThresholdValueControl.updateValueAndValidity();
+        } else {
+          otherThresholdValueControl.clearValidators();
+          otherThresholdValueControl.reset();
+        }
       });
   }
 
@@ -266,7 +289,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       metricsColumn,
       aggregationType,
       operator,
-      thresholdValue
+      thresholdValue,
+      otherThresholdValue
     } = this.alertMetricFormGroup.value;
 
     const {
@@ -298,6 +322,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       aggregationType,
       operator,
       thresholdValue,
+      otherThresholdValue: operator === 'BTW' ? otherThresholdValue : null,
       lookbackColumn,
       lookbackPeriod,
       attributeName,
