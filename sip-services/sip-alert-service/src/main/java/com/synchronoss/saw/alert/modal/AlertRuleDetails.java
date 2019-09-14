@@ -1,10 +1,8 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
-import java.util.List;
 
 public class AlertRuleDetails {
 
@@ -13,25 +11,27 @@ public class AlertRuleDetails {
   private String datapodName;
   private String categoryId;
   private String product;
-  private String alertName;
-  private String alertDescription;
+  private String alertRuleName;
+  private String alertRuleDescription;
   private AlertSeverity alertSeverity;
   private Boolean activeInd;
   private String customerCode;
   private String attributeName;
+  private String attributeValue;
   private String lookbackColumn;
   private String lookbackPeriod;
   private Aggregate aggregationType;
   private Operator operator;
   private String metricsColumn;
-  private String thresholdValue;
-  private List<Filter> filters;
+  private Double thresholdValue;
+  private Double otherThresholdValue;
   private Long createdTime;
   private Long modifiedTime;
   private String createdBy;
   private String updatedBy;
   private SipQuery sipQuery;
-  private List<Notification> notification;
+  private Notification notification;
+  private MonitoringType monitoringType;
 
   /**
    * Gets alertRulesSysId.
@@ -104,31 +104,31 @@ public class AlertRuleDetails {
   }
 
   /**
-   * Gets alertName.
+   * Gets alertRuleName.
    *
-   * @return value of alertName
+   * @return alertRuleName
    */
-  public String getAlertName() {
-    return alertName;
+  public String getAlertRuleName() {
+    return alertRuleName;
   }
 
-  /** Sets alertName. */
-  public void setAlertName(String alertName) {
-    this.alertName = alertName;
+  /** Sets alertRuleName. */
+  public void setAlertRuleName(String alertRuleName) {
+    this.alertRuleName = alertRuleName;
   }
 
   /**
-   * Gets alertDescription.
+   * Gets alertRuleDescription.
    *
-   * @return value of alertDescription
+   * @return alertRuleDescription
    */
-  public String getAlertDescription() {
-    return alertDescription;
+  public String getAlertRuleDescription() {
+    return alertRuleDescription;
   }
 
-  /** Sets alertDescription. */
-  public void setAlertDescription(String alertDescription) {
-    this.alertDescription = alertDescription;
+  /** Sets alertRuleDescription. */
+  public void setAlertRuleDescription(String alertRuleDescription) {
+    this.alertRuleDescription = alertRuleDescription;
   }
 
   /**
@@ -185,6 +185,20 @@ public class AlertRuleDetails {
   /** Sets attributeName. */
   public void setAttributeName(String attributeName) {
     this.attributeName = attributeName;
+  }
+
+  /**
+   * Gets attributeValue.
+   *
+   * @return value of attributeValue
+   */
+  public String getAttributeValue() {
+    return attributeValue;
+  }
+
+  /** Sets attributeValue. */
+  public void setAttributeValue(String attributeValue) {
+    this.attributeValue = attributeValue;
   }
 
   /**
@@ -262,27 +276,27 @@ public class AlertRuleDetails {
    *
    * @return value of thresholdValue
    */
-  public String getThresholdValue() {
+  public Double getThresholdValue() {
     return thresholdValue;
   }
 
   /** Sets thresholdValue. */
-  public void setThresholdValue(String thresholdValue) {
+  public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
   }
 
   /**
-   * Gets filters.
+   * Gets otherThresholdValue.
    *
-   * @return value of filters
+   * @return value of otherThresholdValue
    */
-  public List<Filter> getFilters() {
-    return filters;
+  public Double getOtherThresholdValue() {
+    return otherThresholdValue;
   }
 
-  /** Sets filters. */
-  public void setFilters(List<Filter> filters) {
-    this.filters = filters;
+  /** Sets otherThresholdValue. */
+  public void setOtherThresholdValue(Double otherThresholdValue) {
+    this.otherThresholdValue = otherThresholdValue;
   }
 
   /**
@@ -358,14 +372,28 @@ public class AlertRuleDetails {
   /**
    * Gets notification.
    *
-   * @return list of notification.
+   * @return value of notification
    */
-  public List<Notification> getNotification() {
+  public Notification getNotification() {
     return notification;
   }
 
   /** Sets notification. */
-  public void setNotification(List<Notification> notification) {
+  public void setNotification(Notification notification) {
     this.notification = notification;
+  }
+
+  /**
+   * Gets monitoringType.
+   *
+   * @return value of monitoringType
+   */
+  public MonitoringType getMonitoringType() {
+    return monitoringType;
+  }
+
+  /** Sets monitoringType. */
+  public void setMonitoringType(MonitoringType monitoringType) {
+    this.monitoringType = monitoringType;
   }
 }

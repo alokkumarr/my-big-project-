@@ -1,13 +1,13 @@
 
 package sncr.bda.conf;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Generated;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -30,6 +30,26 @@ public class Output {
     @SerializedName("dataSet")
     @Expose
     private String dataSet;
+
+    /**
+     * Alert
+     * (optional)
+     *
+     */
+    @SerializedName("alert")
+    @Expose
+    private Boolean alert;
+
+
+    /**
+     * DataPod name
+     * (Optional)
+     * Datapod was introduced as optional parameter for backward compatibility.
+     */
+    @SerializedName("datapod")
+    @Expose
+    private String datapod;
+
     /**
      * Description of dataset
      */
@@ -95,33 +115,47 @@ public class Output {
     public Output() {
     }
 
-    /**
-     * 
-     * @param mode
-     * @param numberOfFiles
-     * @param parent
-     * @param userdata
-     * @param dstype
-     * @param catalog
-     * @param name
-     * @param format
-     * @param partitionKeys
-     * @param dataSet
-     * @param description
-     */
-    public Output(String name, String dataSet, String description, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> partitionKeys, String catalog, String parent, Object userdata) {
-        this.name = name;
-        this.dataSet = dataSet;
-        this.description = description;
-        this.format = format;
-        this.mode = mode;
-        this.numberOfFiles = numberOfFiles;
-        this.dstype = dstype;
-        this.partitionKeys = partitionKeys;
-        this.catalog = catalog;
-        this.parent = parent;
-        this.userdata = userdata;
-    }
+  /**
+   * @param mode
+   * @param numberOfFiles
+   * @param parent
+   * @param userdata
+   * @param dstype
+   * @param catalog
+   * @param name
+   * @param format
+   * @param partitionKeys
+   * @param dataSet
+   * @param description
+   */
+  public Output(
+      String name,
+      String dataSet,
+      Boolean alert,
+      String datapod,
+      String description,
+      sncr.bda.conf.Input.Format format,
+      Output.Mode mode,
+      Integer numberOfFiles,
+      sncr.bda.conf.Input.Dstype dstype,
+      Set<String> partitionKeys,
+      String catalog,
+      String parent,
+      Object userdata) {
+    this.name = name;
+    this.dataSet = dataSet;
+    this.alert = alert;
+    this.datapod= datapod;
+    this.description = description;
+    this.format = format;
+    this.mode = mode;
+    this.numberOfFiles = numberOfFiles;
+    this.dstype = dstype;
+    this.partitionKeys = partitionKeys;
+    this.catalog = catalog;
+    this.parent = parent;
+    this.userdata = userdata;
+  }
 
     /**
      * Parameter name

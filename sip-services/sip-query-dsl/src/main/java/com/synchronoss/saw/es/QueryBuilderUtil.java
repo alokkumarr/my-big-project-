@@ -1,11 +1,22 @@
 package com.synchronoss.saw.es;
 
-import java.util.*;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.model.*;
+import com.synchronoss.saw.model.Aggregate;
+import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.BuilderUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -18,7 +29,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class QueryBuilderUtil {
@@ -230,6 +240,54 @@ public class QueryBuilderUtil {
       builder.add(boolQueryBuilderIn);
     }
     return builder;
+  }
+
+  /**
+   * Build Aggregation filter to handle different preset values.
+   *
+   * @param item
+   * @return
+   */
+  public static Script prepareAggregationFilter(Filter item) {
+    Script script = null;
+    if (item.getModel().getOperator().value().equals(Model.Operator.BTW.value())) {
+      script =
+          new Script(
+              "params."
+                  + item.getColumnName()
+                  + " <= "
+                  + item.getModel().getValue()
+                  + "&& "
+                  + "params."
+                  + item.getColumnName()
+                  + " >= "
+                  + item.getModel().getOtherValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.GT.value())) {
+      script = new Script("params." + item.getColumnName() + " > "
+          + item.getModel().getValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.GTE.value())) {
+      script = new Script("params." + item.getColumnName() + " >= "
+          + item.getModel().getValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.LT.value())) {
+      script = new Script("params." + item.getColumnName() + " < "
+          + item.getModel().getValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.LTE.value())) {
+      script = new Script("params." + item.getColumnName() + " <= "
+          + item.getModel().getValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())) {
+      script = new Script("params." + item.getColumnName() + " = "
+          + item.getModel().getValue());
+    }
+    if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())) {
+      script = new Script("params." + item.getColumnName() + " != "
+          + item.getModel().getValue());
+    }
+    return script;
   }
 
   /**

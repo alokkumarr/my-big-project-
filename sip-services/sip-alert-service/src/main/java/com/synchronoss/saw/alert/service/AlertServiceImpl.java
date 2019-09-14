@@ -12,16 +12,21 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCount.GroupBy;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
+import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertSeverity;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
-import com.synchronoss.saw.alert.modal.AlertResult;
-import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
+import com.synchronoss.saw.model.Model.Preset;
+import com.synchronoss.saw.util.BuilderUtil;
+import com.synchronoss.saw.util.DynamicConvertor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -75,6 +80,7 @@ public class AlertServiceImpl implements AlertService {
     Long createdTime = System.currentTimeMillis();
     alert.setCreatedTime(createdTime);
     alert.setCreatedBy(ticket.getUserFullName());
+    alert.setCustomerCode(ticket.getCustCode());
     connection.insert(id, alert);
     return alert;
   }
@@ -95,6 +101,8 @@ public class AlertServiceImpl implements AlertService {
     Long modifiedTime = System.currentTimeMillis();
     alertRuleDetails.setModifiedTime(modifiedTime);
     alertRuleDetails.setUpdatedBy(ticket.getUserFullName());
+    alertRuleDetails.setCustomerCode(ticket.getCustCode());
+    alertRuleDetails.setAlertRulesSysId(alertRuleId);
     connection.update(alertRuleId, alertRuleDetails);
     return alertRuleDetails;
   }
@@ -115,7 +123,7 @@ public class AlertServiceImpl implements AlertService {
     List<AlertRuleDetails> alertRuleList =
         connection.runMaprDbQueryWithFilter(
             node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
-    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setAlertRuleDetailsList(alertRuleList);
     alertRuleResponse.setNumberOfRecords(noOfRecords);
@@ -153,6 +161,7 @@ public class AlertServiceImpl implements AlertService {
     } catch (JsonProcessingException e) {
       logger.error("error occured while converting json to alertRuledetails  ");
       e.printStackTrace();
+      throw new RuntimeException("Error occured while retrieving alertdetails :" + e);
     }
     return alertRule;
   }
@@ -186,7 +195,7 @@ public class AlertServiceImpl implements AlertService {
     List<AlertRuleDetails> alertList =
         connection.runMaprDbQueryWithFilter(
             node.toString(), pageNumber, pageSize, "createdTime", AlertRuleDetails.class);
-    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
     AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
     alertRuleResponse.setNumberOfRecords(noOfRecords);
     alertRuleResponse.setAlertRuleDetailsList(alertList);
@@ -257,11 +266,10 @@ public class AlertServiceImpl implements AlertService {
     objectNode1.put("alertRulesSysId", alertRuleId);
     arrayNode.add(node1);
     arrayNode.add(node2);
-    logger.info("query :::" + node.toString());
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
             node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
-    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
     alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
@@ -284,7 +292,7 @@ public class AlertServiceImpl implements AlertService {
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
             node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
-    Long noOfRecords = connection.getCountForQueryWithFilter(node.toString());
+    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
     alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
@@ -313,8 +321,10 @@ public class AlertServiceImpl implements AlertService {
         return "Less Than and Equal To";
       case NEQ:
         return "Not Equal To";
+      case BTW:
+        return "Between";
         /**
-         * case BTW: return "Between"; case SW: return "Start With"; case EW: return "End With";
+         *  case SW: return "Start With"; case EW: return "End With";
          * case CONTAINS: return "Contains"; case ISIN: return "Is IN";
          */
       default:
@@ -360,13 +370,30 @@ public class AlertServiceImpl implements AlertService {
       String alertRuleSysId,
       Ticket ticket) {
     if (alertCount.getGroupBy() == null) {
-      throw new IllegalArgumentException("GroupBy cannot be null");
+      throw new RuntimeException("GroupBy cannot be null");
     }
-    Map<String, Long> epochTimeMap =
-        AlertUtils.getEpochTimeForPreset(
-            alertCount.getPreset(), alertCount.getStartTime(), alertCount.getEndTime());
-    Long epochGte = epochTimeMap.get("startTime");
-    Long epochLte = epochTimeMap.get("endTime");
+    if (alertCount.getPreset() == null) {
+      throw new RuntimeException("Preset cannot be null");
+    }
+    Long epochGte;
+    Long epochLte;
+    if (alertCount.getPreset() == Preset.NA) {
+      String startTime = alertCount.getStartTime();
+      String endTime = alertCount.getEndTime();
+      if (startTime == null) {
+        throw new RuntimeException("From date is missing for custom date filter");
+      } else if (endTime == null) {
+        throw new RuntimeException("To date is missing for custom date filter");
+      }
+      epochGte = getEpochFromDateTime(startTime);
+      epochLte = getEpochFromDateTime(endTime);
+    } else {
+      DynamicConvertor dynamicConvertor =
+          BuilderUtil.dynamicDecipher(alertCount.getPreset().value());
+      epochGte = getEpochFromDateTime(dynamicConvertor.getGte());
+      epochLte = getEpochFromDateTime(dynamicConvertor.getLte());
+    }
+
     MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
     String query;
     if (alertCount.getGroupBy() == GroupBy.SEVERITY) {
@@ -474,5 +501,19 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node2);
     arrayNode.add(node3);
     return node.toString();
+  }
+
+  /**
+   * Return timestamp from the given date.
+   *
+   * @param date String
+   * @return Long
+   */
+  private static Long getEpochFromDateTime(String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    LocalDateTime ldt = LocalDateTime.parse(date, formatter);
+    ZoneId zoneId = ZoneId.systemDefault();
+    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
+    return epochValue;
   }
 }

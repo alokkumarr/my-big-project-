@@ -12,7 +12,7 @@ logging:
 
 server:
   address: localhost
-  port: 9621
+  port: 9625
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
@@ -24,16 +24,21 @@ sip:
   ssl:
     enable : false
 mail:
-  body: "Hello  </br> Below details contains information about the alert generated.</br>Alert Name: $alertName </br>Category: $category </br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+  body: "Hello  </br> Below alert has created for configured Alert Rule:  $alertRuleName .</br>Alert Name: $alertRuleName </br>Alert Description: $alertRuleDescription </br>Category: $category </br>Metric Threshold: $thresholdValue </br>Attribute Name: $attributeName </br>Attribute Value: $attributeValue </br>Lookback Period: $lookbackPeriod</br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
   subject : "Alert Notification"
 alert:
   dashborad:
-    url: http://35.175.174.29/sip/web/#/alerts/view
+    url: http://<hostname>.sncrbda.dev.cloud.synchronoss.net/sip/web/#/alerts/view
 storage-proxy:
   service:
     host: http://localhost:9400
 metastore:
-  base:  maprfs:///var/sip/
+  base: /var/sip/
   alertRulesTable: alertRulesMetadata
   alertResults: alertResults
   notificationTable : alertNoficationLog
+
+connector: http
+
+sip-analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
+max-number-of-alert-per-rules: 10000
