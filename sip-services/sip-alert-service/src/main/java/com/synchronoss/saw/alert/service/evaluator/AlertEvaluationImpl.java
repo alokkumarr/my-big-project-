@@ -16,6 +16,7 @@ import com.synchronoss.saw.util.DynamicConvertor;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -70,6 +71,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     System.out.println("Evaluating the Alert");
     List<AlertRuleDetails> alertRuleDetailsList = fetchAlertDetailsByDataPod(dataPodId);
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
+      logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
       AlertResult alertResult = new AlertResult();
       alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
       alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
@@ -84,11 +86,31 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
       alertResult.setSipQuery(sipQuery);
       List<?> alertResultList = evaluateAlertRules(sipQuery);
+      List<Map<String, Object>> executionResultList = new ArrayList<>();
+      ObjectMapper mapper = new ObjectMapper();
       if (alertResultList.size() > 0) {
-        alertResult.setAlertCount(alertResultList.size());
-        connection.insert(alertResultId, alertResult);
-        logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-        alertNotifier.sendNotification(alertRuleDetails);
+        alertResultList.forEach(
+            (executionResult) -> {
+              try {
+                Map<String, Object> result = mapper.convertValue(executionResult, Map.class);
+                Object value = result.get(alertRuleDetails.getMetricsColumn());
+                if (value != null && !value.toString().equalsIgnoreCase("null")) {
+                  executionResultList.add(result);
+                }
+              } catch (Exception e) {
+                logger.error("Exception occured while converting the execution result" + e);
+              }
+            });
+        int executionSize = executionResultList.size();
+        if (executionSize > 0) {
+          logger.info(
+              "Threshold has reached for the alert rule id"
+                  + alertRuleDetails.getAlertRulesSysId());
+          alertResult.setAlertCount(executionSize);
+          connection.insert(alertResultId, alertResult);
+          logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
+          alertNotifier.sendNotification(alertRuleDetails);
+        }
       }
     }
     return true;
