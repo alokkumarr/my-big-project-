@@ -1,36 +1,88 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 
 public class AlertRuleDetails {
 
+  @JsonProperty("alertRulesSysId")
   private String alertRulesSysId;
+
+  @JsonProperty("datapodId")
   private String datapodId;
+
+  @JsonProperty("datapodName")
   private String datapodName;
+
+  @JsonProperty("categoryId")
   private String categoryId;
+
+  @JsonProperty("product")
   private String product;
+
+  @JsonProperty("alertRuleName")
   private String alertRuleName;
+
+  @JsonProperty("alertRuleDescription")
   private String alertRuleDescription;
+
+  @JsonProperty("alertSeverity")
   private AlertSeverity alertSeverity;
+
+  @JsonProperty("activeInd")
   private Boolean activeInd;
+
+  @JsonProperty("customerCode")
   private String customerCode;
+
+  @JsonProperty("attributeName")
   private String attributeName;
+
+  @JsonProperty("attributeValue")
   private String attributeValue;
+
+  @JsonProperty("lookbackColumn")
   private String lookbackColumn;
+
+  @JsonProperty("lookbackPeriod")
   private String lookbackPeriod;
+
+  @JsonProperty("aggregationType")
   private Aggregate aggregationType;
+
+  @JsonProperty("operator")
   private Operator operator;
+
+  @JsonProperty("metricsColumn")
   private String metricsColumn;
+
+  @JsonProperty("thresholdValue")
   private Double thresholdValue;
+
+  @JsonProperty("otherThresholdValue")
   private Double otherThresholdValue;
+
+  @JsonProperty("createdTime")
   private Long createdTime;
+
+  @JsonProperty("modifiedTime")
   private Long modifiedTime;
+
+  @JsonProperty("createdBy")
   private String createdBy;
+
+  @JsonProperty("updatedBy")
   private String updatedBy;
+
+  @JsonProperty("sipQuery")
   private SipQuery sipQuery;
+
+  @JsonProperty("notification")
   private Notification notification;
+
+  @JsonProperty("monitoringType")
   private MonitoringType monitoringType;
 
   /**
@@ -38,11 +90,13 @@ public class AlertRuleDetails {
    *
    * @return value of alertRulesSysId
    */
+  @JsonProperty("alertRulesSysId")
   public String getAlertRulesSysId() {
     return alertRulesSysId;
   }
 
   /** Sets alertRulesSysId. */
+  @JsonProperty("alertRulesSysId")
   public void setAlertRulesSysId(String alertRulesSysId) {
     this.alertRulesSysId = alertRulesSysId;
   }
@@ -52,11 +106,13 @@ public class AlertRuleDetails {
    *
    * @return value of datapodId
    */
+  @JsonProperty("datapodId")
   public String getDatapodId() {
     return datapodId;
   }
 
   /** Sets datapodId. */
+  @JsonProperty("datapodId")
   public void setDatapodId(String datapodId) {
     this.datapodId = datapodId;
   }
@@ -66,11 +122,13 @@ public class AlertRuleDetails {
    *
    * @return value of datapod Name
    */
+  @JsonProperty("datapodName")
   public String getDatapodName() {
     return datapodName;
   }
 
   /** Sets datapodName. */
+  @JsonProperty("datapodName")
   public void setDatapodName(String datapodName) {
     this.datapodName = datapodName;
   }
@@ -80,11 +138,13 @@ public class AlertRuleDetails {
    *
    * @return value of categoryId
    */
+  @JsonProperty("categoryId")
   public String getCategoryId() {
     return categoryId;
   }
 
   /** Sets categoryID. */
+  @JsonProperty("categoryId")
   public void setCategoryId(String categoryId) {
     this.categoryId = categoryId;
   }
@@ -94,11 +154,13 @@ public class AlertRuleDetails {
    *
    * @return value of product
    */
+  @JsonProperty("product")
   public String getProduct() {
     return product;
   }
 
   /** Sets product. */
+  @JsonProperty("product")
   public void setProduct(String product) {
     this.product = product;
   }
@@ -108,6 +170,7 @@ public class AlertRuleDetails {
    *
    * @return alertRuleName
    */
+  @JsonProperty("alertRuleName")
   public String getAlertRuleName() {
     return alertRuleName;
   }
@@ -122,11 +185,13 @@ public class AlertRuleDetails {
    *
    * @return alertRuleDescription
    */
+  @JsonProperty("alertRuleDescription")
   public String getAlertRuleDescription() {
     return alertRuleDescription;
   }
 
   /** Sets alertRuleDescription. */
+  @JsonProperty("alertRuleDescription")
   public void setAlertRuleDescription(String alertRuleDescription) {
     this.alertRuleDescription = alertRuleDescription;
   }

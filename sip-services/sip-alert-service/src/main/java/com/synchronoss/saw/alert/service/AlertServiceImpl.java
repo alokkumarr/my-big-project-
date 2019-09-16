@@ -63,6 +63,20 @@ public class AlertServiceImpl implements AlertService {
   private String alertTriggerLog;
 
   /**
+   * Return timestamp from the given date.
+   *
+   * @param date String
+   * @return Long
+   */
+  private static Long getEpochFromDateTime(String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    LocalDateTime ldt = LocalDateTime.parse(date, formatter);
+    ZoneId zoneId = ZoneId.systemDefault();
+    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
+    return epochValue;
+  }
+
+  /**
    * Create Alert rule.
    *
    * @param alert Alert
@@ -266,10 +280,12 @@ public class AlertServiceImpl implements AlertService {
     objectNode1.put("alertRulesSysId", alertRuleId);
     arrayNode.add(node1);
     arrayNode.add(node2);
+    System.out.println(node.toString());
+    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
+    System.out.println("records" + noOfRecords);
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
-            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
-    Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
+            node.toString(), pageNumber, pageSize, "startTime", AlertResult.class);
     alertStatesResponse.setAlertStatesList(alertResultLists);
     alertStatesResponse.setMessage("Success");
     alertStatesResponse.setNumberOfRecords(noOfRecords);
@@ -324,8 +340,8 @@ public class AlertServiceImpl implements AlertService {
       case BTW:
         return "Between";
         /**
-         *  case SW: return "Start With"; case EW: return "End With";
-         * case CONTAINS: return "Contains"; case ISIN: return "Is IN";
+         * case SW: return "Start With"; case EW: return "End With"; case CONTAINS: return
+         * "Contains"; case ISIN: return "Is IN";
          */
       default:
         return null;
@@ -501,19 +517,5 @@ public class AlertServiceImpl implements AlertService {
     arrayNode.add(node2);
     arrayNode.add(node3);
     return node.toString();
-  }
-
-  /**
-   * Return timestamp from the given date.
-   *
-   * @param date String
-   * @return Long
-   */
-  private static Long getEpochFromDateTime(String date) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    LocalDateTime ldt = LocalDateTime.parse(date, formatter);
-    ZoneId zoneId = ZoneId.systemDefault();
-    Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
-    return epochValue;
   }
 }

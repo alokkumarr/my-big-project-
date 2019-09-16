@@ -1,33 +1,49 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.synchronoss.saw.model.SipQuery;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class AlertResult {
-
+  @JsonProperty("alertTriggerSysId")
   private String alertTriggerSysId;
 
+  @JsonProperty("alertRulesSysId")
   private String alertRulesSysId;
 
+  @JsonProperty("alertState")
   private AlertState alertState;
 
+  @JsonProperty("alertSeverity")
   private AlertSeverity alertSeverity;
 
+  @JsonProperty("startTime")
   private Long startTime;
 
+  @JsonProperty("thresholdValue")
   private Double thresholdValue;
 
+  @JsonProperty("metricValue")
   private Double metricValue;
 
+  @JsonProperty("lastUpdatedTime")
   private Long lastUpdatedTime;
 
+  @JsonProperty("alertRuleName")
   private String alertRuleName;
 
+  @JsonProperty("alertRuleDescription")
   private String alertRuleDescription;
 
+  @JsonProperty("categoryId")
   private String categoryId;
 
+  @JsonProperty("sipQuery")
   private SipQuery sipQuery;
 
+  @JsonProperty("customerCode")
+  private String customerCode;
+
+  @JsonProperty("alertCount")
   private Integer alertCount;
 
   /**
@@ -196,5 +212,33 @@ public class AlertResult {
   /** Sets sipQuery. */
   public void setSipQuery(SipQuery sipQuery) {
     this.sipQuery = sipQuery;
+  }
+
+  /**
+   * Gets customerCode
+   *
+   * @return value of customerCode
+   */
+  public String getCustomerCode() {
+    return customerCode;
+  }
+
+  /** Sets customerCode */
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
+  }
+
+  /**
+   * Gets alertCount.
+   *
+   * @return value of alertCount
+   */
+  public Integer getAlertCount() {
+    return alertCount;
+  }
+
+  /** Sets alertCount. */
+  public void setAlertCount(Integer alertCount) {
+    this.alertCount = alertCount;
   }
 }
