@@ -4,10 +4,11 @@ import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.export.generate.ExportServiceImpl;
 import com.synchronoss.saw.export.generate.XlsxExporter;
 import com.synchronoss.saw.export.model.DataResponse;
+import com.synchronoss.saw.model.Field;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +29,7 @@ public class XlsxExporterTest {
   static DataResponse dataResponse;
   static Long LimittoExport = Long.valueOf(50000);
   XlsxExporter xlsxExporter;
+  private List<Field> fields = new LinkedList<>();
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporterTest.class);
 
   @Before
@@ -72,28 +76,35 @@ public class XlsxExporterTest {
     list.add(obj3);
 
     dataResponse.setData(list);
+
+    Field field = new Field();
+    field.setDataField("COORDINATES");
+    field.setDisplayName("COORDINATES.keyword");
+    field.setColumnName("COORDINATES");
+    field.setVisibleIndex(0);
+    fields.add(field);
+
+    field = new Field();
+    field.setDataField("date");
+    field.setDisplayName("Date");
+    field.setColumnName("date");
+    field.setVisibleIndex(1);
+    fields.add(field);
+
+    field = new Field();
+    field.setDataField("integer");
+    field.setDisplayName("Integer");
+    field.setColumnName("integer");
+    field.setVisibleIndex(2);
+    fields.add(field);
   }
 
   @Test
   public void mockTest() {
-    Workbook workBook = new XSSFWorkbook();
+    Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
-    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
-
-    dataResponse.getData().stream()
-        .limit(LimittoExport)
-        .forEach(
-            line -> {
-              try {
-                xlsxExporter.addXlsxRow(exportBean, workBook, sheet, line);
-
-              } catch (Exception e) {
-                logger.error(
-                    this.getClass().getName()
-                        + " Error in adding xlsxsRow : "
-                        + ExceptionUtils.getStackTrace(e));
-              }
-            });
+    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+    xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, dataResponse.getData(), 3l);
     assertEquals(sheet.getPhysicalNumberOfRows(), 4);
   }
 
@@ -102,7 +113,7 @@ public class XlsxExporterTest {
     ExportServiceImpl exportService = new ExportServiceImpl();
     try {
       assertEquals(
-          exportService.streamToXlsxReport(dataResponse, LimittoExport, exportBean), Boolean.TRUE);
+          exportService.streamToXlsxReport(fields, dataResponse, LimittoExport, exportBean), Boolean.TRUE);
     } catch (IOException e) {
       logger.error(
           this.getClass().getName()

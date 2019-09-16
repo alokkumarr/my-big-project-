@@ -54,7 +54,6 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -693,19 +692,19 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String executionId, ExecutionType executionType, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     ObjectMapper objectMapper = new ObjectMapper();
+      ExecutionResult executionResult = null;
     try {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
-      ExecutionResultStore executionResultStore = new ExecutionResultStore(tableName, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      Document doc = executionResultStore.readDocumet(executionId);
-      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-      ExecutionResult executionResult =
-          objectMapper.readValue(doc.asJsonString(), ExecutionResult.class);
+      if (pageSize != null && pageSize > 0) {
+          executionResult = fetchExecutionResult(executionId, maprConnection , false);
+      }else {
+          executionResult = fetchExecutionResult(executionId, maprConnection , true);
+      }
       if (!executionResult.getAnalysis().getType().equalsIgnoreCase("report")) {
-        Long totalRows = getTotalRows(doc, null);
-        logger.trace("Inside fetchExecutionsData totalrows = " + totalRows);
-        executionResponse.setTotalRows(totalRows);
+        logger.trace("Inside fetchExecutionsData totalrows = " + executionResult.getRecordCount());
+        executionResponse.setTotalRows(executionResult.getRecordCount());
 
         logger.trace(
             "Fetching pagination data for execution id " + executionResult.getExecutionId());
@@ -716,10 +715,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           logger.debug("Page size not null = " + pageSize);
           data =
               maprConnection.fetchPagingData(
-                  "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+                  "data", executionResult.getExecutionId(), page, pageSize);
         }
-
-        logger.trace("Paging data fetched = " + data);
+        logger.trace("Paging data fetched = " + pageSize);
         executionResponse.setData(data != null ? data : executionResult.getData());
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
@@ -732,19 +730,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     return executionResponse;
   }
 
-  ExecutionResult fetchLastExecutionResult(String dslQueryId, MaprConnection maprConnection) {
+  ExecutionResult fetchLastExecutionResult(String dslQueryId, MaprConnection maprConnection, Boolean isData) {
+    ExecutionResult executionResult = null;
     try {
-      String fields[] = {
-        "executionId",
-        "dslQueryId",
-        "status",
-        "startTime",
-        "finishedTime",
-        "executedBy",
-        "executionType",
-        "data",
-        "analysis"
-      };
       if (maprConnection == null) {
         maprConnection = new MaprConnection(basePath, executionResultTable);
       }
@@ -754,38 +742,100 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       objectNode.put("dslQueryId", dslQueryId);
 
       List<JsonNode> elements =
-          maprConnection.runMaprDBQuery(fields, node.toString(), "finishedTime", 1);
+          maprConnection.runMaprDBQuery(returnFields(isData), node.toString(), "finishedTime", 1);
       // its last execution for the for Query Id , So consider 0 index.
       objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
-      ExecutionResult executionResult =
+      executionResult =
           objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
       return executionResult;
     } catch (Exception e) {
       logger.error("Error occurred while fetching the execution result data", e);
     }
-    return null;
+    return executionResult;
+  }
+
+  ExecutionResult fetchExecutionResult(
+      String executionId, MaprConnection maprConnection, Boolean isData) {
+    ExecutionResult executionResult = null;
+    List<String> arrayList = new ArrayList<>();
+    try {
+
+      if (maprConnection == null) {
+        maprConnection = new MaprConnection(basePath, executionResultTable);
+      }
+      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectNode node = objectMapper.createObjectNode();
+      ObjectNode objectNode = node.putObject("$eq");
+      objectNode.put("executionId", executionId);
+
+      List<JsonNode> elements =
+          maprConnection.runMaprDBQuery(returnFields(isData), node.toString(), "finishedTime", 1);
+      // its last execution for the for Query Id , So consider 0 index.
+      objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+      executionResult = objectMapper.treeToValue(elements.get(0), ExecutionResult.class);
+      return executionResult;
+    } catch (Exception e) {
+      logger.error("Error occurred while fetching the execution result data", e);
+    }
+    return executionResult;
+  }
+
+  String[] returnFields(Boolean isdata) {
+    if (isdata) {
+      String fields[] = {
+        "executionId",
+        "dslQueryId",
+        "status",
+        "startTime",
+        "finishedTime",
+        "executedBy",
+        "executionType",
+        "analysis",
+        "data",
+        "recordCount"
+      };
+      return fields;
+    } else {
+      String fields[] = {
+        "executionId",
+        "dslQueryId",
+        "status",
+        "startTime",
+        "finishedTime",
+        "executedBy",
+        "executionType",
+        "analysis",
+        "recordCount"
+      };
+      return fields;
+    }
   }
 
   @Override
   public ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
     ExecutionResponse executionResponse = new ExecutionResponse();
+      ExecutionResult executionResult = null;
     try {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-      ExecutionResult executionResult = fetchLastExecutionResult(dslQueryId, maprConnection);
-      List<Object> objList = (List<Object>) executionResult.getData();
-      Long totalRows = getTotalRows(null, objList);
-      logger.trace("Inside fetchLastExecutionsData totalRow = " + totalRows);
-      executionResponse.setTotalRows(totalRows);
+        if (pageSize != null && pageSize > 0) {
+            executionResult = fetchLastExecutionResult(dslQueryId, maprConnection , false);
+        }else {
+            executionResult = fetchLastExecutionResult(dslQueryId, maprConnection , true);
+        }
+      logger.trace("Inside fetchLastExecutionsData totalRow = " + executionResult.getRecordCount());
+      executionResponse.setTotalRows(executionResult.getRecordCount());
 
       // paginated execution data
       Object data =
           maprConnection.fetchPagingData(
-              "data", executionResult.getExecutionId(), page, pageSize, totalRows.intValue());
+              "data", executionResult.getExecutionId(), page, pageSize);
       executionResponse.setData(data != null ? data : executionResult.getData());
+        logger.trace("Data Fetched:  " + executionResult.getRecordCount());
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
     } catch (Exception e) {
@@ -905,35 +955,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             || executionType.equals(ExecutionType.regularExecution)
         : false;
   }
-  /**
-   * Count the total number of rows.
-   *
-   * @param doc
-   * @param objList
-   * @return long number of row count.
-   */
-  private long getTotalRows(Document doc, List<Object> objList) {
-    try {
-      if (doc != null) {
-
-        if (doc.getValue("data").getType() == org.ojai.Value.Type.NULL) {
-          return 0l;
-        }
-
-        List<Object> totalRows = doc.getList("data");
-        logger.debug("Inside if");
-        logger.debug("Total number of rows :" + totalRows.size());
-        return totalRows.size() > 0 ? totalRows.size() : 0l;
-      } else if (objList != null && objList.size() > 0) {
-        logger.debug("Inside else");
-        logger.debug("Total number of rows :" + objList.size());
-        return objList.size();
-      }
-    } catch (Exception ex) {
-      logger.error("Error while count the total rows : {}", ex);
-    }
-    return 0l;
-  }
 
   /**
    * Return List<Object> of paginated data object.
@@ -994,7 +1015,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public ExecutionResponse fetchLastExecutionsDataForDL(
       String analysisId, Integer pageNo, Integer pageSize) {
     logger.info("Fetching last execution data for DL report");
-    ExecutionResult result = fetchLastExecutionResult(analysisId, null);
+    ExecutionResult result = fetchLastExecutionResult(analysisId, null, false);
     ExecutionResponse executionResponse = new ExecutionResponse();
     if (result != null) {
       ExecuteAnalysisResponse executionData =
