@@ -15,6 +15,12 @@ ARG rpm=java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
 ARG path=https://d3pxv6yz143wms.cloudfront.net/8.212.04.2
 ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
 
+# Enable TLS v1.2
+RUN sed -i '/jdk.tls.disabledAlgorithms/s/^/#/g' /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
+# Printing TLS v1.2
+RUN echo "jdk.tls.disabledAlgorithms=SSLv2Hello, TLSv1, TLSv1.1, SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, anon, NULL" >> /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
+RUN grep jdk.tls.disabledAlgorithms /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
+
 # Workaround: Package installations (like mapr-core which depends on
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to

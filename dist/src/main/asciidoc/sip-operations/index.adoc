@@ -879,7 +879,7 @@ Service to use the required number of session, add the below to the
 After that run `systemctl reload sshd` to reload the SSH daemon
 configuration.
 
-The Batch Ingestion Service intitially scans for matching files 
+The Batch Ingestion Service intitially scans for matching files
 with pattern and creates records for processing. Scanned records
 will be picked up by worker threads for transfer. Below property
 is used to for worker threads schedule to pick up scanned records
@@ -887,8 +887,8 @@ is used to for worker threads schedule to pick up scanned records
     worker.delay: 5000
 
 Any long running 'INPROGRESS' file transfers/jobs will be marked as 'FAILED'
-Long runing transfers will be again picked up by retry. Long running job is marked 
-as failed  after waiting for 1 day(default value) to make sure no impact on 
+Long runing transfers will be again picked up by retry. Long running job is marked
+as failed  after waiting for 1 day(default value) to make sure no impact on
 huge files.
 
 
@@ -926,7 +926,12 @@ communication in sip platform
     sip_secure=True/False
 
 Note: This is mandatory field it has to be either 'False' or 'True'. Please observe the case of `T & F`
-# of `True` & `False` Note: true or false will result into an error
+# of `True` & `False` Note: true or false will result into an error. And to make sure only TLS v1.2 are
+in use. IT team has to disable TLS v1.1 while installing JDK using the following COMMANDS
+
+sed -i '/jdk.tls.disabledAlgorithms/s/^/#/g' /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
+echo "jdk.tls.disabledAlgorithms=SSLv2Hello, TLSv1, TLSv1.1, SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, anon, NULL" >> /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
+grep jdk.tls.disabledAlgorithms /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
 
 == Loading semantic metadata
 
