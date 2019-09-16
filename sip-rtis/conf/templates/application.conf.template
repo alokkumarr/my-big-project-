@@ -68,9 +68,9 @@ genericlog = {
     ]
 }
 
-# registration port number where to get config detail on demand
-rtis.config.host=localhost:9501
-rtis.config.connector=http
+# registration config url where to get config detail on demand
+connector=http
+rtis.config.url=${connector}"://localhost:9501/internal/rtisconfig/config"
 stream.queue.location=/var/sip/streams
 stream.file.location=/var/bda/rtis/run/stream.${http.port}.dump
 

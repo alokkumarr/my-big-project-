@@ -252,9 +252,8 @@ object EventHandler {
     if (streamFile == null || streamFile.isEmpty)
       streamFile = "/tmp/frontend-server.stream.checkpoint"
 
-    val host = conf.getString("rtis.config.host")
-    val connector = if (conf.hasPath("rtis.config.connector")) conf.getString("rtis.config.connector") else "http"
-    val configURL = connector + "://" + host + "/internal/rtisconfig/config/" + key;
+    val url = conf.getString("rtis.config.url")
+    val configURL = url + "/" + key;
 
     val mainPath = if (conf.hasPath("stream.queue.location"))
       conf.getString("stream.queue.location") else "/main"
