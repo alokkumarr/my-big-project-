@@ -75,6 +75,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setStartTime(requestTime);
       String alertResultId = UUID.randomUUID().toString();
       alertResult.setAlertTriggerSysId(alertResultId);
+      alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
       alertResult.setSipQuery(alertRuleDetails.getSipQuery());
       List<?> alertResultList = evaluateAlertRules(alertRuleDetails.getSipQuery());
       if (alertResultList.size() > 0) {

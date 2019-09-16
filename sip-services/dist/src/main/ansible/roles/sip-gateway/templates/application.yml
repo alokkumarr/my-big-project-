@@ -189,6 +189,15 @@ api:
         -   location: ${batch.service.host}
             method: DELETE
             path: '[/]ingestion/batch.*'
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]internal/rtisconfig.*'
+        -   location: ${metadata.service.host}
+            method: GET
+            path: '[/]internal/rtisconfig.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]internal/rtisconfig.*'
 
 
    {% if sip_secure %}

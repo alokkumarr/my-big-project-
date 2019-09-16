@@ -75,94 +75,104 @@ batch:
 
 api:
   gateway:
-    endpoints:
-      - location: ${metadata.service.host}
-        method: POST
-        path: "[/]md*"
-      - location: ${alert.service.host}
-        method: GET
-        path: "[/]alerts.*"
-      - location: ${alert.service.host}
-        method: POST
-        path: "[/]alerts.*"
-      - location: ${alert.service.host}
-        method: PUT
-        path: "[/]alerts.*"
-      - location: ${alert.service.host}
-        method: DELETE
-        path: "[/]alerts.*"
-      - location: ${internal-analysis.service.host}
-        method: GET
-        path: "[/]analysis.*"
-      - location: ${internal-analysis.service.host}
-        method: POST
-        path: "[/]analysis*"
-      - location: ${semantic.service.host}
-        method: POST
-        path: "[/]semantic*"
-      - location: ${export.service.host}
-        method: GET
-        path: "[/]export.*"
-      - location: ${export.service.host}
-        method: POST
-        path: "[/]export.*"
-      - location: ${scheduler.service.host}
-        method: GET
-        path: "[/]scheduler.*"
-      - location: ${scheduler.service.host}
-        method: POST
-        path: "[/]scheduler.*"
-      - location: ${scheduler.service.host}
-        method: DELETE
-        path: "[/]scheduler.*"
-      - location: ${observe.service.host}
-        method: POST
-        path: "[/]observe.*"
-      - location: ${observe.service.host}
-        method: GET
-        path: "[/]observe.*"
-      - location: ${observe.service.host}
-        method: PUT
-        path: "[/]observe.*"
-      - location: ${observe.service.host}
-        method: DELETE
-        path: "[/]observe.*"
-      - location: ${internal-analysis.service.host}
-        method: POST
-        path: "[/]filters.*"
-      - location: ${internal-analysis.service.host}
-        method: POST
-        path: "[/]kpi.*"
-      - location: ${workbench.service.host}
-        method: POST
-        path: "[/]internal/workbench.*"
-      - location: ${workbench.service.host}
-        method: GET
-        path: "[/]internal/workbench.*"
-      - location: ${proxy.service.host}
-        method: POST
-        path: "[/]internal/proxy.*"
-      - location: ${datapod.service.host}
-        method: POST
-        path: "[/]internal/semantic.*"
-      - location: ${datapod.service.host}
-        method: GET
-        path: "[/]internal/semantic.*"
-      - location: ${datapod.service.host}
-        method: PUT
-        path: "[/]internal/semantic.*"
-      - location: ${batch.service.host}
-        method: PUT
-        path: "[/]ingestion/batch.*"
-      - location: ${batch.service.host}
-        method: POST
-        path: "[/]ingestion/batch.*"
-      - location: ${batch.service.host}
-        method: GET
-        path: "[/]ingestion/batch.*"
-      - location: ${batch.service.host}
-        method: DELETE
-        path: "[/]ingestion/batch.*"
+        endpoints:
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]md*'
+        -   location: ${alert.service.host}
+            method: GET
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: POST
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: PUT
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: DELETE
+            path: "[/]alerts.*"
+        -   location: ${internal-analysis.service.host}
+            method: GET
+            path: '[/]analysis.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]analysis*'
+        -   location: ${semantic.service.host}
+            method: POST
+            path: '[/]semantic*'
+        -   location: ${export.service.host}
+            method: GET
+            path: '[/]export.*'
+        -   location: ${export.service.host}
+            method : POST
+            path : '[/]export.*'
+        -   location: ${scheduler.service.host}
+            method : GET
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : POST
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : DELETE
+            path : '[/]scheduler.*'
+        -   location: ${observe.service.host}
+            method: POST
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: GET
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: PUT
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: DELETE
+            path: '[/]observe.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]filters.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]kpi.*'
+        -   location: ${workbench.service.host}
+            method: POST
+            path: '[/]internal/workbench.*'
+        -   location: ${workbench.service.host}
+            method: GET
+            path: '[/]internal/workbench.*'
+        -   location: ${proxy.service.host}
+            method: POST
+            path: '[/]internal/proxy.*'
+        -   location: ${datapod.service.host}
+            method: POST
+            path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: GET
+            path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: PUT
+            path: '[/]internal/semantic.*'
+        -   location: ${batch.service.host}
+            method: PUT
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: POST
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: GET
+            path: '[/]ingestion/batch.*'
+        -   location: ${batch.service.host}
+            method: DELETE
+            path: '[/]ingestion/batch.*'
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]internal/rtisconfig.*'
+        -   location: ${metadata.service.host}
+            method: GET
+            path: '[/]internal/rtisconfig.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]internal/rtisconfig.*'
+
 
 sip:
   ssl:
