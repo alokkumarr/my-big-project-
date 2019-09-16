@@ -17,8 +17,8 @@ const confAlertServiceStub = {
   deleteAlert: (id: string) => {
     return new Observable();
   },
-  getAllAlerts: () => {
-    return new Observable();
+  getAllAlerts: async () => {
+    return Promise.resolve();
   }
 };
 const alertDefinitionStub: AlertDefinition = {
