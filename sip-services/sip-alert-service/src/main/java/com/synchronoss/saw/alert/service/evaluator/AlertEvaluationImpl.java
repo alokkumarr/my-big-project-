@@ -77,11 +77,9 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setAlertTriggerSysId(alertResultId);
       alertResult.setSipQuery(alertRuleDetails.getSipQuery());
       List<?> alertResultList = evaluateAlertRules(alertRuleDetails.getSipQuery());
-      alertResultList.forEach(
-          obj -> {
-            connection.insert(alertResultId, alertResult);
-          });
       if (alertResultList.size() > 0) {
+          alertResult.setAlertCount(alertResultList.size());
+          connection.insert(alertResultId, alertResult);
         logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
         alertNotifier.sendNotification(alertRuleDetails);
       }
