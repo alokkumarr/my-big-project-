@@ -143,7 +143,7 @@ public class ExportUtils {
    */
   public static boolean deleteDispatchedFile(String sourceFile, ServiceUtils serviceUtils) {
     try {
-      serviceUtils.deleteFile(sourceFile, false);
+      serviceUtils.deleteFile(sourceFile, true);
       return true;
     } catch (IOException e) {
       logger.error("Error deleting File : " + sourceFile);
