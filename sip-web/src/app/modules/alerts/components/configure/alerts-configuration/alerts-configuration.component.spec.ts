@@ -94,10 +94,6 @@ describe('AlertsConfigurationComponent', () => {
     component.onAddAlert();
   });
 
-  it('should be called on edit alert', () => {
-    component.editAlert(alertDefinitionStub.alertConfig);
-  });
-
   it('should resetAlertDefInput', () => {
     component.resetAlertDefInput();
   });
