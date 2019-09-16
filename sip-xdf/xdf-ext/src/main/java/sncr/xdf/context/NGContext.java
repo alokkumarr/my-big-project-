@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.json.simple.JSONObject;
+
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.context.ContextMetadata;
 
@@ -56,6 +58,11 @@ public class NGContext extends ContextMetadata {
     public boolean runningPipeLine;
     public boolean persistMode;
     public String pipeComponentName;
+    
+    public  JSONObject pipelineConfig;
+    public Map<String, Object> pipelineConfigParams;
+
+	public String[] pipeineArgs;
 
     @Override
     public String toString(){

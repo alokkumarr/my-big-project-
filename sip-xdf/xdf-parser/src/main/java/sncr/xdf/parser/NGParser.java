@@ -15,7 +15,10 @@ import org.apache.spark.util.LongAccumulator;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
-import sncr.bda.conf.*;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.conf.Field;
+import sncr.bda.conf.Output;
+import sncr.bda.conf.OutputFieldsList;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
@@ -41,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import sncr.xdf.context.RequiredNamedParameters;
+import sncr.bda.conf.ParserInputFileFormat;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -96,6 +100,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         super(ngctx);
     }
     
+    public NGParser(NGContext ngctx,  Dataset dataset) {
+		super( ngctx, dataset);
+		logger.debug("Parser constructor with dataset "+ dataset);
+		logger.debug(":::: parser constructor services parser :::"+ ngctx.componentConfiguration.getParser());
+	}
+    
     public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealtime) {
     	
         super(ngctx);
@@ -104,10 +114,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     public NGParser() {  super(); }
 
-    
-    @SuppressWarnings("unchecked")
+
+	@SuppressWarnings("unchecked")
 	@Override
     protected int execute(){
+		
+		
+		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
         int retval = 0;
 
         parserInputFileFormat = ngctx.componentConfiguration.getParser().getParserInputFileFormat();
@@ -133,41 +146,60 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         logger.debug("Input file format = " + this.parserInputFileFormat);
 
-        try {
-            if (pkeys.size() <= 0 ) {
-                if ("replace".equalsIgnoreCase(outputDataSetMode) && HFileOperations.exists(outputDataSetLocation)) {
-                    logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for " + outputDataSetMode);
-                    HFileOperations.deleteEnt(outputDataSetLocation);
-                }
-            }
+        if (this.inputDataFrame == null) {
+			try {
+				if (pkeys != null && pkeys.size() <= 0) {
+					logger.debug("checking pkeys" + pkeys);
+					logger.debug("outputlocation" + outputDataSetLocation);
+					logger.debug("replace".equalsIgnoreCase(outputDataSetMode));
+					logger.debug(HFileOperations.exists(outputDataSetLocation));
+					if ("replace".equalsIgnoreCase(outputDataSetMode)
+							&& HFileOperations.exists(outputDataSetLocation)) {
+						logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for "
+								+ outputDataSetMode);
+						HFileOperations.deleteEnt(outputDataSetLocation);
+					}
+				}
 
-            FileSystem fs = HFileOperations.getFileSystem();
-            FileStatus[] files = fs.globStatus(new Path(sourcePath));
+				FileSystem fs = HFileOperations.getFileSystem();
+				FileStatus[] files = fs.globStatus(new Path(sourcePath));
 
-            if (files.length <= 0 ) {
-                return 0;
-            }
+				if (files.length <= 0) {
+					return 0;
+				}
 
-        }catch(Exception e)
-        {
-            logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-            logger.error(e.getMessage());
-        }
+			} catch (Exception e) {
+				logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
+				logger.error(e.getMessage());
+			} 
+		}
 
-        if (parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
+			logger.debug("format csv");
+			
+			logger.debug("#####Component config:: " + ngctx.componentConfiguration);
+			logger.debug("#####Component config parser :: " +ngctx.componentConfiguration.getParser());
 
             headerSize = ngctx.componentConfiguration.getParser().getHeaderSize();
+            logger.debug("header size"+ headerSize);
 
             lineSeparator = ngctx.componentConfiguration.getParser().getLineSeparator();
+            logger.debug("lineSeparator"+ lineSeparator);
             delimiter = (ngctx.componentConfiguration.getParser().getDelimiter() != null)? ngctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+            logger.debug("delimiter"+ delimiter);
             quoteChar = (ngctx.componentConfiguration.getParser().getQuoteChar() != null)? ngctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+            logger.debug("quoteChar"+ quoteChar);
             quoteEscapeChar = (ngctx.componentConfiguration.getParser().getQuoteEscape() != null)? ngctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
+            logger.debug("quoteEscapeChar"+ quoteEscapeChar);
 
             schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
+            logger.debug("schema"+ schema);
             tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
+            logger.debug("tsFormats"+ tsFormats);
             logger.info(tsFormats);
 
             internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
+            logger.debug("internalSchema"+internalSchema);
 
             // Output data set
             if (ngctx.outputDataSets.size() == 0) {
@@ -197,9 +229,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
                     + " with format " + rejectedDataFormat);
             }
-
-            // TODO: If data set exists and flag is not append - error
-            // TODO: This is good for UI what about pipeline? Talk to Suren
 
             // Check what sourcePath referring
             FileSystem fs = HFileOperations.getFileSystem();
@@ -299,7 +328,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
-        } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
+        } else if (this.inputDataFrame != null || parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
@@ -400,6 +429,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return result;
     }
 
+
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
         return ctx.fs.rename(sourceFilePath, archiveLocation);
@@ -421,15 +451,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter));
-//        // Create output dataset
-
-        int status = 0 ;
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
 
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
-
+        int status = 0 ;
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
         
 
@@ -473,7 +500,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         collectAcceptedData(parsedRdd,outputRdd);
         
-        
 
         if (status != 0) {
             return -1;
@@ -509,32 +535,31 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
 
-    private int parseSingleFile(Path file, Path destDir) {
-        logger.trace("Parsing " + file + " to " + destDir + "\n");
-        logger.trace("Header size : " + headerSize + "\n");
+    private int parseSingleFile(Path file, Path destDir){
+        logger.trace("Parsing " + file + " to " + destDir +"\n");
+        logger.trace("Header size : " + headerSize +"\n");
 
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1);
+                .textFile(file.toString(), 1);
+
 
         JavaRDD<Row> parseRdd = rdd
-            // Add line numbers
-            .zipWithIndex()
-            // Filter out header based on line number
-            .filter(new HeaderFilter(headerSize))
-            // Get rid of file numbers
-            .keys()
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                quoteEscapeChar, '\'', recCounter, errCounter));
+                // Add line numbers
+                .zipWithIndex()
+                // Filter out header based on line number
+                .filter(new HeaderFilter(headerSize))
+                // Get rid of file numbers
+                .keys()
+                .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                    quoteEscapeChar, '\'', recCounter, errCounter));
 
+        
+     // Create output dataset
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
         logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
-
         int rc = 0;
-
-        // Create output dataset
         scala.collection.Seq<Column> outputColumns = null;
-
         if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
         {
             outputColumns =
@@ -587,8 +612,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("Write dataset status = " + rc);
         }
 
+
         //Filter out Accepted Data
         collectAcceptedData(parseRdd,outputRdd);
+
+        logger.debug("Write dataset status = " + rc);
 
         //Filter out Rejected Data
         collectRejectedData(parseRdd, outputRdd);
@@ -633,7 +661,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("parsing dataframe ends here");
         return rc;
     }
-
 
     private boolean collectAcceptedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
         boolean status = true;
@@ -770,8 +797,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             status = false;
         }
 
-
-
         return status;
     }
 
@@ -782,27 +807,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             retval.add(new Column(field.getName()));
         }
         return retval;
-    }
-
-    private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
-
-        List<Column> retval = new ArrayList<>(outputs.size());
-        for(OutputFieldsList output : outputs){
-            retval.add(new Column(output.getName()));
-        }
-        return retval;
-    }
-
-    private static Map createDestinationFieldList(List<OutputFieldsList> outputs){
-
-        Map<String,String> hmap = new HashMap();
-        for(OutputFieldsList output : outputs){
-            if (output.getDestinationName() != null ) {
-                hmap.put(output.getName(),output.getDestinationName());
-            }
-        }
-        logger.debug("createDestinationFieldList ************************** " + hmap.toString());
-        return hmap;
     }
 
     private static List<String> createTsFormatList(List<Field> fields){
@@ -952,6 +956,27 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             System.exit(-1);
         }
     }
+    
+    
+    private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
 
+        List<Column> retval = new ArrayList<>(outputs.size());
+        for(OutputFieldsList output : outputs){
+            retval.add(new Column(output.getName()));
+        }
+        return retval;
+    }
+
+    private static Map createDestinationFieldList(List<OutputFieldsList> outputs){
+
+        Map<String,String> hmap = new HashMap();
+        for(OutputFieldsList output : outputs){
+            if (output.getDestinationName() != null ) {
+                hmap.put(output.getName(),output.getDestinationName());
+            }
+        }
+        logger.debug("createDestinationFieldList ************************** " + hmap.toString());
+        return hmap;
+    }
 
 }

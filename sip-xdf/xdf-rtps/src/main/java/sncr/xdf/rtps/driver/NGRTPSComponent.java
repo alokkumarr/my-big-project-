@@ -1,14 +1,18 @@
-package sncr.xdf.rtps;
+package sncr.xdf.rtps.driver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import scala.Tuple2;
 import sncr.bda.CliHandler;
@@ -27,32 +31,48 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.exceptions.XDFException.ErrorCodes;
+import sncr.xdf.rtps.driver.EventProcessingApplicationDriver;
+
 
 public class NGRTPSComponent extends AbstractComponent
 		implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
 	  private static final Logger logger = Logger.getLogger(NGRTPSComponent.class);
-
+	  
+	  String configPath;
+	
+	 public NGRTPSComponent(NGContext ngctx, String configPath) {
+	        super(ngctx);
+	        this.configPath = configPath;
+	    }
+	 
 
 	 public NGRTPSComponent(NGContext ngctx) {
 	        super(ngctx);
 	    }
-
 	@Override
 	protected int execute() {
 		logger.debug("########rtps execute started#######");
-		 SparkSession spark = SparkSession
-	                .builder()
-	                .appName("SparkSample")
-	                .master("local[*]")
-	                .getOrCreate();
-
-		List<Tuple2<String,String[]>> inputList = new ArrayList<Tuple2<String,String[]>>();
-        inputList.add(new Tuple2<String,String[]>("link91",new String[]{"link620","link761"}));
-        inputList.add(new Tuple2<String,String[]>("link297",new String[]{"link999","link942"}));
-        Dataset<Row> dataset = spark.createDataset(inputList, Encoders.tuple(Encoders.STRING(),
-        		spark.implicits().newStringArrayEncoder())).toDF();
-        ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
+        EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
+        logger.debug("######## reading config path "+ this.configPath);
+        String configAsStr = ConfigLoader.loadConfiguration(this.configPath);
+        ComponentConfiguration config = null;
+        try {
+        	config = NGRTPSComponent.analyzeAndValidate(configAsStr);
+		} catch (Exception ex) {
+			// TODO Auto-generated catch block
+			logger.error(ex.getMessage());
+		}
+		Rtps rtpsProps = config.getRtps();
+		
+		if(ngctx == null) {
+			driver.run(rtpsProps, Optional.empty(), Optional.empty());
+		} else {
+			driver.run(rtpsProps, Optional.of(ngctx), Optional.of(ctx));
+	        
+		}
+        
+       // ngctx.datafileDFmap.put(ngctx.dataSetName,dataset.cache());
 		logger.debug("########rtps execute completed#######");
 		return 0;
 	}
@@ -68,6 +88,7 @@ public class NGRTPSComponent extends AbstractComponent
 		logger.debug("Inside RTPS main");
 		NGContextServices ngCtxSvc;
 		CliHandler cli = new CliHandler();
+		String cfgLocation;
 		try {
 			long start_time = System.currentTimeMillis();
 
@@ -78,7 +99,7 @@ public class NGRTPSComponent extends AbstractComponent
 
 			logger.debug("Command line arguments parsing completed");
 
-			String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+		    cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
 
 			String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
 			if (configAsStr == null || configAsStr.isEmpty()) {
@@ -105,9 +126,10 @@ public class NGRTPSComponent extends AbstractComponent
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
 					ComponentServices.TransformationMetadata, ComponentServices.Spark, };
 			ComponentConfiguration cfg = NGRTPSComponent.analyzeAndValidate(configAsStr);
-
-			logger.debug("Analyze and validation completed");
-
+			
+			logger.debug("Analyze and validation completed" + cfg);
+			
+			
 
 			ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
 			logger.debug("NG Context services initialized");
@@ -123,6 +145,9 @@ public class NGRTPSComponent extends AbstractComponent
         );
         logger.warn(ngCtxSvc.getNgctx().toString());
         NGRTPSComponent component = new NGRTPSComponent(ngCtxSvc.getNgctx());
+        logger.debug("setting config path "+ cfgLocation);
+        component.configPath  = cfgLocation ;
+       
         logger.debug("NGRTPSComponent initialized with NgContext");
         if (!component.initComponent(null))
             System.exit(-1);
@@ -146,7 +171,11 @@ public class NGRTPSComponent extends AbstractComponent
 	public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
 		ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
+		
+		
 		Rtps parserProps = compConf.getRtps();
+		
+		logger.debug("after parsing ::"+ parserProps);
 		if (parserProps == null) {
 			throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
 		}

@@ -22,105 +22,168 @@ import java.util.Map;
 
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.parser.NGParser;
-import sncr.xdf.rtps.NGRTPSComponent;
+import sncr.xdf.rtps.driver.NGRTPSComponent;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
 
 @SuppressWarnings("rawtypes")
 public class XDFDataProcessor  extends AbstractComponent {
 
-	private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
+    public XDFDataProcessor()
+    {
 
+    }
 
-	private String[] args;
-    private  String pipelineConfig = "";
+    public XDFDataProcessor(Dataset dataset)
+    {
+        Map<String, Dataset> datafileDFmap = new HashMap<>();
+        datafileDFmap.put("DATA_STREAM",dataset);
+    }
+
+    private  String PIPELINE_CONFIG;
+    private JSONObject jsonObj;
+    private Map<String, Object> pipelineConfigParams;
     private boolean runningMode  = true;
-    private Map<String, Dataset> datafileDFmap = new HashMap<>();
-    private String dataSetName = "";
+    private static final Logger logger = Logger.getLogger(XDFDataProcessor.class);
+    Map<String, Dataset> datafileDFmap = new HashMap<>();
+    String dataSetName = "";
     String error;
     boolean isRealTime = false;
-
-
-	public XDFDataProcessor(String [] args) {
-		this.args = new String [args.length];
-		this.args = args;
-		componentName = "pipeline";
-	}
-
-	public XDFDataProcessor(Dataset dataset) {
-		this.datafileDFmap.put("DATA_STREAM", dataset);
-	}
+    String[] args;
 
     public static void main(String[] args)  {
-        long startTime = System.currentTimeMillis();
-        XDFDataProcessor processor = new XDFDataProcessor(args);
-        processor.execute();
-        long endTime = System.currentTimeMillis();
-        long difference = endTime - startTime;
+
+        long start_time = System.currentTimeMillis();
+
+        XDFDataProcessor processor = new XDFDataProcessor();
+        processor.processData(args);
+
+        long end_time = System.currentTimeMillis();
+        long difference = end_time-start_time;
         logger.debug("Pipeline total time for processing all the components : " + difference );
     }
 
-	protected int execute() {
+    protected int execute()
+    {
+        return 0;
+    }
+
+    protected void  processData(String[] args)
+    {
         int ret = 0 ;
+
         CliHandler cli = new CliHandler();
+        this.args = args;
+
         try {
+
             HFileOperations.init(10);
             Map<String, Object> parameters = cli.parse(args);
-            this.pipelineConfig = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
-            JSONObject jsonObj =  loadPipelineConfig(pipelineConfig);
+
+            PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+            jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
             JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
-
-            for(int i=0;i<pipeline.size();i++)
-            {
-                JSONObject pipeObj = (JSONObject)pipeline.get(i);
-                String component = pipeObj.get("component").toString();
-                boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-                logger.debug("Processing: " + pipeObj.get("component") + " Component" + "\n" );
-                switch(component)
+            JSONObject componentConfig = (JSONObject)pipeline.get(0);
+            
+            if(componentConfig.get("component").toString().equals("rtps")) {
+            	processRtps(parameters,componentConfig.get("configuration").toString(),
+            			Boolean.valueOf(componentConfig.get("persist").toString()));
+            } else {
+            	
+            	for(int i=0;i<pipeline.size();i++)
                 {
+                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
 
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+                    switch(component)
+                    {
+                    
+                    
+                        case "parser" :
+                        ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,false);
+                        break;
 
-                	case "rtps" :
-                	isRealTime = true;
-                    ret = processRtps(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
+                        case "transformer" :
+                        ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
 
+                        case "sql" :
+                        ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
 
-                    case "parser" :
-                    ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,isRealTime);
-                    break;
-
-                    case "transformer" :
-                    ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
-
-                    case "sql" :
-                    ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
-
-                    case "esloader" :
-                    ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
-                    break;
-
-                    default : ret = XDFException.ErrorCodes.IncorrectCall.ordinal();
-                    break;
+                        case "esloader" :
+                        ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
+                        break;
+                    }
                 }
             }
-        }
-        catch (Exception e) {
+
+
+            
+
+        } catch (Exception e) {
             logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
-            ret = -1;
             System.exit(ret);
         }
-        return ret;
+    }
+
+    
+    public void  processDataWithDataFrame()
+    {
+    	 int ret = 0 ;
+
+        try {
+        	JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
+            
+            	for(int i=1;i<pipeline.size();i++)
+                {
+                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
+
+                    String component = pipeObj.get("component").toString();
+                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+                    switch(component)
+                    {
+                    
+                    
+                        case "parser" :
+                        ret = processParser(pipelineConfigParams,pipeObj.get("configuration").toString(),persist, true);
+                        break;
+
+                        case "transformer" :
+                        ret = processTransformer( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+
+                        case "sql" :
+                        ret = processSQL( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+
+                        case "esloader" :
+                        ret = processESLoader(pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
+                        break;
+                    }
+                }
+
+
+            
+
+        } catch (Exception e) {
+            logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
+            System.exit(ret);
+        }
 	}
 
 
+   
+    
     private int processRtps(Map<String, Object> parameters, String configPath,boolean persistFlag) {
-
+    	 logger.debug("###### Starting RTPS #####"  );
         int ret = 0;
         try {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
+            logger.debug("###### Config as string retrived #####"  );
 
             if (configAsStr == null || configAsStr.isEmpty()) {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
@@ -147,8 +210,10 @@ public class XDFDataProcessor  extends AbstractComponent {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-
+            
+            logger.debug("###### Analize and validate...#####" + configAsStr  );
             ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
+            logger.debug("###### Analize and validate completed ...#####"  );
             NGContextServices ngRtpsCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "rtps", batchId);
             ngRtpsCtxSvc.initContext();
             ngRtpsCtxSvc.registerOutputDataSet();
@@ -162,15 +227,19 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.warn(ngRtpsCtxSvc.getNgctx().toString());
 
             logger.debug("Parser Input dataset size is : " + datafileDFmap.size() );
-
+            
+            
+            ngRtpsCtxSvc.getNgctx().pipelineConfig = jsonObj;
+            ngRtpsCtxSvc.getNgctx().pipelineConfigParams = parameters;
+            ngRtpsCtxSvc.getNgctx().pipeineArgs = args;
             ngRtpsCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String rtpsKey =  cfg.getOutputs().get(0).getDataSet().toString();
-
+          
             ngRtpsCtxSvc.getNgctx().dataSetName = rtpsKey;
             ngRtpsCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngRtpsCtxSvc.getNgctx().persistMode = persistFlag;
 
-            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx());
+            NGRTPSComponent component = new NGRTPSComponent(ngRtpsCtxSvc.getNgctx(),configPath);
 
             if (!component.initComponent(null))
                 System.exit(-1);
@@ -184,7 +253,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             datafileDFmap =  new HashMap<>();
             logger.debug("###RTPS Dataset name::" +ngRtpsCtxSvc.getNgctx().dataSetName);
-
+           
             datafileDFmap.put(rtpsKey,ngRtpsCtxSvc.getNgctx().datafileDFmap.get(ngRtpsCtxSvc.getNgctx().dataSetName));
             logger.debug("###RTPS Dataset count ::" +datafileDFmap.get(rtpsKey).count());
             dataSetName = rtpsKey;
@@ -195,7 +264,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             System.exit(-1);
         }
         return ret;
-
+    
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
@@ -226,17 +295,17 @@ public class XDFDataProcessor  extends AbstractComponent {
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
@@ -268,29 +337,29 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String parserKey = null;
-
+            
             if(isRealTime) {
-            	parserKey = dataSetName;
+            	parserKey = ngParserCtxSvc.getNgctx().dataSetName;
             } else {
             	parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
             }
-
+            
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
             ngParserCtxSvc.getNgctx().runningPipeLine = runningMode;
             ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGParser component = null;
-
+            
     		if(isRealTime) {
-    			Dataset dataset = ngParserCtxSvc.getNgctx().datafileDFmap.get(parserKey);
+    			Dataset dataset =  datafileDFmap.get("DATA_STREAM");
     			component  =  	new NGParser(ngParserCtxSvc.getNgctx(), dataset, true);
             } else {
-
+            	
             	component  =  	new NGParser(ngParserCtxSvc.getNgctx());
-
+            
             }
-
-
+    		
+            		
 
             if (!component.initComponent(null))
                 System.exit(-1);
@@ -305,6 +374,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             datafileDFmap =  new HashMap<>();
             datafileDFmap.put(parserKey,ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
             dataSetName = parserKey;
+
             logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
@@ -356,6 +426,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngTransformerCtxSvc.initContext();
             ngTransformerCtxSvc.registerOutputDataSet();
 
+            logger.trace("Output datasets:   ");
+
             ngTransformerCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
                 logger.trace(id)
             );
@@ -375,6 +447,7 @@ public class XDFDataProcessor  extends AbstractComponent {
                 System.exit(-1);
 
             ret = tcomponent.run();
+
             if (ret != 0){
                 throw new XDFException(ErrorCodes.IncorrectCall, "Could not complete Transformer component");
             }
@@ -532,7 +605,7 @@ public class XDFDataProcessor  extends AbstractComponent {
                 logger.trace(id)
             );
             ngESCtxSvc.registerOutputDataSet();
-
+            
 
             String dataSetInKey =  config.getInputs().get(0).getDataSet();
 
@@ -572,7 +645,6 @@ public class XDFDataProcessor  extends AbstractComponent {
     {
         return 0;
     }
-
 
 
 }
