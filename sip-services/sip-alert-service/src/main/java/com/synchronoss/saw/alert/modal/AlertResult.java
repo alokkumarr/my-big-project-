@@ -215,7 +215,7 @@ public class AlertResult {
   }
 
   /**
-   * Gets customerCode
+   * Gets customerCode.
    *
    * @return value of customerCode
    */
@@ -223,7 +223,7 @@ public class AlertResult {
     return customerCode;
   }
 
-  /** Sets customerCode */
+  /** Sets customerCode. */
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
   }
