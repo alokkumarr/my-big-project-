@@ -2,7 +2,9 @@ package com.synchronoss.saw.export.util;
 
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
+import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,22 +52,49 @@ public class ExportUtils {
   /**
    * Method to provide column header exact GUI sequence
    *
-   * @param fields List of field from sip query
+   * @param sipQuery query of field from sip query
    * @return
    */
-  public static Map<String, String> buildColumnHeaderMap(List<Field> fields) {
+  public static Map<String, String> buildColumnHeaderMap(SipQuery sipQuery) {
+    // collect all the fields to build column sequence
+    List<Field> fields = new ArrayList<>();
+    for (Artifact artifact : sipQuery.getArtifacts()) {
+      fields.addAll(artifact.getFields());
+    }
+
+
     Map<String, String> header = new LinkedHashMap();
     if (fields != null && !fields.isEmpty()) {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
-          if (field.getVisibleIndex().equals(visibleIndex)) {
-            String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
-            if (split != null && split.length >= 2) {
-              header.put(split[0], field.getAlias());
-            } else {
-              header.put(field.getColumnName(), field.getAlias());
+          // look for DL report
+          if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
+            if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
+              String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
+              String columnName;
+              String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;;
+              if (aggregationName != null && "distinctcount".equalsIgnoreCase(aggregationName)) {
+                aggregationName = aggregationName.replace(aggregationName, "distinctCount");
+              }
+              if (split != null && split.length >= 2) {
+                columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
+                header.put(columnName.trim(), field.getAlias());
+              } else {
+                columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
+                header.put(columnName.trim(), field.getAlias());
+              }
+              break;
             }
-            break;
+          } else {
+            if (field.getVisibleIndex().equals(visibleIndex)) {
+              String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
+              if (split != null && split.length >= 2) {
+                header.put(split[0], field.getAlias());
+              } else {
+                header.put(field.getColumnName(), field.getAlias());
+              }
+              break;
+            }
           }
         }
       }
@@ -113,7 +143,7 @@ public class ExportUtils {
    */
   public static boolean deleteDispatchedFile(String sourceFile, ServiceUtils serviceUtils) {
     try {
-      serviceUtils.deleteFile(sourceFile, true);
+      serviceUtils.deleteFile(sourceFile, false);
       return true;
     } catch (IOException e) {
       logger.error("Error deleting File : " + sourceFile);
