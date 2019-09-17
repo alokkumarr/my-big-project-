@@ -462,24 +462,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           return column;
         });
       });
-
-      const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
-
-      const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
-
-      flatArtifacts.forEach(col => {
-        col.checked  = '';
-        fields.forEach(field => {
-          if (col.table === field.table && col.columnName === field.columnName) {
-            col.checked = true;
-            if (this.analysis.type === 'pivot') {
-              col.format = field.format;
-              col.aliasName = field.aliasName;
-            }
-          }
-        });
-      });
     }
+    const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
+
+    const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
+    flatArtifacts.forEach(col => {
+      col.checked  = '';
+      fields.forEach(field => {
+        if (col.table === field.table && col.columnName === field.columnName) {
+          col.checked = true;
+          if (this.analysis.type === 'pivot') {
+            col.format = field.format;
+            col.aliasName = field.aliasName;
+          }
+        }
+      });
+    });
+
     return artifacts;
   }
 
@@ -1102,7 +1101,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         column.format.precision = DEFAULT_PRECISION;
       }
     }
-    if (DATE_TYPES.includes(column.type) && !column.format) {
+
+    if (DATE_TYPES.includes(column.type)) {
+      column.dateFormat = 'yyyy-MM-dd';
       column.format = 'yyyy-MM-dd';
     }
   }
