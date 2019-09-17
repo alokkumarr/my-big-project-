@@ -385,6 +385,7 @@ public class AlertServiceImpl implements AlertService {
       Integer pageSize,
       String alertRuleSysId,
       Ticket ticket) {
+    logger.info("Inside Alert Count for group by :" + alertCount.getGroupBy());
     if (alertCount.getGroupBy() == null) {
       throw new RuntimeException("GroupBy cannot be null");
     }
@@ -412,33 +413,24 @@ public class AlertServiceImpl implements AlertService {
 
     MaprConnection connection = new MaprConnection(basePath, alertTriggerLog);
     String query;
-    if (alertCount.getGroupBy() == GroupBy.SEVERITY) {
-      if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
-        query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<AlertResult> list =
-            connection.runMaprDbQueryWithFilter(
-                query, pageNumber, pageSize, "createdTime", AlertResult.class);
-        return groupByseverity(list);
-      }
-      query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<AlertResult> result =
-          connection.runMaprDbQueryWithFilter(
-              query, pageNumber, pageSize, "createdTime", AlertResult.class);
-      return groupByseverity(result);
-
+    if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
+      query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
     } else {
-      if (alertRuleSysId != null && !StringUtils.isEmpty(alertRuleSysId)) {
-        query = getQueryForAlertCountByAlertRuleId(epochGte, epochLte, ticket, alertRuleSysId);
-        List<AlertResult> result =
-            connection.runMaprDbQueryWithFilter(
-                query, pageNumber, pageSize, "createdTime", AlertResult.class);
-        return groupByDate(result);
-      }
       query = getQueryForAlertCount(epochGte, epochLte, ticket);
-      List<AlertResult> result =
-          connection.runMaprDbQueryWithFilter(
-              query, pageNumber, pageSize, "createdTime", AlertResult.class);
-      return groupByDate(result);
+    }
+    logger.trace("Mapr Filter query for alert count:{}", query);
+    List<AlertResult> result =
+        connection.runMaprDbQueryWithFilter(
+            query, pageNumber, pageSize, "createdTime", AlertResult.class);
+    switch (alertCount.getGroupBy()) {
+      case SEVERITY:
+        return groupByseverity(result);
+      case ATTRIBUTEVALUE:
+        return groupByAttributeValue(result);
+      case STARTTIME:
+        return groupByDate(result);
+      default:
+        throw new RuntimeException("unsupported group by field");
     }
   }
 
@@ -449,7 +441,21 @@ public class AlertServiceImpl implements AlertService {
             .collect(Collectors.groupingBy(AlertResult::getAlertSeverity, Collectors.counting()));
     groupByServrity.forEach(
         (severity, count) -> {
-          AlertCountResponse countResponse = new AlertCountResponse(null, count, severity);
+          AlertCountResponse countResponse = new AlertCountResponse(null, count, severity, null);
+          response.add(countResponse);
+        });
+    return response;
+  }
+
+  private List<AlertCountResponse> groupByAttributeValue(List<AlertResult> list) {
+    List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
+    Map<String, Long> groupByServrity =
+        list.stream()
+            .collect(Collectors.groupingBy(AlertResult::getAttributeValue, Collectors.counting()));
+    groupByServrity.forEach(
+        (attributeValue, count) -> {
+          AlertCountResponse countResponse =
+              new AlertCountResponse(null, count, null, attributeValue);
           response.add(countResponse);
         });
     return response;
@@ -470,7 +476,7 @@ public class AlertServiceImpl implements AlertService {
                     Collectors.counting()));
     groupByServrity.forEach(
         (date, count) -> {
-          AlertCountResponse countResponse = new AlertCountResponse(date, count, null);
+          AlertCountResponse countResponse = new AlertCountResponse(date, count, null, null);
           response.add(countResponse);
         });
     return response;
