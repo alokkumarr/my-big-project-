@@ -28,9 +28,9 @@
   ></dxo-search-panel>
   <!-- <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling> -->
   <dxi-column caption="Alert Name" dataField="alertRuleName"></dxi-column>
-  <dxi-column dataField="severity" cellTemplate="severityTemplate">
+  <dxi-column dataField="alertSeverity" cellTemplate="severityTemplate">
   </dxi-column>
-  <dxi-column dataField="category"></dxi-column>
+  <dxi-column dataField="categoryId"></dxi-column>
 
   <dxi-column
     caption="Time"
@@ -57,10 +57,10 @@
   >
     <mat-icon
       class="alerts-grid__gridIcon"
-      [ngClass]="data.data.severity"
+      [ngClass]="data.value"
       fontIcon="icon-uniE901"
     ></mat-icon>
-    <span fxFelx="50px" i18n>{{ data.data.severity | titlecase }}</span>
+    <span fxFelx="50px" i18n>{{ data.value | titlecase }}</span>
   </div>
 
   <div *dxTemplate="let data of 'dateTemplate'">
