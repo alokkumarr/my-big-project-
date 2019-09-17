@@ -929,7 +929,6 @@ Note: This is mandatory field it has to be either 'False' or 'True'. Please obse
 # of `True` & `False` Note: true or false will result into an error. And to make sure only TLS v1.2 are
 in use. IT team has to disable TLS v1.1 while installing JDK using the following COMMANDS
 
-sed -i '/jdk.tls.disabledAlgorithms/s/^/#/g' /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
 echo "jdk.tls.disabledAlgorithms=SSLv2Hello, TLSv1, TLSv1.1, SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, anon, NULL" >> /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
 grep jdk.tls.disabledAlgorithms /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security
 
