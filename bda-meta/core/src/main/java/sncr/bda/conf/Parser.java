@@ -29,6 +29,10 @@ public class Parser {
   @Expose
   private List<Field> fields = new ArrayList<Field>();
 
+  @SerializedName("outputFieldsList")
+  @Expose
+  private List<OutputFieldsList> outputFieldsList = new ArrayList<OutputFieldsList>();
+
   @SerializedName("lineSeparator")
   @Expose
   private String lineSeparator;
@@ -45,6 +49,10 @@ public class Parser {
   @Expose
   private String quoteEscape;
 
+  @SerializedName("multiLine")
+  @Expose
+  private boolean multiLine;
+
   @SerializedName("headerSize")
   @Expose
   private Integer headerSize;
@@ -52,6 +60,8 @@ public class Parser {
   @SerializedName("numberOfFiles")
   @Expose
   private Integer numberOfFiles = 1;
+
+
 
   /** No args constructor for use in serialization */
   public Parser() {}
@@ -65,24 +75,30 @@ public class Parser {
    * @param delimiter
    * @param fields
    * @param lineSeparator
+   * @param outputFieldsList
+   * @param multiLine
    */
   public Parser(
       String file,
       List<Field> fields,
+      List<OutputFieldsList> outputFieldsList,
       String lineSeparator,
       String delimiter,
       String quoteChar,
       String quoteEscape,
       Integer headerSize,
-      Integer numberOfFiles) {
+      Integer numberOfFiles,
+      boolean multiLine ) {
     this.file = file;
     this.fields = fields;
+    this.outputFieldsList = outputFieldsList;
     this.lineSeparator = lineSeparator;
     this.delimiter = delimiter;
     this.quoteChar = quoteChar;
     this.quoteEscape = quoteEscape;
     this.headerSize = headerSize;
     this.numberOfFiles = numberOfFiles;
+    this.multiLine = multiLine;
   }
 
   /** @return The file */
@@ -142,6 +158,22 @@ public class Parser {
     this.fields = fields;
     return this;
   }
+
+    /** @return The outputFieldsList */
+    public List<OutputFieldsList> getOutputFieldsList() {
+        return outputFieldsList;
+    }
+
+    /** @param fields The outputFieldsList */
+    public void setOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
+        this.outputFieldsList = outputFieldsList;
+    }
+
+    public Parser withOutputFieldsList(List<OutputFieldsList> outputFieldsList) {
+        this.outputFieldsList = outputFieldsList;
+        return this;
+    }
+
 
   /** @return The lineSeparator */
   public String getLineSeparator() {
@@ -241,6 +273,29 @@ public class Parser {
     return this;
   }
 
+    /**
+     * Number of files for all output objects
+     *
+     * @return The multiLine
+     */
+    public boolean getMultiLine() {
+        return multiLine;
+    }
+
+    /**
+     * Json data multiline indicator
+     *
+     * @param multiLine The multiLine
+     */
+    public void setMultiLines(boolean multiLine) {
+        this.multiLine = multiLine;
+    }
+
+    public Parser withMultiLine(boolean multiLine) {
+        this.multiLine = multiLine;
+        return this;
+    }
+
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
@@ -253,12 +308,14 @@ public class Parser {
         .append(parserInputFileFormat)
         .append(schemaValidationRequired)
         .append(fields)
+        .append(outputFieldsList)
         .append(lineSeparator)
         .append(delimiter)
         .append(quoteChar)
         .append(quoteEscape)
         .append(headerSize)
         .append(numberOfFiles)
+        .append(multiLine)
         .toHashCode();
   }
 
@@ -276,12 +333,14 @@ public class Parser {
         .append(parserInputFileFormat, rhs.parserInputFileFormat)
         .append(schemaValidationRequired, rhs.schemaValidationRequired)
         .append(fields, rhs.fields)
+        .append(outputFieldsList,rhs.outputFieldsList)
         .append(lineSeparator, rhs.lineSeparator)
         .append(delimiter, rhs.delimiter)
         .append(quoteChar, rhs.quoteChar)
         .append(quoteEscape, rhs.quoteEscape)
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
+        .append(multiLine,rhs.multiLine)
         .isEquals();
   }
 }

@@ -54,6 +54,7 @@ import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -113,7 +114,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     try{
         HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
         client = prepareRESTESConnection();
-        response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+        response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod,
+            new HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024) );
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -141,21 +143,19 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         try{
             HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
             client = prepareRESTESConnection();
-            response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+            response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod,
+                new HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             HttpEntity entity = response.getEntity();
             jsonNode = objectMapper.readTree(entity.getContent());
-
-            client.close();
         }
         finally{
             if (client !=null){
                 client.close();
             }
         }
-        logger.trace("Search Response", jsonNode.toString());
         return jsonNode;
     }
 
@@ -199,7 +199,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     try{
         HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
         client = prepareRESTESConnection();
-        response = client.performRequest(HttpPut.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+        response = client.performRequest(HttpPut.METHOD_NAME, endpoint, emptyMap(), requestPaylod,
+        new HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -227,7 +228,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         query = (query == null || "".equals(query)) ? "" : query;
         HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
         client = prepareRESTESConnection();
-        response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+        response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod,
+            new HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);

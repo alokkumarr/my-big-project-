@@ -25,7 +25,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "displayName",
   "type",
   "aggregate",
-  "groupInterval"
+  "groupInterval",
+  "visibleIndex"
 })
 public class Field {
 
@@ -76,6 +77,9 @@ public class Field {
 
   @JsonProperty("areaIndex")
   private Integer areaIndex;
+
+  @JsonProperty("visibleIndex")
+  private Integer visibleIndex;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -264,6 +268,16 @@ public class Field {
     this.additionalProperties = null;
   }
 
+  @JsonProperty("visibleIndex")
+  public Integer getVisibleIndex() {
+    return visibleIndex;
+  }
+
+  @JsonProperty("visibleIndex")
+  public void setVisibleIndex(Integer visibleIndex) {
+    this.visibleIndex = visibleIndex;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -277,6 +291,7 @@ public class Field {
         .append("groupInterval", groupInterval)
         .append("additionalProperties", additionalProperties)
         .append("format", format)
+        .append("visibleIndex", visibleIndex)
         .toString();
   }
 
@@ -293,6 +308,7 @@ public class Field {
         .append(displayName)
         .append(groupInterval)
         .append(format)
+        .append(visibleIndex)
         .toHashCode();
   }
 
@@ -317,6 +333,7 @@ public class Field {
         .append(displayName, rhs.displayName)
         .append(groupInterval, rhs.groupInterval)
         .append(format, rhs.format)
+        .append(visibleIndex, rhs.visibleIndex)
         .isEquals();
   }
 

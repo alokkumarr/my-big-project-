@@ -33,8 +33,8 @@ import { getFileContents } from '../../../common/utils/fileManager';
 import { AdminMenuData } from '../consts';
 import { Analysis, AnalysisDSL } from '../../../models';
 import { ExportService } from '../export/export.service';
-import { isDSLAnalysis } from '../../analyze/types';
 import { DSL_ANALYSIS_TYPES } from '../../analyze/consts';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',

@@ -15,9 +15,7 @@ import org.apache.spark.util.LongAccumulator;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
-import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.conf.Field;
-import sncr.bda.conf.Output;
+import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
@@ -38,11 +36,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import sncr.xdf.context.RequiredNamedParameters;
-import sncr.bda.conf.ParserInputFileFormat;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -57,6 +55,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private String sourcePath;
     private String tempDir;
     private String archiveDir;
+    private boolean multiLine = false;
 
     private String outputDataSetName;
     private String outputDataSetLocation;
@@ -227,12 +226,43 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 //Write Consolidated Accepted data
                 if (this.acceptedDataCollector != null) {
-                    scala.collection.Seq<Column> outputColumns =
-                        scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-                    Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
-                    ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
-                    logger.debug("####### count at end of parser after caching "+ outputDS.count());
-                    
+
+                    scala.collection.Seq<Column> outputColumns = null;
+                    if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
+                    {
+                        outputColumns =
+                            scala.collection.JavaConversions.asScalaBuffer(
+                                createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+
+                        Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
+
+                        ngctx.datafileDFmap.put(ngctx.dataSetName,outputDS.cache());
+                        logger.debug("####### end of parser after caching "+ outputDS.count());
+                    }
+                    else {
+                        outputColumns =
+                            scala.collection.JavaConversions.asScalaBuffer(
+                                createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
+
+                        Dataset outputDS = ctx.sparkSession.createDataFrame(acceptedDataCollector.rdd(), internalSchema).select(outputColumns);
+
+                        Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
+
+                        Dataset filterOutputDS = null;
+                        Dataset renameOutputDS = outputDS;
+
+                        // using for-each loop for iteration over Map.entrySet()
+                        for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
+                            String origin = e.getKey();
+                            String destination = e.getValue();
+                            filterOutputDS = renameOutputDS.withColumnRenamed(origin,destination);
+                            renameOutputDS = filterOutputDS;
+                        }
+
+                        ngctx.datafileDFmap.put(ngctx.dataSetName,filterOutputDS.cache());
+                        logger.debug("####### end of parser after caching "+ filterOutputDS.count());
+                    }
+
                 }
 
                 //Write rejected data
@@ -259,7 +289,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
-            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath);
+            multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
+
+            logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
+
+            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+
+            logger.debug("RECORD COUNT IS " + inputDataset.count());
 
             this.recCounter.setValue(inputDataset.count());
 
@@ -349,46 +385,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return result;
     }
 
-
-//    protected int archive(){
-//        int result = 0;
-//        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
-//
-//        try {
-//            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
-//
-//            if (files != null && files.length != 0) {
-//                //Create archive directory
-//
-//                logger.debug("Total files = " + files.length);
-//
-//                int archiveCounter = 0;
-//
-//                for(FileStatus fiile: files) {
-//                    String currentTimestamp = LocalDateTime.now()
-//                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
-//
-//                    Path archivePath = new Path(archiveDir + "/" + currentTimestamp + "/");
-//                    ctx.fs.mkdirs(archivePath);
-//
-//                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
-//                        archiveCounter++;
-//                    }
-//                }
-//
-//                logger.info("Total files archived = " + archiveCounter);
-//            }
-//        } catch (IOException e) {
-//            logger.error("Archival failed");
-//
-//            logger.error(ExceptionUtils.getStackTrace(e));
-//
-//            result = 1;
-//        }
-//
-//        return result;
-//    }
-
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
         return ctx.fs.rename(sourceFilePath, archiveLocation);
@@ -410,24 +406,57 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
                 '\'', recCounter, errCounter));
-        // Create output dataset
-        scala.collection.Seq<Column> outputColumns =
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+//        // Create output dataset
+
+        int status = 0 ;
 
         logger.debug("Output rdd length = " + recCounter.value());
         logger.debug("Rejected rdd length = " + errCounter.value());
 
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
-        
+
         logger.debug("Rdd partition : "+ outputRdd.getNumPartitions());
-        
-        Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-        
+
+        scala.collection.Seq<Column> outputColumns = null;
+        if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
+        {
+            outputColumns =
+                scala.collection.JavaConversions.asScalaBuffer(
+                    createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+
+            Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+            logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
+
+            status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
+
+        }
+        else {
+            outputColumns =
+                scala.collection.JavaConversions.asScalaBuffer(
+                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
+
+            Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
+
+            Dataset filterOutputDS = null;
+            Dataset renameOutputDS = outputDataset;
+
+            for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
+                String origin = e.getKey();
+                String destination = e.getValue();
+                filterOutputDS = renameOutputDS.withColumnRenamed(origin,destination);
+                renameOutputDS = filterOutputDS;
+            }
+
+            logger.debug("Dataset partition : "+ filterOutputDS.rdd().getNumPartitions());
+
+            status = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, tempDir.toString(), "append");
+        }
+
         collectAcceptedData(parsedRdd,outputRdd);
-        
-        logger.debug("Dataset partition : "+ outputDataset.rdd().getNumPartitions());
-        int status = commitDataSetFromDSMap(ngctx, outputDataset, outputDataSetName, tempDir.toString(), "append");
-        
+
         if (status != 0) {
             return -1;
         }
@@ -462,54 +491,86 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
 
-    private int parseSingleFile(Path file, Path destDir){
-        logger.trace("Parsing " + file + " to " + destDir +"\n");
-        logger.trace("Header size : " + headerSize +"\n");
+    private int parseSingleFile(Path file, Path destDir) {
+        logger.trace("Parsing " + file + " to " + destDir + "\n");
+        logger.trace("Header size : " + headerSize + "\n");
 
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-                .textFile(file.toString(), 1);
-
+            .textFile(file.toString(), 1);
 
         JavaRDD<Row> parseRdd = rdd
-                // Add line numbers
-                .zipWithIndex()
-                // Filter out header based on line number
-                .filter(new HeaderFilter(headerSize))
-                // Get rid of file numbers
-                .keys()
-                .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
-                    quoteEscapeChar, '\'', recCounter, errCounter));
+            // Add line numbers
+            .zipWithIndex()
+            // Filter out header based on line number
+            .filter(new HeaderFilter(headerSize))
+            // Get rid of file numbers
+            .keys()
+            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar,
+                quoteEscapeChar, '\'', recCounter, errCounter));
 
-        
-     // Create output dataset
-        scala.collection.Seq<Column> outputColumns =
-            scala.collection.JavaConversions.asScalaBuffer(
-                createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> rejectedRdd = getRejectedData(parseRdd);
         logger.debug("####### Rejected RDD COUNT:: "+ rejectedRdd.count());
         JavaRDD<Row> outputRdd = getOutputData(parseRdd);
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-        
-
-        collectAcceptedData(parseRdd,outputRdd);
-        
-
-        scala.collection.Seq<Column> scalaList=
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-//        Column cond = df.col(REJECTED_FLAG).isNull().or(df.col(REJECTED_FLAG).equalTo(0));
-//        Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
-//        logger.warn ( "Filtered df:  " + filteredDataset.count());
-
-        logger.debug("Output rdd length = " + recCounter.value() +"\n");
-        logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
-        logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
 
         int rc = 0;
-        logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
 
-        rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), "append");
+        // Create output dataset
+        scala.collection.Seq<Column> outputColumns = null;
 
-        logger.debug("Write dataset status = " + rc);
+        if (ngctx.componentConfiguration.getParser().getOutputFieldsList().size() <= 0)
+        {
+            outputColumns =
+                scala.collection.JavaConversions.asScalaBuffer(
+                    createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+
+            Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+            logger.debug("Output rdd length = " + recCounter.value() +"\n");
+            logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
+            logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
+
+            logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
+
+            rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), "append");
+
+            logger.debug("Write dataset status = " + rc);
+        }
+        else {
+
+            outputColumns =
+                scala.collection.JavaConversions.asScalaBuffer(
+                    createParserOutputFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList())).toList();
+
+            Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+            Map<String,String> columnRenameList = createDestinationFieldList(ngctx.componentConfiguration.getParser().getOutputFieldsList());
+
+            Dataset filterOutputDS = null;
+            Dataset renameOutputDS = df;
+
+            for (Map.Entry<String, String> e : columnRenameList.entrySet()) {
+                String origin = e.getKey();
+                String destination = e.getValue();
+                filterOutputDS = renameOutputDS.withColumnRenamed(origin,destination);
+                renameOutputDS = filterOutputDS;
+            }
+
+            logger.debug("Output rdd length = " + recCounter.value() +"\n");
+            logger.debug("Rejected rdd length = " + errCounter.value() +"\n");
+            logger.debug("Dest dir for file " + file + " = " + destDir +"\n");
+
+            logger.debug("************************************** Dest dir for file " + file + " = " + destDir +"\n");
+
+            filterOutputDS.printSchema();
+            filterOutputDS.show(5);
+
+            rc = commitDataSetFromDSMap(ngctx, filterOutputDS, outputDataSetName, destDir.toString(), "append");
+
+            logger.debug("Write dataset status = " + rc);
+        }
+
+        //Filter out Accepted Data
+        collectAcceptedData(parseRdd,outputRdd);
 
         //Filter out Rejected Data
         collectRejectedData(parseRdd, outputRdd);
@@ -663,6 +724,27 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             retval.add(new Column(field.getName()));
         }
         return retval;
+    }
+
+    private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
+
+        List<Column> retval = new ArrayList<>(outputs.size());
+        for(OutputFieldsList output : outputs){
+            retval.add(new Column(output.getName()));
+        }
+        return retval;
+    }
+
+    private static Map createDestinationFieldList(List<OutputFieldsList> outputs){
+
+        Map<String,String> hmap = new HashMap();
+        for(OutputFieldsList output : outputs){
+            if (output.getDestinationName() != null ) {
+                hmap.put(output.getName(),output.getDestinationName());
+            }
+        }
+        logger.debug("createDestinationFieldList ************************** " + hmap.toString());
+        return hmap;
     }
 
     private static List<String> createTsFormatList(List<Field> fields){
