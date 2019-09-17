@@ -81,6 +81,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
       alertResult.setCategoryId(alertRuleDetails.getCategoryId());
       alertResult.setStartTime(requestTime);
+      alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
       String alertResultId = UUID.randomUUID().toString();
       alertResult.setAlertTriggerSysId(alertResultId);
       SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());

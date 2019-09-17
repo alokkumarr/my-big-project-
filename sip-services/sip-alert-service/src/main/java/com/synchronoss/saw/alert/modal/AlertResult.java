@@ -46,6 +46,9 @@ public class AlertResult {
   @JsonProperty("alertCount")
   private Integer alertCount;
 
+  @JsonProperty("attributeValue")
+  private String attributeValue;
+
   /**
    * Gets alertTriggerSysId.
    *
@@ -223,7 +226,7 @@ public class AlertResult {
     return customerCode;
   }
 
-  /** Sets customerCode .*/
+  /** Sets customerCode.*/
   public void setCustomerCode(String customerCode) {
     this.customerCode = customerCode;
   }
@@ -240,5 +243,19 @@ public class AlertResult {
   /** Sets alertCount. */
   public void setAlertCount(Integer alertCount) {
     this.alertCount = alertCount;
+  }
+
+  /**
+   * Gets attributeValue.
+   *
+   * @return value of attributeValue
+   */
+  public String getAttributeValue() {
+    return attributeValue;
+  }
+
+  /** Sets attributeValue. */
+  public void setAttributeValue(String attributeValue) {
+    this.attributeValue = attributeValue;
   }
 }

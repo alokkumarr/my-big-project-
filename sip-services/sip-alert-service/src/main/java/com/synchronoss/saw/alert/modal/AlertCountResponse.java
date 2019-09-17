@@ -2,7 +2,6 @@ package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.util.Date;
 
 @JsonInclude(Include.NON_NULL)
 public class AlertCountResponse {
@@ -10,12 +9,15 @@ public class AlertCountResponse {
   private String date;
   private Long count;
   private AlertSeverity alertSeverity;
+  private String attributeValue;
 
   /** constructs the alertcountresponse with parameters. */
-  public AlertCountResponse(String date, Long count, AlertSeverity alertSeverity) {
+  public AlertCountResponse(
+      String date, Long count, AlertSeverity alertSeverity, String attributeValue) {
     this.date = date;
     this.count = count;
     this.alertSeverity = alertSeverity;
+    this.attributeValue = attributeValue;
   }
 
   /**
@@ -58,5 +60,19 @@ public class AlertCountResponse {
   /** Sets alertseverity. */
   public void setAlertSeverity(AlertSeverity alertSeverity) {
     this.alertSeverity = alertSeverity;
+  }
+
+  /**
+   * Gets attributeValue.
+   *
+   * @return value of attributeValue
+   */
+  public String getAttributeValue() {
+    return attributeValue;
+  }
+
+  /** Sets attributeValue. */
+  public void setAttributeValue(String attributeValue) {
+    this.attributeValue = attributeValue;
   }
 }
