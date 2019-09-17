@@ -273,12 +273,8 @@ public class ExportServiceImpl implements ExportService {
       OutputStreamWriter osw = new OutputStreamWriter(fos);
       String fileType = exportBean.getFileType();
 
-      List<Field> fields = new ArrayList<>();
       final SipQuery sipQuery = getSipQuery(analysisId);
-      for (Artifact artifact : sipQuery.getArtifacts()) {
-        fields.addAll(artifact.getFields());
-      }
-      Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
+      Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
       logger.debug("Writing to file");
       logger.debug("Data = " + entity.getBody().getData());
@@ -288,7 +284,7 @@ public class ExportServiceImpl implements ExportService {
         osw.close();
         fos.close();
       } else {
-        streamToXlsxReport(fields, entity.getBody(), limitPerPage, exportBean);
+        streamToXlsxReport(sipQuery, entity.getBody(), limitPerPage, exportBean);
       }
 
     } catch (IOException e) {
@@ -390,7 +386,7 @@ public class ExportServiceImpl implements ExportService {
    * @throws IOException
    */
   public Boolean streamToXlsxReport(
-      List<Field> fields, DataResponse response, long limitToExport, ExportBean exportBean) throws IOException {
+      SipQuery sipQuery, DataResponse response, long limitToExport, ExportBean exportBean) throws IOException {
 
     List<Object> data = response.getData();
     if (data == null || data.size() == 0) {
@@ -407,7 +403,7 @@ public class ExportServiceImpl implements ExportService {
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
     try {
-      xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, data, limitToExport);
+      xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, data, limitToExport);
       workBook.write(stream);
     } finally {
       stream.flush();
@@ -800,12 +796,9 @@ public class ExportServiceImpl implements ExportService {
     logger.debug("Email async success");
     logger.debug("[Success] Response :" + entity.getStatusCode());
 
-    List<Field> fields = new ArrayList<>();
+
     final SipQuery sipQuery = getSipQuery(analysisId);
-    for (Artifact artifact : sipQuery.getArtifacts()) {
-      fields.addAll(artifact.getFields());
-    }
-    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
+    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
     try {
       // create a directory with unique name in published location to avoid file
@@ -824,7 +817,7 @@ public class ExportServiceImpl implements ExportService {
         osw.close();
         fos.close();
       } else {
-        streamToXlsxReport(fields, entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+        streamToXlsxReport(sipQuery, entity.getBody(), Long.parseLong(emailExportSize), exportBean);
       }
 
       File file = new File(exportBean.getFileName());
