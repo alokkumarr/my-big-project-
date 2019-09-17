@@ -449,10 +449,11 @@ public class AlertServiceImpl implements AlertService {
 
   private List<AlertCountResponse> groupByAttributeValue(List<AlertResult> list) {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
-    Map<String, Long> groupByServrity =
-        list.stream()
-            .collect(Collectors.groupingBy(AlertResult::getAttributeValue, Collectors.counting()));
-    groupByServrity.forEach(
+    Map<String, Long> groupByAttribute =
+        list.stream().filter((alertResult -> alertResult.getAttributeValue()!=null))
+            .collect(Collectors.groupingBy(AlertResult::getAttributeValue,
+                Collectors.counting()));
+    groupByAttribute.forEach(
         (attributeValue, count) -> {
           AlertCountResponse countResponse =
               new AlertCountResponse(null, count, null, attributeValue);
