@@ -6,14 +6,20 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Sort.Order;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.util.BuilderUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
+import org.elasticsearch.search.aggregations.pipeline.bucketselector.BucketSelectorPipelineAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -69,6 +75,7 @@ public class SIPAggregationBuilder {
   public AggregationBuilder reportAggregationBuilder(
       List<Field> dataFields,
       List<Field> aggregateFields,
+      List<Filter> aggregationFilter,
       int fieldCount,
       int aggregatedFieldCount,
       AggregationBuilder aggregationBuilder,
@@ -81,6 +88,7 @@ public class SIPAggregationBuilder {
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
+            aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilder,
@@ -162,9 +170,18 @@ public class SIPAggregationBuilder {
                     .size(size));
           }
         }
+        for (Filter filter : aggregationFilter) {
+          Map<String, String> bucketsPathsMap = new HashMap<>();
+          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + ".value");
+          Script script = QueryBuilderUtil.prepareAggregationFilter(filter);
+          BucketSelectorPipelineAggregationBuilder bs =
+              PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
+          aggregationBuilder.subAggregation(bs);
+        }
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
+            aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilder,
@@ -218,6 +235,7 @@ public class SIPAggregationBuilder {
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
+            aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilderMain,
@@ -226,6 +244,20 @@ public class SIPAggregationBuilder {
     } else {
       return aggregationBuilder;
     }
+  }
+
+  /**
+   * @param filters
+   * @return
+   */
+  public static List<Filter> getAggregationFilter(List<Filter> filters) {
+    List<Filter> aggregationFilters = new ArrayList<>();
+    for (Filter filter : filters) {
+      if (filter.getAggregationFilter() != null && filter.getAggregationFilter()) {
+        aggregationFilters.add(filter);
+      }
+    }
+    return aggregationFilters;
   }
 
   /**
