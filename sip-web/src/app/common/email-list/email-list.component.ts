@@ -12,7 +12,7 @@ import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
-import * as filter from 'lodash/filter';
+import * as reject from 'lodash/reject';
 import * as invoke from 'lodash/invoke';
 import { EMAIL_REGEX } from '../consts';
 
@@ -69,7 +69,7 @@ export class EmailListComponent implements ControlValueAccessor {
 
   removeEmail(targetIndex) {
     if (targetIndex >= 0) {
-      const newEmails = filter(
+      const newEmails = reject(
         this.emails,
         (_, index) => index === targetIndex
       );
@@ -78,7 +78,7 @@ export class EmailListComponent implements ControlValueAccessor {
     }
   }
 
-  trackByIndex(index) {
-    return index;
+  trackByValue(index, value) {
+    return value;
   }
 }

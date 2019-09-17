@@ -344,8 +344,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         !filtr.isGlobalFilter &&
         (filtr.type === 'date' && filtr.model.operator === 'BTW')
       ) {
-        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
-        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.gte = moment(filtr.model.value, 'MM-DD-YYYY').format(
+          'YYYY-MM-DD'
+        );
+        filtr.model.lte = moment(filtr.model.otherValue, 'MM-DD-YYYY').format(
+          'YYYY-MM-DD'
+        );
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });
