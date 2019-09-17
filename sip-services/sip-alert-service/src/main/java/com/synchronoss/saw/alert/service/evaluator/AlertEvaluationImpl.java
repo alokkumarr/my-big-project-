@@ -1,15 +1,22 @@
 package com.synchronoss.saw.alert.service.evaluator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertState;
 import com.synchronoss.saw.alert.service.AlertNotifier;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.util.BuilderUtil;
+import com.synchronoss.saw.util.DynamicConvertor;
 import com.synchronoss.sip.utils.RestUtil;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -64,6 +71,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     System.out.println("Evaluating the Alert");
     List<AlertRuleDetails> alertRuleDetailsList = fetchAlertDetailsByDataPod(dataPodId);
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
+      logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
       AlertResult alertResult = new AlertResult();
       alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
       alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
@@ -73,19 +81,77 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
       alertResult.setCategoryId(alertRuleDetails.getCategoryId());
       alertResult.setStartTime(requestTime);
+      alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
       String alertResultId = UUID.randomUUID().toString();
       alertResult.setAlertTriggerSysId(alertResultId);
-      alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
-      alertResult.setSipQuery(alertRuleDetails.getSipQuery());
-      List<?> alertResultList = evaluateAlertRules(alertRuleDetails.getSipQuery());
+      SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
+      alertResult.setSipQuery(sipQuery);
+      List<?> alertResultList = evaluateAlertRules(sipQuery);
+      List<Map<String, Object>> executionResultList = new ArrayList<>();
+      ObjectMapper mapper = new ObjectMapper();
       if (alertResultList.size() > 0) {
-        alertResult.setAlertCount(alertResultList.size());
-        connection.insert(alertResultId, alertResult);
-        logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-        alertNotifier.sendNotification(alertRuleDetails);
+        alertResultList.forEach(
+            (executionResult) -> {
+              try {
+                Map<String, Object> result = mapper.convertValue(executionResult, Map.class);
+                Object value = result.get(alertRuleDetails.getMetricsColumn());
+                if (value != null && !value.toString().equalsIgnoreCase("null")) {
+                  executionResultList.add(result);
+                }
+              } catch (Exception e) {
+                logger.error("Exception occured while converting the execution result" + e);
+              }
+            });
+        int executionSize = executionResultList.size();
+        if (executionSize > 0) {
+          logger.info(
+              "Threshold has reached for the alert rule id"
+                  + alertRuleDetails.getAlertRulesSysId());
+          alertResult.setAlertCount(executionSize);
+          connection.insert(alertResultId, alertResult);
+          logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
+          alertNotifier.sendNotification(alertRuleDetails);
+        }
       }
     }
     return true;
+  }
+
+  /**
+   * Method calculates lte and gte based on preset and then saves those values in sipQuery.
+   *
+   * @param sipQuery sipQuery
+   * @return sipQuery
+   */
+  public SipQuery getSipQueryWithCalculatedPresetCal(SipQuery sipQuery) {
+    List<Filter> filters = new ArrayList<>();
+    for (Filter eachFilter : sipQuery.getFilters()) {
+      if (eachFilter.getModel() != null) {
+        Model model = eachFilter.getModel();
+        DynamicConvertor dynamicConverter;
+        if (model.getPresetCal() != null) {
+          dynamicConverter =
+              BuilderUtil.getDynamicConvertForPresetCal(eachFilter.getModel().getPresetCal());
+          Model model1 = new Model();
+          model1.setGte(dynamicConverter.getGte());
+          model1.setLte(dynamicConverter.getLte());
+          eachFilter.setModel(model1);
+          filters.add(eachFilter);
+        } else if (model.getPreset() != null) {
+          dynamicConverter = BuilderUtil.dynamicDecipher(eachFilter.getModel().getPreset().value());
+          Model model1 = new Model();
+          model1.setGte(dynamicConverter.getGte());
+          model1.setLte(dynamicConverter.getLte());
+          eachFilter.setModel(model1);
+        } else {
+          filters.add(eachFilter);
+        }
+      } else {
+        filters.add(eachFilter);
+      }
+    }
+    sipQuery.setFilters(filters);
+    return sipQuery;
   }
 
   /**
@@ -104,12 +170,25 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     return restTemplate.postForObject(url, requestEntity, List.class);
   }
 
-  private List<AlertRuleDetails> fetchAlertDetailsByDataPod(String dataPodId) {
-    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
+  /**
+   * Fetches the alertRuledetails based on datapodId.
+   *
+   * @param dataPodId dataPodId
+   * @return list
+   */
+  public List<AlertRuleDetails> fetchAlertDetailsByDataPod(String dataPodId) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
-    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
+    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
+    ObjectNode node1 = objectMapper.createObjectNode();
+    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
     objectNode.put("datapodId", dataPodId);
+    ObjectNode node2 = objectMapper.createObjectNode();
+    ObjectNode objectNode1 = node2.putObject(MaprConnection.EQ);
+    objectNode1.put("activeInd", true);
+    arrayNode.add(node1);
+    arrayNode.add(node2);
+    MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     List<AlertRuleDetails> alertRuleDetails =
         connection.runMaprDbQueryWithFilter(
             node.toString(), null, null, null, AlertRuleDetails.class);

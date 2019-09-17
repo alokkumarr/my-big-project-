@@ -47,7 +47,9 @@ public class AlertCount {
 
   public enum GroupBy {
     STARTTIME("StartTime"),
-    SEVERITY("Severity");
+    SEVERITY("Severity"),
+    ATTRIBUTEVALUE("AttributeValue");
+
     private final String value;
     private static final Map<String, AlertCount.GroupBy> CONSTANTS =
         new HashMap<String, AlertCount.GroupBy>();
