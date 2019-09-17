@@ -38,7 +38,6 @@ export class AlertsViewComponent implements OnInit {
     chart: {
       type: 'bar'
     },
-    colors: ['#e4524c', '#ffbe00', '#24b18c', '#a5b7ce'],
     plotOptions: {
       series: {
         colorByPoint: true

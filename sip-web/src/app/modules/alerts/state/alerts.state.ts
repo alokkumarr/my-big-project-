@@ -34,6 +34,13 @@ const mapAlertCount2ChartData = map(countList => ({
   y: lodashMap(countList, ({ count }) => count)
 }));
 
+const severityColors = {
+  WARNING: '#a5b7ce',
+  LOW: '#24b18c',
+  MEDIUM: '#ffbe00',
+  CRITICAL: '#e4524c'
+};
+
 @State<AlertsStateModel>({
   name: 'alertsState',
   defaults: <AlertsStateModel>clone(defaultAlertsState)
@@ -111,7 +118,10 @@ export class AlertsState {
       .pipe(
         map(severityList => ({
           x: lodashMap(severityList, 'alertSeverity'),
-          y: lodashMap(severityList, 'count')
+          y: lodashMap(severityList, ({ alertSeverity, count }) => ({
+            color: severityColors[alertSeverity],
+            y: count
+          }))
         }))
       )
       .toPromise()
