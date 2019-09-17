@@ -67,21 +67,22 @@ public class ExportUtils {
     if (fields != null && !fields.isEmpty()) {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
+          String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               String columnName;
-              String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;;
+              String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
               if (aggregationName != null && "distinctcount".equalsIgnoreCase(aggregationName)) {
                 aggregationName = aggregationName.replace(aggregationName, "distinctCount");
               }
               if (split != null && split.length >= 2) {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
-                header.put(columnName.trim(), field.getAlias());
+                header.put(columnName.trim(), aliasName);
               } else {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
-                header.put(columnName.trim(), field.getAlias());
+                header.put(columnName.trim(), aliasName);
               }
               break;
             }
@@ -89,9 +90,9 @@ public class ExportUtils {
             if (field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               if (split != null && split.length >= 2) {
-                header.put(split[0], field.getAlias());
+                header.put(split[0], aliasName);
               } else {
-                header.put(field.getColumnName(), field.getAlias());
+                header.put(field.getColumnName(), aliasName);
               }
               break;
             }
@@ -179,7 +180,6 @@ public class ExportUtils {
   }
 
   public static String generateRandomStringDir() {
-    String dir = UUID.randomUUID().toString();
-    return dir;
+    return UUID.randomUUID().toString();
   }
 }
