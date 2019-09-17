@@ -218,7 +218,7 @@ public class AlertResult {
   }
 
   /**
-   * Gets customerCode
+   * Gets customerCode.
    *
    * @return value of customerCode
    */
