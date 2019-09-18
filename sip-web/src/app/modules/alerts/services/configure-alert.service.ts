@@ -124,9 +124,9 @@ export class ConfigureAlertService {
    * @memberof ConfigureAlertService
    */
   getAllAlerts(options): Promise<any> {
-    options.skip = options.skip || 1;
+    options.skip = options.skip || 0;
     options.take = options.take || 10;
-    const pageNumber = ceil(options.skip / options.take);
+    const pageNumber = ceil(options.skip / options.take) + 1;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
     const endpoint = `${this.api}/alerts${queryParams}`;
     return this.http.get<AllAlertsResponse>(endpoint).toPromise();
