@@ -2,6 +2,12 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
+export {
+  BETWEEN_NUMBER_FILTER_OPERATOR,
+  NUMBER_FILTER_OPERATORS,
+  NUMBER_FILTER_OPERATORS_OBJ
+} from '../../common/consts';
+
 export { NUMBER_TYPES, DATE_TYPES } from '../analyze/consts';
 
 export const ALERT_SEVERITY = [

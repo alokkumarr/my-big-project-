@@ -232,39 +232,11 @@
               <mat-error>This field is required</mat-error>
             </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Threshold value</mat-label>
-              <input
-                matInput
-                placeholder="Threshold Value"
-                formControlName="thresholdValue"
-                required
-                type="number"
-                step="any"
-                e2e="alertThresholdValue"
-              />
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.thresholdValue.hasError(
-                    'required'
-                  )
-                "
-                >This field is required</mat-error
-              >
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.thresholdValue.hasError(
-                    'pattern'
-                  )
-                "
-                >Only numbers are allowed for Threshold value.</mat-error
-              >
-            </mat-form-field>
             <mat-form-field
               appearance="outline"
               *ngIf="showOtherThresholdValue"
             >
-              <mat-label>Other threshold value</mat-label>
+              <mat-label>From</mat-label>
               <input
                 matInput
                 placeholder="Other threshold Value"
@@ -300,6 +272,36 @@
                 value.</mat-error
               >
             </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ thresholdValueLabel }}</mat-label>
+              <input
+                matInput
+                placeholder="Threshold Value"
+                formControlName="thresholdValue"
+                required
+                type="number"
+                step="any"
+                e2e="alertThresholdValue"
+              />
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.thresholdValue.hasError(
+                    'required'
+                  )
+                "
+                >This field is required</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.thresholdValue.hasError(
+                    'pattern'
+                  )
+                "
+                >Only numbers are allowed for Threshold value.</mat-error
+              >
+            </mat-form-field>
+
             <div
               fxFlex="45px"
               fxLayout="row"
