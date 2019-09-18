@@ -111,9 +111,9 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                           .equals(MonitoringType.CONTINUOUS_MONITORING)) {
                     if (!AlertUtils.checkThresholdsForRow(
                         alertRuleDetails.getOperator(),
-                        metricValue,
                         alertRuleDetails.getThresholdValue(),
-                        alertRuleDetails.getOtherThresholdValue())) {
+                        alertRuleDetails.getOtherThresholdValue(),
+                        metricValue)) {
                       alert.set(false);
                     }
                   }
@@ -121,7 +121,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                   executionResultList.add(value);
                 }
               } catch (Exception e) {
-                logger.error("Exception occurred while converting the execution result" + e);
+                logger.error("Exception occurred while converting the execution result " + e);
               }
             });
         int executionSize = executionResultList.size();
