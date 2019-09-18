@@ -56,7 +56,7 @@ function getXValue(point, fields, chartType) {
   const { x, g } = fields;
   const hasGroupBy = Boolean(g);
 
-  if(chartType === 'chart_scale') {
+  if (chartType === 'chart_scale') {
     return point.name;
   }
 
@@ -93,6 +93,16 @@ function getFieldLabelWithAggregateFun(field) {
   return field.alias || `${aggregate}(${field.displayName})`;
 }
 
+function getYValueBasedOnAggregate(field, point) {
+  switch (field.aggregate) {
+    case 'percentagebyrow':
+      return round(point.percentage, 2) + '%';
+
+    default:
+      return isUndefined(point.value) ? point.y : point.value;
+  }
+}
+
 /**
  * show axes labels and values
  * for x axis
@@ -116,13 +126,12 @@ export function getTooltipFormatter(fields, chartType) {
       <td><strong>${xLabel}:</strong></td>
       <td>${xValue}</td>
     </tr>`;
-
     const yLabel = fields.g
       ? getFieldLabelWithAggregateFun(fields.y[0])
       : seriesName;
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
-      <td>${isUndefined(point.value) ? point.y : point.value}</td>
+      <td>${getYValueBasedOnAggregate(fields.y[0], point)}</td>
     </tr>`;
 
     const zLabel = fields.z ? getFieldLabelWithAggregateFun(fields.z) : '';
