@@ -8346,7 +8346,7 @@ ts-node@7.0.0:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-tslib@^1.10.0:
+tslib@1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
   integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
@@ -8441,10 +8441,10 @@ typescript@3.2.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.4.tgz#c585cb952912263d915b462726ce244ba510ef3d"
   integrity sha512-0RNDbSdEokBeEAkgNbxJ+BLwSManFy9TeXz8uW+48j/xhEXv1ePME60olyzw2XzUqUBNAYFeJadIqAgNqIACwg==
 
-tz-lookup@^6.1.18:
-  version "6.1.24"
-  resolved "https://registry.yarnpkg.com/tz-lookup/-/tz-lookup-6.1.24.tgz#b23708f27c924d28cf00d40d834a3ccf8bcd0957"
-  integrity sha512-HdNjpzDk9nXTbHMGTzN7Dr0sueSudjOhYjMCKkXCUMZyrYMgERPcoRpZSAhzTv30vQMvMe/Z5fYOu95xWt6nLA==
+tz-lookup@6.1.18:
+  version "6.1.18"
+  resolved "https://registry.yarnpkg.com/tz-lookup/-/tz-lookup-6.1.18.tgz#4398a821268770a09b321f4120ce43e1450bba0d"
+  integrity sha512-vMzwXhSaSPwemOnFneref/Yp5RaQ7eCCmttoIx4bOzzRH2jbVXFTDvi6JL5/E/Gd5I6975awtEFXlowJ/5/wGA==
 
 uglify-js@^3.1.4:
   version "3.4.9"

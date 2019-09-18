@@ -43,6 +43,8 @@ import {
   getArtifactColumnGeneralType,
   getFilterTypes
 } from '../../utils';
+import { MatDialog } from '@angular/material';
+import { DerivedMetricComponent } from '../../derived-metric/derived-metric.component';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -101,7 +103,8 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   constructor(
     private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService,
-    private _store: Store
+    private _store: Store,
+    private dialog: MatDialog
   ) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
@@ -232,6 +235,21 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   onFilterChange(index) {
     this.filterObj.adapters[index] = !this.filterObj.adapters[index];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  openDerivedMetricDialog() {
+    const dialogRef = this.dialog.open(DerivedMetricComponent, {
+      width: '60%',
+      height: '60%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.artifactColumns.push(result);
+        this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+      }
+    });
   }
 
   addToGroup(

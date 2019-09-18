@@ -24,6 +24,7 @@
   grid-template:
     'filters' 80px
     'unselected-fields' 1fr
+    'derived-metric-trigger' 40px
     / 100%;
 }
 
@@ -94,6 +95,10 @@
     text-align: center;
     word-break: break-word;
   }
+}
+
+.settings__derived-metrics-trigger {
+  grid-area: derived-metric-trigger;
 }
 
 .settings__list {

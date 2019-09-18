@@ -75,6 +75,7 @@ const COMPONENTS = [
   ToolbarActionDialogComponent,
   DesignerSortComponent,
   DesignerDescriptionComponent,
+  DerivedMetricComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,
@@ -113,7 +114,7 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
     PerfectScrollbarModule,
     NgxsModule.forFeature([DesignerState])
   ],
-  declarations: [...COMPONENTS, ...PIPES, DerivedMetricComponent],
+  declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
   providers: [
     ...SERVICES,

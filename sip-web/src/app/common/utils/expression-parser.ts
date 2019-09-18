@@ -67,14 +67,7 @@ export class ExpressionError extends Error {
   }
 
   toString() {
-    switch (this.type) {
-      case ExpressionErrorType.StringParsingFailed:
-        return `Invalid expression string. ${this.message}`;
-      case ExpressionErrorType.JsonParsingFailed:
-        return `Invalid JSON can't be transformed to expression for display. ${this.message}`;
-      default:
-        return this.message;
-    }
+    return this.message;
   }
 }
 // #endregion
@@ -193,7 +186,7 @@ const fromJSON = (json: Expression): MathNode => {
 const validateOperator = (operator: Operator): string[] => {
   return Object.values(Operator).includes(operator)
     ? []
-    : [`Operator not supported: ${operator}.`];
+    : [`Operator not supported: ${operator}`];
 };
 
 const validateColumn = ({ column, aggregate }: ColumnExpression): string[] => {
@@ -205,7 +198,7 @@ const validateColumn = ({ column, aggregate }: ColumnExpression): string[] => {
 
   return aggregate &&
     !SUPPORTED_AGGREGATES.some(agg => agg === aggregate.toUpperCase())
-    ? [`Aggregate not supported: ${aggregate} for column: ${column}.`]
+    ? [`Aggregate not supported: ${aggregate} for column: ${column}`]
     : [];
 };
 
