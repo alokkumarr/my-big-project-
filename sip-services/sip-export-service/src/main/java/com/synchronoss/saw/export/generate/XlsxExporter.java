@@ -4,6 +4,7 @@ import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
 import com.synchronoss.saw.export.util.ExportUtils;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -128,20 +129,20 @@ public class XlsxExporter implements IFileExporter {
   /**
    * Added the cells in xlsx workbook with cell style.
    *
-   * @param fields
+   * @param sipQuery
    * @param exportBean
    * @param workBook
    * @param workSheet
    * @param recordRow
    */
   public void buildXlsxSheet(
-      List<Field> fields, ExportBean exportBean, Workbook workBook, SXSSFSheet workSheet, List<Object> recordRow, Long limitToExport) {
+      SipQuery sipQuery, ExportBean exportBean, Workbook workBook, SXSSFSheet workSheet, List<Object> recordRow, Long limitToExport) {
     logger.debug(this.getClass().getName() + " addXlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     String[] header = null;
     CellStyle cellStyle = workBook.createCellStyle();
-    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(fields);
+    Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
     for (int rowNum = 0; rowNum < recordRow.size() && recordRow.size() <= limitToExport; rowNum++) {
       SXSSFRow excelRow = workSheet.createRow(rowNum + 1);
       Object data = recordRow.get(rowNum);
