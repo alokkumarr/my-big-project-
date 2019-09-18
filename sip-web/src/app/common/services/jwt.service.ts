@@ -139,7 +139,7 @@ export class JwtService {
     const parsedJwt = this.parseJWT(this.get());
 
     // TODO remove alertsModule when it's added into saw_security DB
-    parsedJwt.ticket.products[0].productModules.push(ALERTS_MODULE_MENU);
+    // parsedJwt.ticket.products[0].productModules.push(ALERTS_MODULE_MENU);
 
     return parsedJwt;
   }

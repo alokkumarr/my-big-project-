@@ -14,10 +14,17 @@
   (onRowExpanding)="onRowExpanding($event.key)"
 >
   <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
-  <dxo-paging [pageSize]="50"></dxo-paging>
+  <dxo-paging
+    [pageSize]="DEFAULT_PAGE_SIZE"
+    [enabled]="enablePaging"
+    [pageIndex]="0"
+  ></dxo-paging>
   <dxo-pager
+    [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 25, 50]"
     [showPageSizeSelector]="true"
-    [allowedPageSizes]="[10, 25, 50]"
+    [showNavigationButtons]="true"
+    [showInfo]="true"
+    [visible]="enablePaging"
   ></dxo-pager>
   <dxo-selection mode="none"></dxo-selection>
   <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
@@ -47,6 +54,11 @@
     caption="Threshold Value"
     alignment="center"
     dataField="thresholdValue"
+  ></dxi-column>
+  <dxi-column
+    caption="Other threshold Value"
+    alignment="center"
+    dataField="otherThresholdValue"
   ></dxi-column>
 
   <div

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenav, MatDialog } from '@angular/material';
 import { SubscriptionLike } from 'rxjs';
@@ -10,12 +10,14 @@ import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 
+const DEFAULT_PAGE_SIZE = 10;
+
 @Component({
   selector: 'alerts-configuration',
   templateUrl: './alerts-configuration.component.html',
   styleUrls: ['./alerts-configuration.component.scss']
 })
-export class AlertsConfigurationComponent implements OnDestroy {
+export class AlertsConfigurationComponent implements OnInit, OnDestroy {
   public data;
   subscriptions: SubscriptionLike[] = [];
   addAlertPanelMode: 'side' | 'over' = 'side';
@@ -25,6 +27,8 @@ export class AlertsConfigurationComponent implements OnDestroy {
   alertDefInput: AlertDefinition = {
     action: 'create'
   };
+  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  public enablePaging = false;
 
   constructor(
     breakpointObserver: BreakpointObserver,
@@ -43,10 +47,13 @@ export class AlertsConfigurationComponent implements OnDestroy {
         }
       });
     this.subscriptions.push(breakpointObserverSub);
-    this.setAlertLoaderForGrid();
   }
 
   @ViewChild('alertSidenav') sidenav: MatSidenav;
+
+  ngOnInit() {
+    this.setAlertLoaderForGrid();
+  }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
@@ -99,12 +106,16 @@ export class AlertsConfigurationComponent implements OnDestroy {
   }
 
   setAlertLoaderForGrid() {
-    const alertsDataLoader = options => {
-      return this._configureAlertService.getAllAlerts(options).then(result => ({
-        data: result.alertRuleDetailsList,
-        totalCount: result.numberOfRecords
-      }));
-    };
+    const alertsDataLoader = options =>
+      this._configureAlertService
+        .getAllAlerts(options)
+        .then(({ alertRuleDetailsList, numberOfRecords }) => {
+          this.enablePaging = numberOfRecords > DEFAULT_PAGE_SIZE;
+          return {
+            data: alertRuleDetailsList,
+            totalCount: numberOfRecords
+          };
+        });
 
     this.data = new CustomStore({
       load: options => alertsDataLoader(options)

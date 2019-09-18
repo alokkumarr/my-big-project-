@@ -4,6 +4,8 @@ import CustomStore from 'devextreme/data/custom_store';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { GridData, AlertIds } from '../../../alerts.interface';
 
+const DEFAULT_PAGE_SIZE = 10;
+
 @Component({
   selector: 'alerts-grid',
   templateUrl: './alerts-grid.component.html',
@@ -11,17 +13,14 @@ import { GridData, AlertIds } from '../../../alerts.interface';
 })
 export class AlertsGridComponent implements OnInit {
   public remoteOperations = {};
-  public pager = {
-    showNavigationButtons: true,
-    allowedPageSizes: [25, 50, 75, 100],
-    showPageSizeSelector: true
-  };
   data: any = {};
   alertsDataLoader: (options: {}) => Promise<{
     data: any[];
     totalCount: number;
   }>;
   selectedAlertIds: AlertIds;
+  public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  public enablePaging = false;
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
@@ -34,7 +33,11 @@ export class AlertsGridComponent implements OnInit {
     if (isFunction(alertsDataLoader)) {
       this.alertsDataLoader = alertsDataLoader;
       this.data = new CustomStore({
-        load: options => this.alertsDataLoader(options),
+        load: options =>
+          this.alertsDataLoader(options).then(result => {
+            this.enablePaging = result.totalCount > DEFAULT_PAGE_SIZE;
+            return result;
+          }),
         key: ['alertTriggerSysId', 'alertRulesSysId']
       });
     } else {

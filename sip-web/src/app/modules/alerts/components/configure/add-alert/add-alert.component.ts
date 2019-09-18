@@ -35,6 +35,8 @@ import { map, tap } from 'rxjs/operators';
 
 const LAST_STEP_INDEX = 3;
 
+const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
+
 const notificationsOptions = [
   {
     value: 'email',
@@ -114,8 +116,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   transformAlertToFormObject(alert) {
-    const { notification: notificationsFromBackend, lookbackPeriod } = alert;
-
+    const {
+      notification: notificationsFromBackend,
+      lookbackPeriod,
+      aggregationType
+    } = alert;
     const [stringValue, lookbackPeriodType] = split(lookbackPeriod, '-');
     const lookbackPeriodValue = parseInt(stringValue, 10);
 
@@ -130,10 +135,16 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     );
 
     return {
-      ...omit(alert, ['notification', 'lookbackPeriod', 'sipQuery']),
+      ...omit(alert, [
+        'notification',
+        'lookbackPeriod',
+        'sipQuery',
+        'aggregate'
+      ]),
       lookbackPeriodType,
       lookbackPeriodValue,
       notification,
+      aggregationType: aggregationType || 'none',
       notificationEmails
     };
   }
@@ -161,11 +172,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
     const thresholdValuevalidators = [
       Validators.required,
-      Validators.pattern('^-?[0-9]*$')
+      Validators.pattern(floatingPointRegex)
     ];
     const otherThresholdValuevalidators = [
       Validators.required,
-      Validators.pattern('^-?[0-9]*$'),
+      Validators.pattern(floatingPointRegex),
       lessThan('thresholdValue')
     ];
     this.alertMetricFormGroup = this._formBuilder.group({
