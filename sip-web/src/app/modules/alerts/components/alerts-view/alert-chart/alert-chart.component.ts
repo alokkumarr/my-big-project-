@@ -12,15 +12,12 @@ import { AlertChartData } from '../../../alerts.interface';
   styleUrls: ['alert-chart.component.scss']
 })
 export class AlertChartComponent implements OnInit {
-  @ViewChild('container') container: ElementRef;
+  @ViewChild('container', { static: true }) container: ElementRef;
 
   @Input() title: string;
   @Input() dateFilter: string;
   @Input() additionalOptions: object;
   @Input('chartData') set setChartData(chartData: AlertChartData) {
-    if (!this.chart) {
-      return;
-    }
     const series = [
       {
         name: this.title,
@@ -28,12 +25,12 @@ export class AlertChartComponent implements OnInit {
       }
     ];
     const xAxis = { categories: chartData.x };
-
-    // this.chart.update({ series, xAxis }, true);
-    this.chart = Highcharts.chart(
-      this.container.nativeElement,
-      defaultsDeep({ series, xAxis }, this.chartOptions)
-    );
+    setTimeout(() => {
+      this.chart = Highcharts.chart(
+        this.container.nativeElement,
+        defaultsDeep({ series, xAxis }, this.chartOptions)
+      );
+    }, 100);
   }
 
   public chart;
@@ -45,6 +42,10 @@ export class AlertChartComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.initializeChart();
+  }
+
+  initializeChart() {
     this.chartOptions = defaultsDeep(this.additionalOptions, {
       width: '100%',
       height: '100%',
@@ -67,10 +68,5 @@ export class AlertChartComponent implements OnInit {
         }
       ]
     });
-
-    this.chart = Highcharts.chart(
-      this.container.nativeElement,
-      this.chartOptions
-    );
   }
 }

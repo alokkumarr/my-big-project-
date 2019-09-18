@@ -98,15 +98,13 @@
         ></dxi-column>
         <dxi-column dataField="datapodName"></dxi-column>
         <dxi-column caption="Metric" dataField="metricsColumn"></dxi-column>
-        <dxi-column dataField="operator"></dxi-column>
         <dxi-column
           dataField="aggregationType"
           cellTemplate="aggregationTemplate"
         ></dxi-column>
-        <dxi-column dataField="thresholdValue" alignment="center"></dxi-column>
         <dxi-column
-          dataField="otherThresholdValue"
-          alignment="center"
+          caption="Alert Condition"
+          cellTemplate="alertConditionTemplate"
         ></dxi-column>
         <dxi-column
           caption="Is Active"
@@ -174,6 +172,25 @@
           fxLayoutAlign="center center"
         >
           {{ cell.value || 'None' }}
+        </div>
+
+        <div *dxTemplate="let cell of 'alertConditionTemplate'">
+          <div *ngIf="cell.data.operator !== 'BTW'; else isBetween">
+            {{
+              NUMBER_FILTER_OPERATORS_OBJ[cell.data.operator]?.label +
+                ' ' +
+                cell.data.thresholdValue
+            }}
+          </div>
+          <ng-template #isBetween>
+            {{
+              NUMBER_FILTER_OPERATORS_OBJ[cell.data.operator]?.label +
+                ' ' +
+                cell.data.otherThresholdValue +
+                ' and ' +
+                cell.data.thresholdValue
+            }}
+          </ng-template>
         </div>
 
         <div

@@ -61,6 +61,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   operators$;
   aggregations$;
   notifications$;
+  thresholdValueLabel: string;
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
@@ -235,9 +236,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
             otherThresholdValuevalidators
           );
           otherThresholdValueControl.updateValueAndValidity();
+          this.thresholdValueLabel = 'To';
         } else {
           otherThresholdValueControl.clearValidators();
           otherThresholdValueControl.reset();
+          this.thresholdValueLabel = 'Threshold value';
         }
       });
   }

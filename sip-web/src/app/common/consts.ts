@@ -499,3 +499,41 @@ export const PRODUCT_MODULE_MOCK_MENU = {
     }
   ]
 };
+
+export const BETWEEN_NUMBER_FILTER_OPERATOR = {
+  value: 'BTW',
+  label: 'Between'
+};
+
+export const NUMBER_FILTER_OPERATORS = [
+  {
+    value: 'GT',
+    label: 'Greater than'
+  },
+  {
+    value: 'LT',
+    label: 'Less than'
+  },
+  {
+    value: 'GTE',
+    label: 'Greater than or equal to'
+  },
+  {
+    value: 'LTE',
+    label: 'Less than or equal to'
+  },
+  {
+    value: 'EQ',
+    label: 'Equal to'
+  },
+  {
+    value: 'NEQ',
+    label: 'Not equal to'
+  },
+  BETWEEN_NUMBER_FILTER_OPERATOR
+];
+
+export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(NUMBER_FILTER_OPERATORS);

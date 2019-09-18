@@ -9,6 +9,7 @@ import { ConfirmActionDialogComponent } from '../confirm-action-dialog/confirm-a
 import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
+import { NUMBER_FILTER_OPERATORS_OBJ } from '../../../consts';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -28,6 +29,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
     action: 'create'
   };
   public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  public NUMBER_FILTER_OPERATORS_OBJ = NUMBER_FILTER_OPERATORS_OBJ;
   public enablePaging = false;
 
   constructor(
