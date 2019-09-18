@@ -9,10 +9,10 @@ import { AlertChartData } from '../../../alerts.interface';
 @Component({
   selector: 'alert-chart',
   templateUrl: 'alert-chart.component.html',
-  styleUrls: ['alert-chart.component.scss'],
+  styleUrls: ['alert-chart.component.scss']
 })
 export class AlertChartComponent implements OnInit {
-  @ViewChild('container', { static: true }) container: ElementRef;
+  @ViewChild('container') container: ElementRef;
 
   @Input() title: string;
   @Input() dateFilter: string;
@@ -24,15 +24,15 @@ export class AlertChartComponent implements OnInit {
     const series = [
       {
         name: this.title,
-        data: chartData.y,
-      },
+        data: chartData.y
+      }
     ];
     const xAxis = { categories: chartData.x };
 
     // this.chart.update({ series, xAxis }, true);
     this.chart = Highcharts.chart(
       this.container.nativeElement,
-      defaultsDeep({ series, xAxis }, this.chartOptions),
+      defaultsDeep({ series, xAxis }, this.chartOptions)
     );
   }
 
@@ -53,24 +53,24 @@ export class AlertChartComponent implements OnInit {
       xAxis: {
         type: 'datetime',
         categories: [],
-        gridLineWidth: 1,
+        gridLineWidth: 1
       },
       credits: false,
       exporting: { enabled: false },
       yAxis: {
-        title: '',
+        title: ''
       },
       series: [
         {
           name: this.title,
-          data: [],
-        },
-      ],
+          data: []
+        }
+      ]
     });
 
     this.chart = Highcharts.chart(
       this.container.nativeElement,
-      this.chartOptions,
+      this.chartOptions
     );
   }
 }

@@ -66,6 +66,20 @@
         [showRowLines]="false"
         [rowAlternationEnabled]="true"
       >
+        <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
+        <dxo-paging
+          [pageSize]="DEFAULT_PAGE_SIZE"
+          [enabled]="enablePaging"
+          [pageIndex]="0"
+        ></dxo-paging>
+        <dxo-pager
+          [allowedPageSizes]="[DEFAULT_PAGE_SIZE, 25, 50]"
+          [showPageSizeSelector]="true"
+          [showNavigationButtons]="true"
+          [showInfo]="true"
+          [visible]="enablePaging"
+        ></dxo-pager>
+
         <dxo-selection mode="none"></dxo-selection>
         <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
         <dxo-search-panel
@@ -73,7 +87,6 @@
           [width]="220"
           placeholder="Search..."
         ></dxo-search-panel>
-        <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
         <dxi-column caption="Alert Name" dataField="alertRuleName"></dxi-column>
         <dxi-column
           caption="Alert Description"
@@ -87,8 +100,15 @@
         <dxi-column dataField="datapodName"></dxi-column>
         <dxi-column caption="Metric" dataField="metricsColumn"></dxi-column>
         <dxi-column dataField="operator"></dxi-column>
-        <dxi-column dataField="aggregationType"></dxi-column>
+        <dxi-column
+          dataField="aggregationType"
+          cellTemplate="aggregationTemplate"
+        ></dxi-column>
         <dxi-column dataField="thresholdValue" alignment="center"></dxi-column>
+        <dxi-column
+          dataField="otherThresholdValue"
+          alignment="center"
+        ></dxi-column>
         <dxi-column
           caption="Is Active"
           dataField="activeInd"
@@ -147,6 +167,14 @@
           >
             <mat-icon fontIcon="icon-edit"></mat-icon>
           </button>
+        </div>
+
+        <div
+          *dxTemplate="let cell of 'aggregationTemplate'"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+        >
+          {{ cell.value || 'None' }}
         </div>
 
         <div
