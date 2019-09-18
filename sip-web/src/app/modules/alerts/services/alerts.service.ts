@@ -45,9 +45,9 @@ export class AlertsService {
   }
 
   getAlertsStatesForGrid(options: GridPagingOptions = {}) {
-    options.skip = options.skip || 1;
+    options.skip = options.skip || 0;
     options.take = options.take || 10;
-    const pageNumber = ceil(options.skip / options.take);
+    const pageNumber = ceil(options.skip / options.take) + 1;
 
     const basePath = `alerts/states`;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
