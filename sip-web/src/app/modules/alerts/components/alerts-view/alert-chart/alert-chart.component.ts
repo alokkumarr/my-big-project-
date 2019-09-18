@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as Highcharts from 'highcharts/highcharts';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as defaultsDeep from 'lodash/defaultsDeep';
@@ -9,14 +9,14 @@ import { AlertChartData } from '../../../alerts.interface';
 @Component({
   selector: 'alert-chart',
   templateUrl: 'alert-chart.component.html',
-  styleUrls: ['alert-chart.component.scss']
+  styleUrls: ['alert-chart.component.scss'],
 })
 export class AlertChartComponent implements OnInit {
-  @ViewChild('container') container: ElementRef;
+  @ViewChild('container', { static: true }) container: ElementRef;
 
   @Input() title: string;
   @Input() dateFilter: string;
-  @Input() additionalOptions: Object;
+  @Input() additionalOptions: object;
   @Input('chartData') set setChartData(chartData: AlertChartData) {
     if (!this.chart) {
       return;
@@ -24,12 +24,16 @@ export class AlertChartComponent implements OnInit {
     const series = [
       {
         name: this.title,
-        data: chartData.y
-      }
+        data: chartData.y,
+      },
     ];
     const xAxis = { categories: chartData.x };
 
-    this.chart.update({ series, xAxis }, true);
+    // this.chart.update({ series, xAxis }, true);
+    this.chart = Highcharts.chart(
+      this.container.nativeElement,
+      defaultsDeep({ series, xAxis }, this.chartOptions),
+    );
   }
 
   public chart;
@@ -49,24 +53,24 @@ export class AlertChartComponent implements OnInit {
       xAxis: {
         type: 'datetime',
         categories: [],
-        gridLineWidth: 1
+        gridLineWidth: 1,
       },
       credits: false,
       exporting: { enabled: false },
       yAxis: {
-        title: ''
+        title: '',
       },
       series: [
         {
           name: this.title,
-          data: []
-        }
-      ]
+          data: [],
+        },
+      ],
     });
 
     this.chart = Highcharts.chart(
       this.container.nativeElement,
-      this.chartOptions
+      this.chartOptions,
     );
   }
 }

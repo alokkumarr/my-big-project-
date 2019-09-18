@@ -18,7 +18,7 @@ const confAlertServiceStub = {
     return new Observable();
   },
   getAllAlerts: async () => {
-    return new Observable();
+    return Promise.resolve();
   }
 };
 const alertDefinitionStub: AlertDefinition = {
