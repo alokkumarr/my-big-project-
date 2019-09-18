@@ -56,6 +56,7 @@ import {
   PerfectScrollbarConfigInterface,
   PERFECT_SCROLLBAR_CONFIG
 } from 'ngx-perfect-scrollbar';
+import { DerivedMetricComponent } from './derived-metric/derived-metric.component';
 export { DesignerPageComponent, DesignerService };
 
 const COMPONENTS = [
@@ -112,7 +113,7 @@ const PIPES = [ArtifactColumns2PivotFieldsPipe];
     PerfectScrollbarModule,
     NgxsModule.forFeature([DesignerState])
   ],
-  declarations: [...COMPONENTS, ...PIPES],
+  declarations: [...COMPONENTS, ...PIPES, DerivedMetricComponent],
   entryComponents: COMPONENTS,
   providers: [
     ...SERVICES,
