@@ -4,7 +4,9 @@ import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.export.generate.ExportServiceImpl;
 import com.synchronoss.saw.export.generate.XlsxExporter;
 import com.synchronoss.saw.export.model.DataResponse;
+import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.SipQuery;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -30,6 +32,7 @@ public class XlsxExporterTest {
   static Long LimittoExport = Long.valueOf(50000);
   XlsxExporter xlsxExporter;
   private List<Field> fields = new LinkedList<>();
+  private SipQuery sipQuery = new SipQuery();
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporterTest.class);
 
   @Before
@@ -97,6 +100,13 @@ public class XlsxExporterTest {
     field.setColumnName("integer");
     field.setVisibleIndex(2);
     fields.add(field);
+
+    Artifact artifact = new Artifact();
+    artifact.setFields(fields);
+    List<Artifact> artifactList = new ArrayList<>();
+    artifactList.add(artifact);
+
+    sipQuery.setArtifacts(artifactList);
   }
 
   @Test
@@ -104,7 +114,7 @@ public class XlsxExporterTest {
     Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
-    xlsxExporter.buildXlsxSheet(fields, exportBean, workBook, sheet, dataResponse.getData(), 3l);
+    xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, dataResponse.getData(), 3l);
     assertEquals(sheet.getPhysicalNumberOfRows(), 4);
   }
 
@@ -113,7 +123,7 @@ public class XlsxExporterTest {
     ExportServiceImpl exportService = new ExportServiceImpl();
     try {
       assertEquals(
-          exportService.streamToXlsxReport(fields, dataResponse, LimittoExport, exportBean), Boolean.TRUE);
+          exportService.streamToXlsxReport(sipQuery, dataResponse, LimittoExport, exportBean), Boolean.TRUE);
     } catch (IOException e) {
       logger.error(
           this.getClass().getName()
