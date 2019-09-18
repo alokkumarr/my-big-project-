@@ -134,7 +134,7 @@ export interface DesignerChangeEvent {
     | 'artifactPosition'
     | 'column'
     | 'removeColumn'
-    | 'visibleIndex'
+    | 'reorder'
     | 'submitQuery'
     | 'chartTitle'
     | 'fetchLimit'

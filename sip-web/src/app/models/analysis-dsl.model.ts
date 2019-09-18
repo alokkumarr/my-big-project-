@@ -20,6 +20,7 @@ export interface ArtifactColumnDSL {
   displayName: string;
   groupInterval: string;
   limitType?: string; // todo
+  visibleIndex?: number;
   limitValue?: any; // todo
   name: string;
   type: string;

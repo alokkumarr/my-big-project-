@@ -10,8 +10,6 @@ import sncr.bda.conf.Input;
 import sncr.bda.conf.Output;
 import sncr.bda.conf.Parameter;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.context.Context;
-import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.*;
@@ -31,6 +29,7 @@ public class NGSQLScriptDescriptor {
     private final String transactionalLocation;
     private final NGContext ctx;
     private String script;
+    private String withRegex = "\\bwith\\b";
 
     public String getScript() { return script; }
 
@@ -206,22 +205,19 @@ public class NGSQLScriptDescriptor {
                             String s = stmt.toString().toLowerCase();
                             int pos = -1;
 
-
-                            /**
-                             * Fix for SIP-7744.  To avoid
-                             * splitting queries which has key word 'WITH'
-                             * any where in middle. Using trim to be
-                             * safe with leading empty spaces
-                             */
-                            if(s.trim().startsWith("with")) {
-                                pos = s.indexOf("with");
+                            Pattern pattern = Pattern.compile(withRegex, Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(s.trim());
+                            while(matcher.find()) {
+                                pos = matcher.start();
                             }
-                            // pos = s.indexOf("with");
-                            if(pos < 0)
+
+                            if(pos < 0) {
                                 pos = s.indexOf("select");
+                            }
                             if (pos < 0)
                                 throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
                             sqlDesc.SQL = stmt.toString().substring(pos);
+                            logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
                             sqlDesc.tableDescriptor = targetTable;
                         }
                     break;
