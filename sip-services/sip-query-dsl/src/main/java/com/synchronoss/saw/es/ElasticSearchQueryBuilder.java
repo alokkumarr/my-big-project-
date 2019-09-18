@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -76,10 +78,12 @@ public class ElasticSearchQueryBuilder {
 
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
+    List <Filter> aggregationFilter = SIPAggregationBuilder.getAggregationFilter(sipQuery.getFilters());
 
     // Generated Query
     searchSourceBuilder =
-        buildAggregations(dataFields, aggregationFields, searchSourceBuilder, size,sipQuery.getSorts());
+        buildAggregations(dataFields, aggregationFields,aggregationFilter, searchSourceBuilder,
+            size,sipQuery.getSorts());
     return searchSourceBuilder.toString();
   }
 
@@ -213,6 +217,7 @@ public class ElasticSearchQueryBuilder {
   public SearchSourceBuilder buildAggregations(
       List<Field> dataFields,
       List<Field> aggregationFields,
+      List<Filter> aggregationFilter,
       SearchSourceBuilder searchSourceBuilder,
       Integer size,
       List<Sort> sorts) {
@@ -230,7 +235,7 @@ public class ElasticSearchQueryBuilder {
       } else {
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, 0, 0, aggregationBuilder,sorts);
+                dataFields, aggregationFields, aggregationFilter,0, 0, aggregationBuilder,sorts);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
@@ -247,7 +252,9 @@ public class ElasticSearchQueryBuilder {
   public List<QueryBuilder> buildFilters(List<Filter> filters, List<QueryBuilder> builder) {
     for (Filter item : filters) {
       if ((item.getIsRuntimeFilter() == null || !item.getIsRuntimeFilter())
-          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())) {
+          && (item.getIsGlobalFilter() == null || !item.getIsGlobalFilter())
+          // skip the Aggregated filter since it will added based on aggregated data.
+          && (item.getAggregationFilter() == null || !item.getAggregationFilter())) {
 
         if (item.getType().value().equals(Filter.Type.DATE.value())
             || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
@@ -260,6 +267,16 @@ public class ElasticSearchQueryBuilder {
               rangeQueryBuilder.format(DATE_FORMAT);
             }
 
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
+          } else if (item.getModel().getPresetCal() != null) {
+            DynamicConvertor dynamicConvertor =
+                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            if (item.getType().value().equals(Filter.Type.DATE.value())) {
+              rangeQueryBuilder.format(DATE_FORMAT);
+            }
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
@@ -436,6 +453,17 @@ public class ElasticSearchQueryBuilder {
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
 
+          } else if (item.getModel().getPresetCal() != null
+              && !StringUtils.isEmpty(item.getModel().getPresetCal())) {
+            DynamicConvertor dynamicConvertor =
+                BuilderUtil.getDynamicConvertForPresetCal(item.getModel().getPresetCal());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            if (item.getType().value().equals(Filter.Type.DATE.value())) {
+              rangeQueryBuilder.format(DATE_FORMAT);
+            }
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
           } else {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if (item.getType().value().equals(Filter.Type.DATE.value())) {
@@ -497,7 +525,7 @@ public class ElasticSearchQueryBuilder {
         dataField -> {
           String columnName = dataField.getColumnName();
           if (dataField.getAggregate() != null
-              && dataField.getAggregate().equals(Field.Aggregate.PERCENTAGE))
+              && dataField.getAggregate().equals(Aggregate.PERCENTAGE))
             dataField
                 .getAdditionalProperties()
                 .put(

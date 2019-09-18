@@ -87,7 +87,7 @@ import {
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
-  DesignerResetState,
+  // DesignerResetState,
   DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
@@ -168,8 +168,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // this._store.dispatch(new DesignerResetState());
     this.subscriptions.forEach(s => s.unsubscribe());
-    this._store.dispatch(new DesignerResetState());
   }
 
   ngOnInit() {
@@ -346,8 +346,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         !filtr.isGlobalFilter &&
         (filtr.type === 'date' && filtr.model.operator === 'BTW')
       ) {
-        filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
-        filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
+        filtr.model.gte = moment(filtr.model.value, 'MM-DD-YYYY').format(
+          'YYYY-MM-DD'
+        );
+        filtr.model.lte = moment(filtr.model.otherValue, 'MM-DD-YYYY').format(
+          'YYYY-MM-DD'
+        );
         filtr.model.preset = CUSTOM_DATE_PRESET_VALUE;
       }
     });

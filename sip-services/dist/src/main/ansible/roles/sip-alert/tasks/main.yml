@@ -1,0 +1,13 @@
+- name: Copy SIP Alert Service package
+  copy: src="{{ item }}" dest=/tmp/sip-alert.rpm
+  with_fileglob: ["../rpms/sip-alert-*.rpm"]
+- name: Install SIP Alert Service package
+  yum: name=/tmp/sip-alert.rpm state=present
+  notify:
+    - restart sip-alert
+- name: Install SIP alert Service configuration file
+  template: src=application.yml dest=/opt/bda/sip-alert-service/conf
+  notify:
+    - restart sip-alert
+- name: Enable SIP Alert Service
+  systemd: name=sip-alert-proxy.socket enabled=true state=started

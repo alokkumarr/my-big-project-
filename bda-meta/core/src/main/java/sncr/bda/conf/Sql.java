@@ -93,6 +93,30 @@ public class Sql {
         this.scriptLocation = scriptLocation;
     }
 
+    /**
+     * Alert configuration for the component.
+     *
+     */
+    @SerializedName("alert")
+    @Expose
+    private Alert alerts;
+
+    /**
+     * Gets alerts
+     *
+     * @return value of alerts
+     */
+    public Alert getAlerts() {
+        return alerts;
+    }
+
+    /**
+     * Sets alerts
+     */
+    public void setAlerts(Alert alerts) {
+        this.alerts = alerts;
+    }
+
     public Sql withScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
         return this;

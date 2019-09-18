@@ -1,0 +1,35 @@
+@import 'src/themes/base/colors';
+
+:host {
+  width: 100%;
+  max-width: 100% !important;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  padding-bottom: 3px;
+}
+
+.alerts-grid {
+  &__gridIcon {
+    font-size: 11px;
+    height: 12px;
+    width: 15px;
+    line-height: 14px;
+  }
+
+  .WARNING {
+    color: $primary-warning;
+  }
+
+  .LOW {
+    color: $secondary-green;
+  }
+
+  .MEDIUM {
+    color: $secondary-yellow;
+  }
+
+  .CRITICAL {
+    color: $secondary-red;
+  }
+}

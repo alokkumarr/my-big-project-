@@ -1,15 +1,16 @@
 package sncr.bda.base;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
 import org.ojai.store.Connection;
@@ -22,17 +23,75 @@ import org.slf4j.LoggerFactory;
 
 public class MaprConnection {
 
+  public static final String EQ = "$eq";
+  public static final String AND = "$and";
+  public static final String GTE = "$ge";
+  public static final String LTE = "$le";
+  public static final String GT = "$gt";
+  public static final String LT = "$lt";
+  protected static final String METASTORE = "services/metadata";
   private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
-
+  private static final String OJAI_MAPR = "ojai:mapr:";
   private DocumentStore store;
   private Connection connection;
-  private static final String OJAI_MAPR = "ojai:mapr:";
-  protected static final String METASTORE = "services/metadata";
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   public MaprConnection(String basePath, String tableName) {
     // Create an OJAI connection to MapR cluster
     connection = DriverManager.getConnection(OJAI_MAPR);
-    store = connection.getStore(basePath + File.separator + METASTORE + File.separator + tableName);
+    String storeName = basePath + File.separator + METASTORE + File.separator + tableName;
+    if (!connection.storeExists(storeName)) {
+      connection.createStore(storeName);
+    }
+    store = connection.getStore(storeName);
+  }
+
+  /**
+   * This method will insert the document in maprDB.
+   *
+   * @param id Document Id
+   * @param rowData Row Data
+   */
+  public void insert(String id, Object rowData) {
+    Document document = connection.newDocument(rowData);
+    store.insert(id, document);
+  }
+
+  /**
+   * This method will update the document in maprDB.
+   *
+   * @param id Document Id
+   * @param rowData Row Data
+   */
+  public void update(String id, Object rowData) {
+    Document document = connection.newDocument(rowData);
+    store.replace(id, document);
+  }
+
+  /**
+   * Find by document ID.
+   *
+   * @param documentId
+   * @return
+   */
+  public JsonNode findById(String documentId) {
+    Document document = store.findById(documentId);
+    try {
+      return objectMapper.readTree(document.asJsonString());
+    } catch (IOException e) {
+      throw new RuntimeException("error occurred while reading the documents", e);
+    }
+  }
+
+  /**
+   * by document ID.
+   *
+   * @param documentId
+   * @return
+   */
+  public boolean deleteById(String documentId) {
+    store.delete(documentId);
+    return true;
   }
 
   /**
@@ -49,7 +108,6 @@ public class MaprConnection {
     final Query query = getQuery(select, filter, orderBy, limit);
     final DocumentStream stream = store.find(query);
     List<JsonNode> resultSet = new ArrayList<>();
-    ObjectMapper objectMapper = new ObjectMapper();
     for (final Document document : stream) {
       try {
         resultSet.add(objectMapper.readTree(document.asJsonString()));
@@ -79,6 +137,93 @@ public class MaprConnection {
     }
 
     return query;
+  }
+
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param filter
+   * @param pageNumber
+   * @param pageSize
+   * @param orderBy
+   * @param classType
+   * @return list
+   */
+  public <T> List<T> runMaprDbQueryWithFilter(
+      String filter, Integer pageNumber, Integer pageSize, String orderBy, Class<T> classType) {
+    List<T> resultSet = new ArrayList<>();
+    Query query;
+    if (pageNumber != null && pageSize != null) {
+      int documentsToskip = (pageNumber - 1) * pageSize;
+      query =
+          connection
+              .newQuery()
+              .orderBy(orderBy, SortOrder.DESC)
+              .offset(documentsToskip)
+              .limit(pageSize)
+              .where(filter)
+              .build();
+    } else {
+      query = connection.newQuery().where(filter).build();
+    }
+    LOGGER.debug("Mapr Query with filer:{}", query);
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    DocumentStream stream = store.find(query);
+    for (final Document document : stream) {
+      try {
+        resultSet.add(objectMapper.readValue(document.asJsonString(), classType));
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * Run mapr db query with specific fields.
+   *
+   * @param filter
+   * @param orderBy
+   * @return list
+   */
+  public List<JsonNode> runMaprDbQueryWithFilter(String filter, String orderBy) {
+    final Query query =
+        connection.newQuery().orderBy(orderBy, SortOrder.DESC).where(filter).build();
+
+    final DocumentStream stream = store.find(query);
+    List<JsonNode> resultSet = new ArrayList<>();
+    Integer count = 0;
+    for (final Document document : stream) {
+      try {
+        resultSet.add(objectMapper.readTree(document.asJsonString()));
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
+   * calculates count for a query with or withour filters.
+   *
+   * @param filter
+   * @return count of no of documents
+   */
+  public Long runMapDbQueryForCount(String filter) {
+    final Query query;
+    if (filter != null) {
+      query = connection.newQuery().select("_id").where(filter).build();
+    } else {
+      query = connection.newQuery().select("_id").build();
+    }
+    Long countOfDocuments = 0L;
+    final DocumentStream stream = store.find(query);
+    Iterator<Document> itr = stream.iterator();
+    while (itr.hasNext()) {
+      itr.next();
+      countOfDocuments++;
+    }
+    return countOfDocuments;
   }
 
   /**
