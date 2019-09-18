@@ -26,3 +26,4 @@ init_datalake
 load_data
 wait_semantic_service
 insert_json_store_sample $sample_location/sample-spark/sample-data-spark.json
+insert_json_store_sample $sample_location/sample-spark/sample-data-spark-att.json

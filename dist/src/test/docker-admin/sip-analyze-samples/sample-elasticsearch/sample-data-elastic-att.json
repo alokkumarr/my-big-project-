@@ -126,8 +126,8 @@
     }
   ],
   "createdBy": "sipadmin@synchronoss.com",
-  "customerCode": "SYNCHRONOSS",
-  "metricName": "sample-elasticsearch",
+  "customerCode": "ATT",
+  "metricName": "sample-elasticsearch-att",
   "esRepository": {
     "indexName": "sampleAlias",
     "storageType": "ES",
