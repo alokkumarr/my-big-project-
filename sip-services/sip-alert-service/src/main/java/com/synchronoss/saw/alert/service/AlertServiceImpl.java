@@ -10,7 +10,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.alert.modal.AlertCount;
-import com.synchronoss.saw.alert.modal.AlertCount.GroupBy;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
@@ -90,7 +89,6 @@ public class AlertServiceImpl implements AlertService {
     MaprConnection connection = new MaprConnection(basePath, alertRulesMetadata);
     String id = UUID.randomUUID().toString();
     alert.setAlertRulesSysId(id);
-    alert.setCustomerCode(ticket.getCustCode());
     Long createdTime = System.currentTimeMillis();
     alert.setCreatedTime(createdTime);
     alert.setCreatedBy(ticket.getUserFullName());
@@ -450,9 +448,9 @@ public class AlertServiceImpl implements AlertService {
   private List<AlertCountResponse> groupByAttributeValue(List<AlertResult> list) {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<String, Long> groupByAttribute =
-        list.stream().filter((alertResult -> alertResult.getAttributeValue()!=null))
-            .collect(Collectors.groupingBy(AlertResult::getAttributeValue,
-                Collectors.counting()));
+        list.stream()
+            .filter((alertResult -> alertResult.getAttributeValue() != null))
+            .collect(Collectors.groupingBy(AlertResult::getAttributeValue, Collectors.counting()));
     groupByAttribute.forEach(
         (attributeValue, count) -> {
           AlertCountResponse countResponse =

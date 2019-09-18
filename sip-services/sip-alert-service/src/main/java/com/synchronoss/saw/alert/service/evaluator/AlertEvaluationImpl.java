@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertState;
+import com.synchronoss.saw.alert.modal.MonitoringType;
 import com.synchronoss.saw.alert.service.AlertNotifier;
+import com.synchronoss.saw.alert.util.AlertUtils;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.SIPDSL;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -61,7 +64,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
    * @throws Exception if unbale to create the stream.
    */
   @PostConstruct
-  public void init() throws Exception {
+  public void init() {
     restTemplate = restUtil.restTemplate();
   }
 
@@ -74,6 +77,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
       AlertResult alertResult = new AlertResult();
       alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
+      alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
       alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
       alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
       alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
@@ -87,27 +91,54 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
       alertResult.setSipQuery(sipQuery);
       List<?> alertResultList = evaluateAlertRules(sipQuery);
-      List<Map<String, Object>> executionResultList = new ArrayList<>();
+      List<Object> executionResultList = new ArrayList<>();
       ObjectMapper mapper = new ObjectMapper();
+      AtomicReference<Boolean> alert = new AtomicReference<>(true);
+      AtomicReference<Double> metricsValue = new AtomicReference<>();
       if (alertResultList.size() > 0) {
         alertResultList.forEach(
             (executionResult) -> {
               try {
                 Map<String, Object> result = mapper.convertValue(executionResult, Map.class);
                 Object value = result.get(alertRuleDetails.getMetricsColumn());
-                if (value != null && !value.toString().equalsIgnoreCase("null")) {
-                  executionResultList.add(result);
+                if (value != null
+                    && !value.toString().equalsIgnoreCase("null")
+                    && value.toString().length() > 0) {
+                  Double metricValue = (Double) value;
+                  if (alertRuleDetails.getMonitoringType() != null
+                      && alertRuleDetails
+                          .getMonitoringType()
+                          .equals(MonitoringType.CONTINUOUS_MONITORING)) {
+                    if (!AlertUtils.checkThresholdsForRow(
+                        alertRuleDetails.getOperator(),
+                        metricValue,
+                        alertRuleDetails.getThresholdValue(),
+                        alertRuleDetails.getOtherThresholdValue())) {
+                      alert.set(false);
+                    }
+                  }
+                  metricsValue.set(metricValue);
+                  executionResultList.add(value);
                 }
               } catch (Exception e) {
-                logger.error("Exception occured while converting the execution result" + e);
+                logger.error("Exception occurred while converting the execution result" + e);
               }
             });
         int executionSize = executionResultList.size();
-        if (executionSize > 0) {
+        if (executionSize > 0 && alert.get()) {
           logger.info(
               "Threshold has reached for the alert rule id"
                   + alertRuleDetails.getAlertRulesSysId());
-          alertResult.setAlertCount(executionSize);
+          logger.info("Metric Value " + metricsValue.get());
+          alertResult.setMetricValue(metricsValue.get());
+          if (alertRuleDetails.getMonitoringType() != null
+              && alertRuleDetails
+                  .getMonitoringType()
+                  .equals(MonitoringType.CONTINUOUS_MONITORING)) {
+            alertResult.setAlertCount(1);
+          } else {
+            alertResult.setAlertCount(executionSize);
+          }
           connection.insert(alertResultId, alertResult);
           logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
           alertNotifier.sendNotification(alertRuleDetails);
@@ -165,7 +196,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     sipdsl.setType("alert");
     sipdsl.setSipQuery(sipQuery);
     String url = proxyAnalysisUrl + "/fetch?size=" + maxNumberOfAlertPerRules;
-    logger.info("Execute URL for dispatch :" + url);
+    logger.info("Execute URL for alert Evaluation :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(sipdsl);
     return restTemplate.postForObject(url, requestEntity, List.class);
   }

@@ -11,7 +11,9 @@ public enum MonitoringType {
   @SerializedName("ROW_METRICS")
   ROW_METRICS("ROW_METRICS"),
   @SerializedName("AGGREGATION_METRICS")
-  AGGREGATION_METRICS("AGGREGATION_METRICS");
+  AGGREGATION_METRICS("AGGREGATION_METRICS"),
+  @SerializedName("AGGREGATION_METRICS")
+  CONTINUOUS_MONITORING("CONTINUOUS_MONITORING");
   private static final Map<String, MonitoringType> CONSTANTS = new HashMap<>();
 
   static {
