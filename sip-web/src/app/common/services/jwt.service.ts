@@ -9,8 +9,8 @@ import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
-  USER_ANALYSIS_SUBCATEGORY_NAME,
-  ALERTS_MODULE_MENU
+  USER_ANALYSIS_SUBCATEGORY_NAME
+  // ALERTS_MODULE_MENU
 } from '../consts';
 
 const PRIVILEGE_CODE_LENGTH = 16;
