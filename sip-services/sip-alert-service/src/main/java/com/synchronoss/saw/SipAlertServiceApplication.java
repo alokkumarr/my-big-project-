@@ -40,7 +40,7 @@ public class SipAlertServiceApplication {
             EvaluatorListener evaluatorListener = context.getBean(EvaluatorListener.class);
             evaluatorListener.runStreamConsumer();
           } catch (Exception e) {
-            logger.error("Error occurred while running the stream consumer : " + e.toString());
+            logger.error("Error occurred while running the stream consumer : " + e);
           }
         };
     new Thread(r).start();

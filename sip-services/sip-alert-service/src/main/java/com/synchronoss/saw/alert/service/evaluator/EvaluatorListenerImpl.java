@@ -90,7 +90,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
 
   /** This method is listener on messages for evaluators. */
   @Override
-  public void runStreamConsumer() throws Exception {
+  public void runStreamConsumer() {
     try {
       createIfNotExists(10);
     } catch (Exception e) {
@@ -117,7 +117,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
    * @param consumer consumer
    * @throws Exception when unable to process the messages.
    */
-  private void receiveMessages(KafkaConsumer<String, String> consumer) throws Exception {
+  private void receiveMessages(KafkaConsumer<String, String> consumer) {
     long pollTimeout = 60 * 60 * 1000;
     while (true) {
       ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
