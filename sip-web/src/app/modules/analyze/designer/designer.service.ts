@@ -4,6 +4,7 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpMap from 'lodash/fp/map';
+import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as take from 'lodash/take';
@@ -18,8 +19,8 @@ import * as unset from 'lodash/unset';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
-import { AnalysisType, Analysis } from '../types';
-import { AnalysisDSL, AnalysisPivotDSL } from '../../../models';
+import { AnalysisType, Analysis, Artifact } from '../types';
+import { AnalysisDSL, AnalysisPivotDSL, QueryDSL } from '../../../models';
 
 import {
   IDEsignerSettingGroupAdapter,
@@ -49,8 +50,8 @@ const onReorder = (columns: ArtifactColumns) => {
   });
 };
 
-const canAcceptNumberType = ({ type }: ArtifactColumnChart) =>
-  NUMBER_TYPES.includes(type);
+const canAcceptNumberType = ({ type, formula }: ArtifactColumnChart) =>
+  NUMBER_TYPES.includes(type) || !!formula;
 const canAcceptStringType = ({ type }: ArtifactColumnChart) =>
   type === 'string';
 const canAcceptDateType = ({ type }: ArtifactColumnChart) =>
@@ -59,7 +60,7 @@ const canAcceptGeoType = ({ geoType }: ArtifactColumnChart) =>
   geoType !== 'lngLat' && GEO_TYPES.includes(geoType);
 const canAcceptLngLat = ({ geoType }: ArtifactColumnChart) =>
   geoType === 'lngLat';
-const canAcceptAnyType = () => true;
+const canAcceptAnyType = ({ formula }: ArtifactColumnChart) => !formula;
 
 @Injectable()
 export class DesignerService {
@@ -403,7 +404,10 @@ export class DesignerService {
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
     const applyDataFieldDefaults = artifactColumn => {
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+      if (!artifactColumn.formula) {
+        artifactColumn.aggregate =
+          artifactColumn.formulDEFAULT_AGGREGATE_TYPE.value;
+      }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
       } else if (['tsspline', 'tsPane'].includes(chartType)) {
@@ -525,7 +529,7 @@ export class DesignerService {
       map: 'area'
     };
     fpPipe(
-      fpFilter('checked'),
+      fpFilter(cols => cols.checked || !!cols.expression),
       fpSortBy('areaIndex'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {
@@ -710,5 +714,41 @@ export class DesignerService {
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderEsReport> {
     return filter(artifactColumns, 'checked');
+  }
+
+  /**
+   * Adds derived metrics for analysis to the artifacts for access in settings
+   *
+   * @param {Artifact[]} artifacts
+   * @param {QueryDSL} sipQuery
+   * @returns
+   * @memberof DesignerService
+   */
+  addDerivedMetricsToArtifacts(artifacts: Artifact[], sipQuery: QueryDSL) {
+    if (
+      isEmpty(fpGet('artifacts.0.fields', sipQuery)) ||
+      !artifacts ||
+      isEmpty(fpGet('0.columns', artifacts))
+    ) {
+      return artifacts;
+    }
+
+    const existingDerivedMetrics: string[] = fpMap(
+      col => col.dataField,
+      fpFilter(col => !!col.expression, artifacts[0].columns)
+    );
+
+    const derivedMetrics: any[] = filter(
+      sipQuery.artifacts[0].fields,
+      field =>
+        !!field.expression && !existingDerivedMetrics.includes(field.dataField)
+    );
+
+    return [
+      {
+        ...artifacts[0],
+        columns: [...artifacts[0].columns, ...derivedMetrics]
+      }
+    ];
   }
 }

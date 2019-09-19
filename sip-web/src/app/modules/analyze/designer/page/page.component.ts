@@ -17,6 +17,7 @@ import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import { DesignerLoadMetric } from '../actions/designer.actions';
+import { DesignerService } from '../designer.service';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -61,6 +62,7 @@ export class DesignerPageComponent implements OnInit {
     private router: Router,
     private jwtService: JwtService,
     public _executeService: ExecuteService,
+    private designerService: DesignerService,
     private store: Store
   ) {}
 
@@ -202,6 +204,11 @@ export class DesignerPageComponent implements OnInit {
     if (analysis.designerEdit) {
       return artifacts;
     }
+
+    artifacts = this.designerService.addDerivedMetricsToArtifacts(
+      artifacts,
+      analysis.sipQuery
+    );
 
     analysis.sipQuery.artifacts[0].fields.forEach(field => {
       const artifactColumn = find(

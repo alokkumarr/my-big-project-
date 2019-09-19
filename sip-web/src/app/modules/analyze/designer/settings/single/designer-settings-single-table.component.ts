@@ -6,6 +6,7 @@ import {
   OnChanges,
   OnInit
 } from '@angular/core';
+import * as get from 'lodash/get';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -64,7 +65,8 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   @Input('artifacts')
   public set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
-      this.artifactColumns = artifacts[0].columns;
+      this.artifact = artifacts[0];
+      this.artifactColumns = this.artifact.columns;
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     }
   }
@@ -75,6 +77,7 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   public typeIcons = [];
   public isEmpty: (any) => boolean = isEmpty;
   public artifactColumns: ArtifactColumns;
+  private artifact: Artifact;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
@@ -246,7 +249,11 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.artifactColumns.push(result);
+        this.artifactColumns.push({
+          ...result,
+          table: get(this.artifact, 'artifactName'),
+          type: 'double'
+        });
         this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       }
     });

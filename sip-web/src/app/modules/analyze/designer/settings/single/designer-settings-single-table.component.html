@@ -15,7 +15,7 @@
           <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
         </mat-button-toggle>
         <mat-button-toggle
-          *ngFor="let adapter of (groupAdapters | slice: 0:2); let i = index"
+          *ngFor="let adapter of groupAdapters | slice: 0:2; let i = index"
           (change)="onFilterChange(i)"
           [checked]="filterObj.adapters[i]"
           [value]="adapter.title"
@@ -101,6 +101,18 @@
               {{ artifactColumn.displayName || artifactColumn.alias }}
             </div>
 
+            <button
+              class="settings__list-item__derived-metric-edit-btn"
+              mat-icon-button
+              color="primary"
+              *ngIf="artifactColumn.formula"
+              [attr.e2e]="
+                'designer-edit-derived-metric-btn-' +
+                (artifactColumn.alias || artifactColumn.displayName)
+              "
+            >
+              <mat-icon fontIcon="icon-edit"></mat-icon>
+            </button>
             <button
               class="settings__list-item__addbtn"
               mat-icon-button

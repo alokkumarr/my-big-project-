@@ -5,6 +5,7 @@ import { AceEditorComponent } from 'ng2-ace-editor';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { parseExpression } from 'src/app/common/utils/expression-parser';
+import * as startCase from 'lodash/startCase';
 
 @Component({
   selector: 'derived-metric',
@@ -89,7 +90,10 @@ export class DerivedMetricComponent implements OnDestroy {
       this.expressionForm.get('expression').setValue('');
     } finally {
       if (this.expressionForm.valid) {
-        this.dialogRef.close(this.expressionForm.value);
+        this.dialogRef.close({
+          ...this.expressionForm.value,
+          displayName: startCase(this.expressionForm.value.columnName)
+        });
       }
     }
   }

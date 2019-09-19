@@ -1296,14 +1296,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'chart':
       /* At least one y and x field needs to be present. If this is a bubble chart,
        * at least one z axis field is also needed */
-      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
+      const sipQuery = this._store.selectSnapshot(state => state.designerState.analysis.sipQuery);
+      const fields = get(sipQuery, 'artifacts.0.fields');
       const requestCondition = [
-        find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
-        find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
-        /* prettier-ignore */
+        find(fields || [], field => field.area === 'y'),
+        find(fields || [], field => field.area === 'x'),
         ...(this.analysisSubType === 'bubble' ?
         [
-          find(sqlBuilder.dataFields || [], field => field.checked === 'z')
+          find(fields || [], field => field.area === 'x'),
         ] : [])
       ];
       return every(requestCondition, Boolean);
