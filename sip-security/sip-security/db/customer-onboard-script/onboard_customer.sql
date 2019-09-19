@@ -1,7 +1,7 @@
 DROP PROCEDURE onboard_customer ;
 
 DELIMITER //
-CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_email varchar(50), IN l_first_name varchar(50), IN l_middle_name varchar(50), IN l_last_name varchar(50))
+CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product_name varchar(50), IN l_product_code varchar(50), IN l_email varchar(50), IN l_first_name varchar(50), IN l_middle_name varchar(50), IN l_last_name varchar(50), IN is_jv_customer tinyint(4), IN filter_by_customer_code tinyint(4))
 
  BEGIN
 
@@ -81,11 +81,15 @@ select max(customer_sys_id)+1 into l_customer_sys_id  from customers;
 select l_customer_sys_id;
 
 
-INSERT INTO CUSTOMERS (CUSTOMER_SYS_ID,CUSTOMER_CODE,COMPANY_NAME,COMPANY_BUSINESS,LANDING_PROD_SYS_ID,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY,PASSWORD_EXPIRY_DAYS,DOMAIN_NAME)
+INSERT INTO CUSTOMERS (CUSTOMER_SYS_ID,CUSTOMER_CODE,COMPANY_NAME,COMPANY_BUSINESS,LANDING_PROD_SYS_ID,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY,PASSWORD_EXPIRY_DAYS,DOMAIN_NAME, IS_JV_CUSTOMER)
 SELECT l_customer_sys_id CUSTOMER_SYS_ID,l_customer_code CUSTOMER_CODE,l_customer_code COMPANY_NAME,'Telecommunication' COMPANY_BUSINESS,
 l_product_sys_id LANDING_PROD_SYS_ID,1 ACTIVE_STATUS_IND,Now() CREATED_DATE,'onboard' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_BY,
 NULL MODIFIED_DATE,NULL MODIFIED_BY,
-360 PASSWORD_EXPIRY_DAYS,concat(l_customer_code,'.COM') DOMAIN_NAME;
+360 PASSWORD_EXPIRY_DAYS,concat(l_customer_code,'.COM') DOMAIN_NAME,is_jv_customer IS_JV_CUSTOMER;
+
+INSERT INTO CONFIG_VAL (CONFIG_VAL_SYS_ID,CONFIG_VAL_CODE,CONFIG_VALUE,CONFIG_VAL_DESC,CONFIG_VAL_OBJ_TYPE,CONFIG_VAL_OBJ_GROUP,ACTIVE_STATUS_IND, CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY,FILTER_BY_CUSTOMER_CODE)
+SELECT l_customer_sys_id CONFIG_VAL_SYS_ID, 'es-analysis-auto-refresh' CONFIG_VAL_CODE,NULL CONFIG_VALUE,'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page' CONFIG_VAL_DESC,'CUSTOMER' CONFIG_VAL_OBJ_TYPE,
+l_customer_code CONFIG_VAL_OBJ_GROUP, 1 ACTIVE_STATUS_IND, Now() CREATED_DATE,'onboard' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_BY,NULL MODIFIED_DATE,NULL MODIFIED_BY,filter_by_customer_code FILTER_BY_CUSTOMER_CODE;
 
 select max(cust_prod_sys_id)+1 into l_cust_prod_sys_id from customer_products;
 
