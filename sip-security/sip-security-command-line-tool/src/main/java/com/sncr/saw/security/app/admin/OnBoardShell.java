@@ -31,15 +31,19 @@ public class OnBoardShell {
                                 @ShellOption(value = "--E",help = "User-Email",defaultValue = "_NONE_") String email,
                                 @ShellOption(value = "--F",help = "User First Name",defaultValue = "_NONE_") String firstName,
                                 @ShellOption(value = "--M",help = "User Middle Name",defaultValue = "_NONE_") String middleName,
-                                @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName){
+                                @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName,
+                                @ShellOption(value = "--JV",help = "Joint Venture",defaultValue = "_NONE_") String isJvCustomer,
+                                @ShellOption(value = "--FC",help = "Filter By Customer Code",defaultValue = "_NONE_") String filterByCustomerCode){
         if (customerCode.trim().isEmpty() || customerCode.equalsIgnoreCase("_NONE_")
             || productName.trim().isEmpty() || productName.equalsIgnoreCase("_NONE_")
             || productCode.trim().isEmpty() || productCode.equalsIgnoreCase("_NONE_")
             || email.trim().isEmpty() || email.equalsIgnoreCase("_NONE_")
             || firstName.trim().isEmpty() || firstName.equalsIgnoreCase("_NONE_")
             || middleName.equalsIgnoreCase("_NONE_")
-            || lastName.trim().isEmpty() || lastName.equalsIgnoreCase("_NONE_")) {
-            logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L) \n  Use 'help onboard-customer' command to print usage!!");
+            || lastName.trim().isEmpty() || lastName.equalsIgnoreCase("_NONE_")
+            || isJvCustomer.trim().isEmpty() || isJvCustomer.equalsIgnoreCase("_NONE_")
+            || filterByCustomerCode.trim().isEmpty() || filterByCustomerCode.equalsIgnoreCase("_NONE_")) {
+            logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L,--JV,--FC) \n  Use 'help onboard-customer' command to print usage!!");
             throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage!!");
         }
         OnBoardCustomerRepository onBoardCustomerRepositoryDao = onboard.getOnBoardCustomerRepositoryDao();
@@ -47,9 +51,13 @@ public class OnBoardShell {
         logger.debug("Read Required Params :");
         if(!onBoardCustomerRepositoryDao.isValidCustCode(customerCode))  {
             return("Invalid Customer-Code !! Acceptable Format = [^A-Za-z0-9] ");
-
         }
-
+        if (!isJvCustomer.matches("0|1")) {
+            return("Invalid Joint Venture Flag !! Acceptable Format = [0|1] ");
+        }
+        if (!filterByCustomerCode.matches("0|1")) {
+            return("Invalid Filter By Customer Code Flag !! Acceptable Format = [0|1] ");
+        }
         if (middleName.trim().isEmpty() || middleName.equals("--L") ) {
             onBoardCustomer.setMiddleName(" ");
         }
@@ -62,6 +70,8 @@ public class OnBoardShell {
         onBoardCustomer.setEmail(email);
         onBoardCustomer.setFirstName(firstName);
         onBoardCustomer.setLastName(lastName);
+        onBoardCustomer.setIsJvCustomer(isJvCustomer);
+        onBoardCustomer.setFilterByCustomerCode(filterByCustomerCode);
         try {
             // check if connection is working fine only then proceed
             if (onBoardCustomerRepositoryDao.testSql() == 1) {

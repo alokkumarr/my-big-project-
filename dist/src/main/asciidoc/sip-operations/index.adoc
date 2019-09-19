@@ -988,7 +988,7 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     	onboard-customer - Onboard the customer
 
     SYNOPSYS
-    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string
+    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string [--JV] string [FC] string
 
     OPTIONS
     	--C  string
@@ -1017,6 +1017,14 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
 
     	--L  string
     		User Last Name
+    		[Mandatory]
+
+    	--JV  string
+    		Joint Venture Flag
+    		[Mandatory]
+
+    	--FC  string
+    		Filter By Customer Code Flag
     		[Mandatory]
 
 Run the "onboard-customer" command with all required parameters stated
