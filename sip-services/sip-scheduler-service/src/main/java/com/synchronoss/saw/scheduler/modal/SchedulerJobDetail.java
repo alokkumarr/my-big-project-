@@ -66,6 +66,8 @@ public class SchedulerJobDetail implements Serializable {
 
   private Boolean zip;
 
+  private String auth;
+
   /**
    * Gets analysisID
    *
@@ -332,7 +334,15 @@ public class SchedulerJobDetail implements Serializable {
     this.zip = zip;
   }
 
-  /**
+  public String getAuth() {
+    return auth;
+  }
+
+  public void setAuth(String auth) {
+    this.auth = auth;
+  }
+
+    /**
    * @param out
    * @throws IOException
    */
@@ -357,6 +367,7 @@ public class SchedulerJobDetail implements Serializable {
     out.writeObject(timezone);
     out.writeObject(s3);
     out.writeObject(zip);
+    out.writeObject(auth);
   }
 
   /**
@@ -430,6 +441,16 @@ public class SchedulerJobDetail implements Serializable {
       }
     } catch (OptionalDataException e) {
       /* catch block to avoid serialization for newly added fields.*/
+    }
+
+    try {
+        Object authObj = in.readObject();
+        if (authObj instanceof String) {
+            auth = (String) authObj;
+        }
+
+    } catch (OptionalDataException e) {
+
     }
   }
 

@@ -15,6 +15,7 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -308,13 +309,14 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
-    if (authTicket == null && !isScheduledExecution) {
+    Ticket authTicket = request != null ? getTicket(request) : null;
+    if (authTicket == null) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
     }
+    logger.debug(" is auth is null ?: {}", authTicket == null ? true : false);
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
@@ -327,6 +329,28 @@ public class StorageProxyController {
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
+
+      // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+      // code.
+      if (true) {
+          DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+          dataSecurityKeyDef.setName("customerCode");
+          List<String> dskValue = new ArrayList<>();
+          dskValue.add(authTicket.getCustCode());
+          List<String> attFilter = new ArrayList<>(); // For Testing : To be removed later.
+          attFilter.add("ATT");
+          dataSecurityKeyDef.setValues(attFilter);
+          List<DataSecurityKeyDef> dataSecurityKeyDefList;
+          if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
+              dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
+              dataSecurityKeyDefList.add(dataSecurityKeyDef);
+              dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+          } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
+              dataSecurityKeyDefList = new ArrayList<>();
+              dataSecurityKeyDefList.add(dataSecurityKeyDef);
+              dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+          }
+      }
 
     try {
       Long startTime = new Date().getTime();

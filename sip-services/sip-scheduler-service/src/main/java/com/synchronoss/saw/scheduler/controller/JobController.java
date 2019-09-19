@@ -7,6 +7,8 @@ import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,13 @@ public class JobController extends BaseJobController{
 	JobService<SchedulerJobDetail> jobService;
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
-	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail){
+	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail,
+        HttpServletRequest request,
+        HttpServletResponse response){
 		logger.info("JobController schedule() start here.");
+		String auth = request.getHeader("Authorization");
+		logger.debug("Auth = "+auth);
+		jobDetail.setAuth(auth);
 
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
