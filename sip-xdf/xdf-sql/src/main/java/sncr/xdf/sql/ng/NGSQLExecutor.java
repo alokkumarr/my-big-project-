@@ -74,9 +74,12 @@ public class NGSQLExecutor implements Serializable {
                         }
 
                         logger.debug("Attempt to load data for table: " + tn);
+
                         String location;
 
-                        if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        //if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        if (!parent.getNgctx().runningPipeLine)
+
                         {
 
                             if (allTables.get(tn) != null) {

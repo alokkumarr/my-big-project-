@@ -18,7 +18,6 @@ import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.services.NGContextServices;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.parser.NGParser;
@@ -201,11 +200,9 @@ public class XDFDataProcessor  extends AbstractComponent {
                 throw new Exception(error);
             }
 
-            //datafileDFmap =  new HashMap<>();
             datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
-            
 
-            logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
+            logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
             System.exit(-1);
@@ -253,7 +250,9 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
                 "transformer", batchId);
+
             ngTransformerCtxSvc.initContext(); // debug
+
             ngTransformerCtxSvc.registerOutputDataSet();
 
             logger.trace("Output datasets:   ");
@@ -266,9 +265,6 @@ public class XDFDataProcessor  extends AbstractComponent {
             String transOutKey =  config.getOutputs().get(0).getDataSet().toString();
 
             ngTransformerCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
-            //ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
-           // ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey,datafileDFmap.get(dataSetName));
-            logger.debug("dataset count in transformer ::"+ datafileDFmap.get(dataSetName).count());
             ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
             ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
@@ -284,13 +280,9 @@ public class XDFDataProcessor  extends AbstractComponent {
                 throw new Exception(error);
             }
 
-
-            //datafileDFmap =  new HashMap<>();
             datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
-            dataSetName = transOutKey;
 
-            logger.debug("End Of Transformer Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
-
+            logger.debug("End Of Transformer Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processTransformer() Exception is : " + e + "\n");
             System.exit(-1);
@@ -302,11 +294,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     public int processSQL(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
     	
-    	
-    	
-    	 
-    	
-        int ret = 0;
+    	int ret = 0;
         try {
 
             String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -382,16 +370,9 @@ public class XDFDataProcessor  extends AbstractComponent {
                 throw new Exception(error);
             }
 
-
-            
             datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
-            
-           
 
-            logger.debug("End Of SQL Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()+ "\n");
-            
-            
-
+            logger.debug("End Of SQL Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
 
         } catch (Exception e) {
             logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
@@ -449,15 +430,8 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngESCtxSvc.registerOutputDataSet();
             
 
-
-            
-
             ngESCtxSvc.getNgctx().datafileDFmap.putAll(datafileDFmap);
-           // ngESCtxSvc.getNgctx().dataSetName = dataSetInKey;
-           // ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey,datafileDFmap.get(dataSetName));
             ngESCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            
-            logger.warn("##### Printing ES Loader hashmap #######");
             
             NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());
 
