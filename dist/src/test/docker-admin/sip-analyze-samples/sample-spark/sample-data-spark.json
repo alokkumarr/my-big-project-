@@ -145,7 +145,7 @@
           "filterEligible":true,
           "joinEligible":true,
           "name":"customerCode",
-          "table":"sales",
+          "table":"product",
           "type":"string"
         }
       ]
