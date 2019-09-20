@@ -329,8 +329,9 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
@@ -345,7 +346,7 @@ public class StorageProxyController {
             logger.info("Artifact Name : "+artsName);
             for (String artifact : artsName) {
                 dataSecurityKeyDef.setName(artifact + ".customerCode");
-                dataSecurityKeyDef.setValues(Collections.singletonList("ATT"));
+                dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
                 customerFilterDsks.add(dataSecurityKeyDef);
             }
         } else {

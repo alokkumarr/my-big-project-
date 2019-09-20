@@ -134,9 +134,9 @@ public class StorageProxyUtil {
         logger.info("artifact List: " + artifactList);
 
         List<Artifact> artifacts = new ArrayList<>();
-        List<Field> fields = new ArrayList<>();
 
         for (Object artifact : artifactList) {
+          List<Field> fields = new ArrayList<>();
           Artifact dslArtifact = new Artifact();
           Gson gson = new Gson();
           logger.info("Gson String " + gson.toJson(artifact));
@@ -303,7 +303,7 @@ public class StorageProxyUtil {
       List<String> artifactNames = new ArrayList<>();
       List<Artifact> artifactList = sipQuery.getArtifacts();
       for (Artifact artifact : artifactList) {
-          artifactNames.add(artifact.getArtifactsName());
+          artifactNames.add(artifact.getArtifactsName().toUpperCase());
       }
       return artifactNames;
   }
