@@ -78,6 +78,10 @@ public class StorageProxyController {
 
   @Autowired private RestUtil restUtil;
 
+  public static final String CUSTOMER_CODE = "customerCode";
+
+  public Gson gson = new Gson();
+
   /**
    * This method is used to get the data based on the storage type<br>
    * perform conversion based on the specification asynchronously.
@@ -318,10 +322,8 @@ public class StorageProxyController {
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
     }
-    logger.debug(" is auth is null ?: {}", authTicket == null ? true : false);
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
     SipQuery savedQuery =
         getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -342,18 +344,25 @@ public class StorageProxyController {
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
       Boolean designerEdit =
           analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
-        if (analysisType.equalsIgnoreCase("report") && designerEdit == true) {
-            logger.info("Artifact Name : "+artsName);
-            for (String artifact : artsName) {
-                dataSecurityKeyDef.setName(artifact + ".customerCode");
-                dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
-                customerFilterDsks.add(dataSecurityKeyDef);
-            }
-        } else {
-            dataSecurityKeyDef.setName("customerCode");
-            dataSecurityKeyDef.setValues(Collections.singletonList("ATT"));
+      if (analysisType.equalsIgnoreCase("report") && designerEdit == true) {
+        logger.trace("Artifact Name : " + artsName);
+        for (String artifact : artsName) {
+          String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
+          if (query.contains(" " + artifact + " ")) {
+            dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
+          }
         }
+      } else {
+        for (String artifact : artsName) {
+          if (sipQueryArts.contains(artifact.toUpperCase())) {
+            dataSecurityKeyDef.setName(artifact+"."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            customerFilterDsks.add(dataSecurityKeyDef);
+          }
+        }
+      }
 
       List<DataSecurityKeyDef> dataSecurityKeyDefList;
       if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
@@ -365,8 +374,8 @@ public class StorageProxyController {
         dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
       }
     }
-      Gson gson = new Gson();
-      logger.info("Artifact Name : "+gson.toJson(dataSecurityKeyNode));
+
+    logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
 
     try {
       Long startTime = new Date().getTime();

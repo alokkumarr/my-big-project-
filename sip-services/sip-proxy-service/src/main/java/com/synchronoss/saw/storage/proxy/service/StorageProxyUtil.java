@@ -300,11 +300,11 @@ public class StorageProxyUtil {
   }
 
   public static List<String> getArtsNames(SipQuery sipQuery) {
-      List<String> artifactNames = new ArrayList<>();
-      List<Artifact> artifactList = sipQuery.getArtifacts();
-      for (Artifact artifact : artifactList) {
-          artifactNames.add(artifact.getArtifactsName().toUpperCase());
-      }
-      return artifactNames;
+    List<String> artifactNames = new ArrayList<>();
+    List<Artifact> artifactList = sipQuery.getArtifacts();
+    for (Artifact artifact : artifactList) {
+      artifactNames.add(artifact.getArtifactsName().toUpperCase());
+    }
+    return artifactNames;
   }
 }

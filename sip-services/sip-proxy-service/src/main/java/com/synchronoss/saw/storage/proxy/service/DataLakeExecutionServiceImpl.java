@@ -88,9 +88,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     if (designerEdit) {
       query = sipQuery.getQuery();
       queryShownTOUser = query;
-      logger.info(" Query to shown user : " + queryShownTOUser);
       query = dskForManualQuery(sipQuery,query,dataSecurityKey);
-      logger.info(" Query after dsk : "+ query);
     } else {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
@@ -306,46 +304,46 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       logger.info("DSK :" + dataSecurityKey.getDataSecuritykey().get(0).getName());
 
       List<String> semanticArtifactNames = getArtifactNames(sipQuery);
-      logger.info("ArtifactNames = "+semanticArtifactNames);
+      logger.debug("ArtifactNames = " + semanticArtifactNames);
       for (String artifactName : semanticArtifactNames) {
         flag = false;
         dskFilter = " (Select * from ";
-        for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
-          String[] col = dsk.getName().split("\\.");
+        if (query.toUpperCase().contains(" " + artifactName + " ")) {
+          for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
+            String[] col = dsk.getName().split("\\.");
 
-          if (artifactName.equalsIgnoreCase(col[0])) {
-            flag = true;
-            if (dskFilter.equalsIgnoreCase(tempStr)) dskFilter = dskFilter.concat(col[0]);
-            if (!dskFilter.contains("WHERE")) {
-              dskFilter = dskFilter.concat(" WHERE " + dsk.getName() + " in (");
-            } else {
-              dskFilter = dskFilter.concat(" AND " + dsk.getName() + " in (");
+            if (artifactName.equalsIgnoreCase(col[0])) {
+              flag = true;
+              if (dskFilter.equalsIgnoreCase(tempStr)) dskFilter = dskFilter.concat(col[0]);
+              if (!dskFilter.contains("WHERE")) {
+                dskFilter = dskFilter.concat(" WHERE " + dsk.getName() + " in (");
+              } else {
+                dskFilter = dskFilter.concat(" AND " + dsk.getName() + " in (");
+              }
+              List<String> values = dsk.getValues();
+              int initFlag = 0;
+              for (String value : values) {
+                dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
+                dskFilter = dskFilter.concat("'" + value + "'");
+                initFlag++;
+              }
+              dskFilter = dskFilter.concat(")");
             }
-            List<String> values = dsk.getValues();
-            int initFlag = 0;
-            for (String value : values) {
-              dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
-              dskFilter = dskFilter.concat("'" + value + "'");
-              initFlag++;
-            }
-            dskFilter = dskFilter.concat(")");
           }
-        }
 
-        if (flag) {
-          dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
-          query = query + " ";
-          String artName = " " + artifactName + " ";
-          logger.info("Query As is : "+ query);
-          logger.info("artName : "+artName);
-          logger.info("dskFilter str = "+dskFilter);
-          logger.info("Logged query : "+ query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter));
-          query = query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter);
+          if (flag) {
+            dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
+            query = query + " ";
+            String artName = " " + artifactName + " ";
+            logger.trace("dskFilter str = " + dskFilter);
+            query = query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter);
+            logger.info("Logged query : " + query);
+          }
         }
       }
     }
 
-    logger.info("DSK applied Query : "+ query);
+    logger.info("DSK applied Query : " + query);
     return query;
   }
 
@@ -355,8 +353,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
    * @param sipQuery
    * @return List of String
    */
-  public List<String> getArtifactNames(
-      SipQuery sipQuery) {
+  public List<String> getArtifactNames(SipQuery sipQuery) {
     RestTemplate restTemplate = restUtil.restTemplate();
 
     String url = metaDataServiceExport + "/internal/semantic/workbench/" + sipQuery.getSemanticId();
@@ -366,9 +363,9 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     List<Object> artifactList = semanticNode.getArtifacts();
     for (Object artifact : artifactList) {
       Gson gson = new Gson();
-      logger.info("Gson String " + gson.toJson(artifact));
+      logger.debug("Gson String " + gson.toJson(artifact));
       JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
-      artifactNames.add(artifactObj.get("artifactName").getAsString());
+      artifactNames.add(artifactObj.get("artifactName").getAsString().toUpperCase());
     }
     return artifactNames;
   }
