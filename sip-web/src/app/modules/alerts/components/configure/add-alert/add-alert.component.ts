@@ -384,6 +384,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       dataField: selectedMetricsColumn.columnName,
       alias: selectedMetricsColumn.alias,
       columnName: selectedMetricsColumn.columnName,
+      name: selectedMetricsColumn.name,
       displayName: selectedMetricsColumn.displayName,
       type: selectedMetricsColumn.type,
       aggregate
@@ -421,9 +422,18 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         }
       : null;
 
+    const { indexName, type, storageType } = this.selectedDatapod.esRepository;
+    const storage = {
+      dataStore: `${indexName}/${type}`,
+      storageType
+    };
+
     return {
       artifacts: [{ artifactName, fields: [metricsColumn] }],
-      filters: compact([alertFilter, lookbackFilter, stringFilter])
+      booleanCriteria: 'AND',
+      filters: compact([alertFilter, lookbackFilter, stringFilter]),
+      sorts: [],
+      storage
     };
   }
 

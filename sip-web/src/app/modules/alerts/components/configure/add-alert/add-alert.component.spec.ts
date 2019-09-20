@@ -123,7 +123,12 @@ describe('AddAlertComponent', () => {
 
   it('should create alert payload', () => {
     component.selectedDatapod = {
-      artifacts: [{ artifactName: 'sample', fields: [] }]
+      artifacts: [{ artifactName: 'sample', fields: [] }],
+      esRepository: {
+        indexName: '',
+        type: '',
+        storageType: ''
+      }
     };
     component.selectedMetricsColumn = {
       columnName: '',
