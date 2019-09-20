@@ -40,7 +40,6 @@ export class DerivedMetricComponent implements OnDestroy {
   @ViewChild('editor') editor: AceEditorComponent;
 
   editorOptions = {
-    // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
@@ -99,6 +98,12 @@ export class DerivedMetricComponent implements OnDestroy {
          ██╔══╝  ██║   ██║██╔══██╗██║╚██╔╝██║
          ██║     ╚██████╔╝██║  ██║██║ ╚═╝ ██║
          ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝
+         ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+         ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+         ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+         ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
 */
 
   createForm() {
@@ -150,6 +155,8 @@ export class DerivedMetricComponent implements OnDestroy {
         .setValue(JSON.stringify(expressionJSON));
     } catch (e) {
       this.expressionError = e.toString();
+      /* In case of error, set expression to empty to make
+      sure form is invalid since expression is a required field */
       this.expressionForm.get('expression').setValue('');
     } finally {
       if (this.expressionForm.valid) {
@@ -168,6 +175,12 @@ export class DerivedMetricComponent implements OnDestroy {
          ██╔══╝  ██║  ██║██║   ██║   ██║   ██║██╔══██╗
          ███████╗██████╔╝██║   ██║   ╚██████╔╝██║  ██║
          ╚══════╝╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+         ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+         ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+         ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+         ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
 */
 
   /**

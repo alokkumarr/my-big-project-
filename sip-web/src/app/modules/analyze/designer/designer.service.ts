@@ -728,7 +728,7 @@ export class DesignerService {
     if (
       isEmpty(fpGet('artifacts.0.fields', sipQuery)) ||
       !artifacts ||
-      isEmpty(fpGet('0.columns', artifacts))
+      !fpGet('0.columns', artifacts)
     ) {
       return artifacts;
     }
