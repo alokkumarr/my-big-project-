@@ -330,7 +330,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodName,
       categoryId,
       metricsColumn,
-      aggregationType,
+      aggregationType: aggregationType === 'none' ? null : aggregationType,
       operator,
       thresholdValue,
       otherThresholdValue: operator === 'BTW' ? otherThresholdValue : null,
