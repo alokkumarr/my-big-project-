@@ -246,7 +246,7 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
       width: '60%',
       height: '60%',
       autoFocus: false,
-      data: artifactColumn
+      data: { artifactColumn, columns: this.artifactColumns }
     });
 
     dialogRef.afterClosed().subscribe(result => {

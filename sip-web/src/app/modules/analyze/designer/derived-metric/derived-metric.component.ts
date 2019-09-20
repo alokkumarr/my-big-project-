@@ -15,11 +15,16 @@ import {
   FormControl
 } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { parseExpression } from 'src/app/common/utils/expression-parser';
+
 import * as startCase from 'lodash/startCase';
+import * as get from 'lodash/get';
+import * as map from 'lodash/map';
+import * as cloneDeep from 'lodash/cloneDeep';
+
 import {
   SUPPORTED_AGGREGATES,
-  Operator as SupportedOperator
+  Operator as SupportedOperator,
+  parseExpression
 } from 'src/app/common/utils/expression-parser';
 
 enum MODE {
@@ -51,35 +56,7 @@ export class DerivedMetricComponent implements OnDestroy {
   allModes = MODE;
   allAggregatesSupported = SUPPORTED_AGGREGATES;
   allOperatorsSupported = Object.values(SupportedOperator);
-
-  constructor(
-    private fb: FormBuilder,
-    @Optional()
-    @Inject(MAT_DIALOG_DATA)
-    private data,
-    public dialogRef: MatDialogRef<DerivedMetricComponent>
-  ) {
-    if (this.data && this.data.columnName) {
-      this.mode = MODE.edit;
-    } else {
-      this.data = { columnName: '', formula: '', expression: '' };
-    }
-    this.createForm();
-  }
-
-  createForm() {
-    this.expressionForm = this.fb.group({
-      columnName: [
-        {
-          value: this.data.columnName || '',
-          disabled: this.mode === MODE.edit
-        },
-        Validators.required
-      ],
-      formula: [this.data.formula || '', Validators.required], // formula string entered by user
-      expression: [this.data.expression || '', Validators.required] // stringified json expression corresponding to formula
-    });
-  }
+  completions: any[] = [];
 
   get columnName(): FormControl {
     return this.expressionForm.get('columnName') as FormControl;
@@ -87,6 +64,21 @@ export class DerivedMetricComponent implements OnDestroy {
 
   get formula(): FormControl {
     return this.expressionForm.get('formula') as FormControl;
+  }
+
+  constructor(
+    private fb: FormBuilder,
+    @Optional()
+    @Inject(MAT_DIALOG_DATA)
+    private data: { artifactColumn: any; columns: any[] },
+    public dialogRef: MatDialogRef<DerivedMetricComponent>
+  ) {
+    if (get(this.data, 'artifactColumn.columnName')) {
+      this.mode = MODE.edit;
+    }
+    this.createForm();
+    this.generateCompletions();
+    this.addCompletionsToEditor();
   }
 
   ngOnDestroy() {
@@ -98,6 +90,35 @@ export class DerivedMetricComponent implements OnDestroy {
       this.langTools.textCompleter,
       this.langTools.keyWordCompleter
     ]);
+  }
+
+  /*
+         ███████╗ ██████╗ ██████╗ ███╗   ███╗
+         ██╔════╝██╔═══██╗██╔══██╗████╗ ████║
+         █████╗  ██║   ██║██████╔╝██╔████╔██║
+         ██╔══╝  ██║   ██║██╔══██╗██║╚██╔╝██║
+         ██║     ╚██████╔╝██║  ██║██║ ╚═╝ ██║
+         ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝
+*/
+
+  createForm() {
+    this.expressionForm = this.fb.group({
+      columnName: [
+        {
+          value: get(this.data, 'artifactColumn.columnName', ''),
+          disabled: this.mode === MODE.edit
+        },
+        Validators.required
+      ],
+      formula: [
+        get(this.data, 'artifactColumn.formula', ''),
+        Validators.required
+      ], // formula string entered by user
+      expression: [
+        get(this.data, 'artifactColumn.expression', ''),
+        Validators.required
+      ] // stringified json expression corresponding to formula
+    });
   }
 
   /**
@@ -140,6 +161,15 @@ export class DerivedMetricComponent implements OnDestroy {
     }
   }
 
+  /*
+         ███████╗██████╗ ██╗████████╗ ██████╗ ██████╗
+         ██╔════╝██╔══██╗██║╚══██╔══╝██╔═══██╗██╔══██╗
+         █████╗  ██║  ██║██║   ██║   ██║   ██║██████╔╝
+         ██╔══╝  ██║  ██║██║   ██║   ██║   ██║██╔══██╗
+         ███████╗██████╔╝██║   ██║   ╚██████╔╝██║  ██║
+         ╚══════╝╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+*/
+
   /**
    * Adds @text to editor at current cursor position.
    * Additionally, it may set the cursor back by
@@ -169,5 +199,79 @@ export class DerivedMetricComponent implements OnDestroy {
 
     this.expressionError = '';
     editor.focus();
+  }
+
+  /**
+   * Generates auto complete suggestion objects from list of
+   * columns.
+   *
+   * @memberof DerivedMetricComponent
+   */
+  generateCompletions() {
+    const columns = get(this.data, 'columns', []);
+    columns.forEach(({ expression, columnName, displayName }) => {
+      if (expression) {
+        /* Don't add derived metrics to autocompletions.
+        We don't support adding derived metrics to other
+        derived metrics yet. */
+        return;
+      }
+
+      const caption = displayName || columnName;
+      this.completions.push({
+        name: caption,
+        value: caption,
+        caption: caption,
+        meta: 'column',
+        score: 1000,
+
+        /* Custom attribute stores column name.
+        This is used to insert this string when matched instead
+        of 'value' attribute of this completion. */
+        insertValue: columnName
+      });
+    });
+  }
+
+  /**
+   * Adds generated completions to ace editor. Uses custom attribute
+   * 'insertValue' from completions if present to add to insert in
+   * editor.
+   *
+   * @memberof DerivedMetricComponent
+   */
+  addCompletionsToEditor() {
+    const self = this;
+    const artifactsCompleter = {
+      getCompletions: (editor, session, pos, prefix, callback) => {
+        /* Add reference to this completer in each match. Ace editor
+        uses this reference to call the custom 'insertMatch' method of
+        this completer. */
+        const withCompleter = map(self.completions, completion => {
+          completion.completer = artifactsCompleter;
+          return completion;
+        });
+
+        if (prefix.length === 0) {
+          return callback(null, cloneDeep(withCompleter));
+        }
+
+        const matchingCompletions = withCompleter.filter(
+          match =>
+            (match.caption || match.name)
+              .toLowerCase()
+              .indexOf(prefix.toLowerCase()) >= 0
+        );
+
+        return callback(null, cloneDeep(matchingCompletions));
+      },
+
+      insertMatch: (editor, data) => {
+        editor.completer.insertMatch({
+          value: data.insertValue || data.value || data
+        });
+      }
+    };
+    this.langTools.addCompleter(artifactsCompleter);
   }
 }
