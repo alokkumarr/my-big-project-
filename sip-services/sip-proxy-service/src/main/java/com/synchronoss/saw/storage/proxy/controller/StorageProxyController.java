@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.google.gson.Gson;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -330,27 +332,40 @@ public class StorageProxyController {
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
 
-      // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
-      // code.
-      if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
-          DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-          dataSecurityKeyDef.setName("customerCode");
-          List<String> dskValue = new ArrayList<>();
-          dskValue.add(authTicket.getCustCode());
-          List<String> attFilter = new ArrayList<>(); // For Testing : To be removed later.
-          attFilter.add(authTicket.getCustCode());
-          dataSecurityKeyDef.setValues(attFilter);
-          List<DataSecurityKeyDef> dataSecurityKeyDefList;
-          if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
-              dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
-              dataSecurityKeyDefList.add(dataSecurityKeyDef);
-              dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
-          } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
-              dataSecurityKeyDefList = new ArrayList<>();
-              dataSecurityKeyDefList.add(dataSecurityKeyDef);
-              dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
-          }
+    // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+    // code.
+    if (true/*authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1 **/) {
+      String analysisType = analysis.getType();
+      DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+      List<String> artsName = getArtsNames(savedQuery);
+      List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
+      Boolean designerEdit =
+          analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+        if (analysisType.equalsIgnoreCase("report") && designerEdit == true) {
+            logger.info("Artifact Name : "+artsName);
+            for (String artifact : artsName) {
+                dataSecurityKeyDef.setName(artifact + ".customerCode");
+                dataSecurityKeyDef.setValues(Collections.singletonList("ATT"));
+                customerFilterDsks.add(dataSecurityKeyDef);
+            }
+        } else {
+            dataSecurityKeyDef.setName("customerCode");
+            dataSecurityKeyDef.setValues(Collections.singletonList("ATT"));
+            customerFilterDsks.add(dataSecurityKeyDef);
+        }
+
+      List<DataSecurityKeyDef> dataSecurityKeyDefList;
+      if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
+        dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
+        dataSecurityKeyDefList.addAll(customerFilterDsks);
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+      } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
+        dataSecurityKeyDefList = customerFilterDsks;
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
       }
+    }
+      Gson gson = new Gson();
+      logger.info("Artifact Name : "+gson.toJson(dataSecurityKeyNode));
 
     try {
       Long startTime = new Date().getTime();

@@ -298,4 +298,13 @@ public class StorageProxyUtil {
       createDirIfNotExists(path, retries - 1);
     }
   }
+
+  public static List<String> getArtsNames(SipQuery sipQuery) {
+      List<String> artifactNames = new ArrayList<>();
+      List<Artifact> artifactList = sipQuery.getArtifacts();
+      for (Artifact artifact : artifactList) {
+          artifactNames.add(artifact.getArtifactsName());
+      }
+      return artifactNames;
+  }
 }

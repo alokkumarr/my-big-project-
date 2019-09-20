@@ -88,7 +88,9 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     if (designerEdit) {
       query = sipQuery.getQuery();
       queryShownTOUser = query;
+      logger.info(" Query to shown user : " + queryShownTOUser);
       query = dskForManualQuery(sipQuery,query,dataSecurityKey);
+      logger.info(" Query after dsk : "+ query);
     } else {
       DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
       query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
@@ -301,8 +303,10 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
 
     if (dataSecurityKey.getDataSecuritykey() != null
         && dataSecurityKey.getDataSecuritykey().size() != 0) {
+      logger.info("DSK :" + dataSecurityKey.getDataSecuritykey().get(0).getName());
 
       List<String> semanticArtifactNames = getArtifactNames(sipQuery);
+      logger.info("ArtifactNames = "+semanticArtifactNames);
       for (String artifactName : semanticArtifactNames) {
         flag = false;
         dskFilter = " (Select * from ";
@@ -330,11 +334,18 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
 
         if (flag) {
           dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
+          query = query + " ";
           String artName = " " + artifactName + " ";
+          logger.info("Query As is : "+ query);
+          logger.info("artName : "+artName);
+          logger.info("dskFilter str = "+dskFilter);
+          logger.info("Logged query : "+ query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter));
           query = query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter);
         }
       }
     }
+
+    logger.info("DSK applied Query : "+ query);
     return query;
   }
 
