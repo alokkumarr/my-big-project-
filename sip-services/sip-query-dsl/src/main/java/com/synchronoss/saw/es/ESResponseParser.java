@@ -149,7 +149,8 @@ public class ESResponseParser {
     groupByFields = new String[dataFields.size() - aggregationFields.size()];
     int fieldCount = 0;
     for (Field dataField : dataFields) {
-      if (dataField.getAggregate() == null) groupByFields[fieldCount++] = dataField.getColumnName();
+      if (dataField.getAggregate() == null && dataField.getFormula() == null)
+        groupByFields[fieldCount++] = dataField.getColumnName();
     }
     logger.debug("groupByFields :" + groupByFields);
     logger.debug(this.getClass().getName() + " prepareGroupByFields ends");

@@ -2,8 +2,12 @@ package com.synchronoss.saw.es;
 
 import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
+import com.google.gson.Gson;
+import com.synchronoss.saw.model.Expression;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Field.GroupInterval;
+import com.synchronoss.saw.model.Operand;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Sort.Order;
 import com.synchronoss.saw.model.Filter;
@@ -19,6 +23,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
+import org.elasticsearch.search.aggregations.pipeline.bucketscript.BucketScriptPipelineAggregationBuilder;
 import org.elasticsearch.search.aggregations.pipeline.bucketselector.BucketSelectorPipelineAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -37,7 +42,7 @@ public class SIPAggregationBuilder {
   public static List<Field> getAggregationField(List<Field> dataFields) {
     List<Field> aggregateFields = new ArrayList<>();
     for (Field dataField : dataFields) {
-      if (dataField.getAggregate() != null) {
+      if (dataField.getAggregate() != null || dataField.getFormula() != null) {
         aggregateFields.add(dataField);
       }
     }
@@ -139,8 +144,31 @@ public class SIPAggregationBuilder {
                   .size(querySize);
         }
         for (Field dataField1 : aggregateFields) {
-          aggregationBuilder.subAggregation(
-              QueryBuilderUtil.aggregationBuilderDataField(dataField1));
+          if (dataField1.getExpression() != null) {
+
+            /**
+             * Evaluate every operand in the expression as a separate datafield, store them in a
+             * custom field and then evaluate the entire expression and store it in the user
+             * provided field.
+             */
+            String expressionStr = dataField1.getExpression();
+
+            Expression expression = null;
+            Gson gson = new Gson();
+            if (expressionStr != null && expressionStr.length() != 0) {
+              expression = gson.fromJson(expressionStr, Expression.class);
+
+              System.out.println(expression);
+
+              String dataFieldName = dataField1.getDataField();
+
+              expressionEvaluator(dataFieldName, expression, aggregationBuilder);
+            }
+          } else {
+
+            aggregationBuilder.subAggregation(
+                QueryBuilderUtil.aggregationBuilderDataField(dataField1));
+          }
           SortOrder sortOrder;
           Boolean isSortReq = isSortColumnPresent(sorts, dataField1.getColumnName());
           Integer size = new Integer(BuilderUtil.SIZE);
@@ -299,5 +327,82 @@ public class SIPAggregationBuilder {
       }
     }
     return isSortReq;
+  }
+
+  private String expressionEvaluator(
+      String dataFieldName, Expression expression, AggregationBuilder aggregationBuilder) {
+    StringBuilder expressionBuilder = new StringBuilder();
+
+    Map<String, String> bucketsPathsMap = new HashMap<>();
+
+    if (expression != null) {
+      Operand operand1 = expression.getOperand1();
+
+      String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketsPathsMap);
+
+      expressionBuilder.append(operand1Exp);
+
+      if (expression.getOperand2() != null) {
+        Operand operand2 = expression.getOperand2();
+
+        String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketsPathsMap);
+
+        expressionBuilder.append(expression.getOperator());
+
+        expressionBuilder.append(operand2Exp);
+      }
+    }
+
+    Script script1 = new Script(expressionBuilder.toString());
+    BucketScriptPipelineAggregationBuilder bs =
+        PipelineAggregatorBuilders.bucketScript(dataFieldName, bucketsPathsMap, script1);
+    aggregationBuilder.subAggregation(bs);
+
+    return expressionBuilder.toString();
+  }
+
+  private String operandEvaluator(
+      Operand operand, AggregationBuilder aggregationBuilder, Map bucketPathsMap) {
+    StringBuilder operandBuilder = new StringBuilder();
+    if (operand.getAggregation() != null) {
+      Field aggField = new Field();
+
+      aggField.setColumnName(operand.getColumn());
+      aggField.setAggregate(Aggregate.fromValue(operand.getAggregation().toUpperCase()));
+
+      String fieldName = operand.getAggregation() + "_" + operand.getColumn() + "_formula";
+      aggField.setDataField(fieldName);
+
+      aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(aggField));
+
+      bucketPathsMap.put(fieldName, fieldName + ".value");
+
+      operandBuilder.append("params.").append(fieldName);
+
+    } else if (operand.getOperand1() != null
+        && operand.getOperand2() != null
+        && operand.getOperator() != null) {
+
+      operandBuilder.append("(");
+      String operator = operand.getOperator();
+
+      Operand operand1 = operand.getOperand1();
+      Operand operand2 = operand.getOperand2();
+
+      String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketPathsMap);
+
+      operandBuilder.append(operand1Exp);
+
+      operandBuilder.append(operator);
+
+      String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketPathsMap);
+      operandBuilder.append(operand2Exp);
+
+      operandBuilder.append(")");
+    } else if (operand.getValue() != null) {
+      operandBuilder.append(operand.getValue());
+    }
+
+    return operandBuilder.toString();
   }
 }

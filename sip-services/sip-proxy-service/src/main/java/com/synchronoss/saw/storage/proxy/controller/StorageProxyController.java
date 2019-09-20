@@ -337,6 +337,7 @@ public class StorageProxyController {
               analysis, size, page, pageSize, dataSecurityKeyNode, executionType);
 
       // Execution result will one be stored, if execution type is publish or Scheduled.
+
       boolean validExecutionType =
           executionType.equals(ExecutionType.publish)
               || executionType.equals(ExecutionType.scheduled);
