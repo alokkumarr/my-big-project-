@@ -8,10 +8,19 @@ import {
   Optional
 } from '@angular/core';
 import { AceEditorComponent } from 'ng2-ace-editor';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl
+} from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { parseExpression } from 'src/app/common/utils/expression-parser';
 import * as startCase from 'lodash/startCase';
+import {
+  SUPPORTED_AGGREGATES,
+  Operator as SupportedOperator
+} from 'src/app/common/utils/expression-parser';
 
 enum MODE {
   edit,
@@ -40,6 +49,8 @@ export class DerivedMetricComponent implements OnDestroy {
   langTools = ace.require('ace/ext/language_tools');
   mode = MODE.create;
   allModes = MODE;
+  allAggregatesSupported = SUPPORTED_AGGREGATES;
+  allOperatorsSupported = Object.values(SupportedOperator);
 
   constructor(
     private fb: FormBuilder,
@@ -68,6 +79,14 @@ export class DerivedMetricComponent implements OnDestroy {
       formula: [this.data.formula || '', Validators.required], // formula string entered by user
       expression: [this.data.expression || '', Validators.required] // stringified json expression corresponding to formula
     });
+  }
+
+  get columnName(): FormControl {
+    return this.expressionForm.get('columnName') as FormControl;
+  }
+
+  get formula(): FormControl {
+    return this.expressionForm.get('formula') as FormControl;
   }
 
   ngOnDestroy() {
@@ -119,5 +138,36 @@ export class DerivedMetricComponent implements OnDestroy {
         });
       }
     }
+  }
+
+  /**
+   * Adds @text to editor at current cursor position.
+   * Additionally, it may set the cursor back by
+   * @backtrack number of characters. Handy for
+   * inserting templates, where we want the cursor
+   * to be somewhere in middle upon finish.
+   *
+   * @param {string} text
+   * @param {number} backtrack
+   * @memberof DerivedMetricComponent
+   */
+  addText(text: string, backtrack = 0) {
+    const editor = this.editor.getEditor();
+    editor.session.insert(editor.getCursorPosition(), text);
+
+    if (backtrack) {
+      /* Move cursor back by the specified number of characters. */
+      const position: {
+        row: number;
+        column: number;
+      } = editor.getCursorPosition();
+      editor.moveCursorToPosition({
+        ...position,
+        column: Math.max(position.column - backtrack, 0)
+      });
+    }
+
+    this.expressionError = '';
+    editor.focus();
   }
 }

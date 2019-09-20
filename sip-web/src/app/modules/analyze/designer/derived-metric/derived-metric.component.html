@@ -10,7 +10,12 @@
     style="height: 100%"
     fxLayoutGap="10px"
   >
-    <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex>
+    <div
+      fxLayout="row"
+      fxLayoutAlign="space-between stretch"
+      fxLayoutGap="10px"
+      fxFlex
+    >
       <div
         fxLayout="column"
         fxLayoutAlign="space-between stretch"
@@ -27,7 +32,10 @@
           />
         </mat-form-field>
         <mat-error
-          *ngIf="expressionForm.get('columnName').hasError('required')"
+          *ngIf="
+            columnName.hasError('required') &&
+            (columnName.dirty || columnName.touched)
+          "
           i18n
         >
           Field name is
@@ -46,7 +54,9 @@
         </ace-editor>
 
         <mat-error
-          *ngIf="expressionForm.get('formula').hasError('required')"
+          *ngIf="
+            formula.hasError('required') && (formula.dirty || formula.touched)
+          "
           i18n
         >
           Formula is
@@ -57,8 +67,50 @@
           {{ expressionError }}
         </mat-error>
       </div>
-      <div class="derived-metric__aggregate-select">
+      <div
+        class="derived-metric__aggregate-select"
+        fxLayout="column"
+        fxLayoutAlign="start stretch"
+        fxLayoutGap="10px"
+        style="padding-top: 3px"
+      >
         <!-- Add aggregate selection here  -->
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-around center"
+          fxLayoutGap="10px"
+        >
+          <button
+            mat-stroked-button
+            color="primary"
+            *ngFor="let operator of allOperatorsSupported"
+            type="button"
+            fxFlex
+            (click)="addText(' ' + operator + ' ')"
+          >
+            {{ operator }}
+          </button>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start stretch"
+          fxLayoutGap="10px"
+          fxFlex
+        >
+          <button
+            mat-stroked-button
+            color="primary"
+            *ngFor="let agg of allAggregatesSupported"
+            type="button"
+            style="text-align: start"
+            (click)="addText(agg + '()', 1)"
+          >
+            {{ agg | titlecase }}
+          </button>
+          <h4 style="color: #888888; text-align: center">
+            Click an operator to add it to the editor.
+          </h4>
+        </div>
       </div>
     </div>
 
