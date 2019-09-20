@@ -1,6 +1,7 @@
 import * as Highcharts from 'highcharts/highcharts';
 import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
+import * as moment from 'moment';
 
 import {
   FLOAT_TYPES,
@@ -75,9 +76,9 @@ function getXValue(point, fields, chartType) {
   }
   if (DATE_TYPES.includes(x.type)) {
     if (hasGroupBy) {
-      return point.category;
+      return moment(point.category).format(x.dateFormat);
     }
-    return point.key || point.category;
+    return moment(point.key).format(x.dateFormat) || moment(point.category).format(x.dateFormat);
   }
 }
 
