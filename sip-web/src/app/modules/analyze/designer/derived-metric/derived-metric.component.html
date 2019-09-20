@@ -1,0 +1,69 @@
+<form
+  class="derived-metric__form"
+  style="height: 100%"
+  [formGroup]="expressionForm"
+  (submit)="submit()"
+>
+  <div
+    fxLayout="column"
+    fxLayoutAlign="space-between stretch"
+    style="height: 100%"
+    fxLayoutGap="10px"
+  >
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex>
+      <div
+        fxLayout="column"
+        fxLayoutAlign="space-between stretch"
+        fxFlex
+        style="height: 100%"
+      >
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            type="text"
+            formControlName="columnName"
+            placeholder="Name your derived metric"
+          />
+        </mat-form-field>
+        <mat-error
+          *ngIf="expressionForm.get('columnName').hasError('required')"
+          i18n
+        >
+          Field name is
+          <strong>required.</strong>
+        </mat-error>
+
+        <ace-editor
+          #editor
+          [text]="expressionForm.get('formula').value"
+          (textChanged)="expressionChanged($event)"
+          [options]="editorOptions"
+          theme="eclipse"
+          mode="sql"
+          fxFlex
+        >
+        </ace-editor>
+
+        <mat-error
+          *ngIf="expressionForm.get('formula').hasError('required')"
+          i18n
+        >
+          Formula is
+          <strong>required.</strong>
+        </mat-error>
+
+        <mat-error *ngIf="expressionError" i18n>
+          {{ expressionError }}
+        </mat-error>
+      </div>
+      <div class="derived-metric__aggregate-select">
+        <!-- Add aggregate selection here  -->
+      </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+      <button mat-button (click)="dialogRef.close(null)">Cancel</button>
+      <button mat-raised-button type="submit" color="primary">Submit</button>
+    </div>
+  </div>
+</form>
