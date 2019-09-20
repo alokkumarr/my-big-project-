@@ -46,6 +46,7 @@ import {
 } from '../../utils';
 import { MatDialog } from '@angular/material';
 import { DerivedMetricComponent } from '../../derived-metric/derived-metric.component';
+import { ArtifactColumnDSL } from '../../../types';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -240,20 +241,32 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
-  openDerivedMetricDialog() {
+  openDerivedMetricDialog(artifactColumn: ArtifactColumnDSL) {
     const dialogRef = this.dialog.open(DerivedMetricComponent, {
       width: '60%',
       height: '60%',
-      autoFocus: false
+      autoFocus: false,
+      data: artifactColumn
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.artifactColumns.push({
+        const column = {
+          ...artifactColumn,
           ...result,
           table: get(this.artifact, 'artifactName'),
           type: 'double'
-        });
+        };
+
+        const id = findIndex(
+          this.artifactColumns,
+          col => col.columnName === result.columnName
+        );
+        if (id >= 0) {
+          this.artifactColumns.splice(id, 1, column);
+        } else {
+          this.artifactColumns.push(column);
+        }
         this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       }
     });

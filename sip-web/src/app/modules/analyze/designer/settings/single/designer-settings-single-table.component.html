@@ -106,6 +106,7 @@
               mat-icon-button
               color="primary"
               *ngIf="artifactColumn.formula"
+              (click)="openDerivedMetricDialog(artifactColumn)"
               [attr.e2e]="
                 'designer-edit-derived-metric-btn-' +
                 (artifactColumn.alias || artifactColumn.displayName)
