@@ -81,7 +81,7 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
             ps.setString(6,cust.getMiddleName());
             ps.setString(7,cust.getLastName());
             ps.setString(8,cust.getIsJvCustomer());
-            ps.setString(8,cust.getFilterByCustomerCode());
+            ps.setString(9,cust.getFilterByCustomerCode());
         });
         logger.info("res",res);
         return res;
