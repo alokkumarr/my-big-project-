@@ -157,7 +157,6 @@ public abstract class NGExecutor {
         ds.toDF().show(4);
 
         String transOutKey =  ngctx.componentConfiguration.getOutputs().get(0).getDataSet().toString();
-        String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
 
         ngctx.datafileDFmap.put(transOutKey,outputResult);
 
