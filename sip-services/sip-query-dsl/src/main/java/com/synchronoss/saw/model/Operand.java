@@ -8,8 +8,8 @@ public class Operand {
   @JsonProperty("value")
   Number value;
 
-  @JsonProperty("aggregation")
-  String aggregation;
+  @JsonProperty("aggregate")
+  String aggregate;
 
   @JsonProperty("columnm")
   String column;
@@ -33,14 +33,14 @@ public class Operand {
     this.value = value;
   }
 
-  @JsonProperty("aggregation")
-  public String getAggregation() {
-    return aggregation;
+  @JsonProperty("aggregate")
+  public String getAggregate() {
+    return aggregate;
   }
 
-  @JsonProperty("aggregation")
-  public void setAggregation(String aggregation) {
-    this.aggregation = aggregation;
+  @JsonProperty("aggregate")
+  public void setAggregate(String aggregate) {
+    this.aggregate = aggregate;
   }
 
   @JsonProperty("column")
@@ -89,8 +89,8 @@ public class Operand {
 
     if (this.value != null) {
       builder.append(this.value);
-    } else if (this.aggregation != null) {
-      builder.append(aggregation).append("(").append(this.column).append(")");
+    } else if (this.aggregate != null) {
+      builder.append(aggregate).append("(").append(this.column).append(")");
     } else {
       builder.append("(");
       if (operand1 != null) {
@@ -122,7 +122,7 @@ public class Operand {
 
     return new EqualsBuilder()
         .append(value, operand.value)
-        .append(aggregation, operand.aggregation)
+        .append(aggregate, operand.aggregate)
         .append(column, operand.column)
         .append(operator, operand.operator)
         .append(operand1, operand.operand1)
@@ -134,7 +134,7 @@ public class Operand {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(value)
-        .append(aggregation)
+        .append(aggregate)
         .append(column)
         .append(operator)
         .append(operand1)

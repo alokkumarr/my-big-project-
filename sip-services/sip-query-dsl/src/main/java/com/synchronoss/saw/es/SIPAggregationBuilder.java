@@ -22,6 +22,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.pipeline.BucketHelpers.GapPolicy;
 import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
 import org.elasticsearch.search.aggregations.pipeline.bucketscript.BucketScriptPipelineAggregationBuilder;
 import org.elasticsearch.search.aggregations.pipeline.bucketselector.BucketSelectorPipelineAggregationBuilder;
@@ -356,6 +357,7 @@ public class SIPAggregationBuilder {
     Script script1 = new Script(expressionBuilder.toString());
     BucketScriptPipelineAggregationBuilder bs =
         PipelineAggregatorBuilders.bucketScript(dataFieldName, bucketsPathsMap, script1);
+    bs.gapPolicy(GapPolicy.INSERT_ZEROS);
     aggregationBuilder.subAggregation(bs);
 
     return expressionBuilder.toString();
@@ -364,13 +366,13 @@ public class SIPAggregationBuilder {
   private String operandEvaluator(
       Operand operand, AggregationBuilder aggregationBuilder, Map bucketPathsMap) {
     StringBuilder operandBuilder = new StringBuilder();
-    if (operand.getAggregation() != null) {
+    if (operand.getAggregate() != null) {
       Field aggField = new Field();
 
       aggField.setColumnName(operand.getColumn());
-      aggField.setAggregate(Aggregate.fromValue(operand.getAggregation().toUpperCase()));
+      aggField.setAggregate(Aggregate.fromValue(operand.getAggregate().toUpperCase()));
 
-      String fieldName = operand.getAggregation() + "_" + operand.getColumn() + "_formula";
+      String fieldName = operand.getAggregate() + "_" + operand.getColumn() + "_formula";
       aggField.setDataField(fieldName);
 
       aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(aggField));

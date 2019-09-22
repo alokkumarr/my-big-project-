@@ -92,8 +92,12 @@ public class ESResponseParser {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
       for (Field dataField : aggregationFields) {
+        logger.debug("Datafield = " + dataField);
         String columnName =
             dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+
+        logger.debug("Column Name = " + columnName);
+        logger.debug("Child Node = " + childNode);
         flatValues.put(columnName, childNode.get(columnName).get(VALUE));
       }
       flatStructure.add(flatValues);
