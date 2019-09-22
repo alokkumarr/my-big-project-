@@ -32,7 +32,7 @@ interface IMathJS extends mjs.MathJsStatic {
 const { SymbolNode, OperatorNode, ConstantNode, FunctionNode } = mjs as IMathJS;
 
 // #region Type definitions for SIP compatible expressions
-enum Operator {
+export enum Operator {
   Add = '+',
   Subtract = '-',
   Multiply = '*',
@@ -71,6 +71,8 @@ export class ExpressionError extends Error {
   }
 }
 // #endregion
+
+export const SUPPORTED_AGGREGATES = ['SUM', 'AVG'];
 
 /*
   ██████╗ ██████╗ ███╗   ██╗██╗   ██╗███████╗██████╗ ████████╗███████╗██████╗ ███████╗
@@ -190,8 +192,6 @@ const validateOperator = (operator: Operator): string[] => {
 };
 
 const validateColumn = ({ column, aggregate }: ColumnExpression): string[] => {
-  const SUPPORTED_AGGREGATES = ['SUM', 'AVG'];
-
   if (!column) {
     return [`Invalid column name: null`];
   }
