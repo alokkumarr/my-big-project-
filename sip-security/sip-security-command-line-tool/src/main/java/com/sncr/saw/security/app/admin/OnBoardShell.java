@@ -32,7 +32,7 @@ public class OnBoardShell {
                                 @ShellOption(value = "--F",help = "User First Name",defaultValue = "_NONE_") String firstName,
                                 @ShellOption(value = "--M",help = "User Middle Name",defaultValue = "_NONE_") String middleName,
                                 @ShellOption(value = "--L",help = "User Last Name",defaultValue = "_NONE_") String lastName,
-                                @ShellOption(value = "--JV",help = "Joint Venture",defaultValue = "_NONE_") String isJvCustomer,
+                                @ShellOption(value = "--JV",help = "Super Admin ? (No customerCode filtering)",defaultValue = "_NONE_") String isJvCustomer,
                                 @ShellOption(value = "--FC",help = "Filter By Customer Code",defaultValue = "_NONE_") String filterByCustomerCode){
         if (customerCode.trim().isEmpty() || customerCode.equalsIgnoreCase("_NONE_")
             || productName.trim().isEmpty() || productName.equalsIgnoreCase("_NONE_")
