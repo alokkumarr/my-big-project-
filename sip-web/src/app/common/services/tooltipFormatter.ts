@@ -76,9 +76,9 @@ function getXValue(point, fields, chartType) {
   }
   if (DATE_TYPES.includes(x.type)) {
     if (hasGroupBy) {
-      return moment(point.category).format(x.dateFormat);
+      return moment(point.category).format('DD-MM-YYYY');
     }
-    return moment(point.key).format(x.dateFormat) || moment(point.category).format(x.dateFormat);
+    return moment(point.category).format('DD-MM-YYYY');
   }
 }
 
