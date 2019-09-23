@@ -41,6 +41,16 @@
           Field name is
           <strong>required.</strong>
         </mat-error>
+        <mat-error
+          *ngIf="
+            columnName.hasError('isUnique') &&
+            (columnName.dirty || columnName.touched)
+          "
+          i18n
+        >
+          A field with this name
+          <strong>already exists.</strong>
+        </mat-error>
 
         <ace-editor
           #editor
