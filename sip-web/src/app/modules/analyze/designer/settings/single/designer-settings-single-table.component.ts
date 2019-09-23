@@ -144,6 +144,12 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     }
   }
 
+  get isDerivedMetricSupported(): boolean {
+    return (
+      this.analysisType && !['report', 'pivot'].includes(this.analysisType)
+    );
+  }
+
   trackByIndex(index) {
     return index;
   }
