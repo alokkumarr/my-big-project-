@@ -54,7 +54,8 @@ import {
   LabelOptions,
   AnalysisChartDSL,
   AnalysisMapDSL,
-  QueryDSL
+  QueryDSL,
+  ArtifactColumn
 } from '../../../../models';
 import {
   DesignerStates,
@@ -1156,7 +1157,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'expressionAdd':
       const artifact = this.artifacts[0];
-      artifact.columns.push(event.column as any);
+      (<ArtifactColumn[]>artifact.columns).push(event.column as ArtifactColumn);
       this.artifacts = [artifact];
       break;
       case 'alias':
