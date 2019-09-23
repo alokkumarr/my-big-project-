@@ -70,110 +70,87 @@ public class XDFDataProcessor  extends AbstractComponent {
 
     protected void  processData(String[] args)
     {
-        int ret = 0 ;
+    	int ret = 0 ;
 
-        CliHandler cli = new CliHandler();
-        this.args = args;
+    	CliHandler cli = new CliHandler();
+    	this.args = args;
 
-        try {
+    	try {
 
-            HFileOperations.init(10);
-            Map<String, Object> parameters = cli.parse(args);
+    		HFileOperations.init(10);
+    		Map<String, Object> parameters = cli.parse(args);
 
-            PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
-            jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
-            JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
-            JSONObject componentConfig = (JSONObject)pipeline.get(0);
-            
-            if(componentConfig.get("component").toString().equals("rtps")) {
-            	processRtps(parameters,componentConfig.get("configuration").toString(),
-            			Boolean.valueOf(componentConfig.get("persist").toString()));
-            } else {
-            	
-            	for(int i=0;i<pipeline.size();i++)
-                {
-                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
+    		PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+    		jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
+    		
 
-                    String component = pipeObj.get("component").toString();
-                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
-                    switch(component)
-                    {
-                    
-                    
-                        case "parser" :
-                        ret = processParser(parameters,pipeObj.get("configuration").toString(),persist,false);
-                        break;
+    		Object isMultiple = jsonObj.get("multiplePipeline");
+    		
+    		logger.info("Is multiple pipeline ::"+ isMultiple);
 
-                        case "transformer" :
-                        ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
-                        break;
-
-                        case "sql" :
-                        ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
-                        break;
-
-                        case "esloader" :
-                        ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
-                        break;
-                    }
-                }
-            }
+    		if(isMultiple !=null && Boolean.valueOf((String)isMultiple)){
+    			logger.info("is Multiple exists ::");
+    			JSONObject pipeline = (JSONObject) jsonObj.get("pipeline");
+    			JSONObject rtaConfig = (JSONObject) pipeline.get("rta");
+    			if(rtaConfig != null) {
+    				processRtps(parameters,rtaConfig.get("configuration").toString(),
+    						Boolean.valueOf(rtaConfig.get("persist").toString()));
+    			} else {
+    				throw new Exception("Invlid configuration. Missing RTA configuration for multiple pipelines");
+    			}
 
 
-            
+    		} else {
+    			logger.info("is Multiple doesnt exists ::");
+    			JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
+    			JSONObject componentConfig = (JSONObject)pipeline.get(0);
 
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
-            System.exit(ret);
-        }
+    			if(componentConfig.get("component").toString().equals("rtps")) {
+    				processRtps(parameters,componentConfig.get("configuration").toString(),
+    						Boolean.valueOf(componentConfig.get("persist").toString()));
+    			} else {
+
+    				for(int i=0;i<pipeline.size();i++)
+    				{
+    					JSONObject pipeObj = (JSONObject)pipeline.get(i);
+
+    					String component = pipeObj.get("component").toString();
+    					boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+    					logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
+    					switch(component)
+    					{
+
+
+    					case "parser" :
+    						ret = processParser(parameters,pipeObj.get("configuration").toString(),persist);
+    						break;
+
+    					case "transformer" :
+    						ret = processTransformer(parameters,pipeObj.get("configuration").toString(),persist);
+    						break;
+
+    					case "sql" :
+    						ret = processSQL(parameters,pipeObj.get("configuration").toString(),persist);
+    						break;
+
+    					case "esloader" :
+    						ret = processESLoader(parameters,pipeObj.get("configuration").toString(),persist);
+    						break;
+    					}
+    				}
+    			}
+    		}
+
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		System.exit(ret);
+    	}
+
     }
 
     
-    public void  processDataWithDataFrame()
-    {
-    	 int ret = 0 ;
-
-        try {
-        	JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
-            
-            	for(int i=1;i<pipeline.size();i++)
-                {
-                    JSONObject pipeObj = (JSONObject)pipeline.get(i);
-
-                    String component = pipeObj.get("component").toString();
-                    boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-                    logger.debug("Processing   ---> " + pipeObj.get("component") + " Component" + "\n" );
-                    switch(component)
-                    {
-                    
-                    
-                        case "parser" :
-                        ret = processParser(pipelineConfigParams,pipeObj.get("configuration").toString(),persist, true);
-                        break;
-
-                        case "transformer" :
-                        ret = processTransformer( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
-                        break;
-
-                        case "sql" :
-                        ret = processSQL( pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
-                        break;
-
-                        case "esloader" :
-                        ret = processESLoader(pipelineConfigParams,pipeObj.get("configuration").toString(),persist);
-                        break;
-                    }
-                }
-
-
-            
-
-        } catch (Exception e) {
-            logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
-            System.exit(ret);
-        }
-	}
+    
 
 
    
@@ -288,7 +265,7 @@ public class XDFDataProcessor  extends AbstractComponent {
         return pipelineObj;
     }
 
-    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag, boolean isRealTime)
+    public int  processParser(Map<String, Object> parameters, String configPath,boolean persistFlag)
     {
         int ret = 0;
         try {

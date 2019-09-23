@@ -1,5 +1,9 @@
 package sncr.xdf.rtps.transform;
 
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE;
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -8,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,14 +43,8 @@ import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
 
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.rtps.model.GenericJsonModel;
-
 import sncr.xdf.rtps.driver.RTPSPipelineProcessor;
-
-import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
-import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
-import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE;
-import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
+import sncr.xdf.rtps.model.GenericJsonModel;
 
 
 /**
@@ -52,7 +53,7 @@ import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE_JS
  */
 public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<String, String>>, Time> {
 
-    private static final Logger logger = Logger.getLogger(ProcessRecords.class);
+	transient Logger logger = Logger.getLogger(ProcessRecords.class);
     private static final long serialVersionUID = -3110740581467891647L;
 
     private JavaInputDStream<ConsumerRecord<String, String>> inStream;
@@ -77,6 +78,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private String outputType;
     private InternalContext itcx;
     private NGContext ngctx ;
+    
+    
 
     public ProcessRecords(
         JavaInputDStream<ConsumerRecord<String, String>> inStream,
@@ -216,35 +219,150 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         processJsonRecords(jsonRdd, tm, cnf, ctx);
     }
 
-    /*private void ProcessCountlyRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
-        JavaRDD<String> jsonRdd = in.mapPartitions(new TransformCountlyRecord());
-        SparkConf cnf = in.context().getConf();
-        processJsonRecords(jsonRdd, tm, cnf);
-
-    }*/
+    
 
     private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx){
     	logger.debug("######## Inside process json records #####" );
-    	for(String line:jsonRdd.collect()){
-            logger.debug(line);
-        }
+    	
        // SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
     	SparkSession sess = ctx.sparkSession;
         JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
+        //rowRdd.foreachPartitionAsync(f)
+        
+ 
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
+        //List<Row> list =  df.collectAsList();
+        //Dataset<Row> data = sess.createDataFrame(list, schema);
+  	    NGContext context = this.ngctx;
+  	    
+		
+		/*df.repartition(new Column("EVENT_TYPE")).toJavaRDD().foreachPartitionAsync(new VoidFunction<JavaRDD<Row>>() {
+
+			
+
+			@Override
+			public void call(JavaRDD<Row> t) throws Exception {
+				JSONObject pipeline = (JSONObject) context.pipelineConfig.get("pipeline");
+	            JSONObject pipelineConfigs = (JSONObject) pipeline.get("pipelineConfigs");
+				RTPSPipelineProcessor processor = new RTPSPipelineProcessor(sess.createDataFrame(t, schema));
+	            processor.processDataWithDataFrame(context.pipelineConfig,context.pipelineConfigParams, null );
+				
+			}
+			
+			
+		});*/
+    	
+        logger.debug("Invoking  async ...partion logic ....");
         
-        
+       /* List<Row> list =  df.repartition(new Column("EVENT_TYPE")).collectAsList();
+        final SparkSession sparkSession = SparkSession.builder().config(cnf).getOrCreate();
+		sess.createDataFrame(list, schema).toJavaRDD().foreachPartitionAsync(new ProcessEventType(cnf,
+				this.ngctx.pipelineConfig,schema,this.ngctx.pipelineConfigParams,df.sparkSession()));*/
+		
+		
+		
+		logger.debug("Invoking async ...partion logic completed....");
         
         if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
       	  logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
-      	  logger.debug("####"+ this.ngctx.pipelineConfig);
       	  
       	logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
     	  logger.debug("####"+ this.ngctx.pipelineConfigParams);
+    	  List<Row> eventTypes = df.select("EVENT_TYPE").distinct().collectAsList();
     	  
-      	  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.cache());
-           processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams );
-      }
+    	  logger.info("Total event types: "+ eventTypes.size());
+    	  
+    	  NGContext ct = this.ngctx;
+    	  ExecutorService executorService = Executors.newFixedThreadPool(10);
+    	  for(Row eventType: eventTypes) {
+    		  logger.info("Processing for event type: "+ eventType.getString(0));
+    		  
+    		  
+    		  executorService.submit(new Callable<Long>() {
+    		        @Override
+    		        public Long call() throws Exception {
+    		        	/*logger.info("Starting processing for event type " + eventType);
+    					logger.info("Sleeping for " + eventType);
+    					try {
+    						Thread.sleep(60000);
+    					} catch (InterruptedException e) {
+    						// TODO Auto-generated catch block
+    						e.printStackTrace();
+    					}
+    					logger.info("Resumed from sleep for " + eventType);*/
+    		        	
+    		        	String type =  (String) eventType.get(0);
+    		        	
+    		          logger.info("###########Event type::"+ type);
+  		    		  String query = "EVENT_TYPE == \'"+ type+ "\'";
+  		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+  		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
+  					
+    					return 1L;
+    		        }
+    		    });
+    		  
+    		  
+    		  
+    		  
+    			/*CompletableFuture.runAsync(new Runnable() {
+
+				@Override
+				public void run() {
+					logger.info("Starting processing for event type " + eventType);
+					logger.info("Sleeping for " + eventType);
+					try {
+						Thread.sleep(60000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					logger.info("Resumed from sleep for " + eventType);
+				String type =  (String) eventType.get(0);
+		    		  String query = "EVENT_TYPE == \'"+ type+ "\'";
+		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
+					
+				}
+    			  
+    		  });*/
+    		  
+    	  }
+    	  
+    	  /*for(Row eventType: eventTypes) {
+    		 String type =  (String) eventType.get(0);
+    		// Dataset<Row> filteredData = df.select("EVENT_TYPE ==type");
+    		 String query = "EVENT_TYPE == \'"+ type+ "\'";
+    		 logger.debug("Query:: " + query);
+    		 RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,type );
+    		  
+    	  }*/
+    	
+    	  logger.debug("COUNT before async::"+ df.count());
+    	  //List<Row> list =  df.select("EVENT_TYPE").distinct().toJavaRDD().collect();
+    	 /* sess.createDataFrame(list, schema).toJavaRDD().foreachPartitionAsync(
+    			  new ProcessEventType(sess , schema,
+    					  df.cache(),this.ngctx.pipelineConfig,this.ngctx.pipelineConfigParams, logger));*/
+    	  
+    	  
+    	  
+    	  //eventTypes.toJavaRDD().foreachAsync(new ProcessEventType(cachedData,this.ngctx.pipelineConfig,this.ngctx.pipelineConfigParams));
+    	  
+  		/*eventTypes.toJavaRDD().for((ForeachFunction<Row>) row -> {
+  			Dataset<Row> eventTypeData = df.filter("EVENT_TYPE == row.getString(0)");
+  			
+  			 //eventTypeData.rdd().toJavaRDD().foreachPartitionAsync(f)
+  			
+            
+            JSONObject pipeline = (JSONObject) this.ngctx.pipelineConfig.get("pipeline");
+            JSONObject pipelineConfigs = (JSONObject) pipeline.get("pipelineConfigs");
+			RTPSPipelineProcessor processor = new RTPSPipelineProcessor(eventTypeData.cache());
+             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,row.getString(0) );
+  			
+  		});
+      	  
+      }*/
 
         // Elastic Search
         if (esIndex != null && !esIndex.isEmpty()) {
@@ -290,12 +408,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         
         
         
-       
-        
-        return 0;
-    }
+        }
 
     
+        
+        return 0;
+    
+}
     
 
     private int finalizeBatch(String strTmpPath, String finalPath){

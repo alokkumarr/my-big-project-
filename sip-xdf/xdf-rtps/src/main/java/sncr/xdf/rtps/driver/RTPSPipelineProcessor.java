@@ -18,6 +18,7 @@ import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.services.NGContextServices;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import sncr.xdf.transformer.ng.NGTransformerComponent;
@@ -39,6 +40,10 @@ public class RTPSPipelineProcessor {
 		
 	}
 
+	public RTPSPipelineProcessor(List<Row> rowsList) {
+		// TODO Auto-generated constructor stub
+	}
+
 	private String PIPELINE_CONFIG;
 	private JSONObject jsonObj;
 	private Map<String, Object> pipelineConfigParams;
@@ -48,54 +53,88 @@ public class RTPSPipelineProcessor {
 	String dataSetName = "";
 	String error;
 	String[] args;
+	
 
-	public void processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams) {
+	public void processDataWithDataFrame(JSONObject pipeLineConfig, Map<String, Object> pipelineParams, String type) {
 		
-		logger.debug("###### Starting pipeline with dataset.....:)");
+		logger.info("###### Starting pipeline with dataset.....:) for event type "+ type);
 		Dataset<Row> dataset = this.datafileDFmap.get("DATA_STREAM");
 		dataset.show();
 		logger.debug("###### Dataset display completed.....:)");
 		int ret = 0;
 
 		try {
-			JSONArray pipeline = (JSONArray) pipeLineConfig.get("pipeline");
-
-			for (int i = 1; i < pipeline.size(); i++) {
-				JSONObject pipeObj = (JSONObject) pipeline.get(i);
-
-				String component = pipeObj.get("component").toString();
-				boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
-				logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+			
+			logger.debug("###### Pipeline config from consumer "+ pipeLineConfig);
+			
+			Object isMultiple = pipeLineConfig.get("multiplePipeline");
+    		
+    		logger.info("Is multiple pipeline ::"+ isMultiple);
+    		JSONArray pipeline = null;
+    		
+    		if(isMultiple ==null || !Boolean.valueOf((String)isMultiple)){
+    			logger.info("is Multiple doesnt exists ::");
+    			 pipeline = (JSONArray) pipeLineConfig.get("pipeline");
+				logger.debug("### Pipeline configuration retrived successfully starting processing");
 				
-				logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString() );
+    		} else {
+    			logger.info("is Multiple  exists ::");
+    			JSONObject pipelineObj = (JSONObject) pipeLineConfig.get("pipeline");
+    			logger.debug("#######reading pipeline obj" + pipelineObj);
+    			JSONObject configs = (JSONObject) pipelineObj.get("pipelineConfigs");
+    			logger.debug("#######reading pipeline configs"  + configs);
+    			 pipeline = (JSONArray) configs.get(type);
+    			logger.debug("#######pipeline"  + pipeline);
+    			
+    		}
+			
+			
+	
+			
+			if(pipeline == null) {
+				logger.error("####No pipeline defined for event type "+ pipeline);
+			} else {
 				
-				logger.debug("######## Params   ---> " + pipelineParams );
-				
-				
-				switch (component) {
+				for (int i = 1; i < pipeline.size(); i++) {
+					JSONObject pipeObj = (JSONObject) pipeline.get(i);
+					
+					String component = pipeObj.get("component").toString();
+					boolean persist = Boolean.parseBoolean(pipeObj.get("persist").toString());
+					logger.debug("######## Processing   ---> " + pipeObj.get("component") + " Component" + "\n");
+					
+					logger.debug("######## Config   ---> " + pipeObj.get("configuration").toString() );
+					
+					logger.debug("######## Params   ---> " + pipelineParams );
+					
+					
+					switch (component) {
 
-				case "parser":
-					ret = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
-					break;
+					case "parser":
+						ret = processParser(pipelineParams, pipeObj.get("configuration").toString(), persist);
+						break;
 
-				case "transformer":
-					ret = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
-					break;
+					case "transformer":
+						ret = processTransformer(pipelineParams, pipeObj.get("configuration").toString(), persist);
+						break;
 
-				case "sql":
-					ret = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
-					break;
+					case "sql":
+						ret = processSQL(pipelineParams, pipeObj.get("configuration").toString(), persist);
+						break;
 
-				case "esloader":
-					ret = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
-					break;
+					case "esloader":
+						ret = processESLoader(pipelineParams, pipeObj.get("configuration").toString(), persist);
+						break;
+					}
 				}
-			}
-
-		} catch (Exception e) {
-			logger.debug("XDFDataProcessor:processData() Exception is : " + e + "\n");
-			System.exit(ret);
+				
+			} 
+		}catch (Exception e) {
+			e.printStackTrace();
+			logger.debug("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
+			//System.exit(ret);
+		
 		}
+			
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception {
