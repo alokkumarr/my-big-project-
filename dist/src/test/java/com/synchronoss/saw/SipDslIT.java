@@ -40,13 +40,12 @@ public class SipDslIT extends BaseIT {
   @Before
   public void setUpData() {
     testData = new JsonObject();
-    testData.addProperty("type", "chart");
-    testData.addProperty("type", "chart");
-    testData.addProperty("semanticId", "d23c6142-2c10-459e-b1f6-29edd1b2ccfe");
+    testData.addProperty("type", "esReport");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch-att");
     testData.addProperty("id", analysisId);
     testData.addProperty("customerCode", "SYNCHRONOSS");
-    testData.addProperty("projectCode", "sip-sample");
-    testData.addProperty("module", "productSpecific/ANALYZE");
+    testData.addProperty("projectCode", "workbench");
+    testData.addProperty("module", "ANALYZE");
     testData.addProperty("createdTime", 1543921879);
     testData.addProperty("createdBy", "sipadmin@synchronoss.com");
     testData.addProperty("modifiedTime", 1543921879);
@@ -57,7 +56,7 @@ public class SipDslIT extends BaseIT {
     sipQuery = new JsonObject();
 
     JsonObject artifact1 = new JsonObject();
-    artifact1.addProperty("artifactName", "sample");
+    artifact1.addProperty("artifactsName", "sample");
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", "string");
@@ -190,6 +189,7 @@ public class SipDslIT extends BaseIT {
     sorts.add(sort1);
 
     sipQuery.add("sorts", sorts);
+    sipQuery.addProperty("semanticId", "workbench::sample-spark");
 
     JsonObject store = new JsonObject();
     store.addProperty("dataStore", "sampleAlias/sample");

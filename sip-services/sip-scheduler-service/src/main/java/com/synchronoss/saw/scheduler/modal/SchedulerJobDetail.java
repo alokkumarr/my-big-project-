@@ -5,6 +5,8 @@ import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -21,6 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class SchedulerJobDetail implements Serializable {
 
   private static final long serialVersionUID = 8510739855197957265l;
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerJobDetail.class);
 
   private String analysisID;
 
@@ -342,7 +345,7 @@ public class SchedulerJobDetail implements Serializable {
     this.auth = auth;
   }
 
-    /**
+   /**
    * @param out
    * @throws IOException
    */
@@ -450,7 +453,7 @@ public class SchedulerJobDetail implements Serializable {
         }
 
     } catch (OptionalDataException e) {
-
+      logger.error("Unable to read auth Object :{}", e.getMessage());
     }
   }
 

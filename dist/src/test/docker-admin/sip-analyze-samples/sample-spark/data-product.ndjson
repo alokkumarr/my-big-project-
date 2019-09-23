@@ -245,6 +245,3 @@
 {"string_2": "string 245", "long_2": 1244, "float_2": 1000.245, "date_2": "2018-12-30 00:00:00", "integer_2": 344, "double_2": 99995.245, "customerCode": "ATT"}
 {"string_2": "string 246", "long_2": 1245, "float_2": 1000.246, "date_2": "2018-12-31 00:00:00", "integer_2": 345, "double_2": 99995.246, "customerCode": "SNT"}
 {"string_2": "string 247", "long_2": 1246, "float_2": 1000.247, "date_2": "2019-01-01 00:00:00", "integer_2": 346, "double_2": 99995.247, "customerCode": "MCT"}
-
-
-

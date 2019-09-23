@@ -344,7 +344,7 @@ public class StorageProxyController {
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
       Boolean designerEdit =
           analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
-      if (analysisType.equalsIgnoreCase("report") && designerEdit == true) {
+      if (analysisType.equalsIgnoreCase("report") && designerEdit) {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
