@@ -1140,6 +1140,25 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
+    case 'expressionUpdate':
+      this._store.dispatch(new DesignerUpdateArtifactColumn({
+        columnName: event.column.columnName,
+        formula: event.column.formula,
+        expression: event.column.expression
+      }));
+      forEach(this.artifacts[0].columns, col => {
+        if (col.columnName === event.column.columnName) {
+          col.formula = event.column.formula;
+          col.expression = event.column.expression;
+        }
+      });
+      this.artifacts = [...this.artifacts];
+      break;
+    case 'expressionAdd':
+      const artifact = this.artifacts[0];
+      artifact.columns.push(event.column as any);
+      this.artifacts = [artifact];
+      break;
       case 'alias':
         // reload frontEnd
         this.updateAnalysis();

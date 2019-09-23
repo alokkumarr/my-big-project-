@@ -164,6 +164,7 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   }
 
   _changeSettingsDebounced(event: DesignerChangeEvent) {
+    console.log(event);
     this.change.emit(event);
   }
 
@@ -269,9 +270,12 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
           col => col.columnName === result.columnName
         );
         if (id >= 0) {
-          this.artifactColumns.splice(id, 1, column);
+          this._changeSettingsDebounced({
+            subject: 'expressionUpdate',
+            column
+          });
         } else {
-          this.artifactColumns.push(column);
+          this._changeSettingsDebounced({ subject: 'expressionAdd', column });
         }
         this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       }

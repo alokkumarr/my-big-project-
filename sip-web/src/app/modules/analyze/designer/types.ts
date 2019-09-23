@@ -141,6 +141,8 @@ export interface DesignerChangeEvent {
     | 'changeQuery'
     | 'geoRegion'
     | 'chartType'
+    | 'expressionUpdate'
+    | 'expressionAdd'
     | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
