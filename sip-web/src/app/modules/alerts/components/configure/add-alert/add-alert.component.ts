@@ -57,6 +57,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   attributeValues$: Observable<any>;
   selectedDatapod;
   selectedMetricsColumn;
+  selectedAttributeColumn;
+  selectedLookbackColumn;
   metricsList$;
   operators$;
   aggregations$;
@@ -98,8 +100,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.alertRuleFormGroup.patchValue(alertForm);
       });
       this.endActionText = 'Update';
+      this.datapods$ = this._configureAlertService.getListOfDatapods$();
+    } else {
+      this.datapods$ = this._configureAlertService.getListOfDatapods$();
     }
-    this.datapods$ = this._configureAlertService.getListOfDatapods$();
     this.aggregations$ = this._configureAlertService
       .getAggregations()
       .pipe(
@@ -274,6 +278,14 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     }
   }
 
+  onAttributeColumnSelected(selectedAttributeColumn) {
+    this.selectedAttributeColumn = selectedAttributeColumn;
+  }
+
+  onLookbackColumnSelected(selectedLookbackColumn) {
+    this.selectedLookbackColumn = selectedLookbackColumn;
+  }
+
   loadMetrics(datapodId) {
     const metricsList = this._configureAlertService.getDatapod$(datapodId).pipe(
       tap(datapod => (this.selectedDatapod = datapod)),
@@ -387,10 +399,15 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       name: selectedMetricsColumn.name,
       displayName: selectedMetricsColumn.displayName,
       type: selectedMetricsColumn.type,
+      format: selectedMetricsColumn.format,
+      table: selectedMetricsColumn.table,
+      visibleIndex: selectedMetricsColumn.visibleIndex,
+      groupInterval: selectedMetricsColumn.groupInterval,
       aggregate
     };
 
-    const { artifactName } = this.selectedDatapod.artifacts[0];
+    const { id, artifacts } = this.selectedDatapod;
+    const { artifactName } = artifacts[0];
 
     const alertFilter = {
       type: selectedMetricsColumn.type,
@@ -399,17 +416,29 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         operator,
         value: thresholdValue,
         otherValue: operator === 'BTW' ? otherThresholdValue : null
-      }
+      },
+      isRuntimeFilter: false,
+      isGlobalFilter: false,
+      tableName: selectedMetricsColumn.tableName,
+      columnName: selectedMetricsColumn.columnName,
+      isOptional: false
     };
 
+    const selectedLookbackColumn = this.selectedLookbackColumn || {};
     const lookbackFilter = {
       type: 'date',
       artifactsName: artifactName,
       model: {
         presetCal: `${lookbackPeriodValue}-${lookbackPeriodType}`
-      }
+      },
+      isRuntimeFilter: false,
+      isGlobalFilter: false,
+      tableName: selectedLookbackColumn.tableName,
+      columnName: selectedLookbackColumn.columnName,
+      isOptional: false
     };
 
+    const selectedAttributeColumn = this.selectedAttributeColumn || {};
     const hasAttributeFilter = attributeName && attributeValue;
     const stringFilter = hasAttributeFilter
       ? {
@@ -418,23 +447,32 @@ export class AddAlertComponent implements OnInit, OnDestroy {
           model: {
             operator: 'EQ',
             modelValues: [attributeValue]
-          }
+          },
+          isRuntimeFilter: false,
+          isGlobalFilter: false,
+          tableName: selectedAttributeColumn.tableName,
+          columnName: selectedAttributeColumn.columnName,
+          isOptional: false
         }
       : null;
 
     const { indexName, type, storageType } = this.selectedDatapod.esRepository;
-    const storage = {
+    const store = {
       dataStore: `${indexName}/${type}`,
       storageType
     };
 
-    return {
+    const sipQuery = {
       artifacts: [{ artifactName, fields: [metricsColumn] }],
       booleanCriteria: 'AND',
       filters: compact([alertFilter, lookbackFilter, stringFilter]),
       sorts: [],
-      storage
+      joins: [],
+      store,
+      semanticId: id
     };
+
+    return sipQuery;
   }
 
   onStepperSelectionChange(event) {

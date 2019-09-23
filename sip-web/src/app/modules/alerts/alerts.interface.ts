@@ -6,6 +6,10 @@ export interface AlertArtifact {
   displayName: String;
   type: string;
   aggregate?: string;
+  table?: string;
+  format?: string;
+  visibleIndex?: number;
+  groupInterval?: string;
 }
 export interface AlertSipQuery {
   artifacts: {

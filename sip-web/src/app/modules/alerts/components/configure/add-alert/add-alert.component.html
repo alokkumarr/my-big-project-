@@ -353,6 +353,7 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
+                (onSelectionChanged)="onLookbackColumnSelected($event?.selectedItem)"
                 [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="lookbackColumn"
               ></dx-select-box>
@@ -442,6 +443,7 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
+                (onSelectionChanged)="onAttributeColumnSelected($event?.selectedItem)"
                 e2e="attributeName"
               ></dx-select-box>
             </mat-form-field>
