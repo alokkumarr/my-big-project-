@@ -352,15 +352,15 @@ public class StorageProxyController {
             dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
           }
         }
       } else {
-        for (String artifact : artsName) {
-          if (sipQueryArts.contains(artifact.toUpperCase())) {
-            dataSecurityKeyDef.setName(artifact+"."+CUSTOMER_CODE);
+        for (String artifact : sipQueryArts) {
+            dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
-          }
+            dataSecurityKeyDef = new DataSecurityKeyDef();
         }
       }
 

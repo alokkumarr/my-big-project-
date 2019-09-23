@@ -86,7 +86,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     String queryShownTOUser=null;
 
     if (designerEdit) {
-      query = sipQuery.getQuery();
+      query = sipQuery.getQuery().concat(" ");
       queryShownTOUser = query;
       query = dskForManualQuery(sipQuery,query,dataSecurityKey);
     } else {
