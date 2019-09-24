@@ -105,7 +105,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     } else {
       this.datapods$ = this._configureAlertService.getListOfDatapods$();
     }
-    this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
+    // this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
     this.aggregations$ = this._configureAlertService
       .getAggregations()
       .pipe(

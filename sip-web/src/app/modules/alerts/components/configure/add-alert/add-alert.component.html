@@ -473,7 +473,7 @@
               ></dx-select-box>
             </mat-form-field>
 
-            <mat-form-field
+            <!-- <mat-form-field
               appearance="outline"
               class="add-container__body__stepper__dxselect padtop10"
             >
@@ -494,6 +494,23 @@
                 placeholder="Select a type"
                 e2e="monitoringType"
               ></dx-select-box>
+            </mat-form-field> -->
+
+            <mat-form-field appearance="outline">
+              <mat-label>Monitoring type</mat-label>
+              <textarea
+                matInput
+                formControlName="monitoringType"
+                e2e="monitoringType"
+              ></textarea>
+              <mat-error
+                *ngIf="
+                  alertRuleFormGroup.controls.monitoringType.hasError(
+                    'required'
+                  )
+                "
+                >This field is required</mat-error
+              >
             </mat-form-field>
             <div
               fxFlex
