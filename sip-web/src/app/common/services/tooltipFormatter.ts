@@ -1,6 +1,7 @@
 import * as Highcharts from 'highcharts/highcharts';
 import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
+import moment from 'moment';
 
 import {
   FLOAT_TYPES,
@@ -75,10 +76,10 @@ function getXValue(point, fields, chartType) {
   }
   if (DATE_TYPES.includes(x.type)) {
     if (hasGroupBy) {
-      return chartType === 'tsspline' ? new Date(point.category) : point.category;
+      return chartType === 'tsspline' ? moment(point.category).format('MMMM Do dddd YYYY, h:mm:ss a') : point.category;
     }
     return chartType === 'tsspline'
-    ? new Date(point.category)
+    ? moment(point.category).format('MMMM Do dddd YYYY, h:mm:ss a')
     : point.key || point.category;
   }
 }
