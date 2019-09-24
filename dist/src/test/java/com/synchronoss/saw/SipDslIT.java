@@ -17,7 +17,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.response.ResponseBody;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -394,8 +393,7 @@ public class SipDslIT extends BaseIT {
     Long countOfRows = a.get("totalRows").asLong();
     Assert.assertTrue(countOfRows > 0);
     Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
-    ResponseBody responseBody = response.getBody();
-    List<Map<String, String>> dataNode = responseBody.path("data");
+    List<Map<String, String>> dataNode = response.getBody().path("data");
     Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
@@ -439,9 +437,9 @@ public class SipDslIT extends BaseIT {
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode data = attUserRes.withArray("data");
     Long countOfRows = attUserRes.get("totalRows").asLong();
-    Iterator iterator = data.iterator();
+    Iterator<JsonNode> iterator = data.iterator();
     while (iterator.hasNext()) {
-      JsonNode dataNode = (JsonNode) iterator.next();
+      JsonNode dataNode = iterator.next();
       Assert.assertEquals(dataNode.get("customerCode").asText(), validateCustCode);
       // Verifying for each response data object to check customerCode filtering.
     }
@@ -454,11 +452,12 @@ public class SipDslIT extends BaseIT {
     ObjectNode syncUserRes = response1.getBody().as(ObjectNode.class);
     ArrayNode syncData = syncUserRes.withArray("data");
     Assert.assertTrue(syncUserRes.get("totalRows").asLong() > 0);
-    Iterator itr = syncData.iterator();
-    int att, snt, mct;
-    att = snt = mct = 0;
+    Iterator<JsonNode> itr = syncData.iterator();
+    int att = 0;
+    int snt = 0;
+    int mct = 0;
     while (itr.hasNext()) {
-      JsonNode dat = (JsonNode) itr.next();
+      JsonNode dat = itr.next();
       att = dat.get("customerCode").asText().equalsIgnoreCase("ATT") ? ++att : att;
       snt = dat.get("customerCode").asText().equalsIgnoreCase("SNT") ? ++snt : snt;
       mct = dat.get("customerCode").asText().equalsIgnoreCase("MCT") ? ++mct : mct;
@@ -513,12 +512,8 @@ public class SipDslIT extends BaseIT {
         .statusCode(200)
         .body("valid", equalTo(true));
 
-    // Update token after applying DSK.
-    String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
-
     JsonObject sipDsl = testData;
     sipDsl.addProperty("customerCode", "ATT");
-    String validateCustCode = "ATT";
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", "customerCode");
@@ -547,11 +542,14 @@ public class SipDslIT extends BaseIT {
 
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
+    // Update token after applying DSK.
+    String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
     Response response = execute(customTok, jsonNode);
     Assert.assertNotNull(response);
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode data = attUserRes.withArray("data");
     Assert.assertTrue(data.size() == 1);
+    String validateCustCode = "ATT";
     Assert.assertEquals(data.get(0).get("customerCode").asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
@@ -586,16 +584,14 @@ public class SipDslIT extends BaseIT {
     Long countOfRows = a.get("totalRows").asLong();
     Assert.assertTrue(countOfRows > 0);
     Assert.assertEquals(data.get(0).get("string").asText(), testStringFilter);
-    ResponseBody responseBody = response.getBody();
-    List<Map<String, String>> dataNode = responseBody.path("data");
+    List<Map<String, String>> dataNode = response.getBody().path("data");
     Assert.assertEquals(dataNode.get(0).get("string"), testStringFilter);
   }
 
   @Test
-  public void testDLExecuteWithCustCodeFilter() throws IOException {
+  public void testDlExecuteWithCustCodeFilter() throws IOException {
     JsonObject sipDsl = testDataForDl;
     sipDsl.addProperty("customerCode", "ATT");
-    String validateCustCode = "ATT";
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", "customerCode");
@@ -606,8 +602,6 @@ public class SipDslIT extends BaseIT {
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
-
-    JsonElement js = new JsonArray();
 
     sipDsl
         .get("sipQuery")
@@ -632,6 +626,8 @@ public class SipDslIT extends BaseIT {
         .getAsJsonArray()
         .set(1, field1);
 
+    JsonElement js = new JsonArray();
+
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
 
@@ -655,9 +651,10 @@ public class SipDslIT extends BaseIT {
 
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode attData = attUserRes.withArray("data");
-    Iterator iterator = attData.iterator();
+    Iterator<JsonNode> iterator = attData.iterator();
+    String validateCustCode = "ATT";
     while (iterator.hasNext()) {
-      JsonNode dataNode = (JsonNode) iterator.next();
+      JsonNode dataNode = iterator.next();
       Assert.assertEquals(dataNode.get("SALES_customerCode").asText(), validateCustCode);
       Assert.assertEquals(dataNode.get("PRODUCT_customerCode").asText(), validateCustCode);
       // Verifying for each response data object to check customerCode filtering.
@@ -681,11 +678,14 @@ public class SipDslIT extends BaseIT {
 
     ObjectNode syncUserRes = syncResponse.getBody().as(ObjectNode.class);
     ArrayNode syncData = syncUserRes.withArray("data");
-    Iterator itr = syncData.iterator();
-    int att, snt, mct;
-    att = snt = mct = 0;
+
+    int att = 0;
+    int snt = 0;
+    int mct = 0;
+
+    Iterator<JsonNode> itr = syncData.iterator();
     while (itr.hasNext()) {
-      JsonNode dat = (JsonNode) itr.next();
+      JsonNode dat = itr.next();
       att =
           dat.get("SALES_customerCode").asText().equalsIgnoreCase("ATT")
                   && dat.get("PRODUCT_customerCode").asText().equalsIgnoreCase("ATT")
@@ -709,117 +709,115 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testDskWithCustCodeFilterDl() throws IOException {
-      JsonObject sipDsl = testDataForDl;
-      sipDsl.addProperty("customerCode", "ATT");
-      String validateCustCode = "ATT";
+    JsonObject sipDsl = testDataForDl;
+    sipDsl.addProperty("customerCode", "ATT");
 
-      JsonObject field1 = new JsonObject();
-      field1.addProperty("dataField", "customerCode");
-      field1.addProperty("table", "sales");
-      field1.addProperty("alias", "customerCode");
-      field1.addProperty("columnName", "customerCode");
-      field1.addProperty("displayName", "customerCode");
-      field1.addProperty("type", "string");
-      JsonArray artifactFields = new JsonArray();
-      artifactFields.add(field1);
+    JsonObject field1 = new JsonObject();
+    field1.addProperty("dataField", "customerCode");
+    field1.addProperty("table", "sales");
+    field1.addProperty("alias", "customerCode");
+    field1.addProperty("columnName", "customerCode");
+    field1.addProperty("displayName", "customerCode");
+    field1.addProperty("type", "string");
+    JsonArray artifactFields = new JsonArray();
+    artifactFields.add(field1);
 
-      JsonElement js = new JsonArray();
+    JsonElement js = new JsonArray();
 
-      sipDsl
-          .get("sipQuery")
-          .getAsJsonObject()
-          .get("artifacts")
-          .getAsJsonArray()
-          .get(0)
-          .getAsJsonObject()
-          .get("fields")
-          .getAsJsonArray()
-          .set(1, field1);
+    sipDsl
+        .get("sipQuery")
+        .getAsJsonObject()
+        .get("artifacts")
+        .getAsJsonArray()
+        .get(0)
+        .getAsJsonObject()
+        .get("fields")
+        .getAsJsonArray()
+        .set(1, field1);
 
-      sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
-      sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
+    sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
+    sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
 
-      JsonObject artifacts = sipDsl
-          .get("sipQuery")
-          .getAsJsonObject()
-          .get("artifacts")
-          .getAsJsonArray()
-          .get(0)
-          .getAsJsonObject();
+    JsonObject artifacts =
+        sipDsl
+            .get("sipQuery")
+            .getAsJsonObject()
+            .get("artifacts")
+            .getAsJsonArray()
+            .get(0)
+            .getAsJsonObject();
 
-      JsonArray artifactsList = new JsonArray();
-      artifactsList.add(artifacts);
+    JsonArray artifactsList = new JsonArray();
+    artifactsList.add(artifacts);
 
-      sipDsl
-          .get("sipQuery")
-          .getAsJsonObject().add("artifacts",artifactsList);
+    sipDsl.get("sipQuery").getAsJsonObject().add("artifacts", artifactsList);
 
-      sipDsl.get("sipQuery")
-          .getAsJsonObject().add("joins",new JsonArray());
+    sipDsl.get("sipQuery").getAsJsonObject().add("joins", new JsonArray());
 
-      // Add security group for ATT customer.
-      ObjectNode secGroup = mapper.createObjectNode();
-      secGroup.put("description", "TestDesc2");
-      secGroup.put("securityGroupName", "TestGroup2");
-      Response secGroupRes =
-          given(spec)
-              .header("Authorization", "Bearer " + customToken)
-              .contentType(ContentType.JSON)
-              .body(secGroup)
-              .when()
-              .post("/security/auth/admin/security-groups")
-              .then()
-              .assertThat()
-              .statusCode(200)
-              .extract()
-              .response();
-      JsonNode secGroups = secGroupRes.as(JsonNode.class);
-      Long groupSysId = secGroups.get("groupId").asLong();
+    // Add security group for ATT customer.
+    ObjectNode secGroup = mapper.createObjectNode();
+    secGroup.put("description", "TestDesc2");
+    secGroup.put("securityGroupName", "TestGroup2");
+    Response secGroupRes =
+        given(spec)
+            .header("Authorization", "Bearer " + customToken)
+            .contentType(ContentType.JSON)
+            .body(secGroup)
+            .when()
+            .post("/security/auth/admin/security-groups")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    JsonNode secGroups = secGroupRes.as(JsonNode.class);
+    Long groupSysId = secGroups.get("groupId").asLong();
 
-      ObjectNode root = mapper.createObjectNode();
-      root.put("attributeName", "string");
-      root.put("value", "string 1");
-      given(spec)
-          .header("Authorization", "Bearer " + customToken)
-          .contentType(ContentType.JSON)
-          .body(root)
-          .when()
-          .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
-          .then()
-          .assertThat()
-          .statusCode(200)
-          .body("valid", equalTo(true));
+    ObjectNode root = mapper.createObjectNode();
+    root.put("attributeName", "string");
+    root.put("value", "string 1");
+    given(spec)
+        .header("Authorization", "Bearer " + customToken)
+        .contentType(ContentType.JSON)
+        .body(root)
+        .when()
+        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
 
-      given(spec)
-          .header("Authorization", "Bearer " + customToken)
-          .body("TestGroup2")
-          .when()
-          .put("/security/auth/admin/users/" + 5 + "/security-group")
-          .then()
-          .assertThat()
-          .statusCode(200)
-          .body("valid", equalTo(true));
+    given(spec)
+        .header("Authorization", "Bearer " + customToken)
+        .body("TestGroup2")
+        .when()
+        .put("/security/auth/admin/users/" + 5 + "/security-group")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
 
-      // Update token after applying DSK.
-      String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
+    // Update token after applying DSK.
+    String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
 
-      ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
-      Response response = execute(customTok, jsonNode);
-      Assert.assertNotNull(response);
-      ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
-      ArrayNode data = attUserRes.withArray("data");
-      Assert.assertTrue(data.size() == 1);
-      Assert.assertEquals(data.get(0).get("SALES_customerCode").asText(), validateCustCode);
-      Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
+    Response response = execute(customTok, jsonNode);
+    Assert.assertNotNull(response);
+    ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
+    ArrayNode data = attUserRes.withArray("data");
+    Assert.assertTrue(data.size() == 1);
+    String validateCustCode = "ATT";
+    Assert.assertEquals(data.get(0).get("SALES_customerCode").asText(), validateCustCode);
+    Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
-      given(authSpec)
-          .body("TestGroup2")
-          .when()
-          .delete("/security/auth/admin/security-groups/" + groupSysId)
-          .then()
-          .assertThat()
-          .statusCode(200);
+    given(authSpec)
+        .body("TestGroup2")
+        .when()
+        .delete("/security/auth/admin/security-groups/" + groupSysId)
+        .then()
+        .assertThat()
+        .statusCode(200);
   }
 
   @Test
@@ -1119,6 +1117,13 @@ public class SipDslIT extends BaseIT {
     return outputStream.toString();
   }
 
+  /**
+   * Dsl execute method which takes up a token and request body to return back the response.
+   *
+   * @param custToken custom token for each customer login
+   * @param body Request Body
+   * @return Response Object
+   */
   public Response execute(String custToken, JsonNode body) {
     return given(spec)
         .header("Authorization", "Bearer " + custToken)

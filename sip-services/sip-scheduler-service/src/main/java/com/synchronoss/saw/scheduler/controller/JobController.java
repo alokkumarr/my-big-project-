@@ -7,17 +7,18 @@ import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -30,10 +31,9 @@ public class JobController extends BaseJobController{
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
 	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail,
-        HttpServletRequest request,
-        HttpServletResponse response){
+        @RequestHeader("Authorization") String authToken){
 		logger.info("JobController schedule() start here.");
-		String auth = request.getHeader("Authorization");
+		String auth = authToken;
 		logger.debug("Auth = "+auth);
 		jobDetail.setAuth(auth);
 
