@@ -46,6 +46,11 @@ public class OnBoardShell {
             logger.error("Missing argument, Following Options are mandatory to onBoardCustomer (--C,--P,--PC,--E,--F,--M,--L,--JV,--FC) \n  Use 'help onboard-customer' command to print usage!!");
             throw new IllegalArgumentException("Missing argument!! Use 'help onboard-customer' command to print usage!!");
         }
+        if (isJvCustomer.trim().equals(filterByCustomerCode.trim())) {
+            logger.error("Super admin flag and customer code filtering can't be same!! One of them should be different!");
+            throw new UnsupportedOperationException(
+          "Super admin flag and customer code filtering can't be same!! One of them should be different!");
+        }
         OnBoardCustomerRepository onBoardCustomerRepositoryDao = onboard.getOnBoardCustomerRepositoryDao();
         OnBoardCustomer onBoardCustomer = new OnBoardCustomer();
         logger.debug("Read Required Params :");

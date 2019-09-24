@@ -1020,7 +1020,7 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     		[Mandatory]
 
     	--JV  string
-    		Joint Venture Flag
+    		Super Admin? (No customerCode filtering)
     		[Mandatory]
 
     	--FC  string
