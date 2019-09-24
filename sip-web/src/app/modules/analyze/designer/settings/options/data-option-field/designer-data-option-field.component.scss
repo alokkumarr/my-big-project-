@@ -23,6 +23,18 @@
     }
   }
 
+  &__formula {
+    pre {
+      background: white;
+      border: 1px solid #e8e8e8;
+      border-radius: 5px;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow: auto;
+      max-height: 300px;
+    }
+  }
+
   mat-expansion-panel-header {
     height: 43px !important;
   }

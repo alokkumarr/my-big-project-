@@ -37,9 +37,7 @@
         [aggregate]="artifactColumn.aggregate"
         [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
-        [enablePercentByRow]="
-          checkChartType()
-        "
+        [enablePercentByRow]="checkChartType()"
         fxFlex="75"
       >
       </aggregate-chooser-u>
@@ -140,6 +138,16 @@
         fxFlex="75"
       >
       </designer-region-selector>
+    </div>
+
+    <div
+      *ngIf="!!artifactColumn.formula"
+      fxLayout="column"
+      fxLayoutAlign="start stretch"
+      class="data-option__formula"
+    >
+      <label fxFlex>Formula:</label>
+      <pre>{{ artifactColumn.formula }}</pre>
     </div>
   </div>
 </mat-expansion-panel>
