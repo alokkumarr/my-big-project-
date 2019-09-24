@@ -1,7 +1,6 @@
 import * as Highcharts from 'highcharts/highcharts';
 import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
-import * as moment from 'moment';
 
 import {
   FLOAT_TYPES,
