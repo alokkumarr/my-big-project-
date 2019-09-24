@@ -16,6 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
+import { DeleteDialogComponent } from './common/components/delete-dialog/delete-dialog.component';
 
 import {
   LayoutContentComponent,
@@ -28,7 +29,8 @@ const COMPONENTS = [
   LayoutContentComponent,
   LayoutHeaderComponent,
   LayoutFooterComponent,
-  MainPageComponent
+  MainPageComponent,
+  DeleteDialogComponent
 ];
 const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
 

@@ -57,20 +57,17 @@ class Application extends Controller {
 
   def index: Result = {
     val jsonResponse: JsonNode = Json.toJson("Your new application is ready.")
-    val st = play.mvc.Results.ok(jsonResponse) ;
+    val st = play.mvc.Results.ok(jsonResponse);
     st
   }
 
-  private def queryIsValid(query: Map[String, Seq[String]]): Boolean =
-  {
+  private def queryIsValid(query: Map[String, Seq[String]]): Boolean = {
     query.contains("events") || query.contains("metrics")
   }
 
-  private def isWindowsPhoneQuery(query: Map[String, Seq[String]]): Boolean =
-  {
+  private def isWindowsPhoneQuery(query: Map[String, Seq[String]]): Boolean = {
     query.contains("request")
   }
-
 
 
   @ApiOperation(
@@ -84,7 +81,7 @@ class Application extends Controller {
     new ApiResponse(code = 500, message = "RTIS internal exceptions"),
     new ApiResponse(code = 400, message = "Bad request: interface accepts only event related data"),
     new ApiResponse(code = 200, message = "Success")))
-  def i : Result = {
+  def i: Result = {
 
     m_log debug "Inside genericI method"
 
@@ -99,25 +96,29 @@ class Application extends Controller {
     else
       m_log.debug("Raw request: " + ctx._requestHeader.rawQueryString)
 
-    if ( isWindowsPhoneQuery(query))
-    {
+    if (isWindowsPhoneQuery(query)) {
       val msg = "Unsupported event format"
       m_log warn msg
       result.put("result", msg)
       failure400(countlyEventHandler, result)
     }
 
-    if (queryIsValid(query))
-    {
+    if (queryIsValid(query)) {
       m_log debug "Send events"
 
       val appKey = query("app_key").mkString
+
+      // on demand app key reload to RTIS context
+      if (!EventHandler.getAppKeys.contains(appKey)) {
+        val appKeyLoaded = EventHandler.buildOnDemandEventHandlerList(appKey)
+        if (!appKeyLoaded) throw new RTException(ErrorCodes.InvalidAppConf)
+      }
 
       m_log.debug("APP KEY = " + appKey)
 
       m_log.debug("Getting event handler")
 
-      val countly_event_handler:CountlyGenericBridge = EventHandler.getEventHandler[CountlyGenericBridge](appKey)
+      val countly_event_handler: CountlyGenericBridge = EventHandler.getEventHandler[CountlyGenericBridge](appKey)
       if (countly_event_handler == null) throw new RTException(ErrorCodes.NoEventHandler)
 
       countly_event_handler.createMessage(query)
@@ -131,7 +132,7 @@ class Application extends Controller {
         countly_event_handler.processCountlyEvents
         countly_event_handler.sendMessages()
       }
-      else{
+      else {
         m_log warn "Incorrect event request received"
         result.put("result", msg)
         failure400(countlyEventHandler, result)
@@ -154,24 +155,23 @@ class Application extends Controller {
     new ApiResponse(code = 200, message = "Success")))
   def iPost: Result = {
 
-//    if (EventHandler.isStreamMalfunctioning)
-//      return failure500("Service is not available. Please call for support")
+    //    if (EventHandler.isStreamMalfunctioning)
+    //      return failure500("Service is not available. Please call for support")
     handleCrash
   }
 
-  private def handleCrash() : Result =
-  {
+  private def handleCrash(): Result = {
 
     val uuid = UUID.randomUUID().toString
     m_log debug s"Start crash processing  [ Crash ID: ${uuid} ]"
 
-    val countly_crash_handler:CountlyCrashBridge = EventHandler.getEventHandler[CountlyCrashBridge](countlyCrashHandler)
-    if (countly_crash_handler  == null) throw new RTException(ErrorCodes.NoCrashReportSender)
+    val countly_crash_handler: CountlyCrashBridge = EventHandler.getEventHandler[CountlyCrashBridge](countlyCrashHandler)
+    if (countly_crash_handler == null) throw new RTException(ErrorCodes.NoCrashReportSender)
     val result: ObjectNode = Json.newObject
     val ctx: Http.Context = Http.Context.current.get
     import scala.collection.JavaConversions._
     val req = ctx.request()
-    val url_enc: util.Map[String, Array[String]] =  req.body().asFormUrlEncoded()
+    val url_enc: util.Map[String, Array[String]] = req.body().asFormUrlEncoded()
 
     if (EventHandler.debugMode) {
       m_log info "Print request body: "
@@ -180,22 +180,20 @@ class Application extends Controller {
       })
     }
     val query: scala.collection.immutable.Map[String, Seq[String]] =
-    url_enc.filter( !_._1.equalsIgnoreCase("crash")).map( kv => (kv._1 -> kv._2.toSeq)).toMap
+      url_enc.filter(!_._1.equalsIgnoreCase("crash")).map(kv => (kv._1 -> kv._2.toSeq)).toMap
     m_log debug "Send crash reports: "
     countly_crash_handler.createMessage(query)
-    if (url_enc.contains("crash"))
-    {
+    if (url_enc.contains("crash")) {
       countly_crash_handler.addCrashData(play.api.libs.json.Json.parse(url_enc("crash").mkString))
     }
-    val ( validationResult, msg) = countly_crash_handler.processRequest
+    val (validationResult, msg) = countly_crash_handler.processRequest
     if (validationResult) {
       countly_crash_handler.createCrashReport(uuid)
       countly_crash_handler.sendMessages(uuid)
       result.put("result", "Success")
       Stat.getRequestStat(countlyCrashHandler, 1)
     }
-    else
-    {
+    else {
       result.put("result", msg)
       failure400(countlyCrashHandler, result)
     }

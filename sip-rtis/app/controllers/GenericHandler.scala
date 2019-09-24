@@ -27,46 +27,43 @@ class GenericHandler extends Controller {
 
   EventHandler.buildEventHandlerList
   val m_log: Logger = LoggerFactory.getLogger(classOf[GenericHandler].
-		  getName)
+    getName)
 
 
   @ApiOperation(
     nickname = "SyncronossEventWithPayload",
     value = "Method registers a Synchronoss generic event with payload",
     notes = "The interface is designed to accept events in JSON format and" +
-            "forwards it to the Synchronoss Insights Platform",
+      "forwards it to the Synchronoss Insights Platform",
     httpMethod = "POST",
     tags = Array("events")
   )
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "RTI internal exceptions"),
     new ApiResponse(code = 400, message = "Bad request: interface accepts "
-    		+ "only event related data"),
+      + "only event related data"),
     new ApiResponse(code = 200, message = "Success")))
   @ApiImplicitParams(Array(new ApiImplicitParam(value = "Example: \n"
-  		+ " ```  "
-  		+ "{\n {" + 
-		    		"	\"EVENT_TYPE\": \"temperature\",\n" + 
-		    		"	\"SENSOR_UUID\": \"uidxxxdsxx123\",\n" + 
-		    		"	\"UVINDEX\": \"78.0\",\n" + 
-		    		"	\"WIND\": \"55.0\",\n" + 
-		    		"	\"RADIATION_LEVEL\": \"34.3\",\n" + 
-		    		"	\"AMBIENT_TEMPERATURE\": \"34.0\",\n" + 
-		    		"	\"HUMIDITY\": \"81.65\",\n" + 
-		    		"	\"PHOTOSENSOR\": \"870.89\",\n" + 
-		    			"	\"TIMESTAMP\": \"538186875285\"\n" +
-  		
-  		"} ",  
-        paramType = "body", dataType = "object",
-        examples =  new Example(value = Array(new ExampleProperty(mediaType = "default" ,
-       value = "{}"))))))
-  def event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String,
-            EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String] ): Result = {
+    + " ```  "
+    + "{\n {" +
+    "	\"EVENT_TYPE\": \"temperature\",\n" +
+    "	\"SENSOR_UUID\": \"uidxxxdsxx123\",\n" +
+    "	\"UVINDEX\": \"78.0\",\n" +
+    "	\"WIND\": \"55.0\",\n" +
+    "	\"RADIATION_LEVEL\": \"34.3\",\n" +
+    "	\"AMBIENT_TEMPERATURE\": \"34.0\",\n" +
+    "	\"HUMIDITY\": \"81.65\",\n" +
+    "	\"PHOTOSENSOR\": \"870.89\",\n" +
+    "	\"TIMESTAMP\": \"538186875285\"\n" +
+
+    "} ",
+    paramType = "body", dataType = "object",
+    examples = new Example(value = Array(new ExampleProperty(mediaType = "default",
+      value = "{}"))))))
+  def event(APP_KEY: String, APP_VERSION: String, APP_MODULE: String,
+            EVENT_ID: String, EVENT_DATE: String, EVENT_TYPE: Option[String]): Result = {
 
     m_log debug s"Start event processing  [ Event ID: ${EVENT_ID} ]"
-
-//    if (EventHandler.isStreamMalfunctioning)
-//        return failure500("Service is not available. Please call for support")
 
     val ctx: Http.Context = Http.Context.current.get
     m_log.debug("Raw request: " + ctx._requestHeader.rawQueryString)
@@ -92,7 +89,7 @@ class GenericHandler extends Controller {
 
     val query: scala.collection.immutable.Map[String, String] =
       Array(GenericHandler.KEY_APP_KEY, GenericHandler.KEY_APP_VERSION, GenericHandler.KEY_APP_MODULE,
-          GenericHandler.KEY_EVENT_ID, GenericHandler.KEY_EVENT_DATE, GenericHandler.KEY_EVENT_TYPE, GenericHandler.KEY_RECEIVED_TS).map(
+        GenericHandler.KEY_EVENT_ID, GenericHandler.KEY_EVENT_DATE, GenericHandler.KEY_EVENT_TYPE, GenericHandler.KEY_RECEIVED_TS).map(
         _ match {
           case GenericHandler.KEY_APP_KEY => GenericHandler.KEY_APP_KEY -> APP_KEY
           case GenericHandler.KEY_APP_VERSION => GenericHandler.KEY_APP_VERSION -> APP_VERSION
@@ -115,8 +112,7 @@ class GenericHandler extends Controller {
     }
   }
 
-  private def process(genericEventHandlerAppKey: String, query: Map[String, String], payload:Array[Byte] ) : Result =
-  {
+  private def process(genericEventHandlerAppKey: String, query: Map[String, String], payload: Array[Byte]): Result = {
     val res: ObjectNode = Json.newObject
 
     var eventHandler: GenericEventHandler = null
@@ -126,12 +122,12 @@ class GenericHandler extends Controller {
     }
     catch {
       case e: NoSuchElementException => {
-            Stat.getRejectedRequestStat(genericEventHandlerAppKey, 1)
-            throw new RTException(ErrorCodes.NoGenericHandler)
-          }
+        Stat.getRejectedRequestStat(genericEventHandlerAppKey, 1)
+        throw new RTException(ErrorCodes.NoGenericHandler)
+      }
     }
 
-//    eventHandler.createMessage(query)
+    //    eventHandler.createMessage(query)
     eventHandler.createFlattenMessage(query)
     val (validationResult, id) = eventHandler.processRequest()
     if (validationResult) {
@@ -150,7 +146,7 @@ class GenericHandler extends Controller {
 
   val m_log_rejected: Logger = LoggerFactory.getLogger("RejectedRequests")
 
-  def failure400(msg: String, appKey : String): Result = {
+  def failure400(msg: String, appKey: String): Result = {
     val res: ObjectNode = Json.newObject
     Stat.getRejectedRequestStat(appKey, 1)
     m_log_rejected.error(s"APP_KEY = ${appKey}, Rejected reason: ${msg}")
@@ -167,22 +163,22 @@ class GenericHandler extends Controller {
     return play.mvc.Results.internalServerError(res)
   }
 
-  private def validateAppKey(appKey: String) : Boolean =
-  {
+  private def validateAppKey(appKey: String): Boolean = {
     val appKeys = EventHandler.getAppKeys
-    appKeys.contains(appKey)
+    if (appKeys.contains(appKey))
+      appKeys.contains(appKey)
+    else
+      EventHandler.buildOnDemandEventHandlerList(appKey)
   }
-
-
 }
 
 object GenericHandler {
-  val KEY_APP_KEY     = "APP_KEY"
+  val KEY_APP_KEY = "APP_KEY"
   val KEY_APP_VERSION = "APP_VERSION"
-  val KEY_APP_MODULE  = "APP_MODULE"
-  val KEY_EVENT_ID    = "EVENT_ID"
-  val KEY_EVENT_DATE  = "EVENT_DATE"
-  val KEY_EVENT_TYPE  = "EVENT_TYPE"
+  val KEY_APP_MODULE = "APP_MODULE"
+  val KEY_EVENT_ID = "EVENT_ID"
+  val KEY_EVENT_DATE = "EVENT_DATE"
+  val KEY_EVENT_TYPE = "EVENT_TYPE"
   val KEY_RECEIVED_TS = "RECEIVED_TS"
 
   val timestampFormat = "yyyy-MM-dd HH:mm:ss"
