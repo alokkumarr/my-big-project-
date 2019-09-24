@@ -1,6 +1,9 @@
+<h1 mat-dialog-title>
+  {{ mode === allModes.edit ? 'Edit' : 'Create' }} Derived Metric
+</h1>
 <form
   class="derived-metric__form"
-  style="height: 100%"
+  fxFlex
   [formGroup]="expressionForm"
   (submit)="submit()"
 >
