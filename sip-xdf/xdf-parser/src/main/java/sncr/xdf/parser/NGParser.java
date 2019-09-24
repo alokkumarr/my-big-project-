@@ -55,6 +55,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private String sourcePath;
     private String tempDir;
     private String archiveDir;
+    private boolean multiLine = false;
 
     private String outputDataSetName;
     private String outputDataSetLocation;
@@ -287,7 +288,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
-            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath);
+            multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
+
+            logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
+
+            Dataset<Row> inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+
+            logger.debug("RECORD COUNT IS " + inputDataset.count());
 
             this.recCounter.setValue(inputDataset.count());
 

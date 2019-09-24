@@ -1,0 +1,28 @@
+.rtis-registration-title {
+  color: #636363;
+  font-weight: bold;
+}
+
+:host {
+  mat-toolbar {
+    background-color: white !important;
+  }
+
+  .registration-form {
+    overflow: auto;
+    padding: 30px;
+    height: calc(100vh - 35%);
+
+    section mat-form-field {
+      width: 50%;
+    }
+  }
+
+  div form {
+    padding: 0 0 0 20px;
+  }
+
+  mat-slide-toggle {
+    padding: 0 0 0 20px;
+  }
+}

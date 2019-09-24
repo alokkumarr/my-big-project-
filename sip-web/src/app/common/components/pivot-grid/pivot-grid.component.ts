@@ -31,7 +31,7 @@ import {
   DATE_INTERVALS_OBJ,
   PIVOT_DATE_FORMATS_OBJ,
   DEFAULT_PIVOT_DATE_FORMAT
-} from '../../../modules/analyze/consts';
+} from '../../consts';
 import { getFormatter } from '../../utils/numberFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
