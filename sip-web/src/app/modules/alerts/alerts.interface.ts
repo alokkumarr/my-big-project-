@@ -50,6 +50,7 @@ export interface AlertConfig {
   lookbackPeriod?: string;
   modifiedTime?: any;
   modifiedBy?: any;
+  monitoringType?: string;
   sipQuery?: AlertSipQuery;
 }
 

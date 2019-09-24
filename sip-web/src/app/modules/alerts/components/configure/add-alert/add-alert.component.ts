@@ -55,6 +55,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertRuleFormGroup: FormGroup;
   datapods$: Observable<any>;
   attributeValues$: Observable<any>;
+  monitoringTypes$: Observable<any>;
   selectedDatapod;
   selectedMetricsColumn;
   selectedAttributeColumn;
@@ -104,6 +105,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     } else {
       this.datapods$ = this._configureAlertService.getListOfDatapods$();
     }
+    this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
     this.aggregations$ = this._configureAlertService
       .getAggregations()
       .pipe(
@@ -200,7 +202,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackPeriodValue: ['', Validators.required],
       lookbackPeriodType: ['', Validators.required],
       attributeName: [''],
-      attributeValue: ['']
+      attributeValue: [''],
+      monitoringType: [null, Validators.required]
     });
 
     this.alertDefFormGroup
@@ -321,7 +324,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackPeriodValue,
       lookbackPeriodType,
       attributeName,
-      attributeValue
+      attributeValue,
+      monitoringType
     } = this.alertRuleFormGroup.value;
 
     const sipQuery = this.generateSipQuery();
@@ -349,7 +353,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackColumn,
       lookbackPeriod,
       attributeName,
-      attributeValue
+      attributeValue,
+      monitoringType
     };
 
     if (this.alertDefinition.action === 'update') {

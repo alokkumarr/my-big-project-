@@ -353,7 +353,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
-                (onSelectionChanged)="onLookbackColumnSelected($event?.selectedItem)"
+                (onSelectionChanged)="
+                  onLookbackColumnSelected($event?.selectedItem)
+                "
                 [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="lookbackColumn"
               ></dx-select-box>
@@ -443,7 +445,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
-                (onSelectionChanged)="onAttributeColumnSelected($event?.selectedItem)"
+                (onSelectionChanged)="
+                  onAttributeColumnSelected($event?.selectedItem)
+                "
                 e2e="attributeName"
               ></dx-select-box>
             </mat-form-field>
@@ -466,6 +470,29 @@
                 [searchEnabled]="true"
                 placeholder="Select a value"
                 e2e="attributeValue"
+              ></dx-select-box>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Monitoring type</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                formControlName="monitoringType"
+                [items]="monitoringTypes$ | async"
+                displayExpr="name"
+                valueExpr="id"
+                [searchEnabled]="true"
+                placeholder="Select a type"
+                e2e="monitoringType"
               ></dx-select-box>
             </mat-form-field>
             <div
