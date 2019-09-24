@@ -11,6 +11,10 @@ export function getArtifactColumnGeneralType(
   analysisType: string,
   analysisSubType?: string
 ) {
+  if (!!artifactColumn.expression) {
+    return 'derived';
+  }
+
   const { type } = artifactColumn;
   const geoType = get(artifactColumn, 'geoType');
   const hasGeoType = Boolean(geoType);

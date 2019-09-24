@@ -234,6 +234,8 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         return 'number-type-chip-color';
       case 'geo':
         return 'geo-type-chip-color';
+      case 'derived':
+        return 'derived-type-chip-color';
       case 'date':
         return 'date-type-chip-color';
     }
