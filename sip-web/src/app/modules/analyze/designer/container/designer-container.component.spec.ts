@@ -7,13 +7,13 @@ import { ChartService } from '../../../../common/services/chart.service';
 import { AnalyzeService } from '../../services/analyze.service';
 import { JwtService } from '../../../../common/services';
 import { Store } from '@ngxs/store';
+import { MatDialog } from '@angular/material';
 
 @Component({
   // tslint:disable-next-line
   selector: 'designer-container',
   template: 'DesignerContainer'
 })
-
 class DesignerStubComponent {
   @Input() public analysisStarter;
   @Input() public analysis;
@@ -32,7 +32,8 @@ describe('Designer Component', () => {
         { provide: ChartService, useValue: {} },
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
-        { provide: Store, useValue: { dispatch: () => {} } }
+        { provide: Store, useValue: { dispatch: () => {} } },
+        { provide: MatDialog, useValue: {} }
       ],
       declarations: [DesignerContainerComponent, DesignerStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
