@@ -1,4 +1,16 @@
 <div class="settings__container">
+  <div class="settings__derived-metrics-trigger">
+    <button
+      mat-button
+      color="primary"
+      (click)="openDerivedMetricDialog()"
+      *ngIf="isDerivedMetricSupported"
+    >
+      <strong>
+        + Derived Metric
+      </strong>
+    </button>
+  </div>
   <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
     <div
       class="settings__filters__type"
@@ -176,18 +188,5 @@
         </div>
       </div>
     </perfect-scrollbar>
-  </div>
-
-  <div class="settings__derived-metrics-trigger">
-    <button
-      mat-button
-      color="primary"
-      (click)="openDerivedMetricDialog()"
-      *ngIf="isDerivedMetricSupported"
-    >
-      <strong>
-        + Derived Metric
-      </strong>
-    </button>
   </div>
 </div>

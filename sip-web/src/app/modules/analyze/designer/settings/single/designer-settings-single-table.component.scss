@@ -22,10 +22,11 @@
   height: 100%;
   width: 100%;
   grid-template:
+    'derived-metric-trigger' 40px
     'filters' 80px
     'unselected-fields' 1fr
-    'derived-metric-trigger' 40px
     / 100%;
+  gap: 5px;
 }
 
 .settings__filters {
@@ -99,6 +100,10 @@
 
 .settings__derived-metrics-trigger {
   grid-area: derived-metric-trigger;
+  text-align: center;
+  button {
+    width: 90%;
+  }
 }
 
 .settings__list {
