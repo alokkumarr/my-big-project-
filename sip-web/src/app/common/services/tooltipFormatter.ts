@@ -75,10 +75,11 @@ function getXValue(point, fields, chartType) {
     return point.category;
   }
   if (DATE_TYPES.includes(x.type)) {
+    console.log(chartType);
     if (hasGroupBy) {
-      return chartType === 'tsspline' ? moment(point.category).format('dddd, MMM Do YYYY, h:mm') : point.category;
+      return ['tsspline', 'tsPane'].includes(chartType) ? moment(point.category).format('dddd, MMM Do YYYY, h:mm') : point.category;
     }
-    return chartType === 'tsspline'
+    return ['tsspline', 'tsPane'].includes(chartType)
     ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
     : point.key || point.category;
   }
