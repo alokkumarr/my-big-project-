@@ -67,7 +67,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Limit :</label>
+      <label fxFlex i18n>Limit:</label>
       <designer-data-limit-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -99,7 +99,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Format :</label>
+      <label fxFlex i18n>Format:</label>
       <designer-date-format-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -114,7 +114,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Format :</label>
+      <label fxFlex i18n>Format:</label>
       <designer-data-format-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -131,7 +131,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Region :</label>
+      <label fxFlex i18n>Region:</label>
       <designer-region-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -146,7 +146,21 @@
       fxLayoutAlign="start stretch"
       class="data-option__formula"
     >
-      <label fxFlex>Formula:</label>
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <label fxFlex>Formula:</label>
+        <button
+          mat-icon-button
+          matTooltip="Edit Formula"
+          (click)="
+            change.emit({
+              subject: 'updateDerivedMetric',
+              column: artifactColumn
+            })
+          "
+        >
+          <mat-icon fontIcon="icon-edit"></mat-icon>
+        </button>
+      </div>
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
   </div>

@@ -6,7 +6,6 @@ import {
   OnChanges,
   OnInit
 } from '@angular/core';
-import * as get from 'lodash/get';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -44,9 +43,6 @@ import {
   getArtifactColumnGeneralType,
   getFilterTypes
 } from '../../utils';
-import { MatDialog } from '@angular/material';
-import { DerivedMetricComponent } from '../../derived-metric/derived-metric.component';
-import { ArtifactColumnDSL } from '../../../types';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -107,8 +103,7 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   constructor(
     private _designerService: DesignerService,
     private _dndPubsub: DndPubsubService,
-    private _store: Store,
-    private dialog: MatDialog
+    private _store: Store
   ) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
@@ -164,7 +159,6 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   }
 
   _changeSettingsDebounced(event: DesignerChangeEvent) {
-    console.log(event);
     this.change.emit(event);
   }
 
@@ -246,40 +240,6 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   onFilterChange(index) {
     this.filterObj.adapters[index] = !this.filterObj.adapters[index];
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-  }
-
-  openDerivedMetricDialog(artifactColumn: ArtifactColumnDSL) {
-    const dialogRef = this.dialog.open(DerivedMetricComponent, {
-      width: '60%',
-      height: '60%',
-      autoFocus: false,
-      data: { artifactColumn, columns: this.artifactColumns }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const column = {
-          ...artifactColumn,
-          ...result,
-          table: get(this.artifact, 'artifactName'),
-          type: 'double'
-        };
-
-        const id = findIndex(
-          this.artifactColumns,
-          col => col.columnName === result.columnName
-        );
-        if (id >= 0) {
-          this._changeSettingsDebounced({
-            subject: 'expressionUpdate',
-            column
-          });
-        } else {
-          this._changeSettingsDebounced({ subject: 'expressionAdd', column });
-        }
-        this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      }
-    });
   }
 
   addToGroup(

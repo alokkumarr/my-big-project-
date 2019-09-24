@@ -101,6 +101,8 @@ import {
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
+import { MatDialog } from '@angular/material';
+import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -161,6 +163,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
+    private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
   ) {
@@ -1130,7 +1133,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
-    case 'expressionUpdate':
+    case 'updateDerivedMetric':
+      this.openDerivedMetricDialog(event.column);
+      break;
+    case 'addNewDerivedMetric':
+      this.openDerivedMetricDialog(null);
+      break;
+    case 'expressionUpdated':
       this._store.dispatch(new DesignerUpdateArtifactColumn({
         columnName: event.column.columnName,
         formula: event.column.formula,
@@ -1143,8 +1152,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
       });
       this.artifacts = [...this.artifacts];
+      this.requestDataIfPossible();
       break;
-    case 'expressionAdd':
+    case 'derivedMetricAdded':
       const artifact = this.artifacts[0];
       (<ArtifactColumn[]>artifact.columns).push(event.column as ArtifactColumn);
       this.artifacts = [artifact];
@@ -1237,6 +1247,42 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
         break;
     }
+  }
+
+  openDerivedMetricDialog(artifactColumn: ArtifactColumn) {
+    const dialogRef = this.dialog.open(DerivedMetricComponent, {
+      width: '60%',
+      height: '60%',
+      autoFocus: false,
+      data: { artifactColumn, columns: this.artifacts[0].columns }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const column = {
+          ...artifactColumn,
+          ...result,
+          table: get(this.artifacts[0], 'artifactName'),
+          type: 'double'
+        };
+
+        const existing = find(
+          this.artifacts[0].columns,
+          col => col.columnName === result.columnName
+        );
+        if (existing) {
+          this.handleOtherChangeEvents({
+            subject: 'expressionUpdated',
+            column
+          });
+        } else {
+          this.handleOtherChangeEvents({
+            subject: 'derivedMetricAdded',
+            column
+          });
+        }
+      }
+    });
   }
 
   changeSubType(to: string) {

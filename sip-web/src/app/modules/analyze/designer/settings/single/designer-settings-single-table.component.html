@@ -3,7 +3,7 @@
     <button
       mat-button
       color="primary"
-      (click)="openDerivedMetricDialog()"
+      (click)="change.emit({ subject: 'addNewDerivedMetric' })"
       *ngIf="isDerivedMetricSupported"
     >
       <strong>
@@ -118,7 +118,12 @@
               mat-icon-button
               color="primary"
               *ngIf="artifactColumn.formula"
-              (click)="openDerivedMetricDialog(artifactColumn)"
+              (click)="
+                change.emit({
+                  subject: 'updateDerivedMetric',
+                  column: artifactColumn
+                })
+              "
               [attr.e2e]="
                 'designer-edit-derived-metric-btn-' +
                 (artifactColumn.alias || artifactColumn.displayName)
