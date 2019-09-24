@@ -742,7 +742,7 @@ export class AnalyzeService {
 
   newAnalysisChartModel(model: Partial<AnalysisDSL>): Partial<AnalysisDSL> {
     const chartOptions = {
-      chartType: 'column',
+      chartType: '',
       chartTitle: '',
       isInverted: false,
       legend: {

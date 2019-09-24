@@ -329,6 +329,7 @@ export class ChartService {
     const series = this.splitToSeries(parsedData, fields, chartType);
     // split out categories frem the data
     forEach(series, serie => {
+      serie.type = chartType === 'stack' ? '' : serie.type;
       serie.data = map(serie.data, point => {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
@@ -531,7 +532,6 @@ export class ChartService {
       field.chartType = type;
     });
     const series = map(fields.y, this.getSerie.bind(this));
-
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
