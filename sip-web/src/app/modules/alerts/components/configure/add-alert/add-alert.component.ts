@@ -380,10 +380,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   generateSipQuery() {
     const {
-      aggregationType,
-      operator,
-      thresholdValue,
-      otherThresholdValue
+      aggregationType
+      // operator,
+      // thresholdValue,
+      // otherThresholdValue
     } = this.alertMetricFormGroup.value;
 
     const {
@@ -414,20 +414,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const { id, artifacts } = this.selectedDatapod;
     const { artifactName } = artifacts[0];
 
-    const alertFilter = {
-      type: selectedMetricsColumn.type,
-      artifactsName: artifactName,
-      model: {
-        operator,
-        value: thresholdValue,
-        otherValue: operator === 'BTW' ? otherThresholdValue : null
-      },
-      isRuntimeFilter: false,
-      isGlobalFilter: false,
-      tableName: selectedMetricsColumn.tableName,
-      columnName: selectedMetricsColumn.columnName,
-      isOptional: false
-    };
+    // const alertFilter = {
+    //   type: selectedMetricsColumn.type,
+    //   artifactsName: artifactName,
+    //   model: {
+    //     operator,
+    //     value: thresholdValue,
+    //     otherValue: operator === 'BTW' ? otherThresholdValue : null
+    //   },
+    //   isRuntimeFilter: false,
+    //   isGlobalFilter: false,
+    //   tableName: selectedMetricsColumn.tableName,
+    //   columnName: selectedMetricsColumn.columnName,
+    //   isOptional: false
+    // };
 
     const selectedLookbackColumn = this.selectedLookbackColumn || {};
     const lookbackFilter = {
@@ -470,7 +470,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const sipQuery = {
       artifacts: [{ artifactName, fields: [metricsColumn] }],
       booleanCriteria: 'AND',
-      filters: compact([alertFilter, lookbackFilter, stringFilter]),
+      filters: compact([
+        // alertFilter,
+        lookbackFilter,
+        stringFilter
+      ]),
       sorts: [],
       joins: [],
       store,
