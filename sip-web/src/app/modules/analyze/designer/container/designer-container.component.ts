@@ -295,7 +295,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         this.analysis = {
           ...(newAnalysis['analysis'] || newAnalysis),
-          artifacts,
+          artifacts: cloneDeep(artifacts),
           ...this.analysisStarter
         };
         isDSLAnalysis(this.analysis) &&
@@ -464,11 +464,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       });
     }
-    const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
+    const fields = flatMap(
+      (<AnalysisDSL>this.analysis).sipQuery.artifacts,
+      artifact => artifact.fields
+    );
 
     const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
     flatArtifacts.forEach(col => {
-      col.checked  = '';
+      col.checked = '';
       fields.forEach(field => {
         if (col.table === field.table && col.columnName === field.columnName) {
           col.checked = true;
