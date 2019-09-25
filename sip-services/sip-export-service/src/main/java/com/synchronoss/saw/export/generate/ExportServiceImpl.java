@@ -308,9 +308,6 @@ public class ExportServiceImpl implements ExportService {
       return;
     }
 
-    // clear export bean column header before building csv header
-    exportBean.setColumnHeader(null);
-
     data.stream()
         .limit(LimittoExport)
         .forEach(
@@ -800,6 +797,9 @@ public class ExportServiceImpl implements ExportService {
     final SipQuery sipQuery = getSipQuery(analysisId);
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
+    // clear export bean column header before building header
+    exportBean.setColumnHeader(null);
+
     try {
       // create a directory with unique name in published location to avoid file
       // conflict for dispatch.
@@ -1136,6 +1136,9 @@ public class ExportServiceImpl implements ExportService {
     // conflict for dispatch.
     final String mailDispatchFileName = filePath("ftp", userFileName);
     exportBean.setFileName(mailDispatchFileName);
+
+    // clear export bean column header before building header
+    exportBean.setColumnHeader(null);
 
     prepareFileWithSize(
         analysisId,
