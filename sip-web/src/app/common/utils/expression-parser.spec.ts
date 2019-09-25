@@ -6,7 +6,7 @@ import {
 
 const expressionExamples: any[] = [
   {
-    expression: '(SUM(column_name1) + AVG(column_name2)) * column_name3',
+    expression: '(SUM(column_name1) + AVG(column_name2)) * SUM(column_name3)',
     json: {
       operator: '*',
       operand1: {
@@ -15,20 +15,16 @@ const expressionExamples: any[] = [
         operand2: { aggregate: 'AVG', column: 'column_name2' }
       },
       operand2: {
+        aggregate: 'SUM',
         column: 'column_name3'
       }
     }
   },
+
   {
     expression: '1',
     json: {
       value: 1
-    }
-  },
-  {
-    expression: 'column_name',
-    json: {
-      column: 'column_name'
     }
   },
   {
@@ -39,10 +35,11 @@ const expressionExamples: any[] = [
     }
   },
   {
-    expression: 'column_name / 100',
+    expression: 'SUM(column_name) / 100',
     json: {
       operator: '/',
       operand1: {
+        aggregate: 'SUM',
         column: 'column_name'
       },
       operand2: {
@@ -55,7 +52,8 @@ const expressionExamples: any[] = [
 const faultyExpressionStrings: string[] = [
   'SUM(', // unterminated parenthesis
   '1 +', // missing second operand
-  'STUPEFY(column_name)' // unsupported aggregate function
+  'STUPEFY(column_name)', // unsupported aggregate function
+  'column_name' // no aggregate applied
 ];
 
 const faultyExpressionJSON: any[] = [

@@ -57,6 +57,12 @@ interface OperatorExpression {
 
 type Expression = OperatorExpression | ColumnExpression | ConstantExpression;
 
+/* Use when the expression contains only a constant or a column. Backend needs this
+   wrapped inside an operand for some reason. */
+// interface LoneExpression {
+//   operand1: ColumnExpression | ConstantExpression;
+// }
+
 export enum ExpressionErrorType {
   StringParsingFailed,
   JsonParsingFailed
@@ -143,7 +149,7 @@ const validateAggregate = (aggregate: MathNode) => {
 };
 
 const validateConstant = (constant: MathNode) => {
-  if (typeof constant !== 'number' || isNil(constant)) {
+  if (typeof constant.value !== 'number' || isNil(constant.value)) {
     throw new ExpressionError(
       ExpressionErrorType.StringParsingFailed,
       `Invalid constant: ${constant.value}`
@@ -238,6 +244,9 @@ const fromJSON = (json: Expression): MathNode => {
       operatorFunction(operatorJSON.operator),
       [fromJSON(operatorJSON.operand1), fromJSON(operatorJSON.operand2)]
     );
+    /* else if ((<LoneExpression>json).operand1) {
+    return fromJSON((<LoneExpression>json).operand1);
+  }*/
   } else if ((<ColumnExpression>json).column) {
     /* If the json is a column object */
     const columnJSON = json as ColumnExpression;
@@ -267,20 +276,6 @@ const fromJSON = (json: Expression): MathNode => {
 */
 
 /**
- * Converts sip compatible expression json to formula string.
- *
- * @param {Expression} json
- * @returns {string}
- */
-export const parseJSON = (json: Expression): string => {
-  try {
-    return fromJSON(json).toString();
-  } catch (e) {
-    throw new ExpressionError(ExpressionErrorType.JsonParsingFailed, e.message);
-  }
-};
-
-/**
  * Converts formula string to sip compatible expression json.
  *
  * @param {string} expr
@@ -289,10 +284,34 @@ export const parseJSON = (json: Expression): string => {
 export const parseExpression = (expr: string): Expression => {
   try {
     return toJSON(parse(expr));
+    // const json = toJSON(parse(expr));
+    // if (!(<OperatorExpression>json).operator) {
+    //   return <LoneExpression>{
+    //     operand1: json
+    //   };
+    // } else {
+    //   return json;
+    // }
   } catch (e) {
     throw new ExpressionError(
       ExpressionErrorType.StringParsingFailed,
       e.message
     );
+  }
+};
+
+/**
+ * Converts sip compatible expression json to formula string.
+ *
+ * @param {Expression} json
+ * @returns {string}
+ */
+export const parseJSON = (json: Expression): string => {
+  try {
+    const expression = fromJSON(json).toString();
+    parseExpression(expression); // try to parse the expression again to make sure it's valid
+    return expression;
+  } catch (e) {
+    throw new ExpressionError(ExpressionErrorType.JsonParsingFailed, e.message);
   }
 };
