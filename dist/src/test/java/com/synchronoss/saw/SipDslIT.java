@@ -41,15 +41,19 @@ public class SipDslIT extends BaseIT {
   protected JsonObject sipQueryDl = null;
   protected JsonObject sipDslForCustomerCodeFilter = null;
   protected String customToken;
+  private static final String TENANT_A = "TenantA";
+  private static final String TENANT_B = "TenantB";
+  private static final String TENANT_C = "TenantC";
+  private static final String CUSTOMER_CODE = "customerCode";
 
   @Before
   public void setUpData() throws JsonProcessingException {
-    customToken = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
+    customToken = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
     testData = new JsonObject();
     testData.addProperty("type", "esReport");
-    testData.addProperty("semanticId", "workbench::sample-elasticsearch-att");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch-tenantA");
     testData.addProperty("id", analysisId);
-    testData.addProperty("customerCode", "SYNCHRONOSS");
+    testData.addProperty(CUSTOMER_CODE, "SYNCHRONOSS");
     testData.addProperty("projectCode", "workbench");
     testData.addProperty("module", "ANALYZE");
     testData.addProperty("createdTime", 1543921879);
@@ -195,7 +199,7 @@ public class SipDslIT extends BaseIT {
     sorts.add(sort1);
 
     sipQuery.add("sorts", sorts);
-    sipQuery.addProperty("semanticId", "workbench::sample-elasticsearch-att");
+    sipQuery.addProperty("semanticId", "workbench::sample-elasticsearch-tenantA");
 
     JsonObject store = new JsonObject();
     store.addProperty("dataStore", "sampleAlias/sample");
@@ -213,7 +217,7 @@ public class SipDslIT extends BaseIT {
     testDataForDl.addProperty("semanticId", "workbench::sample-spark");
     testDataForDl.addProperty("metricName", "sample-spark");
     testDataForDl.addProperty("id", analysisId);
-    testDataForDl.addProperty("customerCode", "SYNCHRONOSS");
+    testDataForDl.addProperty(CUSTOMER_CODE, "SYNCHRONOSS");
     testDataForDl.addProperty("projectCode", "sip-sample");
     testDataForDl.addProperty("module", "productSpecific/ANALYZE");
     testDataForDl.addProperty("createdTime", 1543921879);
@@ -400,15 +404,15 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testCustomerCodeFilter() throws IOException {
     JsonObject sipDsl = testData;
-    sipDsl.addProperty("customerCode", "ATT");
-    String validateCustCode = "ATT";
+    sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
+    String validateCustCode = TENANT_A;
 
     JsonObject field1 = new JsonObject();
-    field1.addProperty("dataField", "customerCode");
+    field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("area", "x-axis");
-    field1.addProperty("alias", "customerCode");
-    field1.addProperty("columnName", "customerCode.keyword");
-    field1.addProperty("displayName", "customerCode");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE + ".keyword");
+    field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
@@ -428,7 +432,7 @@ public class SipDslIT extends BaseIT {
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
 
-    // Below code uses customToken (i,e. uname = "sawadmin@ATT.com", this customer is added
+    // Below code uses customToken (i,e. uname = "sawadmin@TenantA.com", this customer is added
     // implicitly on every docker start to validate true multi tenancy tests).
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
@@ -440,7 +444,7 @@ public class SipDslIT extends BaseIT {
     Iterator<JsonNode> iterator = data.iterator();
     while (iterator.hasNext()) {
       JsonNode dataNode = iterator.next();
-      Assert.assertEquals(dataNode.get("customerCode").asText(), validateCustCode);
+      Assert.assertEquals(dataNode.get(CUSTOMER_CODE).asText(), validateCustCode);
       // Verifying for each response data object to check customerCode filtering.
     }
     Assert.assertTrue(countOfRows > 0);
@@ -453,23 +457,23 @@ public class SipDslIT extends BaseIT {
     ArrayNode syncData = syncUserRes.withArray("data");
     Assert.assertTrue(syncUserRes.get("totalRows").asLong() > 0);
     Iterator<JsonNode> itr = syncData.iterator();
-    int att = 0;
-    int snt = 0;
-    int mct = 0;
+    int tenantA = 0;
+    int tenantB = 0;
+    int tenantC = 0;
     while (itr.hasNext()) {
       JsonNode dat = itr.next();
-      att = dat.get("customerCode").asText().equalsIgnoreCase("ATT") ? ++att : att;
-      snt = dat.get("customerCode").asText().equalsIgnoreCase("SNT") ? ++snt : snt;
-      mct = dat.get("customerCode").asText().equalsIgnoreCase("MCT") ? ++mct : mct;
+      tenantA = dat.get(CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_A) ? ++tenantA : tenantA;
+      tenantB = dat.get(CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_B) ? ++tenantB : tenantB;
+      tenantC = dat.get(CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_C) ? ++tenantC : tenantC;
     }
-    Assert.assertTrue(att > 0);
-    Assert.assertTrue(snt > 0);
-    Assert.assertTrue(mct > 0);
+    Assert.assertTrue(tenantA > 0);
+    Assert.assertTrue(tenantB > 0);
+    Assert.assertTrue(tenantC > 0);
   }
 
   @Test
   public void testCustomerCodeFilterWithDsk() throws IOException {
-    // Add security group for ATT customer.
+    // Add security group for TenantA customer.
     ObjectNode secGroup = mapper.createObjectNode();
     secGroup.put("description", "TestDesc2");
     secGroup.put("securityGroupName", "TestGroup2");
@@ -513,14 +517,14 @@ public class SipDslIT extends BaseIT {
         .body("valid", equalTo(true));
 
     JsonObject sipDsl = testData;
-    sipDsl.addProperty("customerCode", "ATT");
+    sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
 
     JsonObject field1 = new JsonObject();
-    field1.addProperty("dataField", "customerCode");
+    field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("area", "x-axis");
-    field1.addProperty("alias", "customerCode");
-    field1.addProperty("columnName", "customerCode.keyword");
-    field1.addProperty("displayName", "customerCode");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE + ".keyword");
+    field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
@@ -543,14 +547,14 @@ public class SipDslIT extends BaseIT {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
-    String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
+    String customTok = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
     Response response = execute(customTok, jsonNode);
     Assert.assertNotNull(response);
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode data = attUserRes.withArray("data");
     Assert.assertTrue(data.size() == 1);
-    String validateCustCode = "ATT";
-    Assert.assertEquals(data.get(0).get("customerCode").asText(), validateCustCode);
+    String validateCustCode = TENANT_A;
+    Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
     given(authSpec)
@@ -591,14 +595,14 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testDlExecuteWithCustCodeFilter() throws IOException {
     JsonObject sipDsl = testDataForDl;
-    sipDsl.addProperty("customerCode", "ATT");
+    sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
 
     JsonObject field1 = new JsonObject();
-    field1.addProperty("dataField", "customerCode");
+    field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", "customerCode");
-    field1.addProperty("columnName", "customerCode");
-    field1.addProperty("displayName", "customerCode");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE);
+    field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
@@ -652,11 +656,11 @@ public class SipDslIT extends BaseIT {
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode attData = attUserRes.withArray("data");
     Iterator<JsonNode> iterator = attData.iterator();
-    String validateCustCode = "ATT";
+    String validateCustCode = TENANT_A;
     while (iterator.hasNext()) {
       JsonNode dataNode = iterator.next();
-      Assert.assertEquals(dataNode.get("SALES_customerCode").asText(), validateCustCode);
-      Assert.assertEquals(dataNode.get("PRODUCT_customerCode").asText(), validateCustCode);
+      Assert.assertEquals(dataNode.get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
+      Assert.assertEquals(dataNode.get("PRODUCT_" + CUSTOMER_CODE).asText(), validateCustCode);
       // Verifying for each response data object to check customerCode filtering.
     }
 
@@ -679,45 +683,45 @@ public class SipDslIT extends BaseIT {
     ObjectNode syncUserRes = syncResponse.getBody().as(ObjectNode.class);
     ArrayNode syncData = syncUserRes.withArray("data");
 
-    int att = 0;
-    int snt = 0;
-    int mct = 0;
+    int tenantA = 0;
+    int tenantB = 0;
+    int tenantC = 0;
 
     Iterator<JsonNode> itr = syncData.iterator();
     while (itr.hasNext()) {
       JsonNode dat = itr.next();
-      att =
-          dat.get("SALES_customerCode").asText().equalsIgnoreCase("ATT")
-                  && dat.get("PRODUCT_customerCode").asText().equalsIgnoreCase("ATT")
-              ? ++att
-              : att;
-      snt =
-          dat.get("SALES_customerCode").asText().equalsIgnoreCase("SNT")
-                  && dat.get("PRODUCT_customerCode").asText().equalsIgnoreCase("SNT")
-              ? ++snt
-              : snt;
-      mct =
-          dat.get("SALES_customerCode").asText().equalsIgnoreCase("MCT")
-                  && dat.get("PRODUCT_customerCode").asText().equalsIgnoreCase("MCT")
-              ? ++mct
-              : mct;
+      tenantA =
+          dat.get("SALES_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_A)
+                  && dat.get("PRODUCT_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_A)
+              ? ++tenantA
+              : tenantA;
+      tenantB =
+          dat.get("SALES_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_B)
+                  && dat.get("PRODUCT_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_B)
+              ? ++tenantB
+              : tenantB;
+      tenantC =
+          dat.get("SALES_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_C)
+                  && dat.get("PRODUCT_" + CUSTOMER_CODE).asText().equalsIgnoreCase(TENANT_C)
+              ? ++tenantC
+              : tenantC;
     }
-    Assert.assertTrue(att > 0);
-    Assert.assertTrue(snt > 0);
-    Assert.assertTrue(mct > 0);
+    Assert.assertTrue(tenantA > 0);
+    Assert.assertTrue(tenantB > 0);
+    Assert.assertTrue(tenantC > 0);
   }
 
   @Test
   public void testDskWithCustCodeFilterDl() throws IOException {
     JsonObject sipDsl = testDataForDl;
-    sipDsl.addProperty("customerCode", "ATT");
+    sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
 
     JsonObject field1 = new JsonObject();
-    field1.addProperty("dataField", "customerCode");
+    field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("table", "sales");
-    field1.addProperty("alias", "customerCode");
-    field1.addProperty("columnName", "customerCode");
-    field1.addProperty("displayName", "customerCode");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE);
+    field1.addProperty("displayName", CUSTOMER_CODE);
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
@@ -754,7 +758,7 @@ public class SipDslIT extends BaseIT {
 
     sipDsl.get("sipQuery").getAsJsonObject().add("joins", new JsonArray());
 
-    // Add security group for ATT customer.
+    // Add security group for TenantA customer.
     ObjectNode secGroup = mapper.createObjectNode();
     secGroup.put("description", "TestDesc2");
     secGroup.put("securityGroupName", "TestGroup2");
@@ -798,7 +802,7 @@ public class SipDslIT extends BaseIT {
         .body("valid", equalTo(true));
 
     // Update token after applying DSK.
-    String customTok = authenticate("sawadmin@ATT.com", "Sawsyncnewuser1!");
+    String customTok = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
 
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
@@ -807,8 +811,8 @@ public class SipDslIT extends BaseIT {
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
     ArrayNode data = attUserRes.withArray("data");
     Assert.assertTrue(data.size() == 1);
-    String validateCustCode = "ATT";
-    Assert.assertEquals(data.get(0).get("SALES_customerCode").asText(), validateCustCode);
+    String validateCustCode = TENANT_A;
+    Assert.assertEquals(data.get(0).get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
     given(authSpec)
@@ -821,30 +825,28 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testCreateAnalysis() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
-    Response response =
-        given(spec)
-            .header("Authorization", "Bearer " + token)
-            .body(jsonNode)
-            .when()
-            .post("/sip/services/dslanalysis/")
-            .then()
-            .assertThat()
-            .statusCode(200)
-            .extract()
-            .response();
-    Assert.assertNotNull(response);
-    ObjectNode root = response.getBody().as(ObjectNode.class);
-    analysisId = root.get("analysisId").asText();
+  public void testScheduleForMultiTenancy() throws IOException {
+    analysisId = createAnalysis(customToken);
 
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .delete("/sip/services/dslanalysis/" + analysisId)
-        .then()
-        .assertThat()
-        .statusCode(200);
+    ObjectNode scheduleObj = scheduleData();
+    scheduleObj.put("activeRadio", "currenttime");
+    scheduleObj.put("activeTab", "immediate");
+    scheduleObj.put("analysisID", analysisId);
+    scheduleObj.put("cronExpression", "");
+    scheduleObj.put("jobName", analysisId + "-p96a99");
+    scheduleObj.put("type", "esReport");
+    scheduleObj.put("jobGroup", TENANT_A);
+    scheduleObj.put("scheduleState", "new");
+    scheduleObj.put("zip", false);
+    String json = mapper.writeValueAsString(scheduleObj);
+    createSchedule(json, customToken);
+    deleteAnalysis(analysisId, customToken);
+  }
+
+  @Test
+  public void testCreateAnalysis() throws IOException {
+    analysisId = createAnalysis(token);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
@@ -931,7 +933,7 @@ public class SipDslIT extends BaseIT {
     ObjectNode node = scheduleData();
     node.put("analysisID", analysisId);
     String json = mapper.writeValueAsString(node);
-    createSchedule(json);
+    createSchedule(json, token);
     List<Map<String, String>> data = getLastExecutionsData(analysisId);
 
     given(spec)
@@ -1027,7 +1029,7 @@ public class SipDslIT extends BaseIT {
         .path("data");
   }
 
-  private void createSchedule(String json) {
+  private void createSchedule(String json, String token) {
     given(spec)
         .filter(document("create-schedule", preprocessResponse(prettyPrint())))
         .header("Authorization", "Bearer " + token)
@@ -1135,5 +1137,47 @@ public class SipDslIT extends BaseIT {
         .statusCode(200)
         .extract()
         .response();
+  }
+
+  /**
+   * Method used to create new analysis report.
+   *
+   * @param token auth token
+   * @return Analysis id
+   * @throws IOException IoException
+   */
+  public String createAnalysis(String token) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(jsonNode)
+            .when()
+            .post("/sip/services/dslanalysis/")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    Assert.assertNotNull(response);
+    ObjectNode root = response.getBody().as(ObjectNode.class);
+    analysisId = root.get("analysisId").asText();
+
+    return analysisId;
+  }
+
+  /**
+   * Deletes analysis from maprDB.
+   *
+   * @param analysisId Analysis id
+   */
+  public void deleteAnalysis(String analysisId, String token) {
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
   }
 }

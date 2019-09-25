@@ -151,9 +151,9 @@
       ]
     }
   ],
-  "createdBy": "sipadmin@synchronoss.com",
-  "customerCode": "ATT",
-  "metricName": "sample-spark-att",
+  "createdBy": "sipadmin@TenantA.com",
+  "customerCode": "TenantA",
+  "metricName": "sample-spark-tenantA",
   "module": "ANALYZE",
   "parentDataSetIds": [
     "SALES::json::1550777226458",
@@ -190,5 +190,5 @@
       "label": "TABLES"
     }
   ],
-  "username": "sipadmin@synchronoss.com"
+  "username": "sipadmin@TenantA.com"
 }

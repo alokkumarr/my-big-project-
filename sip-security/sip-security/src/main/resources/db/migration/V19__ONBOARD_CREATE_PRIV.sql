@@ -408,4 +408,4 @@ INSERT INTO PRIVILEGES (PRIVILEGE_SYS_ID, CUST_PROD_SYS_ID,CUST_PROD_MOD_SYS_ID,
 //
 DELIMITER ;
 
-call onboard_customer ('ATT','AT&T','workbench','sipUser@xyz.com','SipAdmin','a','s','0','1');
+call onboard_customer ('TenantA','TenantAT&T','workbench','sipUser@xyz.com','SipAdmin','a','s','0','1');
