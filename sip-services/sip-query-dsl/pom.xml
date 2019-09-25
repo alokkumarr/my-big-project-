@@ -70,6 +70,9 @@
       <version>2.9.6</version>
     </dependency>
     <dependency>
+      <!-- Gson is used to parse the derived metric formula which is recursive.
+      Should be removed in future.
+      -->
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.8.5</version>
