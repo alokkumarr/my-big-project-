@@ -833,17 +833,15 @@ public class SipDslIT extends BaseIT {
   }
 
   /**
+   * Prepares the payload for derived metric field.
+   *
    * @param fieldName Name of the field
    * @param formula Formula for the derived metrics
    * @param expression Formula in json format
    * @return JSON payload for the derived metric
    */
-  private JsonNode prepareDerivedMetricPayload(
-      String fieldName, String formula, String expression) throws IOException {
-    JsonObject payload = testData;
-
-    JsonArray artifactFields = new JsonArray();
-
+  private JsonNode prepareDerivedMetricPayload(String fieldName, String formula, String expression)
+      throws IOException {
     JsonObject formulaField = new JsonObject();
     formulaField.addProperty("area", "y");
     formulaField.addProperty("dataField", fieldName);
@@ -866,9 +864,11 @@ public class SipDslIT extends BaseIT {
     dateField.addProperty("type", "date");
     dateField.addProperty("dateFormat", "MMM d YYYY");
 
+    JsonArray artifactFields = new JsonArray();
     artifactFields.add(formulaField);
     artifactFields.add(dateField);
 
+    JsonObject payload = testData;
     JsonArray fields =
         payload
             .getAsJsonObject("sipQuery")
