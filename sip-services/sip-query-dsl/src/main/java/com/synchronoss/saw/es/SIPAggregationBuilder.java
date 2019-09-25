@@ -93,7 +93,7 @@ public class SIPAggregationBuilder {
     /** For Report find the list of Aggregate fields. */
     if ((fieldCount + aggregateFields.size()) < dataFields.size()) {
       Field dataField = dataFields.get(fieldCount + aggregatedFieldCount);
-      if (dataField.getAggregate() != null) {
+      if (dataField.getAggregate() != null || dataField.getFormula() != null) {
         aggregatedFieldCount++;
         return reportAggregationBuilder(
             dataFields,
