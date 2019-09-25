@@ -39,7 +39,6 @@ public class SipDslIT extends BaseIT {
   protected JsonObject sipQuery = null;
   protected JsonObject testDataForDl = null;
   protected JsonObject sipQueryDl = null;
-  protected JsonObject sipDslForCustomerCodeFilter = null;
   protected String customToken;
   private static final String TENANT_A = "TenantA";
   private static final String TENANT_B = "TenantB";
@@ -51,7 +50,7 @@ public class SipDslIT extends BaseIT {
     customToken = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
     testData = new JsonObject();
     testData.addProperty("type", "esReport");
-    testData.addProperty("semanticId", "workbench::sample-elasticsearch-tenantA");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
     testData.addProperty("id", analysisId);
     testData.addProperty(CUSTOMER_CODE, "SYNCHRONOSS");
     testData.addProperty("projectCode", "workbench");
@@ -199,7 +198,7 @@ public class SipDslIT extends BaseIT {
     sorts.add(sort1);
 
     sipQuery.add("sorts", sorts);
-    sipQuery.addProperty("semanticId", "workbench::sample-elasticsearch-tenantA");
+    sipQuery.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
 
     JsonObject store = new JsonObject();
     store.addProperty("dataStore", "sampleAlias/sample");
@@ -825,7 +824,7 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testScheduleForMultiTenancy() throws IOException {
+  public void testScheduleForMultiTenancy() throws IOException, InterruptedException {
     analysisId = createAnalysis(customToken);
 
     ObjectNode scheduleObj = scheduleData();
@@ -840,6 +839,17 @@ public class SipDslIT extends BaseIT {
     scheduleObj.put("zip", false);
     String json = mapper.writeValueAsString(scheduleObj);
     createSchedule(json, customToken);
+
+    Response executionResultForScheduled =
+        given(spec)
+            .header("Authorization", "Bearer " + customToken)
+            .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    Assert.assertNotNull(executionResultForScheduled);
     deleteAnalysis(analysisId, customToken);
   }
 
