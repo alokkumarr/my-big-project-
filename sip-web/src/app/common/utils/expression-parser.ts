@@ -93,6 +93,14 @@ const validateOperator = (operator: MathNode) => {
   }
 };
 
+const validateLoneColumn = (columnNode: MathNode) => {
+  throw new ExpressionError(
+    ExpressionErrorType.StringParsingFailed,
+    `No aggregate applied to column: ${columnNode.name}.
+    Example usage: ${SUPPORTED_AGGREGATES[0]}(${columnNode.name})`
+  );
+};
+
 const validateAggregate = (aggregate: MathNode) => {
   /* If no argument is provided for aggregate */
   if (isEmpty(aggregate.args)) {
@@ -177,9 +185,10 @@ const toJSON = (node: MathNode): Expression => {
       validateAggregate(node);
       return {
         aggregate: node.name,
-        ...toJSON(node.args[0])
+        column: node.args[0].name
       };
     case 'SymbolNode':
+      validateLoneColumn(node);
       return { column: node.name };
     case 'ParenthesisNode':
       return toJSON(node['content']);
