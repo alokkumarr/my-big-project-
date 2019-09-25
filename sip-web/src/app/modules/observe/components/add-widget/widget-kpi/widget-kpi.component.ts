@@ -285,6 +285,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
             columnName: dataField.columnName,
             name: dataField.name,
             displayName: dataField.displayName,
+            format: {
+              comma: this.kpiForm.get('kpiCommaSeparator').value,
+              precision: this.kpiForm.get('kpiPrecision').value,
+              prefix: this.kpiForm.get('kpiPrefix').value,
+              suffix: this.kpiForm.get('kpiSuffix').value
+            },
             aggregate: [
               this.kpiForm.get('primAggregate').value,
               ...map(secondaryAggregates, ag => ag.value)
