@@ -550,7 +550,8 @@ public class SipDslIT extends BaseIT {
 
     String formula = "sum(col1) + 2";
     String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"value\":2}}";
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
+            + "\"operand2\":{\"value\":2}}";
 
     field.addProperty("dataField", fieldName);
     field.addProperty("displayName", "Arithmetic With Agg");
@@ -578,7 +579,8 @@ public class SipDslIT extends BaseIT {
 
     String formula = "sum(col1) + avg(col2)";
     String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}";
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
+            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}";
 
     field.addProperty("dataField", fieldName);
     field.addProperty("displayName", "Arithmetic With Agg");
@@ -606,7 +608,10 @@ public class SipDslIT extends BaseIT {
 
     String formula = "sum(col1) + avg(col2)";
     String expression =
-        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"avg\",\"column\":\"col1\"},\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}}";
+        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
+            + "\"operand2\":{\"operator\":\"+\","
+            + "\"operand1\":{\"aggregation\":\"avg\",\"column\":\"col1\"},"
+            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}}";
 
     field.addProperty("dataField", fieldName);
     field.addProperty("displayName", "Multiple Operations");
