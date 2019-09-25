@@ -1,6 +1,7 @@
 import * as mjs from 'mathjs';
 import { MathNode, parse } from 'mathjs';
 import * as isNil from 'lodash/isNil';
+import * as isEmpty from 'lodash/isEmpty';
 
 /*
  ████████╗██╗   ██╗██████╗ ███████╗███████╗
@@ -75,6 +76,74 @@ export class ExpressionError extends Error {
 export const SUPPORTED_AGGREGATES = ['SUM', 'AVG'];
 
 /*
+ ██╗   ██╗ █████╗ ██╗     ██╗██████╗  █████╗ ████████╗ ██████╗ ██████╗ ███████╗
+ ██║   ██║██╔══██╗██║     ██║██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗██╔════╝
+ ██║   ██║███████║██║     ██║██║  ██║███████║   ██║   ██║   ██║██████╔╝███████╗
+ ╚██╗ ██╔╝██╔══██║██║     ██║██║  ██║██╔══██║   ██║   ██║   ██║██╔══██╗╚════██║
+  ╚████╔╝ ██║  ██║███████╗██║██████╔╝██║  ██║   ██║   ╚██████╔╝██║  ██║███████║
+   ╚═══╝  ╚═╝  ╚═╝╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝
+*/
+
+const validateOperator = (operator: MathNode) => {
+  if (!Object.values(Operator).includes(<Operator>operator.op)) {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Operator not supported: ${operator.op}`
+    );
+  }
+};
+
+const validateAggregate = (aggregate: MathNode) => {
+  /* If no argument is provided for aggregate */
+  if (isEmpty(aggregate.args)) {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Missing column name for aggregate: ${aggregate.name}().
+      Example usage: ${aggregate.name}(column_name)`
+    );
+  }
+
+  /* If more than one argument is provided for aggregate */
+  if (aggregate.args.length > 1) {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Multiple arguments not supported in aggregate: ${aggregate.toString()}.
+      Example usage: ${aggregate.name}(column_name)`
+    );
+  }
+
+  /* If something other than a column name is provided. For example, SUM(a + b).
+     Here, a + b is not a column name. It's an expression. Not supported.
+  */
+  if (aggregate.args[0].type !== 'SymbolNode') {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Invalid arguments for aggregate: ${aggregate.name}.
+      Replace '${aggregate.args[0].toString()}' with a column name.
+      Example usage: ${aggregate.name}(column_name)`
+    );
+  }
+
+  /* If aggregate is not one of the supported aggregates */
+  const columnNode = aggregate.args[0];
+  if (!SUPPORTED_AGGREGATES.some(agg => agg === aggregate.name.toUpperCase())) {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Aggregate not supported: ${aggregate.name} for column: ${columnNode.name}`
+    );
+  }
+};
+
+const validateConstant = (constant: MathNode) => {
+  if (typeof constant !== 'number' || isNil(constant)) {
+    throw new ExpressionError(
+      ExpressionErrorType.StringParsingFailed,
+      `Invalid constant: ${constant.value}`
+    );
+  }
+};
+
+/*
   ██████╗ ██████╗ ███╗   ██╗██╗   ██╗███████╗██████╗ ████████╗███████╗██████╗ ███████╗
  ██╔════╝██╔═══██╗████╗  ██║██║   ██║██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔════╝
  ██║     ██║   ██║██╔██╗ ██║██║   ██║█████╗  ██████╔╝   ██║   █████╗  ██████╔╝███████╗
@@ -95,14 +164,17 @@ export const SUPPORTED_AGGREGATES = ['SUM', 'AVG'];
 const toJSON = (node: MathNode): Expression => {
   switch (node.type) {
     case 'OperatorNode':
+      validateOperator(node);
       return {
         operator: <Operator>node.op,
         operand1: toJSON(node.args[0]),
         operand2: toJSON(node.args[1])
       };
     case 'ConstantNode':
+      validateConstant(node);
       return { value: node.value };
     case 'FunctionNode':
+      validateAggregate(node);
       return {
         aggregate: node.name,
         ...toJSON(node.args[0])
@@ -177,61 +249,6 @@ const fromJSON = (json: Expression): MathNode => {
 };
 
 /*
- ██╗   ██╗ █████╗ ██╗     ██╗██████╗  █████╗ ████████╗ ██████╗ ██████╗ ███████╗
- ██║   ██║██╔══██╗██║     ██║██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗██╔════╝
- ██║   ██║███████║██║     ██║██║  ██║███████║   ██║   ██║   ██║██████╔╝███████╗
- ╚██╗ ██╔╝██╔══██║██║     ██║██║  ██║██╔══██║   ██║   ██║   ██║██╔══██╗╚════██║
-  ╚████╔╝ ██║  ██║███████╗██║██████╔╝██║  ██║   ██║   ╚██████╔╝██║  ██║███████║
-   ╚═══╝  ╚═╝  ╚═╝╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝
-*/
-
-const validateOperator = (operator: Operator): string[] => {
-  return Object.values(Operator).includes(operator)
-    ? []
-    : [`Operator not supported: ${operator}`];
-};
-
-const validateColumn = ({ column, aggregate }: ColumnExpression): string[] => {
-  if (!column) {
-    return [`Invalid column name: null`];
-  }
-
-  return aggregate &&
-    !SUPPORTED_AGGREGATES.some(agg => agg === aggregate.toUpperCase())
-    ? [`Aggregate not supported: ${aggregate} for column: ${column}`]
-    : [];
-};
-
-const validateConstant = (constant: number): string[] => {
-  return typeof constant !== 'number' || isNil(constant)
-    ? [`Invalid constant: ${constant}`]
-    : [];
-};
-
-const validateExpression = (json: Expression, log: string[] = []): string[] => {
-  if (isNil(json)) {
-    return ['Invalid expression json.'];
-  } else if ((<OperatorExpression>json).operator) {
-    /* If the json is an operator object */
-    const operatorJSON = json as OperatorExpression;
-    return [
-      ...log,
-      ...validateOperator(operatorJSON.operator),
-      ...validateExpression(operatorJSON.operand1),
-      ...validateExpression(operatorJSON.operand2)
-    ];
-  } else if ((<ColumnExpression>json).column) {
-    /* If the json is a column object */
-    const columnJSON = json as ColumnExpression;
-    return [...log, ...validateColumn(columnJSON)];
-  } else if ((<ConstantExpression>json).value) {
-    /* If json is a simple constant */
-    const constantJSON = json as ConstantExpression;
-    return [...log, ...validateConstant(constantJSON.value)];
-  }
-};
-
-/*
  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗     █████╗ ██████╗ ██╗
  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝    ██╔══██╗██╔══██╗██║
  ██████╔╝██║   ██║██████╔╝██║     ██║██║         ███████║██████╔╝██║
@@ -247,13 +264,6 @@ const validateExpression = (json: Expression, log: string[] = []): string[] => {
  * @returns {string}
  */
 export const parseJSON = (json: Expression): string => {
-  const errorLog = validateExpression(json);
-  if (errorLog.length) {
-    throw new ExpressionError(
-      ExpressionErrorType.JsonParsingFailed,
-      errorLog.join('\n')
-    );
-  }
   try {
     return fromJSON(json).toString();
   } catch (e) {
@@ -269,16 +279,7 @@ export const parseJSON = (json: Expression): string => {
  */
 export const parseExpression = (expr: string): Expression => {
   try {
-    const json = toJSON(parse(expr));
-    const errorLog = validateExpression(json);
-    if (errorLog.length) {
-      throw new ExpressionError(
-        ExpressionErrorType.JsonParsingFailed,
-        errorLog.join('\n')
-      );
-    }
-
-    return json;
+    return toJSON(parse(expr));
   } catch (e) {
     throw new ExpressionError(
       ExpressionErrorType.StringParsingFailed,
