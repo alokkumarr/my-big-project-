@@ -1,8 +1,4 @@
-import {
-  parseExpression,
-  parseJSON,
-  ExpressionError
-} from './expression-parser';
+import { ExpressionParser, ExpressionError } from './expression-parser';
 
 const expressionExamples: any[] = [
   {
@@ -82,10 +78,15 @@ const faultyExpressionJSON: any[] = [
 ];
 
 describe('Expression Parser', () => {
+  let parser: ExpressionParser;
+  beforeEach(() => {
+    parser = new ExpressionParser();
+  });
+
   describe('parseExpression', () => {
     it('should parse complex expression', () => {
       expressionExamples.forEach(({ expression, json }, i) => {
-        expect(parseExpression(expression)).toEqual(
+        expect(parser.parseExpression(expression)).toEqual(
           json,
           `Example at index ${i} failed.`
         );
@@ -94,7 +95,9 @@ describe('Expression Parser', () => {
 
     it('should throw error for invalid expression string', () => {
       faultyExpressionStrings.forEach(expr => {
-        expect(() => parseExpression(expr)).toThrowError(ExpressionError);
+        expect(() => parser.parseExpression(expr)).toThrowError(
+          ExpressionError
+        );
       });
     });
   });
@@ -102,13 +105,13 @@ describe('Expression Parser', () => {
   describe('parseJSON', () => {
     it('should throw error for invalid expression json', () => {
       faultyExpressionJSON.forEach(expr => {
-        expect(() => parseJSON(expr)).toThrowError(ExpressionError);
+        expect(() => parser.parseJSON(expr)).toThrowError(ExpressionError);
       });
     });
 
     it('should convert expression json back to string', () => {
       expressionExamples.forEach(({ expression, json }, i) => {
-        expect(parseJSON(json)).toEqual(
+        expect(parser.parseJSON(json)).toEqual(
           expression,
           `Example at index ${i} failed.`
         );

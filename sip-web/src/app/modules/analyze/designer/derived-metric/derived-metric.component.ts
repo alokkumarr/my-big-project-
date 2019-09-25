@@ -27,7 +27,7 @@ import { of, Observable } from 'rxjs';
 import {
   SUPPORTED_AGGREGATES,
   Operator as SupportedOperator,
-  parseExpression
+  ExpressionParser
 } from 'src/app/common/utils/expression-parser';
 import { isUnique } from 'src/app/common/validators';
 
@@ -52,6 +52,7 @@ export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
     fontSize: 16
   };
 
+  parser: ExpressionParser;
   expressionForm: FormGroup;
   expressionError = '';
   langTools = ace.require('ace/ext/language_tools');
@@ -81,6 +82,7 @@ export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
       this.originalColumnName = this.data.artifactColumn.columnName;
       this.mode = MODE.edit;
     }
+    this.initParser();
     this.createForm();
     this.generateCompletions();
     this.addCompletionsToEditor();
@@ -99,6 +101,24 @@ export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
       this.langTools.textCompleter,
       this.langTools.keyWordCompleter
     ]);
+  }
+
+  /**
+   * Inialises parser with supported column names. Exlcudes the names
+   * of other derived metrics. They are not supported in expressions.
+   *
+   * @returns
+   * @memberof DerivedMetricComponent
+   */
+  initParser() {
+    if (!get(this.data, 'columns')) {
+      return;
+    }
+
+    const columnNames = this.data.columns
+      .filter(col => !col.expression)
+      .map(col => col.columnName);
+    this.parser = new ExpressionParser(columnNames);
   }
 
   /*
@@ -168,7 +188,7 @@ export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
    */
   submit() {
     try {
-      const expressionJSON = parseExpression(
+      const expressionJSON = this.parser.parseExpression(
         this.expressionForm.get('formula').value
       );
       this.expressionError = '';
