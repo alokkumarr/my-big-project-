@@ -52,3 +52,26 @@
     background-color: white;
   }
 }
+
+mat-icon {
+  padding: 2px 0;
+  color: $primary-red;
+  font-size: 14px;
+  height: 14px;
+}
+
+.icon-string-type {
+  color: $string-type-color;
+}
+.icon-number-type {
+  color: $number-type-color;
+}
+.icon-derived-type {
+  color: $derived-type-color;
+}
+.icon-geo-chart {
+  color: $geo-type-color;
+}
+.icon-calendar {
+  color: $date-type-color;
+}
