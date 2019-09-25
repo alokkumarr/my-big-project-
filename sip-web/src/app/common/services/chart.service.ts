@@ -856,7 +856,9 @@ export class ChartService {
     forEach(axisFields, (field, index) => {
       const titleText =
         field.alias ||
-        `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`;
+        (field.expression
+          ? field.displayName
+          : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`);
       chartChanges.push({
         labels: {
           align: 'right',
