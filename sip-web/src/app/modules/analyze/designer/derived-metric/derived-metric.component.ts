@@ -5,7 +5,8 @@ import {
   ViewChild,
   OnDestroy,
   Inject,
-  Optional
+  Optional,
+  AfterViewInit
 } from '@angular/core';
 import { AceEditorComponent } from 'ng2-ace-editor';
 import {
@@ -20,12 +21,15 @@ import * as startCase from 'lodash/startCase';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as lowerCase from 'lodash/lowerCase';
+import { of, Observable } from 'rxjs';
 
 import {
   SUPPORTED_AGGREGATES,
   Operator as SupportedOperator,
   parseExpression
 } from 'src/app/common/utils/expression-parser';
+import { isUnique } from 'src/app/common/validators';
 
 enum MODE {
   edit,
@@ -36,7 +40,7 @@ enum MODE {
   templateUrl: './derived-metric.component.html',
   styleUrls: ['./derived-metric.component.scss']
 })
-export class DerivedMetricComponent implements OnDestroy {
+export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
   editorOptions = {
@@ -52,6 +56,7 @@ export class DerivedMetricComponent implements OnDestroy {
   expressionError = '';
   langTools = ace.require('ace/ext/language_tools');
   mode = MODE.create;
+  originalColumnName: string;
   allModes = MODE;
   allAggregatesSupported = SUPPORTED_AGGREGATES;
   allOperatorsSupported = Object.values(SupportedOperator);
@@ -73,11 +78,16 @@ export class DerivedMetricComponent implements OnDestroy {
     public dialogRef: MatDialogRef<DerivedMetricComponent>
   ) {
     if (get(this.data, 'artifactColumn.columnName')) {
+      this.originalColumnName = this.data.artifactColumn.columnName;
       this.mode = MODE.edit;
     }
     this.createForm();
     this.generateCompletions();
     this.addCompletionsToEditor();
+  }
+
+  ngAfterViewInit() {
+    this.editor.getEditor().resize();
   }
 
   ngOnDestroy() {
@@ -113,7 +123,12 @@ export class DerivedMetricComponent implements OnDestroy {
           value: get(this.data, 'artifactColumn.columnName', ''),
           disabled: this.mode === MODE.edit
         },
-        Validators.required
+        Validators.required,
+        isUnique(
+          this.isDuplicateColumnName.bind(this),
+          val => val,
+          this.originalColumnName
+        )
       ],
       formula: [
         get(this.data, 'artifactColumn.formula', ''),
@@ -135,6 +150,13 @@ export class DerivedMetricComponent implements OnDestroy {
   expressionChanged(expression: string) {
     this.expressionForm.get('formula').setValue(expression);
     this.expressionError = '';
+  }
+
+  isDuplicateColumnName(columnName: string): Observable<boolean> {
+    const existingColumnNames = this.data.columns.map(col =>
+      lowerCase(col.columnName)
+    );
+    return of(existingColumnNames.includes(lowerCase(columnName)));
   }
 
   /**

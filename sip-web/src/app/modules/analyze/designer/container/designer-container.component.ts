@@ -54,7 +54,8 @@ import {
   LabelOptions,
   AnalysisChartDSL,
   AnalysisMapDSL,
-  QueryDSL
+  QueryDSL,
+  ArtifactColumn
 } from '../../../../models';
 import {
   DesignerStates,
@@ -100,6 +101,8 @@ import {
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
+import { MatDialog } from '@angular/material';
+import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -160,6 +163,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
+    private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
   ) {
@@ -294,7 +298,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         this.analysis = {
           ...(newAnalysis['analysis'] || newAnalysis),
-          artifacts,
+          artifacts: cloneDeep(artifacts),
           ...this.analysisStarter
         };
         isDSLAnalysis(this.analysis) &&
@@ -328,6 +332,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     fpPipe(
       fpFlatMap(artifact => artifact.columns || artifact.fields),
       fpReduce((accumulator, column) => {
+        column.alias = '';
+        delete column.aggregate;
         if (column.type === 'date') {
           column.dateFormat = 'MMM d YYYY';
         }
@@ -446,8 +452,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
     /* prettier-ignore */
-    switch (this.analysis.type) {
-    case 'chart':
+    if (this.analysis.type === 'chart') {
       const indices = {};
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
@@ -461,40 +466,26 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           return column;
         });
       });
-      break;
-
-    case 'report':
-      const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
-
-      const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
-
-      flatArtifacts.forEach(col => {
-        col.checked  = '';
-        fields.forEach(field => {
-          if (col.table === field.table && col.columnName === field.columnName) {
-            col.checked = true;
-          }
-        });
-      });
-      break;
-
-    case 'pivot':
-      if (isDSLAnalysis(this.analysis)) {
-        forEach(artifacts, table => {
-          table.columns = map(table.columns, column => {
-            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => {
-              forEach(artifact.fields, field => {
-                if (field.columnName === column.columnName) {
-                  column.format = field.format;
-                  column.aliasName = field.aliasName;
-                }
-              });
-            });
-            return column;
-          });
-        });
-      }
     }
+    const fields = flatMap(
+      (<AnalysisDSL>this.analysis).sipQuery.artifacts,
+      artifact => artifact.fields
+    );
+
+    const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
+    flatArtifacts.forEach(col => {
+      col.checked = '';
+      fields.forEach(field => {
+        if (col.table === field.table && col.columnName === field.columnName) {
+          col.checked = true;
+          if (this.analysis.type === 'pivot') {
+            col.format = field.format;
+            col.aliasName = field.aliasName;
+          }
+        }
+      });
+    });
+
     return artifacts;
   }
 
@@ -1117,7 +1108,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         column.format.precision = DEFAULT_PRECISION;
       }
     }
-    if (DATE_TYPES.includes(column.type) && !column.format) {
+
+    if (DATE_TYPES.includes(column.type)) {
+      column.dateFormat = 'yyyy-MM-dd';
       column.format = 'yyyy-MM-dd';
     }
   }
@@ -1140,6 +1133,33 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
+    case 'updateDerivedMetric':
+      this.openDerivedMetricDialog(event.column);
+      break;
+    case 'addNewDerivedMetric':
+      this.openDerivedMetricDialog(null);
+      break;
+    case 'expressionUpdated':
+      this._store.dispatch(new DesignerUpdateArtifactColumn({
+        columnName: event.column.columnName,
+        table: event.column.table,
+        formula: event.column.formula,
+        expression: event.column.expression
+      }));
+      forEach(this.artifacts[0].columns, col => {
+        if (col.columnName === event.column.columnName) {
+          col.formula = event.column.formula;
+          col.expression = event.column.expression;
+        }
+      });
+      this.artifacts = [...this.artifacts];
+      this.requestDataIfPossible();
+      break;
+    case 'derivedMetricAdded':
+      const artifact = this.artifacts[0];
+      (<ArtifactColumn[]>artifact.columns).push(event.column as ArtifactColumn);
+      this.artifacts = [artifact];
+      break;
       case 'alias':
         // reload frontEnd
         this.updateAnalysis();
@@ -1228,6 +1248,42 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
         break;
     }
+  }
+
+  openDerivedMetricDialog(artifactColumn: ArtifactColumn) {
+    const dialogRef = this.dialog.open(DerivedMetricComponent, {
+      width: '60%',
+      height: '60%',
+      autoFocus: false,
+      data: { artifactColumn, columns: this.artifacts[0].columns }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const column = {
+          ...artifactColumn,
+          ...result,
+          table: get(this.artifacts[0], 'artifactName'),
+          type: 'double'
+        };
+
+        const existing = find(
+          this.artifacts[0].columns,
+          col => col.columnName === result.columnName
+        );
+        if (existing) {
+          this.handleOtherChangeEvents({
+            subject: 'expressionUpdated',
+            column
+          });
+        } else {
+          this.handleOtherChangeEvents({
+            subject: 'derivedMetricAdded',
+            column
+          });
+        }
+      }
+    });
   }
 
   changeSubType(to: string) {

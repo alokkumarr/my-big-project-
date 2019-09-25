@@ -405,8 +405,7 @@ export class DesignerService {
 
     const applyDataFieldDefaults = artifactColumn => {
       if (!artifactColumn.formula) {
-        artifactColumn.aggregate =
-          artifactColumn.formulDEFAULT_AGGREGATE_TYPE.value;
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
@@ -734,14 +733,14 @@ export class DesignerService {
     }
 
     const existingDerivedMetrics: string[] = fpMap(
-      col => col.dataField,
+      col => col.columnName,
       fpFilter(col => !!col.expression, artifacts[0].columns)
     );
 
     const derivedMetrics: any[] = filter(
       sipQuery.artifacts[0].fields,
       field =>
-        !!field.expression && !existingDerivedMetrics.includes(field.dataField)
+        !!field.expression && !existingDerivedMetrics.includes(field.columnName)
     );
 
     return [

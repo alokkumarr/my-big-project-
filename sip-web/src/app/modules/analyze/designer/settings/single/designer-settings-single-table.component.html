@@ -1,4 +1,21 @@
-<div class="settings__container">
+<div
+  class="settings__container"
+  [ngClass]="{ 'supports-derived-metrics': isDerivedMetricSupported }"
+>
+  <div
+    class="settings__derived-metrics-trigger"
+    *ngIf="isDerivedMetricSupported"
+  >
+    <button
+      mat-button
+      color="primary"
+      (click)="change.emit({ subject: 'addNewDerivedMetric' })"
+    >
+      <strong>
+        + Derived Metric
+      </strong>
+    </button>
+  </div>
   <div class="settings__filters" fxLayout="column" fxLayoutAlign="center start">
     <div
       class="settings__filters__type"
@@ -103,16 +120,22 @@
 
             <button
               class="settings__list-item__derived-metric-edit-btn"
+              matTooltip="Edit Formula"
               mat-icon-button
               color="primary"
               *ngIf="artifactColumn.formula"
-              (click)="openDerivedMetricDialog(artifactColumn)"
+              (click)="
+                change.emit({
+                  subject: 'updateDerivedMetric',
+                  column: artifactColumn
+                })
+              "
               [attr.e2e]="
                 'designer-edit-derived-metric-btn-' +
                 (artifactColumn.alias || artifactColumn.displayName)
               "
             >
-              <mat-icon fontIcon="icon-edit"></mat-icon>
+              <mat-icon style="border: none" fontIcon="icon-edit"></mat-icon>
             </button>
             <button
               class="settings__list-item__addbtn"
@@ -176,13 +199,5 @@
         </div>
       </div>
     </perfect-scrollbar>
-  </div>
-
-  <div class="settings__derived-metrics-trigger">
-    <button mat-button color="primary" (click)="openDerivedMetricDialog()">
-      <strong>
-        + Derived Metric
-      </strong>
-    </button>
   </div>
 </div>

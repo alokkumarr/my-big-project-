@@ -24,13 +24,21 @@
   grid-template:
     'filters' 80px
     'unselected-fields' 1fr
-    'derived-metric-trigger' 40px
     / 100%;
+  gap: 5px;
+
+  &.supports-derived-metrics {
+    grid-template:
+      'derived-metric-trigger' 40px
+      'filters' 80px
+      'unselected-fields' 1fr
+      / 100%;
+  }
 }
 
 .settings__filters {
   grid-area: filters;
-  margin: 0 10px;
+  margin: 0 5px;
 
   &__type {
     width: 100%;
@@ -58,6 +66,7 @@
 
     ::ng-deep .mat-form-field-wrapper {
       padding: 0;
+      width: 100%;
     }
   }
 }
@@ -72,6 +81,9 @@
   }
   .icon-number-type {
     color: $number-type-color;
+  }
+  .icon-derived-type {
+    color: $derived-type-color;
   }
   .icon-geo-chart {
     color: $geo-type-color;
@@ -99,6 +111,10 @@
 
 .settings__derived-metrics-trigger {
   grid-area: derived-metric-trigger;
+  text-align: center;
+  button {
+    width: 90%;
+  }
 }
 
 .settings__list {

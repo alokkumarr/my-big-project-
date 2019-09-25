@@ -37,12 +37,14 @@ $string-type-color: #4995b2;
 $number-type-color: #00b180;
 $geo-type-color: #845ec2;
 $date-type-color: #d19621;
+$derived-type-color: #0077be;
 
 $type-chip-opacity: 1;
 $string-type-chip-color: rgba($string-type-color, $type-chip-opacity);
 $number-type-chip-color: rgba($number-type-color, $type-chip-opacity);
 $geo-type-chip-color: rgba($geo-type-color, $type-chip-opacity);
 $date-type-chip-color: rgba($date-type-color, $type-chip-opacity);
+$derived-type-chip-color: rgba($derived-type-color, $type-chip-opacity);
 
 $report-designer-settings-bg-color: #f5f9fc;
 $background-color: #f5f9fc;
