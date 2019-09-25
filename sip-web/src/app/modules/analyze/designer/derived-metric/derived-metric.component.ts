@@ -5,7 +5,8 @@ import {
   ViewChild,
   OnDestroy,
   Inject,
-  Optional
+  Optional,
+  AfterViewInit
 } from '@angular/core';
 import { AceEditorComponent } from 'ng2-ace-editor';
 import {
@@ -39,7 +40,7 @@ enum MODE {
   templateUrl: './derived-metric.component.html',
   styleUrls: ['./derived-metric.component.scss']
 })
-export class DerivedMetricComponent implements OnDestroy {
+export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
   editorOptions = {
@@ -83,6 +84,10 @@ export class DerivedMetricComponent implements OnDestroy {
     this.createForm();
     this.generateCompletions();
     this.addCompletionsToEditor();
+  }
+
+  ngAfterViewInit() {
+    this.editor.getEditor().resize();
   }
 
   ngOnDestroy() {
