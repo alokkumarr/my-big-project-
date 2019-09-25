@@ -1142,6 +1142,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'expressionUpdated':
       this._store.dispatch(new DesignerUpdateArtifactColumn({
         columnName: event.column.columnName,
+        table: event.column.table,
         formula: event.column.formula,
         expression: event.column.expression
       }));
