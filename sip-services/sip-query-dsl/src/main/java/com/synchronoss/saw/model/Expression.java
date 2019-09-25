@@ -1,10 +1,22 @@
 package com.synchronoss.saw.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Expression {
+  @JsonProperty("value")
+  Number value;
+
+  @JsonProperty("aggregate")
+  String aggregate;
+
+  @JsonProperty("column")
+  String column;
+
   @JsonProperty("operand1")
   Operand operand1;
 
@@ -44,31 +56,71 @@ public class Expression {
     this.operand2 = operand2;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    Expression that = (Expression) o;
-
-    return new EqualsBuilder()
-        .append(operand1, that.operand1)
-        .append(operator, that.operator)
-        .append(operand2, that.operand2)
-        .isEquals();
+  @JsonProperty("value")
+  public Number getValue() {
+    return value;
   }
 
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(operand1).append(operator).toHashCode();
+  @JsonProperty("value")
+  public void setValue(Number value) {
+    this.value = value;
   }
 
-  @Override
+  @JsonProperty("aggregate")
+  public String getAggregate() {
+    return aggregate;
+  }
+
+  @JsonProperty("aggregate")
+  public void setAggregate(String aggregate) {
+    this.aggregate = aggregate;
+  }
+
+  @JsonProperty("column")
+  public String getColumn() {
+    return column;
+  }
+
+  @JsonProperty("column")
+  public void setColumn(String column) {
+    this.column = column;
+  }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Expression that = (Expression) o;
+
+        return new EqualsBuilder()
+            .append(value, that.value)
+            .append(aggregate, that.aggregate)
+            .append(column, that.column)
+            .append(operand1, that.operand1)
+            .append(operator, that.operator)
+            .append(operand2, that.operand2)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(value)
+            .append(aggregate)
+            .append(column)
+            .append(operand1)
+            .append(operator)
+            .append(operand2)
+            .toHashCode();
+    }
+
+    @Override
   public String toString() {
 
     StringBuilder builder = new StringBuilder();

@@ -11,7 +11,7 @@ public class Operand {
   @JsonProperty("aggregate")
   String aggregate;
 
-  @JsonProperty("columnm")
+  @JsonProperty("column")
   String column;
 
   @JsonProperty("operator")

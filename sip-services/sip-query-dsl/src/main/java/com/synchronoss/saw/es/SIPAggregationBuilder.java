@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -36,8 +37,11 @@ public class SIPAggregationBuilder {
   private static final String GROUP_BY_FIELD = "group_by_field";
   private Integer querySize;
 
+  private Random random;
+
   public SIPAggregationBuilder(Integer querySize) {
     this.querySize = querySize;
+    random = new Random();
   }
 
   public static List<Field> getAggregationField(List<Field> dataFields) {
@@ -331,26 +335,45 @@ public class SIPAggregationBuilder {
   }
 
   private String expressionEvaluator(
-      String dataFieldName, Expression expression, AggregationBuilder aggregationBuilder) {
+      String dataFieldName, Expression expression, AggregationBuilder aggregationBuilder)
+      throws RuntimeException {
     StringBuilder expressionBuilder = new StringBuilder();
 
     Map<String, String> bucketsPathsMap = new HashMap<>();
 
     if (expression != null) {
-      Operand operand1 = expression.getOperand1();
+      // if expression has operator and operand(s)
+      String operator = expression.getOperator();
+      if (operator != null) {
+        Operand operand1 = expression.getOperand1();
 
-      String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketsPathsMap);
+        String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketsPathsMap);
 
-      expressionBuilder.append(operand1Exp);
+        expressionBuilder.append(operand1Exp);
 
-      if (expression.getOperand2() != null) {
-        Operand operand2 = expression.getOperand2();
+        if (expression.getOperand2() != null) {
+          Operand operand2 = expression.getOperand2();
 
-        String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketsPathsMap);
+          String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketsPathsMap);
 
-        expressionBuilder.append(expression.getOperator());
+          expressionBuilder.append(expression.getOperator());
 
-        expressionBuilder.append(operand2Exp);
+          expressionBuilder.append(operand2Exp);
+        }
+      } else {
+        Operand operand = new Operand();
+        if (expression.getValue() != null) {
+          operand.setValue(expression.getValue());
+        } else if (expression.getAggregate() != null && expression.getColumn() != null) {
+          operand.setColumn(expression.getColumn());
+          operand.setAggregate(expression.getAggregate());
+        } else {
+          throw new RuntimeException("Invalid exception");
+        }
+
+        String operandExp = operandEvaluator(operand, aggregationBuilder, bucketsPathsMap);
+
+        expressionBuilder.append(operandExp);
       }
     }
 
@@ -372,7 +395,7 @@ public class SIPAggregationBuilder {
       aggField.setColumnName(operand.getColumn());
       aggField.setAggregate(Aggregate.fromValue(operand.getAggregate().toUpperCase()));
 
-      String fieldName = operand.getAggregate() + "_" + operand.getColumn() + "_formula";
+      String fieldName = operand.getAggregate() + "_" + operand.getColumn() + "_formula_" + random.nextInt(10000);
       aggField.setDataField(fieldName);
 
       aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(aggField));
@@ -381,24 +404,24 @@ public class SIPAggregationBuilder {
 
       operandBuilder.append("params.").append(fieldName);
 
-    } else if (operand.getOperand1() != null
-        && operand.getOperand2() != null
-        && operand.getOperator() != null) {
+    } else if (operand.getOperand1() != null && operand.getOperator() != null) {
 
       operandBuilder.append("(");
       String operator = operand.getOperator();
 
       Operand operand1 = operand.getOperand1();
-      Operand operand2 = operand.getOperand2();
 
       String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketPathsMap);
-
       operandBuilder.append(operand1Exp);
 
-      operandBuilder.append(operator);
+      Operand operand2 = operand.getOperand2();
 
-      String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketPathsMap);
-      operandBuilder.append(operand2Exp);
+      if (operand2 != null) {
+        operandBuilder.append(operator);
+
+        String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketPathsMap);
+        operandBuilder.append(operand2Exp);
+      }
 
       operandBuilder.append(")");
     } else if (operand.getValue() != null) {

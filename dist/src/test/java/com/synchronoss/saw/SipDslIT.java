@@ -516,6 +516,117 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
+  public void testDerivedMetricSimpleArithmetic() {
+    JsonObject field = new JsonObject();
+    String fieldName = "simpleArithmetic";
+
+    String formula = "1 + 2";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"value\":1},\"operand2\":{\"value\":2}}";
+
+    field.addProperty("dataField", fieldName);
+    field.addProperty("displayName", "Simple Arithmetic");
+
+    field.addProperty("formula", formula);
+    field.addProperty("expression", expression);
+
+    sipQuery.getAsJsonArray("artifacts").add(field);
+
+    System.out.println(sipQuery);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testDerivedMetricWithAggregation() {
+    JsonObject field = new JsonObject();
+
+    String fieldName = "arithmeticWithAgg";
+
+    String formula = "sum(col1) + 2";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"value\":2}}";
+
+    field.addProperty("dataField", fieldName);
+    field.addProperty("displayName", "Arithmetic With Agg");
+
+    field.addProperty("formula", formula);
+    field.addProperty("expression", expression);
+
+    sipQuery.getAsJsonArray("artifacts").add(field);
+
+    System.out.println(sipQuery);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testDerivedMetricWithAggregation2() {
+    JsonObject field = new JsonObject();
+
+    String fieldName = "arithmeticWithAgg";
+
+    String formula = "sum(col1) + avg(col2)";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}";
+
+    field.addProperty("dataField", fieldName);
+    field.addProperty("displayName", "Arithmetic With Agg");
+
+    field.addProperty("formula", formula);
+    field.addProperty("expression", expression);
+
+    sipQuery.getAsJsonArray("artifacts").add(field);
+
+    System.out.println(sipQuery);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void testDerivedMetricWithMultipleOperators() {
+    JsonObject field = new JsonObject();
+
+    String fieldName = "multipleOperations";
+
+    String formula = "sum(col1) + avg(col2)";
+    String expression =
+        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},\"operand2\":{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"avg\",\"column\":\"col1\"},\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}}";
+
+    field.addProperty("dataField", fieldName);
+    field.addProperty("displayName", "Multiple Operations");
+
+    field.addProperty("formula", formula);
+    field.addProperty("expression", expression);
+
+    sipQuery.getAsJsonArray("artifacts").add(field);
+
+    System.out.println(sipQuery);
+
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
   public void exportData() throws IOException {
     ObjectNode analysis = testCreateDlAnalysis();
     String analysisId = analysis.get("analysisId").asText();
