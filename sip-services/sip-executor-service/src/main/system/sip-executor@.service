@@ -9,10 +9,10 @@ SyslogIdentifier=sip-executor
 User=mapr
 Restart=always
 Environment="JAVA_OPTS=-Dsaw.executor=%i"
+EnvironmentFile=/etc/bda/etc/bda/mapr-ticket.env
 SuccessExitStatus=143
 TimeoutSec=600
 KillMode=mixed
-
 [Install]
 WantedBy=sip-storage-proxy.service
 
