@@ -22,11 +22,18 @@
   height: 100%;
   width: 100%;
   grid-template:
-    'derived-metric-trigger' 40px
     'filters' 80px
     'unselected-fields' 1fr
     / 100%;
   gap: 5px;
+
+  &.supports-derived-metrics {
+    grid-template:
+      'derived-metric-trigger' 40px
+      'filters' 80px
+      'unselected-fields' 1fr
+      / 100%;
+  }
 }
 
 .settings__filters {

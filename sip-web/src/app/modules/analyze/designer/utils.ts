@@ -60,6 +60,9 @@ export function getFilterTypes(analysisType: string, analysisSubtype: string) {
   let rejectExpression;
   switch (analysisType) {
     case 'pivot':
+      rejectExpression = type =>
+        ['geo', 'coordinate', 'derived'].includes(type.value);
+      break;
     case 'chart':
       rejectExpression = type => ['geo', 'coordinate'].includes(type.value);
       break;

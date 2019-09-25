@@ -1,10 +1,15 @@
-<div class="settings__container">
-  <div class="settings__derived-metrics-trigger">
+<div
+  class="settings__container"
+  [ngClass]="{ 'supports-derived-metrics': isDerivedMetricSupported }"
+>
+  <div
+    class="settings__derived-metrics-trigger"
+    *ngIf="isDerivedMetricSupported"
+  >
     <button
       mat-button
       color="primary"
       (click)="change.emit({ subject: 'addNewDerivedMetric' })"
-      *ngIf="isDerivedMetricSupported"
     >
       <strong>
         + Derived Metric
