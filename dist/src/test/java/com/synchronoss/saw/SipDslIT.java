@@ -57,7 +57,7 @@ public class SipDslIT extends BaseIT {
     sipQuery = new JsonObject();
 
     JsonObject artifact1 = new JsonObject();
-    artifact1.addProperty("artifactName", "sample");
+    artifact1.addProperty("artifactsName", "sample");
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", "string");
@@ -516,119 +516,126 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testDerivedMetricSimpleArithmetic() {
-    JsonObject field = new JsonObject();
+  public void testDerivedMetricSimpleArithmetic() throws IOException {
     String fieldName = "simpleArithmetic";
-
     String formula = "1 + 2";
     String expression =
         "{\"operator\":\"+\",\"operand1\":{\"value\":1},\"operand2\":{\"value\":2}}";
 
-    field.addProperty("dataField", fieldName);
-    field.addProperty("displayName", "Simple Arithmetic");
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
 
-    field.addProperty("formula", formula);
-    field.addProperty("expression", expression);
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
 
-    sipQuery.getAsJsonArray("artifacts").add(field);
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
 
-    System.out.println(sipQuery);
-
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .delete("/sip/services/dslanalysis/" + analysisId)
-        .then()
-        .assertThat()
-        .statusCode(200);
+    Assert.assertNotNull(responseData.get("data"));
   }
 
   @Test
-  public void testDerivedMetricWithAggregation() {
-    JsonObject field = new JsonObject();
-
-    String fieldName = "arithmeticWithAgg";
-
-    String formula = "sum(col1) + 2";
+  public void testDerivedMetricWithAggregation() throws IOException {
+    String formula = "sum(integer) + 2";
     String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"integer\"},"
             + "\"operand2\":{\"value\":2}}";
-
-    field.addProperty("dataField", fieldName);
-    field.addProperty("displayName", "Arithmetic With Agg");
-
-    field.addProperty("formula", formula);
-    field.addProperty("expression", expression);
-
-    sipQuery.getAsJsonArray("artifacts").add(field);
-
-    System.out.println(sipQuery);
-
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .delete("/sip/services/dslanalysis/" + analysisId)
-        .then()
-        .assertThat()
-        .statusCode(200);
-  }
-
-  @Test
-  public void testDerivedMetricWithAggregation2() {
-    JsonObject field = new JsonObject();
-
     String fieldName = "arithmeticWithAgg";
 
-    String formula = "sum(col1) + avg(col2)";
-    String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
-            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}";
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
 
-    field.addProperty("dataField", fieldName);
-    field.addProperty("displayName", "Arithmetic With Agg");
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
 
-    field.addProperty("formula", formula);
-    field.addProperty("expression", expression);
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
 
-    sipQuery.getAsJsonArray("artifacts").add(field);
-
-    System.out.println(sipQuery);
-
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .delete("/sip/services/dslanalysis/" + analysisId)
-        .then()
-        .assertThat()
-        .statusCode(200);
+    Assert.assertNotNull(responseData.get("data"));
   }
 
   @Test
-  public void testDerivedMetricWithMultipleOperators() {
-    JsonObject field = new JsonObject();
+  public void testDerivedMetricWithAggregation2() throws IOException {
+    String formula = "sum(integer) + avg(integer)";
+    String fieldName = "arithmeticWithAgg";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"integer\"}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
+
+    Assert.assertNotNull(responseData.get("data"));
+  }
+
+  @Test
+  public void testDerivedMetricWithMultipleOperators() throws IOException {
 
     String fieldName = "multipleOperations";
 
-    String formula = "sum(col1) + avg(col2)";
+    String formula = "sum(double) - (avg(integer) + avg(double))";
     String expression =
-        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"col1\"},"
+        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"double\"},"
             + "\"operand2\":{\"operator\":\"+\","
-            + "\"operand1\":{\"aggregation\":\"avg\",\"column\":\"col1\"},"
-            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"col2\"}}}";
+            + "\"operand1\":{\"aggregation\":\"avg\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"double\"}}}";
 
-    field.addProperty("dataField", fieldName);
-    field.addProperty("displayName", "Multiple Operations");
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
 
-    field.addProperty("formula", formula);
-    field.addProperty("expression", expression);
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
 
-    sipQuery.getAsJsonArray("artifacts").add(field);
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
 
-    System.out.println(sipQuery);
-
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .delete("/sip/services/dslanalysis/" + analysisId)
-        .then()
-        .assertThat()
-        .statusCode(200);
+    Assert.assertNotNull(responseData.get("data"));
   }
 
   @Test
@@ -823,5 +830,75 @@ public class SipDslIT extends BaseIT {
       throw new IOException("Retrieve file failed: " + filename);
     }
     return outputStream.toString();
+  }
+
+  /**
+   * @param fieldName Name of the field
+   * @param formula Formula for the derived metrics
+   * @param expression Formula in json format
+   * @return JSON payload for the derived metric
+   */
+  private JsonNode prepareDerivedMetricPayload(
+      String fieldName, String formula, String expression) throws IOException {
+    JsonObject payload = testData;
+
+    JsonArray artifactFields = new JsonArray();
+
+    JsonObject formulaField = new JsonObject();
+    formulaField.addProperty("area", "y");
+    formulaField.addProperty("dataField", fieldName);
+    formulaField.addProperty("columnName", fieldName);
+    formulaField.addProperty("displayName", "Derived Metric");
+
+    formulaField.addProperty("formula", formula);
+    formulaField.addProperty("expression", expression);
+    formulaField.addProperty("type", "double");
+    formulaField.addProperty("areaIndex", 0);
+
+    JsonObject dateField = new JsonObject();
+    dateField.addProperty("area", "x");
+    dateField.addProperty("columnName", "date");
+    dateField.addProperty("dataField", "date");
+    dateField.addProperty("displayName", "Date");
+    dateField.addProperty("groupInterval", "year");
+    dateField.addProperty("min_doc_count", 0);
+    dateField.addProperty("name", "date");
+    dateField.addProperty("type", "date");
+    dateField.addProperty("dateFormat", "MMM d YYYY");
+
+    artifactFields.add(formulaField);
+    artifactFields.add(dateField);
+
+    JsonArray fields =
+        payload
+            .getAsJsonObject("sipQuery")
+            .getAsJsonArray("artifacts")
+            .get(0)
+            .getAsJsonObject()
+            .getAsJsonArray("fields");
+    for (int i = fields.size(); i > 0; i--) {
+      fields.remove(i - 1);
+    }
+
+    fields.add(formulaField);
+
+    fields.add(dateField);
+    JsonArray sorts = payload.getAsJsonObject("sipQuery").getAsJsonArray("sorts");
+    for (int i = sorts.size(); i > 0; i--) {
+      sorts.remove(i - 1);
+    }
+
+    JsonArray filters = payload.getAsJsonObject("sipQuery").getAsJsonArray("filters");
+    for (int i = filters.size(); i > 0; i--) {
+      filters.remove(i - 1);
+    }
+
+    JsonObject sortField = new JsonObject();
+    sortField.addProperty("order", "asc");
+    sortField.addProperty("columnName", "date");
+    sortField.addProperty("type", "date");
+    sorts.add(sortField);
+
+    return mapper.readTree(payload.toString());
   }
 }
