@@ -5,7 +5,7 @@ import {
   CommonLoadAllMetrics,
   CommonStateScheuleJobs,
   CommonResetStateOnLogout
-} from '../actions/menu.actions';
+} from '../actions/common.actions';
 import { CommonStateModel, Menu } from './common.state.model';
 import { forkJoin } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';

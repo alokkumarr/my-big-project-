@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.models.BisFileLogDetails;
+import com.synchronoss.saw.logs.models.BisLogs;
 import com.synchronoss.saw.logs.models.BisRouteHistory;
 import com.synchronoss.saw.logs.models.ScheduleDetail;
 import com.synchronoss.saw.logs.repository.BisFileLogsRepository;
@@ -12,7 +13,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,10 +95,10 @@ public class SawBisFileLogsController {
 
     return this.bisLogsRepository.findByPid(id);
   }
-  
+
   /**
    * Retrive file logs by job id.
-   * 
+   *
    * @param jobId job identifer
    * @param offset pagination offset
    * @param size size of page
@@ -105,34 +106,49 @@ public class SawBisFileLogsController {
    * @param column column to sort
    * @return
    */
-  @ApiOperation(value = "Retrieve log record by log Id", nickname = "routeLogWithId", 
-      notes = "", response = BisRouteHistory.class)
+  @ApiOperation(
+      value = "Retrieve log record by log Id",
+      nickname = "routeLogWithId",
+      notes = "",
+      response = BisLogs.class)
   @RequestMapping(value = "/logs/job/{jobId}", method = RequestMethod.GET)
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request has been "
-          + "succeeded without any error"),
-      @ApiResponse(code = 404, message = "The resource "
-          + "you were trying to reach is not found"),
-      @ApiResponse(code = 500, message = "Server is down. "
-          + "Contact System adminstrator"),
-      @ApiResponse(code = 400, message = "Bad request"),
-      @ApiResponse(code = 401, message = "Unauthorized"),
-      @ApiResponse(code = 415, message = "Unsupported Type. "
-          + "Representation not supported for the resource") })
-  public List<BisFileLog> retriveLogByJobId(@PathVariable Long jobId,
-      @ApiParam(value = "offset number", required = false) 
-      @RequestParam(name = "offset", defaultValue = "0") int offset,
-      @ApiParam(value = "number of objects per page", required = false) 
-      @RequestParam(name = "size", defaultValue = "10") int size,
-      @ApiParam(value = "sort order", required = false) 
-      @RequestParam(name = "sort", defaultValue = "desc") String sort,
-      @ApiParam(value = "column name to be sorted", required = false) 
-      @RequestParam(name = "column", defaultValue = "createdDate") String column) {
+  @ApiResponses(
+      value = {
+        @ApiResponse(code = 200, message = "Request has been " + "succeeded without any error"),
+        @ApiResponse(
+            code = 404,
+            message = "The resource " + "you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Server is down. " + "Contact System adminstrator"),
+        @ApiResponse(code = 400, message = "Bad request"),
+        @ApiResponse(code = 401, message = "Unauthorized"),
+        @ApiResponse(
+            code = 415,
+            message = "Unsupported Type. " + "Representation not supported for the resource")
+      })
+  public BisLogs retriveLogByJobId(
+      @PathVariable Long jobId,
+      @ApiParam(value = "offset number", required = false)
+          @RequestParam(name = "offset", defaultValue = "0")
+          int offset,
+      @ApiParam(value = "number of objects per page", required = false)
+          @RequestParam(name = "size", defaultValue = "10")
+          int size,
+      @ApiParam(value = "sort order", required = false)
+          @RequestParam(name = "sort", defaultValue = "desc")
+          String sort,
+      @ApiParam(value = "column name to be sorted", required = false)
+          @RequestParam(name = "column", defaultValue = "createdDate")
+          String column) {
 
-    return this.bisLogsRepository.findByJob_JobId(jobId, PageRequest.of(
-        offset, size, Sort.Direction.fromString(sort), column));
+    Page<BisFileLog> fileLogs =
+        this.bisLogsRepository.findByJob_JobId(
+            jobId, PageRequest.of(offset, size, Sort.Direction.fromString(sort), column));
+    BisLogs bisLogs = new BisLogs(fileLogs.getTotalElements(), fileLogs.getTotalPages());
+    List<BisFileLog> bisFileLogList = fileLogs.getContent();
+    bisLogs.setBisFileLogs(bisFileLogList);
+    return bisLogs;
   }
-  
+
   /**
    * Route history including status
    * of each job and last fire time, next fire time.

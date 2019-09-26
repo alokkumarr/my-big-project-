@@ -7,6 +7,11 @@ import {
 import { Legend, Axis, Artifact } from '../../models';
 import { LabelOptions } from '../../models';
 
+export class DesignerSetData {
+  static readonly type = '[Designer] Set data';
+  constructor(public data: any[]) {}
+}
+
 export class DesignerResetState {
   static readonly type = '[Designer] Reset state on destroy';
   constructor() {}
@@ -204,7 +209,7 @@ export class ConstructDesignerJoins {
 }
 
 export class DesignerUpdateAggregateInSorts {
-  static readonly type = '[Designer] update aggregate in sorts on change of aggregagte';
+  static readonly type =
+    '[Designer] update aggregate in sorts on change of aggregagte';
   constructor(public column: any) {}
 }
-

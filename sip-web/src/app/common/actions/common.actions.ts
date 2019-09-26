@@ -32,3 +32,8 @@ export class CommonResetStateOnLogout {
   static readonly type = '[Common State] Reset common state on logout';
   constructor() {}
 }
+
+export class CommonDesignerJoinsArray {
+  static readonly type = '[Common] Update joins on jsplumb ngoninit';
+  constructor(public joins: any) {}
+}

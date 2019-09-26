@@ -37,7 +37,7 @@
   </div>
 
   <analysis-sub-type-chooser
-    *ngIf="analysis"
+    *ngIf="analysis && analysis.supports"
     (change)="onChartTypeChange($event)"
     [category]="analysis.type"
     [supports]="analysis.supports"
@@ -93,48 +93,52 @@
     <button
       matTooltip="Preview"
       mat-icon-button
-      color="secondary"
+      color="primary"
       [disabled]="showProgress || !areMinRequirmentsMet"
       e2e="open-preview-modal"
       (click)="requestAction.emit('preview')"
     >
-      <mat-icon color="primary" fontIcon="icon-fullscreen"></mat-icon>
+      <mat-icon fontIcon="icon-fullscreen"></mat-icon>
       <span fxHide i18n>Preview</span>
     </button>
 
     <button
       matTooltip="Sort"
       mat-icon-button
-      color="secondary"
+      color="primary"
       e2e="open-sort-modal"
       [disabled]="showProgress || isInQueryMode"
       (click)="requestAction.emit('sort')"
     >
-      <mat-icon color="primary" fontIcon="icon-sort"></mat-icon>
+      <mat-icon fontIcon="icon-sort"></mat-icon>
       <span fxHide i18n>Sort</span>
     </button>
 
     <button
       matTooltip="Filter"
       mat-icon-button
-      color="secondary"
+      color="primary"
       e2e="open-filter-modal"
       [disabled]="showProgress || isInQueryMode"
       (click)="requestAction.emit('filter')"
     >
-      <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+      <mat-icon fontIcon="icon-filter"></mat-icon>
       <span fxHide i18n>Filter</span>
     </button>
 
     <button
       matTooltip="Save"
       mat-icon-button
-      color="secondary"
-      [disabled]="showProgress || !areMinRequirmentsMet"
+      color="primary"
+      [disabled]="
+        showProgress ||
+        !areMinRequirmentsMet ||
+        (isDataTooMuchForChart$ | async)
+      "
       e2e="designer-save-btn"
       (click)="requestAction.emit('save')"
     >
-      <mat-icon color="primary" fontIcon="icon-save"></mat-icon>
+      <mat-icon fontIcon="icon-save"></mat-icon>
 
       <span fxHide i18n>Save</span>
     </button>

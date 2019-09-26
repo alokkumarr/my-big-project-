@@ -1,0 +1,46 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  height: calc(100% - 8px);
+  padding: 3px 5px 5px 5px;
+  background-color: $background-color;
+  min-width: 98% !important;
+  width: 310px;
+  background-color: $background-color;
+
+  .filter-panel-header {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .mat-card-title {
+    font-weight: normal;
+  }
+
+  .mat-icon.filter__clear--btn {
+    position: absolute;
+    border: 1px solid;
+    border-radius: 12px;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    font-size: 10px;
+    padding: 4px;
+    right: 46px;
+    transform: translateY(-5px);
+    background-color: white;
+  }
+
+  .mat-icon.filter__clear--btn:hover {
+    border-color: $primary-red;
+    color: $primary-red;
+  }
+
+  .flow-arrow {
+    transform: rotate(-90deg);
+    height: 16px;
+    width: 16px;
+    margin: 4px;
+  }
+}

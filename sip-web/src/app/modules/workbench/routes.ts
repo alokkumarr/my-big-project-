@@ -8,6 +8,9 @@ import { CreateSemanticComponent } from './components/semantic-management/create
 import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
 import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
 import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
+import { JobsPageComponent, JobLogsPageComponent } from './components/jobs';
+import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
+import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
 
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { IsAdminGuard } from '../admin/guards';
@@ -51,6 +54,24 @@ export const routes: Routes = [
       {
         path: 'datasource/create',
         component: DatasourceComponent,
+        canActivate: [IsAdminGuard]
+      },
+      {
+        path: 'datasource/jobs',
+        component: JobsPageComponent,
+        canActivate: [IsAdminGuard]
+      },
+      {
+        path: 'rtis/registration',
+        component: NewRegistrationComponent
+      },
+      {
+        path: 'rtis/appkeys',
+        component: AppkeysViewComponent
+      },
+      {
+        path: 'datasource/joblogs/:jobId',
+        component: JobLogsPageComponent,
         canActivate: [IsAdminGuard]
       },
       {

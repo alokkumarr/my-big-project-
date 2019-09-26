@@ -88,6 +88,7 @@ import {
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
   DesignerResetState,
+  DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
   DesignerUpdateArtifactColumn,
@@ -114,9 +115,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
-  @Select(state => state.designerState.analysis) dslAnalysis$: Observable<
-    AnalysisDSL
-  >;
+  @Select(DesignerState.data) data$: Observable<any[]>;
+  @Select(DesignerState.analysis) dslAnalysis$: Observable<AnalysisDSL>;
   dslSorts$: Observable<Sort[]> = this.dslAnalysis$.pipe(
     map$(analysis => analysis.sipQuery.sorts)
   );
@@ -216,6 +216,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.layoutConfiguration = this.getLayoutConfiguration(
           this.analysis
         );
+        this._analyzeService.getSemanticObject(this.analysis.semanticId).toPromise().then(semanticObj => {
+          this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
+        });
         if (!isReport) {
           this.requestDataIfPossible();
         }
@@ -224,6 +227,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     default:
       break;
     }
+    this.data$.subscribe(data => (this.data = data));
     this.dslAnalysis$.subscribe(analysis => {
       if (!analysis || ['report'].includes(analysisType)) {
         return;
@@ -327,6 +331,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     fpPipe(
       fpFlatMap(artifact => artifact.columns || artifact.fields),
       fpReduce((accumulator, column) => {
+        column.alias = '';
+        delete column.aggregate;
+        if (column.type === 'date') {
+          column.dateFormat = 'MMM d YYYY';
+        }
         delete column.checked;
         return accumulator;
       }, {})
@@ -435,7 +444,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           value: ''
         };
     }
-
     this._store.dispatch(
       new DesignerUpdateAnalysisChartLabelOptions(labelOptions)
     );
@@ -443,8 +451,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
     /* prettier-ignore */
-    switch (this.analysis.type) {
-    case 'chart':
+    if (this.analysis.type === 'chart') {
       const indices = {};
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
@@ -458,40 +465,23 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           return column;
         });
       });
-      break;
-
-    case 'report':
-      const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
-
-      const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
-
-      flatArtifacts.forEach(col => {
-        col.checked  = '';
-        fields.forEach(field => {
-          if (col.table === field.table && col.columnName === field.columnName) {
-            col.checked = true;
-          }
-        });
-      });
-      break;
-
-    case 'pivot':
-      if (isDSLAnalysis(this.analysis)) {
-        forEach(artifacts, table => {
-          table.columns = map(table.columns, column => {
-            forEach((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => {
-              forEach(artifact.fields, field => {
-                if (field.columnName === column.columnName) {
-                  column.format = field.format;
-                  column.aliasName = field.aliasName;
-                }
-              });
-            });
-            return column;
-          });
-        });
-      }
     }
+    const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
+
+    const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
+    flatArtifacts.forEach(col => {
+      col.checked  = '';
+      fields.forEach(field => {
+        if (col.table === field.table && col.columnName === field.columnName) {
+          col.checked = true;
+          if (this.analysis.type === 'pivot') {
+            col.format = field.format;
+            col.aliasName = field.aliasName;
+          }
+        }
+      });
+    });
+
     return artifacts;
   }
 
@@ -695,7 +685,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     const requestAnalysis = isDSLAnalysis(this.analysis)
       ? this.dslAnalysisForRequest()
       : this.nonDSLAnalysisForRequest(this.analysis);
-
     const clonedAnalysis = cloneDeep(requestAnalysis);
     // unset properties that are set by merging data from semantic layer
     // because these properties are not part of dsl analysis definition
@@ -720,11 +709,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
           this.dataCount = 0;
-          this.data = this.setEmptyData();
+          this._store.dispatch(new DesignerSetData(this.setEmptyData()));
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.flattenData(response.data, this.analysis);
+          this._store.dispatch(
+            new DesignerSetData(this.flattenData(response.data, this.analysis))
+          );
           if (this.analysis.type === 'report' && response.designerQuery) {
             if (!this.isInQueryMode) {
               this._store.dispatch(
@@ -736,7 +727,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       },
       err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-        this.data = [];
+        this._store.dispatch(new DesignerSetData([]));
       }
     );
   }
@@ -1051,6 +1042,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.requestDataIfPossible();
       break;
     // only front end data refresh needed
+    case 'reorder':
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      if (isDSLAnalysis(this.analysis)) {
+        this._store.dispatch(new DesignerUpdateArtifactColumn({
+          columnName: event.column.columnName,
+          table: event.column.table || event.column['tableName'],
+          visibleIndex: event.column['visibleIndex']
+        }));
+      }
+      break;
     case 'format':
     case 'alias':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -1069,7 +1070,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
-    case 'visibleIndex':
     }
   }
 
@@ -1104,7 +1104,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         column.format.precision = DEFAULT_PRECISION;
       }
     }
-    if (DATE_TYPES.includes(column.type) && !column.format) {
+
+    if (DATE_TYPES.includes(column.type)) {
+      column.dateFormat = 'yyyy-MM-dd';
       column.format = 'yyyy-MM-dd';
     }
   }
@@ -1231,6 +1233,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       (<any>this.analysis).isInverted = to === 'bar';
     }
     this.auxSettings = { ...this.auxSettings, isInverted: to === 'bar' };
+    this.auxSettings = {
+      ...this.auxSettings,
+      labelOptions: {
+        enabled: to === 'pie',
+        value: to === 'pie' ? 'percentage' : ''
+      }
+    };
+    this.resetArtifacts();
     // this.artifacts = [...this.artifacts];
   }
 

@@ -403,6 +403,27 @@ Following are the conditions to be met in order to make module compatible with S
 Please refer to the **README** of [product modules repository]
 for further details.
 
+# SIP-XDF build with custom RPM name 
+For the development purpose, SIP-XDF build can be created with custom name to have multiple version 
+of SIP-XDF RPM installed in shared Mapr cluster.  
+
+`Command to create custome Build`
+
+   `mvn -pl sip-xdf/xdf -am clean package -DskipTests -Dsip.modules=all -Dxdf.package.name=<custom name>`
+   
+- Once command completed successfully , RPM build can be found in location `<SIP directory>
+/sip-xdf/xdf/target/sip-xdf-sip-8156-4-0.noarch.rpm` 
+
+- Copy the RPM in mapr-cluster and run the RPM command `rpm -i sip-xdf-sip-8156-4-0.noarch.rpm`
+ to install the XDF. 
+
+-Validate /opt/sip folder for newly installed custom-name
+
+-Modify xdf_info file under /opt/sip/<custom-name>/bin/ and update below 2 parameters to point to latest installed XDF directory:
+
+optdir: /opt/sip/<custom-name>
+vardir: /var/opt/sip/<custom-name>
+
 # XDA Sample Application on Docker
 
 This section will describe list of steps to use the XDA Sample application on the Docker environment.

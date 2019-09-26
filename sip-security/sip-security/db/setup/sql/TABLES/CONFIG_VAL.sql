@@ -14,5 +14,6 @@ CREATE TABLE CONFIG_VAL
   INACTIVATED_DATE   	  DATETIME,
   INACTIVATED_BY        VARCHAR(255),
   MODIFIED_DATE     		DATETIME,
-  MODIFIED_BY        		VARCHAR(255)
+  MODIFIED_BY        		VARCHAR(255),
+  FILTER_BY_CUSTOMER_CODE        TINYINT(4) NOT NULL
 )ENGINE=InnoDB COMMENT='Purpose : CONFIG_VAL table provides feature for additional configurable properties for the SAW';

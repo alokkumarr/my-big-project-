@@ -36,9 +36,9 @@ import {
   Artifact,
   Format,
   AnalysisDialogData,
-  Region,
-  isDSLAnalysis
+  Region
 } from '../types';
+import { isDSLAnalysis } from 'src/app/common/types';
 
 export {
   ArtifactColumnPivot,
@@ -134,7 +134,7 @@ export interface DesignerChangeEvent {
     | 'artifactPosition'
     | 'column'
     | 'removeColumn'
-    | 'visibleIndex'
+    | 'reorder'
     | 'submitQuery'
     | 'chartTitle'
     | 'fetchLimit'
@@ -154,6 +154,7 @@ export interface DesignerSaveEvent {
 export interface DesignerStateModel {
   groupAdapters: IDEsignerSettingGroupAdapter[];
   analysis: AnalysisDSL;
+  data: any[];
   metric: {
     metricName: string;
     artifacts: Artifact[];

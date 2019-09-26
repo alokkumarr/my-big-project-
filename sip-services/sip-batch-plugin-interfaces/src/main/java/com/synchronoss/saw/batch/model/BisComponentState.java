@@ -10,7 +10,8 @@ public enum BisComponentState {
   DATA_INPROGRESS("DATA_INPROGRESS"),
   DUPLICATE("DUPLICATE"),
   FAILED("FAILED"),
-  HOST_NOT_REACHABLE("HOST_NOT_REACHABLE");
+  HOST_NOT_REACHABLE("HOST_NOT_REACHABLE"),
+  HOST_NOT_REACHABLE_OBSOLETE("HOST_NOT_REACHABLE_OBSOLETE");
   private final String value;
   private static final Map<String, BisComponentState> CONSTANTS =
       new HashMap<String, BisComponentState>();

@@ -1,10 +1,8 @@
 package com.synchronoss.saw.storage.proxy.model;
 
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.model.SipQuery;
 
 public class ExecutionResult {
-
 
   String executionId;
   String dslQueryId;
@@ -15,6 +13,7 @@ public class ExecutionResult {
   Analysis analysis;
   String executedBy;
   Object data;
+  Integer recordCount;
 
   /**
    * Gets dslQueryId.
@@ -140,5 +139,19 @@ public class ExecutionResult {
   /** Sets analysis. */
   public void setAnalysis(Analysis analysis) {
     this.analysis = analysis;
+  }
+
+  /**
+   * Gets recordCount
+   *
+   * @return value of recordCount
+   */
+  public Integer getRecordCount() {
+    return recordCount;
+  }
+
+  /** Sets recordCount */
+  public void setRecordCount(Integer recordCount) {
+    this.recordCount = recordCount;
   }
 }

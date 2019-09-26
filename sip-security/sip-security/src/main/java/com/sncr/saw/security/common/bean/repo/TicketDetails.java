@@ -31,8 +31,8 @@ public class TicketDetails implements Serializable {
     private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
-	
-	
+	private Integer isJvCustomer;
+	private Integer filterByCustomerCode;
 
 	public Long getUserId() {
 		return userId;
@@ -143,6 +143,14 @@ public class TicketDetails implements Serializable {
 		return roleType;
 	}
 
+	public Integer getFilterByCustomerCode() {
+		return filterByCustomerCode;
+	}
+
+	public void setFilterByCustomerCode(Integer filterByCustomerCode) {
+		this.filterByCustomerCode = filterByCustomerCode;
+	}
+
 	/**
 	 * @param roleType
 	 *            the roleType to set
@@ -157,5 +165,13 @@ public class TicketDetails implements Serializable {
 
 	public void setProducts(ArrayList<Products> products) {
 		this.products = products;
+	}
+
+	public Integer getIsJvCustomer() {
+		return isJvCustomer;
+	}
+
+	public void setIsJvCustomer(Integer isJvCustomer) {
+		this.isJvCustomer = isJvCustomer;
 	}
 }

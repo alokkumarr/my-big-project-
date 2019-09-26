@@ -1,0 +1,118 @@
+{
+  "AGGREGATE_DLREPORT": {
+    "aggr_dl_reports": {
+      "AGGDL001": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL002": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Sum",
+          "value": "Sum",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL003": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Average",
+          "value": "ic-average",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL004": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Mininum",
+          "value": "ic-min",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL005": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Maximum",
+          "value": "ic-max",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL006": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Distinct Count",
+          "value": "Count",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      },
+      "AGGDL007": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to to apply aggregation dl report",
+        "aggregate": {
+          "designerLabel": "Percentage",
+          "value": "Percentage",
+          "field": "Integer"
+        },
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "Date"]
+          }
+        ]
+      }
+    }
+  }
+}

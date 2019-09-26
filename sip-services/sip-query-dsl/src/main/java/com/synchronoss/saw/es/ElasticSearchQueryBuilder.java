@@ -48,7 +48,11 @@ public class ElasticSearchQueryBuilder {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
     DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
-    if (size == null || size.equals(0)) size = 1000;
+    /*
+    ToDo: when size is -1 need to remove the hard coded size as 1lakh and we need to send the total
+      data  when the size is -1.
+     */
+    if (size == -1) size = 100000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
       throw new NullPointerException(
@@ -75,7 +79,7 @@ public class ElasticSearchQueryBuilder {
 
     // Generated Query
     searchSourceBuilder =
-        buildAggregations(dataFields, aggregationFields, searchSourceBuilder, size);
+        buildAggregations(dataFields, aggregationFields, searchSourceBuilder, size,sipQuery.getSorts());
     return searchSourceBuilder.toString();
   }
 
@@ -210,7 +214,8 @@ public class ElasticSearchQueryBuilder {
       List<Field> dataFields,
       List<Field> aggregationFields,
       SearchSourceBuilder searchSourceBuilder,
-      Integer size) {
+      Integer size,
+      List<Sort> sorts) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
     if (aggregationFields.size() == 0) {
@@ -225,7 +230,7 @@ public class ElasticSearchQueryBuilder {
       } else {
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, 0, 0, aggregationBuilder);
+                dataFields, aggregationFields, 0, 0, aggregationBuilder,sorts);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
