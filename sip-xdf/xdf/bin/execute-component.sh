@@ -2,7 +2,11 @@
 # Executable script for xdf version 2+
 DRYRUN=${DRYRUN:-}
 #VERBOSE=${VERBOSE:-}
-
+MAPR_HOME=/opt/mapr
+isSecure=$(head -1 ${MAPR_HOME}/conf/mapr-clusters.conf | grep -o 'secure=\w*' | cut -d= -f2)
+ if [ "$isSecure" = "true" ] && [ -f "${MAPR_HOME}/conf/mapruserticket" ]; then
+        export MAPR_TICKETFILE_LOCATION="${MAPR_HOME}/conf/mapruserticket"
+ fi
 CMD_DIR=$( cd $(dirname $0) && pwd -P )
 : ${CMD_DIR:?no value}
 source $CMD_DIR/app_env || exit
