@@ -11,7 +11,7 @@ import com.synchronoss.saw.export.model.DataResponse;
 import java.util.List;
 
 public interface ExportService {
-  ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(
+  ResponseEntity<DataResponse> dataToBeExportedAsync(
       String executionId,
       HttpServletRequest request,
       String analysisId,

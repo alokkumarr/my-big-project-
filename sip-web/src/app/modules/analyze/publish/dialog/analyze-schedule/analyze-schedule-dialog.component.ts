@@ -154,7 +154,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         if (response.statusCode === 200) {
           this.loadCronLayout = true;
           const jobDetails = response.data.jobDetails;
-
           if (jobDetails) {
             const {
               cronExpression,
@@ -167,6 +166,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               emailList,
               fileType,
               ftp,
+              zip,
               s3
             } = jobDetails;
             this.crondetails = {
@@ -189,6 +189,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
             this.emails = emailList;
             this.hasSchedule = true;
             this.fileType = fileType;
+            this.zipFormatFlag = zip;
           }
         }
       },

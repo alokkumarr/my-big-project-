@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -42,7 +43,8 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Value("${sip-dispatch-row-limit}")
   private int dispatchRowLimit;
 
-  @Autowired private RestUtil restUtil;
+  @Autowired
+  private RestUtil restUtil;
 
   private RestTemplate restTemplate;
 
@@ -195,7 +197,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         for (DSLExecutionBean executionBean : dslExecutionBeans) {
           if (Long.parseLong(executionBean.getFinishedTime()) > Long.parseLong(latestFinish)
               && (executionBean.getStatus() == null
-                  || executionBean.getStatus().equalsIgnoreCase("Success"))) {
+              || executionBean.getStatus().equalsIgnoreCase("Success"))) {
             latestExecutionID = executionBean.getExecutionId();
             latestFinish = executionBean.getFinishedTime();
           }
@@ -214,24 +216,28 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void executeDslAnalysis(String analysisId) {
+  public void executeDslAnalysis(String analysisId,String auth) {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId;
     logger.info("URL for request body :" + dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
     Analysis analysis = analysisResponse.getAnalysis();
     logger.info("Analysis request body :" + analysisResponse.getAnalysis());
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", auth);
+    headers.set("Content-Type","application/json");
+    logger.info("header auth for execute api : "+auth);
 
-    String url =
-        proxyAnalysisUrl
-            + "/execute?id="
-            + analysisId
-            + "&size="
-            + dispatchRowLimit
-            + "&executionType=scheduled";
+    String url = proxyAnalysisUrl
+          + "/execute?id="
+          + analysisId
+          + "&size="
+          + dispatchRowLimit
+          + "&executionType=scheduled";
+
     logger.info("Execute URL for dispatch :" + url);
-    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis,headers);
 
-    restTemplate.postForObject(url, requestEntity, String.class);
+    restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
   }
 }
