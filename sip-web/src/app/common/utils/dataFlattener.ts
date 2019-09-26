@@ -207,9 +207,9 @@ export function alterReportData(data, analysis) {
   const dateFields = [];
   flatMap(analysis.sipQuery.artifacts, artifact =>
     fpPipe(
-      fpMap(fpPick(['columnName', 'type'])),
-      fpFilter(({ type, columnName }) => {
-        if (type === 'date') {
+      fpMap(fpPick(['columnName', 'type', 'aggregate'])),
+      fpFilter(({ type, columnName, aggregate }) => {
+        if (type === 'date' && !['count', 'distinctcount'].includes(aggregate)) {
           dateFields.push(columnName);
           return;
         }
@@ -219,7 +219,7 @@ export function alterReportData(data, analysis) {
   return data.map(row => {
     return mapValues(row, (value, key) => {
       if (dateFields.includes(key)) {
-        value = moment(value).utc().format('YYYY-MM-DD hh:mm:ss');
+        value = isEmpty(value) ? '' : moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
 
       return value;
