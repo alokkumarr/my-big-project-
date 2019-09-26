@@ -28,3 +28,4 @@ wait_maprfs
 load_data
 wait_semantic_service
 insert_json_store_sample $sample_location/sample-elasticsearch/sample-data-elastic.json
+insert_json_store_sample $sample_location/sample-elasticsearch/sample-data-elastic-tenantA.json
