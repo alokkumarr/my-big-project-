@@ -71,11 +71,18 @@ public class RTPSPipelineProcessor {
     		
     		logger.info("Is multiple pipeline ::"+ isMultiple);
     		JSONArray pipeline = null;
+    		int pipeLinStartIndex = 0;
     		
     		if(isMultiple ==null || !Boolean.valueOf((String)isMultiple)){
     			logger.info("is Multiple doesnt exists ::");
     			 pipeline = (JSONArray) pipeLineConfig.get("pipeline");
 				logger.debug("### Pipeline configuration retrived successfully starting processing");
+				
+				/**
+				 * If single pipeline, then need not process
+				 * first pipeline entry i.e rtps
+				 */
+				pipeLinStartIndex = 1;
 				
     		} else {
     			logger.info("is Multiple  exists ::");
@@ -86,6 +93,7 @@ public class RTPSPipelineProcessor {
     			 pipeline = (JSONArray) configs.get(type);
     			logger.debug("#######pipeline"  + pipeline);
     			
+    			
     		}
 			
 			
@@ -95,7 +103,8 @@ public class RTPSPipelineProcessor {
 				logger.error("####No pipeline defined for event type "+ pipeline);
 			} else {
 				
-				for (int i = 1; i < pipeline.size(); i++) {
+				for (int i = pipeLinStartIndex; i < pipeline.size(); i++) {
+					logger.info("### Pipeline starting from ::"+ pipeLinStartIndex);
 					JSONObject pipeObj = (JSONObject) pipeline.get(i);
 					
 					String component = pipeObj.get("component").toString();
