@@ -48,15 +48,15 @@ public class BaseIT {
 
   @BeforeClass
   public static void setUpClass() {
-    String host = System.getProperty("saw.docker.host");
-    String port = System.getProperty("saw.docker.port");
-    if (host == null) {
-      throw new RuntimeException("Property saw.docker.host unset");
-    }
-    if (port == null) {
-      throw new RuntimeException("Property saw.docker.port unset");
-    }
-    RestAssured.baseURI = "http://" + host + ":" + port + "/";
+//    String host = System.getProperty("saw.docker.host");
+//    String port = System.getProperty("saw.docker.port");
+//    if (host == null) {
+//      throw new RuntimeException("Property saw.docker.host unset");
+//    }
+//    if (port == null) {
+//      throw new RuntimeException("Property saw.docker.port unset");
+//    }
+    RestAssured.baseURI = "http://54.167.59.210/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
 
