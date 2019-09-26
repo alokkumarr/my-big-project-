@@ -144,6 +144,7 @@ public class ServiceUtils {
           ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
           ftp.disconnect();
         }
+        logger.info("Successfully uploaded to FTP");
       } catch (Exception e) {
         logger.error(e.getMessage());
         return false;
