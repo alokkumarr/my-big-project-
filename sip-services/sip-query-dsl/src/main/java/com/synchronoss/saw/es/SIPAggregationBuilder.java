@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
 import com.google.gson.Gson;
+import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Field.Aggregate;
@@ -336,7 +337,7 @@ public class SIPAggregationBuilder {
 
   private String expressionEvaluator(
       String dataFieldName, Expression expression, AggregationBuilder aggregationBuilder)
-      throws RuntimeException {
+      throws SipDslProcessingException {
     StringBuilder expressionBuilder = new StringBuilder();
 
     Map<String, String> bucketsPathsMap = new HashMap<>();
@@ -368,7 +369,7 @@ public class SIPAggregationBuilder {
           operand.setColumn(expression.getColumn());
           operand.setAggregate(expression.getAggregate());
         } else {
-          throw new RuntimeException("Invalid exception");
+          throw new SipDslProcessingException("Invalid expression");
         }
 
         String operandExp = operandEvaluator(operand, aggregationBuilder, bucketsPathsMap);
