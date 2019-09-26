@@ -86,52 +86,63 @@ public class Expression {
     this.column = column;
   }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Expression that = (Expression) o;
-
-        return new EqualsBuilder()
-            .append(value, that.value)
-            .append(aggregate, that.aggregate)
-            .append(column, that.column)
-            .append(operand1, that.operand1)
-            .append(operator, that.operator)
-            .append(operand2, that.operand2)
-            .isEquals();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(value)
-            .append(aggregate)
-            .append(column)
-            .append(operand1)
-            .append(operator)
-            .append(operand2)
-            .toHashCode();
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    @Override
+    Expression that = (Expression) o;
+
+    return new EqualsBuilder()
+        .append(value, that.value)
+        .append(aggregate, that.aggregate)
+        .append(column, that.column)
+        .append(operand1, that.operand1)
+        .append(operator, that.operator)
+        .append(operand2, that.operand2)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(value)
+        .append(aggregate)
+        .append(column)
+        .append(operand1)
+        .append(operator)
+        .append(operand2)
+        .toHashCode();
+  }
+
+  @Override
   public String toString() {
 
     StringBuilder builder = new StringBuilder();
-    if (operand1 != null) {
-      builder.append(operand1.toString());
-    }
 
-    builder.append(" ").append(operator).append(" ");
+    if (operator == null) {
+      // No Operands or operator
+      if (value != null) {
+        builder.append(value);
+      } else if (aggregate != null && column != null) {
+        builder.append(aggregate + "(" + column + ")");
+      }
 
-    if (operand2 != null) {
-      builder.append(operand2.toString());
+    } else {
+      if (operand1 != null) {
+        builder.append(operand1.toString());
+      }
+
+      builder.append(" ").append(operator).append(" ");
+
+      if (operand2 != null) {
+        builder.append(operand2.toString());
+      }
     }
 
     return builder.toString();
