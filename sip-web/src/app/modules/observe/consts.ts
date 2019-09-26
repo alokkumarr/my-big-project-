@@ -105,7 +105,10 @@ export const BULLET_CHART_OPTIONS = {
 export const BULLET_CHART_COLORS = [
   { value: 'rog', b1: '#C0463F', b2: '#EE754E', b3: '#99BA33' },
   { value: 'greys', b1: '#666', b2: '#999', b3: '#BBB' },
-  { value: 'blues', b1: '#568ED5', b2: '#8DB4E3', b3: '#DDE6F3' }
+  { value: 'blues', b1: '#568ED5', b2: '#8DB4E3', b3: '#DDE6F3' },
+  { value: 'gor', b1: '#99BA33', b2: '#EE754E', b3: '#C0463F' },
+  { value: 'greys-reverse', b1: '#BBB', b2: '#999', b3: '#666' },
+  { value: 'blues-reverse', b1: '#DDE6F3', b2: '#8DB4E3', b3: '#568ED5' }
 ];
 
 export const KPI_BG_COLORS = [
