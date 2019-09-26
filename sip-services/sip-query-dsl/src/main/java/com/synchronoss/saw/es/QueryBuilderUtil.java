@@ -8,6 +8,8 @@ import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.Model.Operation;
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.BuilderUtil;
 import java.util.ArrayList;
@@ -262,30 +264,30 @@ public class QueryBuilderUtil {
                   + " >= "
                   + item.getModel().getOtherValue());
     }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GT.value())) {
-      script = new Script("params." + item.getColumnName() + " > "
-          + item.getModel().getValue());
+
+    Operator operator = item.getModel().getOperator();
+
+    switch (operator) {
+      case GT:
+        script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
+        break;
+      case GTE:
+        script = new Script("params." + item.getColumnName() + " " + Operation.GTE.value() + " " + item.getModel().getValue());
+        break;
+      case LT:
+        script = new Script("params." + item.getColumnName() + " " + Operation.LT.value() +  " " + item.getModel().getValue());
+        break;
+      case LTE:
+        script = new Script("params." + item.getColumnName() + " " + Operation.LTE.value() + " " + item.getModel().getValue());
+        break;
+      case EQ:
+        script = new Script("params." + item.getColumnName() + " " + Operation.EQ.value() + " " + item.getModel().getValue());
+        break;
+      case NEQ:
+        script = new Script("params." + item.getColumnName() + " " + Operation.NEQ.value() +  " " + item.getModel().getValue());
+        break;
     }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GTE.value())) {
-      script = new Script("params." + item.getColumnName() + " >= "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LT.value())) {
-      script = new Script("params." + item.getColumnName() + " < "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LTE.value())) {
-      script = new Script("params." + item.getColumnName() + " <= "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())) {
-      script = new Script("params." + item.getColumnName() + " = "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())) {
-      script = new Script("params." + item.getColumnName() + " != "
-          + item.getModel().getValue());
-    }
+
     return script;
   }
 
