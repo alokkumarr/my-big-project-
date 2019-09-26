@@ -56,7 +56,7 @@ function getXValue(point, fields, chartType) {
   const { x, g } = fields;
   const hasGroupBy = Boolean(g);
 
-  if(chartType === 'chart_scale') {
+  if (chartType === 'chart_scale') {
     return point.name;
   }
 
@@ -89,8 +89,13 @@ function getXLabel(point, fields, chartType) {
 }
 
 function getFieldLabelWithAggregateFun(field) {
-  const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
-  return field.alias || `${aggregate}(${field.displayName})`;
+  /* Don't try to apply aggregate to a derived metric */
+  if (field.expression) {
+    return field.alias || `${field.displayName}`;
+  } else {
+    const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
+    return field.alias || `${aggregate}(${field.displayName})`;
+  }
 }
 
 /**
