@@ -125,15 +125,15 @@
       ]
     }
   ],
-  "createdBy": "sipadmin@synchronoss.com",
-  "customerCode": "SYNCHRONOSS",
-  "metricName": "sample-elasticsearch",
+  "createdBy": "sipadmin@TenantA.com",
+  "customerCode": "TenantA",
+  "metricName": "sample-elasticsearch-TenantA",
   "esRepository": {
     "indexName": "sampleAlias",
     "storageType": "ES",
     "type": "sample"
   },
-  "username": "sipadmin@synchronoss.com",
+  "username": "sipadmin@TenantA.com",
   "projectCode": "workbench",
   "parentDataSetIds": ["SALES::json::1550155167974"],
   "parentDataSetNames": ["SALES"],

@@ -216,6 +216,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.layoutConfiguration = this.getLayoutConfiguration(
           this.analysis
         );
+        this._analyzeService.getSemanticObject(this.analysis.semanticId).toPromise().then(semanticObj => {
+          this._store.dispatch(new DesignerMergeSupportsIntoAnalysis(semanticObj.supports));
+        });
         if (!isReport) {
           this.requestDataIfPossible();
         }

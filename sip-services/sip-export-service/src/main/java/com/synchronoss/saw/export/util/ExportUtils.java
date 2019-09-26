@@ -34,6 +34,16 @@ public class ExportUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(ExportUtils.class);
 
+  private static final String HOST = "Host";
+  private static final String NAME = "name";
+  private static final String AUTHORIZATION = "Authorization";
+  private static final String FILE_TYPE = "fileType";
+  private static final String DESCRIPTION = "description";
+  private static final String PUBLISHED_TIME = "publishedTime";
+  private static final String DISTINCT_COUNT = "distinctCount";
+  private static final String USER_FULL_NAME = "userFullName";
+  private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
+
   /**
    * Create Request header with common properties
    *
@@ -42,10 +52,10 @@ public class ExportUtils {
    */
   public static HttpHeaders setRequestHeader(HttpServletRequest request) {
     HttpHeaders requestHeaders = new HttpHeaders();
-    requestHeaders.set("Host", request.getHeader("Host"));
+    requestHeaders.set(HOST, request.getHeader(HOST));
     requestHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_VALUE);
-    requestHeaders.set("Authorization", request.getHeader("Authorization"));
+    requestHeaders.set(AUTHORIZATION, request.getHeader(AUTHORIZATION));
     return requestHeaders;
   }
 
@@ -64,24 +74,25 @@ public class ExportUtils {
 
 
     Map<String, String> header = new LinkedHashMap();
-    if (fields != null && !fields.isEmpty()) {
+    if (!fields.isEmpty()) {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
+          String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               String columnName;
-              String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;;
-              if (aggregationName != null && "distinctcount".equalsIgnoreCase(aggregationName)) {
-                aggregationName = aggregationName.replace(aggregationName, "distinctCount");
+              String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
+              if (aggregationName != null && DISTINCT_COUNT_AGGREGATION.equalsIgnoreCase(aggregationName)) {
+                aggregationName = aggregationName.replace(aggregationName, DISTINCT_COUNT);
               }
               if (split != null && split.length >= 2) {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
-                header.put(columnName.trim(), field.getAlias());
+                header.put(columnName.trim(), aliasName);
               } else {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
-                header.put(columnName.trim(), field.getAlias());
+                header.put(columnName.trim(), aliasName);
               }
               break;
             }
@@ -89,9 +100,9 @@ public class ExportUtils {
             if (field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               if (split != null && split.length >= 2) {
-                header.put(split[0], field.getAlias());
+                header.put(split[0], aliasName);
               } else {
-                header.put(field.getColumnName(), field.getAlias());
+                header.put(field.getColumnName(), aliasName);
               }
               break;
             }
@@ -160,15 +171,15 @@ public class ExportUtils {
    */
   public static void buildExportBean(ExportBean exportBean, Object dispatchBean) {
     exportBean.setFileType(
-        String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        String.valueOf(((LinkedHashMap) dispatchBean).get(FILE_TYPE)));
     exportBean.setReportDesc(
-        String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+        String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
     exportBean.setReportName(
-        String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+        String.valueOf(((LinkedHashMap) dispatchBean).get(NAME)));
     exportBean.setPublishDate(
-        String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+        String.valueOf(((LinkedHashMap) dispatchBean).get(PUBLISHED_TIME)));
     exportBean.setCreatedBy(
-        String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+        String.valueOf(((LinkedHashMap) dispatchBean).get(USER_FULL_NAME)));
   }
 
 
@@ -179,7 +190,6 @@ public class ExportUtils {
   }
 
   public static String generateRandomStringDir() {
-    String dir = UUID.randomUUID().toString();
-    return dir;
+    return UUID.randomUUID().toString();
   }
 }

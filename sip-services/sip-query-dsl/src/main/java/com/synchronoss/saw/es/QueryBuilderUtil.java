@@ -468,7 +468,7 @@ public class QueryBuilderUtil {
    * @return
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
-      SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
+      SipQuery sipQuery, DataSecurityKey dataSecurityKey, List<String> artifactFromAnalysis) {
     List<DataSecurityKeyDef> dataSecurityKeyDefList =
         dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
     List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
@@ -476,13 +476,16 @@ public class QueryBuilderUtil {
     if ((artifactList != null && !artifactList.isEmpty())
         && (dataSecurityKeyDefList != null && !dataSecurityKeyDefList.isEmpty())) {
       for (Artifact artifact : artifactList) {
+
         String artifactName = artifact.getArtifactsName();
-        List<Field> fieldList = artifact.getFields();
-        for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-          if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-            String dskColName = dataSecurityKeyDef.getName();
-            dataSecurityKeyDef.setName(artifactName + "." + dskColName);
-            dataSecurityKeyDefs.add(dataSecurityKeyDef);
+        if (artifactFromAnalysis.contains(artifactName.toUpperCase())) {
+          List<Field> fieldList = artifact.getFields();
+          for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+            if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+              String dskColName = dataSecurityKeyDef.getName();
+              dataSecurityKeyDef.setName(artifactName + "." + dskColName);
+              dataSecurityKeyDefs.add(dataSecurityKeyDef);
+            }
           }
         }
       }
