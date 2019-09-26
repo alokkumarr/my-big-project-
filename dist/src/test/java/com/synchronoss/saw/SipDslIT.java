@@ -548,7 +548,7 @@ public class SipDslIT extends BaseIT {
   public void testDerivedMetricWithAggregation() throws IOException {
     String formula = "sum(integer) + 2";
     String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"integer\"},"
+        "{\"operator\":\"+\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"integer\"},"
             + "\"operand2\":{\"value\":2}}";
     String fieldName = "arithmeticWithAgg";
 
@@ -579,8 +579,8 @@ public class SipDslIT extends BaseIT {
     String formula = "sum(integer) + avg(integer)";
     String fieldName = "arithmeticWithAgg";
     String expression =
-        "{\"operator\":\"+\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"integer\"},"
-            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"integer\"}}";
+        "{\"operator\":\"+\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"avg\",\"column\":\"integer\"}}";
 
     JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
 
@@ -611,10 +611,10 @@ public class SipDslIT extends BaseIT {
 
     String formula = "sum(double) - (avg(integer) + avg(double))";
     String expression =
-        "{\"operator\":\"-\",\"operand1\":{\"aggregation\":\"sum\",\"column\":\"double\"},"
+        "{\"operator\":\"-\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"double\"},"
             + "\"operand2\":{\"operator\":\"+\","
-            + "\"operand1\":{\"aggregation\":\"avg\",\"column\":\"integer\"},"
-            + "\"operand2\":{\"aggregation\":\"avg\",\"column\":\"double\"}}}";
+            + "\"operand1\":{\"aggregate\":\"avg\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"avg\",\"column\":\"double\"}}}";
 
     JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
 
