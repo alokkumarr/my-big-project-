@@ -76,12 +76,13 @@ class ChartsDesignerPage extends Designer {
   clickOnAttribute(attribute, type) {
     browser
       .actions()
-      .mouseMove(this._unselectedField(attribute))
+      .mouseMove(this._attribute(attribute))
       .click()
       .perform();
 
-    commonFunctions.waitFor.elementToBeVisible(this._attribute(attribute));
-    commonFunctions.clickOnElement(this._attribute(attribute));
+    // //commonFunctions.waitFor.elementToBeVisible(this._attribute(attribute));
+    // commonFunctions.clickOnElement(this._attribute(attribute));
+    // this._attribute(attribute).click();
     browser.sleep(1000);
 
     commonFunctions.waitFor.elementToBeVisible(
