@@ -29,6 +29,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   bgColor: string;
   countToChange: string;
   countToCurrent: string;
+  dataFormat: any;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -63,6 +64,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       return;
     }
     this._kpi = data;
+    this.dataFormat = get(this._kpi, 'dataFields.0.format');
     this.executeKPI(this._kpi);
   }
 
@@ -164,12 +166,23 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         change = isFinite(change) ? change : 0;
         this.primaryChange = change;
         this.primaryResult = {
-          current: round(currentParsed, 2),
+          current: currentParsed,
           prior: priorParsed,
           change: trim(change, '-')
         };
 
         this.secondaryResult = secondary;
       });
+  }
+
+  fetchValueAsPerFormat(value) {
+    let formattedValue;
+    if (isUndefined(value)) {
+      return;
+    }
+    formattedValue = value.toFixed(this.dataFormat.precision);
+    formattedValue = this.dataFormat.comma ? formattedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : formattedValue;
+    formattedValue = `${this.dataFormat.prefix} ${formattedValue} ${this.dataFormat.suffix}`;
+    return formattedValue;
   }
 }

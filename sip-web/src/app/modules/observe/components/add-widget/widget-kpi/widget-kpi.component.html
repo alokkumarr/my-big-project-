@@ -69,7 +69,7 @@
     </mat-select>
   </mat-form-field>
 
-  <div class="secondary-aggregate-form" formGroupName="secAggregates" *ngIf="_kpiType!== 'bullet'">
+  <div class="secondary-aggregate-form" formGroupName="secAggregates" >
     <strong>Secondary Aggregations</strong>
     <mat-slide-toggle *ngFor="let ag of aggregations"
                       [formControlName]="ag.value"
@@ -91,55 +91,57 @@
                          [value]="bg.label">
       </mat-button-toggle>
     </mat-button-toggle-group>
-    <mat-accordion>
-      <mat-expansion-panel class="format-data-kpi">
-        <mat-expansion-panel-header class="format-data-kpi-header">
-          <mat-panel-title>
-            <strong>Format Data</strong>
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <div class="format-data-form">
-          <mat-slide-toggle i18n
-                            color="primary"
-                            formControlName="kpiCommaSeparator"
-                            [checked]="kpiCommaSeparator">
-            Show Comma Separators
-          </mat-slide-toggle>
-          <mat-form-field>
-            <input matInput
-                  type="number"
-                  max="99"
-                  min="0"
-                  autocomplete="off"
-                  formControlName="kpiPrecision"
-                  [value]="kpiPrecision"
-                  placeholder="Decimal Precision"/>
-          </mat-form-field>
-          <div fxLayout="row" fxFlex="40">
-            <mat-form-field>
-              <input
-                matInput
-                placeholder="Prefix"
-                formControlName="kpiPrefix"
-                [value]="kpiPrefix"
-                type="text"
-              />
-            </mat-form-field>
-
-            <mat-form-field>
-              <input
-                matInput
-                placeholder="Suffix"
-                formControlName="kpiSuffix"
-                [value]="kpiSuffix"
-                type="text"
-              />
-            </mat-form-field>
-          </div>
-        </div>
-      </mat-expansion-panel>
-    </mat-accordion>
   </div>
+
+  <mat-accordion *ngIf="_kpiType!== 'bullet'">
+    <mat-expansion-panel class="format-data-kpi">
+      <mat-expansion-panel-header class="format-data-kpi-header">
+        <mat-panel-title>
+          <strong>Format Data</strong>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="format-data-form">
+        <mat-slide-toggle i18n
+                          color="primary"
+                          name="kpiCommaSeparator"
+                          formControlName="kpiCommaSeparator"
+                          >
+          Show Comma Separators
+        </mat-slide-toggle>
+        <mat-form-field>
+          <input matInput
+                type="number"
+                max="99"
+                min="0"
+                autocomplete="off"
+                name="kpiPrecision"
+                formControlName="kpiPrecision"
+                placeholder="Decimal Precision"/>
+        </mat-form-field>
+        <div fxLayout="row" fxFlex="40">
+          <mat-form-field>
+            <input
+              matInput
+              placeholder="Prefix"
+              name="kpiPrefix"
+              formControlName="kpiPrefix"
+              type="text"
+            />
+          </mat-form-field>
+
+          <mat-form-field>
+            <input
+              matInput
+              placeholder="Suffix"
+              name="kpiSuffix"
+              formControlName="kpiSuffix"
+              type="text"
+            />
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
 
   <div *ngIf="_kpiType=== 'bullet'">
     <div class="bullet-measures">

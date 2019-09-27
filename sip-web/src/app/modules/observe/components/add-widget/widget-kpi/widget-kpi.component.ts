@@ -95,7 +95,11 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       target: [0, [Validators.required, nonEmpty()]],
       measure1: [''],
       measure2: [''],
-      kpiBgColor: ['blue', Validators.required]
+      kpiBgColor: ['blue', Validators.required],
+      kpiCommaSeparator: [false],
+      kpiPrecision: [''],
+      kpiPrefix: [''],
+      kpiSuffix: ['']
     });
 
     /* Only show date inputs if custom filter is selected */
@@ -174,8 +178,17 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     if (!data) {
       return;
     }
-
     this._kpi = data;
+
+    const dataFormatValues = get(this._kpi, 'dataFields[0].format');
+
+    // set data format values
+    if (!isUndefined(dataFormatValues)) {
+      this.kpiForm.get('kpiCommaSeparator').setValue(dataFormatValues.comma);
+      this.kpiForm.get('kpiPrecision').setValue(dataFormatValues.precision);
+      this.kpiForm.get('kpiPrefix').setValue(dataFormatValues.prefix);
+      this.kpiForm.get('kpiSuffix').setValue(dataFormatValues.suffix);
+    }
 
     data.name && this.kpiForm.get('name').setValue(data.name);
 
@@ -262,6 +275,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    * Represensts the save/update operation.
    */
   applyKPI() {
+    this.kpiForm.get('kpiPrecision').value;
     const dataField = get(this._kpi, 'dataFields.0');
     const dateField = find(
       this._metric.dateColumns,
