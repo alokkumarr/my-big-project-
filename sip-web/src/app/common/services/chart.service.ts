@@ -531,7 +531,6 @@ export class ChartService {
       field.chartType = type;
     });
     const series = map(fields.y, this.getSerie.bind(this));
-
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
