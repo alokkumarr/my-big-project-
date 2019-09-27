@@ -85,6 +85,9 @@ public class AlertRuleDetails {
   @JsonProperty("monitoringType")
   private MonitoringType monitoringType;
 
+  @JsonProperty("triggerOnLookback")
+  private Boolean triggerOnLookback = false;
+
   /**
    * Gets alertRulesSysId.
    *
@@ -460,5 +463,19 @@ public class AlertRuleDetails {
   /** Sets monitoringType. */
   public void setMonitoringType(MonitoringType monitoringType) {
     this.monitoringType = monitoringType;
+  }
+
+  /**
+   * Gets triggerOnLookback.
+   *
+   * @return value of triggerOnLookback
+   */
+  public Boolean getTriggerOnLookback() {
+    return triggerOnLookback;
+  }
+
+  /** Sets triggerOnLookback. */
+  public void setTriggerOnLookback(Boolean triggerOnLookback) {
+    this.triggerOnLookback = triggerOnLookback;
   }
 }
