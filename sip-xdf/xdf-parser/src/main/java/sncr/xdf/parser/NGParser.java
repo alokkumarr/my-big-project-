@@ -328,7 +328,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
-        } else if (this.inputDataFrame != null || parserInputFileFormat.equals(ParserInputFileFormat.JSON))
+        } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
@@ -350,7 +350,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
-            if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
+            if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
             {
                 NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
                 Dataset<Row> inputDataset = null;
@@ -368,10 +368,58 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
                 ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
+            } else if(this.inputDataFrame != null) {
+
+                NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
+
+                Dataset<Row> inputDataset = null;
+
+                if (inputDataFrame != null) {
+    				inputDataset = inputDataFrame;
+    			} else {
+    				inputDataset = jsonFileParser.parseInput(sourcePath);
+    			}
+                
+                this.recCounter.setValue(inputDataset.count());
+
+                commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+
+                ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+                    outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+
+                logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
+            
+            	
+            	
             }
 
         return retval;
     }
+	
+	public void parseJson() {
+
+
+        NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
+        Dataset<Row> inputDataset = null;
+        if (inputDataFrame != null) {
+			inputDataset = inputDataFrame;
+		} else {
+			inputDataset = jsonFileParser.parseInput(sourcePath);
+		}
+        
+        this.recCounter.setValue(inputDataset.count());
+
+        commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
+            outputDataSetName, outputDataSetMode, outputFormat, pkeys));
+        ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+
+        logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
+    
+    
+	}
 
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 

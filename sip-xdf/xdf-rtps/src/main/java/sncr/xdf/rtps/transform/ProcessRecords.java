@@ -273,7 +273,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	  logger.info("Total event types: "+ eventTypes.size());
     	  
     	  NGContext ct = this.ngctx;
-    	  ExecutorService executorService = Executors.newFixedThreadPool(10);
+    	  /*ExecutorService executorService = Executors.newFixedThreadPool(10);
     	  for(Row eventType: eventTypes) {
     		  logger.info("Processing for event type: "+ eventType.getString(0));
     		  
@@ -281,15 +281,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     		  executorService.submit(new Callable<Long>() {
     		        @Override
     		        public Long call() throws Exception {
-    		        	/*logger.info("Starting processing for event type " + eventType);
-    					logger.info("Sleeping for " + eventType);
-    					try {
-    						Thread.sleep(60000);
-    					} catch (InterruptedException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
-    					logger.info("Resumed from sleep for " + eventType);*/
     		        	
     		        	String type =  (String) eventType.get(0);
     		        	
@@ -305,39 +296,19 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     		  
     		  
     		  
-    			/*CompletableFuture.runAsync(new Runnable() {
-
-				@Override
-				public void run() {
-					logger.info("Starting processing for event type " + eventType);
-					logger.info("Sleeping for " + eventType);
-					try {
-						Thread.sleep(60000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					logger.info("Resumed from sleep for " + eventType);
-				String type =  (String) eventType.get(0);
-		    		  String query = "EVENT_TYPE == \'"+ type+ "\'";
-		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
-					
-				}
-    			  
-    		  });*/
-    		  
-    	  }
+    			
+    	  }*/
     	  
-    	  /*for(Row eventType: eventTypes) {
+    	  
+    	  
+    	  for(Row eventType: eventTypes) {
     		 String type =  (String) eventType.get(0);
-    		// Dataset<Row> filteredData = df.select("EVENT_TYPE ==type");
     		 String query = "EVENT_TYPE == \'"+ type+ "\'";
     		 logger.debug("Query:: " + query);
     		 RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
              processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,type );
     		  
-    	  }*/
+    	  }
     	
     	  logger.debug("COUNT before async::"+ df.count());
     	  //List<Row> list =  df.select("EVENT_TYPE").distinct().toJavaRDD().collect();
