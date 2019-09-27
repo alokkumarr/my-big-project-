@@ -14,8 +14,8 @@ if (environment.production) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost
-  apiUrl = 'https://sip-iot-dev-us.synchronoss.net';
-  // apiUrl = 'http://54.158.25.78';
+  apiUrl = 'http://54.89.153.19';
+  // apiUrl = 'https://sip-iot-dev-us.synchronoss.net';
   // apiUrl = 'http://saw-rd611.eng-sip.dev01.us-west.sncrcloud.net';
   // apiUrl = 'https://saw-cert-sip-vaste.sncrcorp.net';
   // apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net';

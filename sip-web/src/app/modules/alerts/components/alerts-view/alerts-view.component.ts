@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-
 import {
   LoadAllAlertCount,
   LoadAllAlertSeverity
@@ -21,8 +20,9 @@ import { AlertsState } from '../../state/alerts.state';
 })
 export class AlertsViewComponent implements OnInit {
   public alertsDataLoader: (options: {}) => Promise<GridData>;
-  @Select(AlertsState.getAlertFilterString) filterString$: Observable<string>;
-  @Select(AlertsState.getAlertFilter) filter$: Observable<AlertFilterModel>;
+  @Select(AlertsState.getAlertFilterStrings) filterStrings$: Observable<string>;
+  @Select(AlertsState.getAlertFilters) filters$: Observable<AlertFilterModel[]>;
+  public filters: AlertFilterModel[] = [];
   @Select(AlertsState.getAllAlertsCountChartData)
   allAlertCountChartData$: Observable<AlertChartData>;
   @Select(AlertsState.getAllAlertsSeverityChartData)
@@ -68,23 +68,22 @@ export class AlertsViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.filterString$.subscribe(() => {
+    this.filters$.subscribe(filters => {
+      this.filters = filters;
       this.setAlertLoaderForGrid();
-      this._store.dispatch(new LoadAllAlertCount());
-      this._store.dispatch(new LoadAllAlertSeverity());
     });
+    this.fetchLateshAlerts();
   }
 
   fetchLateshAlerts() {
     this.setAlertLoaderForGrid();
-    this._store.dispatch(new LoadAllAlertCount());
-    this._store.dispatch(new LoadAllAlertSeverity());
+    this._store.dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
   }
 
   setAlertLoaderForGrid() {
     this.alertsDataLoader = options => {
       return this._alertService
-        .getAlertsStatesForGrid(options)
+        .getAlertsStatesForGrid(options, this.filters)
         .then(result => ({
           data: result.data,
           totalCount: result.totalCount
