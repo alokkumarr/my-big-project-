@@ -4,17 +4,8 @@
   fxLayoutGap="10px"
   fxLayoutAlign="space-around center"
 >
-  <mat-card class="mat-elevation-z3">
-    <mat-card-header>
-      <mat-card-title class="filter__form__title"
-        >Filter By Date</mat-card-title
-      >
-    </mat-card-header>
-    <mat-card-content
-      fxLayout="column"
-      fxLayoutGap="15px"
-      fxLayoutAlign="space-around center"
-    >
+  <mat-card class="mat-elevation-z3" style="width: 80%;">
+    <mat-card-content fxLayout="column" fxLayoutAlign="space-around center">
       <div
         *ngFor="let filter of editedFilters$ | async; let i = index"
         [ngSwitch]="filter.type"
@@ -25,12 +16,12 @@
           [dateFilter]="filter"
           fxFlex
         ></alerts-date-filter>
-        <!-- <alerts-string-filter
+        <alerts-string-filter
           *ngSwitchCase="'string'"
           (change)="onFilterChange(i, $event)"
           [dateFilter]="filter"
           fxFlex
-        ></alerts-string-filter> -->
+        ></alerts-string-filter>
       </div>
     </mat-card-content>
     <mat-card-actions fxLayout="row" fxLayoutGap="12px">

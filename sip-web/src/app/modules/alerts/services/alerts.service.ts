@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import * as ceil from 'lodash/ceil';
 import * as get from 'lodash/get';
+import * as filter from 'lodash/filter';
 import { map } from 'rxjs/operators';
 
 import { GridPagingOptions, AlertFilterModel } from '../alerts.interface';
@@ -15,21 +15,24 @@ import {
 
 const apiUrl = AppConfig.api.url;
 
+const getFiltersForBackend = (filters: AlertFilterModel[]) => {
+  return filter(filters, ({ type, modelValues }) => {
+    switch (type) {
+      case 'string':
+        const [value] = modelValues;
+        return value;
+    }
+    return true;
+  });
+};
+
 const getAlertCountPayload = (filters: AlertFilterModel[], groupBy: string) => {
-  // const { preset, startTime, endTime } = dateFilter;
-  // if (dateFilter.preset === CUSTOM_DATE_PRESET_VALUE) {
-  //   return {
-  //     preset,
-  //     startTime,
-  //     endTime,
-  //     groupBy
-  //   };
-  // }
   return {
-    filters: [filters[0]],
+    filters: getFiltersForBackend(filters),
     groupBy: groupBy
   };
 };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,7 +52,7 @@ export class AlertsService {
     const pageNumber = ceil(options.skip / options.take) + 1;
     const basePath = `alerts/states`;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
-    const payload = { filters: dateFilters };
+    const payload = { filters: getFiltersForBackend(dateFilters) };
     const url = `${apiUrl}/${basePath}${queryParams}`;
     return this._http
       .post(url, payload)
