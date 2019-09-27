@@ -1,6 +1,9 @@
+<div class="filter__form__title">
+  Filter By Date
+</div>
 <form class="filter__form" [formGroup]="alertFilterForm" autocomplete="off">
   <mat-form-field appearance="outline">
-    <mat-label>Filter Value</mat-label>
+    <mat-label>Date preset</mat-label>
     <mat-select e2e="alert-date-preset" formControlName="datePreset">
       <mat-option
         *ngFor="let presetFilter of datePresets"
