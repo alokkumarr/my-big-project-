@@ -246,24 +246,21 @@ public class AlertEvaluationImpl implements AlertEvaluation {
   public Boolean checkAlertResultBasedOnLastTrigger(String alertRuleId, Long lastTriggeredWindow) {
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode node = objectMapper.createObjectNode();
-    ArrayNode arrayNode = node.putArray(MaprConnection.AND);
-    ObjectNode node1 = objectMapper.createObjectNode();
-    ObjectNode objectNode = node1.putObject(MaprConnection.EQ);
+    ObjectNode objectNode = node.putObject(MaprConnection.EQ);
     objectNode.put("alertRulesSysId", alertRuleId);
-    ObjectNode node2 = objectMapper.createObjectNode();
-    ObjectNode objectNode1 = node2.putObject(MaprConnection.LTE);
-    // Add one minute grace period to last trigger time for evaluation
-    // in case alert Evaluation takes time.
-    objectNode1.put("startTime", lastTriggeredWindow + 60000);
-    arrayNode.add(node1);
-    arrayNode.add(node2);
     MaprConnection connection = new MaprConnection(basePath, alertResults);
     List<AlertResult> alertResults =
         connection.runMaprDbQueryWithFilter(node.toString(), 1, 1, "startTime", AlertResult.class);
     if (alertResults.size() > 0) {
-      return true;
+      // Add one minute grace period to last trigger time for evaluation
+      // in case alert Evaluation takes time.
+      if (alertResults.get(0).getStartTime() <= lastTriggeredWindow + 60000) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      return false;
+      return true;
     }
   }
 }
