@@ -1,5 +1,6 @@
 package com.synchronoss.saw.alert.modal;
 
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -21,6 +22,9 @@ public class AlertResult {
 
   @JsonProperty("thresholdValue")
   private Double thresholdValue;
+
+  @JsonProperty("otherThresholdValue")
+  private Double otherThresholdValue;
 
   @JsonProperty("metricValue")
   private Double metricValue;
@@ -48,6 +52,9 @@ public class AlertResult {
 
   @JsonProperty("attributeValue")
   private String attributeValue;
+
+  @JsonProperty("operator")
+  private Operator operator;
 
   /**
    * Gets alertTriggerSysId.
@@ -131,6 +138,20 @@ public class AlertResult {
   /** Sets thresholdValue. */
   public void setThresholdValue(Double thresholdValue) {
     this.thresholdValue = thresholdValue;
+  }
+
+  /**
+   * Gets otherThresholdValue.
+   *
+   * @return value of otherThresholdValue
+   */
+  public Double getOtherThresholdValue() {
+    return otherThresholdValue;
+  }
+
+  /** Sets otherThresholdValue. */
+  public void setOtherThresholdValue(Double otherThresholdValue) {
+    this.otherThresholdValue = otherThresholdValue;
   }
 
   /**
@@ -257,5 +278,19 @@ public class AlertResult {
   /** Sets attributeValue. */
   public void setAttributeValue(String attributeValue) {
     this.attributeValue = attributeValue;
+  }
+
+  /**
+   * Gets operator.
+   *
+   * @return value of operator
+   */
+  public Operator getOperator() {
+    return operator;
+  }
+
+  /** Sets operator. */
+  public void setOperator(Operator operator) {
+    this.operator = operator;
   }
 }

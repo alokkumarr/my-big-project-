@@ -4,11 +4,13 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.builder.RequestSpecBuilder;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hamcrest.text.IsEqualIgnoringCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,10 @@ public class AlertsIT extends BaseIT {
 
   private static final String OPERATORS = "operators";
   private static final String ALERT_PATH = "/saw/services/alerts";
+  private static final String ALERT_COUNT = "count";
+  private static final String ALERT_STATES = "states";
+  private static final String MONITORINGTYPE = "monitoringtype";
+  private static final String ATTRIBUTE_VALUES = "attributevalues";
 
   @Test
   public void testTriggerAlert() throws JsonProcessingException {
@@ -331,6 +338,8 @@ public class AlertsIT extends BaseIT {
     root.put("datapodName", "ABc");
     root.put("monitoringEntity", "abc123");
     root.put("operator", "LT");
+    root.put("attributeName", "testAttribute");
+    root.put("attributeValue", "attribute123");
     root.put("alertRuleDescription", "Tests");
     root.put("alertRuleName", "myName");
     root.put("thresholdValue", "2");
@@ -354,6 +363,8 @@ public class AlertsIT extends BaseIT {
     root.put("datapodName", "ABc");
     root.put("monitoringEntity", "abc123");
     root.put("operator", "GT");
+    root.put("attributeName", "testAttribute");
+    root.put("attributeValue", "attribute123");
     root.put("alertRuleDescription", "Tests");
     root.put("alertRuleName", "myName");
     root.put("thresholdValue", "2");
@@ -362,12 +373,17 @@ public class AlertsIT extends BaseIT {
 
   /** This test-case is check the alert count. */
   @Test
-  public void testAlertCount() throws IOException {
-    String urlForAlertCount = ALERT_PATH + "/" + "count";
+  public void testAlertCount() {
+    String urlForAlertCount = ALERT_PATH + "/" + ALERT_COUNT;
     log.debug("URL for Alert count : " + urlForAlertCount);
     ObjectNode root = mapper.createObjectNode();
-    root.put("preset", "YTD");
     root.put("groupBy", "StartTime");
+    ArrayNode filters = root.putArray("filters");
+    ObjectNode filter1 = mapper.createObjectNode();
+    filter1.put("preset", "YTD");
+    filter1.put("type", "date");
+    filter1.put("fieldName", "startTime");
+    filters.add(filter1);
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(root)
@@ -377,4 +393,101 @@ public class AlertsIT extends BaseIT {
         .assertThat()
         .statusCode(200);
   }
+
+  /** This test-case is check the alert states. */
+  @Test
+  public void testAlertStates() {
+    String urlForAlertStates = ALERT_PATH + "/" + ALERT_STATES;
+    log.debug("URL for Alert count : " + urlForAlertStates);
+    ObjectNode root = mapper.createObjectNode();
+    ArrayNode filters = root.putArray("filters");
+    ObjectNode filter1 = mapper.createObjectNode();
+    filter1.put("preset", "YTD");
+    filter1.put("type", "date");
+    filter1.put("fieldName", "startTime");
+    filters.add(filter1);
+    String message =
+        given(authSpec)
+            .contentType(ContentType.JSON)
+            .body(root)
+            .when()
+            .post(urlForAlertStates)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getJsonObject("message");
+    assertThat(message, IsEqualIgnoringCase.equalToIgnoringCase("Success"));
+  }
+
+  /** This test-case is to check the scenario to list all Alert Monitoring type. */
+  @Test
+  public void testAlertMonitoringType() {
+    String urlForOperators = ALERT_PATH + "/" + MONITORINGTYPE;
+    log.debug("operators url to get list : " + urlForOperators);
+
+    List<?> listOfMonitoringTypes =
+        given(authSpec)
+            .when()
+            .get(urlForOperators)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .jsonPath()
+            .get();
+
+    log.debug("listOfMonitoringTypes : " + listOfMonitoringTypes);
+    assertTrue(listOfMonitoringTypes.size() > 0);
+  }
+
+    /** This test-case is to check the scenario to list all attribute values. */
+    @Test
+    public void testListAttributeValues() throws IOException {
+        HashMap<?, ?> alertObject =
+            given(authSpec)
+                .body(prepareAlertsDataSet())
+                .when()
+                .post(ALERT_PATH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .response()
+                .getBody()
+                .jsonPath()
+                .getJsonObject("alert");
+
+        log.debug("alertObject : " + alertObject);
+
+        JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
+        String alertRulesSysId = jsonNode.get("alertRulesSysId").asText();
+        log.debug("alertRulesSysId : " + alertRulesSysId);
+        assertFalse(alertRulesSysId == null);
+
+        String urlForAttributeList = ALERT_PATH + "/" + ATTRIBUTE_VALUES;
+       List<String> attributeValues =
+            given(authSpec)
+                .when()
+                .get(urlForAttributeList)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .get();
+
+
+        assertTrue(attributeValues.size() > 0);
+
+        // delete alert after testing
+        this.tearDownAlert(alertRulesSysId);
+    }
+
 }

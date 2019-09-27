@@ -4,49 +4,46 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.synchronoss.saw.model.Model.Preset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AlertCount {
-  private Preset preset;
-  private String startTime;
-  private String endTime;
+
+
   private AlertCount.GroupBy groupBy;
+  private List<AlertFilter> filters;
 
-  public Preset getPreset() {
-    return preset;
-  }
 
-  public void setPreset(Preset preset) {
-    this.preset = preset;
-  }
-
-  public String getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(String startTime) {
-    this.startTime = startTime;
-  }
-
-  public String getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(String endTime) {
-    this.endTime = endTime;
-  }
-
+  /**
+   * Gets groupby.
+   *
+   * @return groupby
+   */
   public GroupBy getGroupBy() {
     return groupBy;
   }
 
+  /** Sets groupby. */
   public void setGroupBy(GroupBy groupBy) {
     this.groupBy = groupBy;
   }
 
+  /**
+   * Gets filter.
+   *
+   * @return groupby
+   */
+  public List<AlertFilter> getFilters() {
+    return filters;
+  }
+
+  /** Sets filter. */
+  public void setFilters(List<AlertFilter> filters) {
+    this.filters = filters;
+  }
 
   public enum GroupBy {
-    STARTTIME("StartTime"),
+    DATE("date"),
     SEVERITY("Severity"),
     ATTRIBUTEVALUE("AttributeValue");
 

@@ -71,10 +71,10 @@ public class AlertEvaluationImpl implements AlertEvaluation {
   @Override
   public Boolean evaluateAlert(String dataPodId, Long requestTime) {
     MaprConnection connection = new MaprConnection(basePath, alertResults);
-    System.out.println("Evaluating the Alert");
+    logger.info("Evaluating the Alert for datapodId: " + dataPodId);
     List<AlertRuleDetails> alertRuleDetailsList = fetchAlertDetailsByDataPod(dataPodId);
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
-      logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
+      logger.info("Evaluating the alert for rule id : " + alertRuleDetails.getAlertRulesSysId());
       AlertResult alertResult = new AlertResult();
       alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
       alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
@@ -83,9 +83,11 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
       alertResult.setAlertState(AlertState.ALARM);
       alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
+      alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
       alertResult.setCategoryId(alertRuleDetails.getCategoryId());
       alertResult.setStartTime(requestTime);
       alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
+      alertResult.setOperator(alertRuleDetails.getOperator());
       String alertResultId = UUID.randomUUID().toString();
       alertResult.setAlertTriggerSysId(alertResultId);
       SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
@@ -140,7 +142,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
             alertResult.setAlertCount(executionSize);
           }
           connection.insert(alertResultId, alertResult);
-          logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
+          logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
           alertNotifier.sendNotification(alertRuleDetails);
         }
       }
