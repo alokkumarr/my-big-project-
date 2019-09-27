@@ -69,7 +69,7 @@
     </mat-select>
   </mat-form-field>
 
-  <div class="secondary-aggregate-form" formGroupName="secAggregates" >
+  <div class="secondary-aggregate-form" formGroupName="secAggregates" *ngIf="_kpiType!== 'bullet'">
     <strong>Secondary Aggregations</strong>
     <mat-slide-toggle *ngFor="let ag of aggregations"
                       [formControlName]="ag.value"

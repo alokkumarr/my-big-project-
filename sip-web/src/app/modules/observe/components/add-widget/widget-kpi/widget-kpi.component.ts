@@ -275,7 +275,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    * Represensts the save/update operation.
    */
   applyKPI() {
-    this.kpiForm.get('kpiPrecision').value;
     const dataField = get(this._kpi, 'dataFields.0');
     const dateField = find(
       this._metric.dateColumns,
