@@ -305,7 +305,7 @@ public class AlertServiceImpl implements AlertService {
     objectNode.put("customerCode", ticket.getCustCode());
     List<AlertResult> alertResultLists =
         connection.runMaprDbQueryWithFilter(
-            node.toString(), pageNumber, pageSize, "createdTime", AlertResult.class);
+            node.toString(), pageNumber, pageSize, "startTime", AlertResult.class);
     Long noOfRecords = connection.runMapDbQueryForCount(node.toString());
     AlertStatesResponse alertStatesResponse = new AlertStatesResponse();
     alertStatesResponse.setAlertStatesList(alertResultLists);
@@ -419,7 +419,7 @@ public class AlertServiceImpl implements AlertService {
     logger.trace("Mapr Filter query for alert count:{}", query);
     List<AlertResult> result =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, "createdTime", AlertResult.class);
+            query, pageNumber, pageSize, "startTime", AlertResult.class);
     switch (alertCount.getGroupBy()) {
       case SEVERITY:
         return groupByseverity(result);
