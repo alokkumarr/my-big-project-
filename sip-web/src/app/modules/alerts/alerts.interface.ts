@@ -101,16 +101,27 @@ export interface AlertChartData {
 }
 
 export interface AlertFilterModel {
-  preset: string;
+  fieldName: string;
+  type: string;
+  preset?: string;
+  modelValues?: string[];
   endTime?: string;
   startTime?: string;
-  groupBy: string;
+  operator?: string;
+}
+
+export interface AlertFilterEvent {
+  isValid: boolean;
+  filter: AlertFilterModel;
 }
 
 export interface AlertsStateModel {
-  alertFilter: AlertFilterModel;
+  alertFilters: AlertFilterModel[];
+  editedAlertFilters: AlertFilterModel[];
+  editedAlertsValidity: boolean[];
   allAlertsCountChartData: AlertChartData;
   allAlertsSeverityChartData: AlertChartData;
   selectedAlertCountChartData: AlertChartData;
   selectedAlertRuleDetails: AlertConfig;
+  allAttributeValues: string[];
 }

@@ -7,7 +7,6 @@ import { map } from 'rxjs/operators';
 
 import { GridPagingOptions, AlertFilterModel } from '../alerts.interface';
 import AppConfig from '../../../../../appConfig';
-import { CUSTOM_DATE_PRESET_VALUE } from '../consts';
 import {
   AlertDateCount,
   AlertDateSeverity,
@@ -16,21 +15,18 @@ import {
 
 const apiUrl = AppConfig.api.url;
 
-const getAlertCountPayload = (
-  dateFilter: AlertFilterModel,
-  groupBy: string
-) => {
-  const { preset, startTime, endTime } = dateFilter;
-  if (dateFilter.preset === CUSTOM_DATE_PRESET_VALUE) {
-    return {
-      preset,
-      startTime,
-      endTime,
-      groupBy
-    };
-  }
+const getAlertCountPayload = (filters: AlertFilterModel[], groupBy: string) => {
+  // const { preset, startTime, endTime } = dateFilter;
+  // if (dateFilter.preset === CUSTOM_DATE_PRESET_VALUE) {
+  //   return {
+  //     preset,
+  //     startTime,
+  //     endTime,
+  //     groupBy
+  //   };
+  // }
   return {
-    preset,
+    filters: [filters[0]],
     groupBy: groupBy
   };
 };
@@ -44,22 +40,30 @@ export class AlertsService {
     return this._http.get(`${apiUrl}/${path}`);
   }
 
-  getAlertsStatesForGrid(options: GridPagingOptions = {}) {
+  getAlertsStatesForGrid(
+    options: GridPagingOptions = {},
+    dateFilters: AlertFilterModel[]
+  ) {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const pageNumber = ceil(options.skip / options.take) + 1;
-
     const basePath = `alerts/states`;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
-    const url = `${basePath}${queryParams}`;
-
-    return this.getRequest(url)
+    const payload = { filters: dateFilters };
+    const url = `${apiUrl}/${basePath}${queryParams}`;
+    return this._http
+      .post(url, payload)
       .toPromise()
       .then(response => {
         const data = get(response, `alertStatesList`);
         const totalCount = get(response, `numberOfRecords`) || data.length;
         return { data, totalCount };
       });
+  }
+
+  getAllAttributeValues() {
+    const url = `${apiUrl}/alerts/attributevalues`;
+    return this._http.get<string[]>(url);
   }
 
   getAlertRuleDetails(id: number) {
@@ -69,23 +73,23 @@ export class AlertsService {
       .pipe(map(({ alert }) => alert));
   }
 
-  getAllAlertsCount(dateFilter: AlertFilterModel) {
+  getAllAlertsCount(dateFilters: AlertFilterModel[]) {
     const url = `${apiUrl}/alerts/count`;
-    const payload = getAlertCountPayload(dateFilter, 'StartTime');
+    const payload = getAlertCountPayload(dateFilters, 'date');
 
     return this._http.post<AlertDateCount[]>(url, payload);
   }
 
-  getAllAlertsSeverity(dateFilter: AlertFilterModel) {
+  getAllAlertsSeverity(dateFilters: AlertFilterModel[]) {
     const url = `${apiUrl}/alerts/count`;
-    const payload = getAlertCountPayload(dateFilter, 'Severity');
+    const payload = getAlertCountPayload(dateFilters, 'Severity');
 
     return this._http.post<AlertDateSeverity[]>(url, payload);
   }
 
-  getAlertCountById(id, dateFilter: AlertFilterModel) {
+  getAlertCountById(id, dateFilters: AlertFilterModel[]) {
     const url = `${apiUrl}/alerts/count?alertRuleId=${id}`;
-    const payload = getAlertCountPayload(dateFilter, 'StartTime');
+    const payload = getAlertCountPayload(dateFilters, 'date');
 
     return this._http.post<AlertDateCount[]>(url, payload);
   }

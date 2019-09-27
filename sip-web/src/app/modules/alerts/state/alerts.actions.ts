@@ -2,7 +2,17 @@ import { AlertFilterModel } from '../alerts.interface';
 
 export class ApplyAlertFilters {
   static readonly type = '[Alerts] Apply Filters';
-  constructor(public alertFilter: AlertFilterModel) {}
+  constructor() {}
+}
+
+export class EditAlertFilter {
+  static readonly type = '[Alerts] Edit Alert Filter';
+  constructor(public alertFilter: AlertFilterModel, public index: number) {}
+}
+
+export class EditAlertValidity {
+  static readonly type = '[Alerts] Edit Alert Validity';
+  constructor(public isValid: boolean, public index: number) {}
 }
 
 export class ResetAlertFilters {
@@ -28,4 +38,9 @@ export class LoadSelectedAlertCount {
 export class LoadSelectedAlertRuleDetails {
   static readonly type = '[Alerts] Load selected alert rule details';
   constructor(public id: number) {}
+}
+
+export class LoadAllAttributeValues {
+  static readonly type = '[Alerts] Load all attribute values';
+  constructor() {}
 }

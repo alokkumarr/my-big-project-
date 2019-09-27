@@ -67,11 +67,11 @@
       *ngIf="
         (selectedAlertCountChartData$ | async) &&
         additionalCountChartOptions &&
-        (filterString$ | async)
+        (filterStrings$ | async)
       "
       style="height: 200px; width: 100%"
       title="Frequency"
-      [dateFilter]="filterString$ | async"
+      [dateFilter]="filterStrings$ | async"
       [additionalOptions]="additionalCountChartOptions"
       [chartData]="selectedAlertCountChartData$ | async"
     ></alert-chart>

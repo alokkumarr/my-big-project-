@@ -1,43 +1,52 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
-import { requireIf } from '../../../../../common/validators/index';
+import { requireIf } from '../../../../../../common/validators/index';
 import { Subscription } from 'rxjs';
-import { Store } from '@ngxs/store';
-import {
-  ApplyAlertFilters,
-  ResetAlertFilters
-} from '../../../state/alerts.actions';
 
 import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS
-} from '../../../consts';
-import { AlertFilterModel } from '../../../alerts.interface';
+} from '../../../../consts';
+import {
+  AlertFilterModel,
+  AlertFilterEvent
+} from '../../../../alerts.interface';
 
 @Component({
-  selector: 'alerts-filter',
-  templateUrl: './alerts-filter.component.html',
-  styleUrls: ['./alerts-filter.component.scss']
+  selector: 'alerts-date-filter',
+  templateUrl: './alerts-date-filter.component.html',
+  styleUrls: ['./alerts-date-filter.component.scss']
 })
-export class AlertsFilterComponent implements OnInit, OnDestroy {
+export class AlertsDateFilterComponent implements OnInit, OnDestroy {
   datePresets = DATE_PRESETS;
   alertFilterForm: FormGroup;
   datePresetSubscription: Subscription;
   showDateFields = false;
 
+  @Output() change = new EventEmitter<AlertFilterEvent>();
   @Input('dateFilter') set setDateFilter(dateFilter: AlertFilterModel) {
     const { preset, startTime, endTime } = dateFilter;
     const isCustomDate = preset === CUSTOM_DATE_PRESET_VALUE;
-    this.alertFilterForm.setValue({
-      datePreset: dateFilter.preset,
-      gte: isCustomDate ? moment(startTime) : null,
-      lte: isCustomDate ? moment(endTime) : null
-    });
+    this.alertFilterForm.setValue(
+      {
+        datePreset: dateFilter.preset,
+        gte: isCustomDate ? moment(startTime) : null,
+        lte: isCustomDate ? moment(endTime) : null
+      },
+      { emitEvent: false }
+    );
   }
 
-  constructor(private fb: FormBuilder, private store: Store) {
+  constructor(private fb: FormBuilder) {
     this.createForm();
   }
 
@@ -70,37 +79,32 @@ export class AlertsFilterComponent implements OnInit, OnDestroy {
         this.alertFilterForm.get('gte').updateValueAndValidity();
         this.showDateFields = data === CUSTOM_DATE_PRESET_VALUE;
       });
+
+    this.alertFilterForm.valueChanges.subscribe(({ datePreset, lte, gte }) => {
+      const formIsValid = !this.alertFilterForm.invalid;
+      if (formIsValid) {
+        console.log('isValid');
+        const dateFilter = this.prepareDateFilterModel(datePreset, lte, gte);
+        this.change.emit({ filter: dateFilter, isValid: formIsValid });
+      }
+    });
   }
 
-  prepareDateFilterModel() {
-    const preset = this.alertFilterForm.get('datePreset').value;
-    const groupBy = 'StartTime';
-
+  prepareDateFilterModel(preset, lte, gte) {
     if (preset !== CUSTOM_DATE_PRESET_VALUE) {
       return {
         preset,
-        groupBy
+        fieldName: 'starttime',
+        type: 'date'
       };
     }
 
     return {
+      fieldName: 'starttime',
+      type: 'date',
       preset,
-      endTime:
-        this.alertFilterForm.get('lte').value.format(DATE_FORMAT.YYYY_MM_DD) +
-        ' 23:59:59',
-      startTime:
-        this.alertFilterForm.get('gte').value.format(DATE_FORMAT.YYYY_MM_DD) +
-        ' 00:00:00',
-      groupBy
+      endTime: lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
+      startTime: gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00'
     };
-  }
-
-  applyFilters() {
-    const filters = this.prepareDateFilterModel();
-    this.store.dispatch(new ApplyAlertFilters(filters));
-  }
-
-  resetFilters() {
-    this.store.dispatch(new ResetAlertFilters());
   }
 }

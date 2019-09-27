@@ -22,7 +22,9 @@ import {
   AlertChartComponent,
   AlertsGridComponent,
   AlertDetailComponent,
-  AlertsFilterComponent
+  AlertsDateFilterComponent,
+  AlertsStringFilterComponent,
+  AlertsFiltersComponent
 } from './components/alerts-view/index';
 import { AlertsState } from './state/alerts.state';
 import { IsAdminGuard } from '../admin/guards';
@@ -36,7 +38,9 @@ const components = [
   ConfirmActionDialogComponent,
   AlertsGridComponent,
   AlertDetailComponent,
-  AlertsFilterComponent
+  AlertsDateFilterComponent,
+  AlertsStringFilterComponent,
+  AlertsFiltersComponent
 ];
 
 @NgModule({

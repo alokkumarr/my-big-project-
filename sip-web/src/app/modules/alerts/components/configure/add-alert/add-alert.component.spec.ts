@@ -36,6 +36,9 @@ const confAlertServiceStub = {
   },
   getDatapod$: id => {
     return new Observable();
+  },
+  getMonitoringTypeList: () => {
+    return new Observable();
   }
 };
 
@@ -59,7 +62,8 @@ const payload: AlertConfig = {
   attributeName: '',
   attributeValue: '',
   createdBy: undefined,
-  createdTime: undefined
+  createdTime: undefined,
+  monitoringType: null
 };
 
 const alertDefinitionStub: AlertDefinition = {
