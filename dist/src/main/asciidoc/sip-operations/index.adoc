@@ -796,6 +796,27 @@ The health check responses contain a `detail` propery with a
 human-readable explanation of the health check status, which can be
 used to further narrow down the cause for a possible failure.
 
+=== General guideline for ElasticSearch script support
+
+SIP is using custom scripting of ElasticSearch to build and evaluate
+derived metrics,filters etc.
+
+SIP uses inline scripting.
+To enable this, the below parameter has to be set in elasticsearch.yml file
+
+plantum1
+----
+script.allowed_types: inline
+----
+
+Also, only search operations will be performed using script,
+ update operation can be disabled for security reason.
+
+plantum1
+----
+script.allowed_contexts: search
+----
+
 === Troubleshooting the MariaDB cluster
 
 To troubleshoot MariaDB, inspect the MariaDB logs on each of the hosts
