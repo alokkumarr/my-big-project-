@@ -8,7 +8,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
 import { AlertsState } from '../../../../state/alerts.state';
 
-import { AlertsDateFilterComponent } from './alerts-filter.component';
+import { AlertsDateFilterComponent } from './alerts-date-filter.component';
 
 describe('AlertsDateFilterComponent', () => {
   let component: AlertsDateFilterComponent;
