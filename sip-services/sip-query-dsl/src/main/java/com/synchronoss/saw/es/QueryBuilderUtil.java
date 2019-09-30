@@ -251,23 +251,22 @@ public class QueryBuilderUtil {
    */
   public static Script prepareAggregationFilter(Filter item) {
     Script script = null;
-    if (item.getModel().getOperator().value().equals(Model.Operator.BTW.value())) {
-      script =
-          new Script(
-              "params."
-                  + item.getColumnName()
-                  + " <= "
-                  + item.getModel().getValue()
-                  + "&& "
-                  + "params."
-                  + item.getColumnName()
-                  + " >= "
-                  + item.getModel().getOtherValue());
-    }
 
     Operator operator = item.getModel().getOperator();
 
     switch (operator) {
+        case BTW: script =
+            new Script(
+                "params."
+                    + item.getColumnName()
+                    + " " + Operation.LTE + " "
+                    + item.getModel().getValue()
+                    + "&& "
+                    + "params."
+                    + item.getColumnName()
+                    + " " + Operation.GTE + " "
+                    + item.getModel().getOtherValue());
+
       case GT:
         script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
         break;

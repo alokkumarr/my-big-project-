@@ -164,8 +164,6 @@ public class SIPAggregationBuilder {
             if (expressionStr != null && expressionStr.length() != 0) {
               expression = gson.fromJson(expressionStr, Expression.class);
 
-              System.out.println(expression);
-
               String dataFieldName = dataField1.getDataField();
 
               expressionEvaluator(dataFieldName, expression, aggregationBuilder);

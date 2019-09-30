@@ -804,7 +804,6 @@ derived metrics,filters etc.
 SIP uses inline scripting.
 To enable this, the below parameter has to be set in elasticsearch.yml file
 
-plantum1
 ----
 script.allowed_types: inline
 ----
@@ -812,7 +811,6 @@ script.allowed_types: inline
 Also, only search operations will be performed using script,
  update operation can be disabled for security reason.
 
-plantum1
 ----
 script.allowed_contexts: search
 ----

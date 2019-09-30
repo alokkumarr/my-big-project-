@@ -82,7 +82,6 @@ public class Field {
   private Integer visibleIndex;
 
   @JsonProperty("expression")
-  //  private Expression expression;
   private String expression;
 
   @JsonProperty("formula")
