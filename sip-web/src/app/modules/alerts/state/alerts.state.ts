@@ -148,7 +148,10 @@ export class AlertsState {
 
   @Action(ResetAlertFilters)
   resetAlertFilter({ patchState }: StateContext<AlertsStateModel>) {
-    patchState({ alertFilters: defaultAlertFilters });
+    patchState({
+      alertFilters: cloneDeep(defaultAlertFilters),
+      editedAlertFilters: cloneDeep(defaultAlertFilters)
+    });
   }
 
   @Action(LoadAllAlertCount)
