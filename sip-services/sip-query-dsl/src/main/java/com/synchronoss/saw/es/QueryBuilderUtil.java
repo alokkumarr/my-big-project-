@@ -266,7 +266,7 @@ public class QueryBuilderUtil {
                     + item.getColumnName()
                     + " " + Operation.GTE + " "
                     + item.getModel().getOtherValue());
-
+        break;
       case GT:
         script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
         break;
