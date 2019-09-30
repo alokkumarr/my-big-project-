@@ -175,6 +175,15 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       });
   }
 
+  // Accepts a Number value to be formatted based on the data format options already saved during creation
+  // or edition of a KPI.
+
+  /**
+   * Called everytime when each KPI is loaded on a dashboard.
+   *
+   * @param {Number} value
+   * returns a foramtted value based on the properties set during creation or edition of a dashboard.
+   */
   fetchValueAsPerFormat(value) {
     let formattedValue;
     if (isUndefined(value)) {
