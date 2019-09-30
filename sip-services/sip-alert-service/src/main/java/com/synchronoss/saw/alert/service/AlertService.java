@@ -53,10 +53,7 @@ public interface AlertService {
       Ticket ticket);
 
   AlertStatesResponse listAlertStates(
-      Integer pageNumber,
-      Integer pageSize,
-      Ticket ticket,
-      Optional<AlertStatesFilter> alertStates);
+      Integer pageNumber, Integer pageSize, Ticket ticket, Optional<AlertStatesFilter> alertStates);
 
   List<AlertCountResponse> alertCount(
       AlertCount alertCount,
@@ -68,4 +65,6 @@ public interface AlertService {
   Set<String> listAttribueValues(Ticket ticket);
 
   String retrieveMonitoringType(Ticket ticket);
+
+  void sendMessageToStream();
 }

@@ -21,6 +21,7 @@ import com.synchronoss.saw.alert.modal.AlertSeverity;
 import com.synchronoss.saw.alert.modal.AlertStatesFilter;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.modal.MonitoringType;
+import com.synchronoss.saw.alert.service.evaluator.EvaluatorListener;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.Model.Operator;
@@ -46,6 +47,7 @@ import javax.validation.constraints.NotNull;
 import org.ojai.store.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sncr.bda.base.MaprConnection;
@@ -72,6 +74,8 @@ public class AlertServiceImpl implements AlertService {
   @Value("${metastore.alertResults}")
   @NotNull
   private String alertTriggerLog;
+
+  @Autowired EvaluatorListener evaluatorListener;
 
   /**
    * Create Alert rule.
@@ -500,6 +504,16 @@ public class AlertServiceImpl implements AlertService {
       }
     }
     return elements.toString();
+  }
+
+  @Override
+  public void sendMessageToStream() {
+    try {
+      logger.info("Inside send message to stream");
+      evaluatorListener.sendMessageToStream();
+    } catch (Exception e) {
+      logger.error("Exception occured while sending message to stream");
+    }
   }
 
   private List<AlertCountResponse> groupByseverity(List<AlertResult> list) {
