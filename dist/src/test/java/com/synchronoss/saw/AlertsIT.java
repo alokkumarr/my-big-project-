@@ -377,7 +377,7 @@ public class AlertsIT extends BaseIT {
     String urlForAlertCount = ALERT_PATH + "/" + ALERT_COUNT;
     log.debug("URL for Alert count : " + urlForAlertCount);
     ObjectNode root = mapper.createObjectNode();
-    root.put("groupBy", "StartTime");
+    root.put("groupBy", "date");
     ObjectNode filter1 = mapper.createObjectNode();
     filter1.put("preset", "YTD");
     filter1.put("type", "date");
