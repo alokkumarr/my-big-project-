@@ -40,6 +40,7 @@ public class DLSparkQueryBuilder {
   private static final String ONLY_YEAR_FORMAT = "YYYY";
   private static final String EPOCH_SECOND = "epoch_second";
   private static final String EPOCH_MILLIS = "epoch_millis";
+    public static final String CUSTOMER_CODE = "customerCode";
   private BooleanCriteria booleanCriteria;
 
   List<String> groupByColumns = new ArrayList<>();
@@ -86,17 +87,34 @@ public class DLSparkQueryBuilder {
                         column = buildForPercentage(artifactName, field);
                         groupByColumns.add(artifactName + "." + columnName);
                       } else {
-                        column =
-                            aggregate.value()
-                                + "("
-                                + artifactName
-                                + "."
-                                + columnName.replace(".keyword", "")
-                                + ")";
+                        if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+                          column =
+                              aggregate.value()
+                                  + "("
+                                  + artifactName
+                                  + "."
+                                  + columnName.replace(".keyword", "")
+                                  + ") as `"
+                                  + aggregate.value()
+                                  + "("
+                                  + artifactName
+                                  + "_"
+                                  + columnName
+                                  + ")` ";
+                        } else {
+                          column =
+                              aggregate.value()
+                                  + "("
+                                  + artifactName
+                                  + "."
+                                  + columnName.replace(".keyword", "")
+                                  + ")";
+                        }
                       }
                     } else {
                       column = artifactName + "." + columnName.replace(".keyword", "");
                       groupByColumns.add(column);
+                      column = alias4CustomerCodeField(column, columnName, artifactName);
                     }
                     selectColumns.add(column);
                   });
@@ -521,14 +539,29 @@ public class DLSparkQueryBuilder {
   }
 
   private String buildDistinctCount(String artifactName, Field field) {
-    String column =
-        "count(distinct "
-            + artifactName
-            + "."
-            + field.getColumnName().replace(".keyword", "")
-            + ") as `distinctCount("
-            + field.getColumnName()
-            + ")`";
+    String columnName = field.getColumnName().replace(".keyword", "");
+    String column = null;
+    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+      column =
+          "count(distinct "
+              + artifactName
+              + "."
+              + columnName
+              + ") as `distinctCount("
+              + artifactName
+              + "_"
+              + columnName
+              + ")`";
+    } else {
+      column =
+          "count(distinct "
+              + artifactName
+              + "."
+              + field.getColumnName().replace(".keyword", "")
+              + ") as `distinctCount("
+              + field.getColumnName()
+              + ")`";
+    }
     return column;
   }
 
@@ -603,5 +636,21 @@ public class DLSparkQueryBuilder {
   String joinString(List<Object> strList) {
     Function<Object, String> addQuotes = s -> "\'" + s + "\'";
     return strList.stream().map(addQuotes).collect(Collectors.joining(", "));
+  }
+
+  /**
+   * Handling customerCode field present in table joins.
+   *
+   * @param column
+   * @param columnName
+   * @param artifactName
+   * @return
+   */
+  public String alias4CustomerCodeField(String column, String columnName, String artifactName) {
+    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+      column = column.concat(" as " + artifactName + "_" + columnName + " ");
+      return column;
+    }
+    return column;
   }
 }

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -60,6 +59,6 @@ public class AnalysisServiceTest {
     server.expect(requestTo(metadataServiceUrl + "/123/executions"));
     // .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
     /* Execute analysis */
-    service.executeDslAnalysis(ANALYSIS_ID);
+    //service.executeDslAnalysis(ANALYSIS_ID);
   }
 }

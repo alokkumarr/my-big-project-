@@ -1,0 +1,194 @@
+{
+  "artifacts": [
+    {
+      "artifactName": "SALES",
+      "columns": [
+        {
+          "aliasName": "",
+          "columnName": "string",
+          "displayName": "String",
+          "filterEligible": true,
+          "joinEligible": true,
+          "name": "string",
+          "table": "sales",
+          "type": "string"
+        },
+        {
+          "aliasName": "",
+          "columnName": "long",
+          "displayName": "Long",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "long",
+          "table": "sales",
+          "type": "long"
+        },
+        {
+          "aliasName": "",
+          "columnName": "float",
+          "displayName": "Float",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "float",
+          "table": "sales",
+          "type": "float"
+        },
+        {
+          "aliasName": "",
+          "columnName": "date",
+          "displayName": "Date",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "date",
+          "table": "sales",
+          "type": "date"
+        },
+        {
+          "aliasName": "",
+          "columnName": "integer",
+          "displayName": "Integer",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "integer",
+          "table": "sales",
+          "type": "integer"
+        },
+        {
+          "aliasName": "",
+          "columnName": "double",
+          "displayName": "Double",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "double",
+          "table": "sales",
+          "type": "double"
+        },
+        {
+          "aliasName": "",
+          "columnName": "customerCode",
+          "displayName": "CustomerCode",
+          "filterEligible": true,
+          "joinEligible": true,
+          "name": "customerCode",
+          "table": "sales",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "artifactName": "PRODUCT",
+      "columns": [
+        {
+          "aliasName": "",
+          "columnName": "string_2",
+          "displayName": "String_2",
+          "filterEligible": true,
+          "joinEligible": true,
+          "name": "string_2",
+          "table": "product",
+          "type": "string"
+        },
+        {
+          "aliasName": "",
+          "columnName": "long_2",
+          "displayName": "Long_2",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "long_2",
+          "table": "product",
+          "type": "long"
+        },
+        {
+          "aliasName": "",
+          "columnName": "float_2",
+          "displayName": "Float_2",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "float_2",
+          "table": "product",
+          "type": "float"
+        },
+        {
+          "aliasName": "",
+          "columnName": "date_2",
+          "displayName": "Date_2",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "date_2",
+          "table": "product",
+          "type": "date"
+        },
+        {
+          "aliasName": "",
+          "columnName": "integer_2",
+          "displayName": "Integer_2",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "integer_2",
+          "table": "product",
+          "type": "integer"
+        },
+        {
+          "aliasName": "",
+          "columnName": "double_2",
+          "displayName": "Double_2",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "double_2",
+          "table": "product",
+          "type": "double"
+        },
+        {
+          "aliasName": "",
+          "columnName": "customerCode",
+          "displayName": "CustomerCode",
+          "filterEligible": true,
+          "joinEligible": true,
+          "name": "customerCode",
+          "table": "product",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "createdBy": "sipadmin@TenantA.com",
+  "customerCode": "TenantA",
+  "metricName": "sample-spark-TenantA",
+  "module": "ANALYZE",
+  "parentDataSetIds": [
+    "SALES::json::1550777226458",
+    "PRODUCT::json::1550777234359"
+  ],
+  "parentDataSetNames": [
+    "SALES",
+    "PRODUCT"
+  ],
+  "projectCode": "workbench",
+  "repository": [
+    {
+      "format": "ndjson",
+      "name": "SALES",
+      "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson"
+    },
+    {
+      "format": "ndjson",
+      "name": "PRODUCT",
+      "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-product.ndjson"
+    }
+  ],
+  "saved": false,
+  "supports": [
+    {
+      "category": "table",
+      "children": [
+        {
+          "icon": "icon-report",
+          "label": "Report",
+          "type": "table:report"
+        }
+      ],
+      "label": "TABLES"
+    }
+  ],
+  "username": "sipadmin@TenantA.com"
+}
