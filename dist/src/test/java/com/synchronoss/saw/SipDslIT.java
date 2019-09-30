@@ -1062,7 +1062,7 @@ public class SipDslIT extends BaseIT {
    * This is a test for negative scenario. The formula used here is <code>integer / sum(integer)
    * </code>, which is not supported. In this case, the API will throw 500 Internal Server Error.
    *
-   * @throws IOException
+   * @throws IOException - In case of invalid json
    */
   @Test
   public void testderivedMetricWithSubAggregation() throws IOException {
