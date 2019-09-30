@@ -74,6 +74,10 @@ export interface DatapodMetric {
 export interface GridPagingOptions {
   take?: number;
   skip?: number;
+  sort?: {
+    selector: string;
+    desc: boolean;
+  }[];
 }
 
 export interface GridData {

@@ -83,7 +83,6 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
     this.alertFilterForm.valueChanges.subscribe(({ datePreset, lte, gte }) => {
       const formIsValid = !this.alertFilterForm.invalid;
       if (formIsValid) {
-        console.log('isValid');
         const dateFilter = this.prepareDateFilterModel(datePreset, lte, gte);
         this.change.emit({ filter: dateFilter, isValid: formIsValid });
       }

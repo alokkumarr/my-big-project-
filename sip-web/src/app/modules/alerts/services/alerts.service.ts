@@ -47,12 +47,17 @@ export class AlertsService {
     options: GridPagingOptions = {},
     dateFilters: AlertFilterModel[]
   ) {
+    const [sort] = options.sort || [];
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const pageNumber = ceil(options.skip / options.take) + 1;
     const basePath = `alerts/states`;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
-    const payload = { filters: getFiltersForBackend(dateFilters) };
+    const payload = { filters: getFiltersForBackend(dateFilters), sorts: [] };
+    if (sort) {
+      const { selector, desc } = sort;
+      payload.sorts = [{ fieldName: selector, order: desc ? 'DESC' : 'ASC' }];
+    }
     const url = `${apiUrl}/${basePath}${queryParams}`;
     return this._http
       .post(url, payload)
