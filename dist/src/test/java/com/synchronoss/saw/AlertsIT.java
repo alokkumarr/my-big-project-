@@ -378,11 +378,11 @@ public class AlertsIT extends BaseIT {
     log.debug("URL for Alert count : " + urlForAlertCount);
     ObjectNode root = mapper.createObjectNode();
     root.put("groupBy", "StartTime");
-    ArrayNode filters = root.putArray("filters");
     ObjectNode filter1 = mapper.createObjectNode();
     filter1.put("preset", "YTD");
     filter1.put("type", "date");
     filter1.put("fieldName", "startTime");
+    ArrayNode filters = root.putArray("filters");
     filters.add(filter1);
     given(authSpec)
         .contentType(ContentType.JSON)
@@ -400,11 +400,11 @@ public class AlertsIT extends BaseIT {
     String urlForAlertStates = ALERT_PATH + "/" + ALERT_STATES;
     log.debug("URL for Alert count : " + urlForAlertStates);
     ObjectNode root = mapper.createObjectNode();
-    ArrayNode filters = root.putArray("filters");
     ObjectNode filter1 = mapper.createObjectNode();
     filter1.put("preset", "YTD");
     filter1.put("type", "date");
     filter1.put("fieldName", "startTime");
+    ArrayNode filters = root.putArray("filters");
     filters.add(filter1);
     String message =
         given(authSpec)
