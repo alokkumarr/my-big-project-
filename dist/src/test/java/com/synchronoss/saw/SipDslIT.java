@@ -1058,6 +1058,38 @@ public class SipDslIT extends BaseIT {
     Assert.assertNotNull(responseData.get("data"));
   }
 
+  /**
+   * This is a test for negative scenario. The formula used here is <code>integer / sum(integer)
+   * </code>, which is not supported. In this case, the API will throw 500 Internal Server Error.
+   *
+   * @throws IOException
+   */
+  @Test
+  public void testderivedMetricWithSubAggregation() throws IOException {
+    String fieldName = "percentage";
+    String formula = "integer / sum(integer)";
+
+    String expression =
+        "{\"operator\":\"/\",\"operand1\":{\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"sum\",\"column\":\"integer\"}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(500)
+            .extract()
+            .response();
+  }
+
   @Test
   public void exportData() throws IOException {
     ObjectNode analysis = testCreateDlAnalysis();
