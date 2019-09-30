@@ -106,7 +106,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                 if (value != null
                     && !value.toString().equalsIgnoreCase("null")
                     && value.toString().length() > 0) {
-                  Double metricValue = (Double) value;
+                  Double metricValue = ((Number) value).doubleValue();;
                   if (alertRuleDetails.getMonitoringType() != null
                       && alertRuleDetails
                           .getMonitoringType()

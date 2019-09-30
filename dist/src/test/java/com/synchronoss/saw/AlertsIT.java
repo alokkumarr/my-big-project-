@@ -445,49 +445,47 @@ public class AlertsIT extends BaseIT {
     assertTrue(listOfMonitoringTypes.size() > 0);
   }
 
-    /** This test-case is to check the scenario to list all attribute values. */
-    @Test
-    public void testListAttributeValues() throws IOException {
-        HashMap<?, ?> alertObject =
-            given(authSpec)
-                .body(prepareAlertsDataSet())
-                .when()
-                .post(ALERT_PATH)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .response()
-                .getBody()
-                .jsonPath()
-                .getJsonObject("alert");
+  /** This test-case is to check the scenario to list all attribute values. */
+  @Test
+  public void testListAttributeValues() throws IOException {
+    HashMap<?, ?> alertObject =
+        given(authSpec)
+            .body(prepareAlertsDataSet())
+            .when()
+            .post(ALERT_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getJsonObject("alert");
 
-        log.debug("alertObject : " + alertObject);
+    log.debug("alertObject : " + alertObject);
 
-        JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
-        String alertRulesSysId = jsonNode.get("alertRulesSysId").asText();
-        log.debug("alertRulesSysId : " + alertRulesSysId);
-        assertFalse(alertRulesSysId == null);
+    JsonNode jsonNode = mapper.convertValue(alertObject, JsonNode.class);
+    String alertRulesSysId = jsonNode.get("alertRulesSysId").asText();
+    log.debug("alertRulesSysId : " + alertRulesSysId);
+    assertFalse(alertRulesSysId == null);
 
-        String urlForAttributeList = ALERT_PATH + "/" + ATTRIBUTE_VALUES;
-       List<String> attributeValues =
-            given(authSpec)
-                .when()
-                .get(urlForAttributeList)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .response()
-                .body()
-                .jsonPath()
-                .get();
+    String urlForAttributeList = ALERT_PATH + "/" + ATTRIBUTE_VALUES;
+    List<String> attributeValues =
+        given(authSpec)
+            .when()
+            .get(urlForAttributeList)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .body()
+            .jsonPath()
+            .get();
 
+    assertTrue(attributeValues.size() > 0);
 
-        assertTrue(attributeValues.size() > 0);
-
-        // delete alert after testing
-        this.tearDownAlert(alertRulesSysId);
-    }
-
+    // delete alert after testing
+    this.tearDownAlert(alertRulesSysId);
+  }
 }
