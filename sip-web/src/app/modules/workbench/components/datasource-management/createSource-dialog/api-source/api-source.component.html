@@ -54,6 +54,14 @@
         Host Name is
         <strong>required</strong>
       </mat-error>
+      <mat-error
+        e2e="missing-protocol-error-msg"
+        *ngIf="!!detailsFormGroup.controls.hostName.hasError('pattern')"
+        i18n
+      >
+        Host Name needs to start with
+        <strong>http://</strong> or <strong>https://</strong>
+      </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline" fxFlex="0 1 auto">
       <mat-label i18n>Port Number</mat-label>

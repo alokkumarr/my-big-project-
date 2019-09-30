@@ -32,4 +32,28 @@ describe('ApiSourceComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('Form Validations', () => {
+    it('should validate for protocol in hostname', () => {
+      component.createForm();
+      const hostName = component.detailsFormGroup.get('hostName');
+
+      hostName.setValue('google.com');
+      expect(hostName.valid).toEqual(false);
+
+      hostName.setValue('http://google.com');
+      expect(hostName.valid).toEqual(true);
+    });
+
+    it('should validate port number to always be a number', () => {
+      component.createForm();
+      const port = component.detailsFormGroup.get('portNo');
+
+      port.setValue('abc');
+      expect(port.valid).toEqual(false);
+
+      port.setValue('1234');
+      expect(port.valid).toEqual(true);
+    });
+  });
 });
