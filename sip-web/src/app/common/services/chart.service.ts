@@ -36,13 +36,9 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import {
-  DATE_TYPES,
-  AGGREGATE_TYPES_OBJ,
-  CHART_COLORS
-} from '../../modules/analyze/consts';
 import { QueryDSL } from 'src/app/models';
 import { getTooltipFormats } from './tooltipFormatter';
+import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
 
 const removeKeyword = (input: string) => {
   if (!input) {
@@ -535,7 +531,6 @@ export class ChartService {
       field.chartType = type;
     });
     const series = map(fields.y, this.getSerie.bind(this));
-
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
         series[index].data.push(

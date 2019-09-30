@@ -416,7 +416,13 @@ of SIP-XDF RPM installed in shared Mapr cluster.
 
 - Copy the RPM in mapr-cluster and run the RPM command `rpm -i sip-xdf-sip-8156-4-0.noarch.rpm`
  to install the XDF. 
-  
+
+-Validate /opt/sip folder for newly installed custom-name
+
+-Modify xdf_info file under /opt/sip/<custom-name>/bin/ and update below 2 parameters to point to latest installed XDF directory:
+
+optdir: /opt/sip/<custom-name>
+vardir: /var/opt/sip/<custom-name>
 
 # XDA Sample Application on Docker
 

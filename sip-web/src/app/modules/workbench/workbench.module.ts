@@ -24,6 +24,8 @@ import { SqlScriptComponent } from './components/sql-executor/query/sql-script.c
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
+import { NewRegistrationComponent } from './components/rtis/new-form-registration/new-form-registration.component';
+import { AppkeysViewComponent } from './components/rtis/appkeys-view/appkeys-view.component';
 import {
   CreateSemanticComponent,
   ValidateSemanticComponent,
@@ -104,7 +106,9 @@ const COMPONENTS = [
   SourceFolderDialogComponent,
   JobsPageComponent,
   JobLogsPageComponent,
-  JobFiltersComponent
+  JobFiltersComponent,
+  NewRegistrationComponent,
+  AppkeysViewComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard, IsAdminGuard];

@@ -45,10 +45,13 @@ export class ApiSourceComponent implements OnInit, DetailForm {
 
     if (isNil(this.channelData.length)) {
       this.patchFormArray(
-        this.channelData.headerParameters,
+        this.channelData.headerParameters || [],
         'headerParameters'
       );
-      this.patchFormArray(this.channelData.queryParameters, 'queryParameters');
+      this.patchFormArray(
+        this.channelData.queryParameters || [],
+        'queryParameters'
+      );
 
       this.detailsFormGroup.patchValue(this.channelData);
     }

@@ -1,0 +1,16 @@
+.rtis-category-title {
+  color: #636363;
+  font-weight: bold;
+}
+
+:host {
+  .disply-url {
+    padding: 18px;
+    font-size: 17px;
+  }
+
+  .app-key-grid {
+    overflow: hidden;
+    height: calc(100vh - 51px - 70px - 65px);
+  }
+}

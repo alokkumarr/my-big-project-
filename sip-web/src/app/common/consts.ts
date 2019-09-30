@@ -8,6 +8,8 @@ import * as map from 'lodash/map';
 export const USER_ANALYSIS_CATEGORY_NAME = 'My Analysis';
 export const USER_ANALYSIS_SUBCATEGORY_NAME = 'DRAFTS';
 
+export const TABLE_CUSTCODE_COLUMNNAME = 'customerCode';
+
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
@@ -32,6 +34,44 @@ export const GEO_TYPES = fpPipe(
 )(GEO_TYPES_WITH_IDENTIFIER);
 
 export const BACKEND_TIMEZONE = 'America/New_York';
+
+export const DATE_INTERVALS = [
+  {
+    label: 'All',
+    value: 'all'
+  },
+  {
+    label: 'Year',
+    value: 'year',
+    format: 'yyyy',
+    momentFormat: 'yyyy'
+  },
+  {
+    label: 'Quarter',
+    value: 'quarter',
+    format: 'yyyy-QQQ',
+    momentFormat: 'YYYY-[Q]Q'
+  },
+  {
+    label: 'Month',
+    value: 'month',
+    format: 'yyyy-MM',
+    momentFormat: 'YYYY-MM'
+  },
+  {
+    label: 'Date',
+    value: 'day',
+    format: 'yyyy-MM-dd',
+    momentFormat: 'YYYY-MM-DD'
+  }
+];
+
+export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
+
+export const DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_INTERVALS);
 
 export const CHART_COLORS = [
   '#00c9e8',

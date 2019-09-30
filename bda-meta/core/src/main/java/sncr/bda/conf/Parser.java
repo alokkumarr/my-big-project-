@@ -49,6 +49,10 @@ public class Parser {
   @Expose
   private String quoteEscape;
 
+  @SerializedName("multiLine")
+  @Expose
+  private boolean multiLine;
+
   @SerializedName("headerSize")
   @Expose
   private Integer headerSize;
@@ -56,6 +60,8 @@ public class Parser {
   @SerializedName("numberOfFiles")
   @Expose
   private Integer numberOfFiles = 1;
+
+
 
   /** No args constructor for use in serialization */
   public Parser() {}
@@ -70,6 +76,7 @@ public class Parser {
    * @param fields
    * @param lineSeparator
    * @param outputFieldsList
+   * @param multiLine
    */
   public Parser(
       String file,
@@ -80,7 +87,8 @@ public class Parser {
       String quoteChar,
       String quoteEscape,
       Integer headerSize,
-      Integer numberOfFiles) {
+      Integer numberOfFiles,
+      boolean multiLine ) {
     this.file = file;
     this.fields = fields;
     this.outputFieldsList = outputFieldsList;
@@ -90,6 +98,7 @@ public class Parser {
     this.quoteEscape = quoteEscape;
     this.headerSize = headerSize;
     this.numberOfFiles = numberOfFiles;
+    this.multiLine = multiLine;
   }
 
   /** @return The file */
@@ -264,6 +273,29 @@ public class Parser {
     return this;
   }
 
+    /**
+     * Number of files for all output objects
+     *
+     * @return The multiLine
+     */
+    public boolean getMultiLine() {
+        return multiLine;
+    }
+
+    /**
+     * Json data multiline indicator
+     *
+     * @param multiLine The multiLine
+     */
+    public void setMultiLines(boolean multiLine) {
+        this.multiLine = multiLine;
+    }
+
+    public Parser withMultiLine(boolean multiLine) {
+        this.multiLine = multiLine;
+        return this;
+    }
+
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
@@ -283,6 +315,7 @@ public class Parser {
         .append(quoteEscape)
         .append(headerSize)
         .append(numberOfFiles)
+        .append(multiLine)
         .toHashCode();
   }
 
@@ -307,6 +340,7 @@ public class Parser {
         .append(quoteEscape, rhs.quoteEscape)
         .append(headerSize, rhs.headerSize)
         .append(numberOfFiles, rhs.numberOfFiles)
+        .append(multiLine,rhs.multiLine)
         .isEquals();
   }
 }

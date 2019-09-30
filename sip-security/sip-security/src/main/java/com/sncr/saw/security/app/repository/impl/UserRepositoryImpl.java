@@ -463,8 +463,8 @@ public class UserRepositoryImpl implements UserRepository {
 
 		// Generic User Details
 		try {
-			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE "
-					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
+			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,C.IS_JV_CUSTOMER,R.ROLE_CODE,R.ROLE_TYPE,CV.FILTER_BY_CUSTOMER_CODE "
+					+ "	FROM USERS U, CUSTOMERS C, ROLES R, CONFIG_VAL CV WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND CV.CONFIG_VAL_SYS_ID = C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
 					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
 			TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -903,7 +903,9 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setRoleType(rs.getString("role_type"));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
-				
+				ticketDetails.setIsJvCustomer(rs.getInt("is_jv_customer"));
+				ticketDetails.setFilterByCustomerCode(rs.getInt("filter_by_customer_code"));
+
 				ticketDetails.setUserId(rs.getLong("user_sys_id"));
 				if (firstName == null) {
 					firstName = rs.getString("first_name");
