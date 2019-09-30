@@ -47,7 +47,7 @@ export class AlertsService {
     options: GridPagingOptions = {},
     dateFilters: AlertFilterModel[]
   ) {
-    const [sort] = options.sort || [];
+    const [sort] = options.sort || [null];
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const pageNumber = ceil(options.skip / options.take) + 1;
