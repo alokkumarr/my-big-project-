@@ -5,8 +5,9 @@ import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import CustomStore from 'devextreme/data/custom_store';
+import * as upperCase from 'lodash/upperCase';
 
-import { DEFAULT_CHANNEL_TYPE } from '../../../wb-comp-configs';
+import { DEFAULT_CHANNEL_TYPE, CHANNEL_UID } from '../../../wb-comp-configs';
 import {
   SelectChannelTypeId,
   SelectChannelId,
@@ -110,6 +111,24 @@ export class JobsPageComponent implements OnInit {
       const defaultChannelTypeId = DEFAULT_CHANNEL_TYPE.uid;
       const url = `${baseUrl}${defaultChannelTypeId}${channelIdQueryParam}${routeIdIdQueryParam}`;
       this._router.navigateByUrl(url);
+    }
+  }
+
+  /**
+   * Returns source type for display in grid. We might not
+   * want the exact source type value to be displayed in grid.
+   * This method lets us override that.
+   *
+   * @param {CHANNEL_UID} sourceType
+   * @returns {string}
+   * @memberof JobsPageComponent
+   */
+  sourceTypeForDisplay(sourceType: CHANNEL_UID): string {
+    switch (sourceType) {
+      case CHANNEL_UID.API:
+        return 'API';
+      default:
+        return upperCase(sourceType);
     }
   }
 

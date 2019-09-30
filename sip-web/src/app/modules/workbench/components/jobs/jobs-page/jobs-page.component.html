@@ -124,8 +124,15 @@
           caption="Source type"
           dataField="sourceType"
           alignment="left"
-          cellTemplate="e2eTemplate"
+          cellTemplate="sourceTypeTemplate"
         ></dxi-column>
+
+        <div
+          [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
+          *dxTemplate="let cell of 'sourceTypeTemplate'"
+        >
+          {{ sourceTypeForDisplay(cell.data.sourceType) }}
+        </div>
 
         <div
           [attr.e2e]="'job-' + cell.column.dataField + '-' + cell.text"
