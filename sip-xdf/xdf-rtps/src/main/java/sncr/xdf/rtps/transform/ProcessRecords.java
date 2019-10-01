@@ -268,72 +268,53 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
       	  
       	logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
     	  logger.debug("####"+ this.ngctx.pipelineConfigParams);
-    	  List<Row> eventTypes = df.select("EVENT_TYPE").distinct().collectAsList();
     	  
-    	  logger.info("Total event types: "+ eventTypes.size());
+    	  // ex: event type for iot
+    	  String multiColName = (String) context.pipelineConfig.get("multiColName");
+    	  String isTimeSeries = (String) context.pipelineConfig.get("isTimeSeries");
+    	  
+    	  List<Row> multiColValues = df.select(multiColName).distinct().collectAsList();
+    	  
+    	  logger.info("Total event types: "+ multiColValues.size());
     	  
     	  NGContext ct = this.ngctx;
-    	  /*ExecutorService executorService = Executors.newFixedThreadPool(10);
-    	  for(Row eventType: eventTypes) {
-    		  logger.info("Processing for event type: "+ eventType.getString(0));
-    		  
-    		  
-    		  executorService.submit(new Callable<Long>() {
-    		        @Override
-    		        public Long call() throws Exception {
-    		        	
-    		        	String type =  (String) eventType.get(0);
-    		        	
-    		          logger.info("###########Event type::"+ type);
-  		    		  String query = "EVENT_TYPE == \'"+ type+ "\'";
-  		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-  		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
-  					
-    					return 1L;
-    		        }
-    		    });
-    		  
-    		  
-    		  
-    		  
-    			
-    	  }*/
+    	 
     	  
+    	  ExecutorService executorService = Executors.newFixedThreadPool(10);
     	  
-    	  
-    	  for(Row eventType: eventTypes) {
-    		 String type =  (String) eventType.get(0);
-    		 String query = "EVENT_TYPE == \'"+ type+ "\'";
-    		 logger.debug("Query:: " + query);
-    		 RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,type );
+    	  for(Row multiColType: multiColValues) {
+    		  String type =  (String) multiColType.get(0);
+     		  String query = multiColName +"== \'"+ type+ "\'";
+     		  logger.debug("Query:: " + query);
+    		  
+     		  /**
+     		   * Process asynchronously if not time series.
+     		   * Process synchronously if time series
+     		   */
+    		  if(isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
+    			  
+    			  executorService.submit(new Callable<Long>() {
+      		        @Override
+      		        public Long call() throws Exception {
+      		        	
+    		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+    		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
+    					
+      					return 1L;
+      		        }
+      		    });
+        		  
+        		  
+        	  } else if(Boolean.valueOf(isTimeSeries)){
+        		
+         		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+                  processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,type );
+        	  }
+    		
     		  
     	  }
     	
     	  logger.debug("COUNT before async::"+ df.count());
-    	  //List<Row> list =  df.select("EVENT_TYPE").distinct().toJavaRDD().collect();
-    	 /* sess.createDataFrame(list, schema).toJavaRDD().foreachPartitionAsync(
-    			  new ProcessEventType(sess , schema,
-    					  df.cache(),this.ngctx.pipelineConfig,this.ngctx.pipelineConfigParams, logger));*/
-    	  
-    	  
-    	  
-    	  //eventTypes.toJavaRDD().foreachAsync(new ProcessEventType(cachedData,this.ngctx.pipelineConfig,this.ngctx.pipelineConfigParams));
-    	  
-  		/*eventTypes.toJavaRDD().for((ForeachFunction<Row>) row -> {
-  			Dataset<Row> eventTypeData = df.filter("EVENT_TYPE == row.getString(0)");
-  			
-  			 //eventTypeData.rdd().toJavaRDD().foreachPartitionAsync(f)
-  			
-            
-            JSONObject pipeline = (JSONObject) this.ngctx.pipelineConfig.get("pipeline");
-            JSONObject pipelineConfigs = (JSONObject) pipeline.get("pipelineConfigs");
-			RTPSPipelineProcessor processor = new RTPSPipelineProcessor(eventTypeData.cache());
-             processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,row.getString(0) );
-  			
-  		});
-      	  
-      }*/
 
         // Elastic Search
         if (esIndex != null && !esIndex.isEmpty()) {
