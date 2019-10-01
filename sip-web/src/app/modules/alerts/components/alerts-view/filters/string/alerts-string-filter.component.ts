@@ -42,7 +42,6 @@ export class AlertsStringFilterComponent implements OnInit {
     this.alertFilterForm.valueChanges.subscribe(({ value }) => {
       const formIsValid = !this.alertFilterForm.invalid;
       if (formIsValid) {
-        console.log('isValid');
         this.filter.modelValues = [value];
         this.change.emit({ filter: this.filter, isValid: formIsValid });
       }

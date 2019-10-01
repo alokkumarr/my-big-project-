@@ -3,7 +3,7 @@ export interface AlertArtifact {
   alias: string;
   columnName: string;
   name?: string;
-  displayName: String;
+  displayName: string;
   type: string;
   aggregate?: string;
   table?: string;
@@ -74,6 +74,10 @@ export interface DatapodMetric {
 export interface GridPagingOptions {
   take?: number;
   skip?: number;
+  sort?: {
+    selector: string;
+    desc: boolean;
+  }[];
 }
 
 export interface GridData {

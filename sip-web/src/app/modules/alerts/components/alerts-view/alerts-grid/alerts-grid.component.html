@@ -13,7 +13,8 @@
   [masterDetail]="{ enabled: true, template: 'detailTemplate' }"
   (onRowExpanding)="onRowExpanding($event.key)"
 >
-  <dxo-remote-operations [paging]="true"> </dxo-remote-operations>
+  <dxo-remote-operations [paging]="true" [sorting]="true">
+  </dxo-remote-operations>
   <dxo-paging
     [pageSize]="DEFAULT_PAGE_SIZE"
     [enabled]="enablePaging"
@@ -49,16 +50,19 @@
     caption="Metric Value"
     alignment="center"
     dataField="metricValue"
+    [allowSorting]="false"
   ></dxi-column>
   <dxi-column
     caption="Threshold Value"
     alignment="center"
     dataField="thresholdValue"
+    [allowSorting]="false"
   ></dxi-column>
   <dxi-column
     caption="Other threshold Value"
     alignment="center"
     dataField="otherThresholdValue"
+    [allowSorting]="false"
   ></dxi-column>
 
   <div
