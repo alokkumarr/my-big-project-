@@ -37,7 +37,7 @@
   </div>
 
   <analysis-sub-type-chooser
-    *ngIf="analysis"
+    *ngIf="analysis && analysis.supports"
     (change)="onChartTypeChange($event)"
     [category]="analysis.type"
     [supports]="analysis.supports"

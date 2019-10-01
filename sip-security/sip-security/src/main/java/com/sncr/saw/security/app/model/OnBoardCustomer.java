@@ -7,6 +7,13 @@ public class OnBoardCustomer implements Serializable {
 
     private String customerCode;
     private String productName;
+    private String productCode;
+    private String email;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String isJvCustomer;
+    private String filterByCustomerCode;
 
     public String getCustomerCode() {
         return customerCode;
@@ -64,9 +71,19 @@ public class OnBoardCustomer implements Serializable {
         this.lastName = lastName;
     }
 
-    private String productCode;
-    private String email;
-    private String firstName;
-    private String middleName;
-    private String lastName;
+    public String getIsJvCustomer() {
+        return isJvCustomer;
+    }
+
+    public void setIsJvCustomer(String isJvCustomer) {
+        this.isJvCustomer = isJvCustomer;
+    }
+
+    public String getFilterByCustomerCode() {
+        return filterByCustomerCode;
+    }
+
+    public void setFilterByCustomerCode(String filterByCustomerCode) {
+        this.filterByCustomerCode = filterByCustomerCode;
+    }
 }
