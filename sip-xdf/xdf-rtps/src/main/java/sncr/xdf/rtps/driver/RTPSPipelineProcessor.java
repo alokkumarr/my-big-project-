@@ -34,7 +34,6 @@ public class RTPSPipelineProcessor {
 
 	public RTPSPipelineProcessor(Dataset<Row> dataset) {
 		logger.debug("### creating parser with dataset ###");
-		dataset.show();
 	    this.datafileDFmap = new HashMap<>();
 		this.datafileDFmap.put("DATA_STREAM", dataset.cache());
 		
@@ -59,7 +58,6 @@ public class RTPSPipelineProcessor {
 		
 		logger.info("###### Starting pipeline with dataset.....:) for event type "+ type);
 		Dataset<Row> dataset = this.datafileDFmap.get("DATA_STREAM");
-		dataset.show();
 		logger.debug("###### Dataset display completed.....:)");
 		int ret = 0;
 
@@ -199,7 +197,6 @@ public class RTPSPipelineProcessor {
 
 			logger.warn(ngParserCtxSvc.getNgctx().toString());
 			logger.debug("###### Registered outputs.....");
-			this.datafileDFmap.get("DATA_STREAM").show();
 
 			ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			String parserKey = null;
@@ -214,7 +211,6 @@ public class RTPSPipelineProcessor {
 
 			Dataset dataset = datafileDFmap.get("DATA_STREAM");
 			logger.debug("######Retrived dataset and passing to parser #####");
-			dataset.show();
 			component = new NGParser(ngParserCtxSvc.getNgctx(),  dataset);
 
 			logger.debug("######Starting init component #####");
