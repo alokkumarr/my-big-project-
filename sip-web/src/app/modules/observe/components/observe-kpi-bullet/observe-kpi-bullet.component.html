@@ -1,7 +1,51 @@
-<chart
-  e2e="target-kpi"
-  [updater]="chartUpdater"
-  [options]="chartOptions"
-  chartType="bullet"
-  [enableExport]="false"
-></chart>
+<div *ngIf="!isTileSizeOk" class="small-tile--message">
+  <h2>
+    This KPI needs a bigger size to be displayed properly.
+  </h2>
+</div>
+<div *ngIf="isTileSizeOk">
+  <chart
+    *ngIf="item.bullet.kpiDisplay === 'bullet' || !item.bullet.kpiDisplay"
+    e2e="target-kpi"
+    [updater]="chartUpdater"
+    chartType="bullet"
+    [enableExport]="false"
+  ></chart>
+  <dx-circular-gauge
+    *ngIf="item.bullet.kpiDisplay === 'gauge'"
+    [value]="kpiValue"
+  >
+    <dxo-size [height]="kpiHeight" [width]="kpiWidth"> </dxo-size>
+    <dxo-scale [startValue]="0" [endValue]="item.bullet.target">
+      <dxo-label [useRangeColors]="true"></dxo-label>
+    </dxo-scale>
+    <dxo-range-container palette="pastel">
+      <dxi-range
+        [startValue]="0"
+        [endValue]="item.bullet.measure1"
+        [color]="kpiColorPalette[0]"
+      ></dxi-range>
+      <dxi-range
+        [startValue]="item.bullet.measure1"
+        [endValue]="item.bullet.measure2"
+        [color]="kpiColorPalette[1]"
+      ></dxi-range>
+      <dxi-range
+        [startValue]="item.bullet.measure2"
+        [endValue]="item.bullet.target"
+        [color]="kpiColorPalette[2]"
+      ></dxi-range>
+    </dxo-range-container>
+    <dxo-title [text]="kpiTitle">
+      <dxo-font [size]="18" [weight]="400" [family]="'inherit'"></dxo-font>
+    </dxo-title>
+    <dxo-subtitle [text]="kpiSubTitle">
+      <dxo-font
+        [size]="12"
+        [weight]="400"
+        color="#666666"
+        [family]="'inherit'"
+      ></dxo-font>
+    </dxo-subtitle>
+  </dx-circular-gauge>
+</div>

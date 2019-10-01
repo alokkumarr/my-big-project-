@@ -217,7 +217,6 @@ export class DashboardGridComponent
     if (!item.kpi && !item.bullet) {
       return;
     }
-
     this.dashboardService.onEditItem.next(item);
   }
 
