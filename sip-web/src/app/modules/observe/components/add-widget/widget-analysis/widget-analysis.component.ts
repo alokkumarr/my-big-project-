@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
+import * as get from 'lodash/get';
+const EXCLUDE_MAPTYPE = [''];
 
 import { DashboardService } from '../../../services/dashboard.service';
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
@@ -83,7 +85,8 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
             result,
             analysis =>
               analysis &&
-              ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+              ALLOWED_ANALYSIS_TYPES.includes(analysis.type) &&
+              !EXCLUDE_MAPTYPE.includes(get(analysis, 'mapOptions.mapType'))
           );
         },
         () => {
