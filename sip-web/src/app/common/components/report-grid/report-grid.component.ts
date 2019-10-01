@@ -32,7 +32,8 @@ import * as isEqual from 'lodash/isEqual';
 import {
   AGGREGATE_TYPES,
   AGGREGATE_TYPES_OBJ,
-  ES_REPORTS_DATE_FORMATS
+  ES_REPORTS_DATE_FORMATS,
+  TABLE_CUSTCODE_COLUMNNAME
 } from '../../consts';
 
 import {
@@ -462,6 +463,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
           type,
           column.aggregate
         );
+
         const format = isNumberType
           ? { formatter: getFormatter(preprocessedFormat) }
           : column.format || column.dateFormat;
@@ -508,9 +510,13 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     };
   }
 
+  checkForCustCode(columnName, table) {
+    return columnName === TABLE_CUSTCODE_COLUMNNAME && this.analysis.type === 'report' ? `${table}_${columnName}` : columnName;
+  }
+
   getDataField(column: ArtifactColumnReport) {
     const parts = split(column.columnName, '.');
-    return parts[0];
+    return this.checkForCustCode(parts[0], column.table);
   }
 
   queryColumns2Columns(queryColumns): ReportGridField[] {

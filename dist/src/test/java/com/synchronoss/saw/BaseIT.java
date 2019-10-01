@@ -104,6 +104,33 @@ public class BaseIT {
     return response.path("aToken");
   }
 
+  protected String authenticate(String userName, String password) throws JsonProcessingException {
+    ObjectNode node = mapper.createObjectNode();
+    node.put("masterLoginId", userName);
+    node.put("password", password);
+    String json = mapper.writeValueAsString(node);
+    Response response =
+        given(spec)
+            .accept("application/json")
+            .header("Content-Type", "application/json")
+            .body(json)
+            .filter(
+                document(
+                    "authenticate",
+                    preprocessRequest(
+                        preprocessReplace(userName, "user@example.com"),
+                        preprocessReplace(password, "password123"))))
+            .when()
+            .post("/security/doAuthenticate")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .body("aToken", startsWith(""))
+            .extract()
+            .response();
+    return response.path("aToken");
+  }
+
   private OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
   }

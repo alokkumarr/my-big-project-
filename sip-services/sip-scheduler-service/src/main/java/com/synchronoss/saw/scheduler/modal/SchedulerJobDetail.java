@@ -5,6 +5,8 @@ import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -21,6 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class SchedulerJobDetail implements Serializable {
 
   private static final long serialVersionUID = 8510739855197957265l;
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerJobDetail.class);
 
   private String analysisID;
 
@@ -65,6 +68,8 @@ public class SchedulerJobDetail implements Serializable {
   private List<String> s3;
 
   private Boolean zip;
+
+  private String auth;
 
   /**
    * Gets analysisID
@@ -332,7 +337,15 @@ public class SchedulerJobDetail implements Serializable {
     this.zip = zip;
   }
 
-  /**
+  public String getAuth() {
+    return auth;
+  }
+
+  public void setAuth(String auth) {
+    this.auth = auth;
+  }
+
+   /**
    * @param out
    * @throws IOException
    */
@@ -357,6 +370,7 @@ public class SchedulerJobDetail implements Serializable {
     out.writeObject(timezone);
     out.writeObject(s3);
     out.writeObject(zip);
+    out.writeObject(auth);
   }
 
   /**
@@ -430,6 +444,16 @@ public class SchedulerJobDetail implements Serializable {
       }
     } catch (OptionalDataException e) {
       /* catch block to avoid serialization for newly added fields.*/
+    }
+
+    try {
+        Object authObj = in.readObject();
+        if (authObj instanceof String) {
+            auth = (String) authObj;
+        }
+
+    } catch (OptionalDataException e) {
+      logger.error("Unable to read auth Object :{}", e.getMessage());
     }
   }
 
