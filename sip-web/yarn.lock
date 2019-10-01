@@ -342,10 +342,10 @@
   dependencies:
     tslib "^1.9.0"
 
-"@ngxs/logger-plugin@3.3.2":
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/@ngxs/logger-plugin/-/logger-plugin-3.3.2.tgz#f5e95cd299b974fbfd84a92d8354c52425f86092"
-  integrity sha512-F3LuDI9aoyDqweEUoC60Xob53aMgLDbSG2ZjSxY3uhsMuCKeZTwUHPme3P5dLdulhfrae3eOZl+I4R5VdzXtfQ==
+"@ngxs/logger-plugin@3.4.3":
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@ngxs/logger-plugin/-/logger-plugin-3.4.3.tgz#1b001c563ddc5879a9d523f1b3c456dbdd6996ac"
+  integrity sha512-csPen2ckapQifklrQfdKhDoklM2CNAY7nWWRWxeR/a/DZxMwaESt4HSkt3oab13dQ5kad4AP7mJCuPn51mAsPA==
   dependencies:
     tslib "^1.9.0"
 

@@ -62,6 +62,16 @@
           "name":"double",
           "table":"sales",
           "type":"double"
+        },
+        {
+          "aliasName":"",
+          "columnName":"customerCode",
+          "displayName":"CustomerCode",
+          "filterEligible":true,
+          "joinEligible":true,
+          "name":"customerCode",
+          "table":"sales",
+          "type":"string"
         }
       ]
     },
@@ -127,6 +137,16 @@
           "name":"double_2",
           "table":"product",
           "type":"double"
+        },
+        {
+          "aliasName":"",
+          "columnName":"customerCode",
+          "displayName":"CustomerCode",
+          "filterEligible":true,
+          "joinEligible":true,
+          "name":"customerCode",
+          "table":"product",
+          "type":"string"
         }
       ]
     }
