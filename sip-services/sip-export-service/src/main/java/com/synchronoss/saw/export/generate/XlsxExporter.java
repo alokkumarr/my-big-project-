@@ -143,7 +143,7 @@ public class XlsxExporter implements IFileExporter {
     String[] header = null;
     CellStyle cellStyle = workBook.createCellStyle();
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
-    for (int rowNum = 0; rowNum < recordRow.size() && recordRow.size() <= limitToExport; rowNum++) {
+    for (int rowNum = 0; rowNum < recordRow.size() && rowNum <= limitToExport; rowNum++) {
       SXSSFRow excelRow = workSheet.createRow(rowNum + 1);
       Object data = recordRow.get(rowNum);
 

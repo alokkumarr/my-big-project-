@@ -35,7 +35,7 @@ public class SimpleJob extends QuartzJobBean implements InterruptableJob {
 
     SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-    analysisService.executeDslAnalysis(job.getAnalysisID());
+    analysisService.executeDslAnalysis(job.getAnalysisID(), job.getAuth());
 
     analysisService.scheduleDispatch(job);
 

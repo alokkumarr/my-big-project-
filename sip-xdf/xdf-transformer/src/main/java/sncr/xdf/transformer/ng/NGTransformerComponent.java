@@ -63,7 +63,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
     @Override
     protected int execute(){
-
+        logger.debug("Processing NGTransformerComponent ......" );
         try {
             tempLocation = generateTempLocation(new DataSetHelper(ngctx, services.md),
                 null, null);

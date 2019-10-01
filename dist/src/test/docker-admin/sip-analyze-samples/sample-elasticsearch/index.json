@@ -90,6 +90,19 @@
               "analyzer": "analyzer_custom"
             }
           }
+        },
+        "customerCode": {
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            },
+            "filter": {
+              "type": "text",
+              "analyzer": "analyzer_custom"
+            }
+          }
         }
       }
     }
