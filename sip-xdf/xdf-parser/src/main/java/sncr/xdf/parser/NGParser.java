@@ -59,6 +59,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     private String sourcePath;
     private String tempDir;
     private String archiveDir;
+    private boolean multiLine = false;
 
     private String outputDataSetName;
     private String outputDataSetLocation;
@@ -325,6 +326,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
                 retval =  -1;
             }
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
 
             logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
@@ -333,11 +335,17 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
             Dataset<Row> inputDataset = null;
+            multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
+
+            logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
+
+
+            logger.debug("RECORD COUNT IS " + inputDataset.count());
 
             if (inputDataFrame != null) {
 				inputDataset = inputDataFrame;
 			} else {
-				inputDataset = jsonFileParser.parseInput(sourcePath);
+				inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
 			}
             
             this.recCounter.setValue(inputDataset.count());
@@ -347,7 +355,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
-
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
             if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
@@ -367,6 +375,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
                 ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+                logger.debug("Count for parser in dataset :: " + ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             } else if(this.inputDataFrame != null) {
 
@@ -436,43 +445,47 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return compConf;
     }
 
-    protected int archive(){
-        int result = 0;
-        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+	protected int archive() {
+		int result = 0;
 
-        try {
-            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+		if (this.isRealTime) {
 
-            if (files != null && files.length != 0) {
-                //Create archive directory
+			logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
 
-                logger.debug("Total files = " + files.length);
+			try {
+				FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
 
-                int archiveCounter = 0;
-                String currentTimestamp = LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
+				if (files != null && files.length != 0) {
+					// Create archive directory
 
-                Path archivePath = new Path(archiveDir + Path.SEPARATOR + currentTimestamp
-                    + "_" + UUID.randomUUID() + Path.SEPARATOR);
-                ctx.fs.mkdirs(archivePath);
-                logger.debug("Archive directory " + archivePath);
+					logger.debug("Total files = " + files.length);
 
-                for(FileStatus fiile: files) {
+					int archiveCounter = 0;
+					String currentTimestamp = LocalDateTime.now()
+							.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS"));
 
-                    if (archiveSingleFile(fiile.getPath(), archivePath)) {
-                        archiveCounter++;
-                    }
-                }
+					Path archivePath = new Path(
+							archiveDir + Path.SEPARATOR + currentTimestamp + "_" + UUID.randomUUID() + Path.SEPARATOR);
+					ctx.fs.mkdirs(archivePath);
+					logger.debug("Archive directory " + archivePath);
 
-                logger.info("Total files archived = " + archiveCounter);
-            }
-        } catch (IOException e) {
-            logger.error("Archival failed");
+					for (FileStatus fiile : files) {
 
-            logger.error(ExceptionUtils.getStackTrace(e));
+						if (archiveSingleFile(fiile.getPath(), archivePath)) {
+							archiveCounter++;
+						}
+					}
 
-            result = 1;
-        }
+					logger.info("Total files archived = " + archiveCounter);
+				}
+			} catch (IOException e) {
+				logger.error("Archival failed");
+
+				logger.error(ExceptionUtils.getStackTrace(e));
+
+				result = 1;
+			}
+		}
 
         return result;
     }

@@ -209,6 +209,11 @@ genericlog = {
 
 }
 
+# registration config url where to get config detail on demand
+connector=http
+rtis.config.url=${connector}"://localhost:9501/internal/rtisconfig/config"
+stream.queue.location=/var/sip/streams
+
 stream.file.location=/opt/bda/rtis/var/run/stream.${http.port}.dump
 
 # Waiting time on send call to Kafka/MapR Streams client 

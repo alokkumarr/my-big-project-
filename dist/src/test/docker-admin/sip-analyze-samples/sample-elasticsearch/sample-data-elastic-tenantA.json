@@ -1,0 +1,147 @@
+{
+  "supports": [
+    {
+      "category": "map",
+      "children": [
+        {
+          "icon": "icon-geo-chart",
+          "label": "Choropleth map",
+          "type": "map:chart"
+        },
+        {
+          "icon": "icon-geo-chart",
+          "label": "Geo Map",
+          "type": "map:map"
+        }
+      ],
+      "label": "Geo Location"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifactName": "sample",
+      "columns": [
+        {
+          "aliasName": "",
+          "columnName": "string.keyword",
+          "displayName": "String",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "string",
+          "table": "sample",
+          "type": "string"
+        },
+        {
+          "aliasName": "",
+          "columnName": "long",
+          "displayName": "Long",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "long",
+          "table": "sample",
+          "type": "long"
+        },
+        {
+          "aliasName": "",
+          "columnName": "float",
+          "displayName": "Float",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "float",
+          "table": "sample",
+          "type": "float"
+        },
+        {
+          "aliasName": "",
+          "columnName": "date",
+          "displayName": "Date",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "date",
+          "table": "sample",
+          "type": "date"
+        },
+        {
+          "aliasName": "",
+          "columnName": "integer",
+          "displayName": "Integer",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "integer",
+          "table": "sample",
+          "type": "integer"
+        },
+        {
+          "aliasName": "",
+          "columnName": "double",
+          "displayName": "Double",
+          "filterEligible": true,
+          "joinEligible": false,
+          "kpiEligible": true,
+          "name": "double",
+          "table": "sample",
+          "type": "double"
+        },
+        {
+          "aliasName": "COORDINATES",
+          "columnName": "COORDINATES.keyword",
+          "displayName": "COORDINATES",
+          "filterEligible": true,
+          "geoType": "lngLat",
+          "include": true,
+          "joinEligible": false,
+          "kpiEligible": false,
+          "name": "COORDINATES",
+          "table": "sample",
+          "type": "string"
+        },
+        {
+          "aliasName": "COUNTY",
+          "columnName": "COUNTY.keyword",
+          "displayName": "State",
+          "filterEligible": true,
+          "geoType": "state:postal-code",
+          "include": true,
+          "joinEligible": false,
+          "kpiEligible": false,
+          "name": "COUNTY",
+          "table": "sample",
+          "type": "string"
+        },
+        {
+          "aliasName": "customerCode",
+          "columnName": "customerCode.keyword",
+          "displayName": "customerCode",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "customerCode",
+          "table": "sample",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "createdBy": "sipadmin@TenantA.com",
+  "customerCode": "TenantA",
+  "metricName": "sample-elasticsearch-TenantA",
+  "esRepository": {
+    "indexName": "sampleAlias",
+    "storageType": "ES",
+    "type": "sample"
+  },
+  "username": "sipadmin@TenantA.com",
+  "projectCode": "workbench",
+  "parentDataSetIds": ["SALES::json::1550155167974"],
+  "parentDataSetNames": ["SALES"],
+  "repository": [
+    {
+      "format": "ndjson",
+      "name": "SALES",
+      "physicalLocation": "/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson"
+    }
+  ]
+}
