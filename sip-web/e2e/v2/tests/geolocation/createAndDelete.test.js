@@ -22,7 +22,7 @@ describe('Executing create and delete geolocation analysis tests from geolocatio
   const metrics = 'Double';
   const dimension = 'State';
   // Map
-  const data = 'Data';
+  const dataCol = 'Integer';
   const coordinates = 'COORDINATES';
   const region = 'United States of America';
 
@@ -89,7 +89,7 @@ describe('Executing create and delete geolocation analysis tests from geolocatio
           chartDesignerPage.clickOnFieldsByName(dimension);
           chartDesignerPage.selectRegion(region);
         } else {
-          chartDesignerPage.clickOnAttribute(data, 'Data');
+          chartDesignerPage.clickOnAttribute(dataCol, 'Data');
           chartDesignerPage.clickOnAttribute(coordinates, 'Coordinates');
         }
         //Save
