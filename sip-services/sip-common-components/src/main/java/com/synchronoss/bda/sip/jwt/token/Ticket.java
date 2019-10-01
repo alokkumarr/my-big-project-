@@ -30,6 +30,8 @@ public class Ticket implements Serializable {
   private String error;
   private String custID;
   private String custCode;
+  private Integer isJvCustomer;
+  private Integer filterByCustomerCode;
   private Long userId;
   private ArrayList<Products> products;
   /** This ticket will be valid till this time. */
@@ -85,12 +87,28 @@ public class Ticket implements Serializable {
     this.custCode = custCode;
   }
 
+  public Integer getIsJvCustomer() {
+    return isJvCustomer;
+  }
+
+  public void setIsJvCustomer(Integer jvCustomer) {
+    isJvCustomer = jvCustomer;
+  }
+
   public String getError() {
     return error;
   }
 
   public void setError(String error) {
     this.error = error;
+  }
+
+  public Integer getFilterByCustomerCode() {
+    return filterByCustomerCode;
+  }
+
+  public void setFilterByCustomerCode(Integer filterByCustomerCode) {
+    this.filterByCustomerCode = filterByCustomerCode;
   }
 
   public List<TicketDSKDetails> getDataSecurityKey() {
@@ -134,6 +152,8 @@ public class Ticket implements Serializable {
     sb.append("createdTime = " + createdTime + "\n");
     sb.append("validUpto = " + validUpto + "\n");
     sb.append("validityReason = " + validityReason + "\n");
+    sb.append("isJvCustomer = " + isJvCustomer + "\n");
+    sb.append("filterByCustomerCode = " + filterByCustomerCode + "\n");
     return sb.toString();
   }
 

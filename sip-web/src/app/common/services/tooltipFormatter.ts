@@ -1,6 +1,7 @@
 import * as Highcharts from 'highcharts/highcharts';
 import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
+import moment from 'moment';
 
 import {
   FLOAT_TYPES,
@@ -56,7 +57,7 @@ function getXValue(point, fields, chartType) {
   const { x, g } = fields;
   const hasGroupBy = Boolean(g);
 
-  if(chartType === 'chart_scale') {
+  if (chartType === 'chart_scale') {
     return point.name;
   }
 
@@ -74,10 +75,13 @@ function getXValue(point, fields, chartType) {
     return point.category;
   }
   if (DATE_TYPES.includes(x.type)) {
+    console.log(chartType);
     if (hasGroupBy) {
-      return point.category;
+      return ['tsspline', 'tsPane'].includes(chartType) ? moment(point.category).format('dddd, MMM Do YYYY, h:mm') : point.category;
     }
-    return point.key || point.category;
+    return ['tsspline', 'tsPane'].includes(chartType)
+    ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
+    : point.key || point.category;
   }
 }
 
@@ -91,6 +95,18 @@ function getXLabel(point, fields, chartType) {
 function getFieldLabelWithAggregateFun(field) {
   const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
   return field.alias || `${aggregate}(${field.displayName})`;
+}
+
+function getYValueBasedOnAggregate(field, point) {
+  switch (field.aggregate) {
+    case 'percentage':
+      return Math.round(point.y * 100) / 100 + '%';
+    case 'percentagebyrow':
+      return round(point.percentage, 2) + '%';
+
+    default:
+      return isUndefined(point.value) ? point.y : point.value;
+  }
 }
 
 /**
@@ -116,13 +132,12 @@ export function getTooltipFormatter(fields, chartType) {
       <td><strong>${xLabel}:</strong></td>
       <td>${xValue}</td>
     </tr>`;
-
     const yLabel = fields.g
       ? getFieldLabelWithAggregateFun(fields.y[0])
       : seriesName;
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
-      <td>${isUndefined(point.value) ? point.y : point.value}</td>
+      <td>${getYValueBasedOnAggregate(fields.y[0], point)}</td>
     </tr>`;
 
     const zLabel = fields.z ? getFieldLabelWithAggregateFun(fields.z) : '';

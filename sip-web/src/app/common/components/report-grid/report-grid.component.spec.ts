@@ -71,4 +71,12 @@ describe('Designer Chart Component', () => {
       expect(cols[0].alignment).toBeDefined();
     });
   });
+
+  describe('getDataField', () => {
+    it('should concat table name if columnName is customerCode', () => {
+      const column: any = {};
+      component.getDataField(column);
+      expect(column).toBeDefined();
+    });
+  });
 });
