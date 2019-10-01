@@ -1,29 +1,26 @@
 import { TestBed, async } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
-import { AlertsState } from './alerts.state';
+import { AlertsState, defaultAlertFilters } from './alerts.state';
 import { AlertsService } from '../services/alerts.service';
 import {
-  // AlertFilterModel,
+  AlertFilterModel,
   AlertChartData,
   AlertDateSeverity,
   AlertDateCount
 } from '../alerts.interface';
 import {
-  // ApplyAlertFilters,
+  ApplyAlertFilters,
+  EditAlertFilter,
   LoadAllAlertCount,
   LoadAllAlertSeverity
 } from './alerts.actions';
 import { of } from 'rxjs';
 
-// const selectedAlertFilter: AlertFilterModel = {
-//   preset: 'YTD',
-//   groupBy: 'StartTime'
-// };
-
-// const defaultAlertFilters: AlertFilterModel = {
-//   preset: 'TW',
-//   groupBy: 'StartTime'
-// };
+const yesterdayDateFilter = {
+  preset: 'Yesterday',
+  fieldName: 'starttime',
+  type: 'date'
+};
 
 const alertCountArray: AlertDateCount[] = [
   {
@@ -98,30 +95,39 @@ describe('Alerts actions', () => {
     store = TestBed.get(Store);
   }));
 
-  // it('should have a default date filter', () => {
-  //   store
-  //     .selectOnce(state => state.alerts.alertFilter)
-  //     .subscribe((alertsFilters: AlertFilterModel) => {
-  //       if (alertsFilters) {
-  //         expect(alertsFilters).toEqual(
-  //           jasmine.objectContaining(defaultAlertFilters)
-  //         );
-  //       }
-  //     });
-  // });
+  it('should have a default date filter', () => {
+    store
+      .selectOnce(state => state.alerts.alertFilters)
+      .subscribe((alertsFilters: AlertFilterModel[]) => {
+        if (alertsFilters) {
+          expect(alertsFilters).toEqual(defaultAlertFilters);
+        }
+      });
+  });
 
-  // it('should create an action and add an item', () => {
-  //   store.dispatch(new ApplyAlertFilters());
-  //   store
-  //     .selectOnce(state => state.alerts.alertFilter)
-  //     .subscribe((alertsFilters: AlertFilterModel) => {
-  //       if (alertsFilters) {
-  //         expect(alertsFilters).toEqual(
-  //           jasmine.objectContaining(selectedAlertFilter)
-  //         );
-  //       }
-  //     });
-  // });
+  it('should modify a filter', () => {
+    store.dispatch(new EditAlertFilter(yesterdayDateFilter, 0));
+    store
+      .selectOnce(state => state.alerts.alertFilter)
+      .subscribe((alertsFilters: AlertFilterModel[]) => {
+        if (alertsFilters) {
+          expect(alertsFilters[0]).toEqual(yesterdayDateFilter);
+        }
+      });
+  });
+  it('should apply modified filters', () => {
+    store.dispatch(new ApplyAlertFilters());
+    store
+      .selectOnce(state => ({
+        alertFilters: state.alerts.alertFilters,
+        editedAlertFilters: state.alerts.editedAlertFilters
+      }))
+      .subscribe(({ alertFilters, editedAlertFilters }) => {
+        if (alertFilters && editedAlertFilters) {
+          expect(alertFilters).toEqual(editedAlertFilters);
+        }
+      });
+  });
 
   it('should load all the alert counts chart data', () => {
     store.dispatch(new LoadAllAlertCount());

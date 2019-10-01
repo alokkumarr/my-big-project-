@@ -105,7 +105,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     } else {
       this.datapods$ = this._configureAlertService.getListOfDatapods$();
     }
-    // this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
+    this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
     this.aggregations$ = this._configureAlertService
       .getAggregations()
       .pipe(
@@ -381,9 +381,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   generateSipQuery() {
     const {
       aggregationType
-      // operator,
-      // thresholdValue,
-      // otherThresholdValue
     } = this.alertMetricFormGroup.value;
 
     const {
@@ -413,21 +410,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
     const { id, artifacts } = this.selectedDatapod;
     const { artifactName } = artifacts[0];
-
-    // const alertFilter = {
-    //   type: selectedMetricsColumn.type,
-    //   artifactsName: artifactName,
-    //   model: {
-    //     operator,
-    //     value: thresholdValue,
-    //     otherValue: operator === 'BTW' ? otherThresholdValue : null
-    //   },
-    //   isRuntimeFilter: false,
-    //   isGlobalFilter: false,
-    //   tableName: selectedMetricsColumn.tableName,
-    //   columnName: selectedMetricsColumn.columnName,
-    //   isOptional: false
-    // };
 
     const selectedLookbackColumn = this.selectedLookbackColumn || {};
     const lookbackFilter = {

@@ -21,7 +21,7 @@ import { AlertsStateModel, AlertFilterModel } from '../alerts.interface';
 import { DATE_PRESETS_OBJ, CUSTOM_DATE_PRESET_VALUE } from '../consts';
 import { AlertsService } from '../services/alerts.service';
 
-const defaultAlertFilters: AlertFilterModel[] = [
+export const defaultAlertFilters: AlertFilterModel[] = [
   {
     preset: 'TW',
     fieldName: 'starttime',

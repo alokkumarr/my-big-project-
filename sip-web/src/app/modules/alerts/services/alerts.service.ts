@@ -47,17 +47,14 @@ export class AlertsService {
     options: GridPagingOptions = {},
     dateFilters: AlertFilterModel[]
   ) {
-    const [sort] = options.sort || [null];
-    options.skip = options.skip || 0;
-    options.take = options.take || 10;
-    const pageNumber = ceil(options.skip / options.take) + 1;
+    const { sorts, queryParams } = this.convertOptionsToPayloadAndQueryParams(
+      options
+    );
     const basePath = `alerts/states`;
-    const queryParams = `?pageNumber=${pageNumber}&pageSize=${options.take}`;
-    const payload = { filters: getFiltersForBackend(dateFilters), sorts: [] };
-    if (sort) {
-      const { selector, desc } = sort;
-      payload.sorts = [{ fieldName: selector, order: desc ? 'DESC' : 'ASC' }];
-    }
+    const payload = {
+      filters: getFiltersForBackend(dateFilters),
+      sorts: sorts || []
+    };
     const url = `${apiUrl}/${basePath}${queryParams}`;
     return this._http
       .post(url, payload)
@@ -67,6 +64,25 @@ export class AlertsService {
         const totalCount = get(response, `numberOfRecords`) || data.length;
         return { data, totalCount };
       });
+  }
+
+  /** Convert options from devextreme to queryParams,
+   * and sorts used by the backend
+   */
+  convertOptionsToPayloadAndQueryParams(options) {
+    const skip = options.skip || 0;
+    const take = options.take || 10;
+    const pageNumber = ceil(skip / take) + 1;
+    const queryParams = `?pageNumber=${pageNumber}&pageSize=${take}`;
+    let sorts = null;
+    if (options.sort) {
+      const { selector, desc } = options.sort;
+      sorts = [{ fieldName: selector, order: desc ? 'DESC' : 'ASC' }];
+    }
+    return {
+      sorts,
+      queryParams
+    };
   }
 
   getAllAttributeValues() {
