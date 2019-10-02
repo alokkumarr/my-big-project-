@@ -8,6 +8,7 @@ import { AnalyzeService } from '../../services/analyze.service';
 import { JwtService } from '../../../../common/services';
 import { Store } from '@ngxs/store';
 import { MatDialog } from '@angular/material';
+import { of } from 'rxjs';
 
 @Component({
   // tslint:disable-next-line
@@ -19,6 +20,10 @@ class DesignerStubComponent {
   @Input() public analysis;
   @Input() public designerMode;
 }
+
+const dialogStub = {
+  open: () => {}
+};
 
 describe('Designer Component', () => {
   let component: DesignerContainerComponent;
@@ -33,7 +38,7 @@ describe('Designer Component', () => {
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
         { provide: Store, useValue: { dispatch: () => {} } },
-        { provide: MatDialog, useValue: {} }
+        { provide: MatDialog, useValue: dialogStub }
       ],
       declarations: [DesignerContainerComponent, DesignerStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -43,6 +48,9 @@ describe('Designer Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DesignerContainerComponent);
     component = fixture.componentInstance;
+    component.artifacts = [
+      { artifactName: 'xyz', columns: [{ columnName: 'abc' }] }
+    ] as any;
     fixture.detectChanges();
   });
 
@@ -61,8 +69,8 @@ describe('Designer Component', () => {
         isGlobalFilter: false,
         model: {
           operator: 'BTW',
-          value: '01-01-2017',
-          otherValue: '01-31-2017'
+          value: '2017-01-01',
+          otherValue: '2017-01-31'
         }
       }
     ];
@@ -77,8 +85,8 @@ describe('Designer Component', () => {
         isGlobalFilter: false,
         model: {
           operator: 'BTW',
-          value: '01-01-2017',
-          otherValue: '01-31-2017',
+          value: '2017-01-01',
+          otherValue: '2017-01-31',
           gte: '2017-01-01',
           lte: '2017-01-31',
           preset: 'NA'
@@ -87,5 +95,45 @@ describe('Designer Component', () => {
     ];
     const DSLFilters = component.generateDSLDateFilters(filters);
     expect(DSLFilters).toEqual(output);
+  });
+
+  describe('Derived metrics dialog', () => {
+    it('should replace column if it already exists', async(() => {
+      const column = { columnName: 'abc', table: 'xyz', type: 'double' };
+      const dialogSpy = spyOn(TestBed.get(MatDialog), 'open').and.returnValue({
+        afterClosed: () => of(column)
+      });
+      const changesSpy = spyOn(
+        component,
+        'handleOtherChangeEvents'
+      ).and.returnValue({});
+
+      component.openDerivedMetricDialog(column as any);
+      expect(dialogSpy).toHaveBeenCalled();
+
+      expect(changesSpy).toHaveBeenCalledWith({
+        subject: 'expressionUpdated',
+        column
+      });
+    }));
+
+    it('should add column if it does not already exists', async(() => {
+      const column = { columnName: 'pqr', table: 'xyz', type: 'double' };
+      const dialogSpy = spyOn(TestBed.get(MatDialog), 'open').and.returnValue({
+        afterClosed: () => of(column)
+      });
+      const changesSpy = spyOn(
+        component,
+        'handleOtherChangeEvents'
+      ).and.returnValue({});
+
+      component.openDerivedMetricDialog(column as any);
+      expect(dialogSpy).toHaveBeenCalled();
+
+      expect(changesSpy).toHaveBeenCalledWith({
+        subject: 'derivedMetricAdded',
+        column
+      });
+    }));
   });
 });
