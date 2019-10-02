@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AnalyzeViewComponent } from './view';
 import { ExecutedViewComponent } from './executed-view';
 import { AnalyzePageComponent } from './page';
-import { DesignerPageComponent } from './designer';
+import { DesignerPageComponent } from './designer/designer.module';
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 import { AnalysesResolver } from './view/analyses.resolver';

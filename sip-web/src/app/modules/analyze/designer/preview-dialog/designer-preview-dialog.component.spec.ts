@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { DesignerPreviewDialogComponent } from './designer-preview-dialog.component';
 import { CheckedArtifactColumnFilterPipe } from 'src/app/common/pipes/filterArtifactColumns.pipe';
 import { IsAnalysisTypePipe } from 'src/app/common/pipes/is-analysis-type.pipe';
-import { DesignerService } from '..';
+import { DesignerService } from '../designer.module';
 
 const dialogData = { analysis: {} };
 const storeStub = {

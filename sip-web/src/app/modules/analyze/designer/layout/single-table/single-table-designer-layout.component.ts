@@ -9,6 +9,7 @@ import { Artifact, DesignerChangeEvent, Sort, Filter } from '../../types';
 import { DesignerStates, CHART_TYPES_OBJ } from '../../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 import { QueryDSL } from 'src/app/models';
+import { DesignerService } from '../../designer.service';
 
 // the delay needed to animate opening and closing the sidemenus
 const SIDEMENU_ANIMATION_TIME = 300;
@@ -20,17 +21,31 @@ const SIDEMENU_ANIMATION_TIME = 300;
 })
 export class SingleTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
-  @Input() artifacts: Artifact[];
   @Input() data;
   @Input() auxSettings: any;
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
-  @Input() sipQuery: QueryDSL;
   @Input() designerState: DesignerStates;
   @Input() chartTitle: string;
+  @Input('artifacts') set artifactsArray(artifacts: Artifact[]) {
+    this.artifacts = this.designerService.addDerivedMetricsToArtifacts(
+      artifacts,
+      this.sipQuery
+    );
+  }
 
+  @Input('sipQuery') set setSipQuery(sipQuery: QueryDSL) {
+    this.sipQuery = sipQuery;
+    this.artifacts = this.designerService.addDerivedMetricsToArtifacts(
+      this.artifacts,
+      sipQuery
+    );
+  }
+
+  sipQuery: QueryDSL;
+  artifacts: Artifact[];
   public DesignerStates = DesignerStates;
   public isOptionsPanelOpen = false;
   public isFieldsPanelOpen = true;
@@ -42,7 +57,10 @@ export class SingleTableDesignerLayoutComponent {
   );
   public config: PerfectScrollbarConfigInterface = {};
 
-  constructor(breakpointObserver: BreakpointObserver) {
+  constructor(
+    breakpointObserver: BreakpointObserver,
+    private designerService: DesignerService
+  ) {
     breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])
       .subscribe(result => {
