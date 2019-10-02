@@ -387,7 +387,7 @@ public class ExportServiceImpl implements ExportService {
   /**
    * This method to build excel file with batch size data by using apache API api.
    *
-   * @param sipQuery        query definition to filter out
+   * @param sipQuery        query definition to filter out data
    * @param totalExportSize total configured size to be processed S3/FTP/Email
    * @param exportBean      bean which have all the required fields to build fields
    * @throws IOException
@@ -851,7 +851,7 @@ public class ExportServiceImpl implements ExportService {
    * @param recipients   recipients mail to be sent
    * @param zip          Boolean flag if zip checkbox selected from UI
    * @param restTemplate RestTemplate
-   * @param userFileName
+   * @param userFileName Name of the report file
    * @return True if the mail dispatched successfully else false
    */
   public boolean dispatchMail(String analysisId,
