@@ -80,7 +80,7 @@ public class XlsxExporter implements IFileExporter {
     if (StringUtils.isEmpty(value)
         || value.equalsIgnoreCase("EMPTY")
         || value.equalsIgnoreCase("null")) {
-      cell.setCellValue("");
+      cell.setCellValue("null");
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cell.setCellStyle(cellStyle);
@@ -136,7 +136,13 @@ public class XlsxExporter implements IFileExporter {
    * @param recordRow
    */
   public void buildXlsxSheet(
-      SipQuery sipQuery, ExportBean exportBean, Workbook workBook, SXSSFSheet workSheet, List<Object> recordRow, Long limitToExport) {
+      SipQuery sipQuery,
+      ExportBean exportBean,
+      Workbook workBook,
+      SXSSFSheet workSheet,
+      List<Object> recordRow,
+      Long limitToExport,
+      Long rowCount) {
     logger.debug(this.getClass().getName() + " addXlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
@@ -144,7 +150,7 @@ public class XlsxExporter implements IFileExporter {
     CellStyle cellStyle = workBook.createCellStyle();
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
     for (int rowNum = 0; rowNum < recordRow.size() && rowNum <= limitToExport; rowNum++) {
-      SXSSFRow excelRow = workSheet.createRow(rowNum + 1);
+      SXSSFRow excelRow = workSheet.createRow(rowCount.intValue() + rowNum);
       Object data = recordRow.get(rowNum);
 
       if (data instanceof LinkedHashMap) {
@@ -184,7 +190,8 @@ public class XlsxExporter implements IFileExporter {
           addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
         } else if (header == null || header.length <= 0) {
           header = exportBean.getColumnHeader();
-          addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
+          if (rowCount == 1)
+            addReportHeaderRow(exportBean, workBook, workSheet, columnHeader);
         }
         buildReportXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }

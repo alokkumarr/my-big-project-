@@ -14,8 +14,10 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,12 +38,16 @@ public class XlsxExporterTest {
   private SipQuery sipQuery = new SipQuery();
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporterTest.class);
 
+  @Mock
+  private RestTemplate restTemplate;
+  private String analysisId;
+
   @Before
   public void setUp() {
-
     exportBean = new ExportBean();
     LinkedHashMap dispatchBean = new LinkedHashMap();
     xlsxExporter = new XlsxExporter();
+    analysisId= UUID.randomUUID().toString();
     ClassLoader classLoader = getClass().getClassLoader();
 
     dispatchBean.put("fileType", "xlsx");
@@ -114,7 +121,7 @@ public class XlsxExporterTest {
     Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
-    xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, dataResponse.getData(), 3l);
+    xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, dataResponse.getData(), 3l, 10l);
     assertEquals(sheet.getPhysicalNumberOfRows(), 4);
   }
 
@@ -122,13 +129,10 @@ public class XlsxExporterTest {
   public void streamToXlsxReportTest() {
     ExportServiceImpl exportService = new ExportServiceImpl();
     try {
-      assertEquals(
-          exportService.streamToXlsxReport(sipQuery, dataResponse, LimittoExport, exportBean), Boolean.TRUE);
+      boolean haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, "esReport", LimittoExport, exportBean, restTemplate);
+      assertEquals(haveSheetCreated, Boolean.TRUE);
     } catch (IOException e) {
-      logger.error(
-          this.getClass().getName()
-              + " Error in streamToXlsxReport : "
-              + ExceptionUtils.getStackTrace(e));
+      logger.error(" Error in streamToXlsxReport : {}", ExceptionUtils.getStackTrace(e));
     }
   }
 }
