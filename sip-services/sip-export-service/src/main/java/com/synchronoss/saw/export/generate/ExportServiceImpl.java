@@ -863,7 +863,7 @@ public class ExportServiceImpl implements ExportService {
                               RestTemplate restTemplate,
                               String userFileName) {
 
-    String endPoint = "/internal/proxy/storage/{}/executions/data?page=1&pageSize={}&executionType=scheduled&analysisType={}";
+    String endPoint = "/internal/proxy/storage/%s/executions/data?page=1&pageSize=%s&executionType=scheduled&analysisType=%s";
     String url = storageProxyUrl.concat(String.format(endPoint, executionId, emailExportSize, analysisType));
     ResponseEntity<DataResponse> entity = restTemplate.getForEntity(url, DataResponse.class);
 
