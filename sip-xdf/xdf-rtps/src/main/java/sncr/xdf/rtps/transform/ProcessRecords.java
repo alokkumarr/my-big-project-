@@ -78,6 +78,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private String outputType;
     private InternalContext itcx;
     private NGContext ngctx ;
+    private static final Integer DEFAULT_THREAD_CNT = 10;
     
     
 
@@ -272,6 +273,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	  // ex: event type for iot
     	  String multiColName = (String) context.pipelineConfig.get("multiColName");
     	  String isTimeSeries = (String) context.pipelineConfig.get("isTimeSeries");
+    	  String threadPoolCnt = (String) context.pipelineConfig.get("numberOfThreads");
     	  
     	  List<Row> multiColValues = df.select(multiColName).distinct().collectAsList();
     	  
@@ -279,8 +281,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	  
     	  NGContext ct = this.ngctx;
     	 
-    	  
-    	  ExecutorService executorService = Executors.newFixedThreadPool(10);
+    	  int numThreads = threadPoolCnt==null?DEFAULT_THREAD_CNT : Integer.valueOf(threadPoolCnt) ;
+    	  ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
     	  
     	  for(Row multiColType: multiColValues) {
     		  String type =  (String) multiColType.get(0);
