@@ -9,6 +9,7 @@ import {
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as fpGet from 'lodash/fp/get';
 import * as includes from 'lodash/includes';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
 import * as omit from 'lodash/omit';
@@ -374,14 +375,21 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       ...alertConfigWithoutSipQuery,
       sipQuery
     };
-    this.endPayload = alertConfigWithoutSipQuery;
+    this.endPayload = this.transformAlertConfigToShow(
+      alertConfigWithoutSipQuery
+    );
     return alertConfig;
   }
 
+  transformAlertConfigToShow(alertConfigWithoutSipQuery) {
+    const alertConfigToShow = cloneDeep(alertConfigWithoutSipQuery);
+    const [trimmedAttributeName] = split(alertConfigToShow.attributeName, '.');
+    alertConfigToShow.attributeName = trimmedAttributeName;
+    return alertConfigToShow;
+  }
+
   generateSipQuery() {
-    const {
-      aggregationType
-    } = this.alertMetricFormGroup.value;
+    const { aggregationType } = this.alertMetricFormGroup.value;
 
     const {
       lookbackPeriodValue,
@@ -452,11 +460,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const sipQuery = {
       artifacts: [{ artifactName, fields: [metricsColumn] }],
       booleanCriteria: 'AND',
-      filters: compact([
-        // alertFilter,
-        lookbackFilter,
-        stringFilter
-      ]),
+      filters: compact([lookbackFilter, stringFilter]),
       sorts: [],
       joins: [],
       store,
