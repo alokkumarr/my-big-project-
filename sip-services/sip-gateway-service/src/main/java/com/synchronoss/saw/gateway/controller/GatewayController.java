@@ -43,6 +43,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,6 +56,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
+import com.synchronoss.saw.gateway.Data;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
 import com.synchronoss.saw.gateway.utils.ContentRequestTransformer;
 import com.synchronoss.saw.gateway.utils.HeadersRequestTransformer;
@@ -107,8 +110,8 @@ public class GatewayController {
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
-    logger.info("request info : "+ request);
-    logger.info("filePath info : "+ filePath);
+    logger.trace("request info : "+ request);
+    logger.trace("filePath info : "+ filePath);
     logger.trace("Accept {}",request.getHeader("Accept"));
     logger.trace("Authorization {}",request.getHeader("Authorization"));
     logger.trace("Content-type {}",request.getHeader("Content-type"));    
@@ -145,8 +148,7 @@ public class GatewayController {
             if(uploadfiles!=null && uploadfiles.length==0){throw new FileUploadException("There are no files to upload");}
             String uploadURI = request.getRequestURI();
             if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-              //uploadURI =getServiceUrl(uploadURI, request) + "?" + request.getQueryString();
-                uploadURI =getServiceUrl(uploadURI, request);
+                uploadURI = getServiceUrl(uploadURI, request);
             } else {
               uploadURI = getServiceUrl(uploadURI, request);
             }
@@ -279,10 +281,19 @@ public class GatewayController {
   
   @ExceptionHandler(value=NoHandlerFoundException.class)
   private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest)  {
+    logger.trace("Request Url: " + requestURI);
     Optional<Endpoint> endpoint =
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
                     ).findFirst();
-    return endpoint.get().getLocation() + requestURI;
+    String endPoint = endpoint.get().getLocation() + requestURI;
+    logger.trace("Destination Url: " + endPoint);
+    return endPoint;
   }
+  
+  @PostMapping(path = "/data")
+  public ResponseEntity<Data> getData(@RequestBody Data data){
+    return new ResponseEntity<Data>(data, HttpStatus.ACCEPTED);
+  }
+  
 }

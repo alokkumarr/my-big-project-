@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.methods.RequestBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -22,7 +24,7 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
   public static final String API_DOCS_PATH = "/v2/api-docs";
 
   private ApiGatewayProperties apiGatewayProperties;
-
+  Logger logger = LoggerFactory.getLogger(this.getClass());
   public URLRequestTransformer(ApiGatewayProperties apiGatewayProperties) {
     this.apiGatewayProperties = apiGatewayProperties;
   }
@@ -44,6 +46,7 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
   
   @ExceptionHandler(value=NoHandlerFoundException.class)
   private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest)  {
+    logger.trace("Request Url: " + requestURI);
     Optional<Endpoint> endpoint =
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
@@ -55,6 +58,8 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
     if (uri.endsWith(API_DOCS_PATH)) {
       uri = API_DOCS_PATH;
     }
-    return endpoint.get().getLocation() + uri;
+    String endPoint = endpoint.get().getLocation() + uri;
+    logger.trace("Destination Url: " + endPoint);
+    return endPoint;
   }
 }

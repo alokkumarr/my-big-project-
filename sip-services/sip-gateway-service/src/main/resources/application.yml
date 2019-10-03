@@ -13,7 +13,7 @@ spring:
     banner-mode: 'off'
 logging:
   level:
-    com.synchronoss.saw.gateway: TRACE
+    com.synchronoss.saw.gateway: INFO   
 
 server:
   max-http-header-size: 65536
@@ -24,13 +24,13 @@ server:
     mime-types: text/html,text/css,application/javascript,application/json
   servlet:
     context-path: ''
-  ssl:
-    key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-    key-store-password: sip@123
-    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
-    trust-store-password: sip@123
+  #ssl:
+   # key-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    #key-store-password: sip@123
+    #trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    #trust-store-password: sip@123
 
-connector: https
+connector: http
 saw-security-port: 9000
 
 
@@ -48,7 +48,7 @@ semantic:
         host: http://localhost:9200
 security:
     service:
-        host: ${connector}://localhost:${saw-security-port}/saw-security
+        host: http://saw-rd611.eng-sip.dev01.us-west.sncrcloud.net/sip/security
 export:
     service:
         host: http://localhost:9400
@@ -77,15 +77,18 @@ api:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
             method: GET
-            path: '[/]analysis.*'
-        -   location: ${internal-analysis.service.host}
-            method: POST
-            path: '[/]analysis*'
-        -   location: ${semantic.service.host}
-            method: POST
-            path: '[/]semantic*'
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: PUT
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]dslanalysis.*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
@@ -101,22 +104,22 @@ api:
         -   location: ${scheduler.service.host}
             method : DELETE
             path : '[/]scheduler.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]observe.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]filters.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]kpi.*'
         -   location: ${workbench.service.host}
@@ -126,15 +129,24 @@ api:
             method: GET
             path: '[/]internal/workbench.*'
         -   location: ${proxy.service.host}
+            method: GET
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/proxy.*'
-        -   location: ${datapod.service.host}
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
+            path: '[/]internal/proxy.*'
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
         -   location: ${batch.service.host}
@@ -158,7 +170,6 @@ api:
         -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]internal/rtisconfig.*'
-
 
 
 sip:
