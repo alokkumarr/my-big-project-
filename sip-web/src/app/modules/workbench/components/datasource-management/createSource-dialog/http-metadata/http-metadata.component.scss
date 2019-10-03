@@ -1,0 +1,56 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  padding-bottom: 1.34375em;
+}
+
+mat-tab-group {
+  border: 1px solid $material-grey-border;
+  border-radius: 6px;
+}
+
+mat-form-field {
+  &.left-align {
+    ::ng-deep .mat-form-field-outline-end {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
+  &.right-align {
+    ::ng-deep .mat-form-field-outline-start {
+      border-left: none;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
+}
+
+.parameters {
+  margin-bottom: 10px;
+}
+
+::ng-deep mat-tab-body {
+  padding: 15px 10px 0;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  margin-top: 2px;
+  background-color: $primary-blue-b2;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.tab-error {
+  color: $primary-red;
+  .dot {
+    background-color: $primary-red;
+  }
+}
+
+::ng-deep .mat-tab-labels .mat-tab-label.mat-tab-label-active {
+  opacity: 1;
+}

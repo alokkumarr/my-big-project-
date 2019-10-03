@@ -14,6 +14,7 @@ import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestReposit
 import com.synchronoss.saw.batch.entities.repositories.BisRouteDataRestRepository;
 import com.synchronoss.saw.batch.exception.BisException;
 import com.synchronoss.saw.batch.exception.ResourceNotFoundException;
+import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.service.BisChannelService;
 import com.synchronoss.saw.batch.utils.IntegrationUtils;
 import com.synchronoss.saw.batch.utils.SipObfuscation;
@@ -113,11 +114,18 @@ public class SawBisChannelController {
     if (bisChannelService.isChannelNameExists(channelName)) {
       throw new BisException("Channel Name: " + channelName + " already exists");
     }
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-    String secretPhrase = rootNode.get("password").asText();
-    String passwordPhrase = obfuscator.encrypt(secretPhrase);
-    rootNode.put("password", passwordPhrase);
-    requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+
+
+    String channelType = requestBody.getChannelType();
+
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
+      SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+      String secretPhrase = rootNode.get("password").asText();
+      String passwordPhrase = obfuscator.encrypt(secretPhrase);
+      rootNode.put("password", passwordPhrase);
+      requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+    }
+
     BisChannelEntity channelEntity = new BisChannelEntity();
     BeanUtils.copyProperties(requestBody, channelEntity);
     channelEntity.setCreatedDate(new Date());
@@ -180,10 +188,15 @@ public class SawBisChannelController {
       try {
         nodeEntity = objectMapper.readTree(entity.getChannelMetadata());
         rootNode = (ObjectNode) nodeEntity;
-        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-        String secretPhrase = rootNode.get("password").asText();
-        secretPhrase = obfuscator.decrypt(secretPhrase);
-        rootNode.put("password", secretPhrase);
+
+        String channelType = rootNode.get("channelType").textValue();
+
+        if (channelType.equals(BisChannelType.SFTP.toString())) {
+          SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+          String secretPhrase = rootNode.get("password").asText();
+          secretPhrase = obfuscator.decrypt(secretPhrase);
+          rootNode.put("password", secretPhrase);
+        }
         bisChannelDto = new BisChannelDto();
         BeanUtils.copyProperties(entity, bisChannelDto);
         bisChannelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
@@ -239,10 +252,15 @@ public class SawBisChannelController {
     try {
       nodeEntity = objectMapper.readTree(channelEntityData.getChannelMetadata());
       rootNode = (ObjectNode) nodeEntity;
-      SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-      String secretPhrase = rootNode.get("password").asText();
-      secretPhrase = obfuscator.decrypt(secretPhrase);
-      rootNode.put("password", secretPhrase);
+
+      String channelType = rootNode.get("channelType").textValue();
+
+      if (channelType.equals(BisChannelType.SFTP.toString())) {
+        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+        String secretPhrase = rootNode.get("password").asText();
+        secretPhrase = obfuscator.decrypt(secretPhrase);
+        rootNode.put("password", secretPhrase);
+      }
       BeanUtils.copyProperties(channelEntityData, channelDto);
       channelDto.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
       if (channelEntityData.getCreatedDate() != null) {
@@ -291,11 +309,16 @@ public class SawBisChannelController {
     ObjectNode rootNode = null;
     nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
     rootNode = (ObjectNode) nodeEntity;
-    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
-    String secretPhrase = rootNode.get("password").asText();
-    secretPhrase = obfuscator.encrypt(secretPhrase);
-    rootNode.put("password", secretPhrase);
-    requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+
+    String channelType = requestBody.getChannelType();
+
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
+      SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+      String secretPhrase = rootNode.get("password").asText();
+      secretPhrase = obfuscator.encrypt(secretPhrase);
+      rootNode.put("password", secretPhrase);
+      requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
+    }
     Optional<BisChannelEntity> optionalChannel = bisChannelDataRestRepository.findById(channelId);
     if (optionalChannel.isPresent()) {
       BisChannelEntity channel = optionalChannel.get();
@@ -365,7 +388,7 @@ public class SawBisChannelController {
   /**
    * This API provides an ability to delete a source.
    */
-  @ApiOperation(value = "check channel Name is duplciate", response = Object.class)
+  @ApiOperation(value = "check channel Name is duplicate", response = Object.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
           @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -418,5 +441,44 @@ public class SawBisChannelController {
     return responseMap;
   }
 
+  private String extractAndValidateChannelMetadata(BisChannelDto requestBody) throws Exception {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode nodeEntity = null;
+    ObjectNode channelMetadata = null;
+    nodeEntity = objectMapper.readTree(requestBody.getChannelMetadata());
+    channelMetadata = (ObjectNode) nodeEntity;
+    String channelName = channelMetadata.get("channelName").asText();
+    if (bisChannelService.isChannelNameExists(channelName)) {
+      throw new BisException("Channel Name: " + channelName + " already exists");
+    }
 
+    String channelType = requestBody.getChannelType();
+
+    if (channelType.equals(BisChannelType.SFTP.toString())) {
+      String secretPhrase = channelMetadata.get("password").asText();
+      String passwordPhrase = encryptPassword(secretPhrase);
+      channelMetadata.put("password", passwordPhrase);
+    }
+
+    return objectMapper.writeValueAsString(channelMetadata);
+  }
+
+  private String encryptPassword(String password) throws Exception {
+    String encryptedPassword = null;
+
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    encryptedPassword = obfuscator.encrypt(password);
+    return encryptedPassword;
+  }
+
+  private String decryptPassword(String encryptedPassword) throws Exception {
+    String decryptedPassword = null;
+
+    SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
+    decryptedPassword = obfuscator.decrypt(encryptedPassword);
+
+    return decryptedPassword;
+  }
 }

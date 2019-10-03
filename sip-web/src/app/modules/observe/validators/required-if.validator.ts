@@ -6,20 +6,29 @@ import { FormControl, ValidationErrors } from '@angular/forms';
  *
  * Example: The date fields are required only if preset is set to custom
  *
- * @param {string} otherFieldName
+ * @param {string} otherField
  * @param {(any) => boolean} fn
  * @returns
  */
-export const requireIf = (otherFieldName: string, fn: (any) => boolean) => {
+export const requireIf = (
+  otherField: string | ((FormControl) => FormControl),
+  fn: (any) => boolean
+) => {
   return (thisControl: FormControl): ValidationErrors => {
     if (!thisControl.parent) {
       return null;
     }
 
-    const otherControl = thisControl.parent.get(otherFieldName) as FormControl;
+    let otherControl: FormControl;
+
+    if (typeof otherField === 'string') {
+      otherControl = thisControl.parent.get(otherField) as FormControl;
+    } else {
+      otherControl = otherField(otherControl);
+    }
 
     if (!otherControl) {
-      throw new Error(`${otherFieldName} not found in the form.`);
+      throw new Error(`${otherField} not found in the form.`);
     }
 
     if (!fn(otherControl.value)) {

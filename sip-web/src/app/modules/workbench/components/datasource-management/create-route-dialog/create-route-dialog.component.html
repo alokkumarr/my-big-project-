@@ -23,318 +23,140 @@
       <ng-template matStepperIcon="done">
         <mat-icon fontIcon="icon-checkmark"></mat-icon>
       </ng-template>
-      <mat-step label="Route Details" [stepControl]="detailsFormGroup">
-        <form
-          fxFlex
-          fxLayout="row wrap"
-          class="details-container"
-          #sourceDetails
-          novalidate
-          [formGroup]="detailsFormGroup"
-          autocomplete="false"
+      <mat-step label="Route Details" [stepControl]="stepControl">
+        <div
+          fxLayout="column"
+          fxLayoutAlign="center stretch"
+          style="height: 100%"
         >
-          <section
-            fxFlex="49"
-            fxLayout="column"
-            fxLayoutAlign="space-around center"
+          <ng-container [ngSwitch]="routeData.channelType">
+            <sftp-route
+              #sftpForm
+              *ngSwitchCase="uid.SFTP"
+              fxFlex="1 1 auto"
+              [routeData]="routeData"
+              [opType]="opType"
+            ></sftp-route>
+            <api-route
+              #apiForm
+              *ngSwitchCase="uid.API"
+              fxFlex="1 1 auto"
+              [routeData]="routeData"
+              [opType]="opType"
+            ></api-route>
+          </ng-container>
+          <div
+            fxFlex="0 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            style="padding-top: 20px;"
           >
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Route Name</mat-label>
-              <input
-                matInput
-                name="routeName"
-                formControlName="routeName"
-                e2e="route-name-input"
-                required
-              />
-              <mat-error
-                e2e="route-name-error"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('required')"
-                i18n
-              >
-                Route Name is <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="route-name-exist"
-                *ngIf="detailsFormGroup.controls.routeName.hasError('isUnique')"
-                i18n
-              >
-                Route Name already <strong>exists</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>File Pattern</mat-label>
-              <input
-                matInput
-                name="filePattern"
-                formControlName="filePattern"
-                e2e="route-file-pattern-input"
-                required
-              />
-              <mat-error
-                e2e="route-file-pattern-error"
-                *ngIf="
-                  detailsFormGroup.controls.filePattern.hasError('required')
-                "
-                i18n
-              >
-                File Pattern is <strong>required</strong>
-              </mat-error>
-              <mat-error
-                e2e="route-file-pattern-invalid"
-                *ngIf="
-                  detailsFormGroup.controls.filePattern.hasError(
-                    'inValidPattern'
-                  )
-                "
-                i18n
-              >
-                File Pattern is invalid.
-                <strong> Cannot have more than one pattern</strong>
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Exclude Extension</mat-label>
-              <input
-                matInput
-                type="text"
-                name="fileExclusions"
-                e2e="route-file-exclusions-input"
-                formControlName="fileExclusions"
-              />
-              <mat-error
-                e2e="route-file-exclusions-error"
-                *ngIf="
-                  detailsFormGroup.controls.fileExclusions.hasError(
-                    'inValidPattern'
-                  )
-                "
-                i18n
-              >
-                <strong>
-                  Cannot have more than one extension or a ' . ' in extension
-                  value</strong
-                >
-              </mat-error>
-            </mat-form-field>
-            <mat-checkbox id = "disableDuplicate"
-              e2e="route-disable-duplicate-ch"
-              formControlName="disableDuplicate"
-              i18n>
-              Disable duplicate check
-            </mat-checkbox>
-            <mat-checkbox id = "disableConcurrency"
-              e2e="route-disable-duplicate-ch"
-              formControlName="disableConcurrency"
+            <button
+              mat-stroked-button
+              color="primary"
+              color="warn"
+              (click)="onCancelClick()"
+              e2e="route-cancel-btn"
               i18n
             >
-              Disable Concurrency      
-            </mat-checkbox>
-          </section>
-          <mat-divider fxFlex="2" [vertical]="true"></mat-divider>
-          <section
-            fxFlex="49"
-            fxLayout="column"
-            fxLayoutAlign="space-around center"
-          >
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Source Location</mat-label>
-              <input
-                matInput
-                name="sourceLocation"
-                e2e="route-source-location-input"
-                formControlName="sourceLocation"
-                required
-              />
-              <mat-error
-                e2e="route-source-error"
-                *ngIf="
-                  detailsFormGroup.controls.sourceLocation.hasError('required')
-                "
-                i18n
-              >
-                Source Location is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Destination Location</mat-label>
-              <input
-                matInput
-                name="destinationLocation"
-                e2e="route-dest-location-input"
-                formControlName="destinationLocation"
-                required
-              />
-              <button
-                mat-button
-                matSuffix
-                mat-icon-button
-                (click)="openSelectSourceFolderDialog()"
-              >
-                <mat-icon
-                  matTooltip="Browse"
-                  fontIcon="icon-folder-solid"
-                ></mat-icon>
-              </button>
-              <mat-error
-                e2e="route-dest-location-error"
-                *ngIf="
-                  detailsFormGroup.controls.destinationLocation.hasError(
-                    'required'
-                  )
-                "
-                i18n
-              >
-                Destination Location is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Batch size</mat-label>
-              <input
-                matInput
-                type="number"
-                e2e="route-batch-size-input"
-                name="batchSize"
-                formControlName="batchSize"
-                required
-              />
-              <mat-error
-                e2e="route-batch-size-error"
-                *ngIf="detailsFormGroup.controls.batchSize.hasError('required')"
-                i18n
-              >
-                Batch size is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Look back interval (Hrs)</mat-label>
-              <input
-                matInput
-                type="text"
-                [value]="detailsFormGroup.controls.lastModifiedLimitHours.value "
-                name="lastModifiedLimitHours"
-                e2e="last-modified-limit-input"
-                formControlName="lastModifiedLimitHours"
-              />
-              <span *ngIf="detailsFormGroup.controls.errors" class="errorTextMsg" i18n>Only numbers allowed</span>
-             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label i18n>Description about the route</mat-label>
-              <textarea
-                matInput
-                formControlName="description"
-                e2e="route-description-input"
-              ></textarea>
-            </mat-form-field>
-          </section>
-        </form>
-        <mat-divider></mat-divider>
-        <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="space-between center"
-          style="height: 20%;"
-        >
-          <button
-            mat-stroked-button
-            color="primary"
-            color="warn"
-            (click)="onCancelClick()"
-            e2e="route-cancel-btn"
-            i18n
-          >
-            Cancel
-          </button>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="testRoute(detailsFormGroup.value)"
-            [disabled]="!detailsFormGroup.valid"
-            e2e="route-test-connectivity-btn"
-            i18n
-          >
-            <mat-icon
-              fontIcon="icon-query-mode"
-              style="vertical-align: bottom;"
-            ></mat-icon>
-            Test Connectivity
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-next-btn"
-            matStepperNext
-            [disabled]="!detailsFormGroup.valid"
-            i18n
-          >
-            Next
-          </button>
+              Cancel
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="testRoute(detailsFormTestValue)"
+              [disabled]="!isDetailsFormValid"
+              e2e="route-test-connectivity-btn"
+              i18n
+            >
+              <mat-icon
+                fontIcon="icon-query-mode"
+                style="vertical-align: bottom;"
+              ></mat-icon>
+              Test Connectivity
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-next-btn"
+              matStepperNext
+              [disabled]="!isDetailsFormValid"
+              i18n
+            >
+              Next
+            </button>
+          </div>
         </div>
       </mat-step>
       <mat-step label="Schedule Route">
-        <div style="height: 80%;">
-          <cron-job-schedular
-            [crondetails]="crondetails"
-            (onCronChanged)="onCronChanged($event)"
-          ></cron-job-schedular>
-        </div>
-        <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n
-          >Start date cannot be in past. Please select a Date that is current or
-          in future.</span
-        >
-        <mat-divider></mat-divider>
         <div
-          fxFlex
-          fxLayout="row"
-          fxLayoutAlign="space-between center"
-          style="height: 20%;"
+          fxLayout="column"
+          fxLayoutAlign="start stretch"
+          style="height: 100%"
         >
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-schd-previous-btn"
-            matStepperPrevious
-            i18n
+          <div fxFlex="1 1 auto">
+            <cron-job-schedular
+              [crondetails]="crondetails"
+              (onCronChanged)="onCronChanged($event)"
+            ></cron-job-schedular>
+          </div>
+          <span *ngIf="!startDateCorrectFlag" class="errorTextMsg" i18n
+            >Start date cannot be in past. Please select a Date that is current
+            or in future.</span
           >
-            Previous
-          </button>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="testRoute(detailsFormGroup.value)"
-            [disabled]="!detailsFormGroup.valid"
-            e2e="route-schd-test-conn-btn"
-            i18n
+          <mat-divider></mat-divider>
+          <div
+            fxFlex="0 1 auto"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            style="padding-top: 20px;"
           >
-            <mat-icon
-              fontIcon="icon-query-mode"
-              style="vertical-align: bottom;"
-            ></mat-icon>
-            Test Connectivity
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            *ngIf="opType === 'create'"
-            [disabled]="!detailsFormGroup.valid || !isCronExpressionValid"
-            (click)="createRoute(detailsFormGroup.value)"
-            e2e="route-schd-create-btn"
-            i18n
-          >
-            Create
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            e2e="route-schd-update-btn"
-            *ngIf="opType === 'update'"
-            [disabled]="!detailsFormGroup.valid"
-            (click)="createRoute(detailsFormGroup.value)"
-            i18n
-          >
-            Update
-          </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-schd-previous-btn"
+              matStepperPrevious
+              i18n
+            >
+              Previous
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="testRoute(detailsFormTestValue)"
+              [disabled]="!isDetailsFormValid"
+              e2e="route-schd-test-conn-btn"
+              i18n
+            >
+              <mat-icon
+                fontIcon="icon-query-mode"
+                style="vertical-align: bottom;"
+              ></mat-icon>
+              Test Connectivity
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="opType === 'create'"
+              [disabled]="!isDetailsFormValid || !isCronExpressionValid"
+              (click)="createRoute(detailsFormValue)"
+              e2e="route-schd-create-btn"
+              i18n
+            >
+              Create
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              e2e="route-schd-update-btn"
+              *ngIf="opType === 'update'"
+              [disabled]="!isDetailsFormValid"
+              (click)="createRoute(detailsFormValue)"
+              i18n
+            >
+              Update
+            </button>
+          </div>
         </div>
       </mat-step>
     </mat-horizontal-stepper>
