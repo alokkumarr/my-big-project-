@@ -285,9 +285,9 @@ public class ExportServiceImpl implements ExportService {
       Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
       logger.debug("Writing to file");
-      logger.debug("Data = " + entity.getBody().getData());
       // stream the page output to file.
       if (entity != null && (DEFAULT_FILE_TYPE.equalsIgnoreCase(fileType) || fileType == null || fileType.isEmpty())) {
+        logger.debug("Data = " + entity.getBody().getData());
         streamToCSVReport(columnHeader, entity, limitPerPage, exportBean, osw);
         osw.close();
         fos.close();
