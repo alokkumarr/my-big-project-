@@ -78,7 +78,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
       SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
       DynamicConvertor dynamicConverter =
-          BuilderUtil.getDynamicConvertForPresetCal(alertRuleDetails.getLookbackPeriod());
+          getDynamicConvertorWithCalculatedPreset(alertRuleDetails.getLookbackPeriod());
       if (alertRuleDetails.getTriggerOnLookback() == null
           || !(alertRuleDetails.getTriggerOnLookback())
           || (alertRuleDetails.getTriggerOnLookback()
@@ -194,6 +194,27 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     }
     sipQuery.setFilters(filters);
     return sipQuery;
+  }
+
+  /**
+   * Method calculates lte and gte based on preset and then saves those values in lookBackPeriod.
+   *
+   * @param lookBackPeriod lookBackPeriod.
+   * @return DynamicConvertor Dynamic Convertor
+   */
+  public DynamicConvertor getDynamicConvertorWithCalculatedPreset(String lookBackPeriod) {
+    DynamicConvertor dynamicConverter = null;
+    if (lookBackPeriod != null) {
+      lookBackPeriod = lookBackPeriod.trim();
+      final String hypen = "-";
+      if (lookBackPeriod.contains(hypen)) {
+        dynamicConverter = BuilderUtil.getDynamicConvertForPresetCal(lookBackPeriod);
+      } else {
+        dynamicConverter = BuilderUtil.dynamicDecipher(lookBackPeriod);
+      }
+    }
+
+    return dynamicConverter;
   }
 
   /**
