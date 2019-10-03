@@ -93,6 +93,12 @@
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-esloader</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>org.elasticsearch</groupId>
+      		<artifactId>elasticsearch-spark-20_2.11</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 		
 		   <!-- Spark related -->
