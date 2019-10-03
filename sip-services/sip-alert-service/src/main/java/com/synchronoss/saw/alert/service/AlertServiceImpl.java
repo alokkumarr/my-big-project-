@@ -465,7 +465,7 @@ public class AlertServiceImpl implements AlertService {
     logger.trace("Mapr Filter query for alert count:{}", query);
     List<AlertResult> result =
         connection.runMaprDbQueryWithFilter(
-            query, pageNumber, pageSize, CREATED_TIME, AlertResult.class);
+            query, pageNumber, pageSize, "startTime", AlertResult.class);
     switch (alertCount.getGroupBy()) {
       case SEVERITY:
         return groupByseverity(result);
