@@ -65,7 +65,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   operators$;
   aggregations$;
   notifications$;
-  thresholdValueLabel: string;
+  thresholdValueLabel = 'Threshold value';
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
@@ -171,7 +171,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
       alertRuleName: ['', Validators.required],
-      alertRuleDescription: ['', Validators.required],
+      alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
       notificationEmails: [[]],
