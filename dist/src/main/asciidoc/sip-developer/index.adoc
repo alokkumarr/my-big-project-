@@ -285,8 +285,9 @@ RTIS requires app key to submit the events. Follow the below steps to create app
 . Navigate to RTIS App keys page. This will fetch all the app keys for the customer.
 . Click on RTIS registration page to create a new app key. Fill the form with the following fields.
 .. Model - SIP support models (Countly|Generic|Simple|Simple-Json)
-.. Bath Size - It measures batch size in total bytes instead of the number of messages.
+.. Batch Size - It measures batch size in total bytes instead of the number of messages.
 .. Buffer Full Size - It maintains buffers of unsent records for each partition.
+.. Event URL - It is the URL to submit the events.
 .. Timeout in MS - It is the timeout configured on the leader in the Kafka cluster. This is the timeout on the server side.
 .. Stream/Queue - Name of the Queue.
 .. Topic - Name of the topic.
