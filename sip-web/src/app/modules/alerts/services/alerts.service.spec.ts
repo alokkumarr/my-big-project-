@@ -29,8 +29,8 @@ describe('AlertsService', () => {
     expect(sorts).toEqual(null);
   });
 
-  it('convertOptionsToPayloadAndQueryParams should convert asorts object to backend sorts structure', () => {
-    const options = { sort: { selector: 'someField', desc: true } };
+  it('convertOptionsToPayloadAndQueryParams should convert sorts object to backend sorts structure', () => {
+    const options = { sort: [{ selector: 'someField', desc: true }] };
     const targetSorts = [{ fieldName: 'someField', order: 'DESC' }];
     const { sorts } = service.convertOptionsToPayloadAndQueryParams(options);
     expect(sorts).toEqual(targetSorts);
