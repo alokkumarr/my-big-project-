@@ -98,7 +98,7 @@ public class RTPSPipelineProcessor {
 	
 			
 			if(pipeline == null) {
-				logger.error("####No pipeline defined for event type "+ pipeline);
+				logger.error("####No pipeline defined for event type "+ type);
 			} else {
 				
 				for (int i = pipeLinStartIndex; i < pipeline.size(); i++) {

@@ -216,6 +216,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     private void ProcessGenericRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm, InternalContext ctx){
         JavaRDD<String> jsonRdd = in.mapPartitions(new TransformJsonRecord(definitions));
+        logger.debug("first below::");
+        logger.debug(jsonRdd.first());
         SparkConf cnf = in.context().getConf();
         processJsonRecords(jsonRdd, tm, cnf, ctx);
     }
@@ -232,89 +234,99 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         
  
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
-        //List<Row> list =  df.collectAsList();
-        //Dataset<Row> data = sess.createDataFrame(list, schema);
+        logger.debug("data here ::");
+        df.show();
   	    NGContext context = this.ngctx;
   	    
 		
-		/*df.repartition(new Column("EVENT_TYPE")).toJavaRDD().foreachPartitionAsync(new VoidFunction<JavaRDD<Row>>() {
-
-			
-
-			@Override
-			public void call(JavaRDD<Row> t) throws Exception {
-				JSONObject pipeline = (JSONObject) context.pipelineConfig.get("pipeline");
-	            JSONObject pipelineConfigs = (JSONObject) pipeline.get("pipelineConfigs");
-				RTPSPipelineProcessor processor = new RTPSPipelineProcessor(sess.createDataFrame(t, schema));
-	            processor.processDataWithDataFrame(context.pipelineConfig,context.pipelineConfigParams, null );
-				
-			}
-			
-			
-		});*/
     	
-        logger.debug("Invoking  async ...partion logic ....");
-        
-       /* List<Row> list =  df.repartition(new Column("EVENT_TYPE")).collectAsList();
-        final SparkSession sparkSession = SparkSession.builder().config(cnf).getOrCreate();
-		sess.createDataFrame(list, schema).toJavaRDD().foreachPartitionAsync(new ProcessEventType(cnf,
-				this.ngctx.pipelineConfig,schema,this.ngctx.pipelineConfigParams,df.sparkSession()));*/
-		
-		
-		
-		logger.debug("Invoking async ...partion logic completed....");
+  	   
         
         if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
       	  logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
       	  
-      	logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
+    
     	  logger.debug("####"+ this.ngctx.pipelineConfigParams);
     	  
-    	  // ex: event type for iot
-    	  String multiColName = (String) context.pipelineConfig.get("multiColName");
-    	  String isTimeSeries = (String) context.pipelineConfig.get("isTimeSeries");
-    	  String threadPoolCnt = (String) context.pipelineConfig.get("numberOfThreads");
+    	  Object isMultiple = this.ngctx.pipelineConfig.get("multiplePipeline");
     	  
-    	  List<Row> multiColValues = df.select(multiColName).distinct().collectAsList();
+    	  logger.debug("### Multiple pipeline ::" + isMultiple);
     	  
-    	  logger.info("Total event types: "+ multiColValues.size());
     	  
-    	  NGContext ct = this.ngctx;
-    	 
-    	  int numThreads = threadPoolCnt==null?DEFAULT_THREAD_CNT : Integer.valueOf(threadPoolCnt) ;
-    	  ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-    	  
-    	  for(Row multiColType: multiColValues) {
-    		  String type =  (String) multiColType.get(0);
-     		  String query = multiColName +"== \'"+ type+ "\'";
-     		  logger.debug("Query:: " + query);
+    	  /** 
+    	   * Single pipeline. Ex: Only one event type
+    	   */
+    	  if(isMultiple ==null || !Boolean.valueOf((String)isMultiple)){
     		  
-     		  /**
-     		   * Process asynchronously if not time series.
-     		   * Process synchronously if time series
-     		   */
-    		  if(isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
-    			  
-    			  executorService.submit(new Callable<Long>() {
-      		        @Override
-      		        public Long call() throws Exception {
-      		        	
-    		    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-    		              processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,type );
-    					
-      					return 1L;
-      		        }
-      		    });
-        		  
-        		  
-        	  } else if(Boolean.valueOf(isTimeSeries)){
-        		
-         		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-                  processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,type );
-        	  }
-    		
+    		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
+              processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,"" );
     		  
-    	  }
+    		  
+			} else {
+
+				/**
+				 * Multiple event types
+				 */
+
+				Object multiColName = context.pipelineConfig.get("multiColName");
+
+				if (null == multiColName) {
+					return 255;
+				}
+
+				logger.debug("Multi column name " + multiColName);
+
+				List<Row> multiColValues = df.select((String) multiColName).distinct().collectAsList();
+
+				logger.info("####### Total event types as part of dataset #######: " + multiColValues.size());
+				logger.info("####### Total event types as part of hardcode event typedataset #######: " + df.select("EVENT_TYPE").distinct().collectAsList().size());
+
+				NGContext ct = this.ngctx;
+
+				for (Row multiColType : multiColValues) {
+					
+					logger.debug("#### Processing data for type ::"+ multiColType);
+
+					String isTimeSeries = (String) context.pipelineConfig.get("isTimeSeries");
+
+					logger.debug("########## is Time series data ::" + isTimeSeries);
+
+					String type = (String) multiColType.get(0);
+					String query = multiColName + "== \'" + type + "\'";
+					logger.debug("Query:: " + query);
+
+					/**
+					 * Process asynchronously if not time series. Process synchronously if time
+					 * series
+					 */
+					if (isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
+
+						Object threadPoolCnt = context.pipelineConfig.get("numberOfThreads");
+
+						int numThreads = threadPoolCnt == null ? DEFAULT_THREAD_CNT
+								: Integer.valueOf((Integer) threadPoolCnt);
+						logger.debug("###### Number of threads used only if non timeseries::" + numThreads);
+						ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+						executorService.submit(new Callable<Long>() {
+							@Override
+							public Long call() throws Exception {
+								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+								processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams, type);
+
+								return 1L;
+							}
+						});
+
+					} else if (Boolean.valueOf(isTimeSeries)) {
+
+						RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+						processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,
+								type);
+					}
+
+				}
+
+			}
     	
     	  logger.debug("COUNT before async::"+ df.count());
 
