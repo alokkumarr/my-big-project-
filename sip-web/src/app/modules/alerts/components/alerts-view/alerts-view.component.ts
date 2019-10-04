@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import {
@@ -27,6 +27,7 @@ export class AlertsViewComponent implements OnInit {
   allAlertCountChartData$: Observable<AlertChartData>;
   @Select(AlertsState.getAllAlertsSeverityChartData)
   allAlertSeverityChartData$: Observable<AlertChartData>;
+  @ViewChild('alertViewSidenav') alertViewSidenav;
 
   public additionalCountChartOptions = {
     chart: {
@@ -63,16 +64,15 @@ export class AlertsViewComponent implements OnInit {
     }
   };
 
-  constructor(private _alertService: AlertsService, private _store: Store) {
-    this.setAlertLoaderForGrid();
-  }
+  constructor(private _alertService: AlertsService, private _store: Store) {}
 
   ngOnInit() {
     this.filters$.subscribe(filters => {
       this.filters = filters;
-      this.setAlertLoaderForGrid();
+      this.alertViewSidenav.close();
+      // this.setAlertLoaderForGrid();
+      this.fetchLateshAlerts();
     });
-    this.fetchLateshAlerts();
   }
 
   fetchLateshAlerts() {

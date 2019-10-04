@@ -16,10 +16,9 @@ import {
 const apiUrl = AppConfig.api.url;
 
 const getFiltersForBackend = (filters: AlertFilterModel[]) => {
-  return filter(filters, ({ type, modelValues }) => {
+  return filter(filters, ({ type, value }) => {
     switch (type) {
       case 'string':
-        const [value] = modelValues;
         return value;
     }
     return true;
@@ -45,14 +44,14 @@ export class AlertsService {
 
   getAlertsStatesForGrid(
     options: GridPagingOptions = {},
-    dateFilters: AlertFilterModel[]
+    filters: AlertFilterModel[]
   ) {
     const { sorts, queryParams } = this.convertOptionsToPayloadAndQueryParams(
       options
     );
     const basePath = `alerts/states`;
     const payload = {
-      filters: getFiltersForBackend(dateFilters),
+      filters: getFiltersForBackend(filters),
       sorts: sorts || []
     };
     const url = `${apiUrl}/${basePath}${queryParams}`;
@@ -75,8 +74,8 @@ export class AlertsService {
     const pageNumber = ceil(skip / take) + 1;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${take}`;
     let sorts = null;
-    if (options.sort) {
-      const { selector, desc } = options.sort;
+    if (options.sort && options.sort[0]) {
+      const { selector, desc } = options.sort[0];
       sorts = [{ fieldName: selector, order: desc ? 'DESC' : 'ASC' }];
     }
     return {

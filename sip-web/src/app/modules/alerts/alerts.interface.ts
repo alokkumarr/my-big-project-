@@ -108,7 +108,7 @@ export interface AlertFilterModel {
   fieldName: string;
   type: string;
   preset?: string;
-  modelValues?: string[];
+  value?: string;
   endTime?: string;
   startTime?: string;
   operator?: string;

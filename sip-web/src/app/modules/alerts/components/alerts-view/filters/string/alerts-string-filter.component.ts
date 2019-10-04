@@ -21,8 +21,7 @@ export class AlertsStringFilterComponent implements OnInit {
   filter: AlertFilterModel;
   @Output() change = new EventEmitter<AlertFilterEvent>();
   @Input('stringFilter') set setStringFilter(stringFilter: AlertFilterModel) {
-    const { modelValues } = stringFilter;
-    const [value] = modelValues;
+    const { value } = stringFilter;
     this.filter = stringFilter;
     this.alertFilterForm.setValue({ value }, { emitEvent: false });
   }
@@ -42,7 +41,7 @@ export class AlertsStringFilterComponent implements OnInit {
     this.alertFilterForm.valueChanges.subscribe(({ value }) => {
       const formIsValid = !this.alertFilterForm.invalid;
       if (formIsValid) {
-        this.filter.modelValues = [value];
+        this.filter.value = value;
         this.change.emit({ filter: this.filter, isValid: formIsValid });
       }
     });

@@ -29,7 +29,7 @@ export const defaultAlertFilters: AlertFilterModel[] = [
   },
   {
     fieldName: 'attributeValue',
-    modelValues: [''],
+    value: '',
     operator: 'EQ',
     type: 'string'
   }
