@@ -16,7 +16,7 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.readers.DLBatchReader;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.WithDataSet;
@@ -151,7 +151,7 @@ public abstract class AbstractComponent implements WithContext{
     public int moveAndArchiveForPipeline(int ret)
 	{
 		if (ret == 0) {
-			if (ngctx.persistMode) {
+			if (ngctx.isPersistMode()) {
 				ret = move();
 			}
 			if (ret == 0) {

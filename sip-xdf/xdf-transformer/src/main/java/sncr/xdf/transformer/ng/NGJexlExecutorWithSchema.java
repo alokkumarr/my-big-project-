@@ -61,6 +61,9 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
 
         Dataset ds = dsMap.get(transInKey);
 
+        ds.printSchema();
+        ds.show(5);
+
         prepareRefData(dsMap);
 
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();

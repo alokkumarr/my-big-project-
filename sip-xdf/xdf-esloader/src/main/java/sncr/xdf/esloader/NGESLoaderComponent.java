@@ -17,7 +17,7 @@ import com.google.gson.JsonArray;
     import sncr.bda.conf.ESLoader;
     import sncr.bda.core.file.HFileOperations;
     import sncr.bda.datasets.conf.DataSetProperties;
-    import sncr.xdf.context.ComponentServices;
+    import sncr.bda.conf.ComponentServices;
     import sncr.xdf.context.NGContext;
     import sncr.xdf.esloader.esloadercommon.ESHttpClient;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;

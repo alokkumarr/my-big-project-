@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import sncr.bda.conf.ComponentConfiguration;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
 

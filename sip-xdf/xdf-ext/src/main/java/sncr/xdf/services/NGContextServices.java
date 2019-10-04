@@ -10,7 +10,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.exceptions.XDFException;
@@ -61,6 +61,14 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         this.ngctx.serviceStatus.put(ComponentServices.Sample, true);
         this.ngctx.serviceStatus.put(ComponentServices.Spark, false);
 
+    }
+
+    public NGContextServices( ComponentServices[] cs, String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName,
+                              String batchID, Boolean persistMode){
+        ngctx = new NGContext(xdfRoot, componentConfiguration, applicationID, componentName, batchID, persistMode);
+        for (int i = 0; i < cs.length; i++) {
+            this.ngctx.serviceStatus.put(cs[i], false);
+        }
     }
 
     public NGContext getNgctx(){

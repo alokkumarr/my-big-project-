@@ -12,7 +12,7 @@ import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.services.NGContextServices;
@@ -167,7 +167,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             };
 
             ComponentConfiguration cfg = analyzeAndValidate(configAsStr);
-            NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
+            NGContextServices ngParserCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId,persistFlag);
             ngParserCtxSvc.initContext();
             ngParserCtxSvc.registerOutputDataSet();
 
@@ -185,7 +185,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
             ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            ngParserCtxSvc.getNgctx().persistMode = persistFlag;
+            //ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGParser component = new NGParser(ngParserCtxSvc.getNgctx());
 
@@ -249,7 +249,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             ComponentConfiguration config = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
 
             NGContextServices ngTransformerCtxSvc = new NGContextServices(scs, xdfDataRootSys, config, appId,
-                "transformer", batchId);
+                "transformer", batchId,persistFlag);
 
             ngTransformerCtxSvc.initContext(); // debug
 
@@ -262,11 +262,10 @@ public class XDFDataProcessor  extends AbstractComponent {
             );
 
             String transInKey =  config.getInputs().get(0).getDataSet().toString();
-            String transOutKey =  config.getOutputs().get(0).getDataSet().toString();
 
             ngTransformerCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
             ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
+            //ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
 
             NGTransformerComponent tcomponent = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
 
@@ -332,7 +331,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             ComponentConfiguration config = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
 
             NGContextServices ngSQLCtxSvc = new NGContextServices(sqlcs, xdfDataRootSys, config, appId,
-                "sql", batchId);
+                "sql", batchId,persistFlag);
             ngSQLCtxSvc.initContext(); // debug
             ngSQLCtxSvc.registerOutputDataSet();
 
@@ -353,7 +352,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
            // ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey,datafileDFmap.get(dataSetName)); //TRANS_OUT
             ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-            ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
+            //ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
             ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
             NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
