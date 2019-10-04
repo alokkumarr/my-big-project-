@@ -277,6 +277,23 @@ include::{snippets}/apidoc-rtis/paths.adoc[]
 include::{snippets}/apidoc-rtis/definitions.adoc[]
 include::{snippets}/apidoc-rtis/security.adoc[]
 
+==== Create and Retrieve of RTIS App Keys
+
+RTIS requires app key to submit the events. Follow the below steps to create app key:
+
+. Login to SIP application and navigate to workbench.
+. Navigate to RTIS App keys page. This will fetch all the app keys for the customer.
+. Click on RTIS registration page to create a new app key. Fill the form with the following fields.
+.. Model - SIP support models (Countly|Generic|Simple|Simple-Json)
+.. Bath Size - It measures batch size in total bytes instead of the number of messages.
+.. Buffer Full Size - It maintains buffers of unsent records for each partition.
+.. Timeout in MS - It is the timeout configured on the leader in the Kafka cluster. This is the timeout on the server side.
+.. Stream/Queue - Name of the Queue.
+.. Topic - Name of the topic.
+
+NOTE: App key is auto generated, user does not allow to specify app key.
+
+
 = Export Service API
 
 The Export Service allows clients to export reports and send
