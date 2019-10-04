@@ -76,86 +76,93 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     logger.info("Evaluating the Alert");
     List<AlertRuleDetails> alertRuleDetailsList = fetchAlertDetailsByDataPod(dataPodId);
     for (AlertRuleDetails alertRuleDetails : alertRuleDetailsList) {
-      SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
-      DynamicConvertor dynamicConverter =
-          getDynamicConvertorWithCalculatedPreset(alertRuleDetails.getLookbackPeriod());
-      if (alertRuleDetails.getTriggerOnLookback() == null
-          || !(alertRuleDetails.getTriggerOnLookback())
-          || (alertRuleDetails.getTriggerOnLookback()
-              && checkAlertResultBasedOnLastTrigger(
-                  alertRuleDetails.getAlertRulesSysId(),
-                  getEpochFromDateTime(dynamicConverter.getGte())))) {
-        logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
-        AlertResult alertResult = new AlertResult();
-        alertResult.setSipQuery(sipQuery);
-        alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
-        alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
-        alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
-        alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
-        alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
-        alertResult.setAlertState(AlertState.ALARM);
-        alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
-        alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
-        alertResult.setOperator(alertRuleDetails.getOperator());
-        alertResult.setCategoryId(alertRuleDetails.getCategoryId());
-        alertResult.setStartTime(requestTime);
-        alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
-        String alertResultId = UUID.randomUUID().toString();
-        alertResult.setAlertTriggerSysId(alertResultId);
-        List<?> alertResultList = evaluateAlertRules(sipQuery);
-        List<Object> executionResultList = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        AtomicReference<Boolean> alert = new AtomicReference<>(true);
-        AtomicReference<Double> metricsValue = new AtomicReference<>();
-        if (alertResultList.size() > 0) {
-          alertResultList.forEach(
-              (executionResult) -> {
-                try {
-                  Map<String, Object> result = mapper.convertValue(executionResult, Map.class);
-                  Object value = result.get(alertRuleDetails.getMetricsColumn());
-                  if (value != null
-                      && !value.toString().equalsIgnoreCase("null")
-                      && value.toString().length() > 0) {
-                    Double metricValue = ((Number) value).doubleValue();
-                    if (alertRuleDetails.getMonitoringType() != null
-                        && alertRuleDetails
-                            .getMonitoringType()
-                            .equals(MonitoringType.CONTINUOUS_MONITORING)) {
-                      if (!AlertUtils.checkThresholdsForRow(
-                          alertRuleDetails.getOperator(),
-                          alertRuleDetails.getThresholdValue(),
-                          alertRuleDetails.getOtherThresholdValue(),
-                          metricValue)) {
-                        alert.set(false);
+      try {
+        SipQuery sipQuery = getSipQueryWithCalculatedPresetCal(alertRuleDetails.getSipQuery());
+        DynamicConvertor dynamicConverter =
+            getDynamicConvertorWithCalculatedPreset(alertRuleDetails.getLookbackPeriod());
+        if (alertRuleDetails.getTriggerOnLookback() == null
+            || !(alertRuleDetails.getTriggerOnLookback())
+            || (alertRuleDetails.getTriggerOnLookback()
+                && checkAlertResultBasedOnLastTrigger(
+                    alertRuleDetails.getAlertRulesSysId(),
+                    getEpochFromDateTime(dynamicConverter.getGte())))) {
+          logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
+          AlertResult alertResult = new AlertResult();
+          alertResult.setSipQuery(sipQuery);
+          alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
+          alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
+          alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
+          alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
+          alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
+          alertResult.setAlertState(AlertState.ALARM);
+          alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
+          alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
+          alertResult.setOperator(alertRuleDetails.getOperator());
+          alertResult.setCategoryId(alertRuleDetails.getCategoryId());
+          alertResult.setStartTime(requestTime);
+          alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
+          String alertResultId = UUID.randomUUID().toString();
+          alertResult.setAlertTriggerSysId(alertResultId);
+          List<?> alertResultList = evaluateAlertRules(sipQuery);
+          List<Object> executionResultList = new ArrayList<>();
+          ObjectMapper mapper = new ObjectMapper();
+          AtomicReference<Boolean> alert = new AtomicReference<>(true);
+          AtomicReference<Double> metricsValue = new AtomicReference<>();
+          if (alertResultList.size() > 0) {
+            alertResultList.forEach(
+                (executionResult) -> {
+                  try {
+                    Map<String, Object> result = mapper.convertValue(executionResult, Map.class);
+                    Object value = result.get(alertRuleDetails.getMetricsColumn());
+                    if (value != null
+                        && !value.toString().equalsIgnoreCase("null")
+                        && value.toString().length() > 0) {
+                      Double metricValue = ((Number) value).doubleValue();
+                      if (alertRuleDetails.getMonitoringType() != null
+                          && alertRuleDetails
+                              .getMonitoringType()
+                              .equals(MonitoringType.CONTINUOUS_MONITORING)) {
+                        if (!AlertUtils.checkThresholdsForRow(
+                            alertRuleDetails.getOperator(),
+                            alertRuleDetails.getThresholdValue(),
+                            alertRuleDetails.getOtherThresholdValue(),
+                            metricValue)) {
+                          alert.set(false);
+                        }
                       }
+                      metricsValue.set(metricValue);
+                      executionResultList.add(value);
                     }
-                    metricsValue.set(metricValue);
-                    executionResultList.add(value);
+                  } catch (Exception e) {
+                    logger.error("Exception occurred while converting the execution result " + e);
                   }
-                } catch (Exception e) {
-                  logger.error("Exception occurred while converting the execution result " + e);
-                }
-              });
-          int executionSize = executionResultList.size();
-          if (executionSize > 0 && alert.get()) {
-            logger.info(
-                "Threshold has reached for the alert rule id"
-                    + alertRuleDetails.getAlertRulesSysId());
-            logger.info("Metric Value " + metricsValue.get());
-            alertResult.setMetricValue(metricsValue.get());
-            if (alertRuleDetails.getMonitoringType() != null
-                && alertRuleDetails
-                    .getMonitoringType()
-                    .equals(MonitoringType.CONTINUOUS_MONITORING)) {
-              alertResult.setAlertCount(1);
-            } else {
-              alertResult.setAlertCount(executionSize);
+                });
+            int executionSize = executionResultList.size();
+            if (executionSize > 0 && alert.get()) {
+              logger.trace(
+                  "Threshold has reached for the alert rule id"
+                      + alertRuleDetails.getAlertRulesSysId());
+              logger.info("Metric Value " + metricsValue.get());
+              alertResult.setMetricValue(metricsValue.get());
+              if (alertRuleDetails.getMonitoringType() != null
+                  && alertRuleDetails
+                      .getMonitoringType()
+                      .equals(MonitoringType.CONTINUOUS_MONITORING)) {
+                alertResult.setAlertCount(1);
+              } else {
+                alertResult.setAlertCount(executionSize);
+              }
+              connection.insert(alertResultId, alertResult);
+              logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
+              alertNotifier.sendNotification(alertRuleDetails);
             }
-            connection.insert(alertResultId, alertResult);
-            logger.info("Send Notification for Alert: " + alertRuleDetails.getAlertRuleName());
-            alertNotifier.sendNotification(alertRuleDetails);
           }
         }
+      } catch (Exception ex) {
+        logger.error(
+            "Exception occured while evaluating the alert rule:{} exception :{}",
+            alertRuleDetails.getAlertRulesSysId(),
+            ex);
       }
     }
     return true;

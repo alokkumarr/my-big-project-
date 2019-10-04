@@ -68,13 +68,13 @@ public class AlertUtils {
           return false;
         }
       case EQ:
-        if (metricValue == value) {
+        if (Double.compare(metricValue, value) == 0) {
           return true;
         } else {
           return false;
         }
       case NEQ:
-        if (metricValue != value) {
+        if (Double.compare(metricValue, value) != 0) {
           return true;
         } else {
           return false;

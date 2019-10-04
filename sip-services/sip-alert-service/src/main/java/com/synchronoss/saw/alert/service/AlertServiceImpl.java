@@ -331,7 +331,6 @@ public class AlertServiceImpl implements AlertService {
       alertFilters = new ArrayList<>();
     }
     if (sorts == null) {
-      logger.trace("Sorts are null so adding default sort based on start time");
       sorts = new ArrayList<>();
       Sort s = new Sort("startTime", SortOrder.DESC);
       sorts.add(s);
@@ -358,7 +357,8 @@ public class AlertServiceImpl implements AlertService {
    * @param operator Operator
    * @return String
    */
-  private String getReadableOperator(Operator operator) {
+  @Override
+  public String getReadableOperator(Operator operator) {
 
     switch (operator) {
       case EQ:
@@ -421,9 +421,7 @@ public class AlertServiceImpl implements AlertService {
         return "Aggregation Metrics";
       case CONTINUOUS_MONITORING:
         return "Continuous Monitoring";
-      case ROW_METRICS:
-        return "Row Metrics";
-
+        /** case ROW_METRICS: return "Row Metrics"; */
       default:
         return null;
     }
