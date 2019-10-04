@@ -291,9 +291,9 @@ public class GatewayController {
     return endPoint;
   }
   
-  @PostMapping(path = "/data")
+  /*@PostMapping(path = "/data")
   public ResponseEntity<Data> getData(@RequestBody Data data){
     return new ResponseEntity<Data>(data, HttpStatus.ACCEPTED);
-  }
+  }*/
   
 }
