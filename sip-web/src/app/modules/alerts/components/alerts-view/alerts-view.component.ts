@@ -64,17 +64,15 @@ export class AlertsViewComponent implements OnInit {
     }
   };
 
-  constructor(private _alertService: AlertsService, private _store: Store) {
-    this.setAlertLoaderForGrid();
-  }
+  constructor(private _alertService: AlertsService, private _store: Store) {}
 
   ngOnInit() {
     this.filters$.subscribe(filters => {
       this.filters = filters;
       this.alertViewSidenav.close();
-      this.setAlertLoaderForGrid();
+      // this.setAlertLoaderForGrid();
+      this.fetchLateshAlerts();
     });
-    this.fetchLateshAlerts();
   }
 
   fetchLateshAlerts() {

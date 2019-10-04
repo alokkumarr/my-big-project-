@@ -74,8 +74,8 @@ export class AlertsService {
     const pageNumber = ceil(skip / take) + 1;
     const queryParams = `?pageNumber=${pageNumber}&pageSize=${take}`;
     let sorts = null;
-    if (options.sort) {
-      const { selector, desc } = options.sort;
+    if (options.sort && options.sort[0]) {
+      const { selector, desc } = options.sort[0];
       sorts = [{ fieldName: selector, order: desc ? 'DESC' : 'ASC' }];
     }
     return {
