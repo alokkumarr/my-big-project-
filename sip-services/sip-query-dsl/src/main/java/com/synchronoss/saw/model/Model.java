@@ -91,12 +91,12 @@ public class Model {
     this.preset = preset;
   }
 
-  @JsonProperty("presetCal ")
+  @JsonProperty("presetCal")
   public String getPresetCal() {
     return presetCal;
   }
 
-  @JsonProperty("presetCal ")
+  @JsonProperty("presetCal")
   public void setPresetCal(String presetCal) {
     this.presetCal = presetCal;
   }

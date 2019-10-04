@@ -7,6 +7,7 @@ import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
 import com.synchronoss.saw.alert.modal.AlertStatesFilter;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
+import com.synchronoss.saw.model.Model.Operator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -67,4 +68,6 @@ public interface AlertService {
   String retrieveMonitoringType(Ticket ticket);
 
   void sendMessageToStream();
+
+  String getReadableOperator(Operator operator);
 }

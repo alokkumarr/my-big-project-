@@ -229,7 +229,6 @@ public class MaprConnection {
         String fieldName = sort.getFieldName();
         if (fieldName != null && !StringUtils.isEmpty(fieldName)) {
           query = query.orderBy(fieldName, sortOrder);
-          LOGGER.info("Mapr  with group by1 :{}", query);
         }
       }
     }
@@ -240,7 +239,7 @@ public class MaprConnection {
     if (filter != null && !StringUtils.isEmpty(filter)) {
       query = query.where(filter);
     }
-    LOGGER.info("Mapr Query changed:{}", query);
+    LOGGER.info("Mapr Query :{}", query);
     return query.build();
   }
 
