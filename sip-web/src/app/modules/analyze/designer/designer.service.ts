@@ -16,11 +16,19 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as compact from 'lodash/compact';
 import * as isFunction from 'lodash/isFunction';
 import * as unset from 'lodash/unset';
+import * as toLower from 'lodash/toLower';
+import * as some from 'lodash/some';
+import * as difference from 'lodash/difference';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalysisType, Analysis, Artifact } from '../types';
-import { AnalysisDSL, AnalysisPivotDSL, QueryDSL } from '../../../models';
+import {
+  AnalysisDSL,
+  AnalysisPivotDSL,
+  QueryDSL,
+  ArtifactColumnDSL
+} from '../../../models';
 
 import {
   IDEsignerSettingGroupAdapter,
@@ -41,8 +49,10 @@ import {
   DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
+import { AGGREGATE_TYPES } from 'src/app/common/consts';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
+const AGGREGATE_VALUES = AGGREGATE_TYPES.map(agg => toLower(agg.value));
 
 const onReorder = (columns: ArtifactColumns) => {
   forEach(columns, (column, index) => {
@@ -64,6 +74,72 @@ const canAcceptAnyType = ({ formula }: ArtifactColumnChart) => !formula;
 
 @Injectable()
 export class DesignerService {
+  /**
+   * Generates dataField value for column. Uses
+   * aggregate and column name to generate unique value.
+   * We don't support having more than one columns with
+   * exact same dataField.
+   *
+   * @param {ArtifactColumnDSL} column
+   * @returns {string}
+   * @memberof DesignerService
+   */
+  static dataFieldFor(column: ArtifactColumnDSL): string {
+    if (!column.columnName && !column.name) {
+      throw new Error(
+        `Cannot calculate data field for invalid column: ${JSON.stringify(
+          column,
+          null,
+          2
+        )}.`
+      );
+    }
+
+    const columnName = column.columnName || column.name;
+
+    if (!!column.aggregate) {
+      return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
+    }
+
+    return toLower(columnName);
+  }
+
+  /**
+   * Checks if column has unique data field in list of columns.
+   *
+   * @param {ArtifactColumnDSL} column
+   * @param {ArtifactColumnDSL[]} columns
+   * @returns {boolean}
+   * @memberof DesignerService
+   */
+  static isUniqueDataField(
+    column: ArtifactColumnDSL,
+    columns: ArtifactColumnDSL[]
+  ): boolean {
+    const dataField = DesignerService.dataFieldFor(column);
+    return !some(
+      columns,
+      (col: ArtifactColumnDSL) => this.dataFieldFor(col) === dataField
+    );
+  }
+
+  static unusedAggregates(
+    column: ArtifactColumnDSL,
+    columns: ArtifactColumnDSL[]
+  ): string[] {
+    const alreadyUsedAggregates = compact(
+      (columns || [])
+        .filter(col => col.columnName === column.columnName)
+        .map(col => toLower(col.aggregate))
+    );
+
+    return difference(AGGREGATE_VALUES, alreadyUsedAggregates);
+  }
+
+  static canAddColumn(column: ArtifactColumnDSL, columns: ArtifactColumnDSL[]) {
+    return DesignerService.unusedAggregates(column, columns).length > 0;
+  }
+
   constructor(private _analyzeService: AnalyzeService) {}
 
   createAnalysis(
@@ -403,9 +479,12 @@ export class DesignerService {
       : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
-    const applyDataFieldDefaults = artifactColumn => {
+    const applyDataFieldDefaults = (artifactColumn, columns) => {
       if (!artifactColumn.formula) {
-        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+        const unusedAggregates =
+          DesignerService.unusedAggregates(artifactColumn, columns) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
@@ -436,7 +515,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
       },
       reverseTransform: chartReverseTransform,
       onReorder
@@ -453,7 +532,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'z';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
       },
       reverseTransform: chartReverseTransform,
       onReorder

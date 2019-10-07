@@ -65,7 +65,7 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
-import { AnalysisDSL } from 'src/app/models';
+import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 
 // setAutoFreeze(false);
@@ -139,7 +139,9 @@ export class DesignerState {
 
     return false;
   }
-  static artifactFields(state: DesignerStateModel) {
+
+  @Selector()
+  static allSelectedFields(state: DesignerStateModel) {
     return fpFlatMap(
       artifact => artifact.fields,
       get(state, 'analysis.sipQuery.artifacts')
@@ -221,97 +223,6 @@ export class DesignerState {
         artifacts: metric.artifacts
       }
     });
-  }
-
-  @Action(DesignerAddArtifactColumn)
-  addArtifactColumn(
-    { getState, patchState, dispatch }: StateContext<DesignerStateModel>,
-    { artifactColumn }: DesignerAddArtifactColumn
-  ) {
-    const analysis = getState().analysis;
-    const sipQuery = analysis.sipQuery;
-    let artifacts = sipQuery.artifacts;
-    const isDateType = DATE_TYPES.includes(artifactColumn.type);
-    const fillMissingDataWithZeros =
-      analysis.type === 'chart' && artifactColumn.type === 'date';
-
-    /* If analysis is chart and this is a date field, assign a default
-      groupInterval. For pivots, use dateInterval if available */
-    const groupInterval = { groupInterval: null };
-
-    if (artifactColumn.type === 'date') {
-      switch (analysis.type) {
-        case 'chart':
-          groupInterval.groupInterval =
-            CHART_DATE_FORMATS_OBJ[
-              artifactColumn.dateFormat || <string>artifactColumn.format
-            ].groupInterval;
-          break;
-        case 'pivot':
-          groupInterval.groupInterval = 'day';
-          break;
-        default:
-          break;
-      }
-    }
-
-    const artifactsName =
-      artifactColumn.table || (<any>artifactColumn).tableName;
-
-    /* Find the artifact inside sipQuery of analysis stored in state */
-    const artifactIndex = artifacts.findIndex(
-      artifact => artifact.artifactsName === artifactsName
-    );
-    const artifactColumnToBeAdded = {
-      aggregate: artifactColumn.aggregate,
-      alias: artifactColumn.alias,
-      area: artifactColumn.area,
-      columnName: artifactColumn.columnName,
-      displayType:
-        artifactColumn.displayType || (<any>artifactColumn).comboType,
-      dataField: artifactColumn.name || artifactColumn.columnName,
-      displayName: artifactColumn.displayName,
-      ...(artifactColumn.formula
-        ? {
-            formula: artifactColumn.formula,
-            expression: artifactColumn.expression
-          }
-        : {}),
-      ...groupInterval,
-      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
-      name: artifactColumn.name,
-      type: artifactColumn.type,
-      geoType: artifactColumn.geoType,
-      table: artifactColumn.table || (<any>artifactColumn).tableName,
-      ...(isDateType
-        ? {
-            dateFormat:
-              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
-          }
-        : { format: artifactColumn.format })
-    };
-    if (artifactIndex < 0) {
-      artifacts = [
-        ...artifacts,
-        { artifactsName, fields: [artifactColumnToBeAdded] }
-      ];
-    } else {
-      artifacts[artifactIndex].fields = [
-        ...artifacts[artifactIndex].fields,
-        artifactColumnToBeAdded
-      ];
-    }
-    // cleanup empty artifacts
-    remove(sipQuery.artifacts, artifact => {
-      return isEmpty(artifact.fields);
-    });
-
-    sipQuery.artifacts = artifacts;
-
-    patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery } }
-    });
-    return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerRemoveArtifactColumn)
@@ -702,7 +613,6 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
 
-    adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     // disabled immer because having immutability for groupAdapters causes conflicts in the designer
     // so it will stay disabled until a refactoring of the whole designer to ngxs
     // const groupAdapters = produce(getState().groupAdapters, draft => {
@@ -714,9 +624,101 @@ export class DesignerState {
     // });
 
     adapter.transform(artifactColumn);
+    adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerAddArtifactColumn(artifactColumn));
+  }
+
+  @Action(DesignerAddArtifactColumn)
+  addArtifactColumn(
+    { getState, patchState, dispatch }: StateContext<DesignerStateModel>,
+    { artifactColumn }: DesignerAddArtifactColumn
+  ) {
+    const analysis = getState().analysis;
+    const sipQuery = analysis.sipQuery;
+    let artifacts = sipQuery.artifacts;
+    const isDateType = DATE_TYPES.includes(artifactColumn.type);
+    const fillMissingDataWithZeros =
+      analysis.type === 'chart' && artifactColumn.type === 'date';
+
+    /* If analysis is chart and this is a date field, assign a default
+      groupInterval. For pivots, use dateInterval if available */
+    const groupInterval = { groupInterval: null };
+
+    if (artifactColumn.type === 'date') {
+      switch (analysis.type) {
+        case 'chart':
+          groupInterval.groupInterval =
+            CHART_DATE_FORMATS_OBJ[
+              artifactColumn.dateFormat || <string>artifactColumn.format
+            ].groupInterval;
+          break;
+        case 'pivot':
+          groupInterval.groupInterval = 'day';
+          break;
+        default:
+          break;
+      }
+    }
+
+    const artifactsName =
+      artifactColumn.table || (<any>artifactColumn).tableName;
+
+    /* Find the artifact inside sipQuery of analysis stored in state */
+    const artifactIndex = artifacts.findIndex(
+      artifact => artifact.artifactsName === artifactsName
+    );
+    const artifactColumnToBeAdded = {
+      aggregate: artifactColumn.aggregate,
+      alias: artifactColumn.alias,
+      area: artifactColumn.area,
+      columnName: artifactColumn.columnName,
+      displayType:
+        artifactColumn.displayType || (<any>artifactColumn).comboType,
+      dataField: DesignerService.dataFieldFor(<ArtifactColumnDSL>(
+        artifactColumn
+      )),
+      displayName: artifactColumn.displayName,
+      ...(artifactColumn.formula
+        ? {
+            formula: artifactColumn.formula,
+            expression: artifactColumn.expression
+          }
+        : {}),
+      ...groupInterval,
+      ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
+      name: artifactColumn.name,
+      type: artifactColumn.type,
+      geoType: artifactColumn.geoType,
+      table: artifactColumn.table || (<any>artifactColumn).tableName,
+      ...(isDateType
+        ? {
+            dateFormat:
+              <string>artifactColumn.format || DEFAULT_DATE_FORMAT.value
+          }
+        : { format: artifactColumn.format })
+    };
+    if (artifactIndex < 0) {
+      artifacts = [
+        ...artifacts,
+        { artifactsName, fields: [artifactColumnToBeAdded] }
+      ];
+    } else {
+      artifacts[artifactIndex].fields = [
+        ...artifacts[artifactIndex].fields,
+        artifactColumnToBeAdded
+      ];
+    }
+    // cleanup empty artifacts
+    remove(sipQuery.artifacts, artifact => {
+      return isEmpty(artifact.fields);
+    });
+
+    patchState({
+      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+    });
+    return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
 
   @Action(DesignerClearGroupAdapters)

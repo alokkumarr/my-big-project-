@@ -166,10 +166,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
-  ) {
-    window['designer'] = this;
-    window['DesignerState'] = DesignerState;
-  }
+  ) {}
 
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe());
