@@ -14,6 +14,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -353,7 +354,7 @@ public class UserRepositoryImplTest {
 		Ticket ticket = new Ticket();
 		ticket.setMasterLoginId("Sawadmin@synchronoss.com");
 		ticket.setDefaultProdID("1");
-		ticket.setRoleType("ADMIN");
+		ticket.setRoleType(RoleType.ADMIN);
 		ticket.setUserFullName("SAW ADMIN");
 		ticket.setWindowId("1");
 		String ticketId = "1";

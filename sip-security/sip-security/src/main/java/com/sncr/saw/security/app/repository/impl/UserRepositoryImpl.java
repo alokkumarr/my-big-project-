@@ -27,6 +27,7 @@ import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import java.sql.Connection;
@@ -900,7 +901,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setCompName(rs.getString("company_name"));
 				ticketDetails.setCustID(rs.getString("customer_sys_id"));
 				ticketDetails.setCustCode(rs.getString("customer_code"));
-				ticketDetails.setRoleType(rs.getString("role_type"));
+				ticketDetails.setRoleType(RoleType.fromValue(rs.getString("role_type")));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
 				ticketDetails.setIsJvCustomer(rs.getInt("is_jv_customer"));
@@ -1158,7 +1159,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket = new Ticket();
 				ticket.setMasterLoginId(rs.getString("MASTER_LOGIN_ID"));
 				ticket.setDefaultProdID(rs.getString("PRODUCT_CODE"));
-				ticket.setRoleType(rs.getString("ROLE_TYPE"));
+				ticket.setRoleType(RoleType.fromValue(rs.getString("ROLE_TYPE")));
 				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
 			}
