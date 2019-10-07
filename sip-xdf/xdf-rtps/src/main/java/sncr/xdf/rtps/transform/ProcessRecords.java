@@ -217,7 +217,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private void ProcessGenericRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm, InternalContext ctx){
         JavaRDD<String> jsonRdd = in.mapPartitions(new TransformJsonRecord(definitions));
         logger.debug("first below::");
-        logger.debug(jsonRdd.first());
         SparkConf cnf = in.context().getConf();
         processJsonRecords(jsonRdd, tm, cnf, ctx);
     }
@@ -234,8 +233,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         
  
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
-        logger.debug("data here ::");
-        df.show();
   	    NGContext context = this.ngctx;
   	    
 		

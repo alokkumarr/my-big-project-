@@ -107,9 +107,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 		logger.debug(":::: parser constructor services parser :::"+ ngctx.componentConfiguration.getParser());
 	}
     
-    public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealtime) {
+    public NGParser(NGContext ngctx, Dataset<Row> dataset, boolean isRealTime) {
     	
         super(ngctx);
+        this.isRealTime = isRealTime;
         logger.debug("************ Inside Parser with real time ***********");
     }
 
@@ -448,7 +449,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 	protected int archive() {
 		int result = 0;
 
-		if (this.isRealTime) {
+		if (!this.isRealTime) {
 
 			logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
 
