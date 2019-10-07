@@ -461,7 +461,8 @@ export class AddAlertComponent implements OnInit, OnDestroy {
           isGlobalFilter: false,
           tableName: selectedMetricsColumn.tableName,
           columnName: selectedMetricsColumn.columnName,
-          isOptional: false
+          isOptional: false,
+          isAggregationFilter: true
         }
       : null;
 
