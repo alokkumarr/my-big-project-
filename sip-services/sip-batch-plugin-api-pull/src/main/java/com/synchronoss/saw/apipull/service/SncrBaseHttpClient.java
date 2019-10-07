@@ -48,9 +48,9 @@ public abstract class SncrBaseHttpClient implements BaseHttpClient {
    */
   protected String generateUrl(String apiEndPoint, Map<String, String> queryParams) {
     if (!CollectionUtils.isEmpty(queryParams)) {
-      url += host + "/" + apiEndPoint + "?" + generateQueryParameters(queryParams);
+      url += host  + "?" + generateQueryParameters(queryParams);
     } else if (!StringUtils.isEmpty(apiEndPoint)) {
-      url += host + "/" + apiEndPoint;
+      url += host;
     } else {
       url += host;
     }

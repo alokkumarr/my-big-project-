@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -80,7 +79,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
   private FileProcessor processor;
   FileSystem fs;
   Configuration conf;
-  /** This method is to test connect the route. */
+
   @PostConstruct
   private void init() throws Exception {
 
@@ -103,6 +102,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     fs = FileSystem.get(URI.create(location), conf);
   }
 
+  /** This method is to test connect the route. */
   @Override
   public String connectRoute(Long entityId) throws SipNestedRuntimeException {
     logger.trace("Connecting to route :" + entityId);
@@ -207,36 +207,43 @@ public class ApiPullServiceImpl extends SipPluginContract {
       throws SipNestedRuntimeException, IOException {
     logger.info("Inside immediateConnectRoute");
 
-    return null;
-  }
-
-  /** This method is to test connect the source. */
-  @Override
-  public String immediateConnectChannel(BisConnectionTestPayload payload)
-      throws SipNestedRuntimeException {
-    logger.info("Inside immediateConnectChannel");
     StringBuilder connectionLogs = new StringBuilder();
+    logger.debug("Test payload = " + payload);
 
-    String hostName = payload.getHostName();
-    if (hostName == null || hostName.length() == 0) {
-      throw new SipNestedRuntimeException("Host name is mandatory");
+    Long channelId = Long.valueOf(payload.getChannelId());
+    Optional<BisChannelEntity> bisChannelEntity = this.findChannelById(channelId);
+
+    if (!bisChannelEntity.isPresent()) {
+      throw new SipNestedRuntimeException(
+          "Unable to extract channel information for channel id: " + channelId);
     }
 
-    Integer port = payload.getPortNo();
-    String apiEndPoint = payload.getApiEndPoint() != null ? payload.getApiEndPoint() : "/";
-    String url = generateUrl(hostName, port, apiEndPoint);
+    BisChannelEntity channelEntity = bisChannelEntity.get();
+
+    String channelMetadataStr = channelEntity.getChannelMetadata();
+
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
+    Gson gson = gsonBuilder.create();
+
+    ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
 
     SipApiRequest apiRequest = new SipApiRequest();
+
+    String hostName = channelMetadata.getHostAddress();
+    Integer port = channelMetadata.getPort();
+
+    String apiEndPoint = payload.getApiEndPoint();
+
+    String url = generateUrl(hostName, port, apiEndPoint);
+
     apiRequest.setUrl(url);
 
-    String httpMethodStr = payload.getHttpMethod();
-    if (httpMethodStr != null) {
-      HttpMethod method = HttpMethod.fromValue(httpMethodStr);
-
-      apiRequest.setHttpMethod(method);
-    }
-
     List<Object> queryParamObj = payload.getQueryParameters();
+
+    logger.debug("Query Param Obj = " + queryParamObj);
+    logger.debug("Query Param obj type = " + queryParamObj.getClass().getName());
     List<QueryParameter> queryParameters = new ArrayList<>();
 
     if (queryParamObj != null) {
@@ -245,21 +252,23 @@ public class ApiPullServiceImpl extends SipPluginContract {
       logger.debug("Query Param Type = " + queryParameters.getClass().getName());
 
       for (Object paramObject : queryParamObj) {
+        logger.debug("Object = " + paramObject);
+        logger.debug("Object type = " + paramObject.getClass().getName());
         LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) paramObject;
+
+        System.out.println("Key = " + map.get("key"));
+        System.out.println("Value = " + map.get("value"));
+
+        logger.debug("Key Map = " + map);
         QueryParameter param = new QueryParameter();
 
-        for (Entry<String, String> entry : map.entrySet()) {
-          param.setKey(entry.getKey());
-          param.setValue(entry.getValue());
-        }
+        param.setKey(map.get("key"));
+        param.setValue(map.get("value"));
 
         logger.debug("Param = " + param);
 
         queryParameters.add(param);
       }
-      //      for (QueryParameter param : queryParameters) {
-      //        logger.debug("Param = " + param);
-      //      }
 
       apiRequest.setQueryParameters(queryParameters);
     }
@@ -304,14 +313,131 @@ public class ApiPullServiceImpl extends SipPluginContract {
       Object content = response.getResponseBody();
 
       if (content != null && content.toString().length() != 0) {
-        connectionLogs.append(content.toString()).append("\n");
+        connectionLogs
+            .append("Content Length: ")
+            .append(content.toString().length())
+            .append(" bytes")
+            .append("\n");
       }
 
     } catch (Exception exception) {
       throw new SipNestedRuntimeException(exception.getMessage(), exception);
     }
 
-    return null;
+    return connectionLogs.toString();
+  }
+
+  /** This method is to test connect the source. */
+  @Override
+  public String immediateConnectChannel(BisConnectionTestPayload payload)
+      throws SipNestedRuntimeException {
+    logger.info("Inside immediateConnectChannel");
+    StringBuilder connectionLogs = new StringBuilder();
+
+    String hostName = payload.getHostName();
+    if (hostName == null || hostName.length() == 0) {
+      throw new SipNestedRuntimeException("Host name is mandatory");
+    }
+
+    Integer port = payload.getPortNo();
+    String apiEndPoint = payload.getApiEndPoint() != null ? payload.getApiEndPoint() : "/";
+    String url = generateUrl(hostName, port, apiEndPoint);
+
+    SipApiRequest apiRequest = new SipApiRequest();
+    apiRequest.setUrl(url);
+
+    String httpMethodStr = payload.getHttpMethod();
+    if (httpMethodStr != null) {
+      HttpMethod method = HttpMethod.fromValue(httpMethodStr);
+
+      apiRequest.setHttpMethod(method);
+    }
+
+    List<Object> queryParamObj = payload.getQueryParameters();
+
+    logger.debug("Query Param Obj = " + queryParamObj);
+    logger.debug("Query Param obj type = " + queryParamObj.getClass().getName());
+    List<QueryParameter> queryParameters = new ArrayList<>();
+
+    if (queryParamObj != null) {
+
+      logger.debug("Query Params = " + queryParameters);
+      logger.debug("Query Param Type = " + queryParameters.getClass().getName());
+
+      for (Object paramObject : queryParamObj) {
+        logger.debug("Object = " + paramObject);
+        logger.debug("Object type = " + paramObject.getClass().getName());
+        LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) paramObject;
+
+        System.out.println("Key = " + map.get("key"));
+        System.out.println("Value = " + map.get("value"));
+
+        logger.debug("Key Map = " + map);
+        QueryParameter param = new QueryParameter();
+
+        param.setKey(map.get("key"));
+        param.setValue(map.get("value"));
+
+        logger.debug("Param = " + param);
+
+        queryParameters.add(param);
+      }
+
+      apiRequest.setQueryParameters(queryParameters);
+    }
+
+    List<Object> headerParamObj = payload.getHeaderParameters();
+    List<HeaderParameter> headerParameters = new ArrayList<>();
+
+    if (headerParamObj != null) {
+      for (Object headerObject : headerParamObj) {
+        HeaderParameter headerParameter = (HeaderParameter) headerObject;
+        logger.debug("Header Param = " + headerParameter);
+
+        headerParameters.add(headerParameter);
+      }
+      logger.debug("Header Params = " + headerParameters);
+
+      apiRequest.setHeaderParameters(headerParameters);
+    }
+
+    Object bodyParamsObj = payload.getBodyParameters();
+    BodyParameters bodyParameters = null;
+
+    if (bodyParameters != null) {
+      bodyParameters = (BodyParameters) bodyParamsObj;
+      logger.debug("Body Params = " + bodyParameters);
+
+      apiRequest.setBodyParameters(bodyParameters);
+    }
+
+    try {
+      HttpClient httpClient = new HttpClient();
+
+      connectionLogs.append("Connecting to ").append(url).append("\n");
+      ApiResponse response = httpClient.execute(apiRequest);
+
+      connectionLogs.append("Fetching data from ").append(url).append("\n");
+      HttpStatus httpStatus = response.getHttpStatus();
+      logger.info("Http Status = " + httpStatus);
+
+      connectionLogs.append("Connection Status = " + httpStatus).append("\n");
+
+      Object content = response.getResponseBody();
+
+      if (content != null && content.toString().length() != 0) {
+        connectionLogs
+            .append("Content Length: ")
+            .append(content.toString().length())
+            .append(" bytes")
+            .append("\n");
+      }
+
+    } catch (Exception exception) {
+      throw new SipNestedRuntimeException(exception.getMessage(), exception);
+    }
+
+    return connectionLogs.toString();
   }
 
   @Override

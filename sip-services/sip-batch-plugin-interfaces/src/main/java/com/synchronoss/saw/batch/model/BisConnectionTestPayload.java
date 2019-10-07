@@ -27,7 +27,7 @@ public class BisConnectionTestPayload {
   private String url;
 
   @JsonProperty("portNo")
-  private Integer portNo = 21;
+  private Integer portNo;
 
   @JsonProperty("batchSize")
   private Integer batchSize = 0;

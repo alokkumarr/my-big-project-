@@ -39,6 +39,7 @@ public class HttpClientGet extends SncrBaseHttpClient {
           restTemplate.exchange(url, HttpMethod.GET, httpEntity, Object.class);
 
       apiResponse.setResponseBody(response.getBody());
+      apiResponse.setHttpStatus(response.getStatusCode());
       HttpHeaders httpHeaders = response.getHeaders();
       apiResponse.setHttpHeaders(httpHeaders);
       logger.info("Response Code : {}", response.getStatusCode());

@@ -438,8 +438,14 @@ public class SftpServiceImpl extends SipPluginContract {
     String newLineChar = System.getProperty("line.separator");
     connectionLogs.append("Starting Test connectivity....");
     connectionLogs.append(newLineChar);
+
+    Integer portNo  = payload.getPortNo();
+
+    if (portNo == null) {
+      portNo = 21;
+    }
     connectionLogs.append("Establishing connection to host: " + payload.getHostName() + " at port: "
-        + payload.getPortNo());
+        + portNo);
     connectionLogs.append(newLineChar);
     connectionLogs.append("user name: " + payload.getUserName());
     connectionLogs.append(newLineChar);
@@ -447,7 +453,7 @@ public class SftpServiceImpl extends SipPluginContract {
     try {
       defaultSftpSessionFactory = new DefaultSftpSessionFactory(true);
       defaultSftpSessionFactory.setHost(payload.getHostName());
-      defaultSftpSessionFactory.setPort(payload.getPortNo());
+      defaultSftpSessionFactory.setPort(portNo);
       defaultSftpSessionFactory.setUser(payload.getUserName());
       defaultSftpSessionFactory.setAllowUnknownKeys(true);
       Properties prop = new Properties();
