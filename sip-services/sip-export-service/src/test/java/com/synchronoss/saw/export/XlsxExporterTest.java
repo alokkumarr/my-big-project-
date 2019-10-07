@@ -132,8 +132,16 @@ public class XlsxExporterTest {
   public void streamToXlsxReportTest() {
     ExportServiceImpl exportService = new ExportServiceImpl();
     try {
-      boolean haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, "esReport", LimittoExport, exportBean, restTemplate);
+      // test for esReport
+      String analysisType = "esReport";
+      boolean haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, analysisType, LimittoExport, exportBean, restTemplate);
       assertEquals(haveSheetCreated, Boolean.TRUE);
+
+      // test for report
+      analysisType = "report";
+      haveSheetCreated = exportService.streamToXlsxReport(sipQuery, analysisId, analysisType, LimittoExport, exportBean, restTemplate);
+      assertEquals(haveSheetCreated, Boolean.TRUE);
+
     } catch (IOException e) {
       logger.error(" Error in streamToXlsxReport : {}", ExceptionUtils.getStackTrace(e));
     }
