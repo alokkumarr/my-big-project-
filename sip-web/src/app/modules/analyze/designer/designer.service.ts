@@ -607,7 +607,6 @@ export class DesignerService {
       map: 'area'
     };
     fpPipe(
-      fpFilter(cols => cols.checked || !!cols.expression),
       fpSortBy('areaIndex'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {

@@ -570,11 +570,7 @@ export class DesignerState {
   initGroupAdapter({ patchState, getState }: StateContext<DesignerStateModel>) {
     const analysis = getState().analysis;
     const { type } = analysis;
-    const artifacts = this._designerService.addDerivedMetricsToArtifacts(
-      analysis.artifacts,
-      analysis.sipQuery
-    );
-    const fields = get(artifacts, '0.columns', []);
+    const fields = get(analysis, 'sipQuery.artifacts.0.fields', []);
     let groupAdapters;
     switch (type) {
       case 'pivot':

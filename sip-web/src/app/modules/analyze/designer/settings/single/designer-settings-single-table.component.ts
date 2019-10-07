@@ -46,7 +46,6 @@ import {
   getArtifactColumnGeneralType,
   getFilterTypes
 } from '../../utils';
-import { ArtifactDSL } from '../../../models';
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
