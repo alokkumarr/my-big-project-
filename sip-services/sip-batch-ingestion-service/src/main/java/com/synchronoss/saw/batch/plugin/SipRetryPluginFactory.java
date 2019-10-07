@@ -42,9 +42,11 @@ public class SipRetryPluginFactory {
       case APIPULL:
         sipRetryService = this.apiPullRetryService;
         break;
+      default:
+        LOGGER.info("No instance found for the BIS retry process.");
     }
 
-    LOGGER.trace("Instance of retry process : {}", sipRetryService.getClass());
+    LOGGER.trace("Instance of retry process : {}", sipRetryService);
     return sipRetryService;
   }
 }
