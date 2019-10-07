@@ -31,7 +31,7 @@ import {
   AlertArtifact
 } from '../../../alerts.interface';
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
-import { SubscriptionLike, of, Observable } from 'rxjs';
+import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 const LAST_STEP_INDEX = 3;
@@ -107,14 +107,22 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       this.datapods$ = this._configureAlertService.getListOfDatapods$();
     }
     this.monitoringTypes$ = this._configureAlertService.getMonitoringTypeList();
-    this.aggregations$ = this._configureAlertService
-      .getAggregations()
-      .pipe(
-        map((aggregations: any[]) => [
-          { id: 'none', name: 'None' },
-          ...aggregations
-        ])
-      );
+
+    const monitoringTypeValues = this.alertMetricFormGroup.get('monitoringType')
+      .valueChanges;
+
+    this.aggregations$ = combineLatest(
+      monitoringTypeValues,
+      this._configureAlertService.getAggregations()
+    ).pipe(
+      map(([monitoringType = {}, aggregations]) => [
+        monitoringType === 'AGGREGATION_METRICS'
+          ? null
+          : { id: 'none', name: 'None' },
+        ...aggregations
+      ]),
+      map(compact)
+    );
     this.operators$ = this._configureAlertService.getOperators();
     this.notifications$ = of(notificationsOptions);
   }
@@ -192,6 +200,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodName: [''],
       categoryId: [''],
       metricsColumn: ['', Validators.required],
+      monitoringType: [null, Validators.required],
       aggregationType: ['', Validators.required],
       operator: ['', Validators.required],
       thresholdValue: ['', thresholdValuevalidators],
@@ -203,8 +212,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackPeriodValue: ['', Validators.required],
       lookbackPeriodType: ['', Validators.required],
       attributeName: [''],
-      attributeValue: [''],
-      monitoringType: [null, Validators.required]
+      attributeValue: ['']
     });
 
     this.alertDefFormGroup
@@ -249,6 +257,21 @@ export class AddAlertComponent implements OnInit, OnDestroy {
           otherThresholdValueControl.clearValidators();
           otherThresholdValueControl.reset();
           this.thresholdValueLabel = 'Threshold value';
+        }
+      });
+
+    const aggregationTypeControl = this.alertMetricFormGroup.get(
+      'aggregationType'
+    );
+    this.alertMetricFormGroup
+      .get('monitoringType')
+      .valueChanges.subscribe(monitoringType => {
+        if (monitoringType === 'AGGREGATION_METRICS') {
+          // aggregation cannot be none
+          const aggregate = aggregationTypeControl.value;
+          if (aggregate === 'none') {
+            aggregationTypeControl.setValue(null);
+          }
         }
       });
   }
@@ -314,6 +337,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       datapodName,
       categoryId,
       metricsColumn,
+      monitoringType,
       aggregationType,
       operator,
       thresholdValue,
@@ -325,8 +349,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackPeriodValue,
       lookbackPeriodType,
       attributeName,
-      attributeValue,
-      monitoringType
+      attributeValue
     } = this.alertRuleFormGroup.value;
 
     const sipQuery = this.generateSipQuery();
@@ -389,7 +412,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   generateSipQuery() {
-    const { aggregationType } = this.alertMetricFormGroup.value;
+    const {
+      aggregationType,
+      operator,
+      thresholdValue,
+      otherThresholdValue
+    } = this.alertMetricFormGroup.value;
 
     const {
       lookbackPeriodValue,
@@ -418,6 +446,24 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
     const { id, artifacts } = this.selectedDatapod;
     const { artifactName } = artifacts[0];
+
+    // if there is no aggregate, then there should be no alertFilter
+    const alertFilter = aggregate
+      ? {
+          type: selectedMetricsColumn.type,
+          artifactsName: artifactName,
+          model: {
+            operator,
+            value: thresholdValue,
+            otherValue: operator === 'BTW' ? otherThresholdValue : null
+          },
+          isRuntimeFilter: false,
+          isGlobalFilter: false,
+          tableName: selectedMetricsColumn.tableName,
+          columnName: selectedMetricsColumn.columnName,
+          isOptional: false
+        }
+      : null;
 
     const selectedLookbackColumn = this.selectedLookbackColumn || {};
     const lookbackFilter = {
@@ -460,7 +506,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     const sipQuery = {
       artifacts: [{ artifactName, fields: [metricsColumn] }],
       booleanCriteria: 'AND',
-      filters: compact([lookbackFilter, stringFilter]),
+      filters: compact([alertFilter, lookbackFilter, stringFilter]),
       sorts: [],
       joins: [],
       store,

@@ -204,6 +204,39 @@
               "
               ><small>This field is required </small></mat-error
             >
+
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Monitoring type</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                required
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                formControlName="monitoringType"
+                [items]="monitoringTypes$ | async"
+                displayExpr="name"
+                valueExpr="id"
+                [searchEnabled]="true"
+                placeholder="Select a type"
+                e2e="monitoringType"
+              ></dx-select-box>
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.monitoringType.hasError(
+                    'required'
+                  )
+                "
+                >This field is required</mat-error
+              >
+            </mat-form-field>
+
             <mat-form-field appearance="outline">
               <mat-label>Aggregation</mat-label>
               <mat-select
@@ -480,29 +513,6 @@
               ></dx-select-box>
             </mat-form-field>
 
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
-              <mat-label>Monitoring type</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                matInput
-                required
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
-                formControlName="monitoringType"
-                [items]="monitoringTypes$ | async"
-                displayExpr="name"
-                valueExpr="id"
-                [searchEnabled]="true"
-                placeholder="Select a type"
-                e2e="monitoringType"
-              ></dx-select-box>
-            </mat-form-field>
             <div
               fxFlex
               fxLayout="row"
