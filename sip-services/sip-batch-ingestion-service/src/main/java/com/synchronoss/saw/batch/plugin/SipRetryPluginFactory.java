@@ -32,12 +32,16 @@ public class SipRetryPluginFactory {
   public SipRetryContract getInstance(String ingestionType) {
 
     SipRetryContract sipRetryService = null;
-    if (ingestionType.equals(BisChannelType.SFTP.value())) {
-      sipRetryService = this.sftpRetryServiceImpl;
-    } else if (ingestionType.equals(BisChannelType.S3.value())) {
-      sipRetryService = this.s3RetryServiceImpl;
-    } else if (ingestionType.equals(BisChannelType.APIPULL.value())) {
-      sipRetryService = this.apiPullRetryService;
+    switch (BisChannelType.fromValue(ingestionType)) {
+      case SFTP:
+        sipRetryService = this.sftpRetryServiceImpl;
+        break;
+      case S3:
+        sipRetryService = this.s3RetryServiceImpl;
+        break;
+      case APIPULL:
+        sipRetryService = this.apiPullRetryService;
+        break;
     }
 
     LOGGER.trace("Instance of retry process : {}", sipRetryService.getClass());
