@@ -327,7 +327,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "values (?,?,?,?,?,?,?,?,?,sysdate(),sysdate(),?,?)";
 			// ticket.setRoleType("Basic");
 			Object[] params = new Object[] { ticket.getTicketId(), ticket.getWindowId(), ticket.getMasterLoginId(),
-					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType(), ticket.getCreatedTime(),
+					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType().name(), ticket.getCreatedTime(),
 					ticket.getValidUpto(), isValid, null, ticket.getValidityReason() };
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
@@ -901,7 +901,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setCompName(rs.getString("company_name"));
 				ticketDetails.setCustID(rs.getString("customer_sys_id"));
 				ticketDetails.setCustCode(rs.getString("customer_code"));
-				ticketDetails.setRoleType(RoleType.fromValue(rs.getString("role_type")));
+				ticketDetails.setRoleType(RoleType.valueOf(rs.getString("role_type")));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
 				ticketDetails.setIsJvCustomer(rs.getInt("is_jv_customer"));
@@ -1159,7 +1159,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket = new Ticket();
 				ticket.setMasterLoginId(rs.getString("MASTER_LOGIN_ID"));
 				ticket.setDefaultProdID(rs.getString("PRODUCT_CODE"));
-				ticket.setRoleType(RoleType.fromValue(rs.getString("ROLE_TYPE")));
+				ticket.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
 			}
@@ -1691,7 +1691,7 @@ public class UserRepositoryImpl implements UserRepository {
 				role.setRoleDesc(rs.getString("ROLE_DESC"));
 				role.setRoleName(rs.getString("ROLE_NAME"));
 				role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
-				role.setRoleType(rs.getString("ROLE_TYPE"));
+				role.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 
 				if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
 					role.setActiveStatusInd("Active");
@@ -1764,7 +1764,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(2, role.getRoleName());
 					preparedStatement.setString(3, roleCode.toString());
 					preparedStatement.setString(4, role.getRoleDesc());
-					preparedStatement.setString(5, role.getRoleType());
+					preparedStatement.setString(5, role.getRoleType().name());
 
 					preparedStatement.setLong(6, Integer.parseInt(role.getActiveStatusInd()));
 					preparedStatement.setString(7, role.getMasterLoginId());
@@ -2032,7 +2032,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(2, role.getRoleName());
 					preparedStatement.setString(3, roleCode.toString());
 					preparedStatement.setString(4, role.getRoleDesc());
-					preparedStatement.setString(5, role.getRoleType());
+					preparedStatement.setString(5, role.getRoleType().name());
 					preparedStatement.setInt(6, Integer.parseInt(role.getActiveStatusInd()));
 					preparedStatement.setString(7, role.getMasterLoginId());
 					preparedStatement.setLong(8, role.getRoleSysId());
