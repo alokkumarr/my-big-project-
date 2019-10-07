@@ -224,7 +224,7 @@ public class MaprConnection {
     Query query = connection.newQuery();
     if (sorts != null) {
       for (Sort sort : sorts) {
-        SortOrder sortOrder = sort.getSortOrder();
+        SortOrder sortOrder = sort.getOrder();
         sortOrder = sortOrder == null ? SortOrder.DESC : sortOrder;
         String fieldName = sort.getFieldName();
         if (fieldName != null && !StringUtils.isEmpty(fieldName)) {

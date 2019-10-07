@@ -6,13 +6,13 @@ public class Sort {
 
   private String fieldName;
 
-  private SortOrder sortOrder;
+  private SortOrder order;
 
   public Sort() {}
 
-  public Sort(String fieldName, SortOrder sortOrder) {
+  public Sort(String fieldName, SortOrder order) {
     this.fieldName = fieldName;
-    this.sortOrder = sortOrder;
+    this.order = order;
   }
 
   public String getFieldName() {
@@ -23,11 +23,11 @@ public class Sort {
     this.fieldName = fieldName;
   }
 
-  public SortOrder getSortOrder() {
-    return sortOrder;
+  public SortOrder getOrder() {
+    return order;
   }
 
-  public void setSortOrder(SortOrder sortOrder) {
-    this.sortOrder = sortOrder;
+  public void setOrder(SortOrder order) {
+    this.order = order;
   }
 }

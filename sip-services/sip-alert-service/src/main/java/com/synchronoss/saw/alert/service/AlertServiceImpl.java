@@ -330,7 +330,7 @@ public class AlertServiceImpl implements AlertService {
     } else {
       alertFilters = new ArrayList<>();
     }
-    if (sorts == null) {
+    if (sorts == null || sorts.size() == 0) {
       sorts = new ArrayList<>();
       Sort s = new Sort("startTime", SortOrder.DESC);
       sorts.add(s);
