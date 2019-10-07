@@ -108,7 +108,12 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
-  transform({ columnName, aggregate, type, artifactsName }: ArtifactColumnReport): Sort {
+  transform({
+    columnName,
+    aggregate,
+    type,
+    artifactsName
+  }: ArtifactColumnReport): Sort {
     return {
       artifactsName,
       aggregate,
@@ -120,12 +125,14 @@ export class DesignerSortComponent implements OnInit {
 
   getAvailableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
     return filter(checkedFields, field => {
-      return !find(
-        this.sorts,
-        ({ columnName, artifactsName }) =>
+      return (
+        !field.expression && // derived metrics are not supported for sorts
+        !find(this.sorts, ({ columnName, artifactsName }) =>
           isUndefined(artifactsName)
             ? columnName === field.columnName
-            : artifactsName === field.artifactsName && columnName === field.columnName
+            : artifactsName === field.artifactsName &&
+              columnName === field.columnName
+        )
       );
     });
   }

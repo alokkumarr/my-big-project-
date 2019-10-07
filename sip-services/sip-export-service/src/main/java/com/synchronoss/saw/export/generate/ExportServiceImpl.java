@@ -219,7 +219,6 @@ public class ExportServiceImpl implements ExportService {
           analysisId,
           executionId,
           analysisType,
-          emailExportSize,
           exportBean,
           recipients,
           requestEntity,
@@ -307,9 +306,6 @@ public class ExportServiceImpl implements ExportService {
       logger.info("No data to export");
       return;
     }
-
-    // clear export bean column header before building csv header
-    exportBean.setColumnHeader(null);
 
     data.stream()
         .limit(LimittoExport)
@@ -800,6 +796,9 @@ public class ExportServiceImpl implements ExportService {
     final SipQuery sipQuery = getSipQuery(analysisId);
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
+    // clear export bean column header before building header
+    exportBean.setColumnHeader(null);
+
     try {
       // create a directory with unique name in published location to avoid file
       // conflict for dispatch.
@@ -925,7 +924,7 @@ public class ExportServiceImpl implements ExportService {
   public void s3DispatchExecutor(
       String finalS3, String finalJobGroup, File file, ExportBean exportBean) {
     for (String aliasTemp : finalS3.split(",")) {
-      logger.info("AliasTemp : " + aliasTemp);
+      logger.trace("AliasTemp : " + aliasTemp);
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
         S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
@@ -959,7 +958,6 @@ public class ExportServiceImpl implements ExportService {
       String analysisId,
       String executionId,
       String analysisType,
-      String exportSize,
       ExportBean exportBean,
       String recipients,
       HttpEntity<?> requestEntity,
@@ -970,15 +968,6 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
 
-    String url =
-        storageProxyUrl
-            + "/internal/proxy/storage/"
-            + executionId
-            + "/executions/data?page=1&pageSize="
-            + exportSize
-            + "&executionType=scheduled"
-            + "&analysisType="
-            + analysisType;
     if (s3 != null && s3 != "") {
       logger.debug("S3 details set. Dispatching to S3");
       dispatchFileToS3(
@@ -1011,6 +1000,16 @@ public class ExportServiceImpl implements ExportService {
 
     // mail should send asynchronous
     if (recipients != null && !recipients.equals("")) {
+      String url =
+          storageProxyUrl
+              + "/internal/proxy/storage/"
+              + executionId
+              + "/executions/data?page=1&pageSize="
+              + emailExportSize
+              + "&executionType=scheduled"
+              + "&analysisType="
+              + analysisType;
+
       ResponseEntity<DataResponse> entity = restTemplate.getForEntity(url, DataResponse.class);
       CompletableFuture.runAsync(() -> dispatchMail(analysisId, exportBean, recipients, entity, zip, userFileName));
     }
@@ -1032,7 +1031,7 @@ public class ExportServiceImpl implements ExportService {
     boolean flag = true;
     long totalRowCount = 0;
 
-    for (int i = 1; i < noOfPages; i += 1) {
+    for (int i = 1; i <= noOfPages; i += 1) {
       // get data in pages and keep storing it to file
       // do not use entire exportsize else there will be no data
       // this happens because of memory issues / JVM configuration.
@@ -1136,6 +1135,9 @@ public class ExportServiceImpl implements ExportService {
     // conflict for dispatch.
     final String mailDispatchFileName = filePath("ftp", userFileName);
     exportBean.setFileName(mailDispatchFileName);
+
+    // clear export bean column header before building header
+    exportBean.setColumnHeader(null);
 
     prepareFileWithSize(
         analysisId,

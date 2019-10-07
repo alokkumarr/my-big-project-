@@ -54,7 +54,8 @@ import {
   LabelOptions,
   AnalysisChartDSL,
   AnalysisMapDSL,
-  QueryDSL
+  QueryDSL,
+  ArtifactColumn
 } from '../../../../models';
 import {
   DesignerStates,
@@ -100,6 +101,8 @@ import {
 } from '../actions/designer.actions';
 import { DesignerState } from '../state/designer.state';
 import { CUSTOM_DATE_PRESET_VALUE, NUMBER_TYPES } from './../../consts';
+import { MatDialog } from '@angular/material';
+import { DerivedMetricComponent } from '../derived-metric/derived-metric.component';
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot', 'map'];
 
@@ -160,6 +163,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     public _analyzeDialogService: AnalyzeDialogService,
     public _chartService: ChartService,
     public _analyzeService: AnalyzeService,
+    private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
   ) {
@@ -297,7 +301,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         }
         this.analysis = {
           ...(newAnalysis['analysis'] || newAnalysis),
-          artifacts,
+          artifacts: cloneDeep(artifacts),
           ...this.analysisStarter
         };
         isDSLAnalysis(this.analysis) &&
@@ -466,11 +470,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         });
       });
     }
-    const fields = flatMap((<AnalysisDSL>this.analysis).sipQuery.artifacts, artifact => artifact.fields);
+    const fields = flatMap(
+      (<AnalysisDSL>this.analysis).sipQuery.artifacts,
+      artifact => artifact.fields
+    );
 
     const flatArtifacts = flatMap(artifacts, artifact => artifact.columns);
     flatArtifacts.forEach(col => {
-      col.checked  = '';
+      col.checked = '';
       fields.forEach(field => {
         if (col.table === field.table && col.columnName === field.columnName) {
           col.checked = true;
@@ -1129,6 +1136,33 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.requestDataIfPossible();
         break;
+    case 'updateDerivedMetric':
+      this.openDerivedMetricDialog(event.column);
+      break;
+    case 'addNewDerivedMetric':
+      this.openDerivedMetricDialog(null);
+      break;
+    case 'expressionUpdated':
+      this._store.dispatch(new DesignerUpdateArtifactColumn({
+        columnName: event.column.columnName,
+        table: event.column.table,
+        formula: event.column.formula,
+        expression: event.column.expression
+      }));
+      forEach(this.artifacts[0].columns, col => {
+        if (col.columnName === event.column.columnName) {
+          col.formula = event.column.formula;
+          col.expression = event.column.expression;
+        }
+      });
+      this.artifacts = [...this.artifacts];
+      this.requestDataIfPossible();
+      break;
+    case 'derivedMetricAdded':
+      const artifact = this.artifacts[0];
+      (<ArtifactColumn[]>artifact.columns).push(event.column as ArtifactColumn);
+      this.artifacts = [artifact];
+      break;
       case 'alias':
         // reload frontEnd
         this.updateAnalysis();
@@ -1219,6 +1253,42 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
+  openDerivedMetricDialog(artifactColumn: ArtifactColumn) {
+    const dialogRef = this.dialog.open(DerivedMetricComponent, {
+      width: '60%',
+      height: '60%',
+      autoFocus: false,
+      data: { artifactColumn, columns: this.artifacts[0].columns }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const column = {
+          ...artifactColumn,
+          ...result,
+          table: get(this.artifacts[0], 'artifactName'),
+          type: 'double'
+        };
+
+        const existing = find(
+          this.artifacts[0].columns,
+          col => col.columnName === result.columnName
+        );
+        if (existing) {
+          this.handleOtherChangeEvents({
+            subject: 'expressionUpdated',
+            column
+          });
+        } else {
+          this.handleOtherChangeEvents({
+            subject: 'derivedMetricAdded',
+            column
+          });
+        }
+      }
+    });
+  }
+
   changeSubType(to: string) {
     if (isDSLAnalysis(this.analysis)) {
       this._store.dispatch(new DesignerUpdateAnalysisSubType(to));
@@ -1285,14 +1355,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     case 'chart':
       /* At least one y and x field needs to be present. If this is a bubble chart,
        * at least one z axis field is also needed */
-      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
+      const sipQuery = this._store.selectSnapshot(state => state.designerState.analysis.sipQuery);
+      const fields = get(sipQuery, 'artifacts.0.fields');
       const requestCondition = [
-        find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
-        find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
-        /* prettier-ignore */
+        find(fields || [], field => field.area === 'y'),
+        find(fields || [], field => field.area === 'x'),
         ...(this.analysisSubType === 'bubble' ?
         [
-          find(sqlBuilder.dataFields || [], field => field.checked === 'z')
+          find(fields || [], field => field.area === 'x'),
         ] : [])
       ];
       return every(requestCondition, Boolean);

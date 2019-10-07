@@ -57,7 +57,9 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
     public void executeSingleProcessor(NGContext ngctx) throws Exception {
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
 
-        Dataset ds = dsMap.get(ngctx.dataSetName);
+        String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
+
+        Dataset ds = dsMap.get(transInKey);
 
         prepareRefData(dsMap);
 
