@@ -13,26 +13,32 @@ import javax.xml.bind.Marshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.User;
-
+import org.springframework.stereotype.Component;
 
 
 /**
  * @author vaibhav.kapoor
  * 
  */
+@Component
 public class TicketHelper {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TicketHelper.class);
-	
+	@Autowired
 	public UserRepository userRepository;	
 
 	public TicketHelper(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
+
+    public TicketHelper() {
+        this.userRepository = userRepository;
+    }
 	
 	public void cleanseRepository(int preservePeriod) {
 
@@ -231,5 +237,8 @@ public class TicketHelper {
 		}
 	}
 
-
+	public boolean checkTicketValid(String ticketID, String masterLoginId)
+    {
+      return  userRepository.IsTicketValid(ticketID,masterLoginId);
+    }
 }

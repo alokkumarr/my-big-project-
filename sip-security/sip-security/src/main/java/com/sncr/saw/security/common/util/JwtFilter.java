@@ -15,6 +15,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.GenericFilterBean;
 
 public class JwtFilter extends GenericFilterBean {
@@ -22,6 +23,9 @@ public class JwtFilter extends GenericFilterBean {
   private String jwtSecretKey;
 
   private static final ObjectMapper mapper = new ObjectMapper();
+
+  @Autowired
+  private TicketHelper ticketHelper;
 
   public JwtFilter(String jwtSecretKey) {
     this.jwtSecretKey = jwtSecretKey;
@@ -70,6 +74,11 @@ public class JwtFilter extends GenericFilterBean {
         if (!ticket.getRoleType().equals(RoleType.ADMIN)){
             response.sendError(401, "You are not authorized to perform this operation.");
         }
+        // In case user already logged-out and token is invalidated , same token can't be
+        // reused.
+        if (!(ticket.getTicketId() != null
+            && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId())))
+          response.sendError(401, "Token is not valid ");
       }
     }
     chain.doFilter(req, response);
