@@ -234,7 +234,11 @@ public class AlertEvaluationImpl implements AlertEvaluation {
    */
   private List<?> evaluateAlertRules(SipQuery sipQuery) {
     SIPDSL sipdsl = new SIPDSL();
-    sipdsl.setType("alert");
+    if (sipQuery.getStore().getStorageType().equalsIgnoreCase("ES")) {
+      sipdsl.setType("esReport");
+    } else {
+      sipdsl.setType("report");
+    }
     sipdsl.setSipQuery(sipQuery);
     String url = proxyAnalysisUrl + "/fetch?size=" + maxNumberOfAlertPerRules;
     logger.info("Execute URL for alert Evaluation :" + url);

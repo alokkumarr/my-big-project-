@@ -23,6 +23,19 @@
     }
   }
 
+  &__formula {
+    pre {
+      background: white;
+      border-radius: 5px;
+      border: 1px solid #e8e8e8;
+      box-sizing: border-box;
+      margin: 0;
+      max-height: 300px;
+      overflow: auto;
+      padding: 10px;
+    }
+  }
+
   mat-expansion-panel-header {
     height: 43px !important;
   }
@@ -38,4 +51,27 @@
   ::ng-deep .mat-form-field-outline {
     background-color: white;
   }
+}
+
+mat-icon {
+  padding: 2px 0;
+  color: $primary-red;
+  font-size: 14px;
+  height: 14px;
+}
+
+.icon-string-type {
+  color: $string-type-color;
+}
+.icon-number-type {
+  color: $number-type-color;
+}
+.icon-derived-type {
+  color: $derived-type-color;
+}
+.icon-geo-chart {
+  color: $geo-type-color;
+}
+.icon-calendar {
+  color: $date-type-color;
 }

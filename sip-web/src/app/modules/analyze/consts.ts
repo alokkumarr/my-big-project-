@@ -130,6 +130,11 @@ export const TYPE_ICONS = [
     icon: 'icon-calendar',
     label: 'Date',
     value: 'date'
+  },
+  {
+    icon: 'icon-derived-type',
+    label: 'Derived',
+    value: 'derived'
   }
 ];
 

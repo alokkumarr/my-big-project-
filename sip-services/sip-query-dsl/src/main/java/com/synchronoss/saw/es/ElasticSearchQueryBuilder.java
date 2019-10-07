@@ -78,12 +78,19 @@ public class ElasticSearchQueryBuilder {
 
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
-    List <Filter> aggregationFilter = SIPAggregationBuilder.getAggregationFilter(sipQuery.getFilters());
+    List<Filter> aggregationFilter =
+        SIPAggregationBuilder.getAggregationFilter(sipQuery.getFilters());
 
     // Generated Query
     searchSourceBuilder =
-        buildAggregations(dataFields, aggregationFields,aggregationFilter, searchSourceBuilder,
-            size,sipQuery.getSorts());
+        buildAggregations(
+            dataFields,
+            aggregationFields,
+            aggregationFilter,
+            searchSourceBuilder,
+            size,
+            sipQuery.getSorts());
+
     return searchSourceBuilder.toString();
   }
 
@@ -235,7 +242,7 @@ public class ElasticSearchQueryBuilder {
       } else {
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, aggregationFilter,0, 0, aggregationBuilder,sorts);
+                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder, sorts);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .

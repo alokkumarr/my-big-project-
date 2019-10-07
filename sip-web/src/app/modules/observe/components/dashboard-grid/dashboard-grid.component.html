@@ -114,7 +114,7 @@
       ></observe-kpi-bullet>
     </ng-container>
 
-    <div class="dashboard-item-error-message" *ngIf="!item.success">
+    <div class="dashboard-item-error-message" *ngIf="item.success === false">
       <h2>This item could not be loaded. It may have been deleted.</h2>
     </div>
   </gridster-item>

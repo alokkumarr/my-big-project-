@@ -504,16 +504,6 @@ public class AlertServiceImpl implements AlertService {
     return elements.toString();
   }
 
-  @Override
-  public void sendMessageToStream() {
-    try {
-      logger.info("Inside send message to stream");
-      evaluatorListener.sendMessageToStream();
-    } catch (Exception e) {
-      logger.error("Exception occured while sending message to stream");
-    }
-  }
-
   private List<AlertCountResponse> groupByseverity(List<AlertResult> list) {
     List<AlertCountResponse> response = new ArrayList<AlertCountResponse>();
     Map<AlertSeverity, Long> groupByServrity =

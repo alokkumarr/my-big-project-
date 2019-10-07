@@ -67,7 +67,5 @@ public interface AlertService {
 
   String retrieveMonitoringType(Ticket ticket);
 
-  void sendMessageToStream();
-
   String getReadableOperator(Operator operator);
 }

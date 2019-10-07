@@ -92,8 +92,12 @@ public class ESResponseParser {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
       for (Field dataField : aggregationFields) {
+        logger.debug("Datafield = " + dataField);
         String columnName =
             dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+
+        logger.debug("Column Name = " + columnName);
+        logger.debug("Child Node = " + childNode);
         flatValues.put(columnName, childNode.get(columnName).get(VALUE));
       }
       flatStructure.add(flatValues);
@@ -149,7 +153,8 @@ public class ESResponseParser {
     groupByFields = new String[dataFields.size() - aggregationFields.size()];
     int fieldCount = 0;
     for (Field dataField : dataFields) {
-      if (dataField.getAggregate() == null) groupByFields[fieldCount++] = dataField.getColumnName();
+      if (dataField.getAggregate() == null && dataField.getFormula() == null)
+        groupByFields[fieldCount++] = dataField.getColumnName();
     }
     logger.debug("groupByFields :" + groupByFields);
     logger.debug(this.getClass().getName() + " prepareGroupByFields ends");

@@ -511,25 +511,4 @@ public class SipAlertController {
     }
     return null;
   }
-
-  /**
-   * insert data to stream ..
-   *
-   * @param request HttpServletRequest
-   * @return String return all operators details
-   */
-  @ApiOperation(value = "/streamdata", nickname = "", notes = "", response = String.class)
-  @RequestMapping(
-      value = "/streamdata",
-      method = RequestMethod.GET,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseBody
-  public String sendMessageToStream(HttpServletRequest request) {
-    Ticket ticket = getTicket(request);
-    if (ticket != null) {
-      alertService.sendMessageToStream();
-      return "sent data to Stream";
-    }
-    return null;
-  }
 }
