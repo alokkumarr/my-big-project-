@@ -85,8 +85,16 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
-                services.md = new DLDataSetService(ngctx.xdfDataRootSys);
-                services.als = new AuditLogService(services.md.getRoot());
+
+                if (ngctx.runningPipeLine) {
+                    services.md = new DLDataSetService(ngctx.xdfDataRootSys, ngctx.isPersistMode());
+                    services.als = new AuditLogService(services.md.getRoot(), ngctx.isPersistMode());
+                }
+                else
+                {
+                    services.md = new DLDataSetService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+                    services.als = new AuditLogService(services.md.getRoot(),ngctx.isPersistMode());
+                }
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.Project)){
@@ -98,7 +106,12 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
-                services.transformationMD = new TransformationService(ngctx.xdfDataRootSys);
+
+                if (ngctx.runningPipeLine)
+                    services.transformationMD = new TransformationService(ngctx.xdfDataRootSys, ngctx.isPersistMode());
+                else
+                    services.transformationMD = new TransformationService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+
                 if (initTransformation() != 0){
                     logger.error("Could not init transformation data");
                     return  -1;
@@ -118,18 +131,39 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     }
 
 
-    private int initProject() {
-        try {
-            services.prj.getProjectData(ngctx);
-            ngctx.serviceStatus.put(ComponentServices.Project, true);
-        } catch (Exception e) {
-            String error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
-            logger.error(error);
-            return -1;
+//    private int initProject() {
+//        try {
+//            services.prj.getProjectData(ngctx);
+//            ngctx.serviceStatus.put(ComponentServices.Project, true);
+//        } catch (Exception e) {
+//            String error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
+//            logger.error(error);
+//            return -1;
+//
+//        }
+//        return 0;
+//    }
 
+    private int initProject() {
+        int projectStatus = 0;
+        try {
+            if (!services.prj.projectPresent(ngctx.applicationID)) {
+                logger.warn("With Project Id: "+ ngctx.applicationID);
+                services.prj.getProjectData(ngctx);
+                ngctx.serviceStatus.put(ComponentServices.Project, true);
+            } else {
+                logger.warn("Without Project Id: "+ ngctx.applicationID);
+                ngctx.serviceStatus.put(ComponentServices.Project, true);
+            }
+        } catch (Exception e) {
+            String error = "component initialization (input-discovery/output-preparation) exception: "
+                + ExceptionUtils.getFullStackTrace(e);
+            logger.error(error);
+            projectStatus = -1;
         }
-        return 0;
+        return projectStatus;
     }
+
 
     public int registerOutputDataSet() {
 
@@ -146,14 +180,15 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
                 try
                 {
-                  JsonObject ale = services.als.generateDSAuditLogEntry(ngctx, "INIT", ngctx.inputDataSets, ngctx.outputDataSets);
-                  String aleId = services.als.createAuditLog(ngctx, ale);
 
-                  ngctx.componentConfiguration.getOutputs().forEach(o ->
-                  {
+                    JsonObject ale = services.als.generateDSAuditLogEntry(ngctx, "INIT", ngctx.inputDataSets, ngctx.outputDataSets);
+                    String aleId = ngctx.isPersistMode() ? services.als.createAuditLog(ngctx, ale) : services.als.generateAleId(ngctx) ;
+
+                    ngctx.componentConfiguration.getOutputs().forEach(o ->
+                    {
                         logger.debug("Add output object to data object repository: " + o.getDataSet());
 
-                        if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
+                        if (ngctx.isPersistMode() && ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ) {
                             JsonElement ds = services.md.readOrCreateDataSet(ngctx, ngctx.outputDataSets.get(o.getDataSet()));
                             if (ds == null) {
                                 String error = "Could not create metadata for output dataset [" + o.getDataSet() + "]: " ;
@@ -181,9 +216,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                     });
                     ngctx.serviceStatus.put(ComponentServices.OutputDSMetadata, true);
                 } catch (Exception e) {
-                  logger.error("Could not create Audit log entry" +
-                      ExceptionUtils.getFullStackTrace(e));
-                  return -1;
+                    logger.error("Could not create Audit log entry" +
+                        ExceptionUtils.getFullStackTrace(e));
+                    return -1;
                 }
 
             }
@@ -196,6 +231,24 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         }
     }
 
+//    private int initTransformation(){
+//        if (services.transformationMD == null ||
+//            !ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
+//            logger.error("Incorrect initialization sequence or service is not available");
+//            return -1;
+//        }
+//        try {
+//            ngctx.transformationID =
+//                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
+//            ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
+//        } catch (Exception e) {
+//            String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
+//            logger.error(error);
+//            return -1;
+//        }
+//        return 0;
+//    }
+
     private int initTransformation(){
         if (services.transformationMD == null ||
             !ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
@@ -203,8 +256,11 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             return -1;
         }
         try {
-            ngctx.transformationID =
+            logger.info("ngctx.isPersistMode()" + ngctx.isPersistMode());
+            if(ngctx.isPersistMode()) {
+                ngctx.transformationID =
                     services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
+            }
             ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
         } catch (Exception e) {
             String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);

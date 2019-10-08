@@ -291,7 +291,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 };
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
-                "transformer", batchId);
+                "transformer", batchId,true);
 
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
