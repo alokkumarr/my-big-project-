@@ -4,9 +4,11 @@ import {
   OnDestroy,
   EventEmitter,
   Output,
-  Input
+  Input,
+  ViewChild
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatStepper } from '@angular/material';
 import * as fpGet from 'lodash/fp/get';
 import * as includes from 'lodash/includes';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -14,6 +16,7 @@ import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
 import * as omit from 'lodash/omit';
 import * as get from 'lodash/get';
+import * as range from 'lodash/range';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpMap from 'lodash/fp/map';
@@ -51,6 +54,7 @@ const notificationsOptions = [
   styleUrls: ['./add-alert.component.scss']
 })
 export class AddAlertComponent implements OnInit, OnDestroy {
+  @ViewChild('addAlertStepper') addAlertStepper: MatStepper;
   alertDefFormGroup: FormGroup;
   alertMetricFormGroup: FormGroup;
   alertRuleFormGroup: FormGroup;
@@ -100,6 +104,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.alertDefFormGroup.patchValue(alertForm);
         this.alertMetricFormGroup.patchValue(alertForm);
         this.alertRuleFormGroup.patchValue(alertForm);
+        const allSteps = range(3);
+        allSteps.forEach(() => this.addAlertStepper.next());
+        allSteps.forEach(() => this.addAlertStepper.previous());
       });
       this.endActionText = 'Update';
       this.datapods$ = this._configureAlertService.getListOfDatapods$();
@@ -283,15 +290,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   //   control.setValue(correctedValue);
   // }
 
-  onDatapodChanged() {
-    this.alertMetricFormGroup.controls.metricsColumn.setValue('');
-  }
-
   onSelectedMetricsColumn(selectedItem) {
     this.selectedMetricsColumn = selectedItem;
   }
 
   onDatapodSelected(selectedItem) {
+    this.alertMetricFormGroup.controls.metricsColumn.setValue('');
     if (selectedItem) {
       this.alertMetricFormGroup.controls.datapodName.setValue(
         selectedItem.metricName
