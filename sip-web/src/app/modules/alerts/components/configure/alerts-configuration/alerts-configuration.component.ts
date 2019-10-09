@@ -3,9 +3,10 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenav, MatDialog } from '@angular/material';
 import { SubscriptionLike } from 'rxjs';
 import CustomStore from 'devextreme/data/custom_store';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
 
 import { ConfirmActionDialogComponent } from '../confirm-action-dialog/confirm-action-dialog.component';
-
 import { AlertDefinition, AlertConfig } from '../../../alerts.interface';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
@@ -78,7 +79,14 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
   }
 
   changeAlertStatus(alert) {
-    console.log('alert', alert);
+    const updatedAlert = cloneDeep(alert);
+    const alertID = alert.alertRulesSysId;
+    updatedAlert.activeInd = !alert.activeInd;
+    this._configureAlertService
+      .updateAlert(alertID, updatedAlert)
+      .subscribe((response: any) => {
+        alert.activeInd = Boolean(get(response, 'alert.activeInd'));
+      });
   }
 
   editAlert(data: AlertConfig) {

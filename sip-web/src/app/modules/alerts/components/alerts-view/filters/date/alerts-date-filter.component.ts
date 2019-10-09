@@ -102,8 +102,8 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
       fieldName: 'starttime',
       type: 'date',
       preset,
-      endTime: lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
-      startTime: gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00'
+      to: lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
+      from: gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00'
     };
   }
 }
