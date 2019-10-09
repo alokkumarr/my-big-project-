@@ -21,6 +21,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import { GlobalFilterService } from '../../services/global-filter.service';
+import { ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS } from '../observe-kpi-bullet/observe-kpi-bullet.component';
 
 @Component({
   selector: 'create-dashboard',
@@ -129,13 +130,19 @@ export class CreateDashboardComponent
       return;
     }
     if (
-      this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)
+      this.globalFilterService.haveAnalysisFiltersChanged(
+        data.analysisFilters
+      ) ||
+      !isEmpty(data.analysisFilters)
     ) {
       this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
       this.globalFilterService.onApplyFilter.next(data.analysisFilters);
     }
 
-    if (this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+    if (
+      this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) ||
+      !isEmpty(data.kpiFilters)
+    ) {
       this.globalFilterService.lastKPIFilter = data.kpiFilters;
       this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
     }
@@ -144,13 +151,19 @@ export class CreateDashboardComponent
 
   onClearGlobalFilter(data) {
     if (
-      this.globalFilterService.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)
+      this.globalFilterService.haveAnalysisFiltersChanged(
+        data.analysisFilters
+      ) ||
+      isEmpty(data.analysisFilters)
     ) {
       this.globalFilterService.lastAnalysisFilters = data.analysisFilters;
       this.globalFilterService.onApplyFilter.next(data.analysisFilters);
     }
 
-    if (this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
+    if (
+      this.globalFilterService.hasKPIFilterChanged(data.kpiFilters) ||
+      isEmpty(data.kpiFilters)
+    ) {
       this.globalFilterService.lastKPIFilter = data.kpiFilters;
       this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
     }
@@ -200,33 +213,37 @@ export class CreateDashboardComponent
   onKPIAction(action, data) {
     /* prettier-ignore */
     switch (action) {
-    case WIDGET_ACTIONS.ADD:
-      if (!data) { return; }
+      case WIDGET_ACTIONS.ADD:
+        if (!data) {
+          return;
+        }
 
-      const item = {
-        cols: 13,
-        rows: 6,
-        kpi: data
-      };
-      this.requester.next({action: 'add', data: item});
-      break;
+        const item = {
+          cols: 13,
+          rows: 6,
+          kpi: data
+        };
+        this.requester.next({ action: 'add', data: item });
+        break;
     }
   }
 
   onBulletAction(action, data) {
     /* prettier-ignore */
     switch (action) {
-    case WIDGET_ACTIONS.ADD:
-      if (!data) { return; }
+      case WIDGET_ACTIONS.ADD:
+        if (!data) {
+          return;
+        }
 
-      const item = {
-        cols: 20,
-        rows: 6,
-        bullet: data,
-        updater: new BehaviorSubject({})
-      };
-      this.requester.next({action: 'add', data: item});
-      break;
+        const dimensions = ACTUAL_VS_TARGET_KPI_MIN_DIMENSIONS[data.kpiDisplay];
+        const item = {
+          ...dimensions,
+          bullet: data,
+          updater: new BehaviorSubject({})
+        };
+        this.requester.next({ action: 'add', data: item });
+        break;
     }
   }
 

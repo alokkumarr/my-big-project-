@@ -52,7 +52,8 @@ const CRITICAL = [
   TEST_BASE_DIR + 'reports/EsReportPaginationInPreviewPage.test.js',
   TEST_BASE_DIR + 'reports/DLReportPaginationInExecutePage.test.js',
   TEST_BASE_DIR + 'reports/DLReportPaginationInPreviewPage.test.js',
-  TEST_BASE_DIR + 'geolocation/createAndDelete.test.js'
+  TEST_BASE_DIR + 'geolocation/createAndDelete.test.js',
+  TEST_BASE_DIR + 'charts/forkFromCardViewDelete.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [
