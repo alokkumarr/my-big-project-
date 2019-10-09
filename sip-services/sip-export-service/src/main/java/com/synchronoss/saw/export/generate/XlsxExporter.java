@@ -80,7 +80,7 @@ public class XlsxExporter implements IFileExporter {
     if (StringUtils.isEmpty(value)
         || value.equalsIgnoreCase("EMPTY")
         || value.equalsIgnoreCase("null")) {
-      cell.setCellValue("null");
+      cell.setCellValue("null"); // SIP-8449 - Dispatch - Empty values are inserted instead of "null", while dispatching the analysis in Excel format
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cell.setCellStyle(cellStyle);

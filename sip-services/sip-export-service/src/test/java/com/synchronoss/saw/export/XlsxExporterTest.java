@@ -83,10 +83,16 @@ public class XlsxExporterTest {
     obj3.put("SWITCH_MOU", 4.5);
     obj3.put("REGION", "US");
 
+    LinkedHashMap obj4 = new LinkedHashMap();
+    obj2.put("AccountNum", null);
+    obj2.put("SWITCH_MOU", null);
+    obj2.put("REGION", null);
+
     ArrayList list = new ArrayList();
     list.add(obj1);
     list.add(obj2);
     list.add(obj3);
+    list.add(obj4);
 
     dataResponse.setData(list);
 
@@ -125,7 +131,7 @@ public class XlsxExporterTest {
     workBook.getSpreadsheetVersion();
     SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
     xlsxExporter.buildXlsxSheet(sipQuery, exportBean, workBook, sheet, dataResponse.getData(), 3l, 10l);
-    assertEquals(sheet.getPhysicalNumberOfRows(), 4);
+    assertEquals(sheet.getPhysicalNumberOfRows(), 5);
   }
 
   @Test
