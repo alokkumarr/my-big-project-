@@ -24,8 +24,6 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
-    @Autowired
-    private ApplicationContext appContext;
     /**
      * TomcatServletWebServerFactory has been overridden.
      */

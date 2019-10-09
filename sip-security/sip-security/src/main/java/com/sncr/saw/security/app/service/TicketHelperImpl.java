@@ -20,13 +20,9 @@ public class TicketHelperImpl implements TicketHelper {
   private static final Logger logger = LoggerFactory.getLogger(TicketHelper.class);
   @Autowired public UserRepository userRepository;
 
-  /*public TicketHelperImpl(UserRepository userRepository) {
+  public TicketHelperImpl(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
-
-  public TicketHelperImpl() {
-    this.userRepository = userRepository;
-  }*/
 
   public void cleanseRepository(int preservePeriod) {}
 

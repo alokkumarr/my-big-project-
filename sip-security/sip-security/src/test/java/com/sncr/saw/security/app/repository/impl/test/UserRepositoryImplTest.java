@@ -309,7 +309,7 @@ public class UserRepositoryImplTest {
         nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
         nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
         nssoProperties.setValidityMins("10");
-        TicketHelper ticketHelper = new TicketHelperImpl();
+        TicketHelper ticketHelper = new TicketHelperImpl(userRepositoryDAO);
         SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties,ticketHelper);
         SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
 		assertNotNull("Valid access Token not found, Authentication failed ",ssoResponse.getaToken());
