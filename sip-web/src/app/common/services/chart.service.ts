@@ -482,7 +482,7 @@ export class ChartService {
   ) {
     let aggrSymbol = '';
     const comboGroups = fpPipe(
-      map(field => field.comboType || field.displayType),
+      fpMap(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
@@ -544,7 +544,9 @@ export class ChartService {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
           assign(
-            { y: dataPoint[removeKeyword(field.columnName)] },
+            {
+              y: dataPoint[removeKeyword(field.dataField || field.columnName)]
+            },
             mapValues(axesFieldNameMap, val => dataPoint[val])
           )
         );
@@ -599,7 +601,7 @@ export class ChartService {
       (accumulator, field) => {
         accumulator[
           typeof field.checked === 'string' ? field.checked : field.area
-        ] = removeKeyword(field.columnName);
+        ] = removeKeyword(field.dataField || field.columnName);
         return accumulator;
       },
       {}
