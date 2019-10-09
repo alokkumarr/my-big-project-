@@ -228,11 +228,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	
        // SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
     	SparkSession sess = ctx.sparkSession;
+    	logger.debug("######## Reading through spark session #####" );
         JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
         //rowRdd.foreachPartitionAsync(f)
-        
+        logger.debug("######## Reading completed through spark session #####" );
  
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
+        logger.debug("######## Dataframe created #####" );
   	    NGContext context = this.ngctx;
   	    
 		
@@ -325,7 +327,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 			}
     	
-    	  logger.debug("COUNT before async::"+ df.count());
+        }
 
         // Elastic Search
         if (esIndex != null && !esIndex.isEmpty()) {
@@ -375,7 +377,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         
         
         
-        }
+    
 
     
         
