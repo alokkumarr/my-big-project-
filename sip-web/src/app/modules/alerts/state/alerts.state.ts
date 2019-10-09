@@ -1,6 +1,9 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as clone from 'lodash/clone';
 import * as lodashMap from 'lodash/map';
+import * as every from 'lodash/every';
+import * as isEqual from 'lodash/isEqual';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { map } from 'rxjs/operators';
 // import produce from 'immer';
 
@@ -10,23 +13,37 @@ import {
   LoadAllAlertCount,
   LoadAllAlertSeverity,
   LoadSelectedAlertCount,
-  LoadSelectedAlertRuleDetails
+  LoadSelectedAlertRuleDetails,
+  LoadAllAttributeValues,
+  EditAlertFilter
 } from './alerts.actions';
 import { AlertsStateModel, AlertFilterModel } from '../alerts.interface';
 import { DATE_PRESETS_OBJ, CUSTOM_DATE_PRESET_VALUE } from '../consts';
 import { AlertsService } from '../services/alerts.service';
 
-const defaultAlertFilter: AlertFilterModel = {
-  preset: 'TW',
-  groupBy: 'StartTime'
-};
+export const defaultAlertFilters: AlertFilterModel[] = [
+  {
+    preset: 'TW',
+    fieldName: 'starttime',
+    type: 'date'
+  },
+  {
+    fieldName: 'attributeValue',
+    value: '',
+    operator: 'EQ',
+    type: 'string'
+  }
+];
 
 const defaultAlertsState: AlertsStateModel = {
-  alertFilter: defaultAlertFilter,
+  alertFilters: cloneDeep(defaultAlertFilters),
+  editedAlertFilters: cloneDeep(defaultAlertFilters),
+  editedAlertsValidity: lodashMap(defaultAlertFilters, () => false),
   allAlertsCountChartData: null,
   allAlertsSeverityChartData: null,
   selectedAlertCountChartData: null,
-  selectedAlertRuleDetails: null
+  selectedAlertRuleDetails: null,
+  allAttributeValues: null
 };
 
 const mapAlertCount2ChartData = map(countList => ({
@@ -49,17 +66,38 @@ export class AlertsState {
   constructor(private _alertsService: AlertsService) {}
 
   @Selector()
-  static getAlertFilter(state: AlertsStateModel) {
-    return state.alertFilter;
+  static getAlertFilters(state: AlertsStateModel) {
+    return state.alertFilters;
   }
 
   @Selector()
-  static getAlertFilterString(state: AlertsStateModel) {
-    const { preset, startTime, endTime } = state.alertFilter;
-    const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
-    return isCustomFilter
-      ? `${startTime} -> ${endTime}`
-      : DATE_PRESETS_OBJ[preset].label;
+  static getEditedAlertFilters(state: AlertsStateModel) {
+    return state.editedAlertFilters;
+  }
+
+  @Selector()
+  static areEditedAlertsValid(state: AlertsStateModel) {
+    const { editedAlertFilters, alertFilters } = state;
+    return (
+      every(editedAlertFilters) && !isEqual(editedAlertFilters, alertFilters)
+    );
+  }
+
+  @Selector()
+  static getAlertFilterStrings(state: AlertsStateModel) {
+    const filterStrings = lodashMap(state.alertFilters, filter => {
+      switch (filter.type) {
+        case 'date':
+          const { preset, startTime, endTime } = filter;
+          const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
+          return isCustomFilter
+            ? `${startTime} -> ${endTime}`
+            : DATE_PRESETS_OBJ[preset].label;
+        default:
+          return null;
+      }
+    });
+    return filterStrings;
   }
 
   @Selector()
@@ -82,24 +120,45 @@ export class AlertsState {
     return state.selectedAlertRuleDetails;
   }
 
+  @Selector()
+  static getAllAttributeValues(state: AlertsStateModel) {
+    return state.allAttributeValues;
+  }
+
   @Action(ApplyAlertFilters)
-  applyAlertFilter(
-    { patchState }: StateContext<AlertsStateModel>,
-    { alertFilter }: ApplyAlertFilters
+  applyAlertFilter({
+    patchState,
+    dispatch,
+    getState
+  }: StateContext<AlertsStateModel>) {
+    const { editedAlertFilters } = getState();
+    patchState({ alertFilters: cloneDeep(editedAlertFilters) });
+    dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
+  }
+
+  @Action(EditAlertFilter)
+  editAlertFilter(
+    { patchState, getState }: StateContext<AlertsStateModel>,
+    { alertFilter, index }: EditAlertFilter
   ) {
-    patchState({ alertFilter });
+    const { editedAlertFilters } = getState();
+    editedAlertFilters[index] = alertFilter;
+    patchState({ editedAlertFilters });
   }
 
   @Action(ResetAlertFilters)
   resetAlertFilter({ patchState }: StateContext<AlertsStateModel>) {
-    patchState({ alertFilter: defaultAlertFilter });
+    patchState({
+      alertFilters: cloneDeep(defaultAlertFilters),
+      editedAlertFilters: cloneDeep(defaultAlertFilters)
+    });
   }
 
   @Action(LoadAllAlertCount)
   loadAllAlertCount({ patchState, getState }: StateContext<AlertsStateModel>) {
-    const { alertFilter } = getState();
+    const { alertFilters } = getState();
     return this._alertsService
-      .getAllAlertsCount(alertFilter)
+      .getAllAlertsCount(alertFilters)
       .pipe(mapAlertCount2ChartData)
       .toPromise()
       .then(allAlertsCountChartData => {
@@ -112,9 +171,9 @@ export class AlertsState {
     patchState,
     getState
   }: StateContext<AlertsStateModel>) {
-    const { alertFilter } = getState();
+    const { alertFilters } = getState();
     return this._alertsService
-      .getAllAlertsSeverity(alertFilter)
+      .getAllAlertsSeverity(alertFilters)
       .pipe(
         map(severityList => ({
           x: lodashMap(severityList, 'alertSeverity'),
@@ -131,13 +190,13 @@ export class AlertsState {
   }
 
   @Action(LoadSelectedAlertCount)
-  LoadSelectedAlertCount(
+  loadSelectedAlertCount(
     { patchState, getState }: StateContext<AlertsStateModel>,
     { id }: LoadSelectedAlertCount
   ) {
-    const { alertFilter } = getState();
+    const { alertFilters } = getState();
     return this._alertsService
-      .getAlertCountById(id, alertFilter)
+      .getAlertCountById(id, alertFilters)
       .pipe(mapAlertCount2ChartData)
       .toPromise()
       .then(selectedAlertCountChartData => {
@@ -146,7 +205,7 @@ export class AlertsState {
   }
 
   @Action(LoadSelectedAlertRuleDetails)
-  LoadSelectedAlertRuleDetails(
+  loadSelectedAlertRuleDetails(
     { patchState }: StateContext<AlertsStateModel>,
     { id }: LoadSelectedAlertRuleDetails
   ) {
@@ -155,6 +214,16 @@ export class AlertsState {
       .toPromise()
       .then(selectedAlertRuleDetails => {
         patchState({ selectedAlertRuleDetails });
+      });
+  }
+
+  @Action(LoadAllAttributeValues)
+  loadAllAttributeValues({ patchState }: StateContext<AlertsStateModel>) {
+    return this._alertsService
+      .getAllAttributeValues()
+      .toPromise()
+      .then(allAttributeValues => {
+        patchState({ allAttributeValues });
       });
   }
 }

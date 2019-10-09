@@ -18,7 +18,7 @@ public class AlertUtils {
    * @param date String
    * @return Long
    */
-  private static Long getEpochFromDateTime(String date) {
+  public static Long getEpochFromDateTime(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     LocalDateTime ldt = LocalDateTime.parse(date, formatter);
     ZoneId zoneId = ZoneId.systemDefault();
@@ -68,13 +68,13 @@ public class AlertUtils {
           return false;
         }
       case EQ:
-        if (metricValue == value) {
+        if (Double.compare(metricValue, value) == 0) {
           return true;
         } else {
           return false;
         }
       case NEQ:
-        if (metricValue != value) {
+        if (Double.compare(metricValue, value) != 0) {
           return true;
         } else {
           return false;

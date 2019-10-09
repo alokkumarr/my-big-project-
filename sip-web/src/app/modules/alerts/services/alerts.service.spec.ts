@@ -1,13 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { GridPagingOptions } from '../alerts.interface';
 import { AlertsService } from './alerts.service';
 import { Observable } from 'rxjs';
-
-const pagingOptions: GridPagingOptions = {
-  take: 10,
-  skip: 10
-};
+import { defaultAlertFilters } from '../state/alerts.state';
 
 describe('AlertsService', () => {
   let service: AlertsService;
@@ -24,14 +19,30 @@ describe('AlertsService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getAlertsStatesForGrid should return Promise', () => {
-    expect(
-      service.getAlertsStatesForGrid(pagingOptions) instanceof Promise
-    ).toBeTruthy();
-  });
-
   it('getAlertRuleDetails should return  observable', () => {
     expect(service.getAlertRuleDetails(1) instanceof Observable).toBeTruthy();
+  });
+
+  it('convertOptionsToPayloadAndQueryParams should return null for sorts if no sorting information is given', () => {
+    const options = {};
+    const { sorts } = service.convertOptionsToPayloadAndQueryParams(options);
+    expect(sorts).toEqual(null);
+  });
+
+  it('convertOptionsToPayloadAndQueryParams should convert sorts object to backend sorts structure', () => {
+    const options = { sort: [{ selector: 'someField', desc: true }] };
+    const targetSorts = [{ fieldName: 'someField', order: 'DESC' }];
+    const { sorts } = service.convertOptionsToPayloadAndQueryParams(options);
+    expect(sorts).toEqual(targetSorts);
+  });
+
+  it('convertOptionsToPayloadAndQueryParams should create queryParams properly', () => {
+    const options = { skip: 0, take: 10 };
+    const targetQueryParams = `?pageNumber=1&pageSize=10`;
+    const { queryParams } = service.convertOptionsToPayloadAndQueryParams(
+      options
+    );
+    expect(queryParams).toEqual(targetQueryParams);
   });
 
   it('getRequest should return  observable', () => {
@@ -42,28 +53,19 @@ describe('AlertsService', () => {
 
   it('should return observable for calling getAllAlertsCount', () => {
     expect(
-      service.getAllAlertsCount({
-        preset: 'TW',
-        groupBy: 'StartTime'
-      }) instanceof Observable
+      service.getAllAlertsCount(defaultAlertFilters) instanceof Observable
     ).toBeTruthy();
   });
 
   it('should return observable for calling getAllAlertsSeverity', () => {
     expect(
-      service.getAllAlertsSeverity({
-        preset: 'TW',
-        groupBy: 'StartTime'
-      }) instanceof Observable
+      service.getAllAlertsSeverity(defaultAlertFilters) instanceof Observable
     ).toBeTruthy();
   });
 
   it('should return observable for calling getAlertCountById', () => {
     expect(
-      service.getAlertCountById(1, {
-        preset: 'TW',
-        groupBy: 'StartTime'
-      }) instanceof Observable
+      service.getAlertCountById(1, defaultAlertFilters) instanceof Observable
     ).toBeTruthy();
   });
 });

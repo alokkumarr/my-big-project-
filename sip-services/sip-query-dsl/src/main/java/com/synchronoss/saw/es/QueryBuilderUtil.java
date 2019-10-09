@@ -9,6 +9,8 @@ import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
+import com.synchronoss.saw.model.Model.Operation;
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.util.BuilderUtil;
 import java.util.ArrayList;
@@ -250,43 +252,42 @@ public class QueryBuilderUtil {
    */
   public static Script prepareAggregationFilter(Filter item) {
     Script script = null;
-    if (item.getModel().getOperator().value().equals(Model.Operator.BTW.value())) {
-      script =
-          new Script(
-              "params."
-                  + item.getColumnName()
-                  + " <= "
-                  + item.getModel().getValue()
-                  + "&& "
-                  + "params."
-                  + item.getColumnName()
-                  + " >= "
-                  + item.getModel().getOtherValue());
+
+    Operator operator = item.getModel().getOperator();
+
+    switch (operator) {
+        case BTW: script =
+            new Script(
+                "params."
+                    + item.getColumnName()
+                    + " " + Operation.LTE + " "
+                    + item.getModel().getValue()
+                    + "&& "
+                    + "params."
+                    + item.getColumnName()
+                    + " " + Operation.GTE + " "
+                    + item.getModel().getOtherValue());
+        break;
+      case GT:
+        script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
+        break;
+      case GTE:
+        script = new Script("params." + item.getColumnName() + " " + Operation.GTE.value() + " " + item.getModel().getValue());
+        break;
+      case LT:
+        script = new Script("params." + item.getColumnName() + " " + Operation.LT.value() +  " " + item.getModel().getValue());
+        break;
+      case LTE:
+        script = new Script("params." + item.getColumnName() + " " + Operation.LTE.value() + " " + item.getModel().getValue());
+        break;
+      case EQ:
+        script = new Script("params." + item.getColumnName() + " " + Operation.EQ.value() + " " + item.getModel().getValue());
+        break;
+      case NEQ:
+        script = new Script("params." + item.getColumnName() + " " + Operation.NEQ.value() +  " " + item.getModel().getValue());
+        break;
     }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GT.value())) {
-      script = new Script("params." + item.getColumnName() + " > "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.GTE.value())) {
-      script = new Script("params." + item.getColumnName() + " >= "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LT.value())) {
-      script = new Script("params." + item.getColumnName() + " < "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.LTE.value())) {
-      script = new Script("params." + item.getColumnName() + " <= "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.EQ.value())) {
-      script = new Script("params." + item.getColumnName() + " = "
-          + item.getModel().getValue());
-    }
-    if (item.getModel().getOperator().value().equals(Model.Operator.NEQ.value())) {
-      script = new Script("params." + item.getColumnName() + " != "
-          + item.getModel().getValue());
-    }
+
     return script;
   }
 
@@ -468,7 +469,7 @@ public class QueryBuilderUtil {
    * @return
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
-      SipQuery sipQuery, DataSecurityKey dataSecurityKey) {
+      SipQuery sipQuery, DataSecurityKey dataSecurityKey, List<String> artifactFromAnalysis) {
     List<DataSecurityKeyDef> dataSecurityKeyDefList =
         dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
     List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
@@ -476,13 +477,16 @@ public class QueryBuilderUtil {
     if ((artifactList != null && !artifactList.isEmpty())
         && (dataSecurityKeyDefList != null && !dataSecurityKeyDefList.isEmpty())) {
       for (Artifact artifact : artifactList) {
+
         String artifactName = artifact.getArtifactsName();
-        List<Field> fieldList = artifact.getFields();
-        for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-          if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-            String dskColName = dataSecurityKeyDef.getName();
-            dataSecurityKeyDef.setName(artifactName + "." + dskColName);
-            dataSecurityKeyDefs.add(dataSecurityKeyDef);
+        if (artifactFromAnalysis.contains(artifactName.toUpperCase())) {
+          List<Field> fieldList = artifact.getFields();
+          for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+            if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
+              String dskColName = dataSecurityKeyDef.getName();
+              dataSecurityKeyDef.setName(artifactName + "." + dskColName);
+              dataSecurityKeyDefs.add(dataSecurityKeyDef);
+            }
           }
         }
       }

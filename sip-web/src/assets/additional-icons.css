@@ -1,11 +1,11 @@
 .icon-area-chart .path2::before {
-  content: "\e9e2";
+  content: '\e9e2';
   margin-left: -1em;
   color: rgb(134, 143, 153);
 }
 
 .icon-area-chart .path3::before {
-  content: "\e9e3";
+  content: '\e9e3';
   margin-left: -1em;
   color: rgb(134, 143, 153);
 }
@@ -40,98 +40,107 @@
   font-weight: bolder;
 }
 
+.icon-derived-type.mat-icon {
+  width: 30px;
+}
+.icon-derived-type::before {
+  content: 'f(x)';
+  font-weight: bolder;
+  font-style: italic;
+}
+
 .icon-Count::before {
-  content: "#";
+  content: '#';
   font-size: 26px;
   font-weight: bolder;
 }
 
 .icon-Percentage::before {
-  content: "%";
+  content: '%';
   font-size: 26px;
   font-weight: bolder;
 }
 
 .icon-right-join .path1::before {
-  content: "\e9bc";
+  content: '\e9bc';
   color: rgb(189, 206, 215);
 }
 
 .icon-right-join .path2::before {
-  content: "\e9bd";
+  content: '\e9bd';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-right-join .path3::before {
-  content: "\e9be";
+  content: '\e9be';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-left-join .path1::before {
-  content: "\e9b0";
+  content: '\e9b0';
   color: rgb(189, 206, 215);
 }
 
 .icon-left-join .path2::before {
-  content: "\e9b1";
+  content: '\e9b1';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-left-join .path3::before {
-  content: "\e9b2";
+  content: '\e9b2';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-inner-join .path1::before {
-  content: "\e9ab";
+  content: '\e9ab';
   color: rgb(189, 206, 215);
 }
 
 .icon-inner-join .path2::before {
-  content: "\e9ac";
+  content: '\e9ac';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-inner-join .path3::before {
-  content: "\e9ad";
+  content: '\e9ad';
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
 .icon-arrow-down-circled .path1::before {
-  content: "\e990";
+  content: '\e990';
   color: rgb(132, 150, 160);
 }
 
 .icon-arrow-down-circled .path2::before {
-  content: "\e991";
+  content: '\e991';
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
 
 .icon-arrow-up-circles .path1::before {
-  content: "\e993";
+  content: '\e993';
   color: rgb(132, 150, 160);
 }
 
 .icon-arrow-up-circles .path2::before {
-  content: "\e994";
+  content: '\e994';
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
 
 .icon-column-options .path1::before {
-  content: "\e99e";
+  content: '\e99e';
   color: rgb(92, 102, 112);
 }
 
 .icon-column-options .path2::before {
-  content: "\e99f";
+  content: '\e99f';
   margin-left: -1em;
   color: rgb(209, 211, 211);
 }

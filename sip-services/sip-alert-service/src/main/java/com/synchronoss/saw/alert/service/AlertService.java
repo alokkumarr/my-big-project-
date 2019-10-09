@@ -5,8 +5,12 @@ import com.synchronoss.saw.alert.modal.AlertCount;
 import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
+import com.synchronoss.saw.alert.modal.AlertStatesFilter;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
+import com.synchronoss.saw.model.Model.Operator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -49,7 +53,8 @@ public interface AlertService {
       Integer pageSize,
       Ticket ticket);
 
-  AlertStatesResponse listAlertStates(Integer pageNumber, Integer pageSize, Ticket ticket);
+  AlertStatesResponse listAlertStates(
+      Integer pageNumber, Integer pageSize, Ticket ticket, Optional<AlertStatesFilter> alertStates);
 
   List<AlertCountResponse> alertCount(
       AlertCount alertCount,
@@ -57,4 +62,10 @@ public interface AlertService {
       Integer pageSize,
       String alertRuleSysId,
       Ticket ticket);
+
+  Set<String> listAttribueValues(Ticket ticket);
+
+  String retrieveMonitoringType(Ticket ticket);
+
+  String getReadableOperator(Operator operator);
 }

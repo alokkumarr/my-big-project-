@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
@@ -9,12 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.google.gson.Gson;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -74,6 +77,10 @@ public class StorageProxyController {
   private String metaDataServiceExport;
 
   @Autowired private RestUtil restUtil;
+
+  public static final String CUSTOMER_CODE = "customerCode";
+
+  public Gson gson = new Gson();
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -311,8 +318,8 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
-    if (authTicket == null && !isScheduledExecution) {
+    Ticket authTicket = request != null ? getTicket(request) : null;
+    if (authTicket == null) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
@@ -320,7 +327,6 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
     SipQuery savedQuery =
         getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -328,8 +334,51 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
+
+    // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+    // code.
+    if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+      String analysisType = analysis.getType();
+      DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+      List<String> artsName = getArtsNames(savedQuery);
+      List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
+      Boolean designerEdit =
+          analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+      if (analysisType.equalsIgnoreCase("report") && designerEdit) {
+        logger.trace("Artifact Name : " + artsName);
+        for (String artifact : artsName) {
+          String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
+          if (query.contains(" " + artifact + " ")) {
+            dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
+          }
+        }
+      } else {
+        for (String artifact : sipQueryArts) {
+            dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
+        }
+      }
+
+      List<DataSecurityKeyDef> dataSecurityKeyDefList;
+      if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
+        dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
+        dataSecurityKeyDefList.addAll(customerFilterDsks);
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+      } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
+        dataSecurityKeyDefList = customerFilterDsks;
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+      }
+    }
+
+    logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
 
     try {
       Long startTime = new Date().getTime();

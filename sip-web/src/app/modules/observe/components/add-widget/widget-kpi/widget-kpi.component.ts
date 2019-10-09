@@ -6,7 +6,12 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ValidatorFn
+} from '@angular/forms';
 
 import { nonEmpty, requireIf } from '../../../../../common/validators/index';
 
@@ -49,15 +54,17 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   aggregations = KPI_AGGREGATIONS;
   kpiBgColors = KPI_BG_COLORS;
 
+  chartTypes = ['bullet', 'gauge'];
+
   kpiForm: FormGroup;
   datePresetSubscription: Subscription;
   primaryAggregationSubscription: Subscription;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
     this.createForm();
   }
-
-  ngOnInit() {}
 
   ngOnDestroy() {
     if (this.datePresetSubscription) {
@@ -77,25 +84,61 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregateControls[ag.value] = [false];
     });
 
-    this.kpiForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
-      dateField: ['', Validators.required],
-      gte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      lte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      filter: [this.dateFilters[0].value, Validators.required],
-      primAggregate: [this.aggregations[0].value, Validators.required],
-      secAggregates: this.fb.group(secAggregateControls),
-      target: [0, [Validators.required, nonEmpty()]],
-      measure1: [''],
-      measure2: [''],
-      kpiBgColor: ['blue', Validators.required]
-    });
+    const getRangeValidator = (errorProp: string, from: string, to: string) => (
+      fg: FormGroup
+    ) => {
+      const start = fg.get(from).value;
+      const end = fg.get(to).value;
+      return start !== null && end !== null && start < end
+        ? null
+        : { [errorProp]: true };
+    };
+
+    const isBulletKpi = this._kpiType === 'bullet';
+
+    const measureRangeValidator: ValidatorFn = getRangeValidator(
+      'measureRange',
+      'measure1',
+      'measure2'
+    );
+    const targetRangeValidator: ValidatorFn = getRangeValidator(
+      'targetRange',
+      'measure2',
+      'target'
+    );
+
+    const bulletValidators = isBulletKpi
+      ? { validators: [measureRangeValidator, targetRangeValidator] }
+      : {};
+    const additionalFields = isBulletKpi
+      ? {
+          target: [1, [Validators.required, nonEmpty(), Validators.min(1)]],
+          kpiDisplay: [this.chartTypes[0]],
+          measure1: ['', Validators.required],
+          measure2: ['', Validators.required]
+        }
+      : {};
+
+    this.kpiForm = this.fb.group(
+      {
+        name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
+        dateField: ['', Validators.required],
+        gte: [
+          moment(),
+          [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+        ],
+        lte: [
+          moment(),
+          [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+        ],
+        filter: [this.dateFilters[0].value, Validators.required],
+        primAggregate: [this.aggregations[0].value, Validators.required],
+        secAggregates: this.fb.group(secAggregateControls),
+        ...additionalFields,
+        kpiBgColor: ['blue', Validators.required]
+      },
+      bulletValidators
+    );
 
     /* Only show date inputs if custom filter is selected */
     this.datePresetSubscription = this.kpiForm
@@ -150,9 +193,11 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this._metric = data;
     const kpiDateField = get(this._kpi, 'filters.0.columnName');
 
-    this.kpiForm
-      .get('dateField')
-      .setValue(kpiDateField || data.dateColumns[0].columnName);
+    setTimeout(() => {
+      this.kpiForm
+        .get('dateField')
+        .setValue(kpiDateField || data.dateColumns[0].columnName);
+    });
   }
   /**
    * Type is required to support normal KPI's and bullet KPI with the same component
@@ -176,57 +221,63 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
     this._kpi = data;
 
-    data.name && this.kpiForm.get('name').setValue(data.name);
+    setTimeout(() => {
+      if (data.kpiDisplay) {
+        this.kpiForm.get('kpiDisplay').setValue(data.kpiDisplay);
+      }
 
-    const target = get(data, 'target');
-    target && this.kpiForm.get('target').setValue(target);
+      data.name && this.kpiForm.get('name').setValue(data.name);
 
-    const measure1 = get(data, 'measure1');
-    measure1 && this.kpiForm.get('measure1').setValue(measure1);
+      const target = get(data, 'target');
+      target && this.kpiForm.get('target').setValue(target);
 
-    const measure2 = get(data, 'measure2');
-    measure2 && this.kpiForm.get('measure2').setValue(measure2);
+      const measure1 = get(data, 'measure1');
+      measure1 && this.kpiForm.get('measure1').setValue(measure1);
 
-    this.kpiBgColorValue = isUndefined(data.kpiBgColor)
-      ? 'black'
-      : data.kpiBgColor;
+      const measure2 = get(data, 'measure2');
+      measure2 && this.kpiForm.get('measure2').setValue(measure2);
 
-    this.bandPaletteValue = isUndefined(data.bulletPalette)
-      ? 'rog'
-      : data.bulletPalette;
+      this.kpiBgColorValue = isUndefined(data.kpiBgColor)
+        ? 'black'
+        : data.kpiBgColor;
 
-    const dateField = get(data, 'filters.0.columnName');
-    dateField && this.kpiForm.get('dateField').setValue(dateField);
+      this.bandPaletteValue = isUndefined(data.bulletPalette)
+        ? 'rog'
+        : data.bulletPalette;
 
-    const filt = get(data, 'filters.0.model.preset');
-    this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
+      const dateField = get(data, 'filters.0.columnName');
+      dateField && this.kpiForm.get('dateField').setValue(dateField);
 
-    const lte = get(data, 'filters.0.model.lte');
-    lte &&
+      const filt = get(data, 'filters.0.model.preset');
+      this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
+
+      const lte = get(data, 'filters.0.model.lte');
+      lte &&
+        this.kpiForm
+          .get('lte')
+          .setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
+
+      const gte = get(data, 'filters.0.model.gte');
+      gte &&
+        this.kpiForm
+          .get('gte')
+          .setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
+
+      const [primaryAggregate, ...secondaryAggregates] = get(
+        data,
+        'dataFields.0.aggregate',
+        []
+      );
       this.kpiForm
-        .get('lte')
-        .setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
+        .get('primAggregate')
+        .setValue(primaryAggregate || this.aggregations[0].value);
 
-    const gte = get(data, 'filters.0.model.gte');
-    gte &&
-      this.kpiForm
-        .get('gte')
-        .setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
-
-    const [primaryAggregate, ...secondaryAggregates] = get(
-      data,
-      'dataFields.0.aggregate',
-      []
-    );
-    this.kpiForm
-      .get('primAggregate')
-      .setValue(primaryAggregate || this.aggregations[0].value);
-
-    const secAggregateForm = this.kpiForm.get('secAggregates') as FormGroup;
-    forEach(this.aggregations, ag => {
-      secAggregateForm
-        .get(ag.value)
-        .setValue(secondaryAggregates.includes(ag.value));
+      const secAggregateForm = this.kpiForm.get('secAggregates') as FormGroup;
+      forEach(this.aggregations, ag => {
+        secAggregateForm
+          .get(ag.value)
+          .setValue(secondaryAggregates.includes(ag.value));
+      });
     });
   }
 
@@ -271,12 +322,19 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       ag => this.kpiForm.get('secAggregates').get(ag.value).value
     );
 
+    const additionalFields =
+      this._kpiType === 'bullet'
+        ? {
+            kpiDisplay: this.kpiForm.get('kpiDisplay').value,
+            target: toNumber(this.kpiForm.get('target').value),
+            measure1: toNumber(this.kpiForm.get('measure1').value),
+            measure2: toNumber(this.kpiForm.get('measure2').value)
+          }
+        : {};
     this.onKPIAction.emit({
       kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
-        target: toNumber(this.kpiForm.get('target').value),
-        measure1: toNumber(this.kpiForm.get('measure1').value),
-        measure2: toNumber(this.kpiForm.get('measure2').value),
+        ...additionalFields,
         kpiBgColor: this.kpiBgColorValue,
         bulletPalette: this.bandPaletteValue,
         dataFields: [

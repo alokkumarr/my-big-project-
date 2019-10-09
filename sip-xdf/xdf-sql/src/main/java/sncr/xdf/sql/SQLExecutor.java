@@ -62,7 +62,7 @@ public class SQLExecutor implements Serializable {
                         continue;
                     }
 
-                    logger.debug ("Attempt to load data for table: " + tn);
+                    logger.debug("Attempt to load data for table: " + tn);
                     String location;
                     if (allTables.get(tn) != null){
                         location = allTables.get(tn).getLocation();

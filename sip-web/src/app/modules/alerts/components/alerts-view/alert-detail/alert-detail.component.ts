@@ -22,7 +22,7 @@ export class AlertDetailComponent implements OnInit {
   constructor(private _store: Store) {}
   public alertRuleDetails: AlertConfig;
 
-  @Select(AlertsState.getAlertFilterString) filterString$: Observable<string>;
+  @Select(AlertsState.getAlertFilterStrings) filterStrings$: Observable<string>;
 
   @Select(AlertsState.getSelectedAlertRuleDetails)
   alertRuleDetails$: Observable<AlertConfig>;
@@ -34,12 +34,10 @@ export class AlertDetailComponent implements OnInit {
   set setAlertIds(alertIds: AlertIds) {
     this.alertIds = alertIds;
     if (alertIds) {
-      this._store.dispatch(
-        new LoadSelectedAlertRuleDetails(alertIds.alertRulesSysId)
-      );
-      this._store.dispatch(
+      this._store.dispatch([
+        new LoadSelectedAlertRuleDetails(alertIds.alertRulesSysId),
         new LoadSelectedAlertCount(alertIds.alertRulesSysId)
-      );
+      ]);
     }
   }
 
@@ -52,13 +50,6 @@ export class AlertDetailComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.filterString$.subscribe(() => {
-      if (this.alertIds) {
-        this._store.dispatch(
-          new LoadSelectedAlertCount(this.alertIds.alertRulesSysId)
-        );
-      }
-    });
     this.alertRuleDetails$.subscribe(alertRuleDetails => {
       this.alertRuleDetails = alertRuleDetails;
     });

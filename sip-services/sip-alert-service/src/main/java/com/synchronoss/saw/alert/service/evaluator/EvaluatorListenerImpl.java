@@ -140,7 +140,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
    *
    * @return boolean
    */
-  private boolean sendMessageToStream() {
+  public boolean sendMessageToStream() {
     boolean status = true;
     Properties properties = new Properties();
     properties.setProperty(

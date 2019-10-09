@@ -71,7 +71,7 @@ public class Field {
 
   @JsonProperty("geoRegion")
   private GeoRegion geoRegion;
-  
+
   @JsonProperty("min_doc_count")
   private Integer minDocCount;
 
@@ -80,6 +80,12 @@ public class Field {
 
   @JsonProperty("visibleIndex")
   private Integer visibleIndex;
+
+  @JsonProperty("expression")
+  private String expression;
+
+  @JsonProperty("formula")
+  private String formula;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -253,7 +259,27 @@ public class Field {
     this.areaIndex = areaIndex;
   }
 
-    @JsonAnyGetter
+  @JsonProperty("expression")
+  public String getExpression() {
+    return expression;
+  }
+
+  @JsonProperty("expression")
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
+
+  @JsonProperty("formula")
+  public String getFormula() {
+    return formula;
+  }
+
+  @JsonProperty("formula")
+  public void setFormula(String formula) {
+    this.formula = formula;
+  }
+
+  @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
   }
@@ -292,6 +318,8 @@ public class Field {
         .append("additionalProperties", additionalProperties)
         .append("format", format)
         .append("visibleIndex", visibleIndex)
+        .append("expression", expression)
+        .append("formula", formula)
         .toString();
   }
 
@@ -309,6 +337,8 @@ public class Field {
         .append(groupInterval)
         .append(format)
         .append(visibleIndex)
+        .append(expression)
+        .append(formula)
         .toHashCode();
   }
 
@@ -334,6 +364,8 @@ public class Field {
         .append(groupInterval, rhs.groupInterval)
         .append(format, rhs.format)
         .append(visibleIndex, rhs.visibleIndex)
+        .append(expression, rhs.expression)
+        .append(formula, rhs.formula)
         .isEquals();
   }
 

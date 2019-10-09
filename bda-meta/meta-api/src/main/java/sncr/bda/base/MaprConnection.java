@@ -7,10 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
 import org.ojai.store.Connection;
@@ -20,6 +23,7 @@ import org.ojai.store.Query;
 import org.ojai.store.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sncr.bda.store.generic.schema.Sort;
 
 public class MaprConnection {
 
@@ -29,6 +33,7 @@ public class MaprConnection {
   public static final String LTE = "$le";
   public static final String GT = "$gt";
   public static final String LT = "$lt";
+  public static final String BTW = "$between";
   protected static final String METASTORE = "services/metadata";
   private static final Logger LOGGER = LoggerFactory.getLogger(MaprConnection.class);
   private static final String OJAI_MAPR = "ojai:mapr:";
@@ -183,24 +188,59 @@ public class MaprConnection {
    * Run mapr db query with specific fields.
    *
    * @param filter
-   * @param orderBy
+   * @param pageNumber
+   * @param pageSize
+   * @param sorts
+   * @param classType
    * @return list
    */
-  public List<JsonNode> runMaprDbQueryWithFilter(String filter, String orderBy) {
-    final Query query =
-        connection.newQuery().orderBy(orderBy, SortOrder.DESC).where(filter).build();
-
-    final DocumentStream stream = store.find(query);
-    List<JsonNode> resultSet = new ArrayList<>();
-    Integer count = 0;
+  public <T> List<T> runMaprDbQuery(
+      String filter, Integer pageNumber, Integer pageSize, List<Sort> sorts, Class<T> classType) {
+    List<T> resultSet = new ArrayList<>();
+    Query query = prepareMaprQuery(filter, pageNumber, pageSize, sorts);
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    DocumentStream stream = store.find(query);
     for (final Document document : stream) {
       try {
-        resultSet.add(objectMapper.readTree(document.asJsonString()));
+        resultSet.add(objectMapper.readValue(document.asJsonString(), classType));
       } catch (IOException e) {
         throw new RuntimeException("error occurred while reading the documents", e);
       }
     }
     return resultSet;
+  }
+
+  /**
+   * prepares query with filters and sorts.
+   *
+   * @param filter
+   * @param pageNumber
+   * @param pageSize
+   * @param sorts
+   * @return query
+   */
+  private Query prepareMaprQuery(
+      String filter, Integer pageNumber, Integer pageSize, List<Sort> sorts) {
+    Query query = connection.newQuery();
+    if (sorts != null) {
+      for (Sort sort : sorts) {
+        SortOrder sortOrder = sort.getOrder();
+        sortOrder = sortOrder == null ? SortOrder.DESC : sortOrder;
+        String fieldName = sort.getFieldName();
+        if (fieldName != null && !StringUtils.isEmpty(fieldName)) {
+          query = query.orderBy(fieldName, sortOrder);
+        }
+      }
+    }
+    if (pageNumber != null && pageSize != null) {
+      int documentsToskip = (pageNumber - 1) * pageSize;
+      query = query.offset(documentsToskip).limit(pageSize);
+    }
+    if (filter != null && !StringUtils.isEmpty(filter)) {
+      query = query.where(filter);
+    }
+    LOGGER.info("Mapr Query :{}", query);
+    return query.build();
   }
 
   /**
@@ -227,6 +267,36 @@ public class MaprConnection {
   }
 
   /**
+   * selects distinct values of column selected.
+   *
+   * @param select with column to select
+   * @param filter
+   * @return set of different select column values
+   */
+  public Set<String> runMaprQueryForDistinctValues(String select, String filter) {
+    Set<String> resultSet = new HashSet<>();
+    final Query query;
+    if (filter != null) {
+      query = connection.newQuery().select(select).where(filter).build();
+    } else {
+      query = connection.newQuery().select(select).build();
+    }
+    DocumentStream stream = store.find(query);
+    for (final Document document : stream) {
+      try {
+        JsonNode node = objectMapper.readValue(document.asJsonString(), JsonNode.class);
+        String result = node.get(select).asText();
+        if (result != null && !StringUtils.isEmpty(result)) {
+          resultSet.add(result);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("error occurred while reading the documents", e);
+      }
+    }
+    return resultSet;
+  }
+
+  /**
    * Fetch paginated data from MapR db.
    *
    * @param executionId
@@ -239,8 +309,7 @@ public class MaprConnection {
     if (pageSize != null && pageSize > 0) {
       try {
         ObjectMapper objectMapper = new ObjectMapper();
-        Query query =
-            buildDataQuery(connection, columnName, executionId);
+        Query query = buildDataQuery(connection, columnName, executionId);
         if (query != null) {
           final DocumentStream stream = store.find(query);
             int startIndex = (page-1) * pageSize;
@@ -251,8 +320,8 @@ public class MaprConnection {
                     .limit(pageSize)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-              Object obj =  objectMapper.readTree(objectList.toString());
-              return obj;
+            Object obj = objectMapper.readTree(objectList.toString());
+            return obj;
           }
         }
       } catch (Exception ex) {

@@ -9,6 +9,7 @@ import com.synchronoss.saw.alert.modal.AlertNotificationLog;
 import com.synchronoss.saw.alert.modal.AlertResult;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.Notification;
+import com.synchronoss.saw.model.Model.Operator;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.Date;
 import java.util.List;
@@ -258,13 +259,13 @@ public class AlertNotifier {
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_VALUE, attributeValue);
     }
     if (body.contains(MailBodyResolver.THRESHOLD_VALUE)) {
-      String threshold = null;
-      if (alertRulesDetails.getThresholdValue() != null) {
-        threshold = alertRulesDetails.getThresholdValue().toString();
-      } else {
-        threshold = "";
+      logger.info("Inside threshold");
+      String alertCondition = getReadableConditionWithValues(alertRulesDetails);
+      logger.info("alert condition " + alertCondition);
+      if (alertCondition == null) {
+        alertCondition = "";
       }
-      body = body.replaceAll("\\" + MailBodyResolver.THRESHOLD_VALUE, threshold);
+      body = body.replaceAll("\\" + MailBodyResolver.THRESHOLD_VALUE, alertCondition);
     }
     if (body.contains(MailBodyResolver.LOOKBACK_PERIOD)) {
       String lookBackperiod = alertRulesDetails.getLookbackPeriod();
@@ -275,6 +276,18 @@ public class AlertNotifier {
     }
     logger.debug("prepare mail body ends here :" + this.getClass().getName() + ": " + body);
     return body;
+  }
+
+  private String getReadableConditionWithValues(AlertRuleDetails alertRulesDetails) {
+    Operator operator = alertRulesDetails.getOperator();
+    Double threshold = alertRulesDetails.getThresholdValue();
+    Double otherThreshold = alertRulesDetails.getOtherThresholdValue();
+    String readbleOperator = alertService.getReadableOperator(operator);
+    if (operator == Operator.BTW) {
+      return readbleOperator + " " + otherThreshold + " and " + threshold;
+    } else {
+      return readbleOperator + " " + threshold;
+    }
   }
 
   void saveNotificationStatus(AlertNotificationLog notificationLog) {

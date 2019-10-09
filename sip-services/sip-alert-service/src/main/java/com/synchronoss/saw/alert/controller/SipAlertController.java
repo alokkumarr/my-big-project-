@@ -7,6 +7,7 @@ import com.synchronoss.saw.alert.modal.AlertCountResponse;
 import com.synchronoss.saw.alert.modal.AlertResponse;
 import com.synchronoss.saw.alert.modal.AlertRuleDetails;
 import com.synchronoss.saw.alert.modal.AlertRuleResponse;
+import com.synchronoss.saw.alert.modal.AlertStatesFilter;
 import com.synchronoss.saw.alert.modal.AlertStatesResponse;
 import com.synchronoss.saw.alert.service.AlertService;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -254,7 +257,7 @@ public class SipAlertController {
   }
 
   /**
-   * List Alert rule API.
+   * GET Alert rule API for a alert rule id.
    *
    * @param request HttpServletRequest
    * @param response HttpServletResponse
@@ -341,8 +344,12 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
-      @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize) {
     Ticket ticket = getTicket(request);
     if (ticket != null) {
       if (pageNumber == null) {
@@ -377,14 +384,19 @@ public class SipAlertController {
       response = AlertStatesResponse.class)
   @RequestMapping(
       value = "/states",
-      method = RequestMethod.GET,
+      method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AlertStatesResponse listAlertStates(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+      @RequestBody Optional<AlertStatesFilter> alertStatesFilter,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize) {
     Ticket ticket = getTicket(request);
     if (ticket != null) {
       if (pageNumber == null) {
@@ -393,7 +405,7 @@ public class SipAlertController {
       if (pageSize == null) {
         pageSize = 25;
       }
-      return alertService.listAlertStates(pageNumber, pageSize, ticket);
+      return alertService.listAlertStates(pageNumber, pageSize, ticket, alertStatesFilter);
     }
     return null;
   }
@@ -419,9 +431,15 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody AlertCount alertCount,
-      @RequestParam(name = "alertRuleId", required = false) String alertRuleId,
-      @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
-      @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+      @ApiParam(value = "alert rule id", required = false)
+          @RequestParam(name = "alertRuleId", required = false)
+          String alertRuleId,
+      @ApiParam(value = "page number", required = false)
+          @RequestParam(name = "pageNumber", required = false)
+          Integer pageNumber,
+      @ApiParam(value = "page size", required = false)
+          @RequestParam(name = "pageSize", required = false)
+          Integer pageSize) {
     Ticket ticket = getTicket(request);
     if (ticket != null) {
       if (pageNumber == null) {
@@ -433,6 +451,49 @@ public class SipAlertController {
       return alertService.alertCount(alertCount, pageNumber, pageSize, alertRuleId, ticket);
     }
     return null;
+  }
+
+  /**
+   * List Attribute Values API.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @return AlertStatesResponse alertStatesResponse
+   */
+  @ApiOperation(
+      value = "/attributevalues",
+      nickname = "List Attribute Values",
+      notes = "",
+      response = AlertStatesResponse.class)
+  @RequestMapping(
+      value = "/attributevalues",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public Set<String> listAttributeValues(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.listAttribueValues(ticket) : null;
+  }
+
+  /**
+   * List Monitpring Type..
+   *
+   * @param request HttpServletRequest
+   * @return String return all operators details
+   */
+  @ApiOperation(
+      value = "/monitoringtype",
+      nickname = "List All Alert Monitoring Type",
+      notes = "",
+      response = Object.class)
+  @RequestMapping(
+      value = "/monitoringtype",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseBody
+  public String listMonitoringType(HttpServletRequest request) {
+    Ticket ticket = getTicket(request);
+    return ticket != null ? alertService.retrieveMonitoringType(ticket) : null;
   }
 
   /**

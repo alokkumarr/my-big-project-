@@ -796,6 +796,25 @@ The health check responses contain a `detail` propery with a
 human-readable explanation of the health check status, which can be
 used to further narrow down the cause for a possible failure.
 
+=== General guideline for ElasticSearch script support
+
+SIP is using custom scripting of ElasticSearch to build and evaluate
+derived metrics,filters etc.
+
+SIP uses inline scripting.
+To enable this, the below parameter has to be set in elasticsearch.yml file
+
+----
+script.allowed_types: inline
+----
+
+Also, only search operations will be performed using script,
+ update operation can be disabled for security reason.
+
+----
+script.allowed_contexts: search
+----
+
 === Troubleshooting the MariaDB cluster
 
 To troubleshoot MariaDB, inspect the MariaDB logs on each of the hosts
@@ -988,7 +1007,7 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     	onboard-customer - Onboard the customer
 
     SYNOPSYS
-    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string
+    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string [--JV] string [--FC] string
 
     OPTIONS
     	--C  string
@@ -1019,6 +1038,14 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     		User Last Name
     		[Mandatory]
 
+    	--JV  string
+    		Super Admin? (No customerCode filtering)
+    		[Mandatory]
+
+    	--FC  string
+    		Filter By Customer Code Flag
+    		[Mandatory]
+
 Run the "onboard-customer" command with all required parameters stated
 above and it will start the process of creating customer and related
 products/components in the system.
@@ -1027,7 +1054,7 @@ The below is one such example to call onboard-customer with its
 required parameters.
 
 
-    shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
+    shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z --JV 1 --FC 0
     1
     2019-02-19 08:04:41.326  INFO 17665 --- [           main] c.s.saw.security.app.admin.OnBoardShell  : Connection successful !!
     2019-02-19 08:04:41.357  INFO 17665 --- [           main] s.a.r.i.OnBoardCustomerRepositoryDaoImpl : res
@@ -1036,7 +1063,7 @@ required parameters.
 
 Note : A parameter containing a space in between can be enclosed in either single quotes('') or double quotes("").
 
-        Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
+        Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z --JV 1 --FC 0
 
 ==  SIP SSO Authentication
 

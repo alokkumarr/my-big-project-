@@ -24,7 +24,7 @@
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>
-      <alerts-filter [dateFilter]="filter$ | async" fxFlex></alerts-filter>
+      <alerts-filters></alerts-filters>
     </div>
   </mat-sidenav>
   <mat-sidenav-content fxFlex fxLayout="column" class="view-container-content">
@@ -75,12 +75,12 @@
           *ngIf="
             (allAlertCountChartData$ | async) &&
             additionalCountChartOptions &&
-            (filterString$ | async)
+            (filterStrings$ | async)
           "
           class="mat-elevation-z3"
           style="width: calc(60% - 30px); height: 170px; padding: 10px 10px 0 10px; margin-right: 10px;"
           title="All Alerts"
-          [dateFilter]="filterString$ | async"
+          [dateFilter]="filterStrings$ | async"
           [additionalOptions]="additionalCountChartOptions"
           [chartData]="allAlertCountChartData$ | async"
         ></alert-chart>
@@ -89,12 +89,12 @@
           *ngIf="
             (allAlertSeverityChartData$ | async) &&
             additionalSeverityChartOptions &&
-            (filterString$ | async)
+            (filterStrings$ | async)
           "
           class="mat-elevation-z3"
           style="width: calc(40% - 30px); height: 170px; padding: 10px 10px 0 10px;"
           title="Severity"
-          [dateFilter]="filterString$ | async"
+          [dateFilter]="filterStrings$ | async"
           [additionalOptions]="additionalSeverityChartOptions"
           [chartData]="allAlertSeverityChartData$ | async"
         ></alert-chart>

@@ -8,12 +8,14 @@ import * as map from 'lodash/map';
 export const USER_ANALYSIS_CATEGORY_NAME = 'My Analysis';
 export const USER_ANALYSIS_SUBCATEGORY_NAME = 'DRAFTS';
 
+export const TABLE_CUSTCODE_COLUMNNAME = 'customerCode';
+
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
-export const EMAIL_REGEX = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
+export const EMAIL_REGEX = /^[_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,4})$/;
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],

@@ -70,7 +70,7 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
      */
     @Override
     public long createNewCustomer(OnBoardCustomer cust) {
-        String sql = "call onboard_customer(?,?,?,?,?,?,?) ";
+        String sql = "call onboard_customer(?,?,?,?,?,?,?,?,?) ";
 
         int res = jdbcTemplate.update(sql, ps-> {
             ps.setString(1,cust.getCustomerCode());
@@ -80,6 +80,8 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
             ps.setString(5,cust.getFirstName());
             ps.setString(6,cust.getMiddleName());
             ps.setString(7,cust.getLastName());
+            ps.setString(8,cust.getIsJvCustomer());
+            ps.setString(9,cust.getFilterByCustomerCode());
         });
         logger.info("res",res);
         return res;

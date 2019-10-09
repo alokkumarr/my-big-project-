@@ -131,4 +131,9 @@ export class ConfigureAlertService {
     const endpoint = `${this.api}/alerts${queryParams}`;
     return this.http.get<AllAlertsResponse>(endpoint).toPromise();
   }
+
+  getMonitoringTypeList() {
+    const endpoint = `${this.api}/alerts/monitoringtype`;
+    return this.http.get<string[]>(endpoint);
+  }
 }

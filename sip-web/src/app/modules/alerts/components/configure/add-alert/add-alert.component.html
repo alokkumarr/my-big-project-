@@ -26,6 +26,7 @@
               <mat-label>Alert name</mat-label>
               <input
                 matInput
+                required
                 placeholder="Alert Name"
                 formControlName="alertRuleName"
                 e2e="alertRuleName"
@@ -138,6 +139,7 @@
               <input
                 hidden="true"
                 value="dummy"
+                required
                 matInput
                 placeholder="Placeholder"
               />
@@ -172,6 +174,7 @@
               <input
                 hidden="true"
                 value="dummy"
+                required
                 matInput
                 placeholder="Placeholder"
               />
@@ -201,10 +204,44 @@
               "
               ><small>This field is required </small></mat-error
             >
+
+            <mat-form-field
+              appearance="outline"
+              class="add-container__body__stepper__dxselect padtop10"
+            >
+              <mat-label>Monitoring type</mat-label>
+              <input
+                hidden="true"
+                value="dummy"
+                matInput
+                required
+                placeholder="Placeholder"
+              />
+              <dx-select-box
+                ngDefaultControl
+                formControlName="monitoringType"
+                [items]="monitoringTypes$ | async"
+                displayExpr="name"
+                valueExpr="id"
+                [searchEnabled]="true"
+                placeholder="Select a type"
+                e2e="monitoringType"
+              ></dx-select-box>
+              <mat-error
+                *ngIf="
+                  alertMetricFormGroup.controls.monitoringType.hasError(
+                    'required'
+                  )
+                "
+                >This field is required</mat-error
+              >
+            </mat-form-field>
+
             <mat-form-field appearance="outline">
               <mat-label>Aggregation</mat-label>
               <mat-select
                 formControlName="aggregationType"
+                required
                 e2e="aggregationType"
               >
                 <mat-option
@@ -221,6 +258,7 @@
               <mat-select
                 placeholder="Operator Name"
                 formControlName="operator"
+                required
                 e2e="alertOperator"
               >
                 <mat-option
@@ -341,6 +379,7 @@
               <input
                 hidden="true"
                 value="dummy"
+                required
                 matInput
                 placeholder="Placeholder"
               />
@@ -353,6 +392,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
+                (onSelectionChanged)="
+                  onLookbackColumnSelected($event?.selectedItem)
+                "
                 [readonly]="!alertMetricFormGroup.controls.datapodId.value"
                 e2e="lookbackColumn"
               ></dx-select-box>
@@ -378,6 +420,7 @@
                 <mat-label>Lookback period</mat-label>
                 <input
                   matInput
+                  required
                   placeholder="Loockback period"
                   formControlName="lookbackPeriodValue"
                   type="number"
@@ -403,6 +446,7 @@
                 <input
                   hidden="true"
                   value="dummy"
+                  required
                   matInput
                   placeholder="Placeholder"
                 />
@@ -442,6 +486,9 @@
                 valueExpr="columnName"
                 [searchEnabled]="true"
                 placeholder="Select a column"
+                (onSelectionChanged)="
+                  onAttributeColumnSelected($event?.selectedItem)
+                "
                 e2e="attributeName"
               ></dx-select-box>
             </mat-form-field>
@@ -466,6 +513,7 @@
                 e2e="attributeValue"
               ></dx-select-box>
             </mat-form-field>
+
             <div
               fxFlex
               fxLayout="row"
