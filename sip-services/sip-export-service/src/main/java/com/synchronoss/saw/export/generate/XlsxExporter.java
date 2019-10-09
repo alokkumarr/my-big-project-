@@ -80,7 +80,12 @@ public class XlsxExporter implements IFileExporter {
     if (StringUtils.isEmpty(value)
         || value.equalsIgnoreCase("EMPTY")
         || value.equalsIgnoreCase("null")) {
-      cell.setCellValue("null"); // SIP-8449 - Dispatch - Empty values are inserted instead of "null", while dispatching the analysis in Excel format
+      // SIP-8449 - Dispatch - Empty values are inserted instead of "null", while dispatching the analysis in Excel format
+      if (value.equalsIgnoreCase("null")) {
+        cell.setCellValue("null");
+      } else {
+        cell.setCellValue("");
+      }
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
       cell.setCellStyle(cellStyle);
@@ -92,7 +97,7 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(value);
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.FLOAT.value())
-            || specialType.equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {
+        || specialType.equalsIgnoreCase(DataField.Type.DOUBLE.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat(format.getFormat("0.00"));
@@ -102,7 +107,7 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(d);
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.INT.value())
-            || specialType.equalsIgnoreCase(DataField.Type.LONG.value()))) {
+        || specialType.equalsIgnoreCase(DataField.Type.LONG.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat(format.getFormat("0"));
@@ -112,7 +117,7 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(d);
     } else if (specialType != null
         && (specialType.equalsIgnoreCase(DataField.Type.DATE.value())
-            || specialType.equalsIgnoreCase(DataField.Type.TIMESTAMP.value()))) {
+        || specialType.equalsIgnoreCase(DataField.Type.TIMESTAMP.value()))) {
       cellStyle.setAlignment(HorizontalAlignment.RIGHT);
       DataFormat format = workBook.createDataFormat();
       cellStyle.setDataFormat((format.getFormat(GENERAL)));
@@ -331,7 +336,9 @@ public class XlsxExporter implements IFileExporter {
     }
   }
 
-  /** This method is used to make a parsable row which can be converted into Excel Cell */
+  /**
+   * This method is used to make a parsable row which can be converted into Excel Cell
+   */
   public StringBuffer rowMaker(String values, StringBuffer rowBuffer) {
     if (values != null && !"".equals(values) && !"null".equalsIgnoreCase(values)) {
       rowBuffer.append(values);
