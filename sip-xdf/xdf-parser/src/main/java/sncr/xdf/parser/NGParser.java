@@ -341,13 +341,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
 
 
-            logger.debug("RECORD COUNT IS " + inputDataset.count());
+            
 
-            if (inputDataFrame != null) {
-				inputDataset = inputDataFrame;
+            if (inputDataFrame == null) {
+            	inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+				
 			} else {
-				inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
+				inputDataset = inputDataFrame;
 			}
+            logger.debug("RECORD COUNT IS " + inputDataset.count());
             
             this.recCounter.setValue(inputDataset.count());
 

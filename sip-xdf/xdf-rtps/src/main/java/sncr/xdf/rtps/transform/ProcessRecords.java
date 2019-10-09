@@ -341,6 +341,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             // We use ES.Hadoop settings to control this flow
             String currentEsIndex = parseIndexName(esIndex, new Date()) + esType;
             JavaEsSparkSQL.saveToEs(df2, currentEsIndex, esConfig);
+        } else {
+        	logger.debug("ES information not found. Not writing to elastic search");
         }
         //======================================================================
         // Data Lake
@@ -361,7 +363,9 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             }
             // Done with writing - safe to rename batch directory
             finalizeBatch(strTmpPath, path);
-        } //<-- if(basePath != null && !basePath.isEmpty())
+        } else {
+        	logger.debug("base path not found or empty. Hence not writing to data lake");
+        }
 
         /* Alert metrics collection */
         if (logger.isTraceEnabled()) {

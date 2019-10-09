@@ -60,6 +60,7 @@ public abstract class AbstractComponent implements WithContext{
     protected String componentName = "unnamed";
     protected final Services services = new Services();
     protected Dataset inputDataFrame;
+    protected boolean isRealTime = false;
 
     protected DLBatchReader reader;
 
