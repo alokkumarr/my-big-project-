@@ -1,34 +1,27 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Store } from '@ngxs/store';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzeService } from '../../services/analyze.service';
 import { ExecuteService } from '../../services/execute.service';
-import { JwtService } from '../../../../common/services';
+import {
+  JwtService,
+  ToastService,
+  MenuService
+} from '../../../../common/services';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DesignerPageComponent } from './page.component';
-import { Observable } from 'rxjs';
 import { AnalysisDSL } from '../../models';
+import { DesignerService } from '../designer.service';
 
 class LocationStub {}
-class AnalysisStubService {
-  readAnalysis() {
-    return Promise.resolve({
-      id: '124',
-      category: '6',
-      categoryId: '6',
-      sipQuery: {}
-    });
-  }
 
-  getArtifactsForDataSet() {
-    return new Observable();
-  }
+class StoreStub {
+  selectSnapshot() {}
 }
-
-class StoreStub {}
 
 class ActivatedRouteStub {
   snapshot = { queryParams: {} };
@@ -55,16 +48,20 @@ describe('DesignerPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [DesignerPageComponent],
       providers: [
         { provide: Location, useValue: LocationStub },
-        { provide: AnalyzeService, useValue: new AnalysisStubService() },
         { provide: ActivatedRoute, useValue: new ActivatedRouteStub() },
         { provide: Router, useValue: new RouterStub() },
         { provide: ExecuteService, useValue: new ExecuteServiceStub() },
         { provide: JwtService, useValue: new JwtServiceStub() },
         { provide: MatDialog, useValue: new MatDialogStub() },
-        { provide: Store, useValue: new StoreStub() }
+        { provide: Store, useValue: new StoreStub() },
+        { provide: ToastService, useValue: {} },
+        { provide: MenuService, useValue: {} },
+        AnalyzeService,
+        DesignerService
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -126,6 +123,35 @@ describe('DesignerPageComponent', () => {
         sipQuery: {}
       } as AnalysisDSL);
       expect(analysis.parentAnalysisId).not.toBeUndefined();
+    });
+
+    it('should add derived metrics to metric artifacts', () => {
+      const artifacts = [{ artifactName: 'abc', columns: [] }];
+      const analysis = {
+        type: 'chart',
+        sipQuery: {
+          artifacts: [
+            {
+              artifactsName: 'abc',
+              fields: [
+                {
+                  columnName: 'def',
+                  expression: 'def',
+                  formula: 'def',
+                  table: 'abc',
+                  type: 'double'
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      const updatedArtifacts = component.fixArtifactsForSIPQuery(
+        analysis,
+        artifacts
+      );
+      expect(updatedArtifacts[0].columns.length).toBeGreaterThan(0);
     });
   });
 });

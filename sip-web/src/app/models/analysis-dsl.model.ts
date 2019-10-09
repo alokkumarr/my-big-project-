@@ -19,6 +19,8 @@ export interface ArtifactColumnDSL {
   format?: string | Format;
   displayName: string;
   groupInterval: string;
+  formula?: string;
+  expression?: string;
   limitType?: string; // todo
   visibleIndex?: number;
   limitValue?: any; // todo

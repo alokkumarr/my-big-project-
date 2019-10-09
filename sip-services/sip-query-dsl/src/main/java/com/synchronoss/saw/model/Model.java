@@ -263,6 +263,54 @@ public class Model {
     }
   }
 
+  public enum Operation {
+    GT(">"),
+    LT("<"),
+    GTE(">="),
+    LTE("<="),
+    EQ("="),
+    NEQ("!=");
+
+    private final String value;
+    private static final Map<String, Model.Operation> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Model.Operation c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private Operation(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+
+    /**
+     * Creates Operation Object from a string value.
+     *
+     * @param value Enum value in String
+     * @return
+     */
+    @JsonCreator
+    public static Model.Operation fromValue(String value) {
+      Model.Operation constant = CONSTANTS.get(value.toUpperCase());
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+  }
+
   public enum Preset {
     Yesterday("Yesterday"),
     Today("Today"),

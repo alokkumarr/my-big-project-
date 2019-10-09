@@ -11,6 +11,8 @@ export interface ArtifactColumn {
   displayName: string;
   filterEligible: boolean;
   type: string;
+  expression?: string;
+  formula?: string;
   format: Format | string | null;
   aliasName: string;
   alias?: string;

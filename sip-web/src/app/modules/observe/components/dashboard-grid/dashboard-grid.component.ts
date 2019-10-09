@@ -217,7 +217,6 @@ export class DashboardGridComponent
     if (!item.kpi && !item.bullet) {
       return;
     }
-
     this.dashboardService.onEditItem.next(item);
   }
 
@@ -235,7 +234,7 @@ export class DashboardGridComponent
 
     const dimensions = this.getDimensions(item);
     if (item.kpi) {
-      item.dimensions = dimensions;
+      item.dimensions = {...dimensions};
       return;
     }
 

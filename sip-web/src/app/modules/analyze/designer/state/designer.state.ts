@@ -271,6 +271,12 @@ export class DesignerState {
         artifactColumn.displayType || (<any>artifactColumn).comboType,
       dataField: artifactColumn.name || artifactColumn.columnName,
       displayName: artifactColumn.displayName,
+      ...(artifactColumn.formula
+        ? {
+            formula: artifactColumn.formula,
+            expression: artifactColumn.expression
+          }
+        : {}),
       ...groupInterval,
       ...(fillMissingDataWithZeros ? { min_doc_count: 0 } : {}),
       name: artifactColumn.name,
@@ -653,7 +659,11 @@ export class DesignerState {
   initGroupAdapter({ patchState, getState }: StateContext<DesignerStateModel>) {
     const analysis = getState().analysis;
     const { type } = analysis;
-    const fields = get(analysis, 'artifacts[0].columns', []);
+    const artifacts = this._designerService.addDerivedMetricsToArtifacts(
+      analysis.artifacts,
+      analysis.sipQuery
+    );
+    const fields = get(artifacts, '0.columns', []);
     let groupAdapters;
     switch (type) {
       case 'pivot':

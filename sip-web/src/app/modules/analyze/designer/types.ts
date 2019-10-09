@@ -141,6 +141,10 @@ export interface DesignerChangeEvent {
     | 'changeQuery'
     | 'geoRegion'
     | 'chartType'
+    | 'expressionUpdated'
+    | 'derivedMetricAdded'
+    | 'addNewDerivedMetric'
+    | 'updateDerivedMetric'
     | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;

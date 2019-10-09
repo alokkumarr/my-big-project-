@@ -15,6 +15,7 @@ import {
   ArtifactColumnPivot
 } from '../../../types';
 import { QueryDSL } from 'src/app/models';
+import { getArtifactColumnTypeIcon } from '../../../utils';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -37,6 +38,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.fieldCount = fields.length;
   }
 
+  public typeIcon: string;
   public fieldCount: number;
   public sipQuery: QueryDSL;
   public comboTypes = COMBO_TYPES;
@@ -52,6 +54,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.isDataField = ['y', 'z', 'data'].includes(
       (<ArtifactColumnChart>this.artifactColumn).area
+    );
+
+    this.typeIcon = getArtifactColumnTypeIcon(
+      this.artifactColumn,
+      this.analysisType,
+      this.analysisSubtype
     );
   }
 
