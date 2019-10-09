@@ -58,7 +58,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 /**
- * This class is used to do CRUD operations on the oracle data base having nsso
+ * This class is used to do CRUD operations on the Mariadb data base having nsso
  * tables.
  * 
  * @author girija.sankar
@@ -66,11 +66,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-
-	/**
-	 * @author gsan0003
-	 *
-	 */
 
 	private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 

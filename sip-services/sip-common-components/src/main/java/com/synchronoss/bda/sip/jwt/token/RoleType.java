@@ -29,7 +29,7 @@ public enum RoleType {
    */
   @JsonCreator
   public static RoleType fromValue(String value) {
-    RoleType constant = CONSTANTS.get(value.toLowerCase());
+    RoleType constant = CONSTANTS.get(value.toUpperCase());
     if (constant == null) {
       throw new IllegalArgumentException(value);
     } else {

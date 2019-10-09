@@ -1,6 +1,8 @@
 package com.sncr.saw.security.common.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sncr.saw.security.app.service.TicketHelper;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
@@ -15,20 +17,20 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.filter.GenericFilterBean;
-
+@Service
 public class JwtFilter extends GenericFilterBean {
 
-  private String jwtSecretKey;
+  private final String jwtSecretKey;
 
   private static final ObjectMapper mapper = new ObjectMapper();
 
-  @Autowired
-  private TicketHelper ticketHelper;
+  private final  TicketHelper ticketHelper;
 
-  public JwtFilter(String jwtSecretKey) {
+  public JwtFilter(String jwtSecretKey , TicketHelper ticketHelper) {
     this.jwtSecretKey = jwtSecretKey;
+    this.ticketHelper=ticketHelper;
   }
 
   @SuppressWarnings("unchecked")
@@ -67,16 +69,18 @@ public class JwtFilter extends GenericFilterBean {
       // This checks the validity of the token. logging out does not need
       // the token to be active.
       if (!request.getRequestURI().equals("/saw-security/auth/doLogout")) {
-        ticket = mapper.convertValue(claims, Ticket.class);
+          mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
           response.sendError(401, "Token has expired. Please re-login.");
         }
-        if (!ticket.getRoleType().equals(RoleType.ADMIN)){
-            response.sendError(401, "You are not authorized to perform this operation.");
+        else if (request.getRequestURI().startsWith("/saw-security/auth/admin")
+            && !ticket.getRoleType().equals(RoleType.ADMIN)) {
+          response.sendError(401, "You are not authorized to perform this operation.");
         }
         // In case user already logged-out and token is invalidated , same token can't be
         // reused.
-        if (!(ticket.getTicketId() != null
+        else if (!(ticket.getTicketId() != null
             && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId())))
           response.sendError(401, "Token is not valid ");
       }

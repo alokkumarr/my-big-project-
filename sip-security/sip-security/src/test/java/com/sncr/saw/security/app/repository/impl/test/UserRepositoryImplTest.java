@@ -2,6 +2,8 @@ package com.sncr.saw.security.app.repository.impl.test;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.TicketHelper;
+import com.sncr.saw.security.app.service.TicketHelperImpl;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.*;
@@ -307,7 +309,8 @@ public class UserRepositoryImplTest {
         nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
         nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
         nssoProperties.setValidityMins("10");
-        SSORequestHandler ssoRequestHandler = new SSORequestHandler(userRepositoryDAO,nssoProperties);
+        TicketHelper ticketHelper = new TicketHelperImpl();
+        SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties,ticketHelper);
         SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
 		assertNotNull("Valid access Token not found, Authentication failed ",ssoResponse.getaToken());
 		assertNotNull("Valid refresh Token not found, Authentication failed",ssoResponse.getrToken());
