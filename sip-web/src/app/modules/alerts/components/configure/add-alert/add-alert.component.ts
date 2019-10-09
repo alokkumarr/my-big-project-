@@ -16,6 +16,7 @@ import * as split from 'lodash/split';
 import * as compact from 'lodash/compact';
 import * as omit from 'lodash/omit';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 import * as range from 'lodash/range';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
@@ -24,7 +25,7 @@ import * as fpMap from 'lodash/fp/map';
 import { ConfigureAlertService } from '../../../services/configure-alert.service';
 import { ObserveService } from '../../../../observe/services/observe.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
-import { lessThan } from '../../../../../common/validators/less-than.validator';
+import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
 
@@ -66,6 +67,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   selectedAttributeColumn;
   selectedLookbackColumn;
   metricsList$;
+  metricsList;
   operators$;
   aggregations$;
   notifications$;
@@ -104,6 +106,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.alertDefFormGroup.patchValue(alertForm);
         this.alertMetricFormGroup.patchValue(alertForm);
         this.alertRuleFormGroup.patchValue(alertForm);
+        this.onSelectedMetricsColumn(alertForm.metricsColumn);
         const allSteps = range(3);
         allSteps.forEach(() => this.addAlertStepper.next());
         allSteps.forEach(() => this.addAlertStepper.previous());
@@ -199,23 +202,26 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     ];
     const otherThresholdValuevalidators = [
       Validators.required,
-      Validators.pattern(floatingPointRegex),
-      lessThan('thresholdValue')
+      Validators.pattern(floatingPointRegex)
     ];
-    this.alertMetricFormGroup = this._formBuilder.group({
-      datapodId: ['', Validators.required],
-      datapodName: [''],
-      categoryId: [''],
-      metricsColumn: ['', Validators.required],
-      monitoringType: [null, Validators.required],
-      aggregationType: ['', Validators.required],
-      operator: ['', Validators.required],
-      thresholdValue: ['', thresholdValuevalidators],
-      otherThresholdValue: ['', otherThresholdValuevalidators]
-    });
+
+    this.alertMetricFormGroup = this._formBuilder.group(
+      {
+        datapodId: ['', Validators.required],
+        datapodName: [''],
+        categoryId: [''],
+        metricsColumn: [{ value: '', disabled: true }, Validators.required],
+        monitoringType: [null, Validators.required],
+        aggregationType: ['', Validators.required],
+        operator: ['', Validators.required],
+        thresholdValue: ['', thresholdValuevalidators],
+        otherThresholdValue: ['', otherThresholdValuevalidators]
+      },
+      { validators: [lessThan('otherThresholdValue', 'thresholdValue')] }
+    );
 
     this.alertRuleFormGroup = this._formBuilder.group({
-      lookbackColumn: ['', Validators.required],
+      lookbackColumn: [{ value: '', disabled: true }, Validators.required],
       lookbackPeriodValue: ['', Validators.required],
       lookbackPeriodType: ['', Validators.required],
       attributeName: [''],
@@ -281,6 +287,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
           }
         }
       });
+
+    const metricsColumnControl = this.alertMetricFormGroup.get('metricsColumn');
+    const lookbackColumnControl = this.alertRuleFormGroup.get('lookbackColumn');
+    this.alertMetricFormGroup
+      .get('datapodId')
+      .statusChanges.subscribe(datapodStatus => {
+        if (datapodStatus === 'VALID') {
+          metricsColumnControl.enable();
+          lookbackColumnControl.enable();
+        } else {
+          metricsColumnControl.disable();
+          lookbackColumnControl.disable();
+        }
+      });
   }
 
   // onLookbackPeriodBlur() {
@@ -290,22 +310,18 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   //   control.setValue(correctedValue);
   // }
 
-  onSelectedMetricsColumn(selectedItem) {
-    this.selectedMetricsColumn = selectedItem;
+  onSelectedMetricsColumn(metricColumnName) {
+    const selectedMetric = find(
+      this.metricsList,
+      ({ columnName }) => metricColumnName === columnName
+    );
+    this.selectedMetricsColumn = selectedMetric;
   }
 
-  onDatapodSelected(selectedItem) {
+  onDatapodSelected(datapodId) {
     this.alertMetricFormGroup.controls.metricsColumn.setValue('');
-    if (selectedItem) {
-      this.alertMetricFormGroup.controls.datapodName.setValue(
-        selectedItem.metricName
-      );
-
-      this.alertMetricFormGroup.controls.categoryId.setValue(
-        selectedItem.categoryId || 'Default'
-      );
-
-      this.loadMetrics(selectedItem.id);
+    if (datapodId) {
+      this.loadMetrics(datapodId);
     }
   }
 
@@ -318,12 +334,20 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   loadMetrics(datapodId) {
-    const metricsList = this._configureAlertService.getDatapod$(datapodId).pipe(
-      tap(datapod => (this.selectedDatapod = datapod)),
-      map(fpGet('artifacts.[0].columns'))
+    this.metricsList$ = this._configureAlertService.getDatapod$(datapodId).pipe(
+      tap(datapod => {
+        this.selectedDatapod = datapod;
+        this.alertMetricFormGroup.controls.datapodName.setValue(
+          datapod.metricName
+        );
+        this.alertMetricFormGroup.controls.categoryId.setValue(
+          datapod.categoryId || 'Default'
+        );
+      }),
+      map(fpGet('artifacts.[0].columns')),
+      tap(metricsList => (this.metricsList = metricsList))
     );
-    this.metricsList$ = metricsList;
-    return metricsList.toPromise();
+    return this.metricsList$.toPromise();
   }
 
   constructPayload() {

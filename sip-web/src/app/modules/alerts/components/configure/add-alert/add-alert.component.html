@@ -131,10 +131,7 @@
         <form [formGroup]="alertMetricFormGroup">
           <ng-template matStepLabel>Select a metric to monitor</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Datapod</mat-label>
               <mat-select
                 (selectionChange)="onDatapodSelected($event?.value)"
@@ -159,19 +156,13 @@
               >
             </mat-form-field>
 
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Metric</mat-label>
               <mat-select
                 (selectionChange)="onSelectedMetricsColumn($event?.value)"
                 formControlName="metricsColumn"
                 required
                 e2e="metricsColumn"
-                [disabled]="
-                  alertMetricFormGroup.controls.datapodId.hasError('required')
-                "
               >
                 <mat-option
                   *ngFor="
@@ -281,17 +272,10 @@
                 "
                 >Only numbers are allowed for other threshold value.</mat-error
               >
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.otherThresholdValue.hasError(
-                    'lessThan'
-                  )
-                "
-                >Threshold value should be greater than other threshold
-                value.</mat-error
-              >
             </mat-form-field>
-
+            <mat-error *ngIf="alertMetricFormGroup.errors?.lessThan">
+              To should be greater than From.
+            </mat-error>
             <mat-form-field appearance="outline">
               <mat-label>{{ thresholdValueLabel }}</mat-label>
               <input
@@ -303,6 +287,7 @@
                 step="any"
                 e2e="alertThresholdValue"
               />
+
               <mat-error
                 *ngIf="
                   alertMetricFormGroup.controls.thresholdValue.hasError(
@@ -352,17 +337,13 @@
         <form [formGroup]="alertRuleFormGroup">
           <ng-template matStepLabel>Alerting Rule</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Lookback column</mat-label>
               <mat-select
                 (selectionChange)="onLookbackColumnSelected($event?.value)"
                 formControlName="lookbackColumn"
                 required
                 e2e="lookbackColumn"
-                [disabled]="!alertMetricFormGroup.controls.datapodId.value"
               >
                 <mat-option
                   *ngFor="
@@ -374,25 +355,23 @@
                   >{{ metric.displayName }}</mat-option
                 >
               </mat-select>
+              <mat-error
+                class="add-container__body__stepper__errmsg"
+                fxFlex
+                *ngIf="
+                  alertRuleFormGroup.controls.lookbackColumn.hasError(
+                    'required'
+                  )
+                "
+                ><small>This field is required </small></mat-error
+              >
             </mat-form-field>
-            <mat-error
-              class="add-container__body__stepper__errmsg"
-              fxFlex
-              *ngIf="
-                alertRuleFormGroup.controls.lookbackColumn.hasError('required')
-              "
-              ><small>This field is required </small></mat-error
-            >
             <div
               fxLayout="row"
               fxLayoutAlign="center center"
               style="width: 80%;"
             >
-              <mat-form-field
-                appearance="outline"
-                class="padtop10"
-                style="width: 50%;"
-              >
+              <mat-form-field appearance="outline" style="width: 50%;">
                 <mat-label>Lookback period</mat-label>
                 <input
                   matInput
@@ -415,7 +394,7 @@
 
               <mat-form-field
                 appearance="outline"
-                class="add-container__body__stepper__dxselect padtop10 lookbackperiodtype-field"
+                class="lookbackperiodtype-field"
                 style="width: 50%;"
               >
                 <mat-label>Lookback period type</mat-label>
@@ -425,7 +404,6 @@
                   formControlName="lookbackPeriodType"
                   required
                   e2e="lookbackPeriodType"
-                  [disabled]="!alertRuleFormGroup.controls.lookbackColumn.value"
                 >
                   <mat-option
                     *ngFor="let type of lookbackPeriodTypes"

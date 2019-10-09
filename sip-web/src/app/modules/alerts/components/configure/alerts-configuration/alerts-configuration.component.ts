@@ -77,6 +77,10 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
     this.sidenav.open();
   }
 
+  changeAlertStatus(alert) {
+    console.log('alert', alert);
+  }
+
   editAlert(data: AlertConfig) {
     this.navTitle = 'Edit Alert';
     this.alertDefInput.action = 'update';
