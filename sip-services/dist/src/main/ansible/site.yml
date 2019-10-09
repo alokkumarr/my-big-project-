@@ -12,6 +12,7 @@
     - sip-scheduler
     - sip-storage-proxy
     - sip-batch-ingestion
+    - sip-alert
     # Keep Gateway Service last to avoid starting socket-activated
     # services from the health check until all Ansible handlers have
     # been run (which might otherwise cause unnecessary restarts of

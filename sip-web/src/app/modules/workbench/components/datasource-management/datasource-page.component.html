@@ -54,7 +54,6 @@
         [showColumnLines]="false"
         [showRowLines]="true"
         (onToolbarPreparing)="onToolbarPreparing($event)"
-        keyExpr="bisChannelSysId"
         [rowAlternationEnabled]="false"
         (onSelectionChanged)="onSourceSelectionChanged($event)"
       >
@@ -305,7 +304,6 @@
             [showColumnLines]="false"
             (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
             [rowAlternationEnabled]="true"
-            keyExpr="bisRouteSysId"
             [width]="'100%'"
             [wordWrapEnabled]="true"
             [allowColumnResizing]="true"
