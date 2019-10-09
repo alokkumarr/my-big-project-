@@ -131,102 +131,74 @@
         <form [formGroup]="alertMetricFormGroup">
           <ng-template matStepLabel>Select a metric to monitor</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Datapod</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                required
-                matInput
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
-                required
+              <mat-select
+                (selectionChange)="onDatapodSelected($event?.value)"
                 formControlName="datapodId"
-                [items]="datapods$ | async"
-                displayExpr="metricName"
-                valueExpr="id"
-                [searchEnabled]="true"
-                placeholder="Select a Datapod"
-                (onValueChanged)="onDatapodChanged()"
-                (onSelectionChanged)="onDatapodSelected($event?.selectedItem)"
+                required
                 e2e="datapodId"
-              ></dx-select-box>
-            </mat-form-field>
-            <mat-error
-              class="add-container__body__stepper__errmsg"
-              fxFlex
-              *ngIf="
-                alertMetricFormGroup.controls.datapodId.hasError('required')
-              "
-              ><small>This field is required </small></mat-error
-            >
+              >
+                <mat-option
+                  *ngFor="let datapod of datapods$ | async"
+                  [value]="datapod.id"
+                  >{{ datapod.metricName }}</mat-option
+                >
+              </mat-select>
 
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
-              <mat-label>Metric</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                required
-                matInput
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
-                required
-                formControlName="metricsColumn"
-                [items]="metricsList$ | async | filterFn: numericMetricFilter"
-                displayExpr="displayName"
-                valueExpr="columnName"
-                [searchEnabled]="true"
-                placeholder="Select a metric"
-                (onSelectionChanged)="
-                  onSelectedMetricsColumn($event?.selectedItem)
-                "
-                [readOnly]="
+              <mat-error
+                class="add-container__body__stepper__errmsg"
+                fxFlex
+                *ngIf="
                   alertMetricFormGroup.controls.datapodId.hasError('required')
                 "
-                e2e="metricsColumn"
-              ></dx-select-box>
+                ><small>This field is required </small></mat-error
+              >
             </mat-form-field>
-            <mat-error
-              class="add-container__body__stepper__errmsg"
-              fxFlex
-              *ngIf="
-                alertMetricFormGroup.controls.metricsColumn.hasError('required')
-              "
-              ><small>This field is required </small></mat-error
-            >
 
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
-              <mat-label>Monitoring type</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                matInput
+            <mat-form-field appearance="outline">
+              <mat-label>Metric</mat-label>
+              <mat-select
+                (selectionChange)="onSelectedMetricsColumn($event?.value)"
+                formControlName="metricsColumn"
                 required
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
+                e2e="metricsColumn"
+              >
+                <mat-option
+                  *ngFor="
+                    let metric of metricsList$
+                      | async
+                      | filterFn: numericMetricFilter
+                  "
+                  [value]="metric.columnName"
+                  >{{ metric.displayName }}</mat-option
+                >
+              </mat-select>
+              <mat-error
+                class="add-container__body__stepper__errmsg"
+                fxFlex
+                *ngIf="
+                  alertMetricFormGroup.controls.metricsColumn.hasError(
+                    'required'
+                  )
+                "
+                ><small>This field is required </small></mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Monitoring type</mat-label>
+              <mat-select
                 formControlName="monitoringType"
-                [items]="monitoringTypes$ | async"
-                displayExpr="name"
-                valueExpr="id"
-                [searchEnabled]="true"
-                placeholder="Select a type"
+                required
                 e2e="monitoringType"
-              ></dx-select-box>
+              >
+                <mat-option
+                  *ngFor="let monitoringType of monitoringTypes$ | async"
+                  [value]="monitoringType.id"
+                  >{{ monitoringType.name }}</mat-option
+                >
+              </mat-select>
               <mat-error
                 *ngIf="
                   alertMetricFormGroup.controls.monitoringType.hasError(
@@ -300,17 +272,10 @@
                 "
                 >Only numbers are allowed for other threshold value.</mat-error
               >
-              <mat-error
-                *ngIf="
-                  alertMetricFormGroup.controls.otherThresholdValue.hasError(
-                    'lessThan'
-                  )
-                "
-                >Threshold value should be greater than other threshold
-                value.</mat-error
-              >
             </mat-form-field>
-
+            <mat-error *ngIf="alertMetricFormGroup.errors?.lessThan">
+              To should be greater than From.
+            </mat-error>
             <mat-form-field appearance="outline">
               <mat-label>{{ thresholdValueLabel }}</mat-label>
               <input
@@ -322,6 +287,7 @@
                 step="any"
                 e2e="alertThresholdValue"
               />
+
               <mat-error
                 *ngIf="
                   alertMetricFormGroup.controls.thresholdValue.hasError(
@@ -371,52 +337,41 @@
         <form [formGroup]="alertRuleFormGroup">
           <ng-template matStepLabel>Alerting Rule</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-between center">
-            <mat-form-field
-              appearance="outline"
-              class="add-container__body__stepper__dxselect padtop10"
-            >
+            <mat-form-field appearance="outline">
               <mat-label>Lookback column</mat-label>
-              <input
-                hidden="true"
-                value="dummy"
-                required
-                matInput
-                placeholder="Placeholder"
-              />
-              <dx-select-box
-                ngDefaultControl
-                required
+              <mat-select
+                (selectionChange)="onLookbackColumnSelected($event?.value)"
                 formControlName="lookbackColumn"
-                [items]="metricsList$ | async | filterFn: dateMetricFilter"
-                displayExpr="displayName"
-                valueExpr="columnName"
-                [searchEnabled]="true"
-                placeholder="Select a column"
-                (onSelectionChanged)="
-                  onLookbackColumnSelected($event?.selectedItem)
-                "
-                [readonly]="!alertMetricFormGroup.controls.datapodId.value"
+                required
                 e2e="lookbackColumn"
-              ></dx-select-box>
+              >
+                <mat-option
+                  *ngFor="
+                    let metric of metricsList$
+                      | async
+                      | filterFn: dateMetricFilter
+                  "
+                  [value]="metric.columnName"
+                  >{{ metric.displayName }}</mat-option
+                >
+              </mat-select>
+              <mat-error
+                class="add-container__body__stepper__errmsg"
+                fxFlex
+                *ngIf="
+                  alertRuleFormGroup.controls.lookbackColumn.hasError(
+                    'required'
+                  )
+                "
+                ><small>This field is required </small></mat-error
+              >
             </mat-form-field>
-            <mat-error
-              class="add-container__body__stepper__errmsg"
-              fxFlex
-              *ngIf="
-                alertRuleFormGroup.controls.lookbackColumn.hasError('required')
-              "
-              ><small>This field is required </small></mat-error
-            >
             <div
               fxLayout="row"
               fxLayoutAlign="center center"
               style="width: 80%;"
             >
-              <mat-form-field
-                appearance="outline"
-                class="padtop10"
-                style="width: 50%;"
-              >
+              <mat-form-field appearance="outline" style="width: 50%;">
                 <mat-label>Lookback period</mat-label>
                 <input
                   matInput
@@ -439,26 +394,31 @@
 
               <mat-form-field
                 appearance="outline"
-                class="add-container__body__stepper__dxselect padtop10 lookbackperiodtype-field"
+                class="lookbackperiodtype-field"
                 style="width: 50%;"
               >
                 <mat-label>Lookback period type</mat-label>
-                <input
-                  hidden="true"
-                  value="dummy"
-                  required
-                  matInput
-                  placeholder="Placeholder"
-                />
-                <dx-select-box
-                  ngDefaultControl
-                  required
+
+                <mat-select
+                  (selectionChange)="onLookbackColumnSelected($event?.value)"
                   formControlName="lookbackPeriodType"
-                  [items]="lookbackPeriodTypes"
-                  [searchEnabled]="true"
-                  [readonly]="!alertRuleFormGroup.controls.lookbackColumn.value"
+                  required
                   e2e="lookbackPeriodType"
-                ></dx-select-box>
+                >
+                  <mat-option
+                    *ngFor="let type of lookbackPeriodTypes"
+                    [value]="type"
+                    >{{ type }}</mat-option
+                  >
+                </mat-select>
+                <mat-error
+                  *ngIf="
+                    alertRuleFormGroup.controls.lookbackPeriodType.hasError(
+                      'required'
+                    )
+                  "
+                  >This field is required</mat-error
+                >
               </mat-form-field>
               <!-- <mat-icon
                 class="lookback-period__info-icon"

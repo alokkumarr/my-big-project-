@@ -140,6 +140,7 @@
           fxLayoutAlign="center center"
         >
           <mat-icon
+            (click)="changeAlertStatus(data.data)"
             i18n-matTooltip
             class="conf-container-content__body__statusIcon"
             [ngClass]="data.data.activeInd ? 'active' : 'inactive'"
