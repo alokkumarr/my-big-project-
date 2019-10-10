@@ -1803,7 +1803,8 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("headerParameters", "[]");
     childNode.put(
         "queryParameters",
-        "[{\"key\":\"zip\",\"value\":\"94040\"},{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
+        "[{\"key\":\"zip\",\"value\":\"94040\"},"
+            + "{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
     childNode.put("urlParameters", "[]");
     childNode.put("description", "api");
     ObjectNode root = mapper.createObjectNode();
@@ -1852,7 +1853,8 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("headerParameters", "[]");
     routeMetadata.put(
         "queryParameters",
-        "[{\"key\":\"zip\",\"value\":\"94040\"},{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
+        "[{\"key\":\"zip\",\"value\":\"94040\"},"
+            + "{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
     routeMetadata.put("urlParameters", "[]");
     routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
