@@ -1,0 +1,138 @@
+{
+  "FORKMENUCHARTS": {
+    "positiveTests": {
+      "FRKMN001": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:combo",
+        "description": "User should be able to fork edit and delete combo charts"
+      },
+      "FRKMN002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:combo",
+        "description": "Admin should be able to fork edit and delete combo charts"
+      },
+      "FRKMN003": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:column",
+        "description": "User should be able to fork edit and delete column charts"
+      },
+      "FRKMN004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:column",
+        "description": "Admin should be able to fork edit and delete column charts"
+      },
+      "FRKMN005": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bar",
+        "description": "User should be able to fork edit and delete bar charts"
+      },
+      "FRKMN006": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bar",
+        "description": "Admin should be able to fork edit and delete bar charts"
+      },
+      "FRKMN007": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:stack",
+        "description": "User should be able to fork edit and delete stack charts"
+      },
+      "FRKMN008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:stack",
+        "description": "Admin should be able to fork edit and delete stack charts"
+      },
+      "FRKMN009": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:line",
+        "description": "User should be able to fork edit and delete line charts"
+      },
+      "FRKMN010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:line",
+        "description": "Admin should be able to fork edit and delete line charts"
+      },
+      "FRKMN011": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:area",
+        "description": "User should be able to fork edit and delete area charts"
+      },
+      "FRKMN012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:area",
+        "description": "Admin should be able to fork edit and delete area charts"
+      },
+      "FRKMN013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:scatter",
+        "description": "User should be able to fork edit and delete scatter charts"
+      },
+      "FRKMN014": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:scatter",
+        "description": "Admin should be able to fork edit and delete scatter charts"
+      },
+      "FRKMN015": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:bubble",
+        "description": "User should be able to fork edit and delete bubble charts"
+      },
+      "FRKMN016": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:bubble",
+        "description": "Admin should be able to fork edit and delete bubble charts"
+      },
+      "FRKMN017": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:pie",
+        "description": "User should be able to fork edit and delete pie charts"
+      },
+      "FRKMN018": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:pie",
+        "description": "Admin should be able to fork edit and delete pie charts"
+      },
+      "FRKMN019": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsspline",
+        "description": "User should be able to fork edit and delete tsspline charts"
+      },
+      "FRKMN020": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsspline",
+        "description": "Admin should be able to fork edit and delete tsspline charts"
+      },
+      "FRKMN021": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "chartType": "chart:tsPane",
+        "description": "User should be able to fork edit and delete tsPane charts"
+      },
+      "FRKMN022": {
+        "suites": ["regression"],
+        "user": "admin",
+        "chartType": "chart:tsPane",
+        "description": "Admin should be able to fork edit and delete tsPane charts"
+      }
+    }
+  }
+}

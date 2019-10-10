@@ -56,6 +56,7 @@ import {
   PerfectScrollbarConfigInterface,
   PERFECT_SCROLLBAR_CONFIG
 } from 'ngx-perfect-scrollbar';
+import { DerivedMetricComponent } from './derived-metric/derived-metric.component';
 export { DesignerPageComponent, DesignerService };
 
 const COMPONENTS = [
@@ -74,6 +75,7 @@ const COMPONENTS = [
   ToolbarActionDialogComponent,
   DesignerSortComponent,
   DesignerDescriptionComponent,
+  DerivedMetricComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayoutComponent,

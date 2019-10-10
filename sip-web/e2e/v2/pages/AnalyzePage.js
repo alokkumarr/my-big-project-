@@ -65,7 +65,19 @@ class AnalyzePage extends CreateAnalysisModel {
           `//span[@class="mat-option-text" and contains(text(),"${name}")]`
         )
       );
-    this._actionLinkByAnalysisName=name=>element(by.xpath(`(//*[text()="${name}"]/following::*[@e2e="actions-menu-toggle"])[1]`))
+    this._actionLinkByAnalysisName = name =>
+      element(
+        by.xpath(
+          `(//*[text()="${name}"]/following::*[@e2e="actions-menu-toggle"])[1]`
+        )
+      );
+
+    this._forkButtonByAnalysis = name =>
+      element(
+        by.xpath(
+          `//a[contains(text(),'${name}')]/following::button[@e2e='action-fork-btn']`
+        )
+      );
   }
 
   goToView(viewName) {
@@ -167,12 +179,16 @@ class AnalyzePage extends CreateAnalysisModel {
   }
 
   clickOnExecuteButtonAnalyzePage() {
-      browser.sleep(2000);
+    browser.sleep(2000);
     commonFunctions.clickOnElement(this._analyzeExecuteButton);
   }
 
-  clickOnActionLinkByAnalysisName(name){
-      commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
+  clickOnActionLinkByAnalysisName(name) {
+    commonFunctions.clickOnElement(this._actionLinkByAnalysisName(name));
+  }
+
+  clickOnForkButtonFromCardView(name) {
+    commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
   }
 }
 module.exports = AnalyzePage;

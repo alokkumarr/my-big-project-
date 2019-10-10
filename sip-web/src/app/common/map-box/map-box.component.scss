@@ -26,3 +26,8 @@
   height: 41px;
   background-image: url('/assets/img/additional-icons/marker-icon.png');
 }
+
+::ng-deep canvas.mapboxgl-canvas {
+  height: 100vh !important;
+  width: 100vw !important;
+}
