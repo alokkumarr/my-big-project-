@@ -16,6 +16,7 @@ import {
 } from '../../../types';
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
+import * as uppercase from 'lodash/uppercase';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -102,6 +103,18 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       (<ArtifactColumnChart>this.artifactColumn).comboType ||
       (<any>this.artifactColumn).displayType
     );
+  }
+
+  displayNameFor(column: ArtifactColumn) {
+    if (!column) {
+      return '';
+    }
+
+    if (column.aggregate) {
+      return `${uppercase(column.aggregate)}(${column.displayName})`;
+    }
+
+    return column.displayName;
   }
 
   /**
