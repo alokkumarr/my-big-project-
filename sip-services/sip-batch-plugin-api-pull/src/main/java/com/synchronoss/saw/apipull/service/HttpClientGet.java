@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 @ContextConfiguration(classes = {RestTemplateConfig.class, HttpClientConfig.class})
-public class HttpClientGet extends SncrBaseHttpClient {
+public class HttpClientGet extends SipBaseHttpClient {
   private static final Logger logger = LoggerFactory.getLogger(HttpClientGet.class);
   RestTemplate restTemplate = new RestTemplate();
 

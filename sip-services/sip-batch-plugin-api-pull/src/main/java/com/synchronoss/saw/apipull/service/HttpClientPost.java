@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class HttpClientPost extends SncrBaseHttpClient {
+public class HttpClientPost extends SipBaseHttpClient {
   private static final Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
 
   Map<String, Object> formData;
