@@ -16,10 +16,10 @@ import { map, startWith } from 'rxjs/operators';
 export class HttpMetadataComponent implements OnInit {
   httpMethods: HTTP_METHODS[] = [
     HTTP_METHODS.GET,
-    HTTP_METHODS.POST,
-    HTTP_METHODS.PUT,
-    HTTP_METHODS.PATCH,
-    HTTP_METHODS.DELETE
+    HTTP_METHODS.POST
+    // HTTP_METHODS.PUT,
+    // HTTP_METHODS.PATCH,
+    // HTTP_METHODS.DELETE
   ];
 
   filteredHeaderFields: Observable<string[]>[] = [];

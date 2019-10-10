@@ -1,11 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormControl,
-  FormArray
-} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { isUnique } from 'src/app/common/validators';
 import * as isNil from 'lodash/isNil';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
@@ -15,7 +9,6 @@ import {
   HTTP_METHODS,
   APIChannelMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
-import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
 
 @Component({
   selector: 'api-source',
@@ -95,18 +88,7 @@ export class ApiSourceComponent implements OnInit, DetailForm {
       apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
       bodyParameters: this.formBuilder.group({
-        content: [
-          '',
-          requireIf(
-            control => this.detailsFormGroup.get('httpMethod') as FormControl,
-            method =>
-              [
-                HTTP_METHODS.POST,
-                HTTP_METHODS.PATCH,
-                HTTP_METHODS.PUT
-              ].includes(method)
-          )
-        ]
+        content: ['']
       }),
       headerParameters: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),
