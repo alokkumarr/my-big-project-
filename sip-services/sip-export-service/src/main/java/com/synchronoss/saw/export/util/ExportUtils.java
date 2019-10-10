@@ -97,7 +97,7 @@ public class ExportUtils {
               break;
             }
           } else {
-            if (field.getVisibleIndex().equals(visibleIndex)) {
+            if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               if (split != null && split.length >= 2) {
                 header.put(split[0], aliasName);

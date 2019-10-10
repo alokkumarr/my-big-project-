@@ -196,7 +196,9 @@ public class TicketHelper {
 			ticket.setCustID(user.getTicketDetails().getCustID());
 			ticket.setCustCode(user.getTicketDetails().getCustCode());
 			ticket.setUserId(user.getTicketDetails().getUserId());
-            ticket.setCustomConfig(user.getTicketDetails().getCustomConfig());
+      ticket.setCustomConfig(user.getTicketDetails().getCustomConfig());
+			ticket.setIsJvCustomer(user.getTicketDetails().getIsJvCustomer());
+			ticket.setFilterByCustomerCode(user.getTicketDetails().getFilterByCustomerCode());
 		}
 		return ticket;
 	}

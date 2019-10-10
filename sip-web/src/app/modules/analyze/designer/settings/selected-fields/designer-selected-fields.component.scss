@@ -22,6 +22,10 @@
     color: white;
     background-color: $number-type-chip-color;
   }
+  &.derived-type-chip-color {
+    color: white;
+    background-color: $derived-type-chip-color;
+  }
   &.geo-type-chip-color {
     color: white;
     background-color: $geo-type-chip-color;

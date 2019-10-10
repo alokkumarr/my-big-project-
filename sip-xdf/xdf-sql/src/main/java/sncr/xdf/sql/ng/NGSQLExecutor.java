@@ -4,6 +4,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.StructField;
+
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.ngcomponent.WithContext;
@@ -14,8 +16,10 @@ import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class NGSQLExecutor implements Serializable {
@@ -70,9 +74,12 @@ public class NGSQLExecutor implements Serializable {
                         }
 
                         logger.debug("Attempt to load data for table: " + tn);
+
                         String location;
 
-                        if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        //if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        if (!parent.getNgctx().runningPipeLine)
+
                         {
 
                             if (allTables.get(tn) != null) {
@@ -125,9 +132,18 @@ public class NGSQLExecutor implements Serializable {
 
                 if (parent.getNgctx().runningPipeLine)
                 {
-                    //Map<String, Dataset> dsMap = parent.getNgctx().datafileDFmap;
-                    df = parent.getNgctx().datafileDFmap.get(parent.getNgctx().dataSetName);
-                    df.createOrReplaceTempView(parent.getNgctx().dataSetName);
+                	
+                	
+                	
+                	
+                    
+                    parent.getNgctx().datafileDFmap.forEach((key, value) -> {
+                    
+                    	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
+                        StructField[] fields = parent.getNgctx().datafileDFmap.get(key).schema().fields();
+                        Arrays.asList(fields).forEach((x)->logger.info(x));
+                        
+                	});
                 }
 
                 long lt = System.currentTimeMillis();
@@ -135,6 +151,9 @@ public class NGSQLExecutor implements Serializable {
 
                 Dataset<Row> sqlResult = parent.getICtx().sparkSession.sql(descriptor.SQL);
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
+                
+                
+                
 
                 WithDLBatchWriter pres = (WithDLBatchWriter) parent;
 
@@ -148,8 +167,14 @@ public class NGSQLExecutor implements Serializable {
                 logger.debug(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.transactionalLocation);
 
                 String loc = descriptor.transactionalLocation + Path.SEPARATOR +  descriptor.targetTableName;
-
+                
+                logger.debug("### Adding dynamic SQL Dataset with name ::"+ descriptor.targetTableName);
+                parent.getNgctx().datafileDFmap.put(descriptor.targetTableName,finalResult);
+                
                 if(!descriptor.isTemporaryTable) {
+                	
+                	logger.info("Final result schema :: ");
+                	finalResult.printSchema();
                     pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
 
                     long wt = System.currentTimeMillis();

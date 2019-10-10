@@ -108,6 +108,9 @@ RUN curl -O $path/$rpm \
 
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto
 
+# COPY java.security into the directory
+COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
+
 # Add SIP container health check command
 COPY sip-health-check /root/
 
