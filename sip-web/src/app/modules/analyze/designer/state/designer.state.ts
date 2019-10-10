@@ -6,7 +6,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as forEach from 'lodash/forEach';
 import * as set from 'lodash/set';
 import * as remove from 'lodash/remove';
-import * as lowerCase from 'lodash/lowerCase';
+import * as toLower from 'lodash/toLower';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -65,7 +65,7 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
-import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
+import { AnalysisDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 
 // setAutoFreeze(false);
@@ -238,7 +238,7 @@ export class DesignerState {
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
     const artifactIndex = artifacts.findIndex(
-      artifact => lowerCase(artifact.artifactsName) === lowerCase(artifactsName)
+      artifact => toLower(artifact.artifactsName) === toLower(artifactsName)
     );
 
     if (artifactIndex < 0) {
@@ -246,8 +246,10 @@ export class DesignerState {
     }
 
     const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field =>
-        lowerCase(field.columnName) === lowerCase(artifactColumn.columnName)
+      field => {
+        const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
+        return toLower(field[fieldName]) === toLower(artifactColumn[fieldName]);
+      }
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -672,9 +674,9 @@ export class DesignerState {
       columnName: artifactColumn.columnName,
       displayType:
         artifactColumn.displayType || (<any>artifactColumn).comboType,
-      dataField: DesignerService.dataFieldFor(<ArtifactColumnDSL>(
-        artifactColumn
-      )),
+      ...(artifactColumn.dataField
+        ? { dataField: artifactColumn.dataField }
+        : {}),
       displayName: artifactColumn.displayName,
       ...(artifactColumn.formula
         ? {

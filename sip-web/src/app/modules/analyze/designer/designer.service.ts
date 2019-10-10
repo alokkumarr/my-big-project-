@@ -382,7 +382,7 @@ export class DesignerService {
     const isStockChart = chartType.substring(0, 2) === 'ts';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
-      artifactColumn.checked = false;
+      artifactColumn['checked'] = false;
       artifactColumn.alias = '';
       unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
@@ -485,6 +485,10 @@ export class DesignerService {
           DesignerService.unusedAggregates(artifactColumn, columns) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;

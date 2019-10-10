@@ -22,7 +22,8 @@ import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   Filter,
-  DesignerChangeEvent
+  DesignerChangeEvent,
+  ArtifactColumnDSL
 } from '../../types';
 import { AnalyzeService } from '../../../services/analyze.service';
 import { DesignerState } from '../../state/designer.state';
@@ -139,13 +140,16 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   removeFromGroup(
-    artifactColumn: ArtifactColumn,
+    artifactColumn: ArtifactColumnDSL,
     groupAdapter: IDEsignerSettingGroupAdapter
   ) {
-    artifactColumn.aliasName = '';
+    artifactColumn.alias = '';
     const columnIndex = findIndex(
       groupAdapter.artifactColumns,
-      ({ columnName }) => artifactColumn.columnName === columnName
+      ({ columnName, dataField }) =>
+        dataField
+          ? dataField === artifactColumn.dataField
+          : columnName === artifactColumn.columnName
     );
     const adapterIndex = this.groupAdapters.indexOf(groupAdapter);
     this._store.dispatch(
