@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -234,6 +235,13 @@ public class ApiPullServiceImpl extends SipPluginContract {
     String hostName = channelMetadata.getHostAddress();
     Integer port = channelMetadata.getPort();
 
+    String httpMethodStr = payload.getHttpMethod();
+    if (httpMethodStr != null) {
+      HttpMethod method = HttpMethod.fromValue(httpMethodStr);
+
+      apiRequest.setHttpMethod(method);
+    }
+
     String apiEndPoint = payload.getApiEndPoint();
 
     String url = generateUrl(hostName, port, apiEndPoint);
@@ -278,22 +286,33 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
     if (headerParamObj != null) {
       for (Object headerObject : headerParamObj) {
-        HeaderParameter headerParameter = (HeaderParameter) headerObject;
-        logger.debug("Header Param = " + headerParameter);
+        LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) headerObject;
 
-        headerParameters.add(headerParameter);
+        HeaderParameter param = new HeaderParameter();
+
+        param.setKey(map.get("key"));
+        param.setValue(map.get("value"));
+
+        logger.debug("Param = " + param);
+
+        headerParameters.add(param);
       }
       logger.debug("Header Params = " + headerParameters);
 
       apiRequest.setHeaderParameters(headerParameters);
     }
 
-    Object bodyParamsObj = payload.getBodyParameters();
-    BodyParameters bodyParameters = null;
+    if (httpMethodStr.equalsIgnoreCase("POST")) {
+      Object bodyParamsObj = payload.getBodyParameters();
 
-    if (bodyParameters != null) {
-      bodyParameters = (BodyParameters) bodyParamsObj;
-      logger.debug("Body Params = " + bodyParameters);
+      LinkedHashMap<String, Object> bodyParamMap = (LinkedHashMap<String, Object>) bodyParamsObj;
+
+      logger.debug(bodyParamMap.toString());
+      BodyParameters bodyParameters = new BodyParameters();
+
+      bodyParameters.setContent(bodyParamMap.get("content"));
+
+      logger.debug("Body Parameter = " + bodyParameters);
 
       apiRequest.setBodyParameters(bodyParameters);
     }
@@ -391,22 +410,37 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
     if (headerParamObj != null) {
       for (Object headerObject : headerParamObj) {
-        HeaderParameter headerParameter = (HeaderParameter) headerObject;
-        logger.debug("Header Param = " + headerParameter);
+        logger.debug("Object = " + headerObject);
+        logger.debug("Object type = " + headerObject.getClass().getName());
+        LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) headerObject;
 
-        headerParameters.add(headerParameter);
+        System.out.println("Key = " + map.get("key"));
+        System.out.println("Value = " + map.get("value"));
+
+        logger.debug("Key Map = " + map);
+        HeaderParameter param = new HeaderParameter();
+
+        param.setKey(map.get("key"));
+        param.setValue(map.get("value"));
+
+        headerParameters.add(param);
       }
       logger.debug("Header Params = " + headerParameters);
 
       apiRequest.setHeaderParameters(headerParameters);
     }
 
-    Object bodyParamsObj = payload.getBodyParameters();
-    BodyParameters bodyParameters = null;
+    if (httpMethodStr.equalsIgnoreCase("POST")) {
+      Object bodyParamsObj = payload.getBodyParameters();
 
-    if (bodyParameters != null) {
-      bodyParameters = (BodyParameters) bodyParamsObj;
-      logger.debug("Body Params = " + bodyParameters);
+      LinkedHashMap<String, Object> bodyParamMap = (LinkedHashMap<String, Object>) bodyParamsObj;
+
+      logger.debug(bodyParamMap.toString());
+      BodyParameters bodyParameters = new BodyParameters();
+
+      bodyParameters.setContent(bodyParamMap.get("content"));
+
+      logger.debug("Body Parameter = " + bodyParameters);
 
       apiRequest.setBodyParameters(bodyParameters);
     }

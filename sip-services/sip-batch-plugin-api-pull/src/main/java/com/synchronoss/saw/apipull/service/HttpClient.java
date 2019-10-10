@@ -7,6 +7,7 @@ import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.QueryParameter;
 import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
+import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,11 +55,21 @@ public class HttpClient {
           for (HeaderParameter hp : sipApiRequest.getHeaderParameters()) {
             post.setHeaderParams(hp.getKey(), hp.getValue());
           }
+        } else {
+          logger.debug("Setting default header");
+          post.setHeaderParam("Content-Type", "application/json");
         }
 
         if (sipApiRequest.getBodyParameters() != null) {
           BodyParameters body = sipApiRequest.getBodyParameters();
-          post.setRawData(body.getContent().toString(), body.getType().trim());
+
+          String contentType = body.getType();
+
+          if(contentType == null || contentType.length() == 0) {
+              contentType = MediaType.APPLICATION_JSON;
+          }
+
+          post.setRawData(body.getContent().toString(), contentType);
         }
 
         apiResponse = post.execute();
