@@ -99,6 +99,16 @@ describe('AddAlertComponent', () => {
     fixture = TestBed.createComponent(AddAlertComponent);
     component = fixture.componentInstance;
     component.alertDefinition = alertDefinitionStub;
+    const metricsColumnControl = component.alertMetricFormGroup.get(
+      'metricsColumn'
+    );
+    const lookbackColumnControl = component.alertRuleFormGroup.get(
+      'lookbackColumn'
+    );
+    metricsColumnControl.enable();
+    lookbackColumnControl.enable();
+    fixture.detectChanges();
+    component.ngOnInit();
     fixture.detectChanges();
   });
 
@@ -119,7 +129,6 @@ describe('AddAlertComponent', () => {
   });
 
   it('should reset metricsColumn formControl value', () => {
-    component.onDatapodChanged();
     expect(
       component.alertMetricFormGroup.controls['metricsColumn'].value
     ).toEqual('');
