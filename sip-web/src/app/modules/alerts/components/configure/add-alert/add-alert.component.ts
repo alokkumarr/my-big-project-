@@ -107,6 +107,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.alertMetricFormGroup.patchValue(alertForm);
         this.alertRuleFormGroup.patchValue(alertForm);
         this.onSelectedMetricsColumn(alertForm.metricsColumn);
+        this.onLookbackColumnSelected(alertForm.lookbackColumn);
         const allSteps = range(3);
         allSteps.forEach(() => this.addAlertStepper.next());
         allSteps.forEach(() => this.addAlertStepper.previous());
@@ -329,8 +330,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.selectedAttributeColumn = selectedAttributeColumn;
   }
 
-  onLookbackColumnSelected(selectedLookbackColumn) {
-    this.selectedLookbackColumn = selectedLookbackColumn;
+  onLookbackColumnSelected(LookbackColumnName) {
+    const selectedMetric = find(
+      this.metricsList,
+      ({ columnName }) => LookbackColumnName === columnName
+    );
+    this.selectedLookbackColumn = selectedMetric;
   }
 
   loadMetrics(datapodId) {
