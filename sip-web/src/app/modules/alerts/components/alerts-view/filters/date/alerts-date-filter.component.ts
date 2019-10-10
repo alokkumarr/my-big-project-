@@ -34,13 +34,14 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
 
   @Output() change = new EventEmitter<AlertFilterEvent>();
   @Input('dateFilter') set setDateFilter(dateFilter: AlertFilterModel) {
-    const { preset, startTime, endTime } = dateFilter;
+    const { preset, gte, lte } = dateFilter;
     const isCustomDate = preset === CUSTOM_DATE_PRESET_VALUE;
+    this.showDateFields = isCustomDate;
     this.alertFilterForm.setValue(
       {
         datePreset: dateFilter.preset,
-        gte: isCustomDate ? moment(startTime) : null,
-        lte: isCustomDate ? moment(endTime) : null
+        gte: isCustomDate ? moment(gte) : null,
+        lte: isCustomDate ? moment(lte) : null
       },
       { emitEvent: false }
     );

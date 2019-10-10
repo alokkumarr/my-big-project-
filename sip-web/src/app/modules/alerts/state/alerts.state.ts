@@ -91,7 +91,7 @@ export class AlertsState {
           const { preset, lte, gte } = filter;
           const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
           return isCustomFilter
-            ? `${lte} -> ${gte}`
+            ? `${gte} -> ${lte}`
             : DATE_PRESETS_OBJ[preset].label;
         default:
           return null;

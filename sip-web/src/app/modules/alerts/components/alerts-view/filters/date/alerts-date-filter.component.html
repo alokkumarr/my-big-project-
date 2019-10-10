@@ -1,7 +1,12 @@
 <div class="filter__form__title">
   Filter By Date
 </div>
-<form class="filter__form" [formGroup]="alertFilterForm" autocomplete="off">
+<form
+  class="filter__form"
+  [formGroup]="alertFilterForm"
+  autocomplete="off"
+  fxLayout="column"
+>
   <mat-form-field appearance="outline">
     <mat-label>Date preset</mat-label>
     <mat-select e2e="alert-date-preset" formControlName="datePreset">
