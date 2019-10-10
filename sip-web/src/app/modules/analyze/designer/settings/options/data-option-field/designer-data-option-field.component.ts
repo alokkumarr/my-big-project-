@@ -64,12 +64,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onAliasChange(alias) {
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
-        alias
+        alias,
+        dataField
       })
     );
     this.change.emit({ subject: 'alias' });
@@ -84,11 +85,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         return true;
       }
     });
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
+        dataField,
         aggregate
       })
     );

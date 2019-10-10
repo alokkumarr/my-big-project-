@@ -283,7 +283,10 @@ export class DesignerState {
     }
 
     const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field => field.columnName === artifactColumn.columnName
+      field => {
+        const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
+        return field[fieldName] === artifactColumn[fieldName];
+      }
     );
 
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
@@ -304,7 +307,12 @@ export class DesignerState {
       const targetAdapter = groupAdapters[targetAdapterIndex];
       const adapterColumnIndex = findIndex(
         targetAdapter.artifactColumns,
-        col => col.columnName === artifactColumn.columnName
+        col => {
+          const fieldName = artifactColumn.dataField
+            ? 'dataField'
+            : 'columnName';
+          return col[fieldName] === artifactColumn[fieldName];
+        }
       );
       const adapterColumn = targetAdapter.artifactColumns[adapterColumnIndex];
 
