@@ -209,7 +209,7 @@ export function alterReportData(data, analysis) {
     fpPipe(
       fpMap(fpPick(['columnName', 'type', 'aggregate'])),
       fpFilter(({ type, columnName, aggregate }) => {
-        if (type === 'date' && !['count', 'distinctCount'].includes(aggregate)) {
+        if (type === 'date' && !['count', 'distinctCount', 'distinctcount'].includes(aggregate)) {
           dateFields.push(columnName);
         }
       })
@@ -219,7 +219,11 @@ export function alterReportData(data, analysis) {
   return data.map(row => {
     return mapValues(row, (value, key) => {
       if (dateFields.includes(key)) {
-        value = isEmpty(value) ? '' : moment(value).utc().format('YYYY-MM-DD hh:mm:ss');
+        if (key === '@timestamp') {
+          value = isEmpty(value) ? '' : moment(value).utc().format('YYYY-MM-DD HH:mm:ss');
+        } else {
+          value = isEmpty(value) ? '' : moment(value).format('YYYY-MM-DD hh:mm:ss');
+        }
       }
 
       return value;
