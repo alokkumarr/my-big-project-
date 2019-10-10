@@ -11,6 +11,8 @@ FROM sip-base:${project.version}
 # If YARN is enabled, set to true
 ARG yarn_enabled
 
+ARG secure_enviroment
+
 # Workaround: MapR configuration gives the error
 # "/opt/mapr/server/manageSSLKeys.sh: line 146: openssl: command not
 # found", so install OpenSSL for it
@@ -94,8 +96,13 @@ RUN yum -y -q install which
 
 # Configure MapR using configure script
 COPY sip-mapr-configure /root/
-COPY sip-mapr-configure.service /etc/systemd/system/
-RUN systemctl enable sip-mapr-configure
+COPY sip-mapr-configure@.service /etc/systemd/system/
+
+RUN if [ $secure_enviroment == "True" ]; then \
+      systemctl enable sip-mapr-configure@secure ; \
+    else \
+    systemctl enable sip-mapr-configure@unsecure ; \
+    fi
 
 # Workaround: MapR does not log into the systemd journal.  So install
 # MapR log forwrding as a workaround, so that all logs are aggregated

@@ -325,6 +325,7 @@
           <skipMachine>${saw.docker.skip.machine}</skipMachine>
           <buildArgs>
             <yarn_enabled>${saw.yarn.enabled}</yarn_enabled>
+            <secure_enviroment>${sip.cloud.secure}</secure_enviroment>
           </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>

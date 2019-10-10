@@ -6,6 +6,12 @@ set -eu
 
 dir=$(dirname $0)
 
+if [ $SECURE == "https:" ]; then
+export MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket"
+# Set the mapr ticket for directory creation using hadoop fs commands for further steps.
+echo  MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket" >> /etc/environment
+fi
+
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 hadoop_mkdir="hadoop fs -mkdir -p"

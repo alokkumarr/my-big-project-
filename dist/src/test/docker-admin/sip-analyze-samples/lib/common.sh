@@ -2,6 +2,11 @@
 # Functions shared across sample SAW metric load scripts
 #
 secure=$1
+if [ $secure == "https:" ]; then
+export MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket"
+# Set the mapr ticket for directory creation using hadoop fs commands for further steps.
+echo  MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket" >> /etc/environment
+fi
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 mdcli="sshpass -p root ssh sip-app1 $sudo_mapr /opt/saw/service/bin/mdcli.sh"
