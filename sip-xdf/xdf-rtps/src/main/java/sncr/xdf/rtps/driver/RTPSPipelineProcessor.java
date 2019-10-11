@@ -152,7 +152,7 @@ public class RTPSPipelineProcessor {
 
 
 	public int processParser(Map<String, Object> parameters, String configPath, boolean persistFlag) {
-		logger.debug("###### Starting parser in pipe line with dataset.....");
+		logger.debug("###### Starting parser in pipe line with dataset.....updated");
 		int ret = 0;
 		try {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
@@ -199,11 +199,9 @@ public class RTPSPipelineProcessor {
 			logger.debug("###### Registered outputs.....");
 
 			ngParserCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
-			String parserKey = null;
-
-			parserKey = ngParserCtxSvc.getNgctx().dataSetName;
-
-			ngParserCtxSvc.getNgctx().dataSetName = parserKey;
+			String parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+            ngParserCtxSvc.getNgctx().dataSetName = parserKey;
+			ngParserCtxSvc.getNgctx().datafileDFmap.putAll ( this.datafileDFmap);
 			ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
@@ -211,14 +209,13 @@ public class RTPSPipelineProcessor {
 
 			Dataset dataset = datafileDFmap.get("DATA_STREAM");
 			logger.debug("######Retrived dataset and passing to parser #####");
-			component = new NGParser(ngParserCtxSvc.getNgctx(),  dataset);
+			component = new NGParser(ngParserCtxSvc.getNgctx(),  dataset, true);
 
 			logger.debug("######Starting init component #####");
 			if (!component.initComponent(null)) {
 				logger.error("Unable to initialize Parser component");
 				return 1;
 			}
-			
 
 			ret = component.run();
 
@@ -226,14 +223,11 @@ public class RTPSPipelineProcessor {
 				error = "Could not complete Parser component " + "entry";
 				throw new Exception(error);
 			}
-
-			datafileDFmap = new HashMap<>();
-			datafileDFmap.put(parserKey,
-					ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
-			dataSetName = parserKey;
-
-			logger.debug("End Of Parser Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size()
-					+ "\n");
+			 datafileDFmap.putAll(ngParserCtxSvc.getNgctx().datafileDFmap);
+			//datafileDFmap.put(parserKey,
+				//	ngParserCtxSvc.getNgctx().datafileDFmap.get(ngParserCtxSvc.getNgctx().dataSetName).cache());
+			//dataSetName = parserKey;
+			 logger.debug("End Of Parser Component ==>  dataSetKeys  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size()+ "\n");
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processParser() Exception is : " + e + "\n");
 			//System.exit(-1);
@@ -286,12 +280,14 @@ public class RTPSPipelineProcessor {
 			String transInKey = config.getInputs().get(0).getDataSet().toString();
 			String transOutKey = config.getOutputs().get(0).getDataSet().toString();
 
-			ngTransformerCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
-			ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
-			ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey, datafileDFmap.get(dataSetName));
-			logger.debug("dataset count in transformer ::" + datafileDFmap.get(dataSetName).count());
+			ngTransformerCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
 			ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
+            
+			//ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
+			//ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey, datafileDFmap.get(dataSetName));
+			//logger.debug("dataset count in transformer ::" + datafileDFmap.get(dataSetName).count());
+			
 
 			NGTransformerComponent tcomponent = new NGTransformerComponent(ngTransformerCtxSvc.getNgctx());
 
@@ -304,13 +300,13 @@ public class RTPSPipelineProcessor {
 				error = "Could not complete Transformer component " + "entry";
 				throw new Exception(error);
 			}
+			datafileDFmap.putAll(ngTransformerCtxSvc.getNgctx().datafileDFmap);
+			//datafileDFmap = new HashMap<>();
+			//.put(transOutKey,
+			//		ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
+			//dataSetName = transOutKey;
 
-			datafileDFmap = new HashMap<>();
-			datafileDFmap.put(transOutKey,
-					ngTransformerCtxSvc.getNgctx().datafileDFmap.get(ngTransformerCtxSvc.getNgctx().dataSetName));
-			dataSetName = transOutKey;
-
-			logger.debug("End Of Transformer Component ==>  dataSetName  & size " + dataSetName + ","
+			logger.debug("End Of Transformer Component ==>  dataSetName  & size " + datafileDFmap.keySet() + ","
 					+ datafileDFmap.size() + "\n");
 
 		} catch (Exception e) {
@@ -369,9 +365,10 @@ public class RTPSPipelineProcessor {
 
 			String sqlOutKey = config.getOutputs().get(sqlOutputSize - 1).getDataSet().toString();
 
-			ngSQLCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
+			//ngSQLCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
 			ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; // TRANS_out
-			ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey, datafileDFmap.get(dataSetName)); // TRANS_OUT
+			ngSQLCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
+			//ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey, datafileDFmap.get(dataSetName)); // TRANS_OUT
 			ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 			ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
 			ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
@@ -389,12 +386,11 @@ public class RTPSPipelineProcessor {
 				throw new Exception(error);
 			}
 
-			datafileDFmap = new HashMap<>();
-			datafileDFmap.put(sqlOutKey, ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
+			//datafileDFmap.put(sqlOutKey, ngSQLCtxSvc.getNgctx().datafileDFmap.get(ngSQLCtxSvc.getNgctx().dataSetName));
 			dataSetName = sqlOutKey;
-
+			datafileDFmap.putAll(ngSQLCtxSvc.getNgctx().datafileDFmap);
 			logger.debug(
-					"End Of SQL Component ==>  dataSetName  & size " + dataSetName + "," + datafileDFmap.size() + "\n");
+					"End Of SQL Component ==>  dataSetName  & size " + datafileDFmap.keySet() + "," + datafileDFmap.size() + "\n");
 
 		} catch (Exception e) {
 			logger.debug("XDFDataProcessor:processSQL() Exception is : " + e + "\n");
@@ -447,10 +443,9 @@ public class RTPSPipelineProcessor {
 			String dataSetInKey = config.getInputs().get(0).getDataSet();
 
 			logger.debug("ES loader Dataset Name is    " + dataSetInKey);
-
-			ngESCtxSvc.getNgctx().datafileDFmap = new HashMap<>();
+			ngESCtxSvc.getNgctx().datafileDFmap.putAll(datafileDFmap);
 			ngESCtxSvc.getNgctx().dataSetName = dataSetInKey;
-			ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey, datafileDFmap.get(dataSetName));
+			//ngESCtxSvc.getNgctx().datafileDFmap.put(dataSetInKey, datafileDFmap.get(dataSetName));
 			ngESCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
 
 			NGESLoaderComponent esloader = new NGESLoaderComponent(ngESCtxSvc.getNgctx());

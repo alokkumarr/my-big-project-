@@ -315,11 +315,11 @@ public class XDFDataProcessor  extends AbstractComponent {
             ngParserCtxSvc.getNgctx().datafileDFmap =  new HashMap<>();
             String parserKey = null;
             
-            if(isRealTime) {
-            	parserKey = ngParserCtxSvc.getNgctx().dataSetName;
-            } else {
-            	parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
-            }
+           // if(isRealTime) {
+            //	parserKey = ngParserCtxSvc.getNgctx().dataSetName;
+           // } else {
+            parserKey =  cfg.getOutputs().get(0).getDataSet().toString();
+           // }
             
             ngParserCtxSvc.getNgctx().datafileDFmap.putAll ( this.datafileDFmap);
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
