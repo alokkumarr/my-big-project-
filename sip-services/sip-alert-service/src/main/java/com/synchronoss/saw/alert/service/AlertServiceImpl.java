@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.ojai.store.SortOrder;
@@ -76,6 +77,12 @@ public class AlertServiceImpl implements AlertService {
   private String alertTriggerLog;
 
   @Autowired EvaluatorListener evaluatorListener;
+
+  @PostConstruct
+  public void init() throws Exception {
+    MaprConnection alertRuleTableConnection = new MaprConnection(basePath, alertRulesMetadata);
+    MaprConnection alertResultTableConnection = new MaprConnection(basePath, alertTriggerLog);
+  }
 
   /**
    * Create Alert rule.
@@ -181,7 +188,6 @@ public class AlertServiceImpl implements AlertService {
       alertRule = objectMapper.treeToValue(document, AlertRuleDetails.class);
     } catch (JsonProcessingException e) {
       logger.error("error occured while converting json to alertRuledetails  ");
-      e.printStackTrace();
       throw new RuntimeException("Error occured while retrieving alertdetails :" + e);
     }
     return alertRule;

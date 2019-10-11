@@ -153,7 +153,7 @@ public class AlertNotifier {
       notificationLog.setNotifiedStatus(false);
       notificationLog.setMessage(exeception.toString());
       saveNotificationStatus(notificationLog);
-      logger.error("Exception occured while sending Email Notification");
+      logger.error("Exception occured while sending Email Notification" + exeception);
     }
   }
 
@@ -248,6 +248,10 @@ public class AlertNotifier {
       String attrName = alertRulesDetails.getAttributeName();
       if (attrName == null) {
         attrName = "";
+      } else {
+        if (attrName.endsWith(".keyword")) {
+          attrName = attrName.replace(".keyword", "");
+        }
       }
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_NAME, attrName);
     }
@@ -259,9 +263,7 @@ public class AlertNotifier {
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_VALUE, attributeValue);
     }
     if (body.contains(MailBodyResolver.THRESHOLD_VALUE)) {
-      logger.info("Inside threshold");
       String alertCondition = getReadableConditionWithValues(alertRulesDetails);
-      logger.info("alert condition " + alertCondition);
       if (alertCondition == null) {
         alertCondition = "";
       }

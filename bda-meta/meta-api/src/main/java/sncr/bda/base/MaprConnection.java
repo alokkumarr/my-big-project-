@@ -46,11 +46,7 @@ public class MaprConnection {
     connection = DriverManager.getConnection(OJAI_MAPR);
     String storeName = basePath + File.separator + METASTORE + File.separator + tableName;
     if (!connection.storeExists(storeName)) {
-      synchronized (this) {
-        if (!connection.storeExists(storeName)) {
-          connection.createStore(storeName);
-        }
-      }
+      connection.createStore(storeName);
     }
     store = connection.getStore(storeName);
   }
