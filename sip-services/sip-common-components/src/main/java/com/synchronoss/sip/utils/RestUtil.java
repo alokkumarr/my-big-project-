@@ -270,7 +270,8 @@ public class RestUtil {
           validateNodeValue(node);
         } else {
           Boolean isValid = Boolean.FALSE;
-          isValid = ESAPI.validator().isValidInput("Validating SafeString attributes value for intrusion",
+          isValid = ESAPI.validator().isValidInput("Validating SafeString "
+              + "attributes value for intrusion",
               node.asText(), "SafeString", node.asText().toString().length(), false);
           
           if (!isValid) {
@@ -279,27 +280,32 @@ public class RestUtil {
                     node.asText(), "Email", node.asText().toString().length(), false);
             if (!isValid) {
               isValid =
-                  ESAPI.validator().isValidInput("Validating Password attributes value for intrusion",
+                  ESAPI.validator().isValidInput("Validating Password "
+                      + "attributes value for intrusion",
                       node.asText(), "Password", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
-                  ESAPI.validator().isValidInput("Validating IPAddress attributes value for intrusion",
+                  ESAPI.validator().isValidInput("Validating IPAddress "
+                      + "attributes value for intrusion",
                       node.asText(), "IPAddress", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
-                  ESAPI.validator().isValidInput("Validating URL attributes value for intrusion",
+                  ESAPI.validator().isValidInput("Validating URL "
+                      + "attributes value for intrusion",
                       node.asText(), "URL", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
-                  ESAPI.validator().isValidInput("Validating Id attributes value for intrusion",
+                  ESAPI.validator().isValidInput("Validating Id "
+                      + "attributes value for intrusion",
                       node.asText(), "Id", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
-                  ESAPI.validator().isValidInput("Validating SafeText attributes value for intrusion",
+                  ESAPI.validator().isValidInput("Validating SafeText "
+                      + "attributes value for intrusion",
                       node.asText(), "SafeText", node.asText().toString().length(), false);
             }
             if (!isValid) {
