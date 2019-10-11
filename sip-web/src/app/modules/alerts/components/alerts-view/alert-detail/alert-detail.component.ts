@@ -22,7 +22,9 @@ export class AlertDetailComponent implements OnInit {
   constructor(private _store: Store) {}
   public alertRuleDetails: AlertConfig;
 
-  @Select(AlertsState.getAlertFilterStrings) filterStrings$: Observable<string>;
+  @Select(AlertsState.getAlertDateFilterString) filterStrings$: Observable<
+    string
+  >;
 
   @Select(AlertsState.getSelectedAlertRuleDetails)
   alertRuleDetails$: Observable<AlertConfig>;

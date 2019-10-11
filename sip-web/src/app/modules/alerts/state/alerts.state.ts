@@ -1,9 +1,11 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import * as clone from 'lodash/clone';
 import * as lodashMap from 'lodash/map';
+import * as find from 'lodash/find';
 import * as every from 'lodash/every';
 import * as isEqual from 'lodash/isEqual';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 // import produce from 'immer';
 
@@ -18,7 +20,11 @@ import {
   EditAlertFilter
 } from './alerts.actions';
 import { AlertsStateModel, AlertFilterModel } from '../alerts.interface';
-import { DATE_PRESETS_OBJ, CUSTOM_DATE_PRESET_VALUE } from '../consts';
+import {
+  DATE_PRESETS_OBJ,
+  CUSTOM_DATE_PRESET_VALUE,
+  DATE_FORMAT
+} from '../consts';
 import { AlertsService } from '../services/alerts.service';
 
 export const defaultAlertFilters: AlertFilterModel[] = [
@@ -84,20 +90,16 @@ export class AlertsState {
   }
 
   @Selector()
-  static getAlertFilterStrings(state: AlertsStateModel) {
-    const filterStrings = lodashMap(state.alertFilters, filter => {
-      switch (filter.type) {
-        case 'date':
-          const { preset, lte, gte } = filter;
-          const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
-          return isCustomFilter
-            ? `${gte} -> ${lte}`
-            : DATE_PRESETS_OBJ[preset].label;
-        default:
-          return null;
-      }
-    });
-    return filterStrings;
+  static getAlertDateFilterString(state: AlertsStateModel) {
+    const dateFilter = find(state.alertFilters, ({ type }) => type === 'date');
+    const { preset, lte, gte } = dateFilter;
+    const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
+    if (isCustomFilter) {
+      const startDate = moment(gte).format(DATE_FORMAT.YYYY_MM_DD);
+      const endDate = moment(lte).format(DATE_FORMAT.YYYY_MM_DD);
+      return `${startDate} -> ${endDate}`;
+    }
+    return DATE_PRESETS_OBJ[preset].label;
   }
 
   @Selector()

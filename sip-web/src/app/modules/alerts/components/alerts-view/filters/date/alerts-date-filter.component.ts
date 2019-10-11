@@ -11,11 +11,7 @@ import * as moment from 'moment';
 import { requireIf } from '../../../../../../common/validators/index';
 import { Subscription } from 'rxjs';
 
-import {
-  DATE_FORMAT,
-  CUSTOM_DATE_PRESET_VALUE,
-  DATE_PRESETS
-} from '../../../../consts';
+import { CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS } from '../../../../consts';
 import {
   AlertFilterModel,
   AlertFilterEvent
@@ -103,8 +99,8 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
       fieldName: 'starttime',
       type: 'date',
       preset,
-      lte: lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
-      gte: gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00'
+      lte: lte.utc().valueOf(),
+      gte: gte.utc().valueOf()
     };
   }
 }
