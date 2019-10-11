@@ -20,7 +20,9 @@ import { AlertsState } from '../../state/alerts.state';
 })
 export class AlertsViewComponent implements OnInit {
   public alertsDataLoader: (options: {}) => Promise<GridData>;
-  @Select(AlertsState.getAlertFilterStrings) filterStrings$: Observable<string>;
+  @Select(AlertsState.getAlertDateFilterString) filterStrings$: Observable<
+    string
+  >;
   @Select(AlertsState.getAlertFilters) filters$: Observable<AlertFilterModel[]>;
   public filters: AlertFilterModel[] = [];
   @Select(AlertsState.getAllAlertsCountChartData)
@@ -70,7 +72,6 @@ export class AlertsViewComponent implements OnInit {
     this.filters$.subscribe(filters => {
       this.filters = filters;
       this.alertViewSidenav.close();
-      // this.setAlertLoaderForGrid();
       this.fetchLateshAlerts();
     });
   }
