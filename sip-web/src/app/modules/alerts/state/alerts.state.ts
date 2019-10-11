@@ -95,8 +95,8 @@ export class AlertsState {
     const { preset, lte, gte } = dateFilter;
     const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
     if (isCustomFilter) {
-      const startDate = moment(gte).format(DATE_FORMAT.YYYY_MM_DD);
-      const endDate = moment(lte).format(DATE_FORMAT.YYYY_MM_DD);
+      const startDate = moment.utc(gte).format(DATE_FORMAT.YYYY_MM_DD);
+      const endDate = moment.utc(lte).format(DATE_FORMAT.YYYY_MM_DD);
       return `${startDate} -> ${endDate}`;
     }
     return DATE_PRESETS_OBJ[preset].label;

@@ -109,8 +109,8 @@ export interface AlertFilterModel {
   type: string;
   preset?: string;
   value?: string;
-  lte?: string;
-  gte?: string;
+  lte?: number;
+  gte?: number;
   operator?: string;
 }
 
