@@ -1,0 +1,137 @@
+<h1 mat-dialog-title>
+  {{ mode === allModes.edit ? 'Edit' : 'Create' }} Derived Metric
+</h1>
+<form
+  class="derived-metric__form"
+  fxFlex
+  [formGroup]="expressionForm"
+  (submit)="submit()"
+>
+  <div
+    fxLayout="column"
+    fxLayoutAlign="space-between stretch"
+    style="height: 100%"
+    fxLayoutGap="10px"
+  >
+    <div
+      fxLayout="row"
+      fxLayoutAlign="space-between stretch"
+      fxLayoutGap="10px"
+      fxFlex
+    >
+      <div
+        fxLayout="column"
+        fxLayoutAlign="space-between stretch"
+        fxFlex
+        style="height: 100%"
+      >
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            [readonly]="mode === allModes.edit"
+            type="text"
+            formControlName="columnName"
+            placeholder="Name your derived metric"
+          />
+        </mat-form-field>
+        <mat-error
+          *ngIf="
+            columnName.hasError('required') &&
+            (columnName.dirty || columnName.touched)
+          "
+          i18n
+        >
+          Field name is
+          <strong>required.</strong>
+        </mat-error>
+        <mat-error
+          *ngIf="
+            columnName.hasError('isUnique') &&
+            (columnName.dirty || columnName.touched)
+          "
+          i18n
+        >
+          A field with this name
+          <strong>already exists.</strong>
+        </mat-error>
+
+        <ace-editor
+          #editor
+          [text]="expressionForm.get('formula').value"
+          (textChanged)="expressionChanged($event)"
+          [options]="editorOptions"
+          theme="eclipse"
+          mode="sql"
+          fxFlex
+        >
+        </ace-editor>
+
+        <mat-error
+          *ngIf="
+            formula.hasError('required') && (formula.dirty || formula.touched)
+          "
+          i18n
+        >
+          Formula is
+          <strong>required.</strong>
+        </mat-error>
+
+        <mat-error *ngIf="expressionError" i18n>
+          {{ expressionError }}
+        </mat-error>
+      </div>
+      <div
+        class="derived-metric__aggregate-select"
+        fxLayout="column"
+        fxLayoutAlign="start stretch"
+        fxLayoutGap="10px"
+        style="padding-top: 3px"
+      >
+        <!-- Add aggregate selection here  -->
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-around center"
+          fxLayoutGap="10px"
+        >
+          <button
+            mat-stroked-button
+            color="primary"
+            *ngFor="let operator of allOperatorsSupported"
+            type="button"
+            fxFlex
+            (click)="addText(' ' + operator + ' ')"
+          >
+            {{ operator }}
+          </button>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start stretch"
+          fxLayoutGap="10px"
+          fxFlex
+        >
+          <button
+            mat-stroked-button
+            color="primary"
+            *ngFor="let agg of allAggregatesSupported"
+            type="button"
+            style="text-align: start"
+            (click)="addText(agg + '()', 1)"
+          >
+            {{ agg | titlecase }}
+          </button>
+          <h4 style="color: #888888; text-align: center">
+            Click an operator to add it to the editor.
+          </h4>
+        </div>
+      </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+      <button mat-button type="button" (click)="dialogRef.close(null)">
+        Cancel
+      </button>
+      <button mat-raised-button type="submit" color="primary">Submit</button>
+    </div>
+  </div>
+</form>

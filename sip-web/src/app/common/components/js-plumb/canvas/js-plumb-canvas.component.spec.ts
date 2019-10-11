@@ -3,7 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { JsPlumbCanvasComponent } from '.';
 import { NgxsModule, Store } from '@ngxs/store';
 import { DesignerState } from 'src/app/modules/analyze/designer/state/designer.state';
-import { DesignerService } from 'src/app/modules/analyze/designer';
+import { DesignerService } from 'src/app/modules/analyze/designer/designer.module';
 import { AnalyzeService } from 'src/app/modules/analyze/services/analyze.service';
 
 describe('JS Plumb Canvas Component', () => {

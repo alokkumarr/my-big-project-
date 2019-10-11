@@ -111,6 +111,16 @@
           "name": "COUNTY",
           "table": "sample",
           "type": "string"
+        },
+        {
+          "aliasName": "customerCode",
+          "columnName": "customerCode.keyword",
+          "displayName": "customerCode",
+          "filterEligible": true,
+          "joinEligible": false,
+          "name": "customerCode",
+          "table": "sample",
+          "type": "string"
         }
       ]
     }

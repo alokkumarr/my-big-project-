@@ -466,7 +466,16 @@ export class ChartService {
   }
 
   getSerie(
-    { alias, type, displayName, displayType, comboType, aggregate, chartType },
+    {
+      alias,
+      type,
+      displayName,
+      displayType,
+      expression,
+      comboType,
+      aggregate,
+      chartType
+    },
     index,
     fields,
     chartTypeOverride
@@ -486,9 +495,9 @@ export class ChartService {
     if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
       aggrSymbol = '%';
     }
-    const nameWithAggregate = `${
-      AGGREGATE_TYPES_OBJ[aggregate].designerLabel
-    }(${displayName})`;
+    const nameWithAggregate = expression
+      ? displayName
+      : `${AGGREGATE_TYPES_OBJ[aggregate].designerLabel}(${displayName})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -531,7 +540,6 @@ export class ChartService {
       field.chartType = type;
     });
     const series = map(fields.y, this.getSerie.bind(this));
-
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
@@ -795,16 +803,16 @@ export class ChartService {
             if (!isUndefined(field.alias)) {
               return (
                 field.alias ||
-                `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
-                  field.displayName
-                })`
+                (field.expression
+                  ? field.displayName
+                  : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
               );
             }
             return (
               opts.labels.y ||
-              `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
-                field.displayName
-              })`
+              (field.expression
+                ? field.dislplayName
+                : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
             );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
@@ -847,9 +855,9 @@ export class ChartService {
     forEach(axisFields, (field, index) => {
       const titleText =
         field.alias ||
-        `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${
-          field.displayName
-        })`;
+        (field.expression
+          ? field.displayName
+          : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`);
       chartChanges.push({
         labels: {
           align: 'right',

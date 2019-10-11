@@ -375,6 +375,23 @@ needed, take a backup of the entire environment before upgrading that
 can be used to restore the environment to a state that is supported by
 older RTIS versions.
 
+==== RTIS App Key Registration
+
+RTIS requires app key to submit the events. Follow the below steps to create the app key:
+
+. Login to SIP application and navigate to workbench.
+. Navigate to RTIS App keys page. This will fetch all the app keys for the customer.
+. Click on RTIS registration page to create a new app key. Fill the form with the following fields.
+.. Model - SIP support models (Countly|Generic|Simple|Simple-Json)
+.. Batch Size - It measures batch size in total bytes instead of the number of messages.
+.. Buffer Full Size - It maintains buffers of unsent records for each partition.
+.. Event URL - It is the URL to submit the events.
+.. Timeout in MS - It is the timeout configured on the leader in the Kafka cluster. This is the timeout on the server side.
+.. Stream/Queue - Name of the Queue.
+.. Topic - Name of the topic.
+
+NOTE: App key is auto generated, user does not allow to specify the app key.
+
 === System time zone
 
 Nodes can be configured to use any desired system time zone.  To set
@@ -796,6 +813,25 @@ The health check responses contain a `detail` propery with a
 human-readable explanation of the health check status, which can be
 used to further narrow down the cause for a possible failure.
 
+=== General guideline for ElasticSearch script support
+
+SIP is using custom scripting of ElasticSearch to build and evaluate
+derived metrics,filters etc.
+
+SIP uses inline scripting.
+To enable this, the below parameter has to be set in elasticsearch.yml file
+
+----
+script.allowed_types: inline
+----
+
+Also, only search operations will be performed using script,
+ update operation can be disabled for security reason.
+
+----
+script.allowed_contexts: search
+----
+
 === Troubleshooting the MariaDB cluster
 
 To troubleshoot MariaDB, inspect the MariaDB logs on each of the hosts
@@ -879,7 +915,7 @@ Service to use the required number of session, add the below to the
 After that run `systemctl reload sshd` to reload the SSH daemon
 configuration.
 
-The Batch Ingestion Service intitially scans for matching files 
+The Batch Ingestion Service intitially scans for matching files
 with pattern and creates records for processing. Scanned records
 will be picked up by worker threads for transfer. Below property
 is used to for worker threads schedule to pick up scanned records
@@ -887,8 +923,8 @@ is used to for worker threads schedule to pick up scanned records
     worker.delay: 5000
 
 Any long running 'INPROGRESS' file transfers/jobs will be marked as 'FAILED'
-Long runing transfers will be again picked up by retry. Long running job is marked 
-as failed  after waiting for 1 day(default value) to make sure no impact on 
+Long runing transfers will be again picked up by retry. Long running job is marked
+as failed  after waiting for 1 day(default value) to make sure no impact on
 huge files.
 
 
@@ -926,7 +962,14 @@ communication in sip platform
     sip_secure=True/False
 
 Note: This is mandatory field it has to be either 'False' or 'True'. Please observe the case of `T & F`
-# of `True` & `False` Note: true or false will result into an error
+of `True` & `False` Note: true or false will result into an error. And to make sure only TLS v1.2 are
+in use. IT team has to disable TLS v1.1 while installing JDK using the following COMMANDS
+
+The below command will append the line in java.security file at the end
+`echo "jdk.tls.disabledAlgorithms=SSLv2Hello, TLSv1, TLSv1.1, SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, anon, NULL" >> /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security`
+
+This line will verify whether it has been added properly or not.
+`grep jdk.tls.disabledAlgorithms /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/java.security`
 
 == Loading semantic metadata
 
@@ -988,7 +1031,7 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     	onboard-customer - Onboard the customer
 
     SYNOPSYS
-    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string
+    	onboard-customer [--C] string  [--P] string  [--PC] string  [--E] string  [--F] string  [--M] string  [--L] string [--JV] string [--FC] string
 
     OPTIONS
     	--C  string
@@ -1019,6 +1062,14 @@ Once you are inside the shell, type in "help onboard-customer" and it will show 
     		User Last Name
     		[Mandatory]
 
+    	--JV  string
+    		Super Admin? (No customerCode filtering)
+    		[Mandatory]
+
+    	--FC  string
+    		Filter By Customer Code Flag
+    		[Mandatory]
+
 Run the "onboard-customer" command with all required parameters stated
 above and it will start the process of creating customer and related
 products/components in the system.
@@ -1027,7 +1078,7 @@ The below is one such example to call onboard-customer with its
 required parameters.
 
 
-    shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z
+    shell:>onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M XY --L Z --JV 1 --FC 0
     1
     2019-02-19 08:04:41.326  INFO 17665 --- [           main] c.s.saw.security.app.admin.OnBoardShell  : Connection successful !!
     2019-02-19 08:04:41.357  INFO 17665 --- [           main] s.a.r.i.OnBoardCustomerRepositoryDaoImpl : res
@@ -1036,7 +1087,7 @@ required parameters.
 
 Note : A parameter containing a space in between can be enclosed in either single quotes('') or double quotes("").
 
-        Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z
+        Ex : onboard-customer --C SNCR0001 --P SIPDEMO --PC workbench --E abc@xyz.com --F ABC --M 'X Y' --L Z --JV 1 --FC 0
 
 ==  SIP SSO Authentication
 

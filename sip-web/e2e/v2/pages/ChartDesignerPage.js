@@ -67,6 +67,9 @@ class ChartsDesignerPage extends Designer {
           `//*mat-chip[e2e="designer-selected-field-'${metric}'"]/descendant::*[contains(text(),"${text}")]`
         )
       );
+    this._regionInput = element(by.css(`[formcontrolname='regionCtrl']`));
+    this._regionByValue = region =>
+      element(by.xpath(`//span[contains(text(),'${region}')]`));
   }
 
   searchAttribute(attribute) {
@@ -76,12 +79,13 @@ class ChartsDesignerPage extends Designer {
   clickOnAttribute(attribute, type) {
     browser
       .actions()
-      .mouseMove(this._unselectedField(attribute))
+      .mouseMove(this._attribute(attribute))
       .click()
       .perform();
 
-    commonFunctions.waitFor.elementToBeVisible(this._attribute(attribute));
-    commonFunctions.clickOnElement(this._attribute(attribute));
+    // //commonFunctions.waitFor.elementToBeVisible(this._attribute(attribute));
+    // commonFunctions.clickOnElement(this._attribute(attribute));
+    // this._attribute(attribute).click();
     browser.sleep(1000);
 
     commonFunctions.waitFor.elementToBeVisible(
@@ -177,6 +181,11 @@ class ChartsDesignerPage extends Designer {
   validateSelectedAggregate(metric, designerLabelText, buttonText) {
     expect(this._verifyMetricAggregate(metric, designerLabelText)).toBeTruthy();
     expect(this._selectAndChooseAggregate(buttonText)).toBeTruthy();
+  }
+
+  selectRegion(region) {
+    commonFunctions.clickOnElement(this._regionInput);
+    commonFunctions.clickOnElement(this._regionByValue(region));
   }
 }
 module.exports = ChartsDesignerPage;

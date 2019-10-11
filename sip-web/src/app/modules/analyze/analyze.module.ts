@@ -9,7 +9,7 @@ import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
 import { AnalysesResolver } from './view/analyses.resolver';
-import { AnalyzeDesignerModule } from './designer/index';
+import { AnalyzeDesignerModule } from './designer/designer.module';
 
 import { routes } from './routes';
 
@@ -20,7 +20,7 @@ import { HtmlDownloadService } from '../../common/services';
 import { UChartModule } from '../../common/components/charts';
 import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
-import { DesignerPageComponent } from './designer';
+import { DesignerPageComponent } from './designer/designer.module';
 
 import { AnalyzeFilterModule } from './designer/filter';
 
