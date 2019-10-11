@@ -10,7 +10,7 @@ trap "journalctl -u sip-\* > /build/saw-system.log" EXIT
 
 # For SIP deployment mapr cluster should be avaliable, check and make sure
 # mapr cluster is avaliable before starting the deployment.
-while [[ ! "hadoop fs -ls / > /dev/null 2>&1" ]] || [[ ! -f /opt/mapr/conf/mapruserticket ]] ; do
+while [[ ! "hadoop fs -ls / > /dev/null 2>&1" || -f /opt/mapr/conf/mapruserticket ]] ; do
         sleep 5
         echo "Retrying accessing MapR-FS"
     done

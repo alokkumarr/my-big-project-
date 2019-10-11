@@ -33,6 +33,7 @@
     <!-- SAW Docker environment ports -->
     <saw.docker.port>80</saw.docker.port>
     <saw.squid.port>3128</saw.squid.port>
+    <sip.docker.secure.port>443</sip.docker.secure.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
     <!-- SAW e2e test suite configutration supported values are smoke/sanity/regression/development-->
     <saw.e2e.suite>smoke</saw.e2e.suite>
@@ -303,7 +304,9 @@
         <configuration>
           <systemPropertyVariables>
             <saw.docker.host>${saw.docker.ip}</saw.docker.host>
+            <sip.cloud.secure>${sip.cloud.secure}</sip.cloud.secure>
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
+            <sip.docker.secure.port>${sip.docker.secure.port}</sip.docker.secure.port>
           </systemPropertyVariables>
         </configuration>
       </plugin>
