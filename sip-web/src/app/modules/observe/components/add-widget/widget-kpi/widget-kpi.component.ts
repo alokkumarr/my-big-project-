@@ -85,31 +85,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregateControls[ag.value] = [false];
     });
 
-<<<<<<< HEAD
-    this.kpiForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
-      dateField: ['', Validators.required],
-      gte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      lte: [
-        moment(),
-        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
-      ],
-      filter: [this.dateFilters[0].value, Validators.required],
-      primAggregate: [this.aggregations[0].value, Validators.required],
-      secAggregates: this.fb.group(secAggregateControls),
-      target: [0, [Validators.required, nonEmpty()]],
-      measure1: [''],
-      measure2: [''],
-      kpiBgColor: ['blue', Validators.required],
-      kpiCommaSeparator: [false],
-      kpiPrecision: [''],
-      kpiPrefix: [''],
-      kpiSuffix: ['']
-    });
-=======
     const getRangeValidator = (errorProp: string, from: string, to: string) => (
       fg: FormGroup
     ) => {
@@ -161,11 +136,14 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         primAggregate: [this.aggregations[0].value, Validators.required],
         secAggregates: this.fb.group(secAggregateControls),
         ...additionalFields,
-        kpiBgColor: ['blue', Validators.required]
+        kpiBgColor: ['blue', Validators.required],
+        kpiCommaSeparator: [false],
+        kpiPrecision: [''],
+        kpiPrefix: [''],
+        kpiSuffix: ['']
       },
       bulletValidators
     );
->>>>>>> 5ef2899bbe93878725d9a7f6b0d4bff76969c246
 
     /* Only show date inputs if custom filter is selected */
     this.datePresetSubscription = this.kpiForm
@@ -247,17 +225,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     }
     this._kpi = data;
 
-    const dataFormatValues = get(this._kpi, 'dataFields[0].format');
-
-    // set data format values
-    if (!isUndefined(dataFormatValues)) {
-      this.kpiForm.get('kpiCommaSeparator').setValue(dataFormatValues.comma);
-      this.kpiForm.get('kpiPrecision').setValue(dataFormatValues.precision);
-      this.kpiForm.get('kpiPrefix').setValue(dataFormatValues.prefix);
-      this.kpiForm.get('kpiSuffix').setValue(dataFormatValues.suffix);
-    }
-
-    data.name && this.kpiForm.get('name').setValue(data.name);
     setTimeout(() => {
       if (data.kpiDisplay) {
         this.kpiForm.get('kpiDisplay').setValue(data.kpiDisplay);
@@ -314,6 +281,16 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
           .get(ag.value)
           .setValue(secondaryAggregates.includes(ag.value));
       });
+
+      const dataFormatValues = get(this._kpi, 'dataFields[0].format');
+
+      // set data format values
+      if (!isUndefined(dataFormatValues)) {
+        this.kpiForm.get('kpiCommaSeparator').setValue(dataFormatValues.comma);
+        this.kpiForm.get('kpiPrecision').setValue(dataFormatValues.precision);
+        this.kpiForm.get('kpiPrefix').setValue(dataFormatValues.prefix);
+        this.kpiForm.get('kpiSuffix').setValue(dataFormatValues.suffix);
+      }
     });
   }
 

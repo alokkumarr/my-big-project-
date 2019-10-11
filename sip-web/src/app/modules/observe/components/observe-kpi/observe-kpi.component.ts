@@ -189,9 +189,18 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (isUndefined(value)) {
       return;
     }
+    if (isUndefined(this.dataFormat)) {
+      return value;
+    }
     formattedValue = value.toFixed(this.dataFormat.precision);
-    formattedValue = this.dataFormat.comma ? formattedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : formattedValue;
+    formattedValue = this.dataFormat.comma ? this.fetchCommaValue(formattedValue) : formattedValue;
     formattedValue = `${this.dataFormat.prefix} ${formattedValue} ${this.dataFormat.suffix}`;
     return formattedValue;
   }
-}
+
+  fetchCommaValue(val) {
+    const part = val.toString().split('.');
+    part[0] = part[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return part.join('.');
+  }
+ }
