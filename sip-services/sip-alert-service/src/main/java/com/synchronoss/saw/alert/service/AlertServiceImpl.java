@@ -63,15 +63,15 @@ public class AlertServiceImpl implements AlertService {
   private static final String ID = "id";
   private static final String NAME = "name";
 
-  @Value("${metastore.base}")
+  @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 
-  @Value("${metastore.alertRulesTable}")
+  @Value("${sip.service.metastore.alertRulesTable}")
   @NotNull
   private String alertRulesMetadata;
 
-  @Value("${metastore.alertResults}")
+  @Value("${sip.service.metastore.alertResults}")
   @NotNull
   private String alertTriggerLog;
 
@@ -566,9 +566,20 @@ public class AlertServiceImpl implements AlertService {
         arrayNode.add(node3);
       }
       if (filter.getType() == Type.DATE) {
-        DynamicConvertor convertor = getDynamicConverter(filter);
-        Long epochGte = getEpochFromDateTime(convertor.getGte());
-        Long epochLte = getEpochFromDateTime(convertor.getLte());
+        Long epochGte;
+        Long epochLte;
+        if (filter.getPreset() == Preset.NA) {
+          epochGte = filter.getGte();
+          epochLte = filter.getLte();
+          Preconditions.checkArgument(
+              epochGte != null, "From date is missing for custom date filter");
+          Preconditions.checkArgument(
+              epochLte != null, "To date is missing for custom date filter");
+        } else {
+          DynamicConvertor convertor = getDynamicConverter(filter);
+          epochGte = getEpochFromDateTime(convertor.getGte());
+          epochLte = getEpochFromDateTime(convertor.getLte());
+        }
         ObjectNode innerNode = objectMapper.createObjectNode();
         ArrayNode BetweenValues = innerNode.putArray("startTime");
         BetweenValues.add(epochGte);
@@ -585,18 +596,7 @@ public class AlertServiceImpl implements AlertService {
   private DynamicConvertor getDynamicConverter(AlertFilter filter) {
     Preset preset = filter.getPreset();
     Preconditions.checkArgument(preset != null, "Preset is missing for the date filter");
-    if (preset == Preset.NA) {
-      String startTime = filter.getGte();
-      String endTime = filter.getLte();
-      Preconditions.checkArgument(startTime != null, "From date is missing for custom date filter");
-      Preconditions.checkArgument(endTime != null, "To date is missing for custom date filter");
-      DynamicConvertor dynamicConvertor = new DynamicConvertor();
-      dynamicConvertor.setLte(startTime);
-      dynamicConvertor.setGte(endTime);
-      return dynamicConvertor;
-    } else {
-      return BuilderUtil.dynamicDecipher(filter.getPreset().value());
-    }
+    return BuilderUtil.dynamicDecipher(filter.getPreset().value());
   }
   /**
    * Return timestamp from the given date.

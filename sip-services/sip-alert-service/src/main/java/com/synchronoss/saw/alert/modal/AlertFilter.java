@@ -11,8 +11,8 @@ public class AlertFilter {
   private Preset preset;
   private Type type;
   private Operator operator;
-  private String lte;
-  private String gte;
+  private Long lte;
+  private Long gte;
 
   public AlertFilter() {}
 
@@ -71,19 +71,19 @@ public class AlertFilter {
     this.operator = operator;
   }
 
-  public String getLte() {
+  public Long getLte() {
     return lte;
   }
 
-  public void setLte(String lte) {
+  public void setLte(Long lte) {
     this.lte = lte;
   }
 
-  public String getGte() {
+  public Long getGte() {
     return gte;
   }
 
-  public void setGte(String gte) {
+  public void setGte(Long gte) {
     this.gte = gte;
   }
 }

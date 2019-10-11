@@ -35,27 +35,27 @@ public class AlertNotifier {
 
   @Autowired AlertService alertService;
 
-  @Value("${mail.body}")
+  @Value("${sip.service.alert.mail.body}")
   private String mailBody;
 
-  @Value("${alert.dashborad.url}")
+  @Value("${sip.service.alert.dashborad.url}")
   private String alertDashboardPath;
 
-  @Value("${storage-proxy.service.host}")
+  @Value("${sip.service.storage-proxy.service.host}")
   private String transportUrl;
 
-  @Value("${mail.subject}")
+  @Value("${sip.service.alert.mail.subject}")
   private String mailSubject;
 
-  @Value("${metastore.base}")
+  @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 
-  @Value("${metastore.notificationTable}")
+  @Value("${sip.service.metastore.notificationTable}")
   @NotNull
   private String notificationLogTable;
 
-  @Value("${metastore.alertRulesTable}")
+  @Value("${sip.service.metastore.alertRulesTable}")
   @NotNull
   private String alertRulesMetadata;
 

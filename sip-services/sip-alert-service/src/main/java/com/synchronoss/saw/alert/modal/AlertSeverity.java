@@ -1,20 +1,20 @@
 package com.synchronoss.saw.alert.modal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
 
-/** This ENUM classs defines the severity of Alerts. */
+/** This ENUM class defines the severity of Alerts. */
 public enum AlertSeverity {
-  @SerializedName("CRITICAL")
+  @JsonProperty("CRITICAL")
   CRITICAL("CRITICAL"),
-  @SerializedName("MEDIUM")
+  @JsonProperty("MEDIUM")
   MEDIUM("MEDIUM"),
-  @SerializedName("LOW")
+  @JsonProperty("LOW")
   LOW("LOW"),
-  @SerializedName("WARNING")
+  @JsonProperty("WARNING")
   WARNING("WARNING");
   private static final Map<String, AlertSeverity> CONSTANTS = new HashMap<>();
 
