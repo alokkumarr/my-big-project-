@@ -27,12 +27,12 @@ public class ContentRequestTransformer extends ProxyRequestTransformer {
     String requestContent = request.getReader().lines().collect(Collectors.joining(""));
     logger.trace("Request Content: " + requestContent);
     ObjectMapper objectMapper = new ObjectMapper();
-    try {
-      RestUtil.validateNodeValue(objectMapper.readTree(requestContent));
-    } catch (IOException ex) {
-      throw new SipNotProcessedSipEntityException(requestContent + " is not valid.");
-    }
     if (!requestContent.isEmpty()) {
+      try {
+        RestUtil.validateNodeValue(objectMapper.readTree(requestContent));
+      } catch (IOException ex) {
+        throw new SipNotProcessedSipEntityException(requestContent + " is not valid.");
+      }
       StringEntity entity = new StringEntity(requestContent, ContentType.APPLICATION_JSON);
       requestBuilder.setEntity(entity);
     }

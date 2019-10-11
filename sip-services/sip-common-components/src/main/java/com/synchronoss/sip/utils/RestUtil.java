@@ -269,6 +269,7 @@ public class RestUtil {
         if (node.isObject() || node.isArray()) {
           validateNodeValue(node);
         } else {
+          // Validating for ESAPI constraints
           Boolean isValid = Boolean.FALSE;
           isValid = ESAPI.validator().isValidInput("Validating SafeString "
               + "attributes value for intrusion",
@@ -309,7 +310,7 @@ public class RestUtil {
                       node.asText(), "SafeText", node.asText().toString().length(), false);
             }
             if (!isValid) {
-              logger.info("When attribute is of type Json");
+              logger.info("Attribute is of type Json");
               isValid = Boolean.TRUE;
               ObjectMapper m = new ObjectMapper();
               JsonNode rootNode = m.readTree(m.writeValueAsString(node));
