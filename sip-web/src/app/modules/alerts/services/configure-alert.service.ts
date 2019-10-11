@@ -34,14 +34,12 @@ export class ConfigureAlertService {
     return this.http
       .get(`${this.api}/internal/semantic/md?projectId=${PROJECTID}`)
       .pipe(
-        map(fpGet('contents.[0].ANALYZE'))
+        map(fpGet('contents.[0].ANALYZE')),
         // disabled because it didn't work with
         // https://sip-iot-dev-us.synchronoss.net/ environment
-        // map((artifacts: Array<any>) =>
-        //   artifacts.filter(
-        //     artifact => artifact.repository && artifact.repository.length === 1
-        //   )
-        // )
+        map((artifacts: Array<any>) =>
+          artifacts.filter(artifact => artifact.esRepository)
+        )
       );
   }
 

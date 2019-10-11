@@ -12,9 +12,9 @@ import { requireIf } from '../../../../../../common/validators/index';
 import { Subscription } from 'rxjs';
 
 import {
-  DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  DATE_PRESETS
+  DATE_PRESETS,
+  DATE_FORMAT
 } from '../../../../consts';
 import {
   AlertFilterModel,
@@ -98,13 +98,24 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
         type: 'date'
       };
     }
-
+    const startTime = moment
+      .utc(
+        gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00',
+        DATE_FORMAT.YYYY_MM_DD_HH_mm_ss
+      )
+      .valueOf();
+    const endTime = moment
+      .utc(
+        lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
+        DATE_FORMAT.YYYY_MM_DD_HH_mm_ss
+      )
+      .valueOf();
     return {
       fieldName: 'starttime',
       type: 'date',
       preset,
-      lte: lte.format(DATE_FORMAT.YYYY_MM_DD) + ' 23:59:59',
-      gte: gte.format(DATE_FORMAT.YYYY_MM_DD) + ' 00:00:00'
+      gte: startTime,
+      lte: endTime
     };
   }
 }
