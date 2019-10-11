@@ -933,7 +933,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
             .get("aggregations");
     JsonNode kpiPriorResponse =
         storageConnectorService
-            .executeESQuery(kpiExecutionObject.getCurrentSearchSourceBuilder().toString(), store)
+            .executeESQuery(kpiExecutionObject.getPriorSearchSourceBuilder().toString(), store)
             .get("aggregations");
     data.put("current", mapper.valueToTree(kpiResultParser.jsonNodeParser(kpiCurrentResponse)));
     data.put("prior", mapper.valueToTree(kpiResultParser.jsonNodeParser(kpiPriorResponse)));
