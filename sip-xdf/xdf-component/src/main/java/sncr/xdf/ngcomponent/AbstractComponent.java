@@ -238,25 +238,12 @@ public abstract class AbstractComponent implements WithContext{
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
-                if (ngctx.runningPipeLine) {
-                    services.md = new DLDataSetService(ngctx.xdfDataRootSys, ngctx.isPersistMode());
-                    services.als = new AuditLogService(services.md.getRoot(), ngctx.isPersistMode());
-                }
-                else
-                {
-                    services.md = new DLDataSetService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
-                    services.als = new AuditLogService(services.md.getRoot(),ngctx.isPersistMode());
-                }
-
+                services.md = new DLDataSetService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+                services.als = new AuditLogService(services.md.getRoot(),ngctx.isPersistMode());
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
-
-                if (ngctx.runningPipeLine)
-                    services.transformationMD = new TransformationService(ngctx.xdfDataRootSys, ngctx.isPersistMode());
-                else
-                    services.transformationMD = new TransformationService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
-
+                services.transformationMD = new TransformationService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
             }
 
             if (this instanceof WithDataSet) {
