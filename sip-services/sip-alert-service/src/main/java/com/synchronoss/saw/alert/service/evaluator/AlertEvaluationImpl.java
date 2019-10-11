@@ -42,22 +42,22 @@ public class AlertEvaluationImpl implements AlertEvaluation {
   private RestTemplate restTemplate;
   @Autowired private RestUtil restUtil;
 
-  @Value("${metastore.base}")
+  @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 
-  @Value("${metastore.alertRulesTable}")
+  @Value("${sip.service.metastore.alertRulesTable}")
   @NotNull
   private String alertRulesMetadata;
 
-  @Value("${sip-analysis-proxy-url}")
+  @Value("${sip.service.analysis-proxy-url}")
   private String proxyAnalysisUrl;
 
-  @Value("${metastore.alertResults}")
+  @Value("${sip.service.metastore.alertResults}")
   @NotNull
   private String alertResults;
 
-  @Value("${max-number-of-alert-per-rules}")
+  @Value("${sip.service.max-number-of-alert-per-rules}")
   private String maxNumberOfAlertPerRules;
 
   /**

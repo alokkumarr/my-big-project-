@@ -35,27 +35,27 @@ public class AlertNotifier {
 
   @Autowired AlertService alertService;
 
-  @Value("${mail.body}")
+  @Value("${sip.service.alert.mail.body}")
   private String mailBody;
 
-  @Value("${alert.dashborad.url}")
+  @Value("${sip.service.alert.dashborad.url}")
   private String alertDashboardPath;
 
-  @Value("${storage-proxy.service.host}")
+  @Value("${sip.service.storage-proxy.service.host}")
   private String transportUrl;
 
-  @Value("${mail.subject}")
+  @Value("${sip.service.alert.mail.subject}")
   private String mailSubject;
 
-  @Value("${metastore.base}")
+  @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 
-  @Value("${metastore.notificationTable}")
+  @Value("${sip.service.metastore.notificationTable}")
   @NotNull
   private String notificationLogTable;
 
-  @Value("${metastore.alertRulesTable}")
+  @Value("${sip.service.metastore.alertRulesTable}")
   @NotNull
   private String alertRulesMetadata;
 
@@ -153,7 +153,7 @@ public class AlertNotifier {
       notificationLog.setNotifiedStatus(false);
       notificationLog.setMessage(exeception.toString());
       saveNotificationStatus(notificationLog);
-      logger.error("Exception occured while sending Email Notification");
+      logger.error("Exception occured while sending Email Notification" + exeception);
     }
   }
 
@@ -248,6 +248,10 @@ public class AlertNotifier {
       String attrName = alertRulesDetails.getAttributeName();
       if (attrName == null) {
         attrName = "";
+      } else {
+        if (attrName.endsWith(".keyword")) {
+          attrName = attrName.replace(".keyword", "");
+        }
       }
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_NAME, attrName);
     }
@@ -259,9 +263,7 @@ public class AlertNotifier {
       body = body.replaceAll("\\" + MailBodyResolver.ATTRIBUTE_VALUE, attributeValue);
     }
     if (body.contains(MailBodyResolver.THRESHOLD_VALUE)) {
-      logger.info("Inside threshold");
       String alertCondition = getReadableConditionWithValues(alertRulesDetails);
-      logger.info("alert condition " + alertCondition);
       if (alertCondition == null) {
         alertCondition = "";
       }

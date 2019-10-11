@@ -29,7 +29,7 @@ public class EvaluatorListenerImpl implements EvaluatorListener {
   private static final Logger logger = LoggerFactory.getLogger(EvaluatorListenerImpl.class);
   @Autowired AlertEvaluation alertEvaluation;
 
-  @Value("${metastore.base}")
+  @Value("${sip.service.metastore.base}")
   @NotNull
   private String basePath;
 

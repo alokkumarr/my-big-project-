@@ -84,6 +84,7 @@ public class MaprConnection {
     try {
       return objectMapper.readTree(document.asJsonString());
     } catch (IOException e) {
+      LOGGER.error("error occured while reading the documents :{}", e);
       throw new RuntimeException("error occurred while reading the documents", e);
     }
   }
@@ -117,6 +118,7 @@ public class MaprConnection {
       try {
         resultSet.add(objectMapper.readTree(document.asJsonString()));
       } catch (IOException e) {
+        LOGGER.error("error occured while reading the documents :{}", e);
         throw new RuntimeException("error occurred while reading the documents", e);
       }
     }
@@ -178,6 +180,7 @@ public class MaprConnection {
       try {
         resultSet.add(objectMapper.readValue(document.asJsonString(), classType));
       } catch (IOException e) {
+        LOGGER.error("error occured while reading the documents :{}", e);
         throw new RuntimeException("error occurred while reading the documents", e);
       }
     }
@@ -204,6 +207,7 @@ public class MaprConnection {
       try {
         resultSet.add(objectMapper.readValue(document.asJsonString(), classType));
       } catch (IOException e) {
+        LOGGER.error("error occured while reading the documents :{}", e);
         throw new RuntimeException("error occurred while reading the documents", e);
       }
     }
@@ -290,6 +294,7 @@ public class MaprConnection {
           resultSet.add(result);
         }
       } catch (IOException e) {
+        LOGGER.error("error occured while reading the documents :{}", e);
         throw new RuntimeException("error occurred while reading the documents", e);
       }
     }
@@ -373,6 +378,7 @@ public class MaprConnection {
       store.delete(stream);
       return true;
     } catch (Exception e) {
+      LOGGER.error("error occured while reading the documents :{}", e);
       throw new RuntimeException("Exception occurred while deleting execution results!!", e);
     }
   }

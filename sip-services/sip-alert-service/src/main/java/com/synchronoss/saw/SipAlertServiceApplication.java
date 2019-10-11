@@ -2,9 +2,11 @@ package com.synchronoss.saw;
 
 import com.synchronoss.saw.alert.service.evaluator.EvaluatorListener;
 import info.faljse.SDNotify.SDNotify;
+import javax.validation.constraints.NotNull;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -24,6 +26,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class SipAlertServiceApplication {
 
   private static final Logger logger = LoggerFactory.getLogger(SipAlertServiceApplication.class);
+
+  @Value("${sip.service.taskExecutor.maxPoolSize}")
+  @NotNull
+  private Integer maximumPoolSize;
+
+  @Value("${sip.service.taskExecutor.queueCapacity}")
+  @NotNull
+  private Integer queueCapacity;
 
   /**
    * Start sip-semantic-service.
@@ -55,8 +65,8 @@ public class SipAlertServiceApplication {
   @Bean(name = "workExecutor")
   public TaskExecutor asyncExecutor() {
     ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-    taskExecutor.setMaxPoolSize(10);
-    taskExecutor.setQueueCapacity(10);
+    taskExecutor.setMaxPoolSize(maximumPoolSize);
+    taskExecutor.setQueueCapacity(queueCapacity);
     taskExecutor.afterPropertiesSet();
     return taskExecutor;
   }
