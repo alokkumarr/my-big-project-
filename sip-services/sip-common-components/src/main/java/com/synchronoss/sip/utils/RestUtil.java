@@ -1,6 +1,7 @@
 package com.synchronoss.sip.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
 import java.io.File;
 import java.io.IOException;
@@ -266,12 +267,49 @@ public class RestUtil {
         String nodeName = iter.next();
         JsonNode node = parentNode.path(nodeName);
         if (node.isObject() || node.isArray()) {
-          System.out.println(nodeName + " :Array: " + node.asText());
           validateNodeValue(node);
         } else {
-          Boolean isValid =
-              ESAPI.validator().isValidInput("Validating json attributes value for intrusion",
-                  node.asText(), "SafeString", node.asText().toString().length(), false);
+          Boolean isValid = Boolean.FALSE;
+          isValid = ESAPI.validator().isValidInput("Validating SafeString attributes value for intrusion",
+              node.asText(), "SafeString", node.asText().toString().length(), false);
+          
+          if (!isValid) {
+            isValid =
+                ESAPI.validator().isValidInput("Validating Email attributes value for intrusion",
+                    node.asText(), "Email", node.asText().toString().length(), false);
+            if (!isValid) {
+              isValid =
+                  ESAPI.validator().isValidInput("Validating Password attributes value for intrusion",
+                      node.asText(), "Password", node.asText().toString().length(), false);
+            }
+            if (!isValid) {
+              isValid =
+                  ESAPI.validator().isValidInput("Validating IPAddress attributes value for intrusion",
+                      node.asText(), "IPAddress", node.asText().toString().length(), false);
+            }
+            if (!isValid) {
+              isValid =
+                  ESAPI.validator().isValidInput("Validating URL attributes value for intrusion",
+                      node.asText(), "URL", node.asText().toString().length(), false);
+            }
+            if (!isValid) {
+              isValid =
+                  ESAPI.validator().isValidInput("Validating Id attributes value for intrusion",
+                      node.asText(), "Id", node.asText().toString().length(), false);
+            }
+            if (!isValid) {
+              isValid =
+                  ESAPI.validator().isValidInput("Validating SafeText attributes value for intrusion",
+                      node.asText(), "SafeText", node.asText().toString().length(), false);
+            }
+            if (!isValid) {
+              logger.info("When attribute is of type Json");
+              isValid = Boolean.TRUE;
+              ObjectMapper m = new ObjectMapper();
+              JsonNode rootNode = m.readTree(m.writeValueAsString(node));
+              validateNodeValue(rootNode);
+            }
+          }
           if (!isValid) {
             throw new SipNotProcessedSipEntityException(
                 nodeName + ":'" + node.asText() + "' is not valid");
