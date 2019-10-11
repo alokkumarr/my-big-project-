@@ -78,14 +78,13 @@ public class ExportUtils {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
-          String displayName = field.getDisplayName() != null && !field.getDisplayName().isEmpty() ? field.getDisplayName() : null;
+          if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
+              aliasName = field.getDisplayName().trim();
+          }
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
-              if (displayName != null) {
-                  split = StringUtils.isEmpty(field.getDisplayName()) ? null : field.getDisplayName().split("\\.");
-              }
               String columnName;
               String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
               if (aggregationName != null && DISTINCT_COUNT_AGGREGATION.equalsIgnoreCase(aggregationName)) {
@@ -95,8 +94,7 @@ public class ExportUtils {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
                 header.put(columnName.trim(), aliasName);
               } else {
-                String name = displayName != null ? displayName : field.getColumnName().trim();
-                columnName = aggregationName != null ? aggregationName.trim() + "(" + name + ")" : field.getColumnName();
+                columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
                 header.put(columnName.trim(), aliasName);
               }
               break;
@@ -104,14 +102,10 @@ public class ExportUtils {
           } else {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
-              if (displayName != null) {
-                  split = StringUtils.isEmpty(field.getDisplayName()) ? null : field.getDisplayName().split("\\.");
-              }
               if (split != null && split.length >= 2) {
                 header.put(split[0], aliasName);
               } else {
-                String name = displayName != null ? displayName : field.getColumnName().trim();
-                header.put(name, aliasName);
+                header.put(field.getColumnName(), aliasName);
               }
               break;
             }
