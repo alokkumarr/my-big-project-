@@ -16,7 +16,7 @@ import {
 } from '../../../types';
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
-import * as uppercase from 'lodash/uppercase';
+import * as uppercase from 'lodash/upperCase';
 
 const ALIAS_CHANGE_DELAY = 500;
 
