@@ -1,5 +1,7 @@
 package com.synchronoss.sip.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -7,6 +9,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Iterator;
 import javax.net.ssl.SSLContext;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -16,6 +19,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -239,4 +243,43 @@ public class RestUtil {
   public Boolean getSipSslEnable() {
     return sipSslEnable;
   }
+  
+  /**
+   * Thsi method traverse the node & validates the value.
+   * @param parentNode {@link JsonNode}
+   * @throws IOException {@link IOException}
+   */
+  public static void validateNodeValue(JsonNode parentNode) throws IOException {
+    
+    if (parentNode.isArray()) {
+      Iterator<JsonNode> iter = parentNode.elements();
+      while (iter.hasNext()) {
+        JsonNode node = iter.next();
+        if (node.isObject() || node.isArray()) {
+          validateNodeValue(node);
+        }
+      }
+    }
+    if (parentNode.isObject()) {
+      Iterator<String> iter = parentNode.fieldNames();
+      while (iter.hasNext()) {
+        String nodeName = iter.next();
+        JsonNode node = parentNode.path(nodeName);
+        if (node.isObject() || node.isArray()) {
+          System.out.println(nodeName + " :Array: " + node.asText());
+          validateNodeValue(node);
+        } else {
+          Boolean isValid =
+              ESAPI.validator().isValidInput("Validating json attributes value for intrusion",
+                  node.asText(), "SafeString", node.asText().toString().length(), false);
+          if (!isValid) {
+            throw new SipNotProcessedSipEntityException(
+                nodeName + ":'" + node.asText() + "' is not valid");
+          }
+        }
+      }
+    }
+  }
+
+
 }
