@@ -109,8 +109,8 @@ export interface AlertFilterModel {
   type: string;
   preset?: string;
   value?: string;
-  endTime?: string;
-  startTime?: string;
+  lte?: string;
+  gte?: string;
   operator?: string;
 }
 

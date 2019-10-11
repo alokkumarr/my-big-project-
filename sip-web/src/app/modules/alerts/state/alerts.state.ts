@@ -88,10 +88,10 @@ export class AlertsState {
     const filterStrings = lodashMap(state.alertFilters, filter => {
       switch (filter.type) {
         case 'date':
-          const { preset, startTime, endTime } = filter;
+          const { preset, lte, gte } = filter;
           const isCustomFilter = preset === CUSTOM_DATE_PRESET_VALUE;
           return isCustomFilter
-            ? `${startTime} -> ${endTime}`
+            ? `${gte} -> ${lte}`
             : DATE_PRESETS_OBJ[preset].label;
         default:
           return null;
