@@ -15,6 +15,8 @@ ARG rpm=java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
 ARG path=https://d3pxv6yz143wms.cloudfront.net/8.212.04.2
 ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
 
+ARG secure_enviroment
+
 # Workaround: Package installations (like mapr-core which depends on
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
@@ -115,5 +117,5 @@ COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
 COPY sip-health-check /root/
 
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD /root/sip-health-check
+HEALTHCHECK --interval=5s CMD /root/sip-health-check $secure_enviroment
 
