@@ -40,8 +40,8 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
     this.alertFilterForm.setValue(
       {
         datePreset: dateFilter.preset,
-        gte: isCustomDate ? moment(gte) : null,
-        lte: isCustomDate ? moment(lte) : null
+        gte: isCustomDate ? moment.utc(gte) : null,
+        lte: isCustomDate ? moment.utc(lte) : null
       },
       { emitEvent: false }
     );
@@ -63,11 +63,11 @@ export class AlertsDateFilterComponent implements OnInit, OnDestroy {
     this.alertFilterForm = this.fb.group({
       datePreset: [this.datePresets[2].value, Validators.required],
       gte: [
-        moment(),
+        moment.utc(),
         [requireIf('datePreset', val => val === CUSTOM_DATE_PRESET_VALUE)]
       ],
       lte: [
-        moment(),
+        moment.utc(),
         [requireIf('datePreset', val => val === CUSTOM_DATE_PRESET_VALUE)]
       ]
     });
