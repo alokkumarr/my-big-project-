@@ -39,7 +39,7 @@ sip:
         subject: "Alert Notification"
     storage-proxy:
       service:
-        host: http://localhost:9400
+        host: ${connector}://localhost:9400
     metastore:
       base: /var/sip/
       alertRulesTable: alertRulesMetadata
