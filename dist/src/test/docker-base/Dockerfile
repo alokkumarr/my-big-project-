@@ -117,5 +117,5 @@ COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
 COPY sip-health-check /root/
 
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD /root/sip-health-check $secure_enviroment
+HEALTHCHECK --interval=5s CMD /root/sip-health-check
 

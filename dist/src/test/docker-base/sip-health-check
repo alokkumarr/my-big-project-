@@ -10,7 +10,7 @@ set -eux
 
 # Ensure all systemd services are up and running
 systemctl is-system-running --quiet
-secure=$1
+secure=True
 services_pass=/var/run/sip-health-check-services-pass
 
 # Ensure SIP services are accessible and healthy (for HAProxy to route
