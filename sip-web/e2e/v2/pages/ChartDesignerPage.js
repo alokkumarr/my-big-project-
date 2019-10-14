@@ -67,6 +67,9 @@ class ChartsDesignerPage extends Designer {
           `//*mat-chip[e2e="designer-selected-field-'${metric}'"]/descendant::*[contains(text(),"${text}")]`
         )
       );
+    this._regionInput = element(by.css(`[formcontrolname='regionCtrl']`));
+    this._regionByValue = region =>
+      element(by.xpath(`//span[contains(text(),'${region}')]`));
   }
 
   searchAttribute(attribute) {
@@ -178,6 +181,11 @@ class ChartsDesignerPage extends Designer {
   validateSelectedAggregate(metric, designerLabelText, buttonText) {
     expect(this._verifyMetricAggregate(metric, designerLabelText)).toBeTruthy();
     expect(this._selectAndChooseAggregate(buttonText)).toBeTruthy();
+  }
+
+  selectRegion(region) {
+    commonFunctions.clickOnElement(this._regionInput);
+    commonFunctions.clickOnElement(this._regionByValue(region));
   }
 }
 module.exports = ChartsDesignerPage;

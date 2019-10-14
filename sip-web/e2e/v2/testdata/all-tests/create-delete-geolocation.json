@@ -1,0 +1,30 @@
+{
+  "CREATEDELETECGEO": {
+    "geolocation": {
+      "GELOC001": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "type": "map:chart_scale",
+        "description": "User should be able to create and delete for geolocation"
+      },
+      "GELOC002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "type": "map:chart_scale",
+        "description": "Admin should be able to create and delete for geolocation"
+      },
+      "GELOC003": {
+        "suites": ["regression"],
+        "user": "admin",
+        "type": "map:map",
+        "description": "Admin should be able to create and delete for map"
+      },
+      "GELOC004": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "type": "map:map",
+        "description": "User should be able to create and delete for map"
+      }
+    }
+  }
+}
