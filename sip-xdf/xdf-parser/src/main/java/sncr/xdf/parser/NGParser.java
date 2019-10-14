@@ -339,17 +339,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             multiLine = ngctx.componentConfiguration.getParser().getMultiLine();
 
             logger.debug("NGJsonFileParser ==> multiLine  value is  " + multiLine + "\n");
+             inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
 
-
-            
-
-            if (inputDataFrame == null) {
-            	inputDataset = jsonFileParser.parseInput(sourcePath,multiLine);
-				
-			} else {
-				inputDataset = inputDataFrame;
-			}
             logger.debug("RECORD COUNT IS " + inputDataset.count());
+
             
             this.recCounter.setValue(inputDataset.count());
 
@@ -360,9 +353,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
             logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
             logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
-        } else
-            if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
-            {
+        } else if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))    {
+        
                 NGParquetFileParser parquetFileParser = new NGParquetFileParser(ctx);
                 Dataset<Row> inputDataset = null;
                 
@@ -384,13 +376,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
                 NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
-                Dataset<Row> inputDataset = null;
-
-                if (inputDataFrame != null) {
-    				inputDataset = inputDataFrame;
-    			} else {
-    				inputDataset = jsonFileParser.parseInput(sourcePath);
-    			}
+                Dataset<Row> inputDataset =  inputDataFrame;
                 
                 this.recCounter.setValue(inputDataset.count());
 
