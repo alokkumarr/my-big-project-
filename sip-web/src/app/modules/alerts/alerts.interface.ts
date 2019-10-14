@@ -46,6 +46,7 @@ export interface AlertConfig {
   product?: string;
   createdBy?: any;
   createdTime?: any;
+  triggerOnLookback?: boolean;
   lookbackColumn?: string;
   lookbackPeriod?: string;
   modifiedTime?: any;
