@@ -21,7 +21,8 @@
         <include>${project.groupId}:sip-scheduler-service</include>
         <include>${project.groupId}:sip-storage-proxy-service</include>
         <include>${project.groupId}:sip-batch-ingestion-service</include>
-        <include>${project.groupId}:sip-alert-service</include>
+        <!--Alert module is a new micro service so following the pattern as sip instead of saw-->
+        <include>com.synchronoss.sip:sip-alert-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>

@@ -41,7 +41,7 @@
       <version>${revision}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>com.synchronoss.sip</groupId>
       <artifactId>sip-alert-service</artifactId>
       <version>${revision}</version>
     </dependency>
