@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.filter.GenericFilterBean;
+
 
 
 public class SipXssRequestFilter extends GenericFilterBean {
@@ -48,7 +51,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
           if (!isValid) {
             logger.info(
                 "Check for cross-site scripting: reflected in query parameter value: " + data);
-            break;
+            throw new HttpServerErrorException(HttpStatus.UNPROCESSABLE_ENTITY, data);
           }
         }
       }
@@ -56,6 +59,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     if (!isValid) {
       logger.info("Cross-site scripting: reflected: " + !isValid);
       res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      throw new HttpServerErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
     }
     chain.doFilter(request, response);
     logger.trace("Logging Response :{}", res.getContentType());
