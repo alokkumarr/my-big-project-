@@ -225,6 +225,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackColumn: [{ value: '', disabled: true }, Validators.required],
       lookbackPeriodValue: ['', Validators.required],
       lookbackPeriodType: ['', Validators.required],
+      triggerOnLookback: [false],
       attributeName: [''],
       attributeValue: ['']
     });
@@ -381,6 +382,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       lookbackColumn,
       lookbackPeriodValue,
       lookbackPeriodType,
+      triggerOnLookback,
       attributeName,
       attributeValue
     } = this.alertRuleFormGroup.value;
@@ -409,6 +411,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
       otherThresholdValue: operator === 'BTW' ? otherThresholdValue : null,
       lookbackColumn,
       lookbackPeriod,
+      triggerOnLookback,
       attributeName,
       attributeValue,
       monitoringType
