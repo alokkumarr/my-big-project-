@@ -131,6 +131,20 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                           alert.set(false);
                         }
                       }
+                      if (alertRuleDetails.getMonitoringType() != null
+                          && alertRuleDetails
+                              .getMonitoringType()
+                              .equals(MonitoringType.AGGREGATION_METRICS)) {
+                        logger.trace("Monitoring type is " + MonitoringType.AGGREGATION_METRICS);
+                        alert.set(false);
+                        if (AlertUtils.checkThresholdsForRow(
+                            alertRuleDetails.getOperator(),
+                            alertRuleDetails.getThresholdValue(),
+                            alertRuleDetails.getOtherThresholdValue(),
+                            metricValue)) {
+                          alert.set(true);
+                        }
+                      }
                       metricsValue.set(metricValue);
                       executionResultList.add(value);
                     }

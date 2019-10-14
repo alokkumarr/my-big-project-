@@ -22,7 +22,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
 @EnableAsync
-@ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
+@ComponentScan(basePackages = {"com.synchronoss.sip", "com.synchronoss.sip.utils"})
 public class SipAlertServiceApplication {
 
   private static final Logger logger = LoggerFactory.getLogger(SipAlertServiceApplication.class);
