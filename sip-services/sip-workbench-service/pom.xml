@@ -201,6 +201,10 @@
           <groupId>com.synchronoss.bda</groupId>
           <artifactId>xdf-esloader</artifactId>
         </exclusion>
+        <exclusion>
+        	<groupId>org.elasticsearch</groupId>
+        	<artifactId>elasticsearch-spark-20_2.11</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
