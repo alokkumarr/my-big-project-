@@ -63,7 +63,8 @@ const payload: AlertConfig = {
   attributeValue: '',
   createdBy: undefined,
   createdTime: undefined,
-  monitoringType: null
+  monitoringType: null,
+  triggerOnLookback: false
 };
 
 const alertDefinitionStub: AlertDefinition = {
