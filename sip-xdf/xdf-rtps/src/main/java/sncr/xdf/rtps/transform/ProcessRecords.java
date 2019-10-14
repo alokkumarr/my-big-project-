@@ -226,8 +226,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx){
     	logger.debug("######## Inside process json records #####" );
     	
-       // SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
-    	SparkSession sess = ctx.sparkSession;
+        SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
+    	//SparkSession sess = ctx.sparkSession;
     	logger.debug("######## Reading through spark session #####" );
         JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
         //rowRdd.foreachPartitionAsync(f)
