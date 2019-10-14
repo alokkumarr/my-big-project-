@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.synchronoss.saw</groupId>
+    <groupId>com.synchronoss.sip</groupId>
     <artifactId>sip-alert-service</artifactId>
     <packaging>jar</packaging>
     <version>${revision}</version>
@@ -17,7 +17,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <json.validate>2.2.6</json.validate>
-        <start-class>com.synchronoss.saw.SipAlertServiceApplication</start-class>
+        <start-class>com.synchronoss.sip.SipAlertServiceApplication</start-class>
         <java.version>1.8</java.version>
         <jackson-coreutils>1.8</jackson-coreutils>
         <mapr.version>6.1.0-mapr</mapr.version>

@@ -21,7 +21,7 @@
         <include>${project.groupId}:sip-scheduler-service</include>
         <include>${project.groupId}:sip-storage-proxy-service</include>
         <include>${project.groupId}:sip-batch-ingestion-service</include>
-        <include>${project.groupId}:sip-alert-service</include>
+        <include>com.synchronoss.sip:sip-alert-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>
