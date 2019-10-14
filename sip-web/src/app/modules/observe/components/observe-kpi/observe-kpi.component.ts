@@ -203,4 +203,4 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     part[0] = part[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return part.join('.');
   }
- }
+}
