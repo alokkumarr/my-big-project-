@@ -103,7 +103,12 @@
     </ng-template>
     <!-- Header Parameters form -->
     <div class="parameters headers" fxLayout="row" fxLayoutAlign="end center">
-      <button mat-stroked-button color="primary" (click)="addHeader()">
+      <button
+        [disabled]="!canAddHeader"
+        mat-stroked-button
+        color="primary"
+        (click)="addHeader()"
+      >
         + Header
       </button>
     </div>
@@ -185,7 +190,12 @@
     </ng-template>
     <!-- Query Parameters form -->
     <div class="parameters query" fxLayout="row" fxLayoutAlign="end center">
-      <button mat-stroked-button color="primary" (click)="addQueryParam()">
+      <button
+        [disabled]="!canAddQueryParam"
+        mat-stroked-button
+        color="primary"
+        (click)="addQueryParam()"
+      >
         + Parameter
       </button>
     </div>

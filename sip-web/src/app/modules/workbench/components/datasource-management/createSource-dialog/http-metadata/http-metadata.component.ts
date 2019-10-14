@@ -83,6 +83,14 @@ export class HttpMetadataComponent implements OnInit {
     );
   }
 
+  get canAddHeader() {
+    return this.headerParams.valid;
+  }
+
+  get canAddQueryParam() {
+    return this.queryParams.valid;
+  }
+
   /**
    * Adds new header form group to headers form array, and sets up
    * autocomplete filters for header field name (key) and value.
