@@ -193,7 +193,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
 
         kafkaParams.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaParams.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, 65536);
-        kafkaParams.put("num.stream.threads", 1);
         
         kafkaParams.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 4 * 1024 * 1024);
 
@@ -221,7 +220,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch(Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
             return -1;
         }
         return 0;
@@ -248,7 +246,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
                 try {
                   streamAdmin.createStream(path, desc);
                   logger.info("Stream created: " + path);
-                  streamAdmin.createTopic(path, topic,1);
+                  streamAdmin.createTopic(path, topic);
                   logger.info("Topic created: " + topic);
                 } catch (TableExistsException e) {
                   logger.debug("Stream already exists, so not creating: " + path);
@@ -264,7 +262,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch (Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
         }
         return retval ;
     }
