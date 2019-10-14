@@ -20,6 +20,9 @@ export class AlertsFiltersComponent implements OnInit {
   @Select(AlertsState.areEditedAlertsValid) areEditedAlertsValid$: Observable<
     boolean
   >;
+  @Select(AlertsState.areFiltersApplied) areFiltersApplied$: Observable<
+    boolean
+  >;
   constructor(private store: Store) {}
 
   ngOnInit() {}

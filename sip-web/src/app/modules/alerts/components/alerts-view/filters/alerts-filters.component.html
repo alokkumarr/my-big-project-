@@ -25,7 +25,13 @@
       </div>
     </mat-card-content>
     <mat-card-actions fxLayout="row" fxLayoutGap="12px">
-      <button fxFlex mat-stroked-button color="warn" (click)="resetFilters()">
+      <button
+        fxFlex
+        mat-stroked-button
+        [disabled]="!(areFiltersApplied$ | async)"
+        color="warn"
+        (click)="resetFilters()"
+      >
         Reset
       </button>
       <button

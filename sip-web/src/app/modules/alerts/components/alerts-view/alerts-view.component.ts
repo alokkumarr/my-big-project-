@@ -73,22 +73,17 @@ export class AlertsViewComponent implements OnInit {
     this.filters$.subscribe(filters => {
       this.filters = filters;
       this.alertViewSidenav.close();
-      this.fetchLateshAlerts();
+      this.setAlertLoaderForGrid();
     });
   }
 
-  fetchLateshAlerts() {
-    this.setAlertLoaderForGrid();
-  }
-
   setAlertLoaderForGrid() {
-    this.alertsDataLoader = options => {
-      return this._alertService
+    this.alertsDataLoader = (options: any) =>
+      this._alertService
         .getAlertsStatesForGrid(options, this.filters)
         .then(result => ({
           data: result.data,
           totalCount: result.totalCount
         }));
-    };
   }
 }

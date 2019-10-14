@@ -31,7 +31,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
   };
   public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
   public NUMBER_FILTER_OPERATORS_OBJ = NUMBER_FILTER_OPERATORS_OBJ;
-  public enablePaging = false;
+  public enablePaging = true;
 
   constructor(
     breakpointObserver: BreakpointObserver,
@@ -129,7 +129,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
       this._configureAlertService
         .getAllAlerts(options)
         .then(({ alertRuleDetailsList, numberOfRecords }) => {
-          this.enablePaging = numberOfRecords > DEFAULT_PAGE_SIZE;
+          // this.enablePaging = numberOfRecords > DEFAULT_PAGE_SIZE;
           return {
             data: alertRuleDetailsList,
             totalCount: numberOfRecords
