@@ -42,9 +42,9 @@ public class HttpClientGet extends SncrBaseHttpClient {
       apiResponse.setHttpStatus(response.getStatusCode());
       HttpHeaders httpHeaders = response.getHeaders();
       apiResponse.setHttpHeaders(httpHeaders);
-      logger.info("Response Code : {}", response.getStatusCode());
-      logger.info("Response Body : {}", response.getBody());
-      logger.info("Response headers : {}", response.getHeaders().toString());
+      logger.debug("Response Code : {}", response.getStatusCode());
+      logger.debug("Response Body : {}", response.getBody());
+      logger.debug("Response headers : {}", response.getHeaders().toString());
     } catch (Exception e) {
       logger.error("Unable to fetch data for url : " + url, e);
     }

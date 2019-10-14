@@ -673,11 +673,13 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
           String routeName = routeMetadata.getRouteName();
 
-          fileNameBuilder.append(routeName.toLowerCase()).append("_").append(getBatchId());
+          fileNameBuilder.append(routeName.toLowerCase()
+              .replaceAll(" ", "_")).append("_").append(getBatchId());
 
           if (responseContentType.equals(MediaType.APPLICATION_JSON)
               || responseContentType.equals(MediaType.APPLICATION_JSON_UTF8)) {
             logger.debug("Content type json");
+            content = gson.toJson(content);
             fileNameBuilder.append(".json");
           } else if (responseContentType.equals(MediaType.TEXT_XML)
               || responseContentType.equals(MediaType.APPLICATION_XML)) {
@@ -705,6 +707,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
           logger.trace("File" + fileName + "transfer end time:: " + fileTransEndTime);
           bisDataMetaInfo.setFileTransferStartTime(Date.from(fileTransStartTime.toInstant()));
           bisDataMetaInfo.setFileTransferEndTime(Date.from(fileTransEndTime.toInstant()));
+          bisDataMetaInfo.setDataSizeInBytes((long)content.toString().length());
           bisDataMetaInfo.setFileTransferDuration(
               Duration.between(fileTransStartTime, fileTransEndTime).toMillis());
           bisDataMetaInfo.setReceivedDataName(fileName);
