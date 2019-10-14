@@ -12,10 +12,17 @@ class CreateAnalysisModel {
     this._chartType = chartType =>
       element(by.css(`[e2e="choice-group-item-subtype-${chartType}"]`));
     this._backButton = element(by.css('[e2e="create-analysis-back-button"]'));
+    this._geoLocationType = element(
+      by.xpath(`//*[@e2e="choice-group-item-type-"][2]`)
+    );
   }
 
   clickOnAnalysisType(type) {
-    commonFunctions.clickOnElement(this._analysisType(type));
+    if (type) {
+      commonFunctions.clickOnElement(this._analysisType(type));
+    } else {
+      commonFunctions.clickOnElement(this._geoLocationType);
+    }
     browser.sleep(2000); // Required somehow in headless mode without sleep its not working. Need to find
   }
 
