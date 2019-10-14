@@ -872,7 +872,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 ComponentServices.Spark,
             };
             ComponentConfiguration cfg = NGParser.analyzeAndValidate(configAsStr);
-            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId,true);
+            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId, true);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.warn("Output datasets:");
