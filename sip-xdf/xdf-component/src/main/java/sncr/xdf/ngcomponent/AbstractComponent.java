@@ -58,7 +58,7 @@ public abstract class AbstractComponent implements WithContext{
     protected InternalContext ctx;
     protected String componentName = "unnamed";
     protected final Services services = new Services();
-
+    protected static boolean persistMode = true;
     protected DLBatchReader reader;
 
     /**

@@ -180,7 +180,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 };
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
-                "sql", batchId,true);
+                "sql", batchId, persistMode);
 
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();

@@ -100,7 +100,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
 
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
-            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId,true);
+            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId, persistMode);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.debug("Output datasets:");
