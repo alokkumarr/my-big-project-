@@ -69,6 +69,7 @@ export class AlertsViewComponent implements OnInit {
   constructor(private _alertService: AlertsService, private _store: Store) {}
 
   ngOnInit() {
+    this._store.dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
     this.filters$.subscribe(filters => {
       this.filters = filters;
       this.alertViewSidenav.close();
@@ -78,7 +79,6 @@ export class AlertsViewComponent implements OnInit {
 
   fetchLateshAlerts() {
     this.setAlertLoaderForGrid();
-    this._store.dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
   }
 
   setAlertLoaderForGrid() {
