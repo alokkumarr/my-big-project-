@@ -149,6 +149,8 @@ public class CreatePivotTable {
 
             String columnName = dataField.getAlias() != null && !dataField.getAlias().isEmpty()
                 ? dataField.getAlias()
+                : dataField.getDisplayName() != null && !dataField.getDisplayName().isEmpty()
+                ? dataField.getDisplayName()
                 : dataField.getColumnName();
             switch (dataField.getAggregate()) {
               case SUM:
