@@ -25,6 +25,7 @@ public class AlertUtils {
     Long epochValue = ldt.atZone(zoneId).toInstant().toEpochMilli();
     return epochValue;
   }
+
   /**
    * Continuous Monitoring For All Rows.
    *
@@ -38,47 +39,19 @@ public class AlertUtils {
       Operator operator, Double value, Double otherValue, Double metricValue) {
     switch (operator) {
       case BTW:
-        if (metricValue >= otherValue && metricValue <= value) {
-          return true;
-        } else {
-          return false;
-        }
+        return (metricValue >= otherValue && metricValue <= value) ? true : false;
       case LT:
-        if (metricValue < value) {
-          return true;
-        } else {
-          return false;
-        }
+        return (metricValue < value) ? true : false;
       case GT:
-        if (metricValue > value) {
-          return true;
-        } else {
-          return false;
-        }
+        return (metricValue > value) ? true : false;
       case GTE:
-        if (metricValue >= value) {
-          return true;
-        } else {
-          return false;
-        }
+        return (metricValue >= value) ? true : false;
       case LTE:
-        if (metricValue <= value) {
-          return true;
-        } else {
-          return false;
-        }
+        return (metricValue <= value) ? true : false;
       case EQ:
-        if (Double.compare(metricValue, value) == 0) {
-          return true;
-        } else {
-          return false;
-        }
+        return (Double.compare(metricValue, value) == 0) ? true : false;
       case NEQ:
-        if (Double.compare(metricValue, value) != 0) {
-          return true;
-        } else {
-          return false;
-        }
+        return (Double.compare(metricValue, value) != 0) ? true : false;
       default:
         return false;
     }
