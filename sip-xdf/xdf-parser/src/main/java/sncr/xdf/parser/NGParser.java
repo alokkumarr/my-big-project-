@@ -103,6 +103,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     
     public NGParser(NGContext ngctx,  Dataset dataset) {
 		super( ngctx, dataset);
+		this.inputDataFrame = dataset;
 		logger.debug("Parser constructor with dataset "+ dataset);
 		logger.debug(":::: parser constructor services parser :::"+ ngctx.componentConfiguration.getParser());
 	}
@@ -111,6 +112,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     	
         super(ngctx);
         this.isRealTime = isRealTime;
+        this.inputDataFrame = dataset;
         logger.debug("************ Inside Parser with real time ***********");
     }
 
@@ -146,18 +148,19 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
-        logger.debug("Input file format = " + this.parserInputFileFormat);
+        logger.info("Input file format = " + this.parserInputFileFormat);
 
         if (this.inputDataFrame == null) {
 			try {
+				logger.info("pkeys ::"+pkeys);
 				if (pkeys != null && pkeys.size() <= 0) {
-					logger.debug("checking pkeys" + pkeys);
-					logger.debug("outputlocation" + outputDataSetLocation);
-					logger.debug("replace".equalsIgnoreCase(outputDataSetMode));
-					logger.debug(HFileOperations.exists(outputDataSetLocation));
+					logger.info("checking pkeys" + pkeys);
+					logger.info("outputlocation" + outputDataSetLocation);
+					logger.info("replace".equalsIgnoreCase(outputDataSetMode));
+					logger.info(HFileOperations.exists(outputDataSetLocation));
 					if ("replace".equalsIgnoreCase(outputDataSetMode)
 							&& HFileOperations.exists(outputDataSetLocation)) {
-						logger.debug(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for "
+						logger.info(" Deleting outputDataSetLocation  = " + outputDataSetMode + " for "
 								+ outputDataSetMode);
 						HFileOperations.deleteEnt(outputDataSetLocation);
 					}
@@ -256,7 +259,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 							logger.debug("Total number of files in the directory = " + files.length);
 						}
 						// Check if directory has been given
-						if (files.length == 1 && files[0].isDirectory()) {
+						if (files != null && files.length == 1 && files[0].isDirectory()) {
 							logger.debug("Files length = 1 and is a directory");
 							// If so - we have to process all the files inside - create the mask
 							sourcePath += Path.SEPARATOR + "*";
@@ -374,17 +377,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.debug("NGParquetFileParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
             } else if(this.inputDataFrame != null) {
 
-                NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
 
-                Dataset<Row> inputDataset =  inputDataFrame;
-                
-                this.recCounter.setValue(inputDataset.count());
+                this.recCounter.setValue(inputDataFrame.count());
 
-                commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
+                commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
                 ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                     outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+                ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
 
                 logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
             
