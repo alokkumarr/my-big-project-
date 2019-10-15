@@ -24,6 +24,7 @@ export interface DesignerFilterDialogData {
   artifacts;
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
+  showFilterOptions: boolean;
 }
 export interface DesignerFilterDialogResult {
   filters: Filter[];

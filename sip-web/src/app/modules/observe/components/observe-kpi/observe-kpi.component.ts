@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
@@ -16,6 +17,7 @@ import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs';
 import { map as mapObservable } from 'rxjs/operators';
+import { WidgetFiltersComponent } from './../add-widget/widget-filters/widget-filters.component';
 
 @Component({
   selector: 'observe-kpi',
@@ -44,7 +46,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   constructor(
     public observe: ObserveService,
-    public globalFilterService: GlobalFilterService
+    public globalFilterService: GlobalFilterService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -118,6 +121,15 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     } else {
       return filter;
     }
+  }
+
+  displayFilters() {
+    return this.dialog.open(WidgetFiltersComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data: this._kpi
+    } as MatDialogConfig);
   }
 
   executeKPI(kpi) {

@@ -13,6 +13,11 @@ import {
   ValidatorFn
 } from '@angular/forms';
 
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import {
+  DesignerFilterDialogComponent
+} from './../../../../analyze/designer/filter';
+
 import { nonEmpty } from '../../../validators/non-empty.validator';
 
 import { Subscription } from 'rxjs';
@@ -25,6 +30,10 @@ import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as isUndefined from 'lodash/isUndefined';
 import * as toNumber from 'lodash/toNumber';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as isEmpty from 'lodash/isEmpty';
 
 import * as moment from 'moment';
 import { requireIf } from '../../../validators/required-if.validator';
@@ -47,6 +56,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpiType: string;
   bandPaletteValue: string;
   kpiBgColorValue: string;
+  userOptedFilters: any;
+  creteriaType: boolean;
 
   @Output() onKPIAction = new EventEmitter();
 
@@ -61,7 +72,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   datePresetSubscription: Subscription;
   primaryAggregationSubscription: Subscription;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.createForm();
@@ -210,7 +224,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     }
     this._kpiType = data;
   }
-
   /**
    * Updates the form with the data present in kpi structure
    */
@@ -221,6 +234,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     }
 
     this._kpi = data;
+    this.userOptedFilters = fpPipe(
+      fpFilter(({ primaryKpiFilter }) => {
+        return !primaryKpiFilter;
+      })
+    )(this._kpi.filters);
+    // cover backward compatibility
+    if (this._kpi.filters.length === 1) {
+      this._kpi.filters[0].primaryKpiFilter = true;
+    }
 
     setTimeout(() => {
       if (data.kpiDisplay) {
@@ -246,10 +268,17 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         ? 'rog'
         : data.bulletPalette;
 
-      const dateField = get(data, 'filters.0.columnName');
+      let filt = get(data, 'filters.0.model.preset');
+      let dateField = get(data, 'filters.0.columnName');
+      if (isUndefined(filt)) {
+        forEach(data.filters, primaryfilter => {
+          if (primaryfilter.primaryKpiFilter) {
+            filt = primaryfilter.model.preset;
+            dateField = primaryfilter.model.columnName;
+          }
+        });
+      }
       dateField && this.kpiForm.get('dateField').setValue(dateField);
-
-      const filt = get(data, 'filters.0.model.preset');
       this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
 
       const lte = get(data, 'filters.0.model.lte');
@@ -332,6 +361,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
             measure2: toNumber(this.kpiForm.get('measure2').value)
           }
         : {};
+    const defaultFilter = {
+      type: dateField.type,
+      columnName: dateField.columnName,
+      model: this.prepareDateFilterModel(),
+      primaryKpiFilter: true
+    };
     this.onKPIAction.emit({
       kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
@@ -349,14 +384,75 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
             ]
           }
         ],
-        filters: [
-          {
-            type: dateField.type,
-            columnName: dateField.columnName,
-            model: this.prepareDateFilterModel()
-          }
-        ]
+        booleanCriteria: this.creteriaType,
+        filters: this.constructRequestParamsFilters(defaultFilter)
       })
     });
+  }
+
+  constructRequestParamsFilters(defaultFilter) {
+    if (isEmpty(this.userOptedFilters) || isUndefined(this.userOptedFilters)) {
+      return [defaultFilter];
+    }
+    const index = this.userOptedFilters.findIndex(x => x.columnName === defaultFilter.columnName);
+    if (index === -1) {
+      this.userOptedFilters.push(defaultFilter);
+    }
+    return this.userOptedFilters;
+  }
+
+  filterSelectedFilter() {
+    const dateField = find(
+      this._metric.dateColumns,
+      col => col.columnName === this.kpiForm.get('dateField').value
+    );
+    let primaryFilter;
+    return fpPipe(
+      fpFlatMap(artifact => artifact.columns),
+      fpFilter(({ columnName }) => {
+        forEach(this._kpi.filters, filtr => {
+          if (filtr.primaryKpiFilter) {
+            primaryFilter = filtr;
+          }
+        });
+        return isEmpty(primaryFilter) ? columnName !== dateField.columnName : columnName !== primaryFilter.columnName;
+      })
+    )(this._metric.artifacts);
+  }
+
+  onfilterAction() {
+    const artifacts = [{
+      artifactName: this._metric.artifacts[0].artifactName,
+      columns: this.filterSelectedFilter()
+    }];
+    const filters = this.userOptedFilters;
+    this.openFilterDialog(filters, artifacts, this._kpi.booleanCriteria || 'AND')
+    .afterClosed().subscribe((result) => {
+      if (result) {
+        this.userOptedFilters = result.filters;
+        this.creteriaType = result.booleanCriteria;
+      }
+    });
+  }
+
+  openFilterDialog(
+    filters,
+    artifacts,
+    booleanCriteria
+  ) {
+    const data = {
+      filters,
+      artifacts,
+      booleanCriteria,
+      supportsGlobalFilters: false,
+      isInRuntimeMode: false,
+      showFilterOptions: false
+    };
+    return this.dialog.open(DesignerFilterDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data
+    } as MatDialogConfig);
   }
 }

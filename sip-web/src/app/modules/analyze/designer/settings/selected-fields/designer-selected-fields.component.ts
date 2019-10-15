@@ -32,7 +32,7 @@ import {
   DesignerMoveColumnInGroupAdapter,
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
-import { getFilterValue } from '../../filter/chips-u';
+import { getFilterValue } from './../../../consts';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({

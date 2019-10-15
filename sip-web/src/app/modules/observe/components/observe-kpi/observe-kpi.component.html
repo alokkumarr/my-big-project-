@@ -31,6 +31,9 @@
         {{ countToChange | number: '1.0-2' }}%
       </div>
     </div>
+    <div class="filter-icon" *ngIf="_kpi.filters.length > 1">
+      <mat-icon class="mat-icon icon-filter" fonticon="icon-filter" matTooltip="View Filters" (click)="displayFilters()"></mat-icon>
+    </div>
   </div>
 
   <div class="filter-label" e2e="snapshot-kpi-filter-label">
