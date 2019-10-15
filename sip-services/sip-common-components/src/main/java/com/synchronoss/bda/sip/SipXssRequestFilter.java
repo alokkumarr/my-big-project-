@@ -36,7 +36,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     logger.trace("Logging Request  {} : {}", req.getMethod(), req.getRequestURL());
     String uri = req.getRequestURL().toString();
     Boolean isValid = ESAPI.validator().isValidURI("URL", uri, true);
-    logger.info("isValid URI: "+ isValid);
+    logger.info("isValid URI: " + isValid);
     if (req.getQueryString() != null) {
       Map<String, List<String>> canonicalizedMap = splitQuery(req.getQueryString());
       Set<Entry<String, List<String>>> query = canonicalizedMap.entrySet();
@@ -47,14 +47,16 @@ public class SipXssRequestFilter extends GenericFilterBean {
         List<String> valueString = canonicalizedMap.get(key);
         for (String data : valueString) {
           logger.trace("query parameter value: " + data);
-          
-          Boolean queryIsValid = ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
-              data, "SafeString", data.length(), false);
-          
+
+          Boolean queryIsValid =
+              ESAPI.validator().isValidInput("Validating query parameter value for intrusion", data,
+                  "SafeString", data.length(), false);
+
           if (!queryIsValid) {
-            queryIsValid = ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
-                data, "Digit", data.length(), false);
-            logger.trace("queryIsValid Query Parameter: "+ queryIsValid);
+            queryIsValid =
+                ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
+                    data, "Digit", data.length(), false);
+            logger.trace("queryIsValid Query Parameter: " + queryIsValid);
           }
           if (!queryIsValid) {
             logger.trace(
