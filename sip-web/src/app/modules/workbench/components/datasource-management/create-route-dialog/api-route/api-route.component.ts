@@ -1,11 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormControl,
-  FormArray
-} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import {
   ROUTE_OPERATION,
   DetailForm,
@@ -17,7 +11,6 @@ import { isUnique } from 'src/app/common/validators';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
-import { requireIf } from 'src/app/modules/observe/validators/required-if.validator';
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
 import { SourceFolderDialogComponent } from '../../select-folder-dialog';
 import { MatDialog } from '@angular/material';
@@ -92,18 +85,7 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
       bodyParameters: this.formBuilder.group({
-        content: [
-          '',
-          requireIf(
-            control => this.detailsFormGroup.get('httpMethod') as FormControl,
-            method =>
-              [
-                HTTP_METHODS.POST,
-                HTTP_METHODS.PATCH,
-                HTTP_METHODS.PUT
-              ].includes(method)
-          )
-        ]
+        content: ['']
       }),
       headerParameters: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),

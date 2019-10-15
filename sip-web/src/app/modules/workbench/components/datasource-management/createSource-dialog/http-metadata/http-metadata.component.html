@@ -103,7 +103,12 @@
     </ng-template>
     <!-- Header Parameters form -->
     <div class="parameters headers" fxLayout="row" fxLayoutAlign="end center">
-      <button mat-stroked-button color="primary" (click)="addHeader()">
+      <button
+        [disabled]="!canAddHeader"
+        mat-stroked-button
+        color="primary"
+        (click)="addHeader()"
+      >
         + Header
       </button>
     </div>
@@ -112,9 +117,18 @@
       formArrayName="headerParameters"
       *ngFor="let item of headerParams.controls; let i = index"
     >
-      <div fxLayout="row" fxLayoutAlign="start center" [formGroupName]="i">
+      <div
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        [formGroupName]="i"
+        fxLayoutGap="10px"
+      >
         <!-- Header Key -->
-        <mat-form-field fxFlex="1 1 auto">
+        <mat-form-field
+          fxFlex="1 1 auto"
+          appearance="outline"
+          fxLayoutGap="10px"
+        >
           <mat-label i18n>Header Name</mat-label>
           <input
             matInput
@@ -139,7 +153,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field fxFlex="5 1 auto">
+        <mat-form-field fxFlex="5 1 auto" appearance="outline">
           <mat-label i18n>Header Value</mat-label>
           <input
             matInput
@@ -164,7 +178,7 @@
           </mat-error>
         </mat-form-field>
         <button mat-icon-button (click)="removeHeader(i)" fxFlex="0 1 auto">
-          <mat-icon fontIcon="icon-Minus"></mat-icon>
+          <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
       </div>
     </div>
@@ -185,7 +199,12 @@
     </ng-template>
     <!-- Query Parameters form -->
     <div class="parameters query" fxLayout="row" fxLayoutAlign="end center">
-      <button mat-stroked-button color="primary" (click)="addQueryParam()">
+      <button
+        [disabled]="!canAddQueryParam"
+        mat-stroked-button
+        color="primary"
+        (click)="addQueryParam()"
+      >
         + Parameter
       </button>
     </div>
@@ -194,9 +213,14 @@
       formArrayName="queryParameters"
       *ngFor="let item of queryParams.controls; let i = index"
     >
-      <div fxLayout="row" fxLayoutAlign="start center" [formGroupName]="i">
+      <div
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        [formGroupName]="i"
+        fxLayoutGap="10px"
+      >
         <!-- Query Param Key -->
-        <mat-form-field fxFlex="1 1 auto">
+        <mat-form-field fxFlex="1 1 auto" appearance="outline">
           <mat-label i18n>Parameter Name</mat-label>
           <input
             matInput
@@ -213,7 +237,7 @@
         </mat-form-field>
 
         <!-- Query Param Value -->
-        <mat-form-field fxFlex="5 1 auto">
+        <mat-form-field fxFlex="5 1 auto" appearance="outline">
           <mat-label i18n>Parameter Value</mat-label>
           <input
             matInput
@@ -229,7 +253,7 @@
           </mat-error>
         </mat-form-field>
         <button mat-icon-button (click)="removeQueryParam(i)" fxFlex="0 1 auto">
-          <mat-icon fontIcon="icon-Minus"></mat-icon>
+          <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
       </div>
     </div>

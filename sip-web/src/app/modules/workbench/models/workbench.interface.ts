@@ -1,3 +1,5 @@
+import { CHANNEL_UID } from '../wb-comp-configs';
+
 export interface DetailForm {
   valid: boolean;
   value: any;
@@ -132,6 +134,7 @@ export interface JobLog {
 export interface ChannelForJobs {
   id: number;
   name: string;
+  channelType: CHANNEL_UID;
 }
 
 export interface RouteForJobs {

@@ -1,6 +1,6 @@
 package com.synchronoss.saw.apipull.service;
 
-/* SncrHttpClient is an abstract class defining necessary properties for HTTP Client */
+/* SipHttpClient is an abstract class defining necessary properties for HTTP Client */
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-public abstract class SncrBaseHttpClient implements BaseHttpClient {
+public abstract class SipBaseHttpClient implements BaseHttpClient {
 
   String host;
   String apiEndPoint;
@@ -30,7 +30,7 @@ public abstract class SncrBaseHttpClient implements BaseHttpClient {
    *
    * @param host
    */
-  public SncrBaseHttpClient(String host) {
+  public SipBaseHttpClient(String host) {
     this.host = host;
 
     client = HttpClients.createDefault();

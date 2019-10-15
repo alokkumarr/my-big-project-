@@ -9,7 +9,7 @@ spring:
 
     {% if sip_secure %}
 
-    url: jdbc:mariadb://{% for host in groups['saw-security'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/sip_bis?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&verifyServerCertificate=true&useSSL=true&requireSSL=true&trustCertificateKeyStoreUrl=file:{{ store_path }}/{{ ansible_host }}/truststore.jks&trustCertificateKeyStorePassword={{sip_keystore_password}}&disableSslHostnameVerification=true
+    url: jdbc:mariadb://{% for host in groups['saw-security'] %}{% if loop.last %}{{host}}:3306{% else %}{{host}}:3306,{% endif %}{% endfor %}/sip_bis?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&verifyServerCertificate=true&useSSL=true&requireSSL=true&trustCertificateKeyStoreUrl=file:{{ store_path }}/{{ ansible_host }}/truststore.jks&trustCertificateKeyStorePassword={{sip_keystore_password}}&disableSslHostnameVerification=true&enabledSslProtocolSuites=TLSv1.2
 
     {% else %}
 
@@ -91,7 +91,7 @@ sip:
   retry:
     core-pool-size: 10
     max-pool-size: 50
-    queue-capacity: 10000  
+    queue-capacity: 10000
 
    {% if sip_secure %}
 

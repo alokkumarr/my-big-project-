@@ -2,8 +2,6 @@ package com.synchronoss.saw.apipull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
@@ -14,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,10 +21,8 @@ public class HttpClientTest {
   RestTemplate restTemplate;
   HttpClient httpClient;
   ApiResponse apiResponse;
-  Gson gson = new GsonBuilder().setPrettyPrinting().create();
   String url =
       "https://openweathermap.org/data/2.5/forecast/hourly?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
-  List<HeaderParameter> headerParameterList = new ArrayList<>();
 
   @Before
   public void init() {
@@ -34,7 +31,11 @@ public class HttpClientTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  @Ignore
+  // These test cases are moved to BatchIngestionIT.java . The reason to kept it here being ignored
+  // is, This will help developer to run this manually whenever required to debug or to test after
+  // doing modification to code. 
+  public void testGet() {
 
     SipApiRequest sipApiRequest = new SipApiRequest();
     sipApiRequest.setUrl(url);
@@ -42,13 +43,11 @@ public class HttpClientTest {
     apiResponse = httpClient.execute(sipApiRequest);
     Assert.assertNotNull(apiResponse.getResponseBody());
     Assert.assertNotNull(apiResponse.getHttpHeaders());
-    //    System.out.println("ApiResponse body : " + gson.toJson(apiResponse.getResponseBody()));
-    //    System.out.println("Content Type :" + apiResponse.getContentType());
-    //    System.out.println("Response header :" + gson.toJson(apiResponse.getHttpHeaders()));
   }
 
   @Test
-  public void testPost() throws Exception {
+  @Ignore
+  public void testPost() {
 
     SipApiRequest sipApiRequest = new SipApiRequest();
 
@@ -114,8 +113,5 @@ public class HttpClientTest {
     apiResponse = httpClient.execute(sipApiRequest);
     Assert.assertNotNull(apiResponse.getResponseBody());
     Assert.assertNotNull(apiResponse.getHttpHeaders());
-    //    System.out.println("ApiResponse body : " + gson.toJson(apiResponse.getResponseBody()));
-    //    System.out.println("Content Type :" + apiResponse.getContentType());
-    //    System.out.println("Response header :" + gson.toJson(apiResponse.getHttpHeaders()));
   }
 }
