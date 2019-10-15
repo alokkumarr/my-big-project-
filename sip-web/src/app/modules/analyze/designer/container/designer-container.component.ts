@@ -13,6 +13,7 @@ import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
 import * as flatMap from 'lodash/flatMap';
 import * as every from 'lodash/every';
+import * as some from 'lodash/some';
 import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -23,7 +24,7 @@ import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
-import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
+import { takeWhile, finalize, map as map$, tap } from 'rxjs/operators';
 
 import {
   flattenPivotData,
@@ -1340,8 +1341,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
-      const length = get(this.analysis, 'sqlBuilder.dataFields.length');
-      return isNumber(length) ? length > 0 : false;
+      const query = this._store.selectSnapshot(state => state.designerState.analysis.sipQuery);
+      const pivotFields = get(query, 'artifacts.0.fields');
+      return some(pivotFields, field => field.area === 'data');
     case 'map':
       const sqlB = get(this.analysis, 'sqlBuilder') || {};
       const requestConditions = [

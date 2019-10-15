@@ -216,8 +216,17 @@ export class DesignerService {
       return typeFn(column);
     };
 
-    const applyDataFieldDefaults = artifactColumn => {
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    const applyDataFieldDefaults = (artifactColumn, columns) => {
+      if (!artifactColumn.formula) {
+        const unusedAggregates =
+          DesignerService.unusedAggregates(artifactColumn, columns) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
+      }
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
@@ -242,7 +251,7 @@ export class DesignerService {
         transform(artifactColumn: ArtifactColumnPivot) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn);
+          applyDataFieldDefaults(artifactColumn, this.artifactColumns);
         },
         reverseTransform: pivotReverseTransform,
         onReorder
@@ -315,7 +324,17 @@ export class DesignerService {
       };
     };
 
-    const applyDataFieldDefaults = artifactColumn => {
+    const applyDataFieldDefaults = (artifactColumn, columns) => {
+      if (!artifactColumn.formula) {
+        const unusedAggregates =
+          DesignerService.unusedAggregates(artifactColumn, columns) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
+      }
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
 
@@ -334,7 +353,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnChart) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
       },
       reverseTransform: mapReverseTransform,
       onReorder
