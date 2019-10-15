@@ -74,12 +74,8 @@ public class AlertNotifier {
       AlertNotificationLog notificationLog = new AlertNotificationLog();
       if (alertRule != null) {
         Notification notification = alertRule.getNotification();
-        if (notification != null) {
-          if (notification.getEmail() != null) {
-            sendMailNotification(alertRule);
-          }
-          // Slack/Webhooks and other notification channel can be added here.
-
+        if (notification != null && notification.getEmail() != null) {
+          sendMailNotification(alertRule);
         } else {
           String msg =
               "Notification mechanism is not configured for alertRule :"
@@ -184,13 +180,7 @@ public class AlertNotifier {
     ResponseEntity<JsonNode> aliasResponse =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
     JsonNode response = (JsonNode) aliasResponse.getBody();
-    Boolean notifiedStatus;
-    if (response.has("emailSent")) {
-      notifiedStatus = response.get("emailSent").asBoolean();
-    } else {
-      notifiedStatus = false;
-    }
-    return notifiedStatus;
+    return response.has("emailSent") ? response.get("emailSent").asBoolean() : false;
   }
 
   /**

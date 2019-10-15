@@ -88,22 +88,9 @@ public class AlertEvaluationImpl implements AlertEvaluation {
                     alertRuleDetails.getAlertRulesSysId(),
                     getEpochFromDateTime(dynamicConverter.getGte())))) {
           logger.info("Evaluating the alert for rule id" + alertRuleDetails.getAlertRulesSysId());
-          AlertResult alertResult = new AlertResult();
-          alertResult.setSipQuery(sipQuery);
-          alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
-          alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
-          alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
-          alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
-          alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
-          alertResult.setAlertState(AlertState.ALARM);
-          alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
-          alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
-          alertResult.setOperator(alertRuleDetails.getOperator());
-          alertResult.setCategoryId(alertRuleDetails.getCategoryId());
+          AlertResult alertResult = buildAlertResult(alertRuleDetails);
           alertResult.setStartTime(requestTime);
-          alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
-          String alertResultId = UUID.randomUUID().toString();
-          alertResult.setAlertTriggerSysId(alertResultId);
+          alertResult.setSipQuery(sipQuery);
           List<?> alertResultList = evaluateAlertRules(sipQuery);
           List<Object> executionResultList = new ArrayList<>();
           ObjectMapper mapper = new ObjectMapper();
@@ -167,7 +154,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
               } else {
                 alertResult.setAlertCount(executionSize);
               }
-              connection.insert(alertResultId, alertResult);
+              connection.insert(alertResult.getAlertTriggerSysId(), alertResult);
               logger.info("Sending Notification for Alert: " + alertRuleDetails.getAlertRuleName());
               alertNotifier.sendNotification(alertRuleDetails);
             }
@@ -181,6 +168,30 @@ public class AlertEvaluationImpl implements AlertEvaluation {
       }
     }
     return true;
+  }
+
+  /**
+   * This method builds alertresult from the alertruledetails.
+   *
+   * @param alertRuleDetails AlertRuleDetails
+   * @return AlertResult
+   */
+  private AlertResult buildAlertResult(AlertRuleDetails alertRuleDetails) {
+    AlertResult alertResult = new AlertResult();
+    alertResult.setAlertRuleName(alertRuleDetails.getAlertRuleName());
+    alertResult.setCustomerCode(alertRuleDetails.getCustomerCode());
+    alertResult.setAlertRuleDescription(alertRuleDetails.getAlertRuleDescription());
+    alertResult.setAlertSeverity(alertRuleDetails.getAlertSeverity());
+    alertResult.setAlertRulesSysId(alertRuleDetails.getAlertRulesSysId());
+    alertResult.setAlertState(AlertState.ALARM);
+    alertResult.setThresholdValue(alertRuleDetails.getThresholdValue());
+    alertResult.setOtherThresholdValue(alertRuleDetails.getOtherThresholdValue());
+    alertResult.setOperator(alertRuleDetails.getOperator());
+    alertResult.setCategoryId(alertRuleDetails.getCategoryId());
+    alertResult.setAttributeValue(alertRuleDetails.getAttributeValue());
+    String alertResultId = UUID.randomUUID().toString();
+    alertResult.setAlertTriggerSysId(alertResultId);
+    return alertResult;
   }
 
   /**
@@ -299,11 +310,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
     if (alertResults.size() > 0) {
       // Add one minute grace period to last trigger time for evaluation
       // in case alert Evaluation takes time.
-      if (alertResults.get(0).getStartTime() <= lastTriggeredWindow + 60000) {
-        return true;
-      } else {
-        return false;
-      }
+      return (alertResults.get(0).getStartTime() <= lastTriggeredWindow + 60000) ? true : false;
     } else {
       return true;
     }
