@@ -281,7 +281,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment(value, format).format(format);
+    return value => moment.utc(value, format).format(format);
   }
 
   preProcessData(data) {
@@ -334,7 +334,7 @@ export class PivotGridComponent implements OnDestroy {
         return moment.utc(value).format(formatToApply);
       case 'year':
       default:
-        return moment(value, this.getMomentFormat(format)).toDate();
+        return moment.utc(value, this.getMomentFormat(format)).toDate();
     }
   }
 
