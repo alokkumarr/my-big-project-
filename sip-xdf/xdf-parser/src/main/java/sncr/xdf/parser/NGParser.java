@@ -378,6 +378,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             } else if(this.inputDataFrame != null) {
 
 
+                inputDataFrame.show();
                 this.recCounter.setValue(inputDataFrame.count());
 
                 commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
@@ -395,29 +396,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         return retval;
     }
 	
-	public void parseJson() {
-
-
-        NGJsonFileParser jsonFileParser = new NGJsonFileParser(ctx);
-        Dataset<Row> inputDataset = null;
-        if (inputDataFrame != null) {
-			inputDataset = inputDataFrame;
-		} else {
-			inputDataset = jsonFileParser.parseInput(sourcePath);
-		}
-        
-        this.recCounter.setValue(inputDataset.count());
-
-        commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
-
-        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
-            outputDataSetName, outputDataSetMode, outputFormat, pkeys));
-        ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
-
-        logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
-    
-    
-	}
 
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 

@@ -40,6 +40,8 @@ import org.apache.spark.streaming.kafka010.CanCommitOffsets;
 import org.apache.spark.streaming.kafka010.HasOffsetRanges;
 import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -242,32 +244,43 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
   	   
         
         if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
+        	
       	  logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
       	  
     
     	  logger.debug("####"+ this.ngctx.pipelineConfigParams);
     	  
-    	  Object isMultiple = this.ngctx.pipelineConfig.get("multiplePipeline");
+    	  JSONArray pipeline = null;
+  		 JSONObject rtaConfig = null;
     	  
-    	  logger.debug("### Multiple pipeline ::" + isMultiple);
+    	  Object config =  this.ngctx.pipelineConfig.get("pipeline");
+    	  logger.debug("### Pipeline config in consumer ::" + this.ngctx.pipelineConfig);
     	  
+    	  if( config instanceof JSONObject) {
+				JSONObject jsonConfig = (JSONObject)config;
+				rtaConfig = (JSONObject)jsonConfig.get("rta");
+			    logger.debug("### Pipeline config in RTPS pipeline ::"+ rtaConfig);
+			} 
+    	  
+			
     	  
     	  /** 
     	   * Single pipeline. Ex: Only one event type
     	   */
-    	  if(isMultiple ==null || !Boolean.valueOf((String)isMultiple)){
+    	  if(rtaConfig ==null){
     		  
     		  RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df);
               processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,"" );
     		  
     		  
 			} else {
+				logger.debug("#### rta config is present for multi type");
 
 				/**
 				 * Multiple event types
 				 */
 
-				Object multiColName = context.pipelineConfig.get("multiColName");
+				Object multiColName = rtaConfig.get("keyColumn");
 
 				if (null == multiColName) {
 					return 255;
@@ -278,7 +291,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				List<Row> multiColValues = df.select((String) multiColName).distinct().collectAsList();
 
 				logger.info("####### Total event types as part of dataset #######: " + multiColValues.size());
-				logger.info("####### Total event types as part of hardcode event typedataset #######: " + df.select("EVENT_TYPE").distinct().collectAsList().size());
 
 				NGContext ct = this.ngctx;
 
@@ -286,7 +298,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					
 					logger.debug("#### Processing data for type ::"+ multiColType);
 
-					String isTimeSeries = (String) context.pipelineConfig.get("isTimeSeries");
+					String isTimeSeries = (String) rtaConfig.get("isTimeSeries");
 
 					logger.debug("########## is Time series data ::" + isTimeSeries);
 
@@ -300,7 +312,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					 */
 					if (isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
 
-						Object threadPoolCnt = context.pipelineConfig.get("numberOfThreads");
+						Object threadPoolCnt = rtaConfig.get("numberOfThreads");
 
 						int numThreads = threadPoolCnt == null ? DEFAULT_THREAD_CNT
 								: Integer.valueOf((Integer) threadPoolCnt);

@@ -74,7 +74,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
     	CliHandler cli = new CliHandler();
     	this.args = args;
-
+    	logger.debug("Processing   ---> XDFDataProcessor "  );
     	try {
 
     		HFileOperations.init(10);
@@ -83,33 +83,40 @@ public class XDFDataProcessor  extends AbstractComponent {
     		PIPELINE_CONFIG = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
     		jsonObj =  loadPipelineConfig(PIPELINE_CONFIG);
     		
-
-    		Object isMultiple = jsonObj.get("multiplePipeline");
+    		JSONArray pipeline = null;
+    		JSONObject rtaConfig = null;
     		
-    		logger.info("Is multiple pipeline ::"+ isMultiple);
-
-    		if(isMultiple !=null && Boolean.valueOf((String)isMultiple)){
-    			logger.info("is Multiple exists ::");
-    			JSONObject pipeline = (JSONObject) jsonObj.get("pipeline");
-    			JSONObject rtaConfig = (JSONObject) pipeline.get("rta");
-    			if(rtaConfig != null) {
-    				processRtps(parameters,rtaConfig.get("configuration").toString(),
-    						Boolean.valueOf(rtaConfig.get("persist").toString()));
-    			} else {
-    				throw new Exception("Invlid configuration. Missing RTA configuration for multiple pipelines");
-    			}
-
-
-    		} else {
-    			logger.info("is Multiple doesnt exists ::");
-    			JSONArray pipeline = (JSONArray) jsonObj.get("pipeline");
+    		Object config =  jsonObj.get("pipeline");
+    		
+    		
+			if( config instanceof JSONObject) {
+				JSONObject jsonConfig = (JSONObject)config;
+				rtaConfig = (JSONObject)jsonConfig.get("rta");
+			    logger.debug("### Pipeline config in XDFDataProcessor ::"+ rtaConfig);
+			} else if( config instanceof JSONArray){
+				 pipeline = (JSONArray)config;
+				 
+				 logger.debug("### Pipeline config in RTPS pipeline ::"+ pipeline);
+			}
+    		
+    		if(rtaConfig == null) {
+    			logger.debug("retrived rta config");
     			JSONObject componentConfig = (JSONObject)pipeline.get(0);
-
+    			Object persistFlag = componentConfig.get("persist");
+    			logger.debug("Persist flag::"+ persistFlag);
+    			boolean isPerist = (persistFlag==null)?false:
+    				Boolean.valueOf(componentConfig.get("persist").toString());
+    			logger.debug("Persist flag boolean::"+ persistFlag);
+    			/**
+    			 * If rtps component exists in configuration then its realtime
+    			 */
     			if(componentConfig.get("component").toString().equals("rtps")) {
     				processRtps(parameters,componentConfig.get("configuration").toString(),
-    						Boolean.valueOf(componentConfig.get("persist").toString()));
+    						isPerist);
     			} else {
-
+    				/**
+        			 * If rtps component doesnt exists in configuration then its batch processing
+        			 */
     				for(int i=0;i<pipeline.size();i++)
     				{
     					JSONObject pipeObj = (JSONObject)pipeline.get(i);
@@ -139,8 +146,19 @@ public class XDFDataProcessor  extends AbstractComponent {
     					}
     				}
     			}
+    		
+    			
+    		} else if(rtaConfig != null) {
+    			Object persistFlag = rtaConfig.get("persist");
+    			
+    			boolean isPersist = (persistFlag==null)?false:Boolean.valueOf(rtaConfig.
+    					get("persist").toString());
+    			processRtps(parameters,rtaConfig.get("configuration").toString(),
+    						isPersist);
+    			
     		}
 
+    		
 
     	} catch (Exception e) {
     		logger.debug(e.getMessage());

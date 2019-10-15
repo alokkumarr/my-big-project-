@@ -60,20 +60,32 @@ public class RTPSPipelineProcessor {
 		Dataset<Row> dataset = this.datafileDFmap.get("DATA_STREAM");
 		logger.debug("###### Dataset display completed.....:)");
 		int ret = 0;
+		int pipeLinStartIndex = 0;
+		JSONArray pipeline = null;
+		JSONObject rtaConfig = null;
+		Object config = null;
+		JSONObject jsonConfig = null;
 
 		try {
+			config =  pipeLineConfig.get("pipeline");
+			if( config instanceof JSONObject) {
+				
+				 jsonConfig = (JSONObject)config;
+				rtaConfig = (JSONObject)jsonConfig.get("rta");
+			    logger.debug("### Pipeline config in RTPS pipeline ::"+ rtaConfig);
+			} else if( config instanceof JSONArray){
+				 pipeline = (JSONArray)config;
+				 
+				 logger.debug("### Pipeline config in RTPS pipeline ::"+ pipeLineConfig);
+			}
 			
-			logger.debug("###### Pipeline config from consumer "+ pipeLineConfig);
 			
-			Object isMultiple = pipeLineConfig.get("multiplePipeline");
+			
+			logger.debug("###### rta config "+ rtaConfig);
     		
-    		logger.info("Is multiple pipeline ::"+ isMultiple);
-    		JSONArray pipeline = null;
-    		int pipeLinStartIndex = 0;
     		
-    		if(isMultiple ==null || !Boolean.valueOf((String)isMultiple)){
+    		if(rtaConfig ==null){
     			logger.info("is Multiple doesnt exists ::");
-    			 pipeline = (JSONArray) pipeLineConfig.get("pipeline");
 				logger.debug("### Pipeline configuration retrived successfully starting processing");
 				
 				/**
@@ -84,11 +96,7 @@ public class RTPSPipelineProcessor {
 				
     		} else {
     			logger.info("is Multiple  exists ::");
-    			JSONObject pipelineObj = (JSONObject) pipeLineConfig.get("pipeline");
-    			logger.debug("#######reading pipeline obj" + pipelineObj);
-    			JSONObject configs = (JSONObject) pipelineObj.get("pipelineConfigs");
-    			logger.debug("#######reading pipeline configs"  + configs);
-    			 pipeline = (JSONArray) configs.get(type);
+    			 pipeline = (JSONArray) jsonConfig.get(type);
     			logger.debug("#######pipeline"  + pipeline);
     			
     			
@@ -136,8 +144,7 @@ public class RTPSPipelineProcessor {
 				
 			} 
 		}catch (Exception e) {
-			e.printStackTrace();
-			logger.debug("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
+			logger.error("XDFDataProcessor:processData() Exception is : " + e.getMessage() + "\n");
 			//System.exit(ret);
 		
 		}
