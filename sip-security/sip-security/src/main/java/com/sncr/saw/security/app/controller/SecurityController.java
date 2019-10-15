@@ -1759,7 +1759,7 @@ public class SecurityController {
      *
      * @return
      */
-	@RequestMapping(value= "/auth/admin/user/preferences/upsert", method = RequestMethod.POST)
+	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
     public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
 	    String jwtToken = JWTUtils.getToken(request);
@@ -1774,7 +1774,7 @@ public class SecurityController {
      *
      * @return
      */
-    @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.POST)
+    @RequestMapping(value= "/auth/user/preferences/delete", method = RequestMethod.POST)
     public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
@@ -1794,7 +1794,7 @@ public class SecurityController {
      *
      * @return
      */
-    @RequestMapping(value= "/auth/admin/user/preferences/fetch", method = RequestMethod.GET)
+    @RequestMapping(value= "/auth/user/preferences/fetch", method = RequestMethod.GET)
     public Object fetchUserPreferences(HttpServletRequest request, HttpServletResponse response) {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
