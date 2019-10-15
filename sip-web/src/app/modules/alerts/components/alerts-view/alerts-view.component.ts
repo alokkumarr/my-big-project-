@@ -77,6 +77,11 @@ export class AlertsViewComponent implements OnInit {
     });
   }
 
+  fetchLateshAlerts() {
+    this._store.dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
+    this.setAlertLoaderForGrid();
+  }
+
   setAlertLoaderForGrid() {
     this.alertsDataLoader = (options: any) =>
       this._alertService
