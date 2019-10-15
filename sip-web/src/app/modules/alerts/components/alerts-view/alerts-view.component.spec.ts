@@ -43,7 +43,7 @@ describe('AlertsViewComponent', () => {
 
   it('fetchLateshAlerts should call setAlertLoaderForGrid', () => {
     const setAlertLoaderSpy = spyOn(component, 'setAlertLoaderForGrid');
-    component.fetchLateshAlerts();
+    component.setAlertLoaderForGrid();
     expect(setAlertLoaderSpy).toHaveBeenCalled();
   });
 });

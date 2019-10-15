@@ -90,6 +90,12 @@ export class AlertsState {
   }
 
   @Selector()
+  static areFiltersApplied(state: AlertsStateModel) {
+    const { alertFilters } = state;
+    return !isEqual(alertFilters, defaultAlertFilters);
+  }
+
+  @Selector()
   static getAlertDateFilterString(state: AlertsStateModel) {
     const dateFilter = find(state.alertFilters, ({ type }) => type === 'date');
     const { preset, lte, gte } = dateFilter;
@@ -149,11 +155,12 @@ export class AlertsState {
   }
 
   @Action(ResetAlertFilters)
-  resetAlertFilter({ patchState }: StateContext<AlertsStateModel>) {
+  resetAlertFilter({ patchState, dispatch }: StateContext<AlertsStateModel>) {
     patchState({
       alertFilters: cloneDeep(defaultAlertFilters),
       editedAlertFilters: cloneDeep(defaultAlertFilters)
     });
+    dispatch([new LoadAllAlertCount(), new LoadAllAlertSeverity()]);
   }
 
   @Action(LoadAllAlertCount)
