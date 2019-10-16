@@ -585,7 +585,7 @@ public class AnalyzeIT extends BaseIT {
             .header("Content-Type", "application/json")
             .body(json)
             .when()
-            .post("/saw/security/auth/admin/user/preferences/upsert")
+            .post("/saw/security/auth/user/preferences/upsert")
             .then()
             .assertThat()
             .statusCode(200)
