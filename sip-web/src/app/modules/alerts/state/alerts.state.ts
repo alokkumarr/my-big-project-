@@ -5,6 +5,9 @@ import * as find from 'lodash/find';
 import * as every from 'lodash/every';
 import * as isEqual from 'lodash/isEqual';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as toNumber from 'lodash/toNumber';
+import * as forEach from 'lodash/forEach';
+import * as split from 'lodash/split';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 // import produce from 'immer';
@@ -53,9 +56,41 @@ const defaultAlertsState: AlertsStateModel = {
 };
 
 const mapAlertCount2ChartData = map(countList => ({
-  x: lodashMap(countList, ({ date }) => date),
-  y: lodashMap(countList, ({ count }) => count)
+  x: lodashMap(orderAlertsCount(countList), ({ date }) => date),
+  y: lodashMap(orderAlertsCount(countList), ({ count }) => count)
 }));
+
+const orderAlertsCount = alertData => {
+  let sortedArray = [];
+  /**
+   * Here dates received is in 'DD-MM-YYYY' format. When trying to convert it into moment object
+   * any date(DD in 'DD-MM-YYYY') more than 12 is resulting to 'Invalid date'.
+   * So making sure that string is converted to moment object correctly.
+   */
+  forEach(alertData, obj => {
+    sortedArray.push(
+      toNumber(
+        moment
+          .utc(
+            split(obj.date, '-', 3)
+              .reverse()
+              .join('-')
+          )
+          .format('x')
+      )
+    );
+  });
+
+  sortedArray = sortedArray.sort();
+
+  forEach(sortedArray, (obj, index) => {
+    sortedArray[index] = moment.utc(obj).format('DD-MM-YYYY');
+    sortedArray[index] = find(alertData, {
+      date: sortedArray[index]
+    });
+  });
+  return sortedArray;
+};
 
 const severityColors = {
   WARNING: '#a5b7ce',
