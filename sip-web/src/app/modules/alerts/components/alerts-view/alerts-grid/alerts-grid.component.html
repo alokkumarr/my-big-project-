@@ -73,7 +73,7 @@
   >
     <mat-icon
       class="alerts-grid__gridIcon"
-      [ngClass]="data.value"
+      [ngClass]="data.value | lowercase"
       fontIcon="icon-uniE901"
     ></mat-icon>
     <span fxFelx="50px" i18n>{{ data.value | titlecase }}</span>

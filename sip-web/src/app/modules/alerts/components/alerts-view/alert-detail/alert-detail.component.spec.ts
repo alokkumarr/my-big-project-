@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Observable } from 'rxjs';
 import { NgxsModule } from '@ngxs/store';
 import { AlertsService } from '../../../services/alerts.service';
 import { AlertDetailComponent } from './alert-detail.component';
@@ -15,10 +14,6 @@ const alertIds: AlertIds = {
 };
 
 const alertServiceStub = {
-  getAlertRuleDetails(id: number) {
-    return new Observable();
-  },
-
   getAllAlertsCount() {
     return of([]);
   },
@@ -55,8 +50,4 @@ describe('AlertDetailComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  // it('should getalertRuleDetails', () => {
-  //   component.getalertRuleDetails(1);
-  // });
 });
