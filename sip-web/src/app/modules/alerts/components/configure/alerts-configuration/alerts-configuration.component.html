@@ -220,7 +220,7 @@
         >
           <mat-icon
             class="conf-container-content__body__gridIcon"
-            [ngClass]="data.data.alertSeverity"
+            [ngClass]="data.data.alertSeverity | lowercase"
             fontIcon="icon-uniE901"
           ></mat-icon>
           <span fxFelx="50px" i18n>{{
