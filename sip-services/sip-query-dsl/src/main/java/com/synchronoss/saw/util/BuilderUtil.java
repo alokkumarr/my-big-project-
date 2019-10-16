@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.threeten.extra.YearQuarter;
@@ -440,5 +443,30 @@ public class BuilderUtil {
     }
 
     return dynamicConvertor;
+  }
+
+  /**
+   * Re-arrange the query field for ES sorting.
+   *
+   * @param dataFields
+   * @param sorts
+   * @return list of fields
+   */
+  public static List<Field> buildFieldBySort(List<Field> dataFields, List<Sort> sorts) {
+    List<Field> fields = new ArrayList<>();
+    if (sorts != null && !sorts.isEmpty()) {
+      sorts.forEach(sort -> {
+        fields.add(dataFields.stream().filter(p -> p.getColumnName().equalsIgnoreCase(sort.getColumnName()))
+            .findAny().get());
+      });
+    }
+
+    dataFields.forEach(field -> {
+      if (!fields.contains(field)) {
+        fields.add(field);
+      }
+    });
+
+    return fields;
   }
 }

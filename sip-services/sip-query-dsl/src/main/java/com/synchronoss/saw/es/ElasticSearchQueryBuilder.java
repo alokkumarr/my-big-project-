@@ -81,7 +81,7 @@ public class ElasticSearchQueryBuilder {
     boolean haveAggregate = dataFields.stream().anyMatch(field -> field.getAggregate() != null
         && !field.getAggregate().value().isEmpty());
     if (haveAggregate) {
-      dataFields = buildFieldBySort(dataFields, sipQuery.getSorts());
+      dataFields = BuilderUtil.buildFieldBySort(dataFields, sipQuery.getSorts());
     }
 
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
@@ -99,31 +99,6 @@ public class ElasticSearchQueryBuilder {
             sipQuery.getSorts());
 
     return searchSourceBuilder.toString();
-  }
-
-  /**
-   * Re-arrange the query field for ES sorting.
-   *
-   * @param dataFields
-   * @param sorts
-   * @return list of fields
-   */
-  private List<Field> buildFieldBySort(List<Field> dataFields, List<Sort> sorts) {
-    List<Field> fields = new ArrayList<>();
-    if (sorts != null && !sorts.isEmpty()) {
-      sorts.forEach(sort -> {
-        fields.add(dataFields.stream().filter(p -> p.getColumnName().equalsIgnoreCase(sort.getColumnName()))
-            .findAny().get());
-      });
-    }
-
-    dataFields.forEach(field -> {
-      if (!fields.contains(field)) {
-        fields.add(field);
-      }
-    });
-
-    return fields;
   }
 
   /**
