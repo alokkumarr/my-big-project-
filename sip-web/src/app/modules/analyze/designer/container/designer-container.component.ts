@@ -10,7 +10,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
-import * as isNumber from 'lodash/isNumber';
 import * as flatMap from 'lodash/flatMap';
 import * as every from 'lodash/every';
 import * as some from 'lodash/some';
@@ -24,7 +23,7 @@ import * as map from 'lodash/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
-import { takeWhile, finalize, map as map$, tap } from 'rxjs/operators';
+import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
 
 import {
   flattenPivotData,
