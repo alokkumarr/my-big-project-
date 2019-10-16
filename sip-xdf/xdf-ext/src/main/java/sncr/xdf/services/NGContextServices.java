@@ -119,20 +119,6 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         return 0;
     }
 
-
-//    private int initProject() {
-//        try {
-//            services.prj.getProjectData(ngctx);
-//            ngctx.serviceStatus.put(ComponentServices.Project, true);
-//        } catch (Exception e) {
-//            String error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
-//            logger.error(error);
-//            return -1;
-//
-//        }
-//        return 0;
-//    }
-
     private int initProject() {
         int projectStatus = 0;
         try {
@@ -219,24 +205,6 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             return -1;
         }
     }
-
-//    private int initTransformation(){
-//        if (services.transformationMD == null ||
-//            !ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
-//            logger.error("Incorrect initialization sequence or service is not available");
-//            return -1;
-//        }
-//        try {
-//            ngctx.transformationID =
-//                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-//            ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
-//        } catch (Exception e) {
-//            String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
-//            logger.error(error);
-//            return -1;
-//        }
-//        return 0;
-//    }
 
     private int initTransformation(){
         if (services.transformationMD == null ||
