@@ -8,6 +8,9 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as toNumber from 'lodash/toNumber';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
+import * as mapKeys from 'lodash/mapKeys';
+import * as omitBy from 'lodash/omitBy';
+import * as isUndefined from 'lodash/isUndefined';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 // import produce from 'immer';
@@ -90,6 +93,14 @@ const orderAlertsCount = alertData => {
     });
   });
   return sortedArray;
+};
+
+const orderAlertsSeverity = severity => {
+  const orderedList = [];
+  mapKeys(severityColors, (val, key) => {
+    orderedList.push(find(severity, { alertSeverity: key }));
+  });
+  return omitBy(orderedList, isUndefined);
 };
 
 const severityColors = {
@@ -220,11 +231,14 @@ export class AlertsState {
       .getAllAlertsSeverity(alertFilters)
       .pipe(
         map(severityList => ({
-          x: lodashMap(severityList, 'alertSeverity'),
-          y: lodashMap(severityList, ({ alertSeverity, count }) => ({
-            color: severityColors[alertSeverity],
-            y: count
-          }))
+          x: lodashMap(orderAlertsSeverity(severityList), 'alertSeverity'),
+          y: lodashMap(
+            orderAlertsSeverity(severityList),
+            ({ alertSeverity, count }) => ({
+              color: severityColors[alertSeverity],
+              y: count
+            })
+          )
         }))
       )
       .toPromise()
