@@ -267,7 +267,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	
   	   
         
-        if(this.ngctx != null && this.ngctx.runningPipeLine & df != null) {
+        if(this.ngctx != null && this.ngctx.runningPipeLine & df != null ) {
         	
       	  logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
       	  
@@ -346,18 +346,27 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 						executorService.submit(new Callable<Long>() {
 							@Override
 							public Long call() throws Exception {
-								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(dataset.filter(query).cache());
-								processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams, type);
+								try {
+									RTPSPipelineProcessor processor = new RTPSPipelineProcessor(dataset.filter(query).cache());
+									processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams, type);
+								} catch (Exception e) {
+									logger.error(e.getMessage());
+								}
 
 								return 1L;
 							}
 						});
 
 					} else if (Boolean.valueOf(isTimeSeries)) {
+						
 
-						RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-						processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,
-								type);
+						try {
+							RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+							processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,
+									type);
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+						}
 					}
 
 				}
