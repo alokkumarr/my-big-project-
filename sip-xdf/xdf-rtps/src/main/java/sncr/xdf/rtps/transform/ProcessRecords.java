@@ -93,6 +93,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         this.inStream = inStream;
         this.itcx = itcx;
         this.dataModel = dataModel;
+        logger.debug("###### Data Model ::"+ this.dataModel);
         this.definitions = definitions;
         if(esIndex != null && !esIndex.isEmpty()) {
             if (esIndex.indexOf("/") > 0) {
@@ -123,6 +124,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         JavaRDD<ConsumerRecord<String, String>> in, Time tm) throws Exception {
         if (!in.isEmpty()) {
             logger.info("Starting new batch processing. Batch time: " + tm);
+            logger.debug("#####Data Model::"+ dataModel);
             switch(dataModel.toLowerCase()){
                 case DM_GENERIC : {
                     if (transformations == null) {
@@ -149,7 +151,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                 }*/
                 case DM_SIMPLE : {
                     // Should be changed
-                    ProcessSimpleRecords(in, tm);
+                    ProcessSimpleRecords(in, tm );
                     break;
                 }
                 case DM_SIMPLE_JSON : {
@@ -195,11 +197,19 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private void ProcessSimpleRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
         JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleRecord());
         SaveSimpleBatch(stringRdd, tm);
+        SparkConf cnf = in.context().getConf();
+        processJsonRecords(stringRdd, tm, cnf, this.itcx,DM_SIMPLE);
     }
 
     private void ProcessSimpleJsonRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
+    	logger.debug("Beginning simple-json processing...");
         JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleJsonRecord());
+        logger.debug("String rdd conversion completed saving batch...");
         SaveSimpleBatch(stringRdd, tm);
+        logger.debug("retriving spark configuration");
+        SparkConf cnf = in.context().getConf();
+        logger.debug("Invoking json processing");
+        processJsonRecords(stringRdd, tm, cnf, this.itcx,DM_SIMPLE_JSON);
     }
 
     private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm){
@@ -220,23 +230,37 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         JavaRDD<String> jsonRdd = in.mapPartitions(new TransformJsonRecord(definitions));
         logger.debug("first below::");
         SparkConf cnf = in.context().getConf();
-        processJsonRecords(jsonRdd, tm, cnf, ctx);
+        processJsonRecords(jsonRdd, tm, cnf, ctx,DM_GENERIC);
     }
 
     
 
-    private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx){
+    private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx, String model){
+    	
+    	
+    	
     	logger.debug("######## Inside process json records #####" );
     	
         SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
     	//SparkSession sess = ctx.sparkSession;
     	logger.debug("######## Reading through spark session #####" );
-        JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
-        //rowRdd.foreachPartitionAsync(f)
-        logger.debug("######## Reading completed through spark session #####" );
- 
-        Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
-        logger.debug("######## Dataframe created #####" );
+    	Dataset<Row> df = null;
+    	
+    	
+    	if(model.equals(DM_GENERIC)) {
+    		 JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
+    	        //rowRdd.foreachPartitionAsync(f)
+    	     logger.debug("######## Reading completed through spark session #####" );
+    	 
+    	     df = sess.createDataFrame(rowRdd, schema);
+    	     logger.debug("######## Dataframe created #####" );
+    	} else {
+    		df = sess.read().json(jsonRdd).toDF();
+ 	        logger.debug("######## Dataframe created #####" );
+    	}
+    	
+       
+        df.show();
   	    NGContext context = this.ngctx;
   	    
 		
@@ -318,10 +342,11 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 								: Integer.valueOf((Integer) threadPoolCnt);
 						logger.debug("###### Number of threads used only if non timeseries::" + numThreads);
 						ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+						final Dataset<Row> dataset = df;
 						executorService.submit(new Callable<Long>() {
 							@Override
 							public Long call() throws Exception {
-								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
+								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(dataset.filter(query).cache());
 								processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams, type);
 
 								return 1L;
