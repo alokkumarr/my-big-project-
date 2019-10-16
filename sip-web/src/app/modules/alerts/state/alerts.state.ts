@@ -5,12 +5,15 @@ import * as find from 'lodash/find';
 import * as every from 'lodash/every';
 import * as isEqual from 'lodash/isEqual';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as toNumber from 'lodash/toNumber';
-import * as forEach from 'lodash/forEach';
-import * as split from 'lodash/split';
-import * as mapKeys from 'lodash/mapKeys';
-import * as omitBy from 'lodash/omitBy';
-import * as isUndefined from 'lodash/isUndefined';
+import * as sortBy from 'lodash/sortBy';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpSplit from 'lodash/fp/split';
+import * as fpJoin from 'lodash/fp/join';
+import * as fpReverse from 'lodash/fp/reverse';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpFromPairs from 'lodash/fp/fromPairs';
+import * as fpMap from 'lodash/fp/map';
+import * as fpKeys from 'lodash/fp/keys';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 // import produce from 'immer';
@@ -63,45 +66,15 @@ const mapAlertCount2ChartData = map(countList => ({
   y: lodashMap(orderAlertsCount(countList), ({ count }) => count)
 }));
 
-const orderAlertsCount = alertData => {
-  let sortedArray = [];
-  /**
-   * Here dates received is in 'DD-MM-YYYY' format. When trying to convert it into moment object
-   * any date(DD in 'DD-MM-YYYY') more than 12 is resulting to 'Invalid date'.
-   * So making sure that string is converted to moment object correctly.
-   */
-  forEach(alertData, obj => {
-    sortedArray.push(
-      toNumber(
-        moment
-          .utc(
-            split(obj.date, '-', 3)
-              .reverse()
-              .join('-')
-          )
-          .format('x')
-      )
-    );
-  });
-
-  sortedArray = sortedArray.sort();
-
-  forEach(sortedArray, (obj, index) => {
-    sortedArray[index] = moment.utc(obj).format('DD-MM-YYYY');
-    sortedArray[index] = find(alertData, {
-      date: sortedArray[index]
-    });
-  });
-  return sortedArray;
+/**
+ * reverse "DD-MM-YYYY" date format to "YYYY-MM-DD"
+ */
+const reverseDateFormat = date => {
+  return fpPipe(fpSplit('-'), fpReverse, fpJoin('-'))(date);
 };
 
-const orderAlertsSeverity = severity => {
-  const orderedList = [];
-  mapKeys(severityColors, (val, key) => {
-    orderedList.push(find(severity, { alertSeverity: key }));
-  });
-  return omitBy(orderedList, isUndefined);
-};
+const orderAlertsCount = alertCountList =>
+  sortBy(alertCountList, ({ date }) => reverseDateFormat(date));
 
 const severityColors = {
   WARNING: '#a5b7ce',
@@ -109,6 +82,20 @@ const severityColors = {
   MEDIUM: '#ffbe00',
   CRITICAL: '#e4524c'
 };
+
+/** Severity order map, gives the order of the severity in the chart */
+const severityOrderMap = fpPipe(
+  fpKeys,
+  fpToPairs,
+  fpMap(([key, value]) => [value, key]),
+  fpFromPairs
+)(severityColors);
+
+const orderAlertsSeverity = alertSeverityList =>
+  sortBy(
+    alertSeverityList,
+    ({ alertSeverity }) => severityOrderMap[alertSeverity]
+  );
 
 @State<AlertsStateModel>({
   name: 'alertsState',
