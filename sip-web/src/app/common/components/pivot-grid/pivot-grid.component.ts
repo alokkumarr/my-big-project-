@@ -378,6 +378,7 @@ export class PivotGridComponent implements OnDestroy {
              pivot's aggregate function will lead to bad data. Always keep this
              on sum */
           if (cloned.aggregate) {
+            delete cloned.caption;
             cloned.displayName = `${toUpper(cloned.aggregate)}(${
               cloned.displayName
             })`;
