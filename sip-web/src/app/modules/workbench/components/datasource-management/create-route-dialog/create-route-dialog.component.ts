@@ -111,18 +111,40 @@ export class CreateRouteDialogComponent {
     );
   }
 
-  createRoute(data) {
+  createRoute() {
     this.startDateCorrectFlag =
       this.crondetails.activeTab === 'immediate' ||
       moment(this.crondetails.startDate) > moment();
     if (!this.startDateCorrectFlag) {
       return false;
     }
-    const routeDetails = this.mapData(data);
+    const routeDetails = this.mapData();
     this.dialogRef.close({ routeDetails, opType: this.opType });
   }
 
-  mapData(data) {
+  /**
+   * Sets seconds in start and end dates to 0.
+   * Eg: 2019-10-30T12:54:39+05:30 will be changed to  2019-10-30T12:54:00+05:30
+   * This is required so backend doesn't automatically rounds up minute.
+   *
+   * @memberof CreateRouteDialogComponent
+   */
+  removeSecondsFromCron() {
+    const startDate = moment(this.crondetails.startDate);
+    const endDate = moment(this.crondetails.endDate);
+    if (startDate.isValid()) {
+      startDate.seconds(0);
+      this.crondetails.startDate = startDate.format();
+    }
+
+    if (endDate.isValid()) {
+      endDate.seconds(0);
+      this.crondetails.endDate = endDate.format();
+    }
+  }
+
+  mapData() {
+    this.removeSecondsFromCron();
     const routeDetails = {
       ...this.detailsFormValue,
       schedulerExpression: this.crondetails
