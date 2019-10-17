@@ -62,7 +62,7 @@ public class NGContext extends ContextMetadata {
 
     public String dataSetName;
     public boolean runningPipeLine;
-    private boolean persistMode = true;
+    private boolean persistMode;
     public String pipeComponentName;
 
     @Override
