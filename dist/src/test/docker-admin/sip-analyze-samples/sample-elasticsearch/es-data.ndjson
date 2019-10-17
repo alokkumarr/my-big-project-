@@ -1099,6 +1099,54 @@
 { "index" :{}}
 {"COORDINATES": "83.359006,34.90156267", "COUNTY": "TN","string": null, "long": 1549, "float": null, "date": "2019-01-27 00:00:00", "integer": 649, "double": 100005.00, "customerCode": "TenantA"}
 { "index" :{}}
+{"COORDINATES": "82.359006,34.90156267", "COUNTY": "TN","string": "string ABC", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:29:10", "integer": 649, "double": 100003.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "90.359006,34.90156267", "COUNTY": "TN","string": "string ABC", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:29:18", "integer": 69, "double": 100005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "92.359006,34.90156267", "COUNTY": "TN","string": "string C", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:29:30", "integer": 649, "double": 100005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "95.359006,34.90156267", "COUNTY": "TN","string": "string ABC", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:32:12", "integer": 649, "double": 100003.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "81.359006,34.90156267", "COUNTY": "TN","string": "string ABC", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:32:19", "integer": 69, "double": 100005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "80.359006,34.90156267", "COUNTY": "TN","string": "string C", "long": 1549, "float": 1008.07, "date": "2019-10-15 11:32:38", "integer": 649, "double": 100005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "18.359006,30.90156267", "COUNTY": "IN","string": "string xyz", "long": 1549, "float": 1208.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "25.359006,34.90156267", "COUNTY": "IL","string": "string EFG", "long": 1549, "float": 2004.17, "date": "2019-10-16 5:32:12", "integer": 236, "double": 567814.45, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "33.359006,23.90156267", "COUNTY": "IN","string": "string EFG", "long": 1549, "float": 1208.27, "date": "2019-10-16 12:32:55", "integer": 333, "double": 667711.66, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "41.359006,45.90156267", "COUNTY": "TN","string": "string C", "long": 1549, "float": 9008.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 876543.34, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "49.359006,43.90156267", "COUNTY": "IL","string": "string R", "long": 1549, "float": 1008.07, "date": "2019-10-16 11:32:38", "integer": 236, "double": 567814.45, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "52.359006,76.90156267", "COUNTY": "TN","string": "string C", "long": 1549, "float": 1208.07, "date": "2019-10-16 12:32:55", "integer": 567, "double": 777777.77, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "17.359006,56.90156267", "COUNTY": "IN","string": "string xyz", "long": 1549, "float": 4789.07, "date": "2019-10-16 5:32:12", "integer": 649, "double": 567814.45, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "14.359006,12.90156267", "COUNTY": "TN","string": "string R", "long": 1222, "float": 1008.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantC"}
+{ "index" :{}}
+{"COORDINATES": "24.359006,56.90156267", "COUNTY": "TN","string": "string R", "long": 1549, "float": 1008.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "14.359006,67.90156267", "COUNTY": "TN","string": "string R", "long": 1549, "float": 1008.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "33.359006,78.90156267", "COUNTY": "TN","string": "string R", "long": 1345, "float": 34789.97, "date": "2019-10-16 11:05:38", "integer": 978, "double": 300005.00, "customerCode": "TenantC"}
+{ "index" :{}}
+{"COORDINATES": "66.359006,87.90156267", "COUNTY": "TN","string": "string S", "long": 1290, "float": 123478.69, "date": "2019-10-16 11:32:38", "integer": 978, "double": 400005.00, "customerCode": "TenantC"}
+{ "index" :{}}
+{"COORDINATES": "33.359006,12.90156267", "COUNTY": "TN","string": "string A", "long": 1330, "float": 56789.67, "date": "2019-10-16 11:05:38", "integer": 978, "double": 567005.00, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "77.359006,13.90156267", "COUNTY": "TN","string": "string R", "long": 1234, "float": 43256.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantC"}
+{ "index" :{}}
+{"COORDINATES": "34.359006,23.90156267", "COUNTY": "IN","string": "string C", "long": 1549, "float": 78961.17, "date": "2019-10-16 12:32:55", "integer": 236, "double": 876543.34, "customerCode": "TenantB"}
+{ "index" :{}}
+{"COORDINATES": "58.359006,44.90156267", "COUNTY": "IL","string": "string xyz", "long": 1549, "float": 5679.07, "date": "2019-10-16 11:05:38", "integer": 678, "double": 567814.45, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "55.359006,99.90156267", "COUNTY": "IN","string": "string xyz", "long": 1549, "float": 2004.37, "date": "2019-10-16 5:32:12", "integer": 649, "double": 456790.12, "customerCode": "TenantA"}
+{ "index" :{}}
+{"COORDINATES": "99.359006,31.90156267", "COUNTY": "IL","string": "string P", "long": 1549, "float": 9999.07, "date": "2019-10-16 11:32:38", "integer": 978, "double": 300005.00, "customerCode": "TenantC"}
+{ "index" :{}}
 {"COORDINATES": "37.359006,76.90156267", "COUNTY": "TN","string": null, "long": 1550, "float": 1008.07, "date": "2019-01-28 00:00:00", "integer": 650, "double": 100005.01, "customerCode": "TenantA"}
 { "index" :{}}
 {"COORDINATES": "32.359006,87.90156267", "COUNTY": "TN","string": "string 550", "long": 1551, "float": null, "date": "2019-01-29 00:00:00", "integer": 651, "double": 100005.02, "customerCode": "TenantB"}

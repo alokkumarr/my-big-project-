@@ -1091,6 +1091,86 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
+  public void testExecutionWithGroupIntervalMinute() throws IOException {
+    String groupInterval = "minute";
+    JsonNode payload = preparePayloadForGroupInterval(groupInterval);
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(payload)
+        .post(
+            "/sip/services/internal/proxy/storage/execute?id="
+                + analysisId
+                + "&executionType=preview&page=1&pageSize=100")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+  }
+
+  @Test
+  public void testExecutionWithGroupIntervalSecond() throws IOException {
+    String groupInterval = "second";
+    JsonNode payload = preparePayloadForGroupInterval(groupInterval);
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(payload)
+        .post(
+            "/sip/services/internal/proxy/storage/execute?id="
+                + analysisId
+                + "&executionType=preview&page=1&pageSize=100")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+  }
+
+  /**
+   * This Method prepares the payload with group interval specified.
+   *
+   * @return created payload.
+   */
+  private JsonNode preparePayloadForGroupInterval(String groupInterval) throws IOException {
+    JsonObject payload = testData;
+    JsonObject fieldWithGroupIntervalMinute = prepareFieldForGroupInterval(groupInterval);
+    JsonArray fields =
+        payload
+            .getAsJsonObject("sipQuery")
+            .getAsJsonArray("artifacts")
+            .get(0)
+            .getAsJsonObject()
+            .getAsJsonArray("fields");
+    for (int i = 0; i < fields.size(); i++) {
+      String type = fields.get(i).getAsJsonObject().get("type").getAsString();
+      String dataField = fields.get(i).getAsJsonObject().get("dataField").getAsString();
+      if (type.equalsIgnoreCase("date") && dataField.equalsIgnoreCase("date")) {
+        fields.remove(i);
+        fields.add(fieldWithGroupIntervalMinute);
+        break;
+      }
+    }
+    return mapper.readTree(payload.toString());
+  }
+
+  /**
+   * This Method prepares the field with specified group interval..
+   *
+   * @return field wit group interval.
+   */
+  private JsonObject prepareFieldForGroupInterval(String groupInterval) {
+    JsonObject field = new JsonObject();
+    field.addProperty("dataField", "date");
+    field.addProperty("area", "g-axis");
+    field.addProperty("columnName", "date");
+    field.addProperty("displayName", "Date");
+    field.addProperty("type", "date");
+    field.addProperty("dateFormat", "MM/dd/yyyy HH:mm:ss");
+    field.addProperty("groupInterval", groupInterval);
+    return field;
+  }
+
+  @Test
   public void exportData() throws IOException {
     ObjectNode analysis = testCreateDlAnalysis();
     String analysisId = analysis.get("analysisId").asText();
