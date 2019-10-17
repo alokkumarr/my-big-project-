@@ -11,6 +11,7 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
+import * as find from 'lodash/find';
 
 @Component({
   selector: 'appkeys-view',
@@ -41,22 +42,11 @@ export class AppkeysViewComponent implements OnInit {
   fetchKeysForGrid() {
     const fetchAppKeys = this._rtisService.getAppKeys();
     fetchAppKeys.then(response => {
-      this.custEventUrl = isEmpty(response) ? '' : this.fetchEventURL(response);
+      // Need to Pick the first available event url in the appkey array of
+      // objects to display in list of all appkeys screen.
+      this.custEventUrl = isEmpty(response) ? '' : find(response, 'eventUrl').eventUrl;
       this.appKeys = response;
     });
-  }
-
-  // Need to Pick the first available event url in the appkey array of
-  // objects to display in list of all appkeys screen.
-  fetchEventURL(appKeys) {
-    const eventUrls = fpPipe(
-      fpFilter(({ eventUrl }) => {
-        if (!isEmpty(eventUrl)) {
-          return eventUrl;
-        }
-      })
-    )(appKeys);
-    return eventUrls[0].eventUrl;
   }
 
   deleteAppKey(appKeyData) {
