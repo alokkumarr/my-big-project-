@@ -82,12 +82,14 @@ export class AppkeysViewComponent implements OnInit {
       {
         caption: 'APP KEYS',
         dataField: 'app_key',
-        width: '70%'
+        width: '70%',
+        height: '30'
       },
       {
         caption: 'ACTIONS',
         cellTemplate: 'actionCellTemplate',
-        width: '30%'
+        width: '30%',
+        height: '30'
       }
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({
