@@ -629,6 +629,7 @@ export class DesignerState {
   ) {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
+    const allAdapterFields = fpFlatMap(ad => ad.artifactColumns, groupAdapters);
 
     // disabled immer because having immutability for groupAdapters causes conflicts in the designer
     // so it will stay disabled until a refactoring of the whole designer to ngxs
@@ -640,7 +641,7 @@ export class DesignerState {
     //   );
     // });
 
-    adapter.transform(artifactColumn);
+    adapter.transform(artifactColumn, allAdapterFields);
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });

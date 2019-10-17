@@ -248,10 +248,13 @@ export class DesignerService {
         artifactColumns: [],
         canAcceptArtifactColumnOfType: canAcceptDataType,
         canAcceptArtifactColumn: canAcceptInData,
-        transform(artifactColumn: ArtifactColumnPivot) {
+        transform(
+          artifactColumn: ArtifactColumnPivot,
+          columns: ArtifactColumn[] = []
+        ) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn, this.artifactColumns);
+          applyDataFieldDefaults(artifactColumn, columns);
         },
         reverseTransform: pivotReverseTransform,
         onReorder
@@ -350,10 +353,13 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[]
+      ) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
+        applyDataFieldDefaults(artifactColumn, columns);
       },
       reverseTransform: mapReverseTransform,
       onReorder
@@ -535,10 +541,13 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[]
+      ) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
+        applyDataFieldDefaults(artifactColumn, columns);
       },
       reverseTransform: chartReverseTransform,
       onReorder
@@ -552,10 +561,13 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptSizeType,
       canAcceptArtifactColumn: canAcceptInSize,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[]
+      ) {
         artifactColumn.area = 'z';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn, this.artifactColumns);
+        applyDataFieldDefaults(artifactColumn, columns);
       },
       reverseTransform: chartReverseTransform,
       onReorder
