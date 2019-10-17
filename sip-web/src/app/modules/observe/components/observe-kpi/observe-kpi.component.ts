@@ -102,11 +102,22 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (!this._executedKPI && !this._kpi) {
       return '';
     }
-
-    const preset = get(
-      this._executedKPI || this._kpi,
+    const executedKpi = this._executedKPI || this._kpi;
+    let preset = get(
+      executedKpi,
       'filters.0.model.preset'
     );
+    // For backward compatibility. identify the primary filter
+    // after adding new filters for already existing KPIs
+    if (isUndefined(preset)) {
+      executedKpi.filters.forEach(filt => {
+        if (filt.primaryKpiFilter) {
+          preset = filt.model.preset;
+          return;
+        }
+      });
+    }
+
     const filter = get(this.datePresetObj, `${preset}.label`);
     if (filter === 'Custom') {
       const gte = moment(
