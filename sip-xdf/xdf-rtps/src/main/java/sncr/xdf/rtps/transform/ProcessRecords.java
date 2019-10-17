@@ -3,7 +3,7 @@ package sncr.xdf.rtps.transform;
 import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_GENERIC;
 import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE;
 import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
-
+import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_COUNTLY;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,6 +46,7 @@ import org.json.simple.JSONObject;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.rtps.driver.RTPSPipelineProcessor;
+import sncr.xdf.rtps.model.CountlyModel;
 import sncr.xdf.rtps.model.GenericJsonModel;
 
 
@@ -142,13 +143,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                     ProcessGenericRecords(in, tm ,itcx);
                     break;
                 }
-               /* case DM_COUNTLY : {
+                case DM_COUNTLY : {
                     if(schema == null){
                         schema = CountlyModel.createGlobalSchema();
                     }
                     ProcessCountlyRecords(in, tm);
                     break;
-                }*/
+                }
                 case DM_SIMPLE : {
                     // Should be changed
                     ProcessSimpleRecords(in, tm );
@@ -233,7 +234,12 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         processJsonRecords(jsonRdd, tm, cnf, ctx,DM_GENERIC);
     }
 
-    
+    private void ProcessCountlyRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
+        JavaRDD<String> jsonRdd = in.mapPartitions(new TransformCountlyRecord());
+        SparkConf cnf = in.context().getConf();
+        processJsonRecords(jsonRdd, tm, cnf, this.itcx,DM_COUNTLY);
+
+    }
 
     private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf, InternalContext ctx, String model){
     	
