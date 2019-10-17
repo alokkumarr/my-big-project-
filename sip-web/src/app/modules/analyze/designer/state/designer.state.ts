@@ -65,7 +65,7 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   CHART_DATE_FORMATS_OBJ
 } from '../../consts';
-import { AnalysisDSL } from 'src/app/models';
+import { AnalysisDSL, ArtifactColumnDSL } from 'src/app/models';
 import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions';
 
 // setAutoFreeze(false);
@@ -271,6 +271,10 @@ export class DesignerState {
     const fillMissingDataWithZeros =
       analysis.type === 'chart' && artifactColumn.type === 'date';
 
+    const identifier = artifactColumn.dataField
+      ? artifactColumn.dataField
+      : artifactColumn.columnName;
+
     /* Find the artifact inside sipQuery of analysis stored in state */
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
@@ -285,9 +289,16 @@ export class DesignerState {
     const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
       field => {
         const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
-        return field[fieldName] === artifactColumn[fieldName];
+        return field[fieldName] === identifier;
       }
     );
+
+    artifactColumn.dataField = DesignerService.dataFieldFor({
+      columnName: artifactColumn.columnName,
+      aggregate:
+        artifactColumn.aggregate ||
+        artifacts[artifactIndex].fields[artifactColumnIndex].aggregate
+    } as ArtifactColumnDSL);
 
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
@@ -311,7 +322,7 @@ export class DesignerState {
           const fieldName = artifactColumn.dataField
             ? 'dataField'
             : 'columnName';
-          return col[fieldName] === artifactColumn[fieldName];
+          return col[fieldName] === identifier;
         }
       );
       const adapterColumn = targetAdapter.artifactColumns[adapterColumnIndex];
