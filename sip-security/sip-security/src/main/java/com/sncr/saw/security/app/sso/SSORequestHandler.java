@@ -4,7 +4,7 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.RefreshToken;
 import com.sncr.saw.security.common.bean.User;
-import com.sncr.saw.security.common.util.TicketHelper;
+import com.sncr.saw.security.app.service.TicketHelper;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,14 +24,15 @@ public class SSORequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(SSORequestHandler.class);
 
-    private final UserRepository userRepository;
     private final NSSOProperties nSSOProperties;
+    private final TicketHelper tHelper;
 
     @Autowired
-    public SSORequestHandler(UserRepository userRepository, NSSOProperties nSSOProperties) {
-        this.userRepository = userRepository;
+    public SSORequestHandler(NSSOProperties nSSOProperties, TicketHelper tHelper) {
         this.nSSOProperties = nSSOProperties;
+        this.tHelper = tHelper;
     }
+
 
     public SSOResponse processSSORequest(String token) {
         logger.info("Request received to process single sign-on");
@@ -66,7 +67,6 @@ public class SSORequestHandler {
         String atoken;
         String rToken;
         SSOResponse ssoResponse = new SSOResponse();
-        TicketHelper tHelper = new TicketHelper(userRepository);
         ticket = new Ticket();
         ticket.setMasterLoginId(masterLoginId);
         ticket.setValid(false);
