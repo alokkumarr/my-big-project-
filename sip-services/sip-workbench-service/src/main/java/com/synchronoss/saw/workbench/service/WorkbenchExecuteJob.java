@@ -56,7 +56,6 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     Logger log = LoggerFactory.getLogger(getClass().getName());
     log.info("Start execute job");
     AbstractComponent aac = null;
-    ngctx.setPersistMode(true);
     switch (ngctx.componentName) {
       case "sql":
         aac = new NGSQLComponent(ngctx);

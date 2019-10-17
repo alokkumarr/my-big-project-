@@ -51,7 +51,6 @@ public class NGContext extends ContextMetadata {
         this.persistMode = persistMode;
     }
 
-
     public Map<String, Map<String, Object>> inputDataSets = new HashMap<>();
     public Map<String, Map<String, Object>> outputDataSets = new HashMap<>();
 
@@ -62,7 +61,7 @@ public class NGContext extends ContextMetadata {
 
     public String dataSetName;
     public boolean runningPipeLine;
-    private boolean persistMode;
+    private boolean persistMode = true;
     public String pipeComponentName;
 
     @Override
