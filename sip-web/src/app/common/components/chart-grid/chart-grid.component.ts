@@ -7,6 +7,7 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
+import * as mapKeys from 'lodash/mapKeys';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
 import { setReverseProperty } from './../../../common/utils/dataFlattener';
@@ -36,6 +37,27 @@ interface ReportGridField {
   changeColumnProp: Function;
   headerCellTemplate: string;
 }
+
+/**
+ * Converts datafield notation like 'sum@@double' to human
+ * friendly notation like 'sum(double)'
+ *
+ * Takes an array of data rows. Replaces keys in datafield
+ * notation to described human friendly notation.
+ *
+ * @param {{ [key: string]: any }} data
+ */
+const dataFieldToHuman = (data: { [key: string]: any }) =>
+  map(data, row =>
+    mapKeys(row, (v, key) => {
+      if (/\w@@\w/.test(key)) {
+        const [agg, col] = key.split('@@');
+        return `${agg}(${col})`;
+      }
+
+      return key;
+    })
+  );
 
 @Component({
   selector: 'chart-grid',
@@ -274,7 +296,8 @@ export class ChartGridComponent implements OnInit {
       );
     }
     const chartData = orderedData || data;
-    this.chartToggleData = this.trimKeyword(chartData);
+
+    this.chartToggleData = dataFieldToHuman(this.trimKeyword(chartData));
 
     return [
       ...this._chartService.dataToChangeConfig(
