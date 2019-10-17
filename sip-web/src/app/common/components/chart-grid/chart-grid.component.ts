@@ -187,7 +187,8 @@ export class ChartGridComponent implements OnInit {
     forEach(columns, column => {
       if (
         axisName === column.name ||
-        axisName === column.columnName.split('.keyword')[0]
+        axisName === column.columnName.split('.keyword')[0] ||
+        axisName === column.dataField
       ) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
