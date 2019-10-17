@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.model.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class ESResponseParser {
     }
     // if result contains only aggregated fields.
     else if (groupByFields.length == 0 && childNode != null) {
-      Map<String, Object> flatValues = new TreeMap<>();
+      Map<String, Object> flatValues = new LinkedHashMap<>();
       for (Field dataField : aggregationFields) {
         String columnName =
             dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
@@ -89,7 +89,7 @@ public class ESResponseParser {
       }
       flatStructure.add(flatValues);
     } else {
-      Map<String, Object> flatValues = new TreeMap<>();
+      Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
       for (Field dataField : aggregationFields) {
         logger.debug("Datafield = " + dataField);
@@ -113,7 +113,7 @@ public class ESResponseParser {
    */
   public List<Object> parseData(JsonNode jsonNode) {
     prepareGroupByFields(dataFields);
-    Map<String, Object> dataObj = new TreeMap<>();
+    Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);
     return flatStructure;
