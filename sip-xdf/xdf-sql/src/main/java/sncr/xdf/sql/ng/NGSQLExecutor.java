@@ -1,5 +1,12 @@
 package sncr.xdf.sql.ng;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -8,18 +15,11 @@ import org.apache.spark.sql.types.StructField;
 
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
-import sncr.xdf.file.DLDataSetOperations;
-import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class NGSQLExecutor implements Serializable {
@@ -57,10 +57,26 @@ public class NGSQLExecutor implements Serializable {
                 long st = System.currentTimeMillis();
                 descriptor.startTime =  st;
                 Dataset<Row> df = null;
+                
+                
+                Set<String> tablesFrmFile = new HashSet<String>();    
+				if (parent.getNgctx().datafileDFmap == null) {
+					tablesFrmFile = allTables.keySet();
+					
+				} else {
+					
+					for (String key : allTables.keySet()) {
+						if (!parent.getNgctx().datafileDFmap.containsKey(key)) {
+							tablesFrmFile.add(key);
+	
+						}
+					}
+				}
+                
 
                 if (parent.getNgctx().inputDataSets.size() > 0) {
 
-                    for (String tn : allTables.keySet()) {
+                    for (String tn : tablesFrmFile) {
 
                         TableDescriptor tb = allTables.get(tn);
                         if (tb.isTargetTable) {
