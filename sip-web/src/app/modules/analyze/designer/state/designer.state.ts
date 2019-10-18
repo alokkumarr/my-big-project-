@@ -309,12 +309,16 @@ export class DesignerState {
       }
     );
 
-    artifactColumn.dataField = DesignerService.dataFieldFor({
-      columnName: artifactColumn.columnName,
-      aggregate:
-        artifactColumn.aggregate ||
-        artifacts[artifactIndex].fields[artifactColumnIndex].aggregate
-    } as ArtifactColumnDSL);
+    /* If artifact column had a data field, make sure it's updated with latest aggregate.
+       If no data field exists, it is a non-data field. Do nothing */
+    if (artifactColumn.dataField) {
+      artifactColumn.dataField = DesignerService.dataFieldFor({
+        columnName: artifactColumn.columnName,
+        aggregate:
+          artifactColumn.aggregate ||
+          artifacts[artifactIndex].fields[artifactColumnIndex].aggregate
+      } as ArtifactColumnDSL);
+    }
 
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],

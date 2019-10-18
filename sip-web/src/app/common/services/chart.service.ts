@@ -305,7 +305,12 @@ export class ChartService {
     const yField = isArray(fields.y) ? fields.y[0] : fields.y;
     return [
       {
-        ...this.getSerie(yField, 0, fields.y, chartType),
+        ...this.getSerie(
+          yField,
+          0,
+          isArray(fields.y) ? fields.y : [fields.y],
+          chartType
+        ),
         data: map(parsedData, dataPoint =>
           mapValues(axesFieldNameMap, val => dataPoint[val])
         )

@@ -1393,10 +1393,18 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const pivotFields = get(query, 'artifacts.0.fields');
         return some(pivotFields, field => field.area === 'data');
       case 'map':
-        const sqlB = get(this.analysis, 'sqlBuilder') || {};
+        const selectedFieldsMap = this._store.selectSnapshot(
+          DesignerState.allSelectedFields
+        );
         const requestConditions = [
-          find(sqlB.nodeFields || [], field => field.checked === 'x'),
-          find(sqlB.dataFields || [], field => field.checked === 'y')
+          find(
+            selectedFieldsMap || [],
+            field => field.checked === 'x' || field.area === 'x'
+          ),
+          find(
+            selectedFieldsMap || [],
+            field => field.checked === 'y' || field.area === 'y'
+          )
         ];
         return every(requestConditions, Boolean);
       case 'chart':

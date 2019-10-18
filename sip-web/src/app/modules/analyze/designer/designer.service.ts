@@ -101,7 +101,7 @@ export class DesignerService {
       return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
     }
 
-    return toLower(columnName);
+    return columnName;
   }
 
   /**
