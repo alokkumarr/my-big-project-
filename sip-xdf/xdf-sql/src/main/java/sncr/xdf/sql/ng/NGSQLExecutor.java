@@ -94,9 +94,9 @@ public class NGSQLExecutor implements Serializable {
                         String location;
 
                         //if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
-                        if (!parent.getNgctx().runningPipeLine)
+                        //if (!parent.getNgctx().runningPipeLine)
 
-                        {
+                        //{
 
                             if (allTables.get(tn) != null) {
                                 location = allTables.get(tn).getLocation();
@@ -142,17 +142,12 @@ public class NGSQLExecutor implements Serializable {
                                 jobDataFrames.put(tn, df);
                                 df.createOrReplaceTempView(tn);
 
-                        }
+                        //}
                     }
                 }
 
                 if (parent.getNgctx().runningPipeLine)
                 {
-                	
-                	
-                	
-                	
-                    
                     parent.getNgctx().datafileDFmap.forEach((key, value) -> {
                     
                     	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
