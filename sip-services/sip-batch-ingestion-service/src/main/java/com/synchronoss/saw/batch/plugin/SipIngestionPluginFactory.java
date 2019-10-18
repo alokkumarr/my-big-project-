@@ -44,6 +44,7 @@ public class SipIngestionPluginFactory {
       case APIPULL:
         sipConnectionService = this.apiPullService;
         break;
+      default: break;
     }
 
     return sipConnectionService;
