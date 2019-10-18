@@ -25,6 +25,7 @@ public class ESResponseParser {
   public ESResponseParser(List<Field> dataFields, List<Field> aggregationFields) {
     this.dataFields = dataFields;
     this.aggregationFields = aggregationFields;
+    groupByFields = ElasticSearchQueryBuilder.groupByFields;
   }
 
   /**
@@ -112,7 +113,7 @@ public class ESResponseParser {
    * @return
    */
   public List<Object> parseData(JsonNode jsonNode) {
-    prepareGroupByFields(dataFields);
+    //prepareGroupByFields(dataFields);
     Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);

@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.threeten.extra.YearQuarter;
@@ -454,13 +455,14 @@ public class BuilderUtil {
    */
   public static List<Field> buildFieldBySort(List<Field> dataFields, List<Sort> sorts) {
     List<Field> fields = new ArrayList<>();
-    if (sorts != null && !sorts.isEmpty()) {
-      sorts.forEach(sort -> {
-        fields.add(dataFields.stream().filter(p -> p.getColumnName().equalsIgnoreCase(sort.getColumnName()))
-            .findAny().get());
-      });
-    }
+    dataFields.forEach(field -> {
+      boolean anySortMatch = sorts.stream().anyMatch(p -> p.getColumnName().equalsIgnoreCase(field.getColumnName()));
+      if (!anySortMatch) {
+        fields.add(field);
+      }
+    });
 
+    Collections.reverse(dataFields);
     dataFields.forEach(field -> {
       if (!fields.contains(field)) {
         fields.add(field);

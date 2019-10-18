@@ -44,6 +44,7 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   private static String appenderForGTLTE = "||/M";
+  public static String[] groupByFields;
 
   public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
       throws IOException, ProcessingException {
@@ -247,9 +248,10 @@ public class ElasticSearchQueryBuilder {
         reportAggregationBuilder.aggregationBuilder(
             dataFields, aggregationFields, searchSourceBuilder);
       } else {
+        groupByFields = new String[dataFields.size() - aggregationFields.size()];;
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder, sorts);
+                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder, sorts, groupByFields);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
