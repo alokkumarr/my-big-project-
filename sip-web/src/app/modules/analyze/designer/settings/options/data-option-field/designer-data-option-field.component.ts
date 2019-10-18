@@ -16,6 +16,7 @@ import {
 } from '../../../types';
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
+import * as uppercase from 'lodash/upperCase';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -64,12 +65,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onAliasChange(alias) {
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
-        alias
+        alias,
+        dataField
       })
     );
     this.change.emit({ subject: 'alias' });
@@ -84,11 +86,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         return true;
       }
     });
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
+        dataField,
         aggregate
       })
     );
@@ -100,6 +103,18 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       (<ArtifactColumnChart>this.artifactColumn).comboType ||
       (<any>this.artifactColumn).displayType
     );
+  }
+
+  displayNameFor(column: ArtifactColumn) {
+    if (!column) {
+      return '';
+    }
+
+    if (column.aggregate) {
+      return `${uppercase(column.aggregate)}(${column.displayName})`;
+    }
+
+    return column.displayName;
   }
 
   /**

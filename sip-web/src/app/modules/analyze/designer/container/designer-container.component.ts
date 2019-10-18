@@ -10,9 +10,9 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
-import * as isNumber from 'lodash/isNumber';
 import * as flatMap from 'lodash/flatMap';
 import * as every from 'lodash/every';
+import * as some from 'lodash/some';
 import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -166,10 +166,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private _store: Store,
     private _jwtService: JwtService
-  ) {
-    window['designer'] = this;
-    window['DesignerState'] = DesignerState;
-  }
+  ) {}
 
   ngOnDestroy() {
     // this._store.dispatch(new DesignerResetState());
@@ -1347,8 +1344,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
-      const length = get(this.analysis, 'sqlBuilder.dataFields.length');
-      return isNumber(length) ? length > 0 : false;
+      const query = this._store.selectSnapshot(state => state.designerState.analysis.sipQuery);
+      const pivotFields = get(query, 'artifacts.0.fields');
+      return some(pivotFields, field => field.area === 'data');
     case 'map':
       const sqlB = get(this.analysis, 'sqlBuilder') || {};
       const requestConditions = [

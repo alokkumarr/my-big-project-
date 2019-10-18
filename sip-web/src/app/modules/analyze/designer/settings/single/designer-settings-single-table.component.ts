@@ -4,13 +4,15 @@ import {
   Output,
   EventEmitter,
   OnChanges,
-  OnInit
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
 import * as every from 'lodash/every';
@@ -20,7 +22,7 @@ import * as map from 'lodash/map';
 import * as mapValues from 'lodash/mapValues';
 import * as isBoolean from 'lodash/isBoolean';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { DesignerState } from '../../state/designer.state';
 import {
@@ -35,7 +37,8 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnFilter,
-  DesignerChangeEvent
+  DesignerChangeEvent,
+  ArtifactColumnDSL
 } from '../../types';
 
 import {
@@ -56,7 +59,8 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   templateUrl: './designer-settings-single-table.component.html',
   styleUrls: ['./designer-settings-single-table.component.scss']
 })
-export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
+export class DesignerSettingsSingleTableComponent
+  implements OnChanges, OnInit, OnDestroy {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts')
@@ -80,6 +84,9 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   @Select(DesignerState.groupAdapters) groupAdapters$: Observable<
     IDEsignerSettingGroupAdapter[]
   >;
+  @Select(DesignerState.allSelectedFields)
+  selectedFields$: Observable<ArtifactColumnDSL[]>;
+  selectedFields: ArtifactColumnDSL[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
     types: {
@@ -99,6 +106,7 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
 
   public groupsThatCanRecieveColumn: IDEsignerSettingGroupAdapter[];
   menuVisibleFor: string;
+  listeners: Subscription[] = [];
 
   constructor(
     private _designerService: DesignerService,
@@ -121,10 +129,26 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     this.groupAdapters$.subscribe(adapters => {
       this.groupAdapters = adapters;
     });
+
+    this.listeners.push(
+      this.selectedFields$.subscribe(fields => {
+        if (isEmpty(fields)) {
+          return;
+        }
+        this.selectedFields = fields;
+        this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+      })
+    );
   }
 
   ngOnInit() {
     this.typeIcons = getFilterTypes(this.analysisType, this.analysisSubtype);
+  }
+
+  ngOnDestroy() {
+    this.listeners.forEach(
+      subscription => subscription && subscription.unsubscribe()
+    );
   }
 
   ngOnChanges(changes) {
@@ -150,7 +174,6 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   }
 
   onFieldsChange() {
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this._changeSettingsDebounced({ subject: 'selectedFields' });
   }
 
@@ -165,15 +188,15 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
   getUnselectedArtifactColumns() {
     const { types, keyword } = this.filterObj;
     const unselectedArtifactColumns = fpPipe(
-      fpFilter(artifactColumn => {
-        const { checked, alias, displayName } = artifactColumn;
+      fpFilter(column => {
+        const { alias, displayName } = column;
         return (
-          !checked &&
+          DesignerService.canAddColumn(column, this.selectedFields) &&
           this.hasKeyword(alias || displayName, keyword) &&
-          this.passesTypeFilter(types, artifactColumn)
+          this.passesTypeFilter(types, column)
         );
       }),
-      fpSort(artifactColumn => artifactColumn.displayName)
+      fpSort(column => column.displayName)
     )(this.artifactColumns);
 
     this.dropListContainer = { artifactColumns: unselectedArtifactColumns };
@@ -250,9 +273,13 @@ export class DesignerSettingsSingleTableComponent implements OnChanges, OnInit {
     const index = adapter.artifactColumns.length;
     const adapterIndex = this.groupAdapters.indexOf(adapter);
     // remove from unselected fields
-    this.unselectedArtifactColumns.splice(columnIndex, 1);
+    // this.unselectedArtifactColumns.splice(columnIndex, 1);
     this._store.dispatch(
-      new DesignerAddColumnToGroupAdapter(artifactColumn, index, adapterIndex)
+      new DesignerAddColumnToGroupAdapter(
+        cloneDeep(artifactColumn),
+        index,
+        adapterIndex
+      )
     );
     this.onFieldsChange();
   }
