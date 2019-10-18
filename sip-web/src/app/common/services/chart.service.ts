@@ -599,9 +599,13 @@ export class ChartService {
     return reduce(
       fieldsArray,
       (accumulator, field) => {
-        accumulator[
-          typeof field.checked === 'string' ? field.checked : field.area
-        ] = removeKeyword(field.dataField || field.columnName);
+        const area =
+          typeof field.checked === 'string' ? field.checked : field.area;
+        accumulator[area] = removeKeyword(
+          (area === 'y' || area === 'z') && field.dataField
+            ? field.dataField
+            : field.columnName
+        );
         return accumulator;
       },
       {}
