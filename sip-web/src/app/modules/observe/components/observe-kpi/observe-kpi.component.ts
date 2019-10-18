@@ -65,6 +65,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (isEmpty(data)) {
       return;
     }
+
     this._kpi = data;
     this.executeKPI(this._kpi);
   }
@@ -103,6 +104,10 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       return '';
     }
     const executedKpi = this._executedKPI || this._kpi;
+    let primaryFilter = get(
+      executedKpi,
+      'filters.0.model'
+    );
     let preset = get(
       executedKpi,
       'filters.0.model.preset'
@@ -113,19 +118,19 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       executedKpi.filters.forEach(filt => {
         if (filt.primaryKpiFilter) {
           preset = filt.model.preset;
+          primaryFilter = filt.model;
           return;
         }
       });
     }
-
     const filter = get(this.datePresetObj, `${preset}.label`);
     if (filter === 'Custom') {
       const gte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        get(primaryFilter, 'gte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       const lte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        get(primaryFilter, 'lte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       return `${gte} - ${lte}`;

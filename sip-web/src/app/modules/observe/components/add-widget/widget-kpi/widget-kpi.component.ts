@@ -34,6 +34,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as isEmpty from 'lodash/isEmpty';
+import * as fpMap from 'lodash/fp/map';
 
 import * as moment from 'moment';
 import { requireIf } from '../../../validators/required-if.validator';
@@ -269,25 +270,28 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         : data.bulletPalette;
 
       let filt = get(data, 'filters.0.model.preset');
+      let filterModel = get(data, 'filters.0.model');
       let dateField = get(data, 'filters.0.columnName');
       if (isUndefined(filt)) {
         forEach(data.filters, primaryfilter => {
           if (primaryfilter.primaryKpiFilter) {
             filt = primaryfilter.model.preset;
-            dateField = primaryfilter.model.columnName;
+            filterModel = primaryfilter.model;
+            dateField = primaryfilter.columnName;
           }
         });
       }
+
       dateField && this.kpiForm.get('dateField').setValue(dateField);
       this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
 
-      const lte = get(data, 'filters.0.model.lte');
+      const lte = get(filterModel, 'lte');
       lte &&
         this.kpiForm
           .get('lte')
           .setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
 
-      const gte = get(data, 'filters.0.model.gte');
+      const gte = get(filterModel, 'gte');
       gte &&
         this.kpiForm
           .get('gte')
@@ -397,6 +401,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     const index = this.userOptedFilters.findIndex(x => x.columnName === defaultFilter.columnName);
     if (index === -1) {
       this.userOptedFilters.push(defaultFilter);
+    } else {
+      this.userOptedFilters = fpPipe(
+        fpMap(filt => {
+          if (filt.columnName === defaultFilter.columnName) {
+            filt.model = defaultFilter.model;
+          }
+          return filt;
+        })
+      )(this.userOptedFilters);
     }
     return this.userOptedFilters;
   }

@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
+
 import {
   getFilterValue
 } from './../../../../analyze/consts';
@@ -27,7 +28,7 @@ export class WidgetFiltersComponent implements OnInit {
   }
 
   getDisplayName(filter) {
-    return filter.columnName;
+    return filter.columnName.split('.keyword')[0];
   }
 
   getFilterValue(filter) {
