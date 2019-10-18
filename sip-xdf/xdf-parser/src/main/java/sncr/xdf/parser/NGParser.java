@@ -281,9 +281,6 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
                 retval =  -1;
             }
-            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
-
-            logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
         } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {

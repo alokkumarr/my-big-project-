@@ -344,7 +344,7 @@ public class XDFDataProcessor  extends AbstractComponent {
 
             logger.debug("SQL component sqlOutputSize  :" + sqlOutputSize + "\n" );
 
-            String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet().toString();
+            //String sqlOutKey =  config.getOutputs().get(sqlOutputSize-1).getDataSet().toString();
 
             ngSQLCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
             ngSQLCtxSvc.getNgctx().dataSetName = sqlInKey; //TRANS_out
