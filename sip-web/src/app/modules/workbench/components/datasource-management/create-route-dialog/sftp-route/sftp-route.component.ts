@@ -10,10 +10,12 @@ import {
   DetailForm,
   SFTPRouteMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
+import { takeWhile, tap, debounceTime } from 'rxjs/operators';
 import { isUnique } from 'src/app/common/validators';
 
 import * as includes from 'lodash/includes';
 import * as isUndefined from 'lodash/isUndefined';
+import * as trim from 'lodash/trim';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { MatDialog } from '@angular/material';
@@ -61,7 +63,10 @@ export class SftpRouteComponent implements OnInit, DetailForm {
         )
       ],
       sourceLocation: ['', Validators.required],
-      destinationLocation: ['', Validators.required],
+      destinationLocation: [
+        '',
+        [Validators.required, Validators.pattern(/^((?!\s).)*$/)]
+      ],
       filePattern: ['', [Validators.required, this.validateFilePattern]],
       description: [''],
       disableDuplicate: [false],
@@ -70,6 +75,19 @@ export class SftpRouteComponent implements OnInit, DetailForm {
       fileExclusions: ['', this.validatefileExclusion],
       lastModifiedLimitHours: ['', Validators.pattern(/^\d*[1-9]\d*$/)]
     });
+
+    this.detailsFormGroup
+      .get('destinationLocation')
+      .valueChanges.pipe(
+        takeWhile(() => Boolean(this)),
+        debounceTime(1000),
+        tap(value => {
+          this.detailsFormGroup
+            .get('destinationLocation')
+            .setValue(trim(value), { emitEvent: false });
+        })
+      )
+      .subscribe();
   }
 
   validateFilePattern(

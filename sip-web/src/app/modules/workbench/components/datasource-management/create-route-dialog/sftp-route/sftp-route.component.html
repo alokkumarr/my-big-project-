@@ -144,6 +144,15 @@
       >
         Destination Location is <strong>required</strong>
       </mat-error>
+      <mat-error
+        e2e="route-dest-location-pattern-error"
+        *ngIf="
+          !!detailsFormGroup.controls.destinationLocation.hasError('pattern')
+        "
+        i18n
+      >
+        Destination Location <strong>cannot contain spaces</strong>
+      </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label i18n>Batch size</mat-label>
