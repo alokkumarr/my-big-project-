@@ -149,6 +149,22 @@ export class DesignerState {
   }
 
   @Selector()
+  static selectedNonDataFields(state: DesignerStateModel) {
+    return fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(field => !['data', 'y', 'z'].includes(field.area))
+    )(get(state, 'analysis.sipQuery.artifacts'));
+  }
+
+  @Selector()
+  static selectedDataFields(state: DesignerStateModel) {
+    return fpPipe(
+      fpFlatMap(artifact => artifact.fields),
+      fpFilter(field => ['data', 'y', 'z'].includes(field.area))
+    )(get(state, 'analysis.sipQuery.artifacts'));
+  }
+
+  @Selector()
   static analysis(state: DesignerStateModel) {
     return state.analysis;
   }

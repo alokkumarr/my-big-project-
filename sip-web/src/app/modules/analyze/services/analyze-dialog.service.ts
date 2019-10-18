@@ -25,6 +25,7 @@ import { DataFormatDialogComponent } from '../../../common/components/data-forma
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { ConfirmDialogData, isDSLAnalysis } from '../../../common/types';
+import { ArtifactDSL } from 'src/app/models';
 
 @Injectable()
 export class AnalyzeDialogService {
@@ -70,7 +71,7 @@ export class AnalyzeDialogService {
     });
   }
 
-  openSortDialog(sorts: Sort[], artifacts: Artifact[]) {
+  openSortDialog(sorts: Sort[], artifacts: ArtifactDSL[]) {
     const data: IToolbarActionData = {
       action: 'sort',
       sorts,
