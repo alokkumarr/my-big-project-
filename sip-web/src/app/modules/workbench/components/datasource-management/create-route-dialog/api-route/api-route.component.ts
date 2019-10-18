@@ -6,9 +6,11 @@ import {
   HTTP_METHODS,
   APIRouteMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
+import { takeWhile, tap, debounceTime } from 'rxjs/operators';
 import { isUnique } from 'src/app/common/validators';
 
 import * as isUndefined from 'lodash/isUndefined';
+import * as trim from 'lodash/trim';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
@@ -80,7 +82,10 @@ export class ApiRouteComponent implements OnInit, DetailForm {
           oldRouteName
         )
       ],
-      destinationLocation: ['', Validators.required],
+      destinationLocation: [
+        '',
+        [Validators.required, Validators.pattern(/^((?!\s).)*$/)]
+      ],
       description: [''],
       apiEndPoint: [''],
       httpMethod: [HTTP_METHODS.GET, Validators.required],
@@ -91,6 +96,16 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       queryParameters: this.formBuilder.array([]),
       urlParameters: this.formBuilder.array([])
     });
+
+    this.detailsFormGroup.get('destinationLocation').valueChanges.pipe(
+      takeWhile(() => Boolean(this)),
+      debounceTime(1000),
+      tap(value => {
+        this.detailsFormGroup
+          .get('destinationLocation')
+          .setValue(trim(value), { emitEvent: false });
+      })
+    );
   }
 
   openSelectSourceFolderDialog() {
