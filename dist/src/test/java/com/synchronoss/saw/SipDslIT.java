@@ -1115,8 +1115,8 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testExecutionWithGroupIntervalSecond() throws IOException {
-    String MinuteGroupInterval = "minute";
-    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(MinuteGroupInterval);
+    String minuteGroupInterval = "minute";
+    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(minuteGroupInterval);
     ArrayNode dataForMinuteGrouping =
         reponseAtMinuteLevel.getBody().as(ObjectNode.class).withArray("data");
     Integer responseSizeForMinute = dataForMinuteGrouping.size();
