@@ -51,7 +51,7 @@ public class SIPAggregationBuilder {
 
   public static List<Field> getAggregationField(List<Field> dataFields) {
     return dataFields.stream().filter(
-        dataField -> dataField.getAggregate() != null || StringUtils.isEmpty(dataField.getFormula()))
+        dataField -> dataField.getAggregate() != null || dataField.getFormula() != null)
         .collect(Collectors.toList());
   }
 
