@@ -9,8 +9,6 @@ import { DeleteDialogComponent } from './../../../../../common/components/delete
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpFilter from 'lodash/fp/filter';
 import * as find from 'lodash/find';
 
 @Component({
