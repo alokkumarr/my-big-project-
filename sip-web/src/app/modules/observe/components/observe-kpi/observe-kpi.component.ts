@@ -95,7 +95,15 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   constructGlobalFilter(model) {
-    const globalFilters = this._kpi.filters.length === 0 ? get(this._kpi, 'filters.0') : fpPipe(
+    const globalFilters = this._kpi.filters.length === 1
+    // Check backward compatibility
+    ? fpPipe(
+      fpMap(filt => {
+        filt.model = model;
+        return filt;
+      })
+    )(this._kpi.filters)
+    : fpPipe(
       fpMap(filt => {
         if (filt.primaryKpiFilter) {
           filt.model = model;
@@ -103,7 +111,6 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         return filt;
       })
     )(this._kpi.filters);
-    console.log(globalFilters);
     return globalFilters;
   }
 
