@@ -1,6 +1,7 @@
 package com.sncr.saw.security.app;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.service.TicketHelper;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -36,6 +37,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 
     @Autowired
     private NSSOProperties nSSOProperties;
+    @Autowired private TicketHelper ticketHelper;
 
     @Bean
     public TomcatServletWebServerFactory tomcatEmbedded() {
@@ -57,7 +59,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
     @Bean
     public FilterRegistrationBean<?> jwtFilter() {
       final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-      registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey()));
+      registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(),ticketHelper));
       registrationBean.addUrlPatterns("/auth/*");
   
       return registrationBean;
