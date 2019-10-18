@@ -14,20 +14,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class SipIngestionPluginFactory {
 
-  @Autowired
-  private SftpServiceImpl sftpServiceImpl;
+  @Autowired private SftpServiceImpl sftpServiceImpl;
 
-  @Autowired
-  S3ServiceImpl s3ServiceImpl;
+  @Autowired S3ServiceImpl s3ServiceImpl;
 
-  @Autowired
-  private ApiPullServiceImpl apiPullService;
+  @Autowired private ApiPullServiceImpl apiPullService;
 
   private static final Logger logger = LoggerFactory.getLogger(SipIngestionPluginFactory.class);
 
   /**
    * Retrive instance based on ingestion type.
-   * 
+   *
    * @param ingestionType channel type
    * @return pluginContract
    */
@@ -35,16 +32,20 @@ public class SipIngestionPluginFactory {
 
     SipPluginContract sipConnectionService = null;
 
-    if (ingestionType.equals(BisChannelType.SFTP.value())) {
-      sipConnectionService = this.sftpServiceImpl;
-    } else if (ingestionType.equals(BisChannelType.S3.value())) {
-      sipConnectionService = this.s3ServiceImpl;
-    } else if (ingestionType.equals(BisChannelType.APIPULL.value())) {
-      sipConnectionService = this.apiPullService;
+    BisChannelType type = BisChannelType.fromValue(ingestionType);
+
+    switch (type) {
+      case SFTP:
+        sipConnectionService = this.sftpServiceImpl;
+        break;
+      case S3:
+        sipConnectionService = this.s3ServiceImpl;
+        break;
+      case APIPULL:
+        sipConnectionService = this.apiPullService;
+        break;
     }
 
     return sipConnectionService;
-
   }
-
 }

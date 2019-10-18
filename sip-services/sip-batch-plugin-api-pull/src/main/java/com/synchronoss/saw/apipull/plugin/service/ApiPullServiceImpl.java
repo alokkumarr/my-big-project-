@@ -12,7 +12,7 @@ import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.QueryParameter;
 import com.synchronoss.saw.apipull.pojo.RouteMetadata;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
-import com.synchronoss.saw.apipull.service.HttpClient;
+import com.synchronoss.saw.apipull.service.SipHttpClient;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
 import com.synchronoss.saw.batch.entities.BisRouteEntity;
 import com.synchronoss.saw.batch.entities.repositories.BisChannelDataRestRepository;
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -57,7 +56,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
-import sncr.bda.core.file.HFileOperations;
 
 @Service("apipullService")
 public class ApiPullServiceImpl extends SipPluginContract {
@@ -166,10 +164,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
       }
 
       try {
-        HttpClient httpClient = new HttpClient();
+        SipHttpClient sipHttpClient = new SipHttpClient();
 
         connectionLogs.append("Connecting to ").append(url).append("\n");
-        ApiResponse response = httpClient.execute(apiRequest);
+        ApiResponse response = sipHttpClient.execute(apiRequest);
 
         connectionLogs.append("Fetching data from ").append(url).append("\n");
         MediaType responseContentType = response.getHttpHeaders().getContentType();
@@ -250,24 +248,14 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
     List<Object> queryParamObj = payload.getQueryParameters();
 
-    logger.debug("Query Param Obj = " + queryParamObj);
-    logger.debug("Query Param obj type = " + queryParamObj.getClass().getName());
     List<QueryParameter> queryParameters = new ArrayList<>();
 
     if (queryParamObj != null) {
-
-      logger.debug("Query Params = " + queryParameters);
-      logger.debug("Query Param Type = " + queryParameters.getClass().getName());
-
       for (Object paramObject : queryParamObj) {
         logger.debug("Object = " + paramObject);
         logger.debug("Object type = " + paramObject.getClass().getName());
         LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) paramObject;
 
-        System.out.println("Key = " + map.get("key"));
-        System.out.println("Value = " + map.get("value"));
-
-        logger.debug("Key Map = " + map);
         QueryParameter param = new QueryParameter();
 
         param.setKey(map.get("key"));
@@ -302,7 +290,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
       apiRequest.setHeaderParameters(headerParameters);
     }
 
-    if (httpMethodStr.equalsIgnoreCase("POST")) {
+    if (httpMethodStr.equalsIgnoreCase(HttpMethod.POST.toString())) {
       Object bodyParamsObj = payload.getBodyParameters();
 
       LinkedHashMap<String, Object> bodyParamMap = (LinkedHashMap<String, Object>) bodyParamsObj;
@@ -318,10 +306,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
     }
 
     try {
-      HttpClient httpClient = new HttpClient();
+      SipHttpClient sipHttpClient = new SipHttpClient();
 
       connectionLogs.append("Connecting to ").append(url).append("\n");
-      ApiResponse response = httpClient.execute(apiRequest);
+      ApiResponse response = sipHttpClient.execute(apiRequest);
 
       connectionLogs.append("Fetching data from ").append(url).append("\n");
       HttpStatus httpStatus = response.getHttpStatus();
@@ -381,17 +369,12 @@ public class ApiPullServiceImpl extends SipPluginContract {
     if (queryParamObj != null) {
 
       logger.debug("Query Params = " + queryParameters);
-      logger.debug("Query Param Type = " + queryParameters.getClass().getName());
 
       for (Object paramObject : queryParamObj) {
         logger.debug("Object = " + paramObject);
         logger.debug("Object type = " + paramObject.getClass().getName());
         LinkedHashMap<String, String> map = (LinkedHashMap<String, String>) paramObject;
 
-        System.out.println("Key = " + map.get("key"));
-        System.out.println("Value = " + map.get("value"));
-
-        logger.debug("Key Map = " + map);
         QueryParameter param = new QueryParameter();
 
         param.setKey(map.get("key"));
@@ -446,10 +429,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
     }
 
     try {
-      HttpClient httpClient = new HttpClient();
+      SipHttpClient sipHttpClient = new SipHttpClient();
 
       connectionLogs.append("Connecting to ").append(url).append("\n");
-      ApiResponse response = httpClient.execute(apiRequest);
+      ApiResponse response = sipHttpClient.execute(apiRequest);
 
       connectionLogs.append("Fetching data from ").append(url).append("\n");
       HttpStatus httpStatus = response.getHttpStatus();
@@ -646,12 +629,12 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         try {
           ZonedDateTime fileTransStartTime = ZonedDateTime.now();
-          logger.trace("File" + fileName + " transfer strat time:: " + fileTransStartTime);
-          HttpClient httpClient = new HttpClient();
+          logger.debug("File" + fileName + " transfer strat time:: " + fileTransStartTime);
+          SipHttpClient sipHttpClient = new SipHttpClient();
 
-          logger.debug("Fetching API data");
+          logger.trace("Fetching API data");
 
-          ApiResponse response = httpClient.execute(apiRequest);
+          ApiResponse response = sipHttpClient.execute(apiRequest);
 
           logger.debug("API Response = " + response);
 
@@ -695,8 +678,6 @@ public class ApiPullServiceImpl extends SipPluginContract {
           } else if (responseContentType.equals(MediaType.TEXT_PLAIN)) {
             logger.debug("Content type is text");
             fileNameBuilder.append(".txt");
-          } else {
-            // Not implemented yet
           }
 
           fileName = fileNameBuilder.toString();

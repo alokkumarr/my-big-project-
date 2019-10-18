@@ -7,16 +7,17 @@ import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.QueryParameter;
 import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
-import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @ContextConfiguration(classes = {RestTemplateConfig.class, HttpClientConfig.class})
-public class HttpClient {
-  private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
+public class SipHttpClient {
+  private static final Logger logger = LoggerFactory.getLogger(SipHttpClient.class);
 
   public ApiResponse execute(SipApiRequest sipApiRequest) throws SipApiPullExecption {
     boolean validRequest =
@@ -44,7 +45,7 @@ public class HttpClient {
         return apiResponse;
       } else {
         logger.debug("HttpMethod : {POST}");
-        HttpClientPost post = new HttpClientPost(url);
+        SipHttpClientPost post = new SipHttpClientPost(url);
         if (!CollectionUtils.isEmpty(sipApiRequest.getQueryParameters())) {
           for (QueryParameter qp : sipApiRequest.getQueryParameters()) {
             post.setQueryParam(qp.getKey(), qp.getValue());
@@ -56,8 +57,8 @@ public class HttpClient {
             post.setHeaderParams(hp.getKey(), hp.getValue());
           }
         } else {
-          logger.debug("Setting default header");
-          post.setHeaderParam("Content-Type", "application/json");
+          logger.trace("Setting default header");
+          post.setHeaderParam(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         }
 
         if (sipApiRequest.getBodyParameters() != null) {
@@ -66,7 +67,7 @@ public class HttpClient {
           String contentType = body.getType();
 
           if(contentType == null || contentType.length() == 0) {
-              contentType = MediaType.APPLICATION_JSON;
+              contentType = MediaType.APPLICATION_JSON_VALUE;
           }
 
           post.setRawData(body.getContent().toString(), contentType);

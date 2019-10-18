@@ -7,7 +7,7 @@ import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
-import com.synchronoss.saw.apipull.service.HttpClient;
+import com.synchronoss.saw.apipull.service.SipHttpClient;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -16,10 +16,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
 
-public class HttpClientTest {
+public class SipHttpClientTest {
 
   RestTemplate restTemplate;
-  HttpClient httpClient;
+  SipHttpClient sipHttpClient;
   ApiResponse apiResponse;
   String url =
       "https://openweathermap.org/data/2.5/forecast/hourly?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
@@ -27,7 +27,7 @@ public class HttpClientTest {
   @Before
   public void init() {
     restTemplate = new RestTemplate();
-    httpClient = new HttpClient();
+    sipHttpClient = new SipHttpClient();
   }
 
   @Test
@@ -40,7 +40,7 @@ public class HttpClientTest {
     SipApiRequest sipApiRequest = new SipApiRequest();
     sipApiRequest.setUrl(url);
 
-    apiResponse = httpClient.execute(sipApiRequest);
+    apiResponse = sipHttpClient.execute(sipApiRequest);
     Assert.assertNotNull(apiResponse.getResponseBody());
     Assert.assertNotNull(apiResponse.getHttpHeaders());
   }
@@ -110,7 +110,7 @@ public class HttpClientTest {
     bodyParameters.setContent(objectNode);
     sipApiRequest.setBodyParameters(bodyParameters);
 
-    apiResponse = httpClient.execute(sipApiRequest);
+    apiResponse = sipHttpClient.execute(sipApiRequest);
     Assert.assertNotNull(apiResponse.getResponseBody());
     Assert.assertNotNull(apiResponse.getHttpHeaders());
   }

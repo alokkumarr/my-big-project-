@@ -1,5 +1,7 @@
 package com.synchronoss.saw.apipull.service;
 
+import static org.apache.http.entity.ContentType.MULTIPART_FORM_DATA;
+
 import com.google.gson.Gson;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
@@ -18,8 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class HttpClientPost extends SipBaseHttpClient {
-  private static final Logger logger = LoggerFactory.getLogger(HttpClientPost.class);
+public class SipHttpClientPost extends SipBaseHttpClient {
+  private static final Logger logger = LoggerFactory.getLogger(SipHttpClientPost.class);
 
   Map<String, Object> formData;
   String textData;
@@ -27,7 +29,7 @@ public class HttpClientPost extends SipBaseHttpClient {
   RestTemplate restTemplate = new RestTemplate();
   ApiResponse apiResponse = new ApiResponse();
 
-  public HttpClientPost(String host) {
+  public SipHttpClientPost(String host) {
     super(host);
   }
 
