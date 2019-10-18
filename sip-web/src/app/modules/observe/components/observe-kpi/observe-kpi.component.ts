@@ -11,6 +11,8 @@ import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isFinite from 'lodash/isFinite';
 import * as moment from 'moment';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
@@ -86,17 +88,23 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (!filterModel.preset) {
       return this.executeKPI(this._kpi);
     }
-
-    const filter = defaults(
-      {},
-      {
-        model: filterModel
-      },
-      get(this._kpi, 'filters.0')
-    );
-    const kpi = defaults({}, { filters: [filter] }, this._kpi);
+    const filter = this.constructGlobalFilter(filterModel);
+    const kpi = defaults({}, { filters: filter }, this._kpi);
 
     return this.executeKPI(kpi);
+  }
+
+  constructGlobalFilter(model) {
+    const globalFilters = this._kpi.filters.length === 0 ? get(this._kpi, 'filters.0') : fpPipe(
+      fpMap(filt => {
+        if (filt.primaryKpiFilter) {
+          filt.model = model;
+        }
+        return filt;
+      })
+    )(this._kpi.filters);
+    console.log(globalFilters);
+    return globalFilters;
   }
 
   getFilterLabel() {
