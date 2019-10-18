@@ -1141,7 +1141,7 @@
 { "index" :{}}
 {"COORDINATES": "34.359006,23.90156267", "COUNTY": "IN","string": "string C", "long": 1549, "float": 78961.17, "date": "2019-10-16 12:32:55", "integer": 236, "double": 876543.34, "customerCode": "TenantB"}
 { "index" :{}}
-{"COORDINATES": "58.359006,44.90156267", "COUNTY": "IL","string": "string xyz", "long": 1549, "float": 5679.07, "date": "2019-10-16 11:05:38", "integer": 678, "double": 567814.45, "customerCode": "TenantA"}
+{"COORDINATES": "58.359006,44.90156267", "COUNTY": "IL","string": "string xyz", "long": 1549, "float": 5679.07, "date": "2019-10-16 11:05:32", "integer": 678, "double": 567814.45, "customerCode": "TenantA"}
 { "index" :{}}
 {"COORDINATES": "55.359006,99.90156267", "COUNTY": "IN","string": "string xyz", "long": 1549, "float": 2004.37, "date": "2019-10-16 5:32:12", "integer": 649, "double": 456790.12, "customerCode": "TenantA"}
 { "index" :{}}
