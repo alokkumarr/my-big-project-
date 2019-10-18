@@ -1,0 +1,178 @@
+#
+# SAW environment configuration for local testing
+#
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_ssh_pass=root
+saw_spark_master_url=local[*]
+sip_var_path=/var/sip
+saw_elasticsearch_host=sip-elastic
+
+# The below parameter should made active if we want to  environment to be active
+sip_secure=${sip-cloud-secure}
+# The EPEL is installed in the SIP container base images, so mark it
+# as provided
+sip_epel_yum_provided=true
+
+# Allow developers that run SIP web on their local machine to connect
+# to remote SIP environments by setting localhost to an allowed origin
+# for CORS
+sip_cors_allow_origin=http://localhost:3000
+
+[sip-admin]
+sip-admin
+
+[saw-proxy]
+sip-proxy
+
+[saw-web]
+sip-app1
+sip-app2
+
+[saw-services]
+sip-app1
+sip-app2
+
+[saw-services:vars]
+#
+# SIP
+#
+sip_var_path=/var/sip
+#
+# Spark configuration
+#
+saw_spark_master_url=local[*]
+#saw_spark_master_url=yarn
+#saw_spark_yarn_queue_regular=saw-regular
+#saw_spark_yarn_queue_fast=saw-fast
+#saw_spark_yarn_jars=/opt/mapr/spark/spark-2.3.2/jars
+#saw_spark_yarn_zips=/opt/bda/sip-executor/spark.zip
+#saw_spark_yarn_resource_manager=sip-mapr
+saw_zookeeper_quorum=sip-mapr
+saw_execution_history=2
+
+#
+# Transport Service Executor configuration
+#
+saw_executor_memory_regular=512M
+saw_executor_memory_fast=512M
+saw_executor_cores_regular=1
+saw_executor_cores_fast=1
+saw_spark_executor_instances_regular=1
+saw_spark_executor_instances_fast=1
+saw_executor_result_wait_time=300
+sip_executor_driver_memory=2G
+
+#
+# This property is optional, will become mandatory if any SIP enviroment has limited port accessibility and
+# other ports are blocked for security reasons. In this case SIP Executors to work properly
+# it required to have reserved port series. sip_executors_reserved_port properties can be
+# set for starting port number and SIP will auto calculate the number of required port
+# based on number of SIP-Nodes, like Number of open series port required as (Number of SIP-node * 4 port)
+# For example: if we have assigned 9801 is starting port and number of host is 2 then (2* 4), so 9801 to 9808 port
+# will be used by spark executors.
+#
+sip_executors_reserved_port=9801
+#
+# Elasticsearch configuration
+# For the property saw_elasticsearch_port="8200,8200"
+# within quotes due to the way Jinja renders it in yaml file
+# When there is a single port, can be used without quotes
+#
+saw_elasticsearch_protocol=http
+saw_elasticsearch_host=sip-elastic
+saw_elasticsearch_port=8200
+saw_elasticsearch_username=
+saw_elasticsearch_password=
+saw_elasticsearch_data_store_limit=10000
+saw_elasticsearch_cluster_name=elasticsearch
+saw_elasticsearch_xpack=false
+
+#
+# Path by project
+# replace project key with meaningful name for customer & project
+# replace project path with the accessible by customer like for mct customers only
+# replace project root with appropriate mapr or hdfs root directory
+# replace project preview limit by default set it to 10000
+#
+saw_workbench_project_key=workbench
+saw_workbench_project_path=/workbench
+saw_workbench_project_root=maprfs:///var/sip
+saw_workbench_preview_limit=100
+saw_workbench_livy_uri=http://sip-mapr:8998/
+
+
+# The below parameter is to control what should be the time difference
+# to declare a file in the system is corrupted needs to be downloaded again
+# Default is 5 minutes
+sip_bis_retry_diffs_in_minutes=5
+
+# This parameter has been added to control the logging of duplicate
+# entries on store. This has been added as a part of SIP-6386
+# For expected performance with the large file trees structure
+# it needs to be instructed to turn it off
+sip_bis_duplicate_entry=true
+
+
+#Default configuration is set preview limit is 100, if it not set in config file.
+saw_preview_rows_limit=10000
+# Publish row limit is optional parameter and only get considered if it has been
+# set greater than 0 values if it not set then no limit will be applied for publishing the report.
+saw_publish_rows_limit=10000
+saw_executor_restart_threshold=50
+
+# FTP JSON config
+# (Do not split this into multiple lines)
+## FTP host should be setup in docker instance itself but for timing being we are setting the external FTP enviroment for testing.
+ftp_json_config='{"ftpList":[{"customerName":"SYNCHRONOSS","alias":"ftp_Test","host":"ftp.razorsight.com","port":22,"username":"ftp_saasadmin","password":"RhW4ndePN23","location":"/abc","type":"sftp"}]}'
+
+## S3 host should be setup in docker instance itself but for timing being we are setting it manually.
+s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******4AECBVQ", "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz", "type": "s3"}]}'
+
+#
+# Email and FTP export size definition
+# default value for email is 50000 and ftp is 1000000
+#
+saw_ui_export_size=10000
+saw_email_export_size=50000
+saw_ftp_export_size=1000000
+saw_s3_export_size=1000000
+
+## Chunk size for processing exports
+saw_export_chunk_size=10000
+
+## Alert dashboard URL required to send to mail.
+alert_dashboard_link=http://<hostname>/sip/web/#/alerts/view
+
+saw_email_host=sip-admin
+
+[saw-security]
+sip-app1
+sip-app2
+
+[saw-security:vars]
+saw_security_email_host=sip-admin
+
+[saw-security-arbitrator]
+sip-app3
+
+[sip-xdf]
+sip-mapr
+
+[sip-a2]
+sip-mapr
+
+[sip-rtis]
+sip-app1
+sip-app2
+
+[sip-rtps]
+sip-mapr
+
+[sip-elastic]
+sip-elastic
+
+[sip-rtis:vars]
+sip_rtis_app_class=synchronoss.handlers.GenericEventHandler
