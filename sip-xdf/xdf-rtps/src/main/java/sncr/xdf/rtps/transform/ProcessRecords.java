@@ -253,7 +253,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	Dataset<Row> df = null;
     	
     	
-    	if(model.equals(DM_GENERIC)) {
+    	if(model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) {
     		 JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
     	        //rowRdd.foreachPartitionAsync(f)
     	     logger.debug("######## Reading completed through spark session #####" );
