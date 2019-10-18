@@ -32,13 +32,14 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
   @Override
   public RequestBuilder transform(HttpServletRequest request) throws URISyntaxException {
     String requestURI = request.getRequestURI();
+    logger.trace("requestURI start here: " +requestURI);
     URI uri;
     if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
       uri = new URI(getServiceUrl(requestURI, request) + "?" + request.getQueryString());
     } else {
       uri = new URI(getServiceUrl(requestURI, request));
     }
-
+    logger.trace("requestURI ends here: " +requestURI);
     RequestBuilder rb = RequestBuilder.create(request.getMethod());
     rb.setUri(uri);
     return rb;

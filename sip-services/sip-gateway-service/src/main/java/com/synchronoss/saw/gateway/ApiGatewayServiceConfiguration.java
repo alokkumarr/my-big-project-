@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,13 +44,6 @@ public class ApiGatewayServiceConfiguration implements WebMvcConfigurer {
   }
   
   @Bean
-  public FilterRegistrationBean<SipXssRequestFilter> loggingFilter(){
-      logger.info("sip xss filter starts here.");
-      FilterRegistrationBean<SipXssRequestFilter> registrationBean 
-        = new FilterRegistrationBean<>();
-      registrationBean.setFilter(new SipXssRequestFilter());
-      logger.info("sip xss filter ends here.");
-      return registrationBean;    
-  }
+  public SipXssRequestFilter sipfilter () {return new SipXssRequestFilter();}
   
 }

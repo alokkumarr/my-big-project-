@@ -1,5 +1,6 @@
 package com.synchronoss.bda.sip;
 
+import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -18,9 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.filter.GenericFilterBean;
+
 
 
 
@@ -36,7 +36,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     logger.trace("Logging Request  {} : {}", req.getMethod(), req.getRequestURL());
     String uri = req.getRequestURL().toString();
     Boolean isValid = ESAPI.validator().isValidURI("URL", uri, true);
-    logger.info("isValid URI: " + isValid);
+    logger.trace("isValid URI: " + isValid);
     if (req.getQueryString() != null) {
       Map<String, List<String>> canonicalizedMap = splitQuery(req.getQueryString());
       Set<Entry<String, List<String>>> query = canonicalizedMap.entrySet();
@@ -59,17 +59,19 @@ public class SipXssRequestFilter extends GenericFilterBean {
             logger.trace("queryIsValid Query Parameter: " + queryIsValid);
           }
           if (!queryIsValid) {
+            res.sendError(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
             logger.trace(
                 "Check for cross-site scripting: reflected in query parameter value: " + data);
-            throw new HttpServerErrorException(HttpStatus.UNPROCESSABLE_ENTITY, data);
+            throw new SipNotProcessedSipEntityException("Check for cross-site scripting: "
+                + "reflected in query parameter value: " + data);
           }
         }
       }
     }
     if (!isValid) {
       logger.info("Cross-site scripting: reflected: " + !isValid);
-      res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      throw new HttpServerErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
+      res.sendError(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      throw new SipNotProcessedSipEntityException("Cross-site scripting: reflected: " + !isValid);
     }
     chain.doFilter(request, response);
     logger.trace("Logging Response :{}", res.getContentType());
@@ -90,5 +92,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     }
     return queryPairs;
   }
+  
+  
 
 }

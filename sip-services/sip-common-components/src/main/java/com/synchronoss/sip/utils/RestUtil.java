@@ -311,7 +311,6 @@ public class RestUtil {
             }
             if (!isValid) {
               logger.info("Attribute is of type Json");
-              isValid = Boolean.TRUE;
               ObjectMapper m = new ObjectMapper();
               JsonNode rootNode = m.readTree(m.writeValueAsString(node));
               validateNodeValue(rootNode);

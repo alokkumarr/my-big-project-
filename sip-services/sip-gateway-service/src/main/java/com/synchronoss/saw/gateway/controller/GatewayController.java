@@ -107,7 +107,7 @@ public class GatewayController {
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
-    logger.trace("request info : "+ request);
+    logger.trace("Request info : "+ request.getRequestURI());
     logger.trace("filePath info : "+ filePath);
     logger.trace("Accept {}",request.getHeader("Accept"));
     logger.trace("Authorization {}",request.getHeader("Authorization"));
@@ -261,12 +261,14 @@ public class GatewayController {
   
 
   private HttpUriRequest createHttpUriRequest(HttpServletRequest request, UserCustomerMetaData userRelatedMetaData) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
+    logger.trace("createHttpUriRequest starts here");
     URLRequestTransformer urlRequestTransformer = new URLRequestTransformer(apiGatewayProperties);
     ContentRequestTransformer contentRequestTransformer = new ContentRequestTransformer();
     HeadersRequestTransformer headersRequestTransformer = new HeadersRequestTransformer();
     headersRequestTransformer.setUserRelatedMetaData(userRelatedMetaData);
     headersRequestTransformer.setPredecessor(contentRequestTransformer);
     contentRequestTransformer.setPredecessor(urlRequestTransformer);
+    logger.trace("createHttpUriRequest ends here");
     return headersRequestTransformer.transform(request).build();
   }
 
@@ -287,10 +289,5 @@ public class GatewayController {
     logger.trace("Destination Url: " + endPoint);
     return endPoint;
   }
-  
-  /*@PostMapping(path = "/data")
-  public ResponseEntity<Data> getData(@RequestBody Data data){
-    return new ResponseEntity<Data>(data, HttpStatus.ACCEPTED);
-  }*/
   
 }
