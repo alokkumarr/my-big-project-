@@ -1311,6 +1311,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const column = {
           ...artifactColumn,
           ...result,
+          dataField: result.columnName,
           table: get(this.artifacts[0], 'artifactName'),
           type: 'double'
         };
