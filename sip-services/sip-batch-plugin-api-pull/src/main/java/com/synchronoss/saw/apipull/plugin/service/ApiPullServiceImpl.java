@@ -606,11 +606,16 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
 
+        logger.debug("Channel Metadata = " + channelMetadata);
+
         String hostAddress = channelMetadata.getHostAddress();
         Integer port = channelMetadata.getPort();
+        logger.debug("Port = " + port);
 
         String routeMetadataStr = routeEntity.getRouteMetadata();
         RouteMetadata routeMetadata = gson.fromJson(routeMetadataStr, RouteMetadata.class);
+
+        logger.debug("Route metadata = " + routeMetadata);
 
         String apiEndPoint = routeMetadata.getApiEndPoint();
         String destinationLocation = routeMetadata.getDestinationLocation();
