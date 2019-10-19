@@ -447,6 +447,65 @@ public class BuilderUtil {
   }
 
   /**
+   * calulates lte date and gte date based on presetCal and forms dynamicConverter.
+   *
+   * @param presetCal
+   * @return Dynamic Converter
+   */
+  public static DynamicConvertor getDynamicConvertForPresetCal(String presetCal) {
+    presetCal = presetCal.trim();
+    final String hypen = "-";
+    if (!presetCal.contains(hypen)) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid format");
+    }
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DynamicConvertor dynamicConvertor = new DynamicConvertor();
+    LocalDateTime now = LocalDateTime.now();
+    int indexOfHyphen = presetCal.indexOf(hypen);
+    int length = presetCal.length();
+    String presetType = presetCal.substring(indexOfHyphen + 1, length);
+    Long presetNumber;
+    try {
+      presetNumber = Long.valueOf(presetCal.substring(0, indexOfHyphen));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid format");
+    }
+    if (presetNumber < 0) {
+      throw new RuntimeException("Lookback period cannot be negative");
+    }
+    switch (presetType.toUpperCase()) {
+      case "DAY":
+        LocalDateTime frm = now.minusDays(presetNumber);
+        dynamicConvertor.setGte(frm.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "HOUR":
+        LocalDateTime fromDateTime = now.minusHours(presetNumber);
+        dynamicConvertor.setGte(fromDateTime.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "MINUTE":
+        LocalDateTime fromDate = now.minusMinutes(presetNumber);
+        dynamicConvertor.setGte(fromDate.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "MONTH":
+        LocalDateTime fromDateForMonth = now.minusMonths(presetNumber);
+        dynamicConvertor.setGte(fromDateForMonth.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "WEEK":
+        LocalDateTime fromDateForWeek = now.minusWeeks(presetNumber);
+        dynamicConvertor.setGte(fromDateForWeek.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      default:
+        throw new IllegalArgumentException("presetCal " + presetCal + " not present");
+    }
+    return dynamicConvertor;
+  }
+
+  /**
    * Re-arrange the query field for ES sorting.
    *
    * @param dataFields

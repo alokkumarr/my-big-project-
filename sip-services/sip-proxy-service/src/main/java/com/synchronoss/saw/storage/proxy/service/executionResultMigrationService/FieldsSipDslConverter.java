@@ -3,6 +3,7 @@ package com.synchronoss.saw.storage.proxy.service.executionResultMigrationServic
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -194,7 +195,7 @@ public interface FieldsSipDslConverter {
       JsonElement aggValElement = sortObject.get(FieldNames.AGGREGATE);
 
       if (!aggValElement.isJsonNull() && aggValElement != null) {
-        sort.setAggregate(Sort.Aggregate.fromValue(aggValElement.getAsString()));
+        sort.setAggregate(Aggregate.fromValue(aggValElement.getAsString()));
       }
     }
 
@@ -318,7 +319,7 @@ public interface FieldsSipDslConverter {
       JsonElement aggValElement = fieldObject.get(FieldNames.AGGREGATE);
 
       if (!aggValElement.isJsonNull() && aggValElement != null) {
-        field.setAggregate(Field.Aggregate.fromValue(aggValElement.getAsString()));
+        field.setAggregate(Aggregate.fromValue(aggValElement.getAsString()));
       }
     }
 

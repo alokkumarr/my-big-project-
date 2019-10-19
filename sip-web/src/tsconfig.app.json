@@ -2,10 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/app",
-    "types": [
-      "highcharts",
-      "node"
-    ]
+    "types": ["highcharts", "node"]
   },
   "files": [
     "main.ts",
@@ -14,11 +11,8 @@
     "app/modules/analyze/analyze.module.ts",
     "app/modules/workbench/workbench.module.ts",
     "app/modules/admin/admin.module.ts",
-    "app/login/login.module.ts"
+    "app/login/login.module.ts",
+    "app/modules/alerts/alerts.module.ts"
   ],
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts",
-    "**/app/**"
-  ]
+  "exclude": ["test.ts", "**/*.spec.ts", "**/app/**"]
 }

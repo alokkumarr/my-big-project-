@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Operand;
 import com.synchronoss.saw.model.Sort;
@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -55,29 +54,35 @@ public class SIPAggregationBuilder {
         .collect(Collectors.toList());
   }
 
-  public static DateHistogramInterval groupInterval(String groupInterval) {
+  public static DateHistogramInterval groupInterval(GroupInterval groupInterval) {
     DateHistogramInterval histogramInterval = null;
     switch (groupInterval) {
-      case "all":
+      case ALL:
         // For group interval ALL, no need to set any value. Refer line: 87.
         break;
-      case "month":
+      case MONTH:
         histogramInterval = DateHistogramInterval.MONTH;
         break;
-      case "day":
+      case DAY:
         histogramInterval = DateHistogramInterval.DAY;
         break;
-      case "year":
+      case YEAR:
         histogramInterval = DateHistogramInterval.YEAR;
         break;
-      case "quarter":
+      case QUARTER:
         histogramInterval = DateHistogramInterval.QUARTER;
         break;
-      case "hour":
+      case HOUR:
         histogramInterval = DateHistogramInterval.HOUR;
         break;
-      case "week":
+      case WEEK:
         histogramInterval = DateHistogramInterval.WEEK;
+        break;
+      case MINUTE:
+        histogramInterval = DateHistogramInterval.MINUTE;
+        break;
+      case SECOND:
+        histogramInterval = DateHistogramInterval.SECOND;
         break;
     }
     return histogramInterval;
@@ -105,7 +110,8 @@ public class SIPAggregationBuilder {
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilder,
-            sorts, groupByFields);
+            sorts,
+            groupByFields);
       }
       if (aggregationBuilder == null) {
         // initialize the terms aggregation builder.
@@ -127,7 +133,7 @@ public class SIPAggregationBuilder {
                     .field(dataField.getColumnName())
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
-                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval().value()))
+                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
                     .order(BucketOrder.key(order));
             if (dataField.getAggregate() == null && dataField.getFormula() == null)
               groupByFields[groupFieldCount++] = dataField.getColumnName();
@@ -204,7 +210,8 @@ public class SIPAggregationBuilder {
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilder,
-            sorts, groupByFields);
+            sorts,
+            groupByFields);
 
       } else {
         boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
@@ -226,7 +233,7 @@ public class SIPAggregationBuilder {
                     .field(dataField.getColumnName())
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
-                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval().value()))
+                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
                     .order(BucketOrder.key(order))
                     .subAggregation(aggregationBuilder);
             if (dataField.getAggregate() == null && dataField.getFormula() == null)

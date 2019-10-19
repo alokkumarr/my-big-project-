@@ -1,0 +1,8 @@
+[Unit]
+Description=SIP Alert Proxy Socket
+
+[Socket]
+ListenStream=9620
+
+[Install]
+WantedBy=sockets.target

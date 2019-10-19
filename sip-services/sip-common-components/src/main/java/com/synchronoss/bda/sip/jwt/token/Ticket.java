@@ -20,7 +20,7 @@ public class Ticket implements Serializable {
   private String userFullName;
   private String defaultProdID;
   private String roleCode;
-  private String roleType;
+  private RoleType roleType;
   private Long createdTime;
   private List<TicketDSKDetails> dataSecurityKey;
 
@@ -230,12 +230,12 @@ public class Ticket implements Serializable {
   }
 
   /** @return the roleType */
-  public String getRoleType() {
+  public RoleType getRoleType() {
     return roleType;
   }
 
   /** @param roleType the roleType to set */
-  public void setRoleType(String roleType) {
+  public void setRoleType(RoleType roleType) {
     this.roleType = roleType;
   }
 
