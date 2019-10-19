@@ -156,11 +156,6 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       new DesignerRemoveColumnFromGroupAdapter(columnIndex, adapterIndex)
     );
     this.onFieldsChange();
-    // this._designerService.removeArtifactColumnFromGroup(
-    //   artifactColumn,
-    //   groupAdapter
-    // );
-    // this.onFieldsChange();
   }
 
   onFieldsChange() {

@@ -17,6 +17,7 @@ import {
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import * as uppercase from 'lodash/upperCase';
+import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -133,6 +134,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   checkChartType() {
-    return ['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype);
+    return AggregateChooserComponent.supportsPercentByRow(this.analysisSubtype);
   }
 }

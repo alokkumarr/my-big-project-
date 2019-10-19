@@ -148,14 +148,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
   get analysisSubType(): string {
     const analysis = this._store.selectSnapshot(DesignerState).analysis;
-    const normalAnalysisSubType = (<AnalysisChart>this.analysis).chartType;
-    const subTypePath =
-      this.analysis.type === 'chart'
-        ? 'chartOptions.chartType'
-        : 'mapOptions.mapType';
-    return isDSLAnalysis(this.analysis)
-      ? get(analysis, subTypePath)
-      : normalAnalysisSubType;
+    return DesignerService.analysisSubType(analysis);
   }
 
   constructor(

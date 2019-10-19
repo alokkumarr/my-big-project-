@@ -49,13 +49,16 @@ export class AggregateChooserComponent implements OnInit {
     );
   }
 
+  static supportsPercentByRow(analysisSubtype: string) {
+    return ['column', 'bar', 'stack', 'combo'].includes(analysisSubtype);
+  }
+
   static isAggregateValid(
     value,
-    fields: ArtifactColumnDSL[],
     artifactColumn: ArtifactColumnDSL,
+    fields: ArtifactColumnDSL[],
     analysisType: string,
-    analysisSubtype: string,
-    enablePercentByRow: boolean
+    analysisSubtype: string
   ) {
     let enableByRowPercentage = false;
 
@@ -81,7 +84,10 @@ export class AggregateChooserComponent implements OnInit {
     const isGroupBy = AggregateChooserComponent.getGroupByPresent(fields);
     if (['column', 'bar', 'stack', 'combo'].includes(analysisSubtype)) {
       if (isGroupBy) {
-        if (value === 'percentagebyrow' && !enablePercentByRow) {
+        if (
+          value === 'percentagebyrow' &&
+          !AggregateChooserComponent.supportsPercentByRow(analysisSubtype)
+        ) {
           return false;
         }
         enableByRowPercentage = true;
@@ -92,7 +98,10 @@ export class AggregateChooserComponent implements OnInit {
       }
     }
 
-    if (isGroupBy && enablePercentByRow) {
+    if (
+      isGroupBy &&
+      AggregateChooserComponent.supportsPercentByRow(analysisSubtype)
+    ) {
       return true && !hasAggregateBeenUsed;
     }
     return value === 'percentagebyrow' && !isGroupBy && !enableByRowPercentage
@@ -131,11 +140,10 @@ export class AggregateChooserComponent implements OnInit {
 
     return AggregateChooserComponent.isAggregateValid(
       value,
-      fields,
       this.artifactColumn,
+      fields,
       this.analysisType,
-      this.analysisSubtype,
-      this.enablePercentByRow
+      this.analysisSubtype
     );
   }
 }

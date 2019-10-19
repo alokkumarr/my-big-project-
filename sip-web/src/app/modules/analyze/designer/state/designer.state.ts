@@ -648,6 +648,7 @@ export class DesignerState {
     }: DesignerAddColumnToGroupAdapter
   ) {
     const groupAdapters = getState().groupAdapters;
+    const analysis = getState().analysis;
     const adapter = groupAdapters[adapterIndex];
     const allAdapterFields = fpFlatMap(ad => ad.artifactColumns, groupAdapters);
 
@@ -661,7 +662,11 @@ export class DesignerState {
     //   );
     // });
 
-    adapter.transform(artifactColumn, allAdapterFields);
+    adapter.transform(artifactColumn, allAdapterFields, {
+      analysisType: analysis.type,
+      analysisSubtype: DesignerService.analysisSubType(analysis)
+    });
+
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });

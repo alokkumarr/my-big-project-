@@ -109,7 +109,8 @@ export interface IDEsignerSettingGroupAdapter {
   // a callback to possibly transform the artifactColumn added to a group
   transform: (
     artifactColumn: ArtifactColumn,
-    columns?: ArtifactColumn[]
+    columns?: ArtifactColumn[],
+    options?: any
   ) => void;
   // a callback to undo any transformations done to the element
   reverseTransform: (artifactColumn: ArtifactColumn) => void;

@@ -12,6 +12,7 @@ import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isNil from 'lodash/isNil';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import * as filter from 'lodash/filter';
@@ -132,7 +133,7 @@ export class DesignerSettingsSingleTableComponent
 
     this.listeners.push(
       this.selectedFields$.subscribe(fields => {
-        if (isEmpty(fields)) {
+        if (isNil(fields)) {
           return;
         }
         this.selectedFields = fields;
@@ -191,7 +192,12 @@ export class DesignerSettingsSingleTableComponent
       fpFilter(column => {
         const { alias, displayName } = column;
         return (
-          DesignerService.canAddColumn(column, this.selectedFields) &&
+          DesignerService.canAddColumn(
+            column,
+            this.selectedFields,
+            this.analysisType,
+            this.analysisSubtype
+          ) &&
           this.hasKeyword(alias || displayName, keyword) &&
           this.passesTypeFilter(types, column)
         );
@@ -296,10 +302,6 @@ export class DesignerSettingsSingleTableComponent
     this._store.dispatch(
       new DesignerRemoveColumnFromGroupAdapter(columnIndex, adapterIndex)
     );
-    // this._designerService.removeArtifactColumnFromGroup(
-    //   artifactColumn,
-    //   groupAdapter
-    // );
     this.onFieldsChange();
   }
 
