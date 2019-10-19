@@ -384,7 +384,9 @@ public class Field {
     DAY("day"),
     QUARTER("quarter"),
     WEEK("week"),
-    HOUR("hour");
+    HOUR("hour"),
+    MINUTE("minute"),
+    SECOND("second");
     private static final Map<String, GroupInterval> CONSTANTS =
         new HashMap<String, GroupInterval>();
 

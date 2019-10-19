@@ -55,29 +55,35 @@ public class SIPAggregationBuilder {
     return aggregateFields;
   }
 
-  public static DateHistogramInterval groupInterval(String groupInterval) {
+  public static DateHistogramInterval groupInterval(GroupInterval groupInterval) {
     DateHistogramInterval histogramInterval = null;
     switch (groupInterval) {
-      case "all":
+      case ALL:
         // For groupinterval ALL, no need to set any value. Refer line: 87.
         break;
-      case "month":
+      case MONTH:
         histogramInterval = DateHistogramInterval.MONTH;
         break;
-      case "day":
+      case DAY:
         histogramInterval = DateHistogramInterval.DAY;
         break;
-      case "year":
+      case YEAR:
         histogramInterval = DateHistogramInterval.YEAR;
         break;
-      case "quarter":
+      case QUARTER:
         histogramInterval = DateHistogramInterval.QUARTER;
         break;
-      case "hour":
+      case HOUR:
         histogramInterval = DateHistogramInterval.HOUR;
         break;
-      case "week":
+      case WEEK:
         histogramInterval = DateHistogramInterval.WEEK;
+        break;
+      case MINUTE:
+        histogramInterval = DateHistogramInterval.MINUTE;
+        break;
+      case SECOND:
+        histogramInterval = DateHistogramInterval.SECOND;
         break;
     }
     return histogramInterval;
@@ -128,7 +134,7 @@ public class SIPAggregationBuilder {
                     .field(dataField.getColumnName())
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
-                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval().value()))
+                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
                     .order(BucketOrder.key(order));
           } else {
             aggregationBuilder =
@@ -243,7 +249,7 @@ public class SIPAggregationBuilder {
                     .field(dataField.getColumnName())
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
-                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval().value()))
+                    .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
                     .order(BucketOrder.key(order))
                     .subAggregation(aggregationBuilder);
           } else {
