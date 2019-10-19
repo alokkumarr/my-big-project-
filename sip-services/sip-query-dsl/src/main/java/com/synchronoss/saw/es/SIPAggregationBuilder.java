@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Operand;
 import com.synchronoss.saw.model.Sort;

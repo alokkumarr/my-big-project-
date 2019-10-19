@@ -13,7 +13,7 @@ import {
   ValidatorFn
 } from '@angular/forms';
 
-import { nonEmpty } from '../../../validators/non-empty.validator';
+import { nonEmpty, requireIf } from '../../../../../common/validators/index';
 
 import { Subscription } from 'rxjs';
 
@@ -27,7 +27,6 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as toNumber from 'lodash/toNumber';
 
 import * as moment from 'moment';
-import { requireIf } from '../../../validators/required-if.validator';
 import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,

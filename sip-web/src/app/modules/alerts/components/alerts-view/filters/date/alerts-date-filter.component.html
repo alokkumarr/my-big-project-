@@ -1,0 +1,52 @@
+<div class="filter__form__title">
+  Filter By Date
+</div>
+<form
+  class="filter__form"
+  [formGroup]="alertFilterForm"
+  autocomplete="off"
+  fxLayout="column"
+>
+  <mat-form-field appearance="outline">
+    <mat-label>Date preset</mat-label>
+    <mat-select e2e="alert-date-preset" formControlName="datePreset">
+      <mat-option
+        *ngFor="let presetFilter of datePresets"
+        [value]="presetFilter.value"
+      >
+        {{ presetFilter.label }}
+      </mat-option>
+    </mat-select>
+    <mat-error>This field is required</mat-error>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="showDateFields" appearance="outline">
+    <mat-label>From</mat-label>
+    <input
+      matInput
+      e2e="alert-date-gte-input"
+      formControlName="gte"
+      [max]="alertFilterForm.get('lte').value"
+      [matDatepicker]="frompicker"
+      (click)="frompicker.open()"
+      placeholder="From"
+    />
+    <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
+    <mat-datepicker #frompicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="showDateFields" appearance="outline">
+    <mat-label>To</mat-label>
+    <input
+      matInput
+      e2e="alert-date-lte-input"
+      formControlName="lte"
+      [min]="alertFilterForm.get('gte').value"
+      [matDatepicker]="topicker"
+      (click)="topicker.open()"
+      placeholder="To"
+    />
+    <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
+    <mat-datepicker #topicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+</form>

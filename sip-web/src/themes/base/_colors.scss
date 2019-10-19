@@ -24,12 +24,14 @@ $primary-white: #fff;
 $primary-black: #000;
 $primary-red: #ab0e27;
 $primary-green: #73b421;
+$primary-yellow: #f8b513;
 $primary-orange: #f07601;
+$primary-warning: #a5b7ce;
 
-$secondary-green: #6fb320;
+$secondary-green: #24b18c;
 $secondary-yellow: #ffbe00;
 $secondary-orange: #ff9000;
-$secondary-red: #d93e00;
+$secondary-red: #e4524c;
 $secondary-berry: #ac145a;
 $secondary-purple: #914191;
 
@@ -48,3 +50,6 @@ $derived-type-chip-color: rgba($derived-type-color, $type-chip-opacity);
 
 $report-designer-settings-bg-color: #f5f9fc;
 $background-color: #f5f9fc;
+
+$alert-dark-font-color: #606a74;
+$alert-light-font-color: #91989f;
