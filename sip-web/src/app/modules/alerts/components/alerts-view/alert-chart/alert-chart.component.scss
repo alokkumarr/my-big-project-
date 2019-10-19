@@ -1,0 +1,24 @@
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  background-color: white;
+
+  .chart__title {
+    font-weight: 700;
+    font-size: 14px;
+    color: $alert-dark-font-color;
+    margin-right: 10px;
+    line-height: 18px;
+  }
+
+  .chart__date-filter {
+    color: $alert-light-font-color;
+    line-height: 18px;
+  }
+
+  .chart__container {
+    width: 100%;
+    height: 88%;
+  }
+}

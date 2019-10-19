@@ -2,7 +2,9 @@ package sncr.xdf.sql;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.alert.AlertQueueManager;
 import sncr.xdf.component.*;
 import sncr.xdf.exceptions.XDFException;
 import sncr.bda.conf.ComponentConfiguration;
@@ -62,7 +64,20 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
             logger.trace("Script to execute:\n" +  script);
             executor.analyze(script);
             String tempDir = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
-            return executor.start(tempDir);
+            int status = executor.start(tempDir);
+            // check if Alert is enabled for the component and send the message to queue.
+            if (ctx.componentConfiguration.getSql().getAlerts()!=null &&
+                ctx.componentConfiguration.getSql().getAlerts().getDatapod()!=null)
+            {
+                String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+                AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+                Long createdTime = System.currentTimeMillis();
+                alertQueueManager.sendMessageToStream(ctx.componentConfiguration.getSql()
+                    .getAlerts().getDatapod(),createdTime
+                );
+                logger.info("Alert configure for the dataset sent notification to stream");
+            }
+            return status;
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();
             logger.error(e);

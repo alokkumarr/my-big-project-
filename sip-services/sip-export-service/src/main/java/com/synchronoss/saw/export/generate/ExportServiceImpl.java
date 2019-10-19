@@ -1318,14 +1318,14 @@ public class ExportServiceImpl implements ExportService {
             exportBean.getReportName() + " | " + exportBean.getPublishDate(),
             serviceUtils.prepareMailBody(exportBean, mailBody),
             zipFileName);
-        logger.debug("Email sent successfully");
+        logger.info("Email sent successfully");
       } else {
         MailSender.sendMail(
             recipients,
             exportBean.getReportName() + " | " + exportBean.getPublishDate(),
             serviceUtils.prepareMailBody(exportBean, mailBody),
             exportBean.getFileName());
-        logger.debug("Email sent successfully");
+        logger.info("Email sent successfully");
       }
 
     } catch (Exception e) {

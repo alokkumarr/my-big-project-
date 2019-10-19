@@ -1,0 +1,10 @@
+[Unit]
+Description=SIP Alert Proxy
+Requires=sip-alert.service
+After=sip-alert.service
+Requires=sip-alert-proxy.socket
+After=sip-alert-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9621
+PrivateTmp=yes

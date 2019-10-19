@@ -24,14 +24,17 @@ export class FilterPipe implements PipeTransform {
     const field = args.length > 1 ? args[0] : null;
     const value = field ? args[1] : args[0];
 
-    if (!value) {
+    if (!value || !input) {
       return input;
     }
 
-    const compare = (a, b) => typeof a === 'string' || typeof b === 'string' ?
-      includes(lowerCase(a), lowerCase(b)) :
-      a === b;
+    const compare = (a, b) =>
+      typeof a === 'string' || typeof b === 'string'
+        ? includes(lowerCase(a), lowerCase(b))
+        : a === b;
 
-    return filter(input, el => field ? compare(el[field], value) : compare(el, value));
+    return filter(input, el =>
+      field ? compare(el[field], value) : compare(el, value)
+    );
   }
 }
