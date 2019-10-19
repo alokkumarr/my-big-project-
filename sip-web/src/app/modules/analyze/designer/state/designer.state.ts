@@ -7,6 +7,7 @@ import * as forEach from 'lodash/forEach';
 import * as set from 'lodash/set';
 import * as remove from 'lodash/remove';
 import * as lowerCase from 'lodash/lowerCase';
+import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -832,42 +833,25 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    const sipJoins = [];
-    if (isEmpty(joins)) {
-      return;
-    }
-    joins.forEach(join => {
-      let leftJoin = {};
-      let rightJoin = {};
-      join.criteria.forEach(crt => {
-        if (crt.side === 'left') {
-          leftJoin = {
-            artifactsName: crt.tableName,
-            columnName: crt.columnName
-          };
-        }
-
-        if (crt.side === 'right') {
-          rightJoin = {
-            artifactsName: crt.tableName,
-            columnName: crt.columnName
-          };
-        }
-      });
+    const sipJoins = map(joins, join => {
+      const [leftCriteria, rightCriteria] = join.criteria;
+      const leftJoin = {
+        artifactsName: leftCriteria.tableName,
+        columnName: leftCriteria.columnName
+      };
+      const rightJoin = {
+        artifactsName: rightCriteria.tableName,
+        columnName: rightCriteria.columnName
+      };
       const joinCondition = {
         operator: 'EQ',
         left: leftJoin,
         right: rightJoin
       };
-      const sipJoin = {
+      return {
         join: join.type,
-        criteria: [
-          {
-            joinCondition
-          }
-        ]
+        criteria: [{ joinCondition }]
       };
-      sipJoins.push(sipJoin);
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, joins: sipJoins } }
