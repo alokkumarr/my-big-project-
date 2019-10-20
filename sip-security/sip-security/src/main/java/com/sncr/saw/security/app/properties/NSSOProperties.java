@@ -43,6 +43,12 @@ public class NSSOProperties {
   @Value("${jwt.secret.key}")
   private String jwtSecretKey;
 
+  @Value("${user.lockingTime.mins}")
+  private int lockingTime;
+
+  @Value("${user.maxInvalidPwdLimit.count}")
+  private int maxInvalidPwdLimit;
+
   public String getRefreshTokenValidityMins() {
     return refreshTokenValidityMins;
   }
@@ -143,5 +149,25 @@ public class NSSOProperties {
   /** Sets jwtSecretKey */
   public void setJwtSecretKey(String jwtSecretKey) {
     this.jwtSecretKey = jwtSecretKey;
+  }
+
+  /** Gets Account LockTime in mins when maximum invalid limit reaches */
+  public int getLockingTime() {
+    return lockingTime;
+  }
+
+  /** Sets Account LockTime in mins when maximum invalid limit reaches */
+  public void setLockingTime(int lockingTime) {
+    this.lockingTime = lockingTime;
+  }
+
+  /** Gets Max number of attempts the user can retry */
+  public int getMaxInvalidPwdLimit() {
+    return maxInvalidPwdLimit;
+  }
+
+  /** Sets Max number of attempts the user can retry */
+  public void setMaxInvalidPwdLimit(int maxInvalidPwdLimit) {
+    this.maxInvalidPwdLimit = maxInvalidPwdLimit;
   }
 }

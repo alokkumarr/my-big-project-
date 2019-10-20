@@ -128,6 +128,12 @@ saw_email_password=
 saw_email_from=noreply@example.com
 
 #
+#user properties
+#
+user.maxInvalidPwdLimit.count=5
+user.lockingTime.mins=5
+
+#
 # Path by project
 # replace project key with meaningful name for customer & project
 # replace project path with the accessible by customer like for mct customers only
@@ -181,6 +187,12 @@ saw_security_email_protocol=smtp
 saw_security_email_host=localhost
 saw_security_email_port=25
 saw_security_email_from=noreply@example.com
+
+#
+#user properties
+#
+user.maxInvalidPwdLimit.count=5
+user.lockingTime.mins=5
 
 #
 # generate secret key using command : openssl rand 32 -base64
