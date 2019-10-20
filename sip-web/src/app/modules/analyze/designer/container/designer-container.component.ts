@@ -88,7 +88,7 @@ import {
   DesignerMergeMetricColumns,
   DesignerMergeSupportsIntoAnalysis,
   DesignerLoadMetric,
-  // DesignerResetState,
+  DesignerResetState,
   DesignerSetData,
   DesignerAddArtifactColumn,
   DesignerRemoveArtifactColumn,
@@ -172,7 +172,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // this._store.dispatch(new DesignerResetState());
+    this._store.dispatch(new DesignerResetState());
     this.subscriptions.forEach(s => s.unsubscribe());
   }
 
