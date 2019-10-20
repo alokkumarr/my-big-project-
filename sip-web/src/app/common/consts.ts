@@ -39,31 +39,37 @@ export const BACKEND_TIMEZONE = 'America/New_York';
 export const DATE_INTERVALS = [
   {
     label: 'All',
-    value: 'all'
+    value: 'all',
+    formatForBackEnd: 'yyyy-MM-dd'
   },
   {
     label: 'Year',
     value: 'year',
     format: 'yyyy',
-    momentFormat: 'yyyy'
+    momentFormat: 'yyyy',
+    formatForBackEnd: 'yyyy'
   },
   {
     label: 'Quarter',
     value: 'quarter',
     format: 'yyyy-QQQ',
-    momentFormat: 'YYYY-[Q]Q'
+    momentFormat: 'YYYY-[Q]Q',
+    formatForBackEnd: 'yyyy-MM' // the backend can't handle quarters,
+    // so we'll send month foramt, and convert to quarter on front end
   },
   {
     label: 'Month',
     value: 'month',
     format: 'yyyy-MM',
-    momentFormat: 'YYYY-MM'
+    momentFormat: 'YYYY-MM',
+    formatForBackEnd: 'yyyy-MM'
   },
   {
     label: 'Date',
     value: 'day',
     format: 'yyyy-MM-dd',
-    momentFormat: 'YYYY-MM-DD'
+    momentFormat: 'YYYY-MM-DD',
+    formatForBackEnd: 'yyyy-MM-dd'
   }
 ];
 
