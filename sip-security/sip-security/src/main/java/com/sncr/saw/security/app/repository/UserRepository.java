@@ -22,7 +22,8 @@ import java.util.List;
 
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
-	boolean[] authenticateUser(String masterLoginId, String password);
+	boolean[] authenticateUser(String masterLoginId, String password,int lockingTime,
+        int maxInvalidPwdLimit);
 	void prepareTicketDetails(User user, Boolean onlyDef);
 	void invalidateTicket(String ticketId, String validityMessage);	
 	String updateUserPass(String masterLoginId, String newPassEncrp);
