@@ -244,7 +244,7 @@ export class DesignerState {
   @Action(DesignerRemoveArtifactColumn)
   removeArtifactColumn(
     { getState, patchState, dispatch }: StateContext<DesignerStateModel>,
-    { artifactColumn }: DesignerRemoveArtifactColumn
+    { artifactColumn, fieldArea }: DesignerRemoveArtifactColumn
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
@@ -264,7 +264,13 @@ export class DesignerState {
     const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
       field => {
         const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
-        return toLower(field[fieldName]) === toLower(artifactColumn[fieldName]);
+        return (
+          toLower(field[fieldName]) === toLower(artifactColumn[fieldName]) &&
+          /* If a field is added to more than one area (say, x axis and group by),
+             then we need to know exactly which area the user removed the field from.
+          */
+          (fieldArea ? field.area === fieldArea : true)
+        );
       }
     );
 
@@ -798,7 +804,7 @@ export class DesignerState {
     const updatedAdapter = groupAdapters[adapterIndex];
     adapter.onReorder(updatedAdapter.artifactColumns);
     patchState({ groupAdapters: [...groupAdapters] });
-    return dispatch(new DesignerRemoveArtifactColumn(column));
+    return dispatch(new DesignerRemoveArtifactColumn(column, adapter.marker));
   }
 
   @Action(DesignerMoveColumnInGroupAdapter)
