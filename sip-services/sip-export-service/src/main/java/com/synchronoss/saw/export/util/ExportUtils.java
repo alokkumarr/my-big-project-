@@ -78,6 +78,9 @@ public class ExportUtils {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
+          if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
+              aliasName = field.getDisplayName().trim();
+          }
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {

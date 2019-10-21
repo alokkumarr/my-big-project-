@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { requireIf } from '../../../../common/validators/index';
+import { requireIf } from 'src/app/common/validators';
 
 import {
   CUSTOM_DATE_PRESET_VALUE,
