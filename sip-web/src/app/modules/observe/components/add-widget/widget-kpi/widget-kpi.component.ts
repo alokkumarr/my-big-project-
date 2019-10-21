@@ -17,8 +17,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import {
   DesignerFilterDialogComponent
 } from './../../../../analyze/designer/filter';
-
-import { nonEmpty } from '../../../validators/non-empty.validator';
+import { nonEmpty, requireIf } from '../../../../../common/validators/index';
 
 import { Subscription } from 'rxjs';
 
@@ -37,7 +36,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as fpMap from 'lodash/fp/map';
 
 import * as moment from 'moment';
-import { requireIf } from '../../../validators/required-if.validator';
 import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,

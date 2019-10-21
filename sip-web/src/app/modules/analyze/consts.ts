@@ -26,9 +26,13 @@ import {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   DEFAULT_PRECISION,
+  EMAIL_REGEX,
   DATE_INTERVALS,
   DATE_INTERVALS_OBJ,
-  DEFAULT_DATE_INTERVAL
+  DEFAULT_DATE_INTERVAL,
+  BETWEEN_NUMBER_FILTER_OPERATOR,
+  NUMBER_FILTER_OPERATORS,
+  NUMBER_FILTER_OPERATORS_OBJ
 } from '../../common/consts';
 
 export { DATAPOD_CATEGORIES_OBJ } from '../../common/consts';
@@ -54,9 +58,13 @@ export {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   DEFAULT_PRECISION,
+  EMAIL_REGEX,
   DATE_INTERVALS,
   DATE_INTERVALS_OBJ,
-  DEFAULT_DATE_INTERVAL
+  DEFAULT_DATE_INTERVAL,
+  BETWEEN_NUMBER_FILTER_OPERATOR,
+  NUMBER_FILTER_OPERATORS,
+  NUMBER_FILTER_OPERATORS_OBJ
 };
 
 export const DSL_ANALYSIS_TYPES = [
@@ -442,44 +450,6 @@ export const DATE_PRESETS = [
     label: 'Custom'
   }
 ];
-
-export const BETWEEN_NUMBER_FILTER_OPERATOR = {
-  value: 'BTW',
-  label: 'Between'
-};
-
-export const NUMBER_FILTER_OPERATORS = [
-  {
-    value: 'GT',
-    label: 'Greater than'
-  },
-  {
-    value: 'LT',
-    label: 'Less than'
-  },
-  {
-    value: 'GTE',
-    label: 'Greater than or equal to'
-  },
-  {
-    value: 'LTE',
-    label: 'Less than or equal to'
-  },
-  {
-    value: 'EQ',
-    label: 'Equal to'
-  },
-  {
-    value: 'NEQ',
-    label: 'Not equal to'
-  },
-  BETWEEN_NUMBER_FILTER_OPERATOR
-];
-
-export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(NUMBER_FILTER_OPERATORS);
 
 export const PLURAL_STRING_FILTERS = [
   {

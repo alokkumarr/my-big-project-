@@ -15,6 +15,7 @@ export const FLOAT_TYPES = ['double', 'float'];
 export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
+export const EMAIL_REGEX = /^[_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,4})$/;
 const GEO_TYPES_WITH_IDENTIFIER = {
   state: ['name', 'postal-code'],
   country: ['name', 'fips'],
@@ -38,31 +39,37 @@ export const BACKEND_TIMEZONE = 'America/New_York';
 export const DATE_INTERVALS = [
   {
     label: 'All',
-    value: 'all'
+    value: 'all',
+    formatForBackEnd: 'yyyy-MM-dd'
   },
   {
     label: 'Year',
     value: 'year',
     format: 'yyyy',
-    momentFormat: 'yyyy'
+    momentFormat: 'yyyy',
+    formatForBackEnd: 'yyyy'
   },
   {
     label: 'Quarter',
     value: 'quarter',
     format: 'yyyy-QQQ',
-    momentFormat: 'YYYY-[Q]Q'
+    momentFormat: 'YYYY-[Q]Q',
+    formatForBackEnd: 'yyyy-MM' // the backend can't handle quarters,
+    // so we'll send month foramt, and convert to quarter on front end
   },
   {
     label: 'Month',
     value: 'month',
     format: 'yyyy-MM',
-    momentFormat: 'YYYY-MM'
+    momentFormat: 'YYYY-MM',
+    formatForBackEnd: 'yyyy-MM'
   },
   {
     label: 'Date',
     value: 'day',
     format: 'yyyy-MM-dd',
-    momentFormat: 'YYYY-MM-DD'
+    momentFormat: 'YYYY-MM-DD',
+    formatForBackEnd: 'yyyy-MM-dd'
   }
 ];
 
@@ -428,3 +435,113 @@ export const DATAPOD_CATEGORIES_OBJ = fpPipe(
   fpGroupBy('name'),
   fpMapValues(v => v[0])
 )(DATAPOD_CATEGORIES);
+
+// TODO remove alertsModule when it's added into saw_security DB
+export const ALERTS_MODULE_MENU = {
+  prodCode: 'SAWD0000012131',
+  productModName: 'ALERTS',
+  productModDesc: 'Alerts Module',
+  productModCode: 'ALERT00001',
+  productModID: '333333',
+  moduleURL: 'alerts',
+  defaultMod: '1',
+  privilegeCode: 128,
+  prodModFeature: [
+    {
+      prodModFeatureName: 'Alerts',
+      prodModCode: 'ALERT00001',
+      productModuleSubFeatures: [
+        {
+          prodModFeatureName: 'View Alerts',
+          prodModFeatureDesc: 'View Alert',
+          defaultURL: 'view',
+          prodModFeatureID: 'viewAlert',
+          prodModFeatrCode: 'viewAlert',
+          roleId: 1
+        },
+        {
+          prodModFeatureName: 'Configure Alerts',
+          prodModFeatureDesc: 'Configure Alerts',
+          defaultURL: 'configure',
+          prodModFeatureID: 'configureAlert',
+          prodModFeatrCode: 'configureAlert',
+          roleId: 1
+        }
+      ]
+    }
+  ]
+};
+
+export const PRODUCT_MODULE_MOCK_MENU = {
+  prodCode: 'SAWD0000012131',
+  productModName: 'INSIGHTS',
+  productModDesc: 'Insights Module',
+  productModCode: 'INSIGH00001',
+  productModID: '1324244',
+  moduleURL: 'http://localhost:4200/assets/insights.umd.js',
+  defaultMod: '1',
+  privilegeCode: 128,
+  prodModFeature: [
+    {
+      prodModFeatureName: 'SubModules',
+      prodModCode: 'INSIGH00001',
+      productModuleSubFeatures: [
+        {
+          prodModFeatureName: 'IOT',
+          prodModFeatureDesc: 'Iot',
+          defaultURL: 'iot',
+          prodModFeatureID: 'iot',
+          prodModFeatrCode: 'iot',
+          prodModCode: 'INSIGH00001',
+          roleId: 1
+        },
+        {
+          prodModFeatureName: 'REVIEW',
+          prodModFeatureDesc: 'Review',
+          defaultURL: 'review',
+          prodModFeatureID: 'review',
+          prodModFeatrCode: 'review',
+          roleId: 1
+        }
+      ]
+    }
+  ]
+};
+
+export const BETWEEN_NUMBER_FILTER_OPERATOR = {
+  value: 'BTW',
+  label: 'Between'
+};
+
+export const NUMBER_FILTER_OPERATORS = [
+  {
+    value: 'GT',
+    label: 'Greater than'
+  },
+  {
+    value: 'LT',
+    label: 'Less than'
+  },
+  {
+    value: 'GTE',
+    label: 'Greater than or equal to'
+  },
+  {
+    value: 'LTE',
+    label: 'Less than or equal to'
+  },
+  {
+    value: 'EQ',
+    label: 'Equal to'
+  },
+  {
+    value: 'NEQ',
+    label: 'Not equal to'
+  },
+  BETWEEN_NUMBER_FILTER_OPERATOR
+];
+
+export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(NUMBER_FILTER_OPERATORS);

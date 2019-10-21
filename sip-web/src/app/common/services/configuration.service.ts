@@ -32,7 +32,7 @@ export class ConfigService {
 
   private loadConfig(): Observable<Configuration> {
     return this.httpClient.get(
-      `${AppConfig.login.url}/auth/admin/user/preferences/fetch`
+      `${AppConfig.login.url}/auth/user/preferences/fetch`
     ) as Observable<Configuration>;
   }
 
@@ -43,7 +43,7 @@ export class ConfigService {
     }));
 
     return (this.httpClient.post(
-      `${AppConfig.login.url}/auth/admin/user/preferences/upsert`,
+      `${AppConfig.login.url}/auth/user/preferences/upsert`,
       payload
     ) as Observable<Configuration>).pipe(tap(this.cacheConfig.bind(this)));
   }
@@ -69,7 +69,7 @@ export class ConfigService {
     return (this.httpClient.post(
       `${
         AppConfig.login.url
-      }/auth/admin/user/preferences/delete?inactiveAll=${allUsers}`,
+      }/auth/user/preferences/delete?inactiveAll=${allUsers}`,
       payload
     ) as Observable<Configuration>).pipe(
       tap(this.removeConfigFromCache.bind(this))

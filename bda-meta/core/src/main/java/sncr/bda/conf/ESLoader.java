@@ -121,6 +121,14 @@ public class ESLoader {
     private String storePassword;
 
     /**
+     * Alert configuration for the component.
+     *
+     */
+    @SerializedName("alert")
+    @Expose
+    private Alert alerts;
+
+    /**
      * No args constructor for use in serialization
      *
      */
@@ -378,6 +386,22 @@ public class ESLoader {
      */
     public String getStorePassword() {
         return storePassword;
+    }
+
+    /**
+     * Gets alerts.
+     *
+     * @return value of alerts
+     */
+    public Alert getAlerts() {
+        return alerts;
+    }
+
+    /**
+     * Sets alerts.
+     */
+    public void setAlerts(Alert alerts) {
+        this.alerts = alerts;
     }
 
     /**
