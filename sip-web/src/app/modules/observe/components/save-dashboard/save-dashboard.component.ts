@@ -16,7 +16,7 @@ import {
   HeaderProgressService,
   JwtService
 } from '../../../../common/services';
-import { requireIf } from '../../validators/required-if.validator';
+import { requireIf } from '../../../../common/validators/index';
 
 export const REFRESH_INTERVALS = [
   {

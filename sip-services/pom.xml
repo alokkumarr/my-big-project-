@@ -198,6 +198,7 @@
 		<module>sip-batch-plugin-s3</module>
     <module>sip-batch-plugin-api-pull</module>
     <module>sip-common-components</module>
+    <module>sip-alert-service</module>
 		<module>dist</module>
   </modules>
   <distributionManagement>

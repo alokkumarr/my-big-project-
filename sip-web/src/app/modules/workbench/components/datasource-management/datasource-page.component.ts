@@ -112,8 +112,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
 
   selectSingleChannel(channelID) {
     setTimeout(() => {
-      this.channelsGrid.instance.deselectAll();
-      this.channelsGrid.instance.selectRows([channelID], false);
+      const gridInstance = this.channelsGrid.instance;
+      gridInstance.deselectAll();
+      gridInstance.selectRows([channelID], false);
       this.getRoutesForChannel(channelID);
     });
   }
