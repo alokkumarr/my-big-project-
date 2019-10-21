@@ -69,8 +69,8 @@ describe('Designer Component', () => {
         isGlobalFilter: false,
         model: {
           operator: 'BTW',
-          value: '2017-01-01',
-          otherValue: '2017-01-31'
+          value: '01-01-2017',
+          otherValue: '01-31-2017'
         }
       }
     ];
@@ -85,8 +85,8 @@ describe('Designer Component', () => {
         isGlobalFilter: false,
         model: {
           operator: 'BTW',
-          value: '2017-01-01',
-          otherValue: '2017-01-31',
+          value: '01-01-2017',
+          otherValue: '01-31-2017',
           gte: '2017-01-01',
           lte: '2017-01-31',
           preset: 'NA'

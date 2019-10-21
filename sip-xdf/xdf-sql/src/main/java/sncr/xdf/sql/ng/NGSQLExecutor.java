@@ -77,6 +77,11 @@ public class NGSQLExecutor implements Serializable {
 
                         String location;
 
+                        //if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
+                        if (!parent.getNgctx().runningPipeLine)
+
+                        {
+
                             if (allTables.get(tn) != null) {
                                 location = allTables.get(tn).getLocation();
                             } else {
@@ -89,50 +94,56 @@ public class NGSQLExecutor implements Serializable {
                                 return -1;
                             }
 
-                                logger.debug("Load data from: " + location + ", registered table name: " + tn);
+                            logger.debug("Load data from: " + location + ", registered table name: " + tn);
 
-                                if (jobDataFrames.get(tn) != null) {
-                                    continue;
-                                }
+                            if (jobDataFrames.get(tn) != null) {
+                                continue;
+                            }
 
-                                //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
-                                Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
-                                    DLDataSetOperations.getPartitioningInfo(location);
+                            //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                            Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                                DLDataSetOperations.getPartitioningInfo(location);
 
-                                if (loc_desc == null)
-                                	return -1;
-                                   // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                            if (loc_desc == null)
+                                return -1;
+                            // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
 
-                                logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
-                                
-                                try {
-									df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
-								} catch (Exception exception) {
-									logger.error("Could not load data neither in parquet nor in JSON, cancel processing " 
-											+ exception.getMessage() );
-									return -1;
-								}
-                                
-                                if (df == null) {
-                                	logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
-                                	return -1;
-                                   //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
-                                }
-                                jobDataFrames.put(tn, df);
-                                df.createOrReplaceTempView(tn);
+                            logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
+
+                            try {
+                                df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+                            } catch (Exception exception) {
+                                logger.error("Could not load data neither in parquet nor in JSON, cancel processing "
+                                    + exception.getMessage() );
+                                return -1;
+                            }
+
+                            if (df == null) {
+                                logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
+                                return -1;
+                                //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
+                            }
+                            jobDataFrames.put(tn, df);
+                            df.createOrReplaceTempView(tn);
+
                         }
                     }
+                }
 
                 if (parent.getNgctx().runningPipeLine)
                 {
 
+
+
+
+
                     parent.getNgctx().datafileDFmap.forEach((key, value) -> {
-                    
-                    	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
+
+                        parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
                         StructField[] fields = parent.getNgctx().datafileDFmap.get(key).schema().fields();
                         Arrays.asList(fields).forEach((x)->logger.info(x));
-                        
-                	});
+
+                    });
                 }
 
                 long lt = System.currentTimeMillis();

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  *  The AbstractComponent class is base class for all XDF components.
  *  All component should be implemented as follows:

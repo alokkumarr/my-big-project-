@@ -1,9 +1,5 @@
 package com.synchronoss.saw.export.pivot;
 
-import com.synchronoss.saw.export.model.Analysis;
-import com.synchronoss.saw.export.model.ColumnField;
-import com.synchronoss.saw.export.model.DataField;
-import com.synchronoss.saw.export.model.RowField;
 import com.synchronoss.saw.model.Field;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.DataConsolidateFunction;
@@ -140,86 +136,98 @@ public class CreatePivotTable {
       }
 
       logger.debug(this.getClass().getName() + " set pivot Data fields ");
-      /** Set the data Fields */
-      for (Field dataField : fields) {
-        if ("data".equalsIgnoreCase(dataField.getArea())
-            && !"string".equalsIgnoreCase(dataField.getType().value())
-            && !"date".equalsIgnoreCase(dataField.getType().value())) {
-          switch (dataField.getAggregate()) {
-            case SUM:
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.SUM, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case AVG:
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.AVERAGE, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case MAX:
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.MAX, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case MIN:
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.MIN, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case COUNT:
+      /**
+       * 1) Set the data Fields
+       * 2) Maintained the sequence same as UI
+       * */
+      for (int index = 0; index < fields.size(); index++) {
+        for (Field dataField : fields) {
+          if ("data".equalsIgnoreCase(dataField.getArea())
+              && !"string".equalsIgnoreCase(dataField.getType().value())
+              && !"date".equalsIgnoreCase(dataField.getType().value())
+              && dataField.getAreaIndex() != null && dataField.getAreaIndex().equals(index)) {
+
+            String columnName = dataField.getAlias() != null && !dataField.getAlias().isEmpty()
+                ? dataField.getAlias()
+                : dataField.getDisplayName() != null && !dataField.getDisplayName().isEmpty()
+                ? dataField.getDisplayName()
+                : dataField.getColumnName();
+            switch (dataField.getAggregate()) {
+              case SUM:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case AVG:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.AVERAGE, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case MAX:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.MAX, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case MIN:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.MIN, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case COUNT:
               /* Count is already calculated by elastic search aggregation, no need to calculate it again. consider the default
               value as sum to display count value */
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.SUM, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case DISTINCTCOUNT:
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.SUM, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
-            case PERCENTAGE:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case DISTINCTCOUNT:
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+              case PERCENTAGE:
               /* PERCENTAGE is already calculated by elastic search aggregation, no need to calculate it again. consider the default
               value as sum to display PERCENTAGE value */
-              pivotTable.addColumnLabel(
-                  DataConsolidateFunction.SUM, count, dataField.getColumnName());
-              pivotTable.addDataColumn(count, true);
-              pivotTable
-                  .getCTPivotTableDefinition()
-                  .getPivotFields()
-                  .getPivotFieldArray(count++)
-                  .setDataField(true);
-              break;
+                pivotTable.addColumnLabel(
+                    DataConsolidateFunction.SUM, count, columnName);
+                pivotTable.addDataColumn(count, true);
+                pivotTable
+                    .getCTPivotTableDefinition()
+                    .getPivotFields()
+                    .getPivotFieldArray(count++)
+                    .setDataField(true);
+                break;
+            }
           }
         }
       }

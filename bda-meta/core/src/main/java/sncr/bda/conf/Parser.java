@@ -61,7 +61,13 @@ public class Parser {
   @Expose
   private Integer numberOfFiles = 1;
 
-
+    /**
+     * Alert configuration for the component.
+     *
+     */
+    @SerializedName("alert")
+    @Expose
+    private Alert alerts;
 
   /** No args constructor for use in serialization */
   public Parser() {}
@@ -296,7 +302,23 @@ public class Parser {
         return this;
     }
 
-  @Override
+    /**
+     * Gets alerts
+     *
+     * @return value of alerts
+     */
+    public Alert getAlerts() {
+        return alerts;
+    }
+
+    /**
+     * Sets alerts
+     */
+    public void setAlerts(Alert alerts) {
+        this.alerts = alerts;
+    }
+
+    @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
   }
