@@ -13,6 +13,7 @@ import * as isFinite from 'lodash/isFinite';
 import * as moment from 'moment';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
@@ -88,13 +89,15 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (!filterModel.preset) {
       return this.executeKPI(this._kpi);
     }
-    const filter = this.constructGlobalFilter(filterModel);
-    const kpi = defaults({}, { filters: filter }, this._kpi);
+
+    const kpiFilters = cloneDeep(this._kpi);
+    const filter = this.constructGlobalFilter(filterModel, kpiFilters.filters);
+    const kpi = defaults({}, { filters: filter }, kpiFilters);
 
     return this.executeKPI(kpi);
   }
 
-  constructGlobalFilter(model) {
+  constructGlobalFilter(model, kpiFilters) {
     const globalFilters = this._kpi.filters.length === 1
     // Check backward compatibility
     ? fpPipe(
@@ -110,7 +113,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         }
         return filt;
       })
-    )(this._kpi.filters);
+    )(kpiFilters);
     return globalFilters;
   }
 
