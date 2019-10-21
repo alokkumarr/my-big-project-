@@ -1,0 +1,17 @@
+<div class="filter__form__title">
+  Filter By Attribute
+</div>
+<form class="filter__form" [formGroup]="alertFilterForm" autocomplete="off">
+  <mat-form-field appearance="outline">
+    <mat-label>Attribute value</mat-label>
+    <mat-select e2e="alert-string-preset" formControlName="value">
+      <mat-option
+        *ngFor="let attributeValue of attributeValues$ | async"
+        [value]="attributeValue"
+      >
+        {{ attributeValue }}
+      </mat-option>
+    </mat-select>
+    <mat-error>This field is required</mat-error>
+  </mat-form-field>
+</form>
