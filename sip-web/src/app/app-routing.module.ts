@@ -19,6 +19,10 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'alerts',
+    loadChildren: './modules/alerts/alerts.module#AlertsModule'
+  },
+  {
     path: 'workbench',
     loadChildren: './modules/workbench/workbench.module#WorkbenchModule'
   },
@@ -56,6 +60,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes, {
       useHash: true,
       onSameUrlNavigation: 'reload',
+      enableTracing: false,
       preloadingStrategy: PreloadAllModules
     })
   ],

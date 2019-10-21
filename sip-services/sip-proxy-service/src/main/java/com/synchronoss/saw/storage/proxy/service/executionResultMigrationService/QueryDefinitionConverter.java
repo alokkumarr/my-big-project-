@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.Field;
@@ -304,7 +305,7 @@ public class QueryDefinitionConverter implements FieldsSipDslConverter {
     if (sortObject.has(FieldNames.AGGREGATE)) {
       String aggregate = sortObject.get(FieldNames.AGGREGATE).getAsString();
 
-      sort.setAggregate(Sort.Aggregate.fromValue(aggregate));
+      sort.setAggregate(Aggregate.fromValue(aggregate));
     }
 
     return sort;

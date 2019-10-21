@@ -16,6 +16,7 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as some from 'lodash/some';
 import * as clone from 'lodash/clone';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
@@ -245,18 +246,19 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         break;
       default:
         this.addExportConfig(this.config);
-        forEach(this.config.series, seriesOptions => {
-          if (['percentagebyrow'].includes(seriesOptions.aggregate)) {
-            set(requestConfig, 'plotOptions.column.stacking', 'percent');
-          }
-        });
         const defaultConfig = get(
           find(this.chartSettings, ['type', chartSettingsType]),
           'config',
           cloneDeep(chartOptions)
         );
         const requestConfig = defaultsDeep({}, this.config, defaultConfig);
-
+        const shouldSetColumnStackingToPercent = some(
+          this.config.series,
+          ({ aggregate }) => aggregate === 'percentagebyrow'
+        );
+        if (shouldSetColumnStackingToPercent) {
+          set(requestConfig, 'plotOptions.column.stacking', 'percent');
+        }
         this.chart = this.highcharts.chart(
           this.container.nativeElement,
           requestConfig
