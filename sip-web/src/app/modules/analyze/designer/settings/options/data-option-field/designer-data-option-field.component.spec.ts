@@ -28,10 +28,15 @@ describe('Designer Data Options', () => {
     fixture = TestBed.createComponent(DesignerDataOptionFieldComponent);
     component = fixture.componentInstance;
     component.artifactColumn = {} as any;
+    component.analysisSubtype = 'column';
     fixture.detectChanges();
   });
 
   it('should exist', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should return percent by row support', () => {
+    expect(component.checkChartType()).toEqual(true);
   });
 });
