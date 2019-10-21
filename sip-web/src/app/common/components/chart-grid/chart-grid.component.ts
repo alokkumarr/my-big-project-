@@ -7,7 +7,6 @@ import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
-import * as mapKeys from 'lodash/mapKeys';
 import * as moment from 'moment';
 import { HeaderProgressService } from './../../../common/services';
 import { setReverseProperty } from './../../../common/utils/dataFlattener';
@@ -47,17 +46,14 @@ interface ReportGridField {
  *
  * @param {{ [key: string]: any }} data
  */
-export const dataFieldToHuman = (data: { [key: string]: any }) =>
-  map(data, row =>
-    mapKeys(row, (v, key) => {
-      if (/\w@@\w/.test(key)) {
-        const [agg, col] = key.split('@@');
-        return `${agg}(${col})`;
-      }
+export const dataFieldToHuman = (dataFieldName: string) => {
+  if (/\w@@\w/.test(dataFieldName)) {
+    const [agg, col] = dataFieldName.split('@@');
+    return `${agg}(${col})`;
+  }
 
-      return key;
-    })
-  );
+  return dataFieldName;
+};
 
 @Component({
   selector: 'chart-grid',
@@ -184,15 +180,20 @@ export class ChartGridComponent implements OnInit {
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
+    const isDataField = /@@/.test(axisName);
     forEach(columns, column => {
-      if (
-        axisName === column.name ||
-        axisName === column.columnName.split('.keyword')[0] ||
-        axisName === column.dataField
-      ) {
+      const isMatchingColumn = isDataField
+        ? axisName === column.dataField
+        : axisName === column.name ||
+          axisName === column.columnName.split('.keyword')[0];
+      if (isMatchingColumn) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
-        alias = column.alias || column.displayName;
+
+        /* If this is a data field, make it look user friendly */
+        alias = isDataField
+          ? dataFieldToHuman(column.dataField)
+          : column.alias || column.displayName;
         value =
           column.type === 'date'
             ? moment
@@ -298,7 +299,7 @@ export class ChartGridComponent implements OnInit {
     }
     const chartData = orderedData || data;
 
-    this.chartToggleData = dataFieldToHuman(this.trimKeyword(chartData));
+    this.chartToggleData = this.trimKeyword(chartData);
 
     return [
       ...this._chartService.dataToChangeConfig(

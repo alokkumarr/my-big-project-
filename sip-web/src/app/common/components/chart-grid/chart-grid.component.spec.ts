@@ -171,8 +171,7 @@ describe('Chart Grid Component', () => {
   });
 
   it('should convert datafield to human friendly format', () => {
-    const data = [{ 'sum@@double': 1 }];
-    const result = dataFieldToHuman(data);
-    expect(result[0]['sum(double)']).toEqual(1);
+    const result = dataFieldToHuman('sum@@double');
+    expect(result).toEqual('sum(double)');
   });
 });
