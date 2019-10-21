@@ -996,8 +996,8 @@ export class ChartService {
     const hasGroupBy = Boolean(groupField);
 
     const dataMapper = dataPoint => {
-      const valueProp = fields.y[0].columnName;
-      const nameProp = fields.x.dataField;
+      const valueProp = fields.y[0].dataField || fields.y[0].columnName;
+      const nameProp = fields.x.dataField || removeKeyword(fields.x.columnName);
       return { name: dataPoint[nameProp], value: dataPoint[valueProp] };
     };
 
@@ -1022,9 +1022,10 @@ export class ChartService {
     };
 
     if (hasGroupBy) {
-      const groupProp = groupField.dataField;
+      const groupProp =
+        groupField.dataField || removeKeyword(groupField.columnName);
       const series = fpPipe(
-        fpGroupBy(fields.g.dataField),
+        fpGroupBy(fields.g.dataField || removeKeyword(fields.g.columnName)),
         fpMap(group => {
           const name = group[0][groupProp];
           return { name, data: map(group, dataMapper) };
