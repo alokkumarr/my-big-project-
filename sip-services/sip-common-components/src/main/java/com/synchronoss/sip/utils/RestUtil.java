@@ -251,7 +251,9 @@ public class RestUtil {
    * @throws IOException {@link IOException}
    */
   public static void validateNodeValue(JsonNode parentNode) throws IOException {
-    
+    Boolean isValid = Boolean.TRUE;
+    String nodeName = null;
+    String nodeText = null;
     if (parentNode.isArray()) {
       Iterator<JsonNode> iter = parentNode.elements();
       while (iter.hasNext()) {
@@ -264,13 +266,13 @@ public class RestUtil {
     if (parentNode.isObject()) {
       Iterator<String> iter = parentNode.fieldNames();
       while (iter.hasNext()) {
-        String nodeName = iter.next();
+        nodeName = iter.next();
         JsonNode node = parentNode.path(nodeName);
         if (node.isObject() || node.isArray()) {
           validateNodeValue(node);
         } else {
+          nodeText = node.asText();
           // Validating for ESAPI constraints
-          Boolean isValid = Boolean.FALSE;
           isValid = ESAPI.validator().isValidInput("Validating SafeString "
               + "attributes value for intrusion",
               node.asText(), "SafeString", node.asText().toString().length(), false);
@@ -316,13 +318,14 @@ public class RestUtil {
               validateNodeValue(rootNode);
             }
           }
-          if (!isValid) {
-            throw new SipNotProcessedSipEntityException(
-                nodeName + ":'" + node.asText() + "' is not valid");
-          }
         }
       }
     }
+    if (!isValid) {
+      throw new SipNotProcessedSipEntityException(
+          nodeName + ":'" + nodeText + "' is not valid");
+    }
+    
   }
 
 
