@@ -67,7 +67,7 @@ public class SIPDSLTest {
     ElasticSearchQueryBuilder.groupByFields[1] = "date";
     ElasticSearchQueryBuilder.groupByFields[0] = "string";
 
-    ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
+    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
     List<Object> result = esResponseParser.parseData(jsonNode);
     Assert.assertTrue(result.size() > 0);
   }

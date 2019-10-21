@@ -22,7 +22,11 @@ import java.util.Locale;
 import org.threeten.extra.YearQuarter;
 
 public class BuilderUtil {
+
+  public static final String VALUE = ".value";
   public static final String SUFFIX = ".keyword";
+  public static final String BUCKET_SORT = "bucketSort";
+
   public static final int SIZE =
       ((System.getProperty("aggr.es.size") != null
               && !System.getProperty("aggr.es.size").equals(""))

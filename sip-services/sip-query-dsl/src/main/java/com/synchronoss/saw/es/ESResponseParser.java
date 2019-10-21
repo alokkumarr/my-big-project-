@@ -2,28 +2,30 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.model.Field;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ESResponseParser {
 
-  private static final String KEY = "key";
-  private static final String KEY_AS_STRING = "key_as_string";
-  private static final String BUCKETS = "buckets";
-  private static final String VALUE = "value";
   private static final Logger logger = LoggerFactory.getLogger(ESResponseParser.class);
+
+  private static final String KEY = "key";
+  private static final String VALUE = "value";
+  private static final String BUCKETS = "buckets";
   private static String GROUP_BY_FIELD = "group_by_field";
+  private static final String KEY_AS_STRING = "key_as_string";
+
   private String[] groupByFields;
-  private List<Field> dataFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> dataFields, List<Field> aggregationFields) {
-    this.dataFields = dataFields;
+  public ESResponseParser(List<Field> aggregationFields) {
     this.aggregationFields = aggregationFields;
     this.groupByFields = ElasticSearchQueryBuilder.groupByFields;
   }
@@ -92,13 +94,12 @@ public class ESResponseParser {
     } else {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
-      for (Field dataField : aggregationFields) {
-        logger.debug("Datafield = " + dataField);
+      for (Field field : aggregationFields) {
+        logger.debug("Data field name {}", field);
         String columnName =
-            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+            field.getDataField() == null ? field.getColumnName() : field.getDataField();
 
-        logger.debug("Column Name = " + columnName);
-        logger.debug("Child Node = " + childNode);
+        logger.debug("Column Name : {} , Child Name : {}", columnName, childNode);
         flatValues.put(columnName, childNode.get(columnName).get(VALUE));
       }
       flatStructure.add(flatValues);
@@ -137,7 +138,9 @@ public class ESResponseParser {
     return columnName;
   }
 
-  /** @param jsonNode */
+  /**
+   * @param jsonNode
+   */
   private String childNodeName(JsonNode jsonNode) {
     Iterator<String> keys = jsonNode.fieldNames();
     while (keys.hasNext()) {
@@ -149,7 +152,9 @@ public class ESResponseParser {
     return null;
   }
 
-  /** Fetch the group By fields for parsing aggregation result. */
+  /**
+   * Fetch the group By fields for parsing aggregation result.
+   */
   private void prepareGroupByFields(List<Field> dataFields) {
     groupByFields = new String[dataFields.size() - aggregationFields.size()];
     int fieldCount = 0;

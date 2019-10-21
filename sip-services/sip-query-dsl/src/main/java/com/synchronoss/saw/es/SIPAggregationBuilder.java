@@ -161,7 +161,7 @@ public class SIPAggregationBuilder {
           if (dataField1.getExpression() != null) {
 
             /**
-             * Evaluate every operand in the expression as a separate datafield, store them in a
+             * Evaluate every operand in the expression as a separate data field, store them in a
              * custom field and then evaluate the entire expression and store it in the user
              * provided field.
              */
@@ -189,15 +189,14 @@ public class SIPAggregationBuilder {
               size = dataField1.getLimitValue();
             aggregationBuilder.subAggregation(
                 bucketSort(
-                    "bucketSort",
-                    Arrays.asList(
-                        new FieldSortBuilder(dataField1.getColumnName()).order(sortOrder)))
+                    BuilderUtil.BUCKET_SORT,
+                    Arrays.asList(new FieldSortBuilder(dataField1.getColumnName()).order(sortOrder)))
                     .size(size));
           }
         }
         for (Filter filter : aggregationFilter) {
           Map<String, String> bucketsPathsMap = new HashMap<>();
-          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + ".value");
+          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
           Script script = QueryBuilderUtil.prepareAggregationFilter(filter);
           BucketSelectorPipelineAggregationBuilder bs =
               PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
@@ -370,7 +369,7 @@ public class SIPAggregationBuilder {
       String fieldName = operand.getAggregate() + "_" + operand.getColumn() + "_formula_" + random.nextInt(10000);
       aggField.setDataField(fieldName);
       aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(aggField));
-      bucketPathsMap.put(fieldName, fieldName + ".value");
+      bucketPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
       operandBuilder.append("params.").append(fieldName);
     } else if (operand.getOperand1() != null && operand.getOperator() != null) {
       operandBuilder.append("(");
