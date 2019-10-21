@@ -17,7 +17,8 @@ import com.google.gson.JsonArray;
     import sncr.bda.conf.ESLoader;
     import sncr.bda.core.file.HFileOperations;
     import sncr.bda.datasets.conf.DataSetProperties;
-    import sncr.xdf.context.ComponentServices;
+import sncr.xdf.alert.AlertQueueManager;
+import sncr.xdf.context.ComponentServices;
     import sncr.xdf.context.NGContext;
     import sncr.xdf.esloader.esloadercommon.ESHttpClient;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
@@ -173,6 +174,16 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 ESHttpClient esHttpClient = loader.getHttpClient();
 
                 retVal = registerOrUpdateESDataset(indexType, esHttpClient);
+            }
+            // check if Alert is enabled for the component and send the notification.
+            if (esLoaderConfig.getAlerts()!=null && esLoaderConfig.getAlerts().getDatapod()!=null)
+            {
+                String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+                AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+                Long createdTime = System.currentTimeMillis();
+                alertQueueManager.sendMessageToStream(esLoaderConfig.getAlerts().getDatapod(),createdTime
+                );
+                logger.info("Alert configure for the dataset sent notification to stream");
             }
 
             return retVal;

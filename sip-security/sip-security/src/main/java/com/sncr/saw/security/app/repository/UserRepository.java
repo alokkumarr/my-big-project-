@@ -65,4 +65,6 @@ public interface UserRepository {
 	Valid updateCategory(CategoryDetails category);
 	boolean checkSubCatExists(CategoryDetails category);
 	Long createAdminUserForOnboarding(User user);
+
+    Boolean IsTicketValid(String ticketId, String masterLogin);
 }

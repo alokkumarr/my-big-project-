@@ -82,6 +82,7 @@ import { CronJobSchedularComponent } from './components/cron-scheduler/cron-job-
 import { CronDatePickerComponent } from './components/cron-scheduler/cron-date-picker';
 import { ChartGridComponent } from './components/chart-grid';
 import { SSOAuthComponent } from './components/sso-auth/sso-auth.component';
+import { EmailListComponent } from './email-list';
 
 import { UChartModule } from './components/charts';
 import { MapBoxModule } from './map-box/map-box.module';
@@ -165,7 +166,8 @@ const COMPONENTS = [
   ChartGridComponent,
   RemoteFolderSelectorComponent,
   CreatefolderDialogComponent,
-  SSOAuthComponent
+  SSOAuthComponent,
+  EmailListComponent
 ];
 
 const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
