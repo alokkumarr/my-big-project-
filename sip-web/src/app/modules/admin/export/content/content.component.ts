@@ -76,6 +76,9 @@ export class AdminExportContentComponent implements OnInit {
    */
   get allSelected(): boolean {
     const [intersection, analyses] = this.intersection();
+    if (!intersection || !analyses) {
+      return false;
+    }
     return intersection.length === analyses.length && analyses.length > 0;
   }
 
@@ -88,6 +91,9 @@ export class AdminExportContentComponent implements OnInit {
    */
   get someSelected(): boolean {
     const [intersection, analyses] = this.intersection();
+    if (!intersection || !analyses) {
+      return false;
+    }
     return intersection.length < analyses.length && intersection.length > 0;
   }
 
