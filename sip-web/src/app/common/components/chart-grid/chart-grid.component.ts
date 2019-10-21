@@ -47,7 +47,7 @@ interface ReportGridField {
  *
  * @param {{ [key: string]: any }} data
  */
-const dataFieldToHuman = (data: { [key: string]: any }) =>
+export const dataFieldToHuman = (data: { [key: string]: any }) =>
   map(data, row =>
     mapKeys(row, (v, key) => {
       if (/\w@@\w/.test(key)) {

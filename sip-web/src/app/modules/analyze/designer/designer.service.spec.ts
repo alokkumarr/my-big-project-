@@ -23,4 +23,15 @@ describe('Designer Service', () => {
   it('should exist', () => {
     expect(service).toBeTruthy();
   });
+
+  it('should return dataField for a column', () => {
+    expect(
+      DesignerService.dataFieldFor({
+        aggregate: 'sum',
+        columnName: 'double'
+      } as any)
+    ).toEqual('sum@@double');
+
+    expect(() => DesignerService.dataFieldFor({} as any)).toThrow();
+  });
 });

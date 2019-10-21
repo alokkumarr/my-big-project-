@@ -7,7 +7,7 @@ import {
   Output
 } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ChartGridComponent } from './chart-grid.component';
+import { ChartGridComponent, dataFieldToHuman } from './chart-grid.component';
 import { UChartModule } from '../../components/charts';
 import { ChartService } from '../../services';
 import { HeaderProgressService } from './../../../common/services';
@@ -45,7 +45,7 @@ class ChartStubService {
 }
 
 class HeaderProgressStubService {
-  show = () => (true);
+  show = () => true;
 }
 
 describe('Chart Grid Component', () => {
@@ -68,8 +68,10 @@ describe('Chart Grid Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [UChartModule],
-      providers: [{ provide: ChartService, useClass: ChartStubService },
-        { provide: HeaderProgressService, useClass: HeaderProgressStubService }],
+      providers: [
+        { provide: ChartService, useClass: ChartStubService },
+        { provide: HeaderProgressService, useClass: HeaderProgressStubService }
+      ],
       declarations: [ChartGridComponent, DxDataGridStubComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -86,7 +88,7 @@ describe('Chart Grid Component', () => {
           },
           chartType: 'map',
           type: 'chart',
-          mapOptions: {mapType: 'map'},
+          mapOptions: { mapType: 'map' },
           sipQuery: {
             artifacts: [
               {
@@ -150,13 +152,27 @@ describe('Chart Grid Component', () => {
   });
 
   it('should update chart options based on sorts applied in sipquery', () => {
-    expect(setReverseProperty(component.analysis.chartOptions, component.analysis.sipQuery))
-    .toBeTruthy(reversePropertyTrue.xAxis.reversed);
+    expect(
+      setReverseProperty(
+        component.analysis.chartOptions,
+        component.analysis.sipQuery
+      )
+    ).toBeTruthy(reversePropertyTrue.xAxis.reversed);
   });
 
   it('should update chart options based on sorts applied in sipquery', () => {
     component.analysis.sipQuery.sorts[0].order = 'asc';
-    expect(setReverseProperty(component.analysis.chartOptions, component.analysis.sipQuery))
-    .toBeTruthy(reversePropertyFalse.xAxis.reversed);
+    expect(
+      setReverseProperty(
+        component.analysis.chartOptions,
+        component.analysis.sipQuery
+      )
+    ).toBeTruthy(reversePropertyFalse.xAxis.reversed);
+  });
+
+  it('should convert datafield to human friendly format', () => {
+    const data = [{ 'sum@@double': 1 }];
+    const result = dataFieldToHuman(data);
+    expect(result[0]['sum(double)']).toEqual(1);
   });
 });
