@@ -1091,6 +1091,130 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
+  public void testExecutionWithGroupIntervalMinute() throws IOException {
+    String groupInterval = null;
+    Response reponseAtSecondLevel = getExecutedDataWithGroupInterval(groupInterval);
+    Assert.assertNotNull(reponseAtSecondLevel);
+    ArrayNode data = reponseAtSecondLevel.getBody().as(ObjectNode.class).withArray("data");
+    Assert.assertNotNull(data);
+    Long expectedValue = 0L;
+    for (JsonNode jsonNode : data) {
+      Long value = jsonNode.get("long").asLong();
+      expectedValue = expectedValue + value;
+    }
+    String groupIntervalMinute = "minute";
+    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(groupIntervalMinute);
+    Assert.assertNotNull(reponseAtMinuteLevel);
+    ArrayNode dataForMinuteGrouping =
+        reponseAtMinuteLevel.getBody().as(ObjectNode.class).withArray("data");
+    Assert.assertNotNull(dataForMinuteGrouping);
+    Assert.assertNotNull(dataForMinuteGrouping);
+    Long actualValue = dataForMinuteGrouping.get(0).get("long").asLong();
+    Assert.assertEquals(expectedValue, actualValue);
+  }
+
+  @Test
+  public void testExecutionWithGroupIntervalSecond() throws IOException {
+    String minuteGroupInterval = "minute";
+    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(minuteGroupInterval);
+    ArrayNode dataForMinuteGrouping =
+        reponseAtMinuteLevel.getBody().as(ObjectNode.class).withArray("data");
+    Integer responseSizeForMinute = dataForMinuteGrouping.size();
+    String groupInterval = "second";
+    Response reponseAtSecondLevel = getExecutedDataWithGroupInterval(groupInterval);
+    Assert.assertNotNull(reponseAtSecondLevel);
+    ArrayNode dataForSecondGrouping =
+        reponseAtSecondLevel.getBody().as(ObjectNode.class).withArray("data");
+    Integer responseSizeForSecond = dataForSecondGrouping.size();
+    Assert.assertTrue(responseSizeForSecond > responseSizeForMinute);
+  }
+
+  private Response getExecutedDataWithGroupInterval(String groupInterval) throws IOException {
+    JsonNode payload = preparePayloadForGroupInterval(groupInterval);
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payload)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    return response;
+  }
+
+  /**
+   * This Method prepares the payload with group interval specified.
+   *
+   * @return created payload.
+   */
+  private JsonNode preparePayloadForGroupInterval(String groupInterval) throws IOException {
+    JsonObject payload = testData;
+    JsonObject fieldWithGroupIntervalMinute = prepareFieldForGroupInterval(groupInterval);
+    JsonArray fields =
+        payload
+            .getAsJsonObject("sipQuery")
+            .getAsJsonArray("artifacts")
+            .get(0)
+            .getAsJsonObject()
+            .getAsJsonArray("fields");
+    for (int i = fields.size(); i > 0; i--) {
+      fields.remove(i - 1);
+    }
+    fields.add(prepareFieldForGroupInterval(groupInterval));
+
+    JsonObject field3 = new JsonObject();
+    field3.addProperty("dataField", "long");
+    field3.addProperty("columnName", "long");
+    field3.addProperty("displayName", "Long");
+    field3.addProperty("type", "long");
+    field3.addProperty("aggregate", "sum");
+    fields.add(field3);
+    JsonArray filters = payload.getAsJsonObject("sipQuery").getAsJsonArray("filters");
+    for (int j = filters.size(); j > 0; j--) {
+      filters.remove(j - 1);
+    }
+
+    JsonObject filter = new JsonObject();
+    filter.addProperty("type", "date");
+    filter.addProperty("tableName", "sample");
+    filter.addProperty("isOptional", false);
+    filter.addProperty("columnName", "date");
+    filter.addProperty("isRuntimeFilter", false);
+    filter.addProperty("isGlobalFilter", false);
+    JsonObject model = new JsonObject();
+    model.addProperty("format", "yyyy-MM-dd HH:mm:ss");
+    model.addProperty("operator", "NEQ");
+    model.addProperty("gte", "2019-10-16 11:05:00");
+    model.addProperty("lte", "2019-10-16 11:05:59");
+    filter.add("model", model);
+    filters.add(filter);
+
+    return mapper.readTree(payload.toString());
+  }
+
+  /**
+   * This Method prepares the field with specified group interval..
+   *
+   * @return field wit group interval.
+   */
+  private JsonObject prepareFieldForGroupInterval(String groupInterval) {
+    JsonObject field = new JsonObject();
+    field.addProperty("dataField", "date");
+    field.addProperty("area", "g-axis");
+    field.addProperty("columnName", "date");
+    field.addProperty("displayName", "Date");
+    field.addProperty("type", "date");
+    field.addProperty("dateFormat", "MM/dd/yyyy HH:mm:ss");
+    field.addProperty("groupInterval", groupInterval);
+    return field;
+  }
+
+  @Test
   public void exportData() throws IOException {
     ObjectNode analysis = testCreateDlAnalysis();
     String analysisId = analysis.get("analysisId").asText();

@@ -8,11 +8,11 @@ import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
@@ -197,7 +197,7 @@ public class SIPDSLTest {
     sort.setColumnName("integer");
     sort.setOrder(Order.DESC);
     sort.setType(Sort.Type.INTEGER);
-    sort.setAggregate(Sort.Aggregate.SUM);
+    sort.setAggregate(Aggregate.SUM);
     sipdsl.getSipQuery().setSorts(Collections.singletonList(sort));
 
     String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
