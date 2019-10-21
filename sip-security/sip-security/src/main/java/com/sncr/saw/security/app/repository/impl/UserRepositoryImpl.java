@@ -3,7 +3,7 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.common.UserLoginCount;
+import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.Module;
@@ -39,16 +39,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -139,7 +129,7 @@ public class UserRepositoryImpl implements UserRepository {
         ret[0] = isAuthenticated;
         ret[1] = isPasswordActive;
       }
-      UserLoginCount userLoginCount = getUserLoginCounts(masterLoginId);
+      UserUnsuccessfulLoginAttemptBean userLoginCount = getUserUnsuccessfulLoginAttempt(masterLoginId);
       if (userLoginCount != null && userLoginCount.getUserId() != null) {
         if (userLoginCount.getInvalidPassWordCount() == null)
           userLoginCount.setInvalidPassWordCount(0L);
@@ -3298,8 +3288,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  public UserLoginCount getUserLoginCounts(String userId) {
-    UserLoginCount userList = null;
+  public UserUnsuccessfulLoginAttemptBean getUserUnsuccessfulLoginAttempt(String userId) {
+    UserUnsuccessfulLoginAttemptBean userList = null;
     String sql =
         "SELECT U.USER_SYS_ID, U.USER_ID, U.UNSUCCESSFUL_LOGIN_ATTEMPT, U.LAST_UNSUCCESS_LOGIN_TIME "
             + "  FROM USERS U WHERE U.USER_ID = ?";
@@ -3326,12 +3316,12 @@ public class UserRepositoryImpl implements UserRepository {
     return userList;
   }
 
-  public class UserLoginCountExtractor implements ResultSetExtractor<UserLoginCount> {
+  public class UserLoginCountExtractor implements ResultSetExtractor<UserUnsuccessfulLoginAttemptBean> {
 
     @Override
-    public UserLoginCount extractData(ResultSet rs) throws SQLException, DataAccessException {
+    public UserUnsuccessfulLoginAttemptBean extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-      UserLoginCount user = new UserLoginCount();
+      UserUnsuccessfulLoginAttemptBean user = new UserUnsuccessfulLoginAttemptBean();
       while (rs.next()) {
         user.setUserSysId(rs.getLong("USER_SYS_ID"));
         user.setUserId(rs.getString("USER_ID"));
@@ -3359,15 +3349,15 @@ public class UserRepositoryImpl implements UserRepository {
         message = "No user found for updating new password value.";
       }
     } catch (DataAccessException de) {
-      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      logger.error("Exception encountered while updating users table : " + de.getMessage(), null, de);
       throw de;
     } catch (Exception e) {
       logger.error(
-          "Exception encountered while resetting password for user " + e.getMessage(),
+          "Exception encountered while updating unsuccess attempt for user " + e.getMessage(),
           userSysId,
           null,
           e);
-      message = "Error encountered while updating new password value.";
+      message = "Error encountered while updating Unsuccess login attempt count.";
     }
     return message;
   }

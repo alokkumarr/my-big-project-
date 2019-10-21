@@ -3,7 +3,7 @@ package com.sncr.saw.security.common;
 import java.io.Serializable;
 import java.util.Date;
 
-public class UserLoginCount implements Serializable {
+public class UserUnsuccessfulLoginAttemptBean implements Serializable {
     private static final long serialVersionUID = 6710590219794990734L;
     private Long userSysId;
     private String userId;

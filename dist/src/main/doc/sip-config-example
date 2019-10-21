@@ -128,10 +128,10 @@ saw_email_password=
 saw_email_from=noreply@example.com
 
 #
-#user properties
+# Properties for inactivating user after max unsuccessful login attempts.
 #
-user.maxUnsuccessfulLoginAttemptAllowed=5
-user.lockingTime.mins=5
+sip_maxUnsuccessfulLoginAttemptAllowed=5
+sip_user_lockingTime_mins=5
 
 #
 # Path by project
@@ -187,12 +187,6 @@ saw_security_email_protocol=smtp
 saw_security_email_host=localhost
 saw_security_email_port=25
 saw_security_email_from=noreply@example.com
-
-#
-#user properties
-#
-user.maxUnsuccessfulLoginAttemptAllowed=5
-user.lockingTime.mins=5
 
 #
 # generate secret key using command : openssl rand 32 -base64
