@@ -165,7 +165,7 @@ export class DesignerService {
     analysisType: string,
     analysisSubtype: string
   ) {
-    if (!NUMBER_TYPES.includes(column.type)) {
+    if (!NUMBER_TYPES.includes(column.type) || !!column.expression) {
       return !some(columns, col => col.columnName === column.columnName);
     }
     return (
@@ -464,7 +464,6 @@ export class DesignerService {
   ): IDEsignerSettingGroupAdapter[] {
     const isStockChart = chartType.substring(0, 2) === 'ts';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
-      artifactColumn.area = null;
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
       unset(artifactColumn, 'aggregate');
