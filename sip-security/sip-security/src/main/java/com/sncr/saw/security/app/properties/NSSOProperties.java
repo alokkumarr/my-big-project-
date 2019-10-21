@@ -46,7 +46,7 @@ public class NSSOProperties {
   @Value("${user.lockingTime.mins}")
   private int lockingTime;
 
-  @Value("${user.maxInvalidPwdLimit.count}")
+  @Value("${user.maxUnsuccessfulLoginAttemptAllowed}")
   private int maxInvalidPwdLimit;
 
   public String getRefreshTokenValidityMins() {

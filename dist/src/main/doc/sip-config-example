@@ -130,7 +130,7 @@ saw_email_from=noreply@example.com
 #
 #user properties
 #
-user.maxInvalidPwdLimit.count=5
+user.maxUnsuccessfulLoginAttemptAllowed=5
 user.lockingTime.mins=5
 
 #
@@ -191,7 +191,7 @@ saw_security_email_from=noreply@example.com
 #
 #user properties
 #
-user.maxInvalidPwdLimit.count=5
+user.maxUnsuccessfulLoginAttemptAllowed=5
 user.lockingTime.mins=5
 
 #

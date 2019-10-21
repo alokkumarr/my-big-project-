@@ -293,8 +293,8 @@ public class UserRepositoryImplTest {
 		boolean isPasswordActive = true;
 		boolean[] valid = { isAuthenticated, isPasswordActive };
 		
-		when(userRepositoryDAO.authenticateUser(masterLoginId, password,5,5)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
-		boolean[] isValid = userRepositoryDAO.authenticateUser(masterLoginId, password,5,5);
+		when(userRepositoryDAO.authenticateUser(masterLoginId, password)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
+		boolean[] isValid = userRepositoryDAO.authenticateUser(masterLoginId, password);
 		assertEquals(true, isValid[0]);
 		assertEquals(true, isValid[1]);		
 	}

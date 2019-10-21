@@ -90,8 +90,7 @@ public class SecurityController {
 
 		logger.info("Ticket will be created..");
 		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
-        logger.info("lockingTime :" + nSSOProperties.getLockingTime());
-        logger.info("maxInvalidPwdLimit :" + nSSOProperties.getMaxInvalidPwdLimit());
+
 
 		Ticket ticket = new Ticket();
 		User user = null;
@@ -102,7 +101,7 @@ public class SecurityController {
 		int maxInvalidPwdLimit = nSSOProperties.getMaxInvalidPwdLimit();
 		try {
 			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
-					loginDetails.getPassword(),lockingTime,maxInvalidPwdLimit);
+					loginDetails.getPassword());
 
 			boolean isUserAuthentic = ret[0];
 			boolean isPassWordActive = ret[1];
@@ -118,7 +117,8 @@ public class SecurityController {
 					ticket.setValidityReason("Password Expired");
 				}
 			} else if (isAccountLocked) {
-			    ticket.setValidityReason("Account has been locked for "+lockingTime+ " mins!!");
+        ticket.setValidityReason(
+            String.format("Account has been locked for %s mins!!", lockingTime));
             } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}

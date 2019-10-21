@@ -1,6 +1,7 @@
 package com.sncr.saw.security.app.repository.impl;
 
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.UserLoginCount;
 import com.sncr.saw.security.common.bean.Category;
@@ -89,6 +90,9 @@ public class UserRepositoryImpl implements UserRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+    @Autowired
+    private NSSOProperties nSSOProperties;
+
   /**
    * Authenticates sso user.
    *
@@ -96,11 +100,15 @@ public class UserRepositoryImpl implements UserRepository {
    * @param password
    * @return
    */
-  public boolean[] authenticateUser(
-      String masterLoginId, String password, int lockingTime, int maxInvalidPwdLimit) {
+  public boolean[] authenticateUser(String masterLoginId, String password) {
     boolean isAuthenticated = false;
     boolean isPasswordActive = false;
     boolean[] ret = {false, false, false};
+
+    int lockingTime = nSSOProperties.getLockingTime();
+    int maxInvalidPwdLimit = nSSOProperties.getMaxInvalidPwdLimit();
+    logger.debug("lockingTime : {} ",lockingTime);
+    logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
     password = Ccode.cencode(password).trim();
     String pwd = password;
@@ -132,37 +140,44 @@ public class UserRepositoryImpl implements UserRepository {
         ret[1] = isPasswordActive;
       }
       UserLoginCount userLoginCount = getUserLoginCounts(masterLoginId);
-      if (!isAuthenticated) {
-        if (userLoginCount != null && userLoginCount.getUserId() != null) {
-          if (userLoginCount.getInvalidPassWordCount() == null)
-            userLoginCount.setInvalidPassWordCount(0L);
-          Date date = new Date();
-          DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-          long diff = date.getTime() - userLoginCount.getLastUnsuccessLoginTime().getTime();
-          long diffMinutes = diff / (60 * 1000) % 60;
-          logger.info("current date : " + dateFormat.format(date));
-          logger.info(
-              "Cusrrent dateTime : "
-                  + dateFormat.format(date)
-                  + " Last Unsuccessful login : "
-                  + dateFormat.format(userLoginCount.getLastUnsuccessLoginTime()));
-          logger.info(
-              "Date.getTime : "
-                  + date.getTime()
-                  + " ,Last Unsuccessful login time : "
-                  + userLoginCount.getLastUnsuccessLoginTime().getTime());
-          logger.info("Diff in minutes : " + diffMinutes);
+      if (userLoginCount != null && userLoginCount.getUserId() != null) {
+        if (userLoginCount.getInvalidPassWordCount() == null)
+          userLoginCount.setInvalidPassWordCount(0L);
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long diff = date.getTime() - userLoginCount.getLastUnsuccessLoginTime().getTime();
+        long diffMinutes = diff / (60 * 1000) % 60;
+        if (!isAuthenticated) {
+          logger.debug(
+              "Current dateTime : {} Last Unsuccessful login : {} ",
+              dateFormat.format(date),
+              dateFormat.format(userLoginCount.getLastUnsuccessLoginTime()));
+          logger.debug(
+              "Date.getTime : {} , Last Unsuccessful login time : {} ",
+              date.getTime(),
+              userLoginCount.getLastUnsuccessLoginTime().getTime());
+          logger.info("Diff in minutes : {} ", diffMinutes);
           if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
               && diffMinutes <= lockingTime) {
             ret[2] = true;
+            logger.info("Maximum Attempts reached, user account is locked.!!, Contact Administrator.");
           } else {
             updateInvalidLoginCount(
                 userLoginCount.getUserSysId(),
                 (int) (userLoginCount.getInvalidPassWordCount() + 1));
           }
+        } else {
+          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
+              && diffMinutes <= lockingTime) {
+            ret[2] = true; // Lock the account.
+            ret[0] =
+                false; // In locking period even though user gives right credentials, he shouldn't
+            // be allowed login till specified time.
+            logger.info("Maximum Attempts reached, user account is locked.!!");
+          } else {
+            updateInvalidLoginCount(userLoginCount.getUserSysId(), 0);
+          }
         }
-      } else if (userLoginCount != null && userLoginCount.getUserSysId() != null) {
-        updateInvalidLoginCount(userLoginCount.getUserSysId(), 0);
       }
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
@@ -3286,7 +3301,7 @@ public class UserRepositoryImpl implements UserRepository {
   public UserLoginCount getUserLoginCounts(String userId) {
     UserLoginCount userList = null;
     String sql =
-        "SELECT U.USER_SYS_ID, U.USER_ID, U.INVALID_PASSWORD_COUNT, U.LAST_UNSUCCESS_LOGIN_TIME "
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.UNSUCCESSFUL_LOGIN_ATTEMPT, U.LAST_UNSUCCESS_LOGIN_TIME "
             + "  FROM USERS U WHERE U.USER_ID = ?";
     try {
       userList =
@@ -3320,7 +3335,7 @@ public class UserRepositoryImpl implements UserRepository {
       while (rs.next()) {
         user.setUserSysId(rs.getLong("USER_SYS_ID"));
         user.setUserId(rs.getString("USER_ID"));
-        user.setInvalidPassWordCount(rs.getLong("INVALID_PASSWORD_COUNT"));
+        user.setInvalidPassWordCount(rs.getLong("UNSUCCESSFUL_LOGIN_ATTEMPT"));
         user.setLastUnsuccessLoginTime(rs.getDate("LAST_UNSUCCESS_LOGIN_TIME"));
       }
       return user;
@@ -3329,7 +3344,7 @@ public class UserRepositoryImpl implements UserRepository {
 
   public String updateInvalidLoginCount(Long userSysId, int count) {
     String sql =
-        "update users u set u.INVALID_PASSWORD_COUNT='"
+        "update users u set u.UNSUCCESSFUL_LOGIN_ATTEMPT='"
             + count
             + "' "
             + " , u.LAST_UNSUCCESS_LOGIN_TIME = sysdate() where u.USER_SYS_ID ='"

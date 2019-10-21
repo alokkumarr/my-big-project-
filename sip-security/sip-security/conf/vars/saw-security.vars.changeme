@@ -34,5 +34,5 @@ sso.secret.key=CHANGEME # SSO login JWT token.
 jwt.secret.key=CHANGEME # Secret key for jwt Token.
 
 #user properties
-user.maxInvalidPwdLimit.count=5
+user.maxUnsuccessfulLoginAttemptAllowed=5
 user.lockingTime.mins=5
