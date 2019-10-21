@@ -9,6 +9,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as moment from 'moment';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as toNumber from 'lodash/toNumber';
@@ -16,6 +17,10 @@ import * as round from 'lodash/round';
 import * as find from 'lodash/find';
 import * as some from 'lodash/some';
 import * as debounce from 'lodash/debounce';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as defaults from 'lodash/defaults';
 
@@ -23,6 +28,7 @@ import { DATE_PRESETS_OBJ, BULLET_CHART_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
+import { WidgetFiltersComponent } from './../add-widget/widget-filters/widget-filters.component';
 
 import { Subscription, BehaviorSubject } from 'rxjs';
 
@@ -78,7 +84,8 @@ export class ObserveKPIBulletComponent
 
   constructor(
     public observe: ObserveService,
-    public globalFilterService: GlobalFilterService
+    public globalFilterService: GlobalFilterService,
+    public dialog: MatDialog
   ) {
     this.setKpiSize = debounce(this.setKpiSize, 10);
   }
@@ -166,35 +173,65 @@ export class ObserveKPIBulletComponent
       return this.executeKPI(this._kpi);
     }
 
-    const filter = defaults(
-      {},
-      {
-        model: filterModel
-      },
-      get(this._kpi, 'filters.0')
-    );
-    const kpi = defaults({}, { filters: [filter] }, this._kpi);
+    const kpiFilters = cloneDeep(this._kpi);
+    const filter = this.constructGlobalFilter(filterModel, kpiFilters.filters);
+    const kpi = defaults({}, { filters: filter }, kpiFilters);
 
     return this.executeKPI(kpi);
   }
 
-  filterLabel() {
+  constructGlobalFilter(model, kpiFilters) {
+    const globalFilters = this._kpi.filters.length === 1
+    // Check backward compatibility
+    ? fpPipe(
+      fpMap(filt => {
+        filt.model = model;
+        return filt;
+      })
+    )(this._kpi.filters)
+    : fpPipe(
+      fpMap(filt => {
+        if (filt.primaryKpiFilter) {
+          filt.model = model;
+        }
+        return filt;
+      })
+    )(kpiFilters);
+    return globalFilters;
+  }
+
+  getFilterLabel() {
     if (!this._executedKPI && !this._kpi) {
       return '';
     }
-
-    const preset = get(
-      this._executedKPI || this._kpi,
+    const executedKpi = this._executedKPI || this._kpi;
+    let primaryFilter = get(
+      executedKpi,
+      'filters.0.model'
+    );
+    let preset = get(
+      executedKpi,
       'filters.0.model.preset'
     );
+    // For backward compatibility. identify the primary filter
+    // after adding new filters for already existing KPIs
+    if (isUndefined(preset)) {
+      executedKpi.filters.forEach(filt => {
+        if (filt.primaryKpiFilter) {
+          preset = filt.model.preset;
+          primaryFilter = filt.model;
+          return;
+        }
+      });
+    }
     const filter = get(this.datePresetObj, `${preset}.label`);
     if (filter === 'Custom') {
       const gte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        get(primaryFilter, 'gte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       const lte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        get(primaryFilter, 'lte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       return `${gte} - ${lte}`;
@@ -208,7 +245,7 @@ export class ObserveKPIBulletComponent
 
     const dataFieldName = get(kpi, 'dataFields.0.name');
     const kpiTitle = get(kpi, 'name');
-    const kpiFilter = this.filterLabel();
+    const kpiFilter = this.getFilterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
     const categories = get(kpi, 'dataFields.0.displayName', '');
     this.observe.executeKPI(kpi).subscribe(res => {
@@ -259,5 +296,14 @@ export class ObserveKPIBulletComponent
       this.reloadChart(changes);
       this.item && this.onRefresh.emit(this.item);
     });
+  }
+
+  displayFilters() {
+    return this.dialog.open(WidgetFiltersComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data: this._kpi
+    } as MatDialogConfig);
   }
 }
