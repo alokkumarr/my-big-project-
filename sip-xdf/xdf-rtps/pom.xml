@@ -44,6 +44,7 @@
 		<scala.version>2.11</scala.version>
 		<mapr.client>6.1.0-mapr</mapr.client>
 		<es.version>6.3.0</es.version>
+		<scala.version.exclude>20_2.11</scala.version.exclude>
 
 		<junit.version>4.11</junit.version>
 		<typesafe-version>1.3.1</typesafe-version>
@@ -96,7 +97,7 @@
       <exclusions>
       	<exclusion>
       		<groupId>org.elasticsearch</groupId>
-      		<artifactId>elasticsearch-spark-20_2.11</artifactId>
+      		<artifactId>elasticsearch-spark-{$scala.version.exclude}</artifactId>
       	</exclusion>
       </exclusions>
     </dependency>

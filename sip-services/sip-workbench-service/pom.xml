@@ -30,6 +30,7 @@
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
     <jjwt.version>0.7.0</jjwt.version>
     <spark-version>2.3.2</spark-version>
+    <scala.version.exclude>20_2.11</scala.version.exclude>
     <!-- TODO: Check livy version 0.5.0 (not getting resolved) -->
     <livy.version>0.5.0-incubating</livy.version>
   </properties>
@@ -203,7 +204,7 @@
         </exclusion>
         <exclusion>
         	<groupId>org.elasticsearch</groupId>
-        	<artifactId>elasticsearch-spark-20_2.11</artifactId>
+        	<artifactId>elasticsearch-spark-${scala.version.exclude}</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
