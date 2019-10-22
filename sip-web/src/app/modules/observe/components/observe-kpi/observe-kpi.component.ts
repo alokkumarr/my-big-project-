@@ -34,6 +34,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   bgColor: string;
   countToChange: string;
   countToCurrent: string;
+  dataFormat: any;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -70,6 +71,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     }
 
     this._kpi = data;
+    this.dataFormat = get(this._kpi, 'dataFields.0.format');
     this.executeKPI(this._kpi);
   }
 
@@ -210,12 +212,41 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         change = isFinite(change) ? change : 0;
         this.primaryChange = change;
         this.primaryResult = {
-          current: round(currentParsed, 2),
+          current: currentParsed,
           prior: priorParsed,
           change: trim(change, '-')
         };
 
         this.secondaryResult = secondary;
       });
+  }
+
+  // Accepts a Number value to be formatted based on the data format options already saved during creation
+  // or edition of a KPI.
+
+  /**
+   * Called everytime when each KPI is loaded on a dashboard.
+   *
+   * @param {Number} value
+   * returns a foramtted value based on the properties set during creation or edition of a dashboard.
+   */
+  fetchValueAsPerFormat(value) {
+    let formattedValue;
+    if (isUndefined(value)) {
+      return;
+    }
+    if (isUndefined(this.dataFormat)) {
+      return value;
+    }
+    formattedValue = value.toFixed(this.dataFormat.precision);
+    formattedValue = this.dataFormat.comma ? this.fetchCommaValue(formattedValue) : formattedValue;
+    formattedValue = `${this.dataFormat.prefix} ${formattedValue} ${this.dataFormat.suffix}`;
+    return formattedValue;
+  }
+
+  fetchCommaValue(val) {
+    const part = val.toString().split('.');
+    part[0] = part[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return part.join('.');
   }
 }

@@ -145,7 +145,59 @@
     </mat-button-toggle-group>
   </div>
 
-  <div *ngIf="_kpiType === 'bullet'">
+  <mat-accordion *ngIf="_kpiType!== 'bullet'">
+    <mat-expansion-panel class="format-data-kpi">
+      <mat-expansion-panel-header class="format-data-kpi-header">
+        <mat-panel-title class="format-title">
+          <strong>Format Data</strong>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="format-data-form">
+        <mat-slide-toggle i18n
+                          color="primary"
+                          name="kpiCommaSeparator"
+                          formControlName="kpiCommaSeparator"
+                          >
+          Show Comma Separators
+        </mat-slide-toggle>
+        <mat-form-field>
+          <input matInput
+                type="number"
+                max="99"
+                min="0"
+                autocomplete="off"
+                name="kpiPrecision"
+                formControlName="kpiPrecision"
+                placeholder="Decimal Precision"/>
+        </mat-form-field>
+        <div fxLayout="row" fxFlex="40">
+          <mat-form-field>
+            <input
+              matInput
+              placeholder="Prefix"
+              name="kpiPrefix"
+              formControlName="kpiPrefix"
+              maxlength="5"
+              type="text"
+            />
+          </mat-form-field>
+
+          <mat-form-field>
+            <input
+              matInput
+              placeholder="Suffix"
+              name="kpiSuffix"
+              formControlName="kpiSuffix"
+              maxlength="10"
+              type="text"
+            />
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <div *ngIf="_kpiType=== 'bullet'">
     <div class="bullet-measures">
       <mat-form-field>
         <input
