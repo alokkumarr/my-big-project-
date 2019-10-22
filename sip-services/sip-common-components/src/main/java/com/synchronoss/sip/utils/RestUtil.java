@@ -52,7 +52,7 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
   
-  private static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\\\[\\\\]_{}]";
+  private static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/]";
   private static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
