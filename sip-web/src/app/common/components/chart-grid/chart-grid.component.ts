@@ -192,7 +192,7 @@ export class ChartGridComponent implements OnInit {
 
         /* If this is a data field, make it look user friendly */
         alias =
-          alias ||
+          column.alias ||
           (isDataField
             ? dataFieldToHuman(column.dataField)
             : column.displayName);
