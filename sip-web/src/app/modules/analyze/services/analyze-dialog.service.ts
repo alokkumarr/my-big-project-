@@ -163,6 +163,7 @@ export class AnalyzeDialogService {
     return this.dialog.open(DateFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data: { format, availableFormats }
     } as MatDialogConfig);
   }
