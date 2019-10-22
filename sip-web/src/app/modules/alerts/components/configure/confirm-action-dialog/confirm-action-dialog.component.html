@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>Are you sure to delete ?</h1>
+<mat-divider></mat-divider>
+<div mat-dialog-content>
+  <div fxLayout="column">
+    <div class="alert-action-dialog-content" fxFlex="50" fxLayout="row">
+      <span
+        class="alert-action-dialog-content__prop-name"
+        e2e="delete-title"
+        i18n
+        >{{ data?.typeTitle }} :
+      </span>
+      <span>{{ data?.typeName }}</span>
+    </div>
+    <p class="mat-caption" e2e="delete-alert-warn-msg" i18n>
+      This action deletes the alert permanently and cannot be un-done.
+    </p>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button
+    mat-raised-button
+    color="primary"
+    e2e="alert-delete-no"
+    (click)="onNoClick(false)"
+  >
+    No
+  </button>
+  <div fxFlex></div>
+  <button
+    e2e="alert-delete-yes"
+    mat-raised-button
+    color="warn"
+    (click)="onYesClick(true)"
+    cdkFocusInitial
+  >
+    Yes
+  </button>
+</div>

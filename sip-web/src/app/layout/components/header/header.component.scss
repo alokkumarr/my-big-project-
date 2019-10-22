@@ -110,6 +110,10 @@ mat-toolbar {
         background-image: url('/assets/img/module-icons/admin.svg');
       }
 
+      &.module-alerts > .option-image {
+        background-image: url('/assets/img/module-icons/alerts.svg');
+      }
+
       &.module-insights > .option-image {
         background-image: url('/assets/img/module-icons/insights.svg');
       }

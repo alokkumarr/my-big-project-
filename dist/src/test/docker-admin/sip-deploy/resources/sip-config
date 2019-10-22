@@ -143,6 +143,9 @@ saw_s3_export_size=1000000
 ## Chunk size for processing exports
 saw_export_chunk_size=10000
 
+## Alert dashboard URL required to send to mail.
+alert_dashboard_link=http://<hostname>/sip/web/#/alerts/view
+
 saw_email_host=sip-admin
 
 [saw-security]

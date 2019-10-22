@@ -480,21 +480,19 @@ export class ChartService {
     fields,
     chartTypeOverride
   ) {
-    let aggrSymbol = '';
+    const aggrSymbol = ['percentage', 'percentagebyrow'].includes(aggregate)
+      ? '%'
+      : '';
     const comboGroups = fpPipe(
       map(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
     )(fields);
-
     const splinifiedChartType = this.splinifyChartType(
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
-      aggrSymbol = '%';
-    }
     const nameWithAggregate = expression
       ? displayName
       : `${AGGREGATE_TYPES_OBJ[aggregate].designerLabel}(${displayName})`;
@@ -556,14 +554,12 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    let comboType = fields.y[0].comboType || fields.y[0].displayType;
-    let aggrsymbol = '';
-    if (
-      fields.y[0].aggregate === 'percentage' ||
-      fields.y[0].aggregate === 'percentagebyrow'
-    ) {
-      aggrsymbol = '%';
-    }
+    const [firstYField] = fields.y;
+    const { aggregate } = firstYField;
+    const aggrSymbol = ['percentage', 'percentagebyrow'].includes(aggregate)
+      ? '%'
+      : '';
+    let comboType = firstYField.comboType || firstYField.displayType;
     if (!isUndefined(comboType)) {
       if (comboType === 'tsspline' || comboType === 'tsPane') {
         comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
@@ -578,9 +574,9 @@ export class ChartService {
         name,
         data,
         type: comboType,
-        aggrSymbol: aggrsymbol,
-        aggregate: fields.y[0].aggregate,
-        dataType: fields.y[0].type
+        aggrSymbol,
+        aggregate,
+        dataType: firstYField.type
       }))
     )(parsedData);
   }
@@ -664,9 +660,11 @@ export class ChartService {
       const drillDataLen = data[i].drilldown.yData.length;
       for (let j = 0; j < drillDataLen; j += 1) {
         const brightness = 0.2 - j / drillDataLen;
-        const { categories, yData, xData } = data[i].drilldown;
+        const { categories: drillDownCategories, yData, xData } = data[
+          i
+        ].drilldown;
         outerData.push({
-          name: categories[j],
+          name: drillDownCategories[j],
           y: yData[j],
           x: xData[j],
 

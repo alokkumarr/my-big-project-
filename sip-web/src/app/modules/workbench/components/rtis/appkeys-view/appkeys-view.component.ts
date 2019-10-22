@@ -9,6 +9,7 @@ import { DeleteDialogComponent } from './../../../../../common/components/delete
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
+import * as find from 'lodash/find';
 
 @Component({
   selector: 'appkeys-view',
@@ -39,7 +40,9 @@ export class AppkeysViewComponent implements OnInit {
   fetchKeysForGrid() {
     const fetchAppKeys = this._rtisService.getAppKeys();
     fetchAppKeys.then(response => {
-      this.custEventUrl = isEmpty(response) ? '' : response[0].eventUrl;
+      // Need to Pick the first available event url in the appkey array of
+      // objects to display in list of all appkeys screen.
+      this.custEventUrl = isEmpty(response) ? '' : find(response, 'eventUrl').eventUrl;
       this.appKeys = response;
     });
   }
@@ -77,12 +80,14 @@ export class AppkeysViewComponent implements OnInit {
       {
         caption: 'APP KEYS',
         dataField: 'app_key',
-        width: '70%'
+        width: '70%',
+        height: '30'
       },
       {
         caption: 'ACTIONS',
         cellTemplate: 'actionCellTemplate',
-        width: '30%'
+        width: '30%',
+        height: '30'
       }
     ];
     return this._DxDataGridService.mergeWithDefaultConfig({

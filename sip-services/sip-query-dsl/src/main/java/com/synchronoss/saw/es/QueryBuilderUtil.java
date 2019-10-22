@@ -2,6 +2,7 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
@@ -418,7 +419,7 @@ public class QueryBuilderUtil {
     for (Object dataField : dataFields) {
       if (dataField instanceof com.synchronoss.saw.model.Field) {
         Field field = (Field) dataField;
-        if (field.getAggregate() == Field.Aggregate.PERCENTAGE) {
+        if (field.getAggregate() == Aggregate.PERCENTAGE) {
           String aggDataField =
               field.getDataField() == null ? field.getColumnName() : field.getDataField();
           preSearchSourceBuilder.aggregation(

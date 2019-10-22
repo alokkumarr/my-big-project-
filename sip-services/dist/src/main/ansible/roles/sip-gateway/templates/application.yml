@@ -60,6 +60,9 @@ connector: http
 
 {% endif %}
 
+alert:
+  service:
+    host: ${connector}://localhost:9620
 internal-analysis:
     service:
         host: ${connector}://localhost:9200
@@ -91,6 +94,18 @@ api:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
+        -   location: ${alert.service.host}
+            method: GET
+            path: '[/]alerts.*'
+        -   location: ${alert.service.host}
+            method: POST
+            path: '[/]alerts.*'
+        -   location: ${alert.service.host}
+            method: PUT
+            path: '[/]alerts.*'
+        -   location: ${alert.service.host}
+            method: DELETE
+            path: '[/]alerts.*'
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]dslanalysis.*'

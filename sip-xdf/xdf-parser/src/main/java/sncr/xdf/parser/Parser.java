@@ -17,6 +17,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.bda.conf.Output;
@@ -25,6 +26,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.alert.AlertQueueManager;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
@@ -256,6 +258,18 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 outputDataSetName, outputDataSetMode, outputFormat, outputDsPartitionKeys));
         }
 
+        // check if Alert is enabled for the component and send the notification.
+        if (ctx.componentConfiguration.getParser().getAlerts()!=null &&
+            ctx.componentConfiguration.getParser().getAlerts().getDatapod()!=null)
+        {
+            String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+            Long createdTime = System.currentTimeMillis();
+            alertQueueManager.sendMessageToStream(ctx.componentConfiguration.getParser()
+                .getAlerts().getDatapod(),createdTime
+            );
+            logger.info("Alert configure for the dataset sent notification to stream");
+        }
 
         return retval;
     }

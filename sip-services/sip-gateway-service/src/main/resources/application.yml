@@ -5,15 +5,15 @@ spring:
     name: saw-gateway-service
   servlet:
     multipart:
-      enabled : true
+      enabled: true
       max-request-size: 25MB
       max-file-size: 25MB
       file-size-threshold: 2KB
   main:
-    banner-mode: 'off'
+    banner-mode: "off"
 logging:
   level:
-    com.synchronoss.saw.gateway: INFO   
+    com.synchronoss.saw.gateway: INFO
 
 server:
   max-http-header-size: 65536
@@ -23,61 +23,81 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
   servlet:
-    context-path: ''
-  #ssl:
-   # key-store: /Users/spau0004/Desktop/keystore/keystore.jks
-    #key-store-password: sip@123
-    #trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
-    #trust-store-password: sip@123
+    context-path: ""
+  ssl:
+    key-store: /Users/spau0004/Desktop/keystore/keystore.jks
+    key-store-password: sip@123
+    trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
+    trust-store-password: sip@123
 
 connector: http
 saw-security-port: 9000
 
-
 analysis:
-    service:
-        host: http://localhost:9300
+  service:
+    host: http://localhost:9300
+alert:
+  service:
+    host: http://localhost:9620
 internal-analysis:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 metadata:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 semantic:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 security:
-    service:
-        host: http://saw-rd611.eng-sip.dev01.us-west.sncrcloud.net/sip/security
+  service:
+    host: ${connector}://localhost:${saw-security-port}/saw-security
 export:
-    service:
-        host: http://localhost:9400
+  service:
+    host: http://localhost:9400
 observe:
-    service:
-        host: http://localhost:9500
+  service:
+    host: http://localhost:9500
 scheduler:
-    service:
-        host: http://localhost:9600
+  service:
+    host: http://localhost:9600
 workbench:
-    service:
-        host: http://localhost:9700
+  service:
+    host: http://localhost:9700
 proxy:
-    service:
-        host: http://localhost:9800
+  service:
+    host: http://localhost:9800
 datapod:
-    service:
-        host: http://localhost:9900
+  service:
+    host: http://localhost:9900
 batch:
-    service:
-        host: ${connector}://localhost:9642
-        
+  service:
+    host: ${connector}://localhost:9642
+
 api:
   gateway:
         endpoints:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
-        -   location: ${metadata.service.host}
+        -   location: ${alert.service.host}
+            method: GET
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: POST
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: PUT
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: DELETE
+            path: "[/]alerts.*"
+        -   location: ${internal-analysis.service.host}
+            method: GET
+            path: '[/]analysis.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]analysis*'
+        -   location: ${semantic.service.host}
             method: POST
             path: '[/]dslanalysis.*'
         -   location: ${metadata.service.host}
@@ -173,11 +193,11 @@ api:
 
 
 sip:
-   ssl:
-     enable : false
-   trust:
-       store: /Users/spau0004/Desktop/keystore/truststore.jks
-       password: sip@123
-   key:
-      store: /Users/spau0004/Desktop/keystore/keystore.jks
-      password: sip@123
+  ssl:
+    enable: false
+  trust:
+    store: /Users/spau0004/Desktop/keystore/truststore.jks
+    password: sip@123
+  key:
+    store: /Users/spau0004/Desktop/keystore/keystore.jks
+    password: sip@123

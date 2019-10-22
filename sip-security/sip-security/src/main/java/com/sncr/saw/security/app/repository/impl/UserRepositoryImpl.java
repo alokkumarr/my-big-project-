@@ -27,9 +27,20 @@ import com.sncr.saw.security.common.util.DateUtil;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -46,20 +57,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * This class is used to do CRUD operations on the oracle data base having nsso
+ * This class is used to do CRUD operations on the Mariadb data base having nsso
  * tables.
  * 
  * @author girija.sankar
@@ -67,11 +66,6 @@ import java.util.Map;
  */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-
-	/**
-	 * @author gsan0003
-	 *
-	 */
 
 	private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
@@ -326,7 +320,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "values (?,?,?,?,?,?,?,?,?,sysdate(),sysdate(),?,?)";
 			// ticket.setRoleType("Basic");
 			Object[] params = new Object[] { ticket.getTicketId(), ticket.getWindowId(), ticket.getMasterLoginId(),
-					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType(), ticket.getCreatedTime(),
+					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType().name(), ticket.getCreatedTime(),
 					ticket.getValidUpto(), isValid, null, ticket.getValidityReason() };
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
@@ -900,7 +894,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setCompName(rs.getString("company_name"));
 				ticketDetails.setCustID(rs.getString("customer_sys_id"));
 				ticketDetails.setCustCode(rs.getString("customer_code"));
-				ticketDetails.setRoleType(rs.getString("role_type"));
+				ticketDetails.setRoleType(RoleType.valueOf(rs.getString("role_type")));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
 				ticketDetails.setIsJvCustomer(rs.getInt("is_jv_customer"));
@@ -1158,7 +1152,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket = new Ticket();
 				ticket.setMasterLoginId(rs.getString("MASTER_LOGIN_ID"));
 				ticket.setDefaultProdID(rs.getString("PRODUCT_CODE"));
-				ticket.setRoleType(rs.getString("ROLE_TYPE"));
+				ticket.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
 			}
@@ -1685,12 +1679,12 @@ public class UserRepositoryImpl implements UserRepository {
 					role.setActiveStatusInd("Inactive");
 				}
 				role.setCustSysId(rs.getLong("CUSTOMER_SYS_ID"));
-				
-				
+
+
 				role.setRoleDesc(rs.getString("ROLE_DESC"));
 				role.setRoleName(rs.getString("ROLE_NAME"));
 				role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
-				role.setRoleType(rs.getString("ROLE_TYPE"));
+				role.setRoleType(RoleType.valueOf(rs.getString("ROLE_TYPE")));
 
 				if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
 					role.setActiveStatusInd("Active");
@@ -1763,7 +1757,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(2, role.getRoleName());
 					preparedStatement.setString(3, roleCode.toString());
 					preparedStatement.setString(4, role.getRoleDesc());
-					preparedStatement.setString(5, role.getRoleType());
+					preparedStatement.setString(5, role.getRoleType().name());
 
 					preparedStatement.setLong(6, Integer.parseInt(role.getActiveStatusInd()));
 					preparedStatement.setString(7, role.getMasterLoginId());
@@ -2031,7 +2025,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(2, role.getRoleName());
 					preparedStatement.setString(3, roleCode.toString());
 					preparedStatement.setString(4, role.getRoleDesc());
-					preparedStatement.setString(5, role.getRoleType());
+					preparedStatement.setString(5, role.getRoleType().name());
 					preparedStatement.setInt(6, Integer.parseInt(role.getActiveStatusInd()));
 					preparedStatement.setString(7, role.getMasterLoginId());
 					preparedStatement.setLong(8, role.getRoleSysId());
@@ -3196,5 +3190,42 @@ public class UserRepositoryImpl implements UserRepository {
 		return valid;
 	}
 
+    @Override
+    public Boolean IsTicketValid(String ticketId, String masterLogin) {
+        String sql = "SELECT MASTER_LOGIN_ID,"
+            + " VALID_INDICATOR FROM TICKET WHERE TICKET_ID=? "
+            + "AND MASTER_LOGIN_ID=?";
+        Boolean isValid = false;
+        try {
+            isValid = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                    preparedStatement.setString(1, ticketId);
+                    preparedStatement.setString(2,masterLogin);
+                }
+            }, new UserRepositoryImpl.TicketValidExtractor());
+        } catch (DataAccessException de) {
+            logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+            throw de;
+        } catch (Exception e) {
+            logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
+        }
+      return isValid;
+    }
 
+  public class TicketValidExtractor implements ResultSetExtractor<Boolean> {
+
+    @Override
+    public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+      Boolean isValid = false;
+      if (rs.next()) {
+        int validInd = rs.getInt("VALID_INDICATOR");
+        if (validInd > 0) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return isValid;
+    }
+  }
 }
