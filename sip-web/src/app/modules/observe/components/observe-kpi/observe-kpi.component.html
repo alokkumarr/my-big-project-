@@ -49,7 +49,7 @@
         [duration]="2"
         (countoChange)="countToCurrent = $event"
       >
-        {{ countToCurrent | number: '1.0-2' }}
+        {{ fetchValueAsPerFormat(countToCurrent) }}
       </span>
     </div>
   </div>

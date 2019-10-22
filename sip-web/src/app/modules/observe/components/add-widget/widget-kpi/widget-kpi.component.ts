@@ -135,7 +135,11 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         primAggregate: [this.aggregations[0].value, Validators.required],
         secAggregates: this.fb.group(secAggregateControls),
         ...additionalFields,
-        kpiBgColor: ['blue', Validators.required]
+        kpiBgColor: ['blue', Validators.required],
+        kpiCommaSeparator: [false],
+        kpiPrecision: [''],
+        kpiPrefix: [''],
+        kpiSuffix: ['']
       },
       bulletValidators
     );
@@ -218,14 +222,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     if (!data) {
       return;
     }
-
     this._kpi = data;
 
     setTimeout(() => {
       if (data.kpiDisplay) {
         this.kpiForm.get('kpiDisplay').setValue(data.kpiDisplay);
       }
-
       data.name && this.kpiForm.get('name').setValue(data.name);
 
       const target = get(data, 'target');
@@ -278,6 +280,16 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
           .get(ag.value)
           .setValue(secondaryAggregates.includes(ag.value));
       });
+
+      const dataFormatValues = get(this._kpi, 'dataFields[0].format');
+
+      // set data format values
+      if (!isUndefined(dataFormatValues)) {
+        this.kpiForm.get('kpiCommaSeparator').setValue(dataFormatValues.comma);
+        this.kpiForm.get('kpiPrecision').setValue(dataFormatValues.precision);
+        this.kpiForm.get('kpiPrefix').setValue(dataFormatValues.prefix);
+        this.kpiForm.get('kpiSuffix').setValue(dataFormatValues.suffix);
+      }
     });
   }
 
@@ -342,6 +354,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
             columnName: dataField.columnName,
             name: dataField.name,
             displayName: dataField.displayName,
+            format: {
+              comma: this.kpiForm.get('kpiCommaSeparator').value,
+              precision: this.kpiForm.get('kpiPrecision').value,
+              prefix: this.kpiForm.get('kpiPrefix').value,
+              suffix: this.kpiForm.get('kpiSuffix').value
+            },
             aggregate: [
               this.kpiForm.get('primAggregate').value,
               ...map(secondaryAggregates, ag => ag.value)
