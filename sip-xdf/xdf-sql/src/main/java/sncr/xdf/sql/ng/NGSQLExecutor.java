@@ -11,7 +11,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.file.DLDataSetOperations;
-import sncr.xdf.exceptions.XDFException;
+import org.apache.spark.sql.Row;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
 
@@ -176,6 +176,8 @@ public class NGSQLExecutor implements Serializable {
                 	logger.info("Final result schema :: ");
                 	finalResult.printSchema();
                     pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
+
+                    descriptor.schema = pres.getSchema(parent.getNgctx(),finalResult);
 
                     long wt = System.currentTimeMillis();
                     descriptor.writeTime = (int) ((wt - exet) / 1000);
