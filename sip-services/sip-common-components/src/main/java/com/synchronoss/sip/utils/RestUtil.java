@@ -52,7 +52,7 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
   
-  private static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/]";
+  private static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!]";
   private static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
@@ -318,7 +318,6 @@ public class RestUtil {
               logger.trace("Attribute is of type Json");
               ObjectMapper m = new ObjectMapper();
               JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));
-              System.out.println(nodeText);
               validateNodeValue(rootNode);
             }
           }
