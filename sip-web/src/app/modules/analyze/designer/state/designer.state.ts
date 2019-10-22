@@ -326,6 +326,18 @@ export class DesignerState {
       } as ArtifactColumnDSL);
     }
 
+    artifactColumn.displayName = DesignerService.displayNameFor({
+      displayName:
+        artifactColumn.displayName ||
+        artifacts[artifactIndex].fields[artifactColumnIndex].displayName,
+      aggregate:
+        artifactColumn.aggregate ||
+        artifacts[artifactIndex].fields[artifactColumnIndex].aggregate,
+      area: artifactColumn.hasOwnProperty('area')
+        ? artifactColumn.area
+        : artifacts[artifactIndex].fields[artifactColumnIndex].area
+    } as any);
+
     artifacts[artifactIndex].fields[artifactColumnIndex] = {
       ...artifacts[artifactIndex].fields[artifactColumnIndex],
       ...artifactColumn,
@@ -728,7 +740,9 @@ export class DesignerState {
       ...(artifactColumn.dataField
         ? { dataField: artifactColumn.dataField }
         : {}),
-      displayName: artifactColumn.displayName,
+      displayName: DesignerService.displayNameFor(
+        artifactColumn as ArtifactColumnDSL
+      ),
       ...(artifactColumn.formula
         ? {
             formula: artifactColumn.formula,

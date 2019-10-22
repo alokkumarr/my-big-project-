@@ -36,8 +36,11 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { QueryDSL } from 'src/app/models';
-import { getTooltipFormats } from './tooltipFormatter';
+import { QueryDSL, ArtifactColumnDSL } from 'src/app/models';
+import {
+  getTooltipFormats,
+  displayNameWithoutAggregateFor
+} from './tooltipFormatter';
 import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
 
 const removeKeyword = (input: string) => {
@@ -476,6 +479,7 @@ export class ChartService {
       type,
       displayName,
       displayType,
+      dataField,
       expression,
       comboType,
       aggregate,
@@ -500,7 +504,12 @@ export class ChartService {
     const zIndex = this.getZIndex(comboType || displayType);
     const nameWithAggregate = expression
       ? displayName
-      : `${AGGREGATE_TYPES_OBJ[aggregate].designerLabel}(${displayName})`;
+      : `${
+          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+        }(${displayNameWithoutAggregateFor({
+          displayName,
+          dataField
+        } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -814,14 +823,18 @@ export class ChartService {
                 field.alias ||
                 (field.expression
                   ? field.displayName
-                  : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                  : `${
+                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                    }(${displayNameWithoutAggregateFor(field)})`)
               );
             }
             return (
               opts.labels.y ||
               (field.expression
                 ? field.dislplayName
-                : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                : `${
+                    AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                  }(${displayNameWithoutAggregateFor(field)})`)
             );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
@@ -866,7 +879,9 @@ export class ChartService {
         field.alias ||
         (field.expression
           ? field.displayName
-          : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`);
+          : `${
+              AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+            }(${displayNameWithoutAggregateFor(field)})`);
       chartChanges.push({
         labels: {
           align: 'right',

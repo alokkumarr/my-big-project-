@@ -34,6 +34,7 @@ import {
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
 import { getFilterValue } from '../../filter/chips-u';
+import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({
@@ -110,9 +111,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  getDisplayName(filter) {
+  getDisplayNameForFilter(filter) {
     const table = filter.artifactsName || filter.tableName;
     return this.nameMap[table][filter.columnName] || [filter.columnName];
+  }
+
+  getDisplayNameForColumn(column: ArtifactColumnDSL) {
+    return displayNameWithoutAggregateFor(column);
   }
 
   onDndEvent(event: DndEvent) {

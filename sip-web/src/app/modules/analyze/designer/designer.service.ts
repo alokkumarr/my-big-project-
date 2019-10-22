@@ -14,6 +14,7 @@ import * as compact from 'lodash/compact';
 import * as isFunction from 'lodash/isFunction';
 import * as unset from 'lodash/unset';
 import * as toLower from 'lodash/toLower';
+import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
 
 import { Injectable } from '@angular/core';
@@ -76,6 +77,18 @@ export class DesignerService {
         : 'mapOptions.mapType';
     return fpGet(subTypePath, analysis);
   }
+
+  static displayNameFor(column: ArtifactColumnDSL): string {
+    const match = column.displayName.match(/\((.+)\)/);
+    if (['z', 'y', 'data'].includes(column.area) && column.aggregate) {
+      return match
+        ? `${toUpper(column.aggregate)}(${match[1]})`
+        : `${toUpper(column.aggregate)}(${column.displayName})`;
+    }
+
+    return match ? match[1] : column.displayName;
+  }
+
   /**
    * Generates dataField value for column. Uses
    * aggregate and column name to generate unique value.
