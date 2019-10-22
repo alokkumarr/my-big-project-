@@ -186,6 +186,10 @@ describe('KPI Form Widget', () => {
     expect(typeof fixture.componentInstance.prepareDateFilterModel).toEqual('function');
   });
 
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.updateSecondaryAggregations).toEqual('function');
+  });
+
   it('should disable secondary aggregation if it is selected in primary', done => {
     const pAggr = fixture.componentInstance.kpiForm.get(
       'primAggregate'

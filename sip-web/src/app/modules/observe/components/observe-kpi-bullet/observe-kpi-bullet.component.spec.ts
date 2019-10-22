@@ -127,7 +127,37 @@ describe('Observe KPI Bullet Component', () => {
     expect(value).toEqual('2018/02/01 - 2018/02/28');
   });
 
+  it('should construct global filters', () => {
+    const model = {
+      preset: 'LY'
+    };
+
+    const filters = [{
+      columnName: 'TRANSFER_DATE',
+      model: {
+        preset: 'LY'
+      },
+      primaryKpiFilter: true,
+      type: 'date'
+    }];
+
+    const result = [{
+      columnName: 'TRANSFER_DATE',
+      model: {
+        preset: 'LY'
+      },
+      primaryKpiFilter: true,
+      type: 'date'
+    }];
+    const value = fixture.componentInstance.constructGlobalFilter(model, filters);
+    expect(value).toEqual(result);
+  });
+
   it('should exist', () => {
     expect(typeof fixture.componentInstance.executeKPI).toEqual('function');
+  });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.displayFilters).toEqual('function');
   });
 });
