@@ -980,25 +980,18 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     switch (event.subject) {
     // backend data refresh needed
     case 'column':
+    case 'removeColumn':
       this.setColumnPropsToDefaultIfNeeded(event.column);
       if (event.column.checked) {
         this._store.dispatch(new DesignerAddArtifactColumn(event.column));
+        this.loadGridWithoutData(event.column, 'add');
       } else {
         this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
+        this.loadGridWithoutData(event.column, 'remove');
       }
       this.cleanSorts();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.areMinRequirmentsMet = this.canRequestData();
-      this.loadGridWithoutData(event.column, 'add');
-      break;
-    case 'removeColumn':
-      this.setColumnPropsToDefaultIfNeeded(event.column);
-      this._store.dispatch(new DesignerRemoveArtifactColumn(event.column));
-      this.cleanSorts();
-      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-      this.artifacts = [...this.artifacts];
-      this.artifacts = this.removeColumn(event.column);
-      this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
       this._store.dispatch(new DesignerUpdateArtifactColumn({
@@ -1082,21 +1075,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       break;
     case 'artifactPosition':
     }
-  }
-
-  removeColumn(data) {
-    fpPipe(
-      fpFlatMap(artifact => artifact.columns),
-      fpReduce((acc, column) => {
-        if (
-          column.columnName === data.columnName &&
-          column.table === data.table
-        ) {
-          delete column.checked;
-        }
-      }, {})
-    )(this.artifacts);
-    return this.artifacts;
   }
 
   changeToQueryModePermanently() {

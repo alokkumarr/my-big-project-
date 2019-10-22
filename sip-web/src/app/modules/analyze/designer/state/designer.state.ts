@@ -9,6 +9,7 @@ import * as remove from 'lodash/remove';
 import * as lowerCase from 'lodash/lowerCase';
 import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
+import * as filter from 'lodash/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
@@ -341,9 +342,15 @@ export class DesignerState {
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
-
+    const sortedArtifacts = filter(
+      artifacts,
+      artifact => !isEmpty(artifact.fields)
+    );
     patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: {
+        ...analysis,
+        sipQuery: { ...sipQuery, artifacts: sortedArtifacts }
+      }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
