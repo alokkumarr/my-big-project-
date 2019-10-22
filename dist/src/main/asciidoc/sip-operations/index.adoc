@@ -349,32 +349,32 @@ XDF-NG batch pipeline can be configured as below.
 		{
 			"pipeline": [{
 				"component": "rtps",
-				"configuration": "file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/
-				    RPTS_TEST/tc713/tc713_RTPS.jconf.template",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_RTPS.jconf.template",
 				    
 			},
 			{
 				"component": "parser",
-				"configuration": "file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/
-				    RPTS_TEST/tc713/tc713_parse_temperature.template.jconf",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_temperature.template.jconf",
 				"persist": "true"
 			},
 			{
 				"component": "transformer",
-				"configuration": "file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/
-				    RPTS_TEST/tc713/tc713_transformer_temperature.template.jconf",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_transformer_temperature.template.jconf",
 				"persist": "true"
 			},
 			{
 				"component": "sql",
-				"configuration": "file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/
-				    RPTS_TEST/tc713/tc71333_sql_temperature.template.jconf",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_sql_temperature.template.jconf",
 				"persist": "true"
 			},
 			{
 				"component": "esloader",
-				"configuration": "file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/
-				   RPTS_TEST/tc713/tc713_esloader_temperature.template.jconf",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				   test_esloader_temperature.template.jconf",
 				"persist": "true"
 			}
 	
