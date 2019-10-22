@@ -191,9 +191,11 @@ export class ChartGridComponent implements OnInit {
           column.type === 'date' ? column.dateFormat : column.format;
 
         /* If this is a data field, make it look user friendly */
-        alias = isDataField
-          ? dataFieldToHuman(column.dataField)
-          : column.alias || column.displayName;
+        alias =
+          alias ||
+          (isDataField
+            ? dataFieldToHuman(column.dataField)
+            : column.displayName);
         value =
           column.type === 'date'
             ? moment
