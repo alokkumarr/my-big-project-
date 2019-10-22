@@ -127,11 +127,6 @@ saw_email_username=
 saw_email_password=
 saw_email_from=noreply@example.com
 
-#
-# Properties for inactivating user after max unsuccessful login attempts.
-#
-sip_maxUnsuccessfulLoginAttemptAllowed=5
-sip_user_lockingTime_mins=5
 
 #
 # Path by project
@@ -179,6 +174,9 @@ sip-host2
 [saw-security:vars]
 # Alternative MariaDB YUM repository URL
 #sip_mariadb_yum_url = http://yum.mariadb.org/10.3/centos7-amd64
+# Properties for inactivating user after max unsuccessful login attempts.
+sip_maxUnsuccessfulLoginAttemptAllowed=5
+sip_user_lockingTime_mins=5
 
 #
 # Outgoing email configuration

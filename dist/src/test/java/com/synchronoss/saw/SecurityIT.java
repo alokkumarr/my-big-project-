@@ -282,6 +282,14 @@ public class SecurityIT extends BaseIT {
         userAuthenticatedMsg);
   }
 
+  /**
+   * Test for /doAuth api by providing different inputs and test the behavior.
+   *
+   * @param uname Username
+   * @param pwd Password
+   * @return Response Object
+   * @throws JsonProcessingException Exception
+   */
   public Response testAuthentication(String uname, String pwd) throws JsonProcessingException {
     ObjectNode node = mapper.createObjectNode();
     node.put("masterLoginId", uname);
@@ -309,6 +317,13 @@ public class SecurityIT extends BaseIT {
     return response;
   }
 
+  /**
+   * preprocessReplace Util for String.
+   *
+   * @param from from String
+   * @param to To String
+   * @return OperationPreprocessor Object
+   */
   public OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
   }
