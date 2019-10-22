@@ -10,6 +10,75 @@ import { MaterialModule } from '../../../../../material.module';
 import { WidgetKPIComponent } from './widget-kpi.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
+const _metricStub = {
+  dateColumns: [{
+    aliasName: '',
+    columnName: 'TRANSFER_DATE',
+    displayName: 'Transfer Date',
+    filterEligible: true,
+    format: 'yyyy-MM-dd HH:mm:ss',
+    joinEligible: false,
+    kpiEligible: true,
+    name: 'TRANSFER_DATE',
+    table: 'mct_tgt_session',
+    type: 'date'
+  }],
+  artifacts: [{
+    artifactName: 'mct_tgt_session',
+    columns: [{
+      aliasName: '',
+      columnName: 'TRANSFER_DATE',
+      displayName: 'Transfer Date',
+      filterEligible: true,
+      format: 'yyyy-MM-dd HH:mm:ss',
+      joinEligible: false,
+      kpiEligible: true,
+      name: 'TRANSFER_DATE',
+      table: 'mct_tgt_session',
+      type: 'date'
+    }]
+  }]
+};
+
+const userOptedFiltersStub = [{
+    columnName: 'AVAILABLE_ITEMS',
+    isGlobalFilter: false,
+    isOptional: false,
+    isRuntimeFilter: false,
+    model: {
+       operator: 'BTW',
+       otherValue: 10,
+       value: 200
+    },
+    tableName: 'mct_test',
+    type: 'double'
+ },
+ {
+    columnName: 'SOURCE_OS.keyword',
+    isGlobalFilter: false,
+    isOptional: false,
+    isRuntimeFilter: false,
+    model: {
+       modelValues: [
+          'A'
+       ],
+       operator: 'SW'
+    },
+    tableName: 'mct_test',
+    type: 'string'
+ },
+ {
+    columnName: 'TRANSFER_DATE',
+    model: {
+       gte: '2018-02-01 00:00:00',
+       lte: '2018-02-28 23:59:59',
+       preset: 'NA'
+    },
+    primaryKpiFilter: true,
+    type: 'date'
+ }
+];
+
 const _kpiStub = {
   booleanCriteria: 'AND',
   bulletPalette: 'rog',
@@ -95,6 +164,8 @@ describe('KPI Form Widget', () => {
         fixture = TestBed.createComponent(WidgetKPIComponent);
         component = fixture.componentInstance;
         component._kpi = _kpiStub;
+        component.userOptedFilters = userOptedFiltersStub;
+        component._metric = _metricStub;
         fixture.detectChanges();
       });
   });
@@ -184,6 +255,24 @@ describe('KPI Form Widget', () => {
     };
     const filters = fixture.componentInstance.constructRequestParamsFilters(defaultFilter);
     expect(filters).not.toBeNull();
+  });
+
+  it('should construct filter without custom values', () => {
+    const defaultFilter = {
+      columnName: 'TRANSFER_DATE',
+        model: {
+           preset: 'LY'
+        },
+        primaryKpiFilter: true,
+        type: 'date'
+    };
+    const filters = fixture.componentInstance.constructRequestParamsFilters(defaultFilter);
+    expect(filters).not.toBeNull();
+  });
+
+  it('should check filterSelectedFilter function ', () => {
+    const filtersColumns = fixture.componentInstance.filterSelectedFilter();
+    expect(filtersColumns).toEqual([]);
   });
 
   it('create form function to exist as its form which is input to the request.', () => {
