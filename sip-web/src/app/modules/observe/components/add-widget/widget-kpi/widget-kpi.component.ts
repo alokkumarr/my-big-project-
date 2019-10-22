@@ -437,11 +437,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       columns: this.filterSelectedFilter()
     }];
     const filters = this.userOptedFilters;
-    this.openFilterDialog(filters, artifacts, this._kpi.booleanCriteria || 'AND')
+    this.openFilterDialog(filters, artifacts, this._kpi.booleanCriteria)
     .afterClosed().subscribe((result) => {
       if (result) {
         this.userOptedFilters = result.filters;
         this.creteriaType = result.booleanCriteria;
+        this._kpi.booleanCriteria = result.booleanCriteria;
       }
     });
   }
@@ -451,6 +452,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     artifacts,
     booleanCriteria
   ) {
+    console.log(booleanCriteria);
     const data = {
       filters,
       artifacts,
