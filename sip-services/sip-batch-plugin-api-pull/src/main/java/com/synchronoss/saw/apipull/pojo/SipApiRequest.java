@@ -3,6 +3,8 @@ package com.synchronoss.saw.apipull.pojo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -17,27 +19,47 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "urlParameters",
   "bodyParameters"
 })
+@ApiModel
 public class SipApiRequest {
 
   /** (Required) */
   @JsonProperty("url")
+  @ApiModelProperty(
+      notes = "URL from where the data should be pulled",
+      name = "url",
+      required = true)
   private String url;
 
   /** (Required) */
   @JsonProperty("httpMethod")
+  @ApiModelProperty(
+      notes = "HTTP method to be used for the request (GET/POST)",
+      name = "httpMethod",
+      required = true)
   private HttpMethod httpMethod = HttpMethod.fromValue("GET");
 
   @JsonProperty("queryParameters")
+  @ApiModelProperty(
+      notes = "List fo query parameters used for the API request",
+      name = "queryParameters")
   private List<QueryParameter> queryParameters = null;
 
   @JsonProperty("headerParameters")
+  @ApiModelProperty(
+      notes = "List fo header parameters used for the API request",
+      name = "headerParameters")
   private List<HeaderParameter> headerParameters = null;
 
   /** Added just as a place holder. No implementation for now */
   @JsonProperty("urlParameters")
+  @ApiModelProperty(
+      notes = "List fo url parameters used for the API request",
+      name = "urlParameters")
   private List<Object> urlParameters = null;
 
   @JsonProperty("bodyParameters")
+  @ApiModelProperty(notes = "Body parameters used for the API request",
+      name="bodyParameters")
   private BodyParameters bodyParameters;
 
   @JsonProperty("url")

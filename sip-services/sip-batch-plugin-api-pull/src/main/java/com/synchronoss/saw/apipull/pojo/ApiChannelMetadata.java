@@ -24,7 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "urlParameters",
   "bodyParameters"
 })
-public class ChannelMetadata {
+public class ApiChannelMetadata {
 
   /** (Required) */
   @JsonProperty("channelName")
@@ -227,10 +227,10 @@ public class ChannelMetadata {
     if (other == this) {
       return true;
     }
-    if ((other instanceof ChannelMetadata) == false) {
+    if ((other instanceof ApiChannelMetadata) == false) {
       return false;
     }
-    ChannelMetadata rhs = ((ChannelMetadata) other);
+    ApiChannelMetadata rhs = ((ApiChannelMetadata) other);
     return new EqualsBuilder()
         .append(port, rhs.port)
         .append(headerParameters, rhs.headerParameters)

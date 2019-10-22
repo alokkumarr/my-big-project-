@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
   "destinationLocation",
   "schedulerExpression"
 })
-public class RouteMetadata {
+public class ApiRouteMetadata {
 
   /** (Required) */
   @JsonProperty("routeName")
@@ -201,10 +201,10 @@ public class RouteMetadata {
     if (other == this) {
       return true;
     }
-    if ((other instanceof RouteMetadata) == false) {
+    if ((other instanceof ApiRouteMetadata) == false) {
       return false;
     }
-    RouteMetadata rhs = ((RouteMetadata) other);
+    ApiRouteMetadata rhs = ((ApiRouteMetadata) other);
     return new EqualsBuilder()
         .append(headerParameters, rhs.headerParameters)
         .append(apiEndPoint, rhs.apiEndPoint)

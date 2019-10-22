@@ -6,11 +6,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
-import com.synchronoss.saw.apipull.pojo.ChannelMetadata;
+import com.synchronoss.saw.apipull.pojo.ApiChannelMetadata;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.HttpMethod;
 import com.synchronoss.saw.apipull.pojo.QueryParameter;
-import com.synchronoss.saw.apipull.pojo.RouteMetadata;
+import com.synchronoss.saw.apipull.pojo.ApiRouteMetadata;
 import com.synchronoss.saw.apipull.pojo.SipApiRequest;
 import com.synchronoss.saw.apipull.service.SipHttpClient;
 import com.synchronoss.saw.batch.entities.BisChannelEntity;
@@ -85,7 +85,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
     processor = FileProcessorFactory.getFileProcessor(defaultDestinationLocation);
 
     if (!processor.isDestinationExists(defaultDestinationLocation)) {
-      logger.trace("Defautl drop location not found");
+      logger.trace("Default drop location not found");
       logger.trace("Creating folders for default drop location :: " + defaultDestinationLocation);
 
       processor.createDestination(defaultDestinationLocation, new StringBuffer());
@@ -130,17 +130,17 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       String channelMetadataStr = channelEntity.getChannelMetadata();
 
-      ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
+      ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
-      String hostAddress = channelMetadata.getHostAddress();
-      Integer port = channelMetadata.getPort();
+      String hostAddress = apiChannelMetadata.getHostAddress();
+      Integer port = apiChannelMetadata.getPort();
 
       String routeMetadataStr = entity.getRouteMetadata();
-      RouteMetadata routeMetadata = gson.fromJson(routeMetadataStr, RouteMetadata.class);
+      ApiRouteMetadata apiRouteMetadata = gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
 
-      String apiEndPoint = routeMetadata.getApiEndPoint();
-      String destinationLocation = routeMetadata.getDestinationLocation();
-      HttpMethod method = routeMetadata.getHttpMethod();
+      String apiEndPoint = apiRouteMetadata.getApiEndPoint();
+      String destinationLocation = apiRouteMetadata.getDestinationLocation();
+      HttpMethod method = apiRouteMetadata.getHttpMethod();
 
       SipApiRequest apiRequest = new SipApiRequest();
       String url = generateUrl(hostAddress, port, apiEndPoint);
@@ -148,17 +148,17 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       apiRequest.setHttpMethod(method != null ? method : HttpMethod.GET);
 
-      List<QueryParameter> queryParameters = routeMetadata.getQueryParameters();
+      List<QueryParameter> queryParameters = apiRouteMetadata.getQueryParameters();
       if (queryParameters != null && queryParameters.size() != 0) {
         apiRequest.setQueryParameters(queryParameters);
       }
 
-      List<HeaderParameter> headerParameters = routeMetadata.getHeaderParameters();
+      List<HeaderParameter> headerParameters = apiRouteMetadata.getHeaderParameters();
       if (headerParameters != null && headerParameters.size() != 0) {
         apiRequest.setHeaderParameters(headerParameters);
       }
 
-      BodyParameters bodyParameters = routeMetadata.getBodyParameters();
+      BodyParameters bodyParameters = apiRouteMetadata.getBodyParameters();
       if (bodyParameters != null) {
         apiRequest.setBodyParameters(bodyParameters);
       }
@@ -226,12 +226,12 @@ public class ApiPullServiceImpl extends SipPluginContract {
     gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
     Gson gson = gsonBuilder.create();
 
-    ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
+    ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
     SipApiRequest apiRequest = new SipApiRequest();
 
-    String hostName = channelMetadata.getHostAddress();
-    Integer port = channelMetadata.getPort();
+    String hostName = apiChannelMetadata.getHostAddress();
+    Integer port = apiChannelMetadata.getPort();
 
     String httpMethodStr = payload.getHttpMethod();
     if (httpMethodStr != null) {
@@ -587,22 +587,22 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         String channelMetadataStr = channelEntity.getChannelMetadata();
 
-        ChannelMetadata channelMetadata = gson.fromJson(channelMetadataStr, ChannelMetadata.class);
+        ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
-        logger.debug("Channel Metadata = " + channelMetadata);
+        logger.debug("Channel Metadata = " + apiChannelMetadata);
 
-        String hostAddress = channelMetadata.getHostAddress();
-        Integer port = channelMetadata.getPort();
+        String hostAddress = apiChannelMetadata.getHostAddress();
+        Integer port = apiChannelMetadata.getPort();
         logger.debug("Port = " + port);
 
         String routeMetadataStr = routeEntity.getRouteMetadata();
-        RouteMetadata routeMetadata = gson.fromJson(routeMetadataStr, RouteMetadata.class);
+        ApiRouteMetadata apiRouteMetadata = gson.fromJson(routeMetadataStr, ApiRouteMetadata.class);
 
-        logger.debug("Route metadata = " + routeMetadata);
+        logger.debug("Route metadata = " + apiRouteMetadata);
 
-        String apiEndPoint = routeMetadata.getApiEndPoint();
-        String destinationLocation = routeMetadata.getDestinationLocation();
-        HttpMethod method = routeMetadata.getHttpMethod();
+        String apiEndPoint = apiRouteMetadata.getApiEndPoint();
+        String destinationLocation = apiRouteMetadata.getDestinationLocation();
+        HttpMethod method = apiRouteMetadata.getHttpMethod();
 
         SipApiRequest apiRequest = new SipApiRequest();
         String url = generateUrl(hostAddress, port, apiEndPoint);
@@ -612,17 +612,17 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         apiRequest.setHttpMethod(method != null ? method : HttpMethod.GET);
 
-        List<QueryParameter> queryParameters = routeMetadata.getQueryParameters();
+        List<QueryParameter> queryParameters = apiRouteMetadata.getQueryParameters();
         if (queryParameters != null && queryParameters.size() != 0) {
           apiRequest.setQueryParameters(queryParameters);
         }
 
-        List<HeaderParameter> headerParameters = routeMetadata.getHeaderParameters();
+        List<HeaderParameter> headerParameters = apiRouteMetadata.getHeaderParameters();
         if (headerParameters != null && headerParameters.size() != 0) {
           apiRequest.setHeaderParameters(headerParameters);
         }
 
-        BodyParameters bodyParameters = routeMetadata.getBodyParameters();
+        BodyParameters bodyParameters = apiRouteMetadata.getBodyParameters();
         if (bodyParameters != null) {
           apiRequest.setBodyParameters(bodyParameters);
         }
@@ -659,7 +659,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
           StringBuilder fileNameBuilder = new StringBuilder();
 
-          String routeName = routeMetadata.getRouteName();
+          String routeName = apiRouteMetadata.getRouteName();
 
           fileNameBuilder.append(routeName.toLowerCase()
               .replaceAll(" ", "_")).append("_").append(getBatchId());

@@ -115,10 +115,10 @@ public class SipHttpClientPost extends SipBaseHttpClient {
             new HttpEntity(formData, httpHeaders);
         ResponseEntity<Object> response =
             restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-        logger.info("Response Code : {}", response.getStatusCode());
-        logger.info("Response Body : {}", response.getBody());
+        logger.debug("Response Code : {}", response.getStatusCode());
+        logger.debug("Response Body : {}", response.getBody());
         apiResponse.setResponseBody(response.getBody().toString());
-        logger.info("Response headers : {}", response.getHeaders().toString());
+        logger.debug("Response headers : {}", response.getHeaders().toString());
         HttpHeaders resHeaders = response.getHeaders();
         apiResponse.setHttpHeaders(resHeaders);
         apiResponse.setHttpStatus(response.getStatusCode());
@@ -134,8 +134,8 @@ public class SipHttpClientPost extends SipBaseHttpClient {
           HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
           ResponseEntity<Object> response =
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-          logger.info("Response Code : {}", response.getStatusCode());
-          logger.info("Response Body : {}", response.getBody());
+          logger.debug("Response Code : {}", response.getStatusCode());
+          logger.debug("Response Body : {}", response.getBody());
           apiResponse.setResponseBody(response.getBody());
           logger.info("Response headers : {}", response.getHeaders().toString());
           HttpHeaders responseHeaders = response.getHeaders();
@@ -148,10 +148,10 @@ public class SipHttpClientPost extends SipBaseHttpClient {
           HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
           ResponseEntity<Object> response =
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-          logger.info("Response Code : {}", response.getStatusCode());
-          logger.info("Response Body : {}", response.getBody());
+          logger.debug("Response Code : {}", response.getStatusCode());
+          logger.debug("Response Body : {}", response.getBody());
           apiResponse.setResponseBody(response.getBody());
-          logger.info("Response headers : {}", response.getHeaders().toString());
+          logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
           apiResponse.setHttpHeaders(resHeaders);
           apiResponse.setHttpStatus(response.getStatusCode());
@@ -165,10 +165,10 @@ public class SipHttpClientPost extends SipBaseHttpClient {
           HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
           ResponseEntity<Object> response =
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-          logger.info("Response Code : {}", response.getStatusCode());
-          logger.info("Response Body : {}", response.getBody());
+          logger.debug("Response Code : {}", response.getStatusCode());
+          logger.debug("Response Body : {}", response.getBody());
           apiResponse.setResponseBody(response.getBody());
-          logger.info("Response headers : {}", response.getHeaders().toString());
+          logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
           apiResponse.setHttpHeaders(resHeaders);
           apiResponse.setHttpStatus(response.getStatusCode());
@@ -182,8 +182,8 @@ public class SipHttpClientPost extends SipBaseHttpClient {
           HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
           ResponseEntity<Object> response =
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-          logger.info("Response Code : {}", response.getStatusCode());
-          logger.info("Response Body : {}", response.getBody());
+          logger.debug("Response Code : {}", response.getStatusCode());
+          logger.debug("Response Body : {}", response.getBody());
           apiResponse.setResponseBody(response.getBody());
           logger.info("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
@@ -199,10 +199,10 @@ public class SipHttpClientPost extends SipBaseHttpClient {
           HttpEntity httpEntity = new HttpEntity(textData, httpHeaders);
           ResponseEntity<Object> response =
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-          logger.info("Response Code : {}", response.getStatusCode());
-          logger.info("Response Body : {}", response.getBody());
+          logger.debug("Response Code : {}", response.getStatusCode());
+          logger.debug("Response Body : {}", response.getBody());
           apiResponse.setResponseBody(response.getBody());
-          logger.info("Response headers : {}", response.getHeaders().toString());
+          logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
           apiResponse.setHttpHeaders(resHeaders);
           apiResponse.setHttpStatus(response.getStatusCode());

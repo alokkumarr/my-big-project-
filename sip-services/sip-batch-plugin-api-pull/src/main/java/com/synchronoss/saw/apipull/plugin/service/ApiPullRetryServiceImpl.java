@@ -75,8 +75,6 @@ public class ApiPullRetryServiceImpl implements SipRetryContract {
               BisProcessState.FAILED.value(), SourceType.RETRY.name(), jobId);
         }
         break;
-      case "jdbc":
-        break;
       default:
         throw new NotFoundException("channelType does not support");
     }
