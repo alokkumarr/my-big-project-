@@ -242,7 +242,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       })
     )(this._kpi.filters);
     // cover backward compatibility
-    if (this._kpi.filters.length === 1) {
+    const length = get(this._kpi, 'filters').length;
+    if (length === 1) {
       this._kpi.filters[0].primaryKpiFilter = true;
     }
 
@@ -470,7 +471,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     artifacts,
     booleanCriteria
   ) {
-    console.log(booleanCriteria);
     const data = {
       filters,
       artifacts,

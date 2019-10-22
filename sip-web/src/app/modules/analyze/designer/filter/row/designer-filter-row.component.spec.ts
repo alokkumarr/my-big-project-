@@ -35,4 +35,26 @@ describe('DesignerFilterRowComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.onGlobalCheckboxToggle).toEqual('function');
+  });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.onRuntimeCheckboxToggle).toEqual('function');
+  });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.onOptionalCheckboxToggle).toEqual('function');
+  });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.displayWith).toEqual('function');
+  });
+
+  it('should fetch display name', () => {
+    const filterModel = fixture.componentInstance.nameFilter('sample');
+    expect(filterModel).not.toBeNull();
+  });
 });
+
