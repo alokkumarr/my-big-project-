@@ -29,6 +29,9 @@ export class CategoryService implements IAdminDataService {
     public _jwtService: JwtService
   ) {
     const token = _jwtService.getTokenObj();
+    if (!token) {
+      return;
+    }
     const customerId = token.ticket.custID;
     this.customerId = customerId;
   }

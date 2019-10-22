@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TreeModule } from 'angular-tree-component';
 import { RouterModule } from '@angular/router';
 import { CommonModuleTs } from '../../common';
@@ -53,11 +52,6 @@ import {
   DeleteDialogComponent
 } from './datasecurity';
 import { JwtService } from '../../common/services';
-import {
-  AddTokenInterceptor,
-  HandleErrorInterceptor,
-  RefreshTokenInterceptor
-} from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
 import {
   DxDataGridService,
@@ -91,20 +85,6 @@ const COMPONENTS = [
   AdminImportFileListComponent,
   AdminImportCategorySelectComponent
 ];
-
-const INTERCEPTORS = [
-  { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: HandleErrorInterceptor,
-    multi: true
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: RefreshTokenInterceptor,
-    multi: true
-  }
-];
 const GUARDS = [IsAdminGuard, GoToDefaultAdminPageGuard];
 
 const SERVICES = [
@@ -125,15 +105,15 @@ const SERVICES = [
 ];
 @NgModule({
   imports: [
-    NgxsModule.forFeature([AdminState, ExportPageState, AdminImportPageState]),
+    RouterModule.forChild(routes),
     CommonModuleTs,
     FormsModule,
-    RouterModule.forChild(routes),
-    TreeModule
+    TreeModule,
+    NgxsModule.forFeature([AdminState, ExportPageState, AdminImportPageState])
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [...INTERCEPTORS, ...SERVICES, ...GUARDS],
+  providers: [...SERVICES, ...GUARDS],
   exports: [AdminPageComponent]
 })
 export class AdminModule {}
