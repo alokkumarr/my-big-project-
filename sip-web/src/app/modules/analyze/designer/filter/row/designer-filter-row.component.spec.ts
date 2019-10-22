@@ -41,15 +41,12 @@ describe('DesignerFilterRowComponent', () => {
   });
 
   it('should exist', () => {
-    expect(typeof fixture.componentInstance.onRuntimeCheckboxToggle).toEqual('function');
-  });
-
-  it('should exist', () => {
-    expect(typeof fixture.componentInstance.onOptionalCheckboxToggle).toEqual('function');
-  });
-
-  it('should exist', () => {
     expect(typeof fixture.componentInstance.displayWith).toEqual('function');
+  });
+
+  it('should fetch display name', () => {
+    const filter = fixture.componentInstance.displayWith({displayName: 'sample'});
+    expect(filter).not.toBeNull();
   });
 
   it('should fetch display name', () => {

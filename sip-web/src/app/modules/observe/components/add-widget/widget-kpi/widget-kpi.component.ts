@@ -456,7 +456,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       columns: this.filterSelectedFilter()
     }];
     const filters = this.userOptedFilters;
-    this.openFilterDialog(filters, artifacts, this._kpi.booleanCriteria)
+    this.openFilterDialog(filters, artifacts, this._kpi.booleanCriteria || 'AND')
     .afterClosed().subscribe((result) => {
       if (result) {
         this.userOptedFilters = result.filters;

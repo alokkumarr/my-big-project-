@@ -126,4 +126,8 @@ describe('Observe KPI Bullet Component', () => {
     const value = fixture.componentInstance.getFilterLabel();
     expect(value).toEqual('2018/02/01 - 2018/02/28');
   });
+
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.executeKPI).toEqual('function');
+  });
 });
