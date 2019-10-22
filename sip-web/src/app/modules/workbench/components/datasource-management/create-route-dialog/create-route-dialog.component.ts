@@ -72,8 +72,7 @@ export class CreateRouteDialogComponent {
       disableConcurrency: [false],
       batchSize: ['', [Validators.required]],
       fileExclusions: ['', this.validatefileExclusion],
-      lastModifiedLimitHours:['',Validators.pattern(/^\d*[1-9]\d*$/)]
-
+      lastModifiedLimitHours: ['', Validators.pattern(/^\d*[1-9]\d*$/)]
     });
   }
 
@@ -136,7 +135,9 @@ export class CreateRouteDialogComponent {
   }
 
   createRoute(data) {
-    this.startDateCorrectFlag = this.crondetails.activeTab === 'immediate' || moment(this.crondetails.startDate) > moment();
+    this.startDateCorrectFlag =
+      this.crondetails.activeTab === 'immediate' ||
+      moment(this.crondetails.startDate) > moment();
     if (!this.startDateCorrectFlag) {
       return false;
     }
@@ -156,7 +157,7 @@ export class CreateRouteDialogComponent {
       disableConcurrency: data.disableConcurrency,
       batchSize: data.batchSize,
       fileExclusions: data.fileExclusions,
-      lastModifiedLimitHours:data.lastModifiedLimitHours
+      lastModifiedLimitHours: data.lastModifiedLimitHours
     };
     return routeDetails;
   }

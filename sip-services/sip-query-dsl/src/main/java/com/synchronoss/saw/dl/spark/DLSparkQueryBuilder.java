@@ -1,12 +1,12 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Join;
 import com.synchronoss.saw.model.JoinCondition;
@@ -314,7 +314,8 @@ public class DLSparkQueryBuilder {
         && (filter.getModel().getFormat() != null
             || filter.getModel().getGte() != null
             || filter.getModel().getLte() != null
-            || filter.getModel().getPreset() != null)) {
+            || filter.getModel().getPreset() != null
+            || filter.getModel().getPresetCal() != null)) {
       dateFormat = filter.getModel().getFormat();
       dateFormat = dateFormat != null ? dateFormat : DATE_WITH_HOUR_MINUTES;
     }
@@ -362,6 +363,12 @@ public class DLSparkQueryBuilder {
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
       whereCond = setGteLteForDate(gte, lte, filter);
+    } else if (filter.getModel().getPresetCal() != null) {
+      DynamicConvertor dynamicConvertor =
+          BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
+      gte = dynamicConvertor.getGte();
+      lte = dynamicConvertor.getLte();
+      whereCond = setGteLteForDate(gte, lte, filter);
     } else if ((preset.value().equals(Model.Preset.NA.toString())
             || (operator.equals(Operator.BTW)))
         && (gte != null || value != null)
@@ -406,6 +413,12 @@ public class DLSparkQueryBuilder {
     String lte = filter.getModel().getLte();
     if (preset != null && !preset.value().equals(Model.Preset.NA.toString())) {
       DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(preset.value());
+      gte = dynamicConvertor.getGte();
+      lte = dynamicConvertor.getLte();
+      whereCond = setGteLteForDate(gte, lte, filter);
+    } else if (filter.getModel().getPresetCal() != null) {
+      DynamicConvertor dynamicConvertor =
+          BuilderUtil.getDynamicConvertForPresetCal(filter.getModel().getPresetCal());
       gte = dynamicConvertor.getGte();
       lte = dynamicConvertor.getLte();
       whereCond = setGteLteForDate(gte, lte, filter);

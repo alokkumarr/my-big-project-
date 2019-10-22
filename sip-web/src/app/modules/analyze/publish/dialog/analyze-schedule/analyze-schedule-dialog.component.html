@@ -65,41 +65,11 @@
           fxLayout="column"
         >
           <label i18n>Publish to Email</label>
-          <mat-form-field flex="20" *ngIf="data.analysis.type !== 'chart'">
-            <mat-chip-list #chipList>
-              <mat-chip
-                *ngFor="
-                  let email of emails;
-                  trackBy: trackByIndex;
-                  let i = index
-                "
-                (removed)="removeEmail(i)"
-                [attr.e2e]="'email-address-' + email"
-              >
-                <div
-                  *ngIf="!validateThisEmail(email)"
-                  class="errorMsg"
-                  [attr.e2e]="'wrong-email-type-' + email"
-                >
-                  ?
-                </div>
-                {{ email }}
-                <mat-icon
-                  matChipRemove
-                  fontIcon="icon-close"
-                  [attr.e2e]="'remove-email-' + email"
-                ></mat-icon>
-              </mat-chip>
-              <input
-                placeholder="Emails separate by ';'"
-                [matChipInputFor]="chipList"
-                [matChipInputSeparatorKeyCodes]="separatorKeys"
-                [matChipInputAddOnBlur]="true"
-                (matChipInputTokenEnd)="addEmail($event)"
-                [attr.e2e]="'email-list-input'"
-              />
-            </mat-chip-list>
-          </mat-form-field>
+          <email-list
+            *ngIf="data.analysis.type !== 'chart'"
+            [emails]="emails"
+            (emailsChange)="onEmailsChange($event)"
+          ></email-list>
 
           <label i18n>Publish to FTP</label>
           <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">

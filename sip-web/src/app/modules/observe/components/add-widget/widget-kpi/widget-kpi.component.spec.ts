@@ -25,7 +25,6 @@ describe('KPI Form Widget', () => {
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(WidgetKPIComponent);
-
         fixture.detectChanges();
       });
   });
@@ -82,5 +81,11 @@ describe('KPI Form Widget', () => {
       .catch(() => {
         done();
       });
+  });
+
+  it('should fetch filters model based on user selection in kpi', () => {
+    const filterModel = fixture.componentInstance.prepareDateFilterModel();
+    const preset = {preset: 'Yesterday'};
+    expect(filterModel).toEqual(preset);
   });
 });
