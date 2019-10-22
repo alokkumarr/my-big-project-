@@ -51,6 +51,9 @@ public class RestUtil {
 
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
+  
+  private static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\\\[\\\\]_{}]";
+  private static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
   public RestTemplate restTemplate() {
@@ -271,50 +274,51 @@ public class RestUtil {
         if (node.isObject() || node.isArray()) {
           validateNodeValue(node);
         } else {
-          nodeText = node.asText();
+          nodeText = node.asText().replaceAll(sanatizeAndValidateregEx,noSpace);
           // Validating for ESAPI constraints
           isValid = ESAPI.validator().isValidInput("Validating SafeString "
               + "attributes value for intrusion",
-              node.asText(), "SafeString", node.asText().toString().length(), false);
+              nodeText, "SafeString", node.asText().toString().length(), false);
           
           if (!isValid) {
             isValid =
                 ESAPI.validator().isValidInput("Validating Email attributes value for intrusion",
-                    node.asText(), "Email", node.asText().toString().length(), false);
+                    nodeText, "Email", node.asText().toString().length(), false);
             if (!isValid) {
               isValid =
                   ESAPI.validator().isValidInput("Validating Password "
                       + "attributes value for intrusion",
-                      node.asText(), "Password", node.asText().toString().length(), false);
+                      nodeText, "Password", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
                   ESAPI.validator().isValidInput("Validating IPAddress "
                       + "attributes value for intrusion",
-                      node.asText(), "IPAddress", node.asText().toString().length(), false);
+                      nodeText, "IPAddress", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
                   ESAPI.validator().isValidInput("Validating URL "
                       + "attributes value for intrusion",
-                      node.asText(), "URL", node.asText().toString().length(), false);
+                      nodeText, "URL", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
                   ESAPI.validator().isValidInput("Validating Id "
                       + "attributes value for intrusion",
-                      node.asText(), "Id", node.asText().toString().length(), false);
+                      nodeText, "Id", node.asText().toString().length(), false);
             }
             if (!isValid) {
               isValid =
                   ESAPI.validator().isValidInput("Validating SafeText "
                       + "attributes value for intrusion",
-                      node.asText(), "SafeText", node.asText().toString().length(), false);
+                      nodeText, "SafeText", node.asText().toString().length(), false);
             }
             if (!isValid) {
-              logger.info("Attribute is of type Json");
+              logger.trace("Attribute is of type Json");
               ObjectMapper m = new ObjectMapper();
-              JsonNode rootNode = m.readTree(m.writeValueAsString(node));
+              JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));
+              System.out.println(nodeText);
               validateNodeValue(rootNode);
             }
           }

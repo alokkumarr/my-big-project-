@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
-
 
 
 
@@ -59,19 +59,20 @@ public class SipXssRequestFilter extends GenericFilterBean {
             logger.trace("queryIsValid Query Parameter: " + queryIsValid);
           }
           if (!queryIsValid) {
-            res.sendError(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+            res.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
             logger.trace(
                 "Check for cross-site scripting: reflected in query parameter value: " + data);
-            throw new SipNotProcessedSipEntityException("Check for cross-site scripting: "
-                + "reflected in query parameter value: " + data);
+            throw new SipNotProcessedSipEntityException(
+                "Check for cross-site scripting: " + "reflected in query parameter value: " + data);
           }
         }
       }
     }
     if (!isValid) {
       logger.info("Cross-site scripting: reflected: " + !isValid);
-      res.sendError(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
-      throw new SipNotProcessedSipEntityException("Cross-site scripting: reflected: " + !isValid);
+      res.sendError(HttpStatus.UNAUTHORIZED.value(),
+          "Cross-site scripting: reflected: " + !isValid);
+      return;
     }
     chain.doFilter(request, response);
     logger.trace("Logging Response :{}", res.getContentType());
@@ -92,7 +93,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     }
     return queryPairs;
   }
-  
-  
+
+
 
 }
