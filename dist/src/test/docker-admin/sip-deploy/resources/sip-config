@@ -118,8 +118,8 @@ sip_bis_duplicate_entry=true
 #
 # Properties for inactivating user after max unsuccessful login attempts.
 #
-sip_maxUnsuccessfulLoginAttemptAllowed=5
-sip_user_lockingTime_mins=5
+sip_maxUnsuccessfulLoginAttemptAllowed=2
+sip_user_lockingTime_mins=2
 
 
 #Default configuration is set preview limit is 100, if it not set in config file.
