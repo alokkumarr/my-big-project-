@@ -12,5 +12,16 @@
   .app-key-grid {
     overflow: hidden;
     height: calc(100vh - 51px - 70px - 65px);
+
+    ::ng-deep dx-data-grid div div div div div div table tbody tr {
+      height: 25px !important;
+    }
+  }
+
+  button.mat-icon-button.delete-keys {
+    width: 20px;
+    height: 20px;
+    line-height: 12px;
+    margin-left: 10px;
   }
 }
