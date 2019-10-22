@@ -15,7 +15,7 @@
               artifact.artifactName || artifact.artifactsName
             ];
             let i = index;
-            trackBy: trackByIndex
+            trackBy: filterRowTrackBy
           "
           (removeRequest)="
             removeFilter(i, artifact.artifactName || artifact.artifactsName)

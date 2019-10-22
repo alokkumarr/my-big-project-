@@ -65,8 +65,8 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
-  trackByIndex(index) {
-    return index;
+  filterRowTrackBy(index, filterRow) {
+    return `${index}:${filterRow.columnName}`;
   }
 
   onFilterModelChange() {
