@@ -1,6 +1,7 @@
 package com.synchronoss.bda.sip;
 
 import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
+import com.synchronoss.sip.utils.RestUtil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
     HttpServletResponse res = (HttpServletResponse) response;
     logger.trace("Logging Request  {} : {}", req.getMethod(), req.getRequestURL());
     String uri = req.getRequestURL().toString();
-    Boolean isValid = ESAPI.validator().isValidURI("URL", uri, true);
+    Boolean isValid = ESAPI.validator().isValidURI("URL", uri.replace("%", RestUtil.noSpace), true);
     logger.trace("isValid URI: " + isValid);
     if (req.getQueryString() != null) {
       Map<String, List<String>> canonicalizedMap = splitQuery(req.getQueryString());
