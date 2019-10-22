@@ -266,7 +266,8 @@ public class SIPAggregationBuilder {
             fieldCount,
             aggregatedFieldCount,
             aggregationBuilderMain,
-            sorts, groupByFields);
+            sorts,
+            groupByFields);
       }
     } else {
       return aggregationBuilder;

@@ -1,6 +1,6 @@
 .rtis-registration-title {
-  color: #636363;
-  font-weight: bold;
+  color: #5c6670;
+  font-size: 24px;
 }
 
 :host {
@@ -10,8 +10,7 @@
 
   .registration-form {
     overflow: auto;
-    padding: 30px;
-    height: calc(100vh - 35%);
+    height: calc(100vh - 40%);
 
     section mat-form-field {
       width: 50%;
@@ -20,6 +19,7 @@
 
   div form {
     padding: 0 0 0 20px;
+    height: 600px;
   }
 
   mat-slide-toggle {
