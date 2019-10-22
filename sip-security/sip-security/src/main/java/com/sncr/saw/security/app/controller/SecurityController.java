@@ -98,7 +98,7 @@ public class SecurityController {
 		ticket.setValid(false);
 		RefreshToken rToken = null;
 		int lockingTime = nSSOProperties.getLockingTime();
-		int maxInvalidPwdLimit = nSSOProperties.getMaxInvalidPwdLimit();
+
 		try {
 			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
 					loginDetails.getPassword());
