@@ -33,8 +33,8 @@ import {
   DesignerMoveColumnInGroupAdapter,
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
-import { getFilterValue } from '../../filter/chips-u';
 import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
+import { getFilterValue } from './../../../consts';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({

@@ -60,6 +60,7 @@ import { CommonModuleTs } from '../../common';
 import { FirstDashboardGuard } from './guards';
 import { ZoomAnalysisComponent } from './components/zoom-analysis/zoom-analysis.component';
 import { ObserveState } from './state/observe.state';
+import { WidgetFiltersComponent } from './components/add-widget/widget-filters/widget-filters.component';
 
 const components = [
   ObservePageComponent,
@@ -80,7 +81,8 @@ const components = [
   KPIFilterComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,
-  ZoomAnalysisComponent
+  ZoomAnalysisComponent,
+  WidgetFiltersComponent
 ];
 
 const GUARDS = [FirstDashboardGuard];

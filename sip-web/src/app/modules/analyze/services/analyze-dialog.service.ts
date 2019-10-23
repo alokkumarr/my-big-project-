@@ -97,7 +97,8 @@ export class AnalyzeDialogService {
       artifacts,
       booleanCriteria,
       supportsGlobalFilters,
-      isInRuntimeMode: false
+      isInRuntimeMode: false,
+      showFilterOptions: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
@@ -115,7 +116,8 @@ export class AnalyzeDialogService {
             state => state.common.metrics[analysis.semanticId]
           ).artifacts
         : analysis.artifacts,
-      isInRuntimeMode: true
+      isInRuntimeMode: true,
+      showFilterOptions: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
@@ -164,6 +166,7 @@ export class AnalyzeDialogService {
     return this.dialog.open(DateFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data: { format, availableFormats }
     } as MatDialogConfig);
   }

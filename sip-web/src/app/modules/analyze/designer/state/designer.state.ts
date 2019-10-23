@@ -862,7 +862,7 @@ export class DesignerState {
         filter.model = {
           gte: filter.model.gte,
           lte: filter.model.lte,
-          format: 'yyyy-MM-dd',
+          format: 'yyyy-MM-dd HH:mm:ss',
           preset: CUSTOM_DATE_PRESET_VALUE
         };
       }
