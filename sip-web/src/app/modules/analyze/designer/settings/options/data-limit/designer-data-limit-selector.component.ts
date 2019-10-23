@@ -63,11 +63,12 @@ export class DesignerDataLimitSelectorComponent implements OnInit {
   }
 
   emitChange(limitType, limitValue) {
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
+        dataField,
         limitValue,
         limitType
       })

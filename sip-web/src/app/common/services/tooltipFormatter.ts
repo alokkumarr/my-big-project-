@@ -10,6 +10,14 @@ import {
   AGGREGATE_TYPES_OBJ
 } from '../consts';
 
+export const displayNameWithoutAggregateFor = (column): string => {
+  if (!column.dataField) {
+    return column.displayName;
+  }
+
+  const match = column.displayName.match(/\((.+)\)/);
+  return match ? match[1] : column.displayName;
+};
 /**
  * If the data type is float OR aggregate is percentage or average, we
  * show two decimal places. Else, no decimal places.
@@ -77,7 +85,9 @@ function getFieldLabelWithAggregateFun(field) {
     return field.alias || `${field.displayName}`;
   } else {
     const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
-    return field.alias || `${aggregate}(${field.displayName})`;
+    return (
+      field.alias || `${aggregate}(${displayNameWithoutAggregateFor(field)})`
+    );
   }
 }
 

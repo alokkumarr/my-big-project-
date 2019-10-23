@@ -14,4 +14,14 @@
       color: $primary-grey-g4;
     }
   }
+
+  .filter-icon-bullet {
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    z-index: 9;
+    width: 100%;
+    margin: 7px 0px 0px -18px;
+    text-align: right;
+  }
 }

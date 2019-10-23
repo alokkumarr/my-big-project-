@@ -36,8 +36,11 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { QueryDSL } from 'src/app/models';
-import { getTooltipFormats } from './tooltipFormatter';
+import { QueryDSL, ArtifactColumnDSL } from 'src/app/models';
+import {
+  getTooltipFormats,
+  displayNameWithoutAggregateFor
+} from './tooltipFormatter';
 import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
 
 const removeKeyword = (input: string) => {
@@ -305,7 +308,12 @@ export class ChartService {
     const yField = isArray(fields.y) ? fields.y[0] : fields.y;
     return [
       {
-        ...this.getSerie(yField, 0, fields.y, chartType),
+        ...this.getSerie(
+          yField,
+          0,
+          isArray(fields.y) ? fields.y : [fields.y],
+          chartType
+        ),
         data: map(parsedData, dataPoint =>
           mapValues(axesFieldNameMap, val => dataPoint[val])
         )
@@ -471,6 +479,7 @@ export class ChartService {
       type,
       displayName,
       displayType,
+      dataField,
       expression,
       comboType,
       aggregate,
@@ -484,7 +493,7 @@ export class ChartService {
       ? '%'
       : '';
     const comboGroups = fpPipe(
-      map(field => field.comboType || field.displayType),
+      fpMap(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
@@ -495,7 +504,12 @@ export class ChartService {
     const zIndex = this.getZIndex(comboType || displayType);
     const nameWithAggregate = expression
       ? displayName
-      : `${AGGREGATE_TYPES_OBJ[aggregate].designerLabel}(${displayName})`;
+      : `${
+          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+        }(${displayNameWithoutAggregateFor({
+          displayName,
+          dataField
+        } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -542,7 +556,9 @@ export class ChartService {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
           assign(
-            { y: dataPoint[removeKeyword(field.columnName)] },
+            {
+              y: dataPoint[removeKeyword(field.dataField || field.columnName)]
+            },
             mapValues(axesFieldNameMap, val => dataPoint[val])
           )
         );
@@ -593,9 +609,13 @@ export class ChartService {
     return reduce(
       fieldsArray,
       (accumulator, field) => {
-        accumulator[
-          typeof field.checked === 'string' ? field.checked : field.area
-        ] = removeKeyword(field.columnName);
+        const area =
+          typeof field.checked === 'string' ? field.checked : field.area;
+        accumulator[area] = removeKeyword(
+          (area === 'y' || area === 'z') && field.dataField
+            ? field.dataField
+            : field.columnName
+        );
         return accumulator;
       },
       {}
@@ -803,14 +823,18 @@ export class ChartService {
                 field.alias ||
                 (field.expression
                   ? field.displayName
-                  : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                  : `${
+                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                    }(${displayNameWithoutAggregateFor(field)})`)
               );
             }
             return (
               opts.labels.y ||
               (field.expression
                 ? field.dislplayName
-                : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                : `${
+                    AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                  }(${displayNameWithoutAggregateFor(field)})`)
             );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
@@ -855,7 +879,9 @@ export class ChartService {
         field.alias ||
         (field.expression
           ? field.displayName
-          : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`);
+          : `${
+              AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+            }(${displayNameWithoutAggregateFor(field)})`);
       chartChanges.push({
         labels: {
           align: 'right',
@@ -985,8 +1011,8 @@ export class ChartService {
     const hasGroupBy = Boolean(groupField);
 
     const dataMapper = dataPoint => {
-      const valueProp = fields.y[0].columnName;
-      const nameProp = fields.x.dataField;
+      const valueProp = fields.y[0].dataField || fields.y[0].columnName;
+      const nameProp = fields.x.dataField || removeKeyword(fields.x.columnName);
       return { name: dataPoint[nameProp], value: dataPoint[valueProp] };
     };
 
@@ -1011,9 +1037,10 @@ export class ChartService {
     };
 
     if (hasGroupBy) {
-      const groupProp = groupField.dataField;
+      const groupProp =
+        groupField.dataField || removeKeyword(groupField.columnName);
       const series = fpPipe(
-        fpGroupBy(fields.g.dataField),
+        fpGroupBy(fields.g.dataField || removeKeyword(fields.g.columnName)),
         fpMap(group => {
           const name = group[0][groupProp];
           return { name, data: map(group, dataMapper) };

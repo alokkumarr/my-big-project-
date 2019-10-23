@@ -17,6 +17,7 @@ import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from '../environments/environment';
 import { DeleteDialogComponent } from './common/components/delete-dialog/delete-dialog.component';
+import { AnalyzeFilterModule } from './modules/analyze/designer/filter';
 
 import {
   LayoutContentComponent,
@@ -49,6 +50,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     CommonModuleGlobal.forRoot(),
     AnalyzeModuleGlobal.forRoot(),
     FlexLayoutModule,
+    AnalyzeFilterModule,
     MaterialModule
   ],
   exports: [FlexLayoutModule],

@@ -26,6 +26,7 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
   let token;
   const metricName = dataSets.pivotChart;
   const metrics = 'Integer';
+  const topNBottomNField = 'SUM(Integer)';
   const dimension = 'Date';
   const groupName = 'String';
   const sizeByName = 'Float';
@@ -95,7 +96,7 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
 
         // Apply limit section starts, if more than one metrics field selected then no LIMIT
         chartDesignerPage.clickOnDataOptionsTab();
-        chartDesignerPage.clickOnFieldsByName(metrics);
+        chartDesignerPage.clickOnFieldsByName(topNBottomNField);
         chartDesignerPage.fillLimitValue(2);
         chartDesignerPage.clickOnTopNButton();
         // Apply limit section ends
