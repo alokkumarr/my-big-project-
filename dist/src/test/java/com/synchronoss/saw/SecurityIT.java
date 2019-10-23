@@ -266,7 +266,7 @@ public class SecurityIT extends BaseIT {
 
     log.info("Wait for : {} minutes, to login with correct credentials");
     // Wait for two minutes to check user able to login provided he gives correct credentials.
-    TimeUnit.MINUTES.sleep(3);
+    TimeUnit.MINUTES.sleep(2);
     log.debug("Trying to login with username : {} password : {} ", userName, password);
     Response response1 = testAuthentication(userName, password);
     Assert.assertNotNull(response1);
