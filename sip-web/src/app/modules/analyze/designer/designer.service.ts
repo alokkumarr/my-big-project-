@@ -747,7 +747,8 @@ export class DesignerService {
       {
         ...artifacts[0],
         columns: [...artifacts[0].columns, ...derivedMetrics]
-      }
+      },
+      ...artifacts.slice(1)
     ];
   }
 }
