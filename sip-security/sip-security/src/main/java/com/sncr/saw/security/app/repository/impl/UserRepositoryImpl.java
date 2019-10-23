@@ -148,7 +148,7 @@ public class UserRepositoryImpl implements UserRepository {
               userLoginCount.getLastUnsuccessLoginTime().getTime());
           logger.info("Diff in minutes : {} ", diffMinutes);
           if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit - 1
-              && diffMinutes <= lockingTime) {
+              && diffMinutes < lockingTime) {
             updateInvalidLoginCount(
                 userLoginCount.getUserSysId(),
                 (int) (userLoginCount.getInvalidPassWordCount() + 1));
@@ -163,7 +163,7 @@ public class UserRepositoryImpl implements UserRepository {
           }
         } else {
           if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
-              && diffMinutes <= lockingTime) {
+              && diffMinutes < lockingTime) {
             ret[2] = true; // Lock the account.
             ret[0] =
                 false; // In locking period even though user gives right credentials, he shouldn't
