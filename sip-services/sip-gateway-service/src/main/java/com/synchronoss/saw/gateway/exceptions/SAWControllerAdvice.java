@@ -1,6 +1,7 @@
 package com.synchronoss.saw.gateway.exceptions;
 
 import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,18 @@ public class SAWControllerAdvice {
   @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(SipNotProcessedSipEntityException.class)
   public VndErrors inValidJsonBody(SipNotProcessedSipEntityException ex) {
+    return this.error(ex, ex.getLocalizedMessage());
+  }
+
+  @ResponseStatus(value = HttpStatus.NOT_FOUND)
+  @ExceptionHandler()
+  public VndErrors notPresent(NoSuchElementException ex) {
+    return this.error(ex, ex.getLocalizedMessage());
+  }
+
+  @ResponseStatus(value = HttpStatus.NOT_FOUND)
+  @ExceptionHandler(NullPointerException.class)
+  public VndErrors notFound(NoSuchElementException ex) {
     return this.error(ex, ex.getLocalizedMessage());
   }
 

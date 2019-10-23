@@ -48,7 +48,7 @@ public class SipXssRequestFilter extends GenericFilterBean {
         List<String> valueString = canonicalizedMap.get(key);
         for (String data : valueString) {
           logger.trace("query parameter value: " + data);
-
+          data = data.replaceAll(RestUtil.sanatizeAndValidateregEx, RestUtil.noSpace);
           Boolean queryIsValid =
               ESAPI.validator().isValidInput("Validating query parameter value for intrusion", data,
                   "SafeString", data.length(), false);
