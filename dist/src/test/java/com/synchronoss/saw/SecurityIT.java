@@ -241,23 +241,22 @@ public class SecurityIT extends BaseIT {
   public void testLockUserForMaxInvalidAttempts()
       throws JsonProcessingException, InterruptedException {
     log.info("Test for Invalid Login attempts starts: ");
-    for (int i = 0; i < 2; i++) {
-      log.debug("Trying to login with username : {} password : {} ", userName, invalidPwd);
-      Response response = testAuthentication(userName, invalidPwd);
-      Assert.assertNotNull(response);
-      ObjectNode root = response.getBody().as(ObjectNode.class);
-      Boolean validity = root.get("validity").asBoolean();
-      Assert.assertEquals(validity, false);
-      String message = root.get("message").asText();
-      Assert.assertEquals(message, invalidLoginMessage);
-      log.info("Invalid Credentials = validity : {}, message : {}", validity, invalidLoginMessage);
-    }
     log.debug("Trying to login with username : {} password : {} ", userName, invalidPwd);
     Response response = testAuthentication(userName, invalidPwd);
     Assert.assertNotNull(response);
     ObjectNode root = response.getBody().as(ObjectNode.class);
     Boolean validity = root.get("validity").asBoolean();
+    Assert.assertEquals(validity, false);
     String message = root.get("message").asText();
+    Assert.assertEquals(message, invalidLoginMessage);
+    log.info("Invalid Credentials = validity : {}, message : {}", validity, invalidLoginMessage);
+
+    log.debug("Trying to login with username : {} password : {} ", userName, invalidPwd);
+    response = testAuthentication(userName, invalidPwd);
+    Assert.assertNotNull(response);
+    root = response.getBody().as(ObjectNode.class);
+    validity = root.get("validity").asBoolean();
+    message = root.get("message").asText();
     Assert.assertEquals(validity, false);
     Assert.assertEquals(message, userLockedMessage);
     log.info(

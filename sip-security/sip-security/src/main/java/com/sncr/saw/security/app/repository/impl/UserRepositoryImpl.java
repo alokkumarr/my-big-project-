@@ -147,7 +147,7 @@ public class UserRepositoryImpl implements UserRepository {
               date.getTime(),
               userLoginCount.getLastUnsuccessLoginTime().getTime());
           logger.info("Diff in minutes : {} ", diffMinutes);
-          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
+          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit-1
               && diffMinutes <= lockingTime) {
             ret[2] = true;
             logger.info("Maximum Attempts reached, user account is locked.!!, Contact Administrator.");
