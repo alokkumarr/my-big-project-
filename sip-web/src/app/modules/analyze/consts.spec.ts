@@ -95,14 +95,16 @@ describe('Analyze Constants', () => {
       isGlobalFilter: false,
       isOptional: false,
       isRuntimeFilter: false,
-      model: {operator: 'BTW', gte: '2019-10-22 00:00:00', lte: '2019-10-22 23:59:59'},
+      model: {
+        operator: 'BTW',
+        gte: moment().startOf('day').format('YYYY-MM-DD'),
+        lte: moment().endOf('day').format('YYYY-MM-DD')
+      },
       tableName: 'mct_tgt_session',
       type: 'date'
     };
 
-    const value = `: From ${moment('2019-10-22').format('YYYY-MM-DD')} to ${moment(
-      '2019-10-22'
-    ).format('YYYY-MM-DD')}`;
+    const value = `: From ${moment().startOf('day').format('YYYY-MM-DD')} to ${moment().endOf('day').format('YYYY-MM-DD')}`;
 
     expect(getFilterValue(customBTWDateFilter)).toEqual(value);
 
