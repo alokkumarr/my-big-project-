@@ -219,13 +219,10 @@ export function alterReportData(data, analysis) {
   return data.map(row => {
     return mapValues(row, (value, key) => {
       if (dateFields.includes(key)) {
-        if (key === '@timestamp') {
-          value = isEmpty(value) ? '' : moment(value).utc().format('YYYY-MM-DD HH:mm:ss');
-        } else {
-          value = isEmpty(value) ? '' : moment(value).format('YYYY-MM-DD hh:mm:ss');
-        }
+        value = value.includes('Z')
+          ? moment(value).utc().format('YYYY-MM-DD HH:mm:ss')
+          : value;
       }
-
       return value;
     });
   });
