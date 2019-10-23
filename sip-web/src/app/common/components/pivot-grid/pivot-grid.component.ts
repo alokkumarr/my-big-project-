@@ -11,6 +11,7 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
+import * as toUpper from 'lodash/toUpper';
 import * as clone from 'lodash/clone';
 import * as split from 'lodash/split';
 import * as isPlainObject from 'lodash/isPlainObject';
@@ -36,7 +37,7 @@ import { getFormatter } from '../../utils/numberFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
-  columnName: 'dataField',
+  dataField: 'dataField',
   aggregate: 'summaryType'
 };
 
@@ -281,7 +282,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment(value, format).format(format);
+    return value => moment.utc(value, format).format(format);
   }
 
   preProcessData(data) {
@@ -334,7 +335,7 @@ export class PivotGridComponent implements OnDestroy {
         return moment.utc(value).format(formatToApply);
       case 'year':
       default:
-        return moment(value, this.getMomentFormat(format)).toDate();
+        return moment.utc(value, this.getMomentFormat(format)).toDate();
     }
   }
 
@@ -376,6 +377,12 @@ export class PivotGridComponent implements OnDestroy {
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
              on sum */
+          if (cloned.aggregate) {
+            delete cloned.caption;
+            cloned.displayName = `${toUpper(cloned.aggregate)}(${
+              cloned.displayName
+            })`;
+          }
           cloned.aggregate = 'sum';
         } else {
           cloned.dataType = cloned.type;
@@ -386,7 +393,10 @@ export class PivotGridComponent implements OnDestroy {
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
 
-        cloned.dataField = cloned.columnName;
+        cloned.dataField =
+          cloned.area === 'data' && cloned.dataField
+            ? cloned.dataField
+            : cloned.columnName;
 
         if (DATE_TYPES.includes(cloned.type)) {
           // disable sorting for the fields that have a type string because of manual formatting

@@ -15,7 +15,7 @@
               artifact.artifactName || artifact.artifactsName
             ];
             let i = index;
-            trackBy: trackByIndex
+            trackBy: filterRowTrackBy
           "
           (removeRequest)="
             removeFilter(i, artifact.artifactName || artifact.artifactsName)
@@ -26,6 +26,7 @@
           [supportsGlobalFilters]="data.supportsGlobalFilters"
           [isInRuntimeMode]="data.isInRuntimeMode"
           [artifactColumns]="artifact.columns || artifact.fields"
+          [showFilterOptions]="data.showFilterOptions"
         >
         </designer-filter-row>
       </div>

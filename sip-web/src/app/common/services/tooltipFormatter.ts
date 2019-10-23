@@ -10,6 +10,14 @@ import {
   AGGREGATE_TYPES_OBJ
 } from '../consts';
 
+export const displayNameWithoutAggregateFor = (column): string => {
+  if (!column.dataField) {
+    return column.displayName;
+  }
+
+  const match = column.displayName.match(/\((.+)\)/);
+  return match ? match[1] : column.displayName;
+};
 /**
  * If the data type is float OR aggregate is percentage or average, we
  * show two decimal places. Else, no decimal places.
@@ -22,28 +30,6 @@ const getPrecision = (aggregate, type) => {
     ? 2
     : 0;
 };
-
-// const handleNaNIssue = (point, options) => {
-//   /**
-//    * In some cases point.value or point.y is received as 0. Which was causing the round()
-//    * to return NaN . So making sure that if value received is 0 then
-//    * it should return as it is. Also checking if option datatype
-//    * is float or double return the value with correct decimal precision.
-//    *
-//    */
-//   return point.value === 0 || point.y === 0
-//     ? point.value
-//       ? point.value.toFixed(getPrecision(options.aggregate, options.dataType))
-//       : point.y.toFixed(getPrecision(options.aggregate, options.dataType))
-//     : round(
-//         options.aggregate === 'percentagebyrow'
-//           ? round(point.percentage, 2)
-//           : point.y
-//           ? point.y
-//           : point.value,
-//         getPrecision(options.aggregate, options.dataType)
-//       ).toLocaleString();
-// };
 
 export function getTooltipFormats(fields, chartType) {
   return {
@@ -75,13 +61,14 @@ function getXValue(point, fields, chartType) {
     return point.category;
   }
   if (DATE_TYPES.includes(x.type)) {
-    console.log(chartType);
     if (hasGroupBy) {
-      return ['tsspline', 'tsPane'].includes(chartType) ? moment(point.category).format('dddd, MMM Do YYYY, h:mm') : point.category;
+      return ['tsspline', 'tsPane'].includes(chartType)
+        ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
+        : point.category;
     }
     return ['tsspline', 'tsPane'].includes(chartType)
-    ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
-    : point.key || point.category;
+      ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
+      : point.key || point.category;
   }
 }
 
@@ -98,7 +85,9 @@ function getFieldLabelWithAggregateFun(field) {
     return field.alias || `${field.displayName}`;
   } else {
     const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
-    return field.alias || `${aggregate}(${field.displayName})`;
+    return (
+      field.alias || `${aggregate}(${displayNameWithoutAggregateFor(field)})`
+    );
   }
 }
 
@@ -108,7 +97,6 @@ function getYValueBasedOnAggregate(field, point) {
       return Math.round(point.y * 100) / 100 + '%';
     case 'percentagebyrow':
       return round(point.percentage, 2) + '%';
-
     default:
       return isUndefined(point.value) ? point.y : point.value;
   }

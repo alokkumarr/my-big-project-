@@ -36,8 +36,11 @@ import * as isArray from 'lodash/isArray';
 
 import * as Highcharts from 'highcharts/highcharts';
 
-import { QueryDSL } from 'src/app/models';
-import { getTooltipFormats } from './tooltipFormatter';
+import { QueryDSL, ArtifactColumnDSL } from 'src/app/models';
+import {
+  getTooltipFormats,
+  displayNameWithoutAggregateFor
+} from './tooltipFormatter';
 import { DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS } from '../consts';
 
 const removeKeyword = (input: string) => {
@@ -305,7 +308,12 @@ export class ChartService {
     const yField = isArray(fields.y) ? fields.y[0] : fields.y;
     return [
       {
-        ...this.getSerie(yField, 0, fields.y, chartType),
+        ...this.getSerie(
+          yField,
+          0,
+          isArray(fields.y) ? fields.y : [fields.y],
+          chartType
+        ),
         data: map(parsedData, dataPoint =>
           mapValues(axesFieldNameMap, val => dataPoint[val])
         )
@@ -471,6 +479,7 @@ export class ChartService {
       type,
       displayName,
       displayType,
+      dataField,
       expression,
       comboType,
       aggregate,
@@ -480,24 +489,27 @@ export class ChartService {
     fields,
     chartTypeOverride
   ) {
-    let aggrSymbol = '';
+    const aggrSymbol = ['percentage', 'percentagebyrow'].includes(aggregate)
+      ? '%'
+      : '';
     const comboGroups = fpPipe(
-      map(field => field.comboType || field.displayType),
+      fpMap(field => field.comboType || field.displayType),
       fpUniq,
       fpInvert,
       fpMapValues(parseInt)
     )(fields);
-
     const splinifiedChartType = this.splinifyChartType(
       comboType || displayType
     );
     const zIndex = this.getZIndex(comboType || displayType);
-    if (aggregate === 'percentage' || aggregate === 'percentagebyrow') {
-      aggrSymbol = '%';
-    }
     const nameWithAggregate = expression
       ? displayName
-      : `${AGGREGATE_TYPES_OBJ[aggregate].designerLabel}(${displayName})`;
+      : `${
+          AGGREGATE_TYPES_OBJ[aggregate].designerLabel
+        }(${displayNameWithoutAggregateFor({
+          displayName,
+          dataField
+        } as ArtifactColumnDSL)})`;
     return {
       name: alias || nameWithAggregate,
       aggrSymbol,
@@ -544,7 +556,9 @@ export class ChartService {
       forEach(fields.y, (field, index) => {
         series[index].data.push(
           assign(
-            { y: dataPoint[removeKeyword(field.columnName)] },
+            {
+              y: dataPoint[removeKeyword(field.dataField || field.columnName)]
+            },
             mapValues(axesFieldNameMap, val => dataPoint[val])
           )
         );
@@ -556,14 +570,12 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    let comboType = fields.y[0].comboType || fields.y[0].displayType;
-    let aggrsymbol = '';
-    if (
-      fields.y[0].aggregate === 'percentage' ||
-      fields.y[0].aggregate === 'percentagebyrow'
-    ) {
-      aggrsymbol = '%';
-    }
+    const [firstYField] = fields.y;
+    const { aggregate } = firstYField;
+    const aggrSymbol = ['percentage', 'percentagebyrow'].includes(aggregate)
+      ? '%'
+      : '';
+    let comboType = firstYField.comboType || firstYField.displayType;
     if (!isUndefined(comboType)) {
       if (comboType === 'tsspline' || comboType === 'tsPane') {
         comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
@@ -578,9 +590,9 @@ export class ChartService {
         name,
         data,
         type: comboType,
-        aggrSymbol: aggrsymbol,
-        aggregate: fields.y[0].aggregate,
-        dataType: fields.y[0].type
+        aggrSymbol,
+        aggregate,
+        dataType: firstYField.type
       }))
     )(parsedData);
   }
@@ -597,9 +609,13 @@ export class ChartService {
     return reduce(
       fieldsArray,
       (accumulator, field) => {
-        accumulator[
-          typeof field.checked === 'string' ? field.checked : field.area
-        ] = removeKeyword(field.columnName);
+        const area =
+          typeof field.checked === 'string' ? field.checked : field.area;
+        accumulator[area] = removeKeyword(
+          (area === 'y' || area === 'z') && field.dataField
+            ? field.dataField
+            : field.columnName
+        );
         return accumulator;
       },
       {}
@@ -664,9 +680,11 @@ export class ChartService {
       const drillDataLen = data[i].drilldown.yData.length;
       for (let j = 0; j < drillDataLen; j += 1) {
         const brightness = 0.2 - j / drillDataLen;
-        const { categories, yData, xData } = data[i].drilldown;
+        const { categories: drillDownCategories, yData, xData } = data[
+          i
+        ].drilldown;
         outerData.push({
-          name: categories[j],
+          name: drillDownCategories[j],
           y: yData[j],
           x: xData[j],
 
@@ -805,14 +823,18 @@ export class ChartService {
                 field.alias ||
                 (field.expression
                   ? field.displayName
-                  : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                  : `${
+                      AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                    }(${displayNameWithoutAggregateFor(field)})`)
               );
             }
             return (
               opts.labels.y ||
               (field.expression
                 ? field.dislplayName
-                : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`)
+                : `${
+                    AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+                  }(${displayNameWithoutAggregateFor(field)})`)
             );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
@@ -857,7 +879,9 @@ export class ChartService {
         field.alias ||
         (field.expression
           ? field.displayName
-          : `${AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel}(${field.displayName})`);
+          : `${
+              AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel
+            }(${displayNameWithoutAggregateFor(field)})`);
       chartChanges.push({
         labels: {
           align: 'right',
@@ -987,8 +1011,8 @@ export class ChartService {
     const hasGroupBy = Boolean(groupField);
 
     const dataMapper = dataPoint => {
-      const valueProp = fields.y[0].columnName;
-      const nameProp = fields.x.dataField;
+      const valueProp = fields.y[0].dataField || fields.y[0].columnName;
+      const nameProp = fields.x.dataField || removeKeyword(fields.x.columnName);
       return { name: dataPoint[nameProp], value: dataPoint[valueProp] };
     };
 
@@ -1013,9 +1037,10 @@ export class ChartService {
     };
 
     if (hasGroupBy) {
-      const groupProp = groupField.dataField;
+      const groupProp =
+        groupField.dataField || removeKeyword(groupField.columnName);
       const series = fpPipe(
-        fpGroupBy(fields.g.dataField),
+        fpGroupBy(fields.g.dataField || removeKeyword(fields.g.columnName)),
         fpMap(group => {
           const name = group[0][groupProp];
           return { name, data: map(group, dataMapper) };

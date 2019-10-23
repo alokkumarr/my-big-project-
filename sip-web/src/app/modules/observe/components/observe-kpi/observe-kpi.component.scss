@@ -25,7 +25,7 @@
     .kpi-title {
       font-size: 16px;
       font-weight: bold;
-      flex-grow: 0.75;
+      flex-grow: 0.95;
       text-align: start;
     }
 
@@ -101,4 +101,10 @@
       display: flex;
     }
   }
+}
+
+.filter-icon {
+  font-size: 16px;
+  padding-left: 10px;
+  cursor: pointer;
 }

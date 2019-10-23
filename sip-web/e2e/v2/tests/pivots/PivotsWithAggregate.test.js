@@ -22,6 +22,7 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
   const analysisType = 'table:pivot';
   const dateFieldName = 'Date';
   const numberFieldName = 'Integer';
+  const dataOption = 'SUM(Integer)';
   const stringFieldName = 'String';
   const selectedAggregate = 'sum';
   beforeAll(() => {
@@ -77,7 +78,7 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
         chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
         chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
         chartDesignerPage.clickOnDataOptionsTab();
-        chartDesignerPage.clickOnDataOptions(numberFieldName);
+        chartDesignerPage.clickOnDataOptions(dataOption);
         chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
         chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
 
