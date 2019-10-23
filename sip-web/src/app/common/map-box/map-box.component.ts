@@ -76,9 +76,7 @@ export class MapBoxComponent implements OnChanges {
     const style = last(split(this.mapStyle, '/'));
     const apiBaseURL = 'https://api.mapbox.com';
     const base = `${apiBaseURL}/styles/v1/mapbox`;
-    const url = `${base}/${style}/static/${lng},${lat},${
-      this.zoom
-    },0,0/${size}?access_token=${token}`;
+    const url = `${base}/${style}/static/${lng},${lat},${this.zoom},0,0/${size}?access_token=${token}`;
     this.imageUrl = url;
   }
 
@@ -116,7 +114,7 @@ export class MapBoxComponent implements OnChanges {
     const fieldsMap = reduce(
       allFields,
       (acc, field) => {
-        acc[field.columnName] = field;
+        acc[field.dataField || field.columnName] = field;
         return acc;
       },
       {}

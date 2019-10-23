@@ -528,7 +528,10 @@ public class ElasticSearchQueryBuilder {
   public void setPriorPercentages(List<Field> fields, JsonNode jsonNode) {
     fields.forEach(
         dataField -> {
-          String columnName = dataField.getColumnName();
+          String columnName =
+              dataField.getDataField() == null
+                  ? dataField.getColumnName()
+                  : dataField.getDataField();
           if (dataField.getAggregate() != null
               && dataField.getAggregate().equals(Aggregate.PERCENTAGE))
             dataField
