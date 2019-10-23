@@ -157,7 +157,7 @@ public class UserRepositoryImpl implements UserRepository {
                 (int) (userLoginCount.getInvalidPassWordCount() + 1));
           }
         } else {
-          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit-1
+          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
               && diffMinutes <= lockingTime) {
             ret[2] = true; // Lock the account.
             ret[0] =
