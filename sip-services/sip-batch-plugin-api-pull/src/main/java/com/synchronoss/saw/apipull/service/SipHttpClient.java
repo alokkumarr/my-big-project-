@@ -29,7 +29,7 @@ public class SipHttpClient {
 
       if (sipApiRequest.getHttpMethod() == HttpMethod.GET) {
         logger.debug("HttpMethod : {GET}");
-        HttpClientGet get = new HttpClientGet(url);
+        SipHttpClientGet get = new SipHttpClientGet(url);
         if (!CollectionUtils.isEmpty(sipApiRequest.getQueryParameters())) {
           for (QueryParameter qp : sipApiRequest.getQueryParameters()) {
             get.setQueryParam(qp.getKey(), qp.getValue());

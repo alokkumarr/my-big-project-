@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.ApiChannelMetadata;
@@ -54,6 +55,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import sncr.bda.core.file.FileProcessor;
 import sncr.bda.core.file.FileProcessorFactory;
 
@@ -130,7 +132,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
       String channelMetadataStr = channelEntity.getChannelMetadata();
 
-      ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+      ApiChannelMetadata apiChannelMetadata =
+          gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
       String hostAddress = apiChannelMetadata.getHostAddress();
       Integer port = apiChannelMetadata.getPort();
@@ -226,7 +229,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
     gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
     Gson gson = gsonBuilder.create();
 
-    ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+    ApiChannelMetadata apiChannelMetadata =
+        gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
     SipApiRequest apiRequest = new SipApiRequest();
 
@@ -327,7 +331,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
             .append("\n");
       }
 
+    } catch (RestClientException exception) {
+      throw new SipNestedRuntimeException("Unsupported content type text/html;charset=UTF-8");
     } catch (Exception exception) {
+      logger.error("Exception caught");
       throw new SipNestedRuntimeException(exception.getMessage(), exception);
     }
 
@@ -450,6 +457,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
             .append("\n");
       }
 
+    } catch (RestClientException exception) {
+      throw new SipNestedRuntimeException("Unsupported content type text/html;charset=UTF-8");
     } catch (Exception exception) {
       throw new SipNestedRuntimeException(exception.getMessage(), exception);
     }
@@ -587,7 +596,8 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
         String channelMetadataStr = channelEntity.getChannelMetadata();
 
-        ApiChannelMetadata apiChannelMetadata = gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
+        ApiChannelMetadata apiChannelMetadata =
+            gson.fromJson(channelMetadataStr, ApiChannelMetadata.class);
 
         logger.debug("Channel Metadata = " + apiChannelMetadata);
 
@@ -661,8 +671,10 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
           String routeName = apiRouteMetadata.getRouteName();
 
-          fileNameBuilder.append(routeName.toLowerCase()
-              .replaceAll(" ", "_")).append("_").append(getBatchId());
+          fileNameBuilder
+              .append(routeName.toLowerCase().replaceAll(" ", "_"))
+              .append("_")
+              .append(getBatchId());
 
           if (responseContentType.equals(MediaType.APPLICATION_JSON)
               || responseContentType.equals(MediaType.APPLICATION_JSON_UTF8)) {
@@ -693,7 +705,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
           logger.trace("File" + fileName + "transfer end time:: " + fileTransEndTime);
           bisDataMetaInfo.setFileTransferStartTime(Date.from(fileTransStartTime.toInstant()));
           bisDataMetaInfo.setFileTransferEndTime(Date.from(fileTransEndTime.toInstant()));
-          bisDataMetaInfo.setDataSizeInBytes((long)content.toString().length());
+          bisDataMetaInfo.setDataSizeInBytes((long) content.toString().length());
           bisDataMetaInfo.setFileTransferDuration(
               Duration.between(fileTransStartTime, fileTransEndTime).toMillis());
           bisDataMetaInfo.setReceivedDataName(fileName);

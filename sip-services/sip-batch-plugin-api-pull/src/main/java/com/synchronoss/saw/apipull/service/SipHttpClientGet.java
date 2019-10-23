@@ -1,5 +1,6 @@
 package com.synchronoss.saw.apipull.service;
 
+import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
 import com.synchronoss.saw.apipull.pojo.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,11 +9,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @ContextConfiguration(classes = {RestTemplateConfig.class, HttpClientConfig.class})
-public class HttpClientGet extends SipBaseHttpClient {
-  private static final Logger logger = LoggerFactory.getLogger(HttpClientGet.class);
+public class SipHttpClientGet extends SipBaseHttpClient {
+  private static final Logger logger = LoggerFactory.getLogger(SipHttpClientGet.class);
   RestTemplate restTemplate = new RestTemplate();
 
   /**
@@ -20,7 +22,7 @@ public class HttpClientGet extends SipBaseHttpClient {
    *
    * @param host
    */
-  public HttpClientGet(String host) {
+  public SipHttpClientGet(String host) {
     super(host);
   }
 
@@ -45,8 +47,12 @@ public class HttpClientGet extends SipBaseHttpClient {
       logger.debug("Response Code : {}", response.getStatusCode());
       logger.debug("Response Body : {}", response.getBody());
       logger.debug("Response headers : {}", response.getHeaders().toString());
-    } catch (Exception e) {
-      logger.error("Unable to fetch data for url : " + url, e);
+    } catch (RestClientException ex) {
+      logger.error("RestClient Exception occurred");
+      throw ex;
+    } catch (Exception ex) {
+      logger.error("Exception occurred");
+      throw ex;
     }
     return apiResponse;
   }
