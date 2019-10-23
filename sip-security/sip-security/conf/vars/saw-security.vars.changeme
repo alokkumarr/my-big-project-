@@ -32,3 +32,7 @@ mail.from=CHANGEME # helpdesk@synchronoss.com
 mail.subject=CHANGEME # Request for Reset Password
 sso.secret.key=CHANGEME # SSO login JWT token.
 jwt.secret.key=CHANGEME # Secret key for jwt Token.
+
+#user properties
+user.maxUnsuccessfulLoginAttemptAllowed=CHANGEME
+user.lockingTime.mins=CHANGEME
