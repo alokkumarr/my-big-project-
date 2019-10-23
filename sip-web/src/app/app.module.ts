@@ -6,10 +6,16 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NO_ERRORS_SCHEMA
 } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CommonModuleTs, CommonModuleGlobal } from './common';
+import {
+  AddTokenInterceptor,
+  HandleErrorInterceptor,
+  RefreshTokenInterceptor
+} from './common/interceptor';
 import { AnalyzeModuleGlobal } from './modules/analyze/analyze.global.module';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
@@ -35,6 +41,20 @@ const COMPONENTS = [
 ];
 const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
 
+const INTERCEPTORS = [
+  { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: HandleErrorInterceptor,
+    multi: true
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: RefreshTokenInterceptor,
+    multi: true
+  }
+];
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -54,7 +74,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     MaterialModule
   ],
   exports: [FlexLayoutModule],
-  providers: [...SERVICES],
+  providers: [...INTERCEPTORS, ...SERVICES],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent],
