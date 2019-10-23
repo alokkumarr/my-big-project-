@@ -4,6 +4,7 @@
 package com.sncr.saw.security.app;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.service.TicketHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,15 +12,16 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import com.sncr.saw.security.common.util.JwtFilter;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-//@EnableDiscoveryClient
 public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
     /**
@@ -27,6 +29,7 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
      */
     @Autowired
     private NSSOProperties nSSOProperties;
+    @Autowired private TicketHelper ticketHelper;
     @Bean
     public TomcatServletWebServerFactory tomcatEmbedded() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
@@ -48,7 +51,7 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
 	@Bean
 	public FilterRegistrationBean jwtFilter() {
 		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-		registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey()));
+		registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(), ticketHelper));
 		registrationBean.addUrlPatterns("/auth/*");
 
 		return registrationBean;

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "tableName",
     "semanticId",
     "dataFields",
+    "booleanCriteria",
     "filters",
     "esRepository"
 })
@@ -30,6 +32,8 @@ public class Kpi {
     private String semanticId;
     @JsonProperty("dataFields")
     private List<DataField> dataFields = null;
+    @JsonProperty("booleanCriteria")
+    private BooleanCriteria booleanCriteria;
     @JsonProperty("filters")
     private List<Filter> filters = null;
     @JsonProperty("esRepository")
@@ -65,6 +69,16 @@ public class Kpi {
     @JsonProperty("dataFields")
     public void setDataFields(List<DataField> dataFields) {
         this.dataFields = dataFields;
+    }
+
+    @JsonProperty("booleanCriteria")
+    public BooleanCriteria getBooleanCriteria() {
+        return booleanCriteria;
+    }
+
+    @JsonProperty("booleanCriteria")
+    public void setBooleanCriteria(BooleanCriteria booleanCriteria) {
+        this.booleanCriteria = booleanCriteria;
     }
 
     @JsonProperty("filters")

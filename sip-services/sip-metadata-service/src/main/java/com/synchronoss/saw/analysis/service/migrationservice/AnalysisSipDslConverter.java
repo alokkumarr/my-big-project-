@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.exceptions.MissingFieldException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Filter;
@@ -472,7 +473,7 @@ public interface AnalysisSipDslConverter {
       JsonElement aggValElement = fieldObject.get(FieldNames.AGGREGATE);
 
       if (!aggValElement.isJsonNull() && aggValElement != null) {
-        field.setAggregate(Field.Aggregate.fromValue(aggValElement.getAsString()));
+        field.setAggregate(Aggregate.fromValue(aggValElement.getAsString()));
       }
     }
 

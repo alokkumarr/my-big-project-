@@ -23,4 +23,8 @@ describe('Designer Service', () => {
   it('should exist', () => {
     expect(service).toBeTruthy();
   });
+
+  it('should exist', () => {
+    expect(typeof service.addArtifactColumnIntoAGroup).toEqual('function');
+  });
 });

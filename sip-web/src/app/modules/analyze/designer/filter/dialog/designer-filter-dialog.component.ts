@@ -24,6 +24,7 @@ export interface DesignerFilterDialogData {
   artifacts;
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
+  showFilterOptions: boolean;
 }
 export interface DesignerFilterDialogResult {
   filters: Filter[];
@@ -65,8 +66,8 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
-  trackByIndex(index) {
-    return index;
+  filterRowTrackBy(index, filterRow) {
+    return `${index}:${filterRow.columnName}`;
   }
 
   onFilterModelChange() {

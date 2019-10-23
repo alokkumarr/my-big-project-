@@ -4,6 +4,7 @@
 package com.sncr.saw.security.common.bean.repo;
 
 import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class TicketDetails implements Serializable {
 	private String custCode;
 	private String compName;
 	private String roleCode;
-	private String roleType;
+	private RoleType roleType;
 	private List<TicketDSKDetails> dataSKey;
     private List<String> CustomConfig;
 	private Long userId;
@@ -139,7 +140,7 @@ public class TicketDetails implements Serializable {
 	/**
 	 * @return the roleType
 	 */
-	public String getRoleType() {
+	public RoleType getRoleType() {
 		return roleType;
 	}
 
@@ -155,7 +156,7 @@ public class TicketDetails implements Serializable {
 	 * @param roleType
 	 *            the roleType to set
 	 */
-	public void setRoleType(String roleType) {
+	public void setRoleType(RoleType roleType) {
 		this.roleType = roleType;
 	}
 

@@ -1,0 +1,108 @@
+<mat-sidenav-container fxFlex fxFill hasBackdrop="false" class="view-container">
+  <mat-sidenav
+    #alertViewSidenav
+    position="end"
+    [mode]="viewAlertPanelMode"
+    autoFocus="false"
+  >
+    <div fxFlex fxLayout="column" class="view-container__filter">
+      <div
+        fxFlex="45px"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        class="view-container__filter__header"
+      >
+        <span fxFlex class="view-container__filter__header__title" i18n
+          >Filter Alerts
+        </span>
+        <button
+          mat-icon-button
+          color="warn"
+          e2e="close-nav"
+          (click)="alertViewSidenav.close()"
+        >
+          <mat-icon fontIcon="icon-close"></mat-icon>
+        </button>
+      </div>
+      <alerts-filters></alerts-filters>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlex fxLayout="column" class="view-container-content">
+    <div
+      fxFlex="45px"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      fxLayoutGap="9px"
+      class="view-container-content__header"
+    >
+      <span fxFlex class="view-container-content__header__title" i18n
+        >Alert History
+      </span>
+      <button
+        matTooltip="Refresh"
+        mat-mini-fab
+        class="view-container-content__header__iconBtn"
+        e2e="refresh-btn"
+        color="secondary"
+        (click)="fetchLateshAlerts()"
+      >
+        <mat-icon color="primary" fontIcon="icon-Refresh"></mat-icon>
+      </button>
+      <button
+        *ngIf="!alertViewSidenav.opened"
+        matTooltip="Filter"
+        mat-mini-fab
+        class="view-container-content__header__iconBtn"
+        color="secondary"
+        e2e="open-filter-panel"
+        (click)="alertViewSidenav.open()"
+      >
+        <mat-icon color="primary" fontIcon="icon-filter"></mat-icon>
+      </button>
+    </div>
+    <div
+      fxFlex
+      fxLayout="column"
+      fxLayoutGap="5px"
+      class="view-container-content__body"
+    >
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-around"
+        style="width: 100%; height: 250px;"
+      >
+        <alert-chart
+          *ngIf="
+            (allAlertCountChartData$ | async) &&
+            additionalCountChartOptions &&
+            (filterStrings$ | async)
+          "
+          class="mat-elevation-z3"
+          style="width: calc(60% - 30px); height: 170px; padding: 10px 10px 0 10px; margin-right: 10px;"
+          title="All Alerts"
+          [dateFilter]="filterStrings$ | async"
+          [additionalOptions]="additionalCountChartOptions"
+          [chartData]="allAlertCountChartData$ | async"
+        ></alert-chart>
+
+        <alert-chart
+          *ngIf="
+            (allAlertSeverityChartData$ | async) &&
+            additionalSeverityChartOptions &&
+            (filterStrings$ | async)
+          "
+          class="mat-elevation-z3"
+          style="width: calc(40% - 30px); height: 170px; padding: 10px 10px 0 10px;"
+          title="Severity"
+          [dateFilter]="filterStrings$ | async"
+          [additionalOptions]="additionalSeverityChartOptions"
+          [chartData]="allAlertSeverityChartData$ | async"
+        ></alert-chart>
+      </div>
+      <alerts-grid
+        [alertsDataLoader]="alertsDataLoader"
+        class="view-container-content__body__grid mat-elevation-z3"
+      ></alerts-grid>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

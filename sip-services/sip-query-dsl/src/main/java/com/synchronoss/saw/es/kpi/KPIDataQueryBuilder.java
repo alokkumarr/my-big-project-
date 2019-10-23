@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.kpi.DataField;
 import com.synchronoss.saw.model.kpi.Filter;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
@@ -144,10 +145,18 @@ public class KPIDataQueryBuilder {
         builder = KPIQueryBuilderUtil.numericFilterKPI(item, builder);
       }
     }
-    builder.forEach(
-        item -> {
-          boolQueryBuilder.must(item);
-        });
+    BooleanCriteria booleanCriteria = kpiBuilder.getKpi().getBooleanCriteria();
+    if (booleanCriteria != null && booleanCriteria == BooleanCriteria.OR) {
+      builder.forEach(
+          item -> {
+            boolQueryBuilder.should(item);
+          });
+    } else {
+      builder.forEach(
+          item -> {
+            boolQueryBuilder.must(item);
+          });
+    }
     searchSourceBuilder.query(boolQueryBuilder);
     List<DataField> dataFields = kpiBuilder.getKpi().getDataFields();
     for (DataField dataField : dataFields) {

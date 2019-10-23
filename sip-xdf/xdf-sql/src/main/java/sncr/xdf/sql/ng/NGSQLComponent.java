@@ -11,6 +11,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.alert.AlertQueueManager;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
@@ -58,6 +59,18 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 null, null);
             logger.info("tempDir : " +tempDir);
             int rc = executor.start(tempDir);
+            // check if Alert is enabled for the component and send the message to queue.
+            if (ngctx.componentConfiguration.getSql().getAlerts()!=null &&
+                ngctx.componentConfiguration.getSql().getAlerts().getDatapod()!=null)
+            {
+                String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+                AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+                Long createdTime = System.currentTimeMillis();
+                alertQueueManager.sendMessageToStream(ngctx.componentConfiguration.getSql()
+                    .getAlerts().getDatapod(),createdTime
+                );
+                logger.info("Alert configure for the dataset sent notification to stream");
+            }
             if(rc != 0) {
             	return -1;
             }

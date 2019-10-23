@@ -74,6 +74,14 @@ public class Transformer {
      * No args constructor for use in serialization
      * 
      */
+    /**
+     * Alert configuration for the component.
+     *
+     */
+    @SerializedName("alert")
+    @Expose
+    private Alert alerts;
+
     public Transformer() {
     }
 
@@ -270,6 +278,22 @@ public class Transformer {
     public Transformer withOutputSchema(Set<OutputSchema> outputSchema) {
         this.outputSchema = outputSchema;
         return this;
+    }
+
+    /**
+     * Gets alerts
+     *
+     * @return value of alerts
+     */
+    public Alert getAlerts() {
+        return alerts;
+    }
+
+    /**
+     * Sets alerts
+     */
+    public void setAlerts(Alert alerts) {
+        this.alerts = alerts;
     }
 
     @Override

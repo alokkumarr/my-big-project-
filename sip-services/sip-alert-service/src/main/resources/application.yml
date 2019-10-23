@@ -1,0 +1,49 @@
+info:
+  component: Synchronoss Alert Service
+spring:
+  application:
+    name: sip-alert-service
+
+logging:
+  level:
+    com.synchronoss.sip: INFO
+    org.springframework: INFO
+    org.hibernate.type : INFO
+
+server:
+  address: localhost
+  port: 9625
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+sip:
+  service:
+    index: 0
+    alert:
+      dashborad:
+        url: http://<hostname>.sncrbda.dev.cloud.synchronoss.net/sip/web/#/alerts/view
+      mail:
+        body: "Hello  </br> Below alert has created for configured Alert Rule:  $alertRuleName .</br>Alert Name: $alertRuleName </br>Alert Description: $alertRuleDescription </br>Category: $category </br>Metric Threshold: $thresholdValue </br>Attribute Name: $attributeName </br>Attribute Value: $attributeValue </br>Lookback Period: $lookbackPeriod</br>Link for the alert Dashboard : $link </br> Alert Severity: $alertSeverity </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
+        subject: "Alert Notification"
+    storage-proxy:
+      service:
+        host: http://localhost:9400
+    metastore:
+      base: /var/sip/
+      alertRulesTable: alertRulesMetadata
+      alertResults: alertResults
+      notificationTable: alertNotificationLog
+
+    taskExecutor:
+      maxPoolSize: 10
+      queueCapacity: 10
+
+    analysis-proxy-url: ${connector}://localhost:9800/internal/proxy/storage
+    max-number-of-alert-per-rules: 10000
+  ssl:
+    enable: false
+
+connector: http
+
