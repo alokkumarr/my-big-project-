@@ -8,6 +8,8 @@ import * as set from 'lodash/set';
 import * as remove from 'lodash/remove';
 import * as toLower from 'lodash/toLower';
 import * as isEmpty from 'lodash/isEmpty';
+import * as map from 'lodash/map';
+import * as filter from 'lodash/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
@@ -275,9 +277,15 @@ export class DesignerState {
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
-
+    const sortedArtifacts = filter(
+      artifacts,
+      artifact => !isEmpty(artifact.fields)
+    );
     patchState({
-      analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
+      analysis: {
+        ...analysis,
+        sipQuery: { ...sipQuery, artifacts: sortedArtifacts }
+      }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
   }
@@ -897,42 +905,25 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
-    const sipJoins = [];
-    if (isEmpty(joins)) {
-      return;
-    }
-    joins.forEach(join => {
-      let leftJoin = {};
-      let rightJoin = {};
-      join.criteria.forEach(crt => {
-        if (crt.side === 'left') {
-          leftJoin = {
-            artifactsName: crt.tableName,
-            columnName: crt.columnName
-          };
-        }
-
-        if (crt.side === 'right') {
-          rightJoin = {
-            artifactsName: crt.tableName,
-            columnName: crt.columnName
-          };
-        }
-      });
+    const sipJoins = map(joins, join => {
+      const [leftCriteria, rightCriteria] = join.criteria;
+      const leftJoin = {
+        artifactsName: leftCriteria.tableName,
+        columnName: leftCriteria.columnName
+      };
+      const rightJoin = {
+        artifactsName: rightCriteria.tableName,
+        columnName: rightCriteria.columnName
+      };
       const joinCondition = {
         operator: 'EQ',
         left: leftJoin,
         right: rightJoin
       };
-      const sipJoin = {
+      return {
         join: join.type,
-        criteria: [
-          {
-            joinCondition
-          }
-        ]
+        criteria: [{ joinCondition }]
       };
-      sipJoins.push(sipJoin);
     });
     return patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, joins: sipJoins } }
