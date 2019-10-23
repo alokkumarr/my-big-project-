@@ -1,5 +1,5 @@
 <div
-  *ngFor="let adapter of (groupAdapters$ | async); let adapterIndex = index"
+  *ngFor="let adapter of groupAdapters$ | async; let adapterIndex = index"
   fxLayout="row"
   fxLayoutAlign="start center"
   class="selected-fields__container"
@@ -38,10 +38,12 @@
       <ng-container *ngIf="col.aggregate; else defaultTemplate">
         <span
           [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
-          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel"
+          [innerHtml]="
+            AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel
+          "
         >
         </span>
-        <span> (&nbsp;{{ col.displayName || col.alias }}&nbsp;) </span>
+        <span> (&nbsp;{{ getDisplayNameForColumn(col) }}&nbsp;) </span>
       </ng-container>
       <ng-template #defaultTemplate>
         {{ col.displayName || col.alias }}
@@ -77,12 +79,14 @@
       *ngFor="let filter of filters; let i = index"
       class="selected-fields__item"
       [attr.e2e]="
-        'applied-filter-' + getDisplayName(filter) + getFilterValue(filter)
+        'applied-filter-' +
+        getDisplayNameForFilter(filter) +
+        getFilterValue(filter)
       "
       [removable]="true"
       (removed)="removeFilter.emit(i)"
     >
-      {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
+      {{ getDisplayNameForFilter(filter) }}{{ getFilterValue(filter) }}
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>
   </mat-chip-list>

@@ -14,7 +14,8 @@ import {
   Region,
   ArtifactColumn,
   ArtifactColumnDSL,
-  AnalysisChartDSL
+  AnalysisChartDSL,
+  ArtifactDSL
 } from './models';
 
 export type ArtifactColumns = ArtifactColumn[];
@@ -80,7 +81,7 @@ export type DesignerToolbarAciton =
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
-  artifacts?: Artifact[];
+  artifacts?: Artifact[] | ArtifactDSL[];
   sorts?: Sort[];
   filters?: Filter[];
   booleanCriteria?: string;

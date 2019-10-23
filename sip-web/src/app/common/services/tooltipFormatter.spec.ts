@@ -1,6 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { getTooltipFormatter, getTooltipFormats } from './tooltipFormatter';
+import {
+  getTooltipFormatter,
+  getTooltipFormats,
+  displayNameWithoutAggregateFor
+} from './tooltipFormatter';
 
 describe('Analyze Service', () => {
   beforeEach(() => {
@@ -31,5 +35,23 @@ describe('Analyze Service', () => {
     ).bind({ series: {} })();
 
     expect(/abc:/.test(tooltip)).toBeTruthy();
+  });
+
+  describe('displayNameWithoutAggregateFor', () => {
+    it('should return display name without parenthesis (aggregates) if datafield present', () => {
+      expect(
+        displayNameWithoutAggregateFor({
+          dataField: 'abc',
+          displayName: 'avg(double)'
+        })
+      ).toEqual('double');
+
+      expect(
+        displayNameWithoutAggregateFor({
+          dataField: 'abc',
+          displayName: 'avg(default(double))'
+        })
+      ).toEqual('default(double)');
+    });
   });
 });
