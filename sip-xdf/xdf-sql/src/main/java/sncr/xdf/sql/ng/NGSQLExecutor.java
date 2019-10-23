@@ -11,7 +11,6 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.file.DLDataSetOperations;
-import org.apache.spark.sql.Row;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
 
@@ -19,7 +18,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class NGSQLExecutor implements Serializable {
