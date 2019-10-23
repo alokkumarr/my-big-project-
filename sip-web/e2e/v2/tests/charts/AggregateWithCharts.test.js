@@ -20,6 +20,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   let token;
   const metricName = dataSets.pivotChart;
   const metrics = 'Float';
+  const dataOption = 'SUM(Float)';
   const dimension = 'Date';
   const groupName = 'String';
   const sizeByName = 'Integer';
@@ -86,8 +87,8 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         if (data.chartType === 'chart:bubble') {
           chartDesignerPage.clickOnAttribute(sizeByName, 'Size');
         }
-       chartDesignerPage.clickOnDataOptionsTab();
-        chartDesignerPage.clickOnDataOptions(metrics);
+        chartDesignerPage.clickOnDataOptionsTab();
+        chartDesignerPage.clickOnDataOptions(dataOption);
         chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
         chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
 
