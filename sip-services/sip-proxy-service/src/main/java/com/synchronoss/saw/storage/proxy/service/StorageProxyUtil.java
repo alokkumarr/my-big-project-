@@ -16,6 +16,7 @@ import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
@@ -112,15 +113,14 @@ public class StorageProxyUtil {
   /**
    * This will fetch the SIP query from metadata and provide.
    *
-   * @param sipQuery
+   * @param semanticId
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      SipQuery sipQuery,
+      String semanticId,
       String metaDataServiceExport,
       HttpServletRequest request,
       RestUtil restUtil) {
-    String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
             + metaDataServiceExport
@@ -306,5 +306,28 @@ public class StorageProxyUtil {
       artifactNames.add(artifact.getArtifactsName().toUpperCase());
     }
     return artifactNames;
+  }
+
+  /**
+   * Validate and check CustomerCode filter is not preset in filter section.
+   *
+   * @param filters
+   * @param cutomerCodeColumn
+   * @return
+   */
+  public static List<Filter> validateCustomerCode(List<Filter> filters, String cutomerCodeColumn) {
+    for (int i =0 ; i< filters.size(); i++) {
+      String fieldName = filters.get(i).getColumnName();
+      /**
+       * .keyword may present in the es-mapping fields take out form the columnName to get actual
+       * column name if present
+       */
+      String[] split = fieldName.split("\\.");
+      String columnName = (split.length >= 2) ? split[0] : fieldName;
+      if (columnName.equalsIgnoreCase(cutomerCodeColumn)) {
+        filters.remove(filters.get(i));
+      }
+    }
+    return filters;
   }
 }

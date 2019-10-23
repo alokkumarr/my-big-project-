@@ -4,6 +4,7 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArts
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.validateCustomerCode;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -313,7 +314,7 @@ public class StorageProxyController {
       throws JsonProcessingException ,IllegalAccessException{
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
+      throw new JSONMissingSAWException("Analysis definition is missing in request body");
     }
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
@@ -328,7 +329,7 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     SipQuery savedQuery =
-        getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
+        getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -379,7 +380,9 @@ public class StorageProxyController {
     }
 
     logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
-
+    if (authTicket.getIsJvCustomer() != 1) {
+      validateCustomerCode(analysis.getSipQuery().getFilters(), CUSTOMER_CODE);
+    }
     try {
       Long startTime = new Date().getTime();
       logger.trace(
