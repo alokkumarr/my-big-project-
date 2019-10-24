@@ -1,6 +1,8 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
@@ -53,6 +57,8 @@ public class SipKpiController {
 
   @Autowired private RestUtil restUtil;
 
+    private static final String CUSTOMER_CODE = "customerCode";
+
   @RequestMapping(
       value = "/kpi",
       method = RequestMethod.POST,
@@ -82,18 +88,34 @@ public class SipKpiController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    ArrayList list = (ArrayList) (kpiBuilder.getAdditionalProperties().get("keys"));
+    LinkedHashMap hashMap = (LinkedHashMap) (list.get(0));
+    String semanticId = hashMap.get("semanticId").toString();
     try {
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(kpiBuilder));
       if (kpiBuilder.getAdditionalProperties().get("action").toString().equalsIgnoreCase("fetch")) {
-        ArrayList list = (ArrayList) (kpiBuilder.getAdditionalProperties().get("keys"));
-        LinkedHashMap hashMap = (LinkedHashMap) (list.get(0));
-        String semanticId = hashMap.get("semanticId").toString();
         SemanticNode semanticNode =
             StorageProxyUtil.fetchSemantic(semanticId, metaDataServiceUrl, restUtil);
         return StorageProxyUtil.merge(
             objectMapper.valueToTree(kpiBuilder), objectMapper.valueToTree(semanticNode));
       }
+        SipQuery savedQuery =
+            getSipQuery(semanticId, metaDataServiceUrl, request, restUtil);
+        // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+        // code.
+        if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+
+            DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+            List<String> artsName = getArtsNames(savedQuery);
+            List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
+                for (String artifact : artsName) {
+                    dataSecurityKeyDef.setName(CUSTOMER_CODE);
+                    dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+                    customerFilterDsks.add(dataSecurityKeyDef);
+                    dataSecurityKey.getDataSecuritykey().addAll(customerFilterDsks);
+                }
+        }
       responseObject = proxyService.processKpi(kpiBuilder, dataSecurityKey);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

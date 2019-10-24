@@ -221,7 +221,7 @@ public class ElasticSearchQueryBuilder {
      * @param builder
      * @return
      */
-    public BoolQueryBuilder buildBooleanQuery(SipQuery.BooleanCriteria criteria, List<QueryBuilder> builder,
+    public static BoolQueryBuilder buildBooleanQuery(SipQuery.BooleanCriteria criteria, List<QueryBuilder> builder,
         BoolQueryBuilder boolQueryBuilder ) {
         if (criteria.value().equals(SipQuery.BooleanCriteria.AND.value())) {
             builder.forEach(
