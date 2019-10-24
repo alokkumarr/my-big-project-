@@ -49,14 +49,15 @@ public class SipXssRequestFilter extends GenericFilterBean {
         for (String data : valueString) {
           logger.trace("query parameter value: " + data);
           data = data.replaceAll(RestUtil.sanatizeAndValidateregEx, RestUtil.noSpace);
+          System.out.println(data);
           Boolean queryIsValid =
               ESAPI.validator().isValidInput("Validating query parameter value for intrusion", data,
-                  "SafeString", data.length(), false);
+                  "Digit", data.length(), false);
 
           if (!queryIsValid) {
             queryIsValid =
                 ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
-                    data, "Digit", data.length(), false);
+                    data, "SafeText", data.length(), false);
             logger.trace("queryIsValid Query Parameter: " + queryIsValid);
           }
           if (!queryIsValid) {

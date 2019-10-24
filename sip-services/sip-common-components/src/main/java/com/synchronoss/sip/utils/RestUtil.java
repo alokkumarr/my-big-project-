@@ -52,7 +52,8 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
-  public static final String sanatizeAndValidateregEx = "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%]";
+  public static final String sanatizeAndValidateregEx =
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+]";
   public static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
@@ -233,47 +234,41 @@ public class RestUtil {
             isValid = ESAPI.validator().isValidInput(
                 "Validating SafeString " + "attributes value for intrusion", nodeText, "SafeString",
                 node.asText().toString().length(), false);
+            isValid =
+                ESAPI.validator().isValidInput("Validating Email attributes value for intrusion",
+                    nodeText, "Email", node.asText().toString().length(), false);
+            isValid = ESAPI.validator().isValidInput(
+                "Validating Password " + "attributes value for intrusion", nodeText, "Password",
+                node.asText().toString().length(), false);
+            isValid = ESAPI.validator().isValidInput(
+                "Validating IPAddress " + "attributes value for intrusion", nodeText, "IPAddress",
+                nodeText.length(), false);
 
-            if (!isValid) {
-              isValid =
-                  ESAPI.validator().isValidInput("Validating Email attributes value for intrusion",
-                      nodeText, "Email", node.asText().toString().length(), false);
-              if (!isValid) {
-                isValid = ESAPI.validator().isValidInput(
-                    "Validating Password " + "attributes value for intrusion", nodeText, "Password",
-                    node.asText().toString().length(), false);
-              }
-              if (!isValid) {
-                isValid = ESAPI.validator().isValidInput(
-                    "Validating IPAddress " + "attributes value for intrusion", nodeText,
-                    "IPAddress", node.asText().toString().length(), false);
-              }
-              if (!isValid) {
-                isValid = ESAPI.validator().isValidInput(
-                    "Validating URL " + "attributes value for intrusion", nodeText, "URL",
-                    node.asText().toString().length(), false);
-              }
-              if (!isValid) {
-                isValid = ESAPI.validator().isValidInput(
-                    "Validating Id " + "attributes value for intrusion", nodeText, "Id",
-                    node.asText().toString().length(), false);
-              }
-              if (!isValid) {
-                isValid = ESAPI.validator().isValidInput(
-                    "Validating SafeText " + "attributes value for intrusion", nodeText, "SafeText",
-                    node.asText().toString().length(), false);
-              }
-              if (!isValid) {
-                logger.trace("Attribute is of type Json");
-                ObjectMapper m = new ObjectMapper();
-                JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));
-                validateNodeValue(rootNode);
-              }
-            }
+            isValid =
+                ESAPI.validator().isValidInput("Validating URL " + "attributes value for intrusion",
+                    nodeText, "URL", nodeText.length(), false);
+
+            isValid =
+                ESAPI.validator().isValidInput("Validating Id " + "attributes value for intrusion",
+                    nodeText, "Id", nodeText.length(), false);
+
+            isValid = ESAPI.validator().isValidInput(
+                "Validating SafeText " + "attributes value for intrusion", nodeText, "SafeText",
+                nodeText.length(), false);
+
+            isValid = ESAPI.validator().isValidInput(
+                "Validating Digit " + "attributes value for intrusion", nodeText, "Digit",
+                nodeText.length(), false);
+
+            logger.trace("Attribute is of type Json");
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));
+            validateNodeValue(rootNode);
           }
         }
       }
     }
+    // }
     if (!isValid) {
       throw new SipNotProcessedSipEntityException(nodeName + ":'" + nodeText + "' is not valid");
     }
