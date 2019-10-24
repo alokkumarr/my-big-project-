@@ -89,7 +89,13 @@ public class ElasticSearchAggregationParser {
           // data field
           if (field != null && field.getArea().equalsIgnoreCase("data")) {
             columnDataType[count++] = field.getType();
-            dataType.add(getColumnName(field.getColumnName()));
+            /*As per multiple metric implementation the dataField and column name will be not same
+             * with aggregations.The  elastic search output field is dataField name not columnName.
+             * Sample output is `{"date":"2018-11-18","sum@@double":100000.02}`
+             * */
+            String columnName =
+                field.getDataField() != null ? field.getDataField() : field.getColumnName();
+            dataType.add(getColumnName(columnName));
           }
         }
       }

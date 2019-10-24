@@ -1,5 +1,12 @@
 package sncr.xdf.sql.ng;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -8,18 +15,11 @@ import org.apache.spark.sql.types.StructField;
 
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
-import sncr.xdf.file.DLDataSetOperations;
-import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class NGSQLExecutor implements Serializable {
@@ -58,9 +58,25 @@ public class NGSQLExecutor implements Serializable {
                 descriptor.startTime =  st;
                 Dataset<Row> df = null;
 
+
+                Set<String> tablesFrmFile = new HashSet<String>();
+				if (parent.getNgctx().datafileDFmap == null) {
+					tablesFrmFile = allTables.keySet();
+
+				} else {
+
+					for (String key : allTables.keySet()) {
+						if (!parent.getNgctx().datafileDFmap.containsKey(key)) {
+							tablesFrmFile.add(key);
+
+						}
+					}
+				}
+
+
                 if (parent.getNgctx().inputDataSets.size() > 0) {
 
-                    for (String tn : allTables.keySet()) {
+                    for (String tn : tablesFrmFile) {
 
                         TableDescriptor tb = allTables.get(tn);
                         if (tb.isTargetTable) {
@@ -77,10 +93,6 @@ public class NGSQLExecutor implements Serializable {
 
                         String location;
 
-                        //if (!tn.equalsIgnoreCase(parent.getNgctx().dataSetName))
-                        if (!parent.getNgctx().runningPipeLine)
-
-                        {
 
                             if (allTables.get(tn) != null) {
                                 location = allTables.get(tn).getLocation();
@@ -94,56 +106,50 @@ public class NGSQLExecutor implements Serializable {
                                 return -1;
                             }
 
-                            logger.debug("Load data from: " + location + ", registered table name: " + tn);
+                                logger.debug("Load data from: " + location + ", registered table name: " + tn);
 
-                            if (jobDataFrames.get(tn) != null) {
-                                continue;
-                            }
+                                if (jobDataFrames.get(tn) != null) {
+                                    continue;
+                                }
 
-                            //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
-                            Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
-                                DLDataSetOperations.getPartitioningInfo(location);
+                                //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                                Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                                    DLDataSetOperations.getPartitioningInfo(location);
 
-                            if (loc_desc == null)
-                                return -1;
-                            // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                                if (loc_desc == null)
+                                	return -1;
+                                   // throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
 
-                            logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
+                                logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
+                                
+                                try {
+									df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+								} catch (Exception exception) {
+									logger.error("Could not load data neither in parquet nor in JSON, cancel processing " 
+											+ exception.getMessage() );
+									return -1;
+								}
+                                
+                                if (df == null) {
+                                	logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
+                                	return -1;
+                                   //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
+                                }
+                                jobDataFrames.put(tn, df);
+                                df.createOrReplaceTempView(tn);
 
-                            try {
-                                df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
-                            } catch (Exception exception) {
-                                logger.error("Could not load data neither in parquet nor in JSON, cancel processing "
-                                    + exception.getMessage() );
-                                return -1;
-                            }
-
-                            if (df == null) {
-                                logger.error("Could not load data neither in parquet nor in JSON, cancel processing");
-                                return -1;
-                                //throw new Exception("Could not load data neither in parquet nor in JSON, cancel processing");
-                            }
-                            jobDataFrames.put(tn, df);
-                            df.createOrReplaceTempView(tn);
-
-                        }
                     }
                 }
 
                 if (parent.getNgctx().runningPipeLine)
                 {
-
-
-
-
-
                     parent.getNgctx().datafileDFmap.forEach((key, value) -> {
-
-                        parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
+                    
+                    	parent.getNgctx().datafileDFmap.get(key).createOrReplaceTempView(key);
                         StructField[] fields = parent.getNgctx().datafileDFmap.get(key).schema().fields();
                         Arrays.asList(fields).forEach((x)->logger.info(x));
-
-                    });
+                        
+                	});
                 }
 
                 long lt = System.currentTimeMillis();

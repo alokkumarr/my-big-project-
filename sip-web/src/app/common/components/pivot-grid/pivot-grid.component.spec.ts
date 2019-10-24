@@ -7,7 +7,6 @@ import { PivotGridComponent } from './pivot-grid.component';
   selector: 'pivot-grid',
   template: 'PivotGridComponent'
 })
-
 class PivotStubComponent {
   @Input() public updater;
   @Input() public mode;
@@ -40,7 +39,24 @@ describe('Pivot grid Component', () => {
   });
 
   it('should sort pivot grid data', () => {
-    const format = component.getFormattedDataValue('2017-01-01', 'day', 'YYYY-MM-DD');
+    const format = component.getFormattedDataValue(
+      '2017-01-01',
+      'day',
+      'YYYY-MM-DD'
+    );
     expect(format).toEqual('2017-01-01');
+  });
+
+  it('should apply aggregates to display names for data fields', () => {
+    const column = {
+      type: 'double',
+      aggregate: 'sum',
+      area: 'data',
+      dataField: 'sum@@double',
+      displayName: 'Double',
+      columnName: 'double'
+    };
+    const result = component.artifactColumn2PivotField()([column])[0];
+    expect(result.caption).toEqual('SUM(Double)');
   });
 });
