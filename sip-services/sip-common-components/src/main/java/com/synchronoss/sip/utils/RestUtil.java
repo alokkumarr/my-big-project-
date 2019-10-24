@@ -53,7 +53,7 @@ public class RestUtil {
   private Boolean sipSslEnable;
 
   public static final String sanatizeAndValidateregEx =
-      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+]";
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/]";
   public static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
@@ -266,9 +266,11 @@ public class RestUtil {
             validateNodeValue(rootNode);
           }
         }
+        if (!isValid) {
+          throw new SipNotProcessedSipEntityException(nodeName + ":'" + nodeText + "' is not valid");
+        }
       }
     }
-    // }
     if (!isValid) {
       throw new SipNotProcessedSipEntityException(nodeName + ":'" + nodeText + "' is not valid");
     }
