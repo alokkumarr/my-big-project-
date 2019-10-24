@@ -4,7 +4,6 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArts
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.validateCustomerCode;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -380,9 +379,6 @@ public class StorageProxyController {
     }
 
     logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
-    if (authTicket.getIsJvCustomer() != 1) {
-      validateCustomerCode(analysis.getSipQuery().getFilters(), CUSTOMER_CODE);
-    }
     try {
       Long startTime = new Date().getTime();
       logger.trace(

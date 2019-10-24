@@ -308,26 +308,4 @@ public class StorageProxyUtil {
     return artifactNames;
   }
 
-  /**
-   * Validate and check CustomerCode filter is not preset in filter section.
-   *
-   * @param filters
-   * @param cutomerCodeColumn
-   * @return
-   */
-  public static List<Filter> validateCustomerCode(List<Filter> filters, String cutomerCodeColumn) {
-    for (int i =0 ; i< filters.size(); i++) {
-      String fieldName = filters.get(i).getColumnName();
-      /**
-       * .keyword may present in the es-mapping fields take out form the columnName to get actual
-       * column name if present
-       */
-      String[] split = fieldName.split("\\.");
-      String columnName = (split.length >= 2) ? split[0] : fieldName;
-      if (columnName.equalsIgnoreCase(cutomerCodeColumn)) {
-        filters.remove(filters.get(i));
-      }
-    }
-    return filters;
-  }
 }
