@@ -10,6 +10,7 @@ import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Filter.Type;
 import com.synchronoss.saw.model.Model;
 import com.synchronoss.saw.model.SipQuery;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
@@ -62,17 +63,16 @@ public class ElasticSearchQueryBuilder {
     }
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
-
+      List<QueryBuilder> dskBuilder = new ArrayList<>();
+      dskBuilder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, dskBuilder);
     // The below code to build filters
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    buildBooleanQuery(BooleanCriteria.AND, dskBuilder,boolQueryBuilder);
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();
-      List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-
-      builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, builder);
+      List<QueryBuilder> builder = new ArrayList<>();
       builder = buildFilters(filters, builder);
-
-      boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
+      boolQueryBuilder = buildBooleanQuery(sipQuery.getBooleanCriteria(), builder,boolQueryBuilder);
       searchSourceBuilder.query(boolQueryBuilder);
     }
 
@@ -212,6 +212,27 @@ public class ElasticSearchQueryBuilder {
     }
     return boolQueryBuilder;
   }
+
+    /**
+     * @param criteria
+     * @param builder
+     * @return
+     */
+    public BoolQueryBuilder buildBooleanQuery(SipQuery.BooleanCriteria criteria, List<QueryBuilder> builder,
+        BoolQueryBuilder boolQueryBuilder ) {
+        if (criteria.value().equals(SipQuery.BooleanCriteria.AND.value())) {
+            builder.forEach(
+                item -> {
+                    boolQueryBuilder.must(item);
+                });
+        } else {
+            builder.forEach(
+                item -> {
+                    boolQueryBuilder.should(item);
+                });
+        }
+        return boolQueryBuilder;
+    }
 
   /**
    * @param dataFields
