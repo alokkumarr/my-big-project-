@@ -32,11 +32,70 @@ const dataFormatStub = {
 };
 
 const _kpiStub = {
+  booleanCriteria: 'AND',
+  bulletPalette: 'rog',
   dataFields: [{
-    name: 'Available_items',
-    columnName: 'Available_items',
-    displayName: 'Available_items'
-  }]
+        aggregate: [
+           'sum',
+           'avg',
+           'min',
+           'max',
+           'count',
+           'distinctCount'
+        ],
+        columnName: 'AVAILABLE_ITEMS',
+        displayName: 'Available Items',
+        name: 'AVAILABLE_ITEMS'
+     }
+  ],
+  esRepository: {
+     indexName: 'mct_test',
+     storageType: 'ES',
+     type: 'session'
+  },
+  filters: [{
+        columnName: 'AVAILABLE_ITEMS',
+        isGlobalFilter: false,
+        isOptional: false,
+        isRuntimeFilter: false,
+        model: {
+           operator: 'BTW',
+           otherValue: 10,
+           value: 200
+        },
+        tableName: 'mct_test',
+        type: 'double'
+     },
+     {
+        columnName: 'SOURCE_OS.keyword',
+        isGlobalFilter: false,
+        isOptional: false,
+        isRuntimeFilter: false,
+        model: {
+           modelValues: [
+              'A'
+           ],
+           operator: 'SW'
+        },
+        tableName: 'mct_test',
+        type: 'string'
+     },
+     {
+        columnName: 'TRANSFER_DATE',
+        model: {
+           gte: '2018-02-01 00:00:00',
+           lte: '2018-02-28 23:59:59',
+           preset: 'NA'
+        },
+        primaryKpiFilter: true,
+        type: 'date'
+     }
+  ],
+  id: '044cf2ca-a42e-a855-2d12-48a834c281da',
+  kpiBgColor: 'green',
+  name: 'Available Items',
+  semanticId: 'tf-es-201912345678',
+  tableName: 'mct_test'
 };
 
 describe('Observe KPI Bullet Component', () => {

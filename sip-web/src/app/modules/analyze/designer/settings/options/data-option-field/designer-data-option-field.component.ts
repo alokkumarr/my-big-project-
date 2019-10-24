@@ -16,6 +16,7 @@ import {
 } from '../../../types';
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
+import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -64,12 +65,13 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   onAliasChange(alias) {
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
-        alias
+        alias,
+        dataField
       })
     );
     this.change.emit({ subject: 'alias' });
@@ -84,11 +86,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
         return true;
       }
     });
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
         columnName,
+        dataField,
         aggregate
       })
     );
@@ -118,6 +121,6 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   }
 
   checkChartType() {
-    return ['column', 'bar', 'stack', 'combo'].includes(this.analysisSubtype);
+    return AggregateChooserComponent.supportsPercentByRow(this.analysisSubtype);
   }
 }

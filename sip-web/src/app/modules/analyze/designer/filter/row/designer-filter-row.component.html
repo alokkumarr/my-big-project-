@@ -70,6 +70,7 @@
     fxLayout="row"
     class="filter__action__space"
     fxLayoutAlign="space-between center"
+    *ngIf="showFilterOptions"
   >
     <mat-checkbox
       [checked]="filter.isGlobalFilter"
@@ -98,10 +99,9 @@
     >
       Optional
     </mat-checkbox>
-
-    <button *ngIf="!isInRuntimeMode" mat-icon-button (click)="remove()">
-      <mat-icon fontIcon="icon-close" class="filter__remove-button__icon">
-      </mat-icon>
-    </button>
   </div>
+  <button *ngIf="!isInRuntimeMode" mat-icon-button (click)="remove()">
+    <mat-icon fontIcon="icon-close" class="filter__remove-button__icon">
+    </mat-icon>
+  </button>
 </div>

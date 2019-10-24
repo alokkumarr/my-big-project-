@@ -48,8 +48,8 @@ export class DesignerDateFilterComponent implements OnInit {
   ngOnInit() {
     if (this.filterModel) {
       this.tempModel = {
-        gte: moment(this.filterModel.gte),
-        lte: moment(this.filterModel.lte),
+        gte: moment.utc(this.filterModel.gte),
+        lte: moment.utc(this.filterModel.lte),
         preset: this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE
       };
       this.lteFC.setValue(this.tempModel.lte);
@@ -83,8 +83,8 @@ export class DesignerDateFilterComponent implements OnInit {
     return {
       preset,
       ...(preset === CUSTOM_DATE_PRESET_VALUE ? {
-        lte: lte ? lte.format(DATE_FORMAT) : null,
-        gte: gte ? gte.format(DATE_FORMAT) : null
+        lte: lte ? `${lte.format(DATE_FORMAT)} 23:59:59` : null,
+        gte: gte ? `${gte.format(DATE_FORMAT)} 00:00:00` : null
       } : {})
     };
   }

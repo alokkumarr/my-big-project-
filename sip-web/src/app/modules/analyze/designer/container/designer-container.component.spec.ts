@@ -58,6 +58,22 @@ describe('Designer Component', () => {
     expect(component).toBeDefined();
   });
 
+  it('should recreate data object', () => {
+    // check if object is different, even if its contents is not.
+    const data = [];
+    component.data = data;
+
+    component.refreshDataObject();
+    expect(component.data).not.toBe(data);
+  });
+
+  it('should affect state when changing to query mode permanently', () => {
+    const store = TestBed.get(Store);
+    const spy = spyOn(store, 'dispatch').and.returnValue({});
+    component.changeToQueryModePermanently();
+    expect(spy).toHaveBeenCalled();
+  });
+
   it('should construct filters for DSL format', () => {
     const filters = [
       {
@@ -99,7 +115,12 @@ describe('Designer Component', () => {
 
   describe('Derived metrics dialog', () => {
     it('should replace column if it already exists', async(() => {
-      const column = { columnName: 'abc', table: 'xyz', type: 'double' };
+      const column = {
+        columnName: 'abc',
+        table: 'xyz',
+        type: 'double',
+        dataField: 'abc'
+      };
       const dialogSpy = spyOn(TestBed.get(MatDialog), 'open').and.returnValue({
         afterClosed: () => of(column)
       });
@@ -118,7 +139,12 @@ describe('Designer Component', () => {
     }));
 
     it('should add column if it does not already exists', async(() => {
-      const column = { columnName: 'pqr', table: 'xyz', type: 'double' };
+      const column = {
+        columnName: 'pqr',
+        table: 'xyz',
+        type: 'double',
+        dataField: 'pqr'
+      };
       const dialogSpy = spyOn(TestBed.get(MatDialog), 'open').and.returnValue({
         afterClosed: () => of(column)
       });

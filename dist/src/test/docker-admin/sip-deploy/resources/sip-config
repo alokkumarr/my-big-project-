@@ -115,7 +115,6 @@ sip_bis_retry_diffs_in_minutes=5
 # it needs to be instructed to turn it off
 sip_bis_duplicate_entry=true
 
-
 #Default configuration is set preview limit is 100, if it not set in config file.
 saw_preview_rows_limit=10000
 # Publish row limit is optional parameter and only get considered if it has been
@@ -154,6 +153,11 @@ sip-app2
 
 [saw-security:vars]
 saw_security_email_host=sip-admin
+#
+# Properties for inactivating user after max unsuccessful login attempts.
+#
+sip_maxUnsuccessfulLoginAttemptAllowed=2
+sip_user_lockingTime_mins=2
 
 [saw-security-arbitrator]
 sip-app3
