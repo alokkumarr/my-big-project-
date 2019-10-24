@@ -308,7 +308,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       for (String artifactName : semanticArtifactNames) {
         flag = false;
         dskFilter = " (Select * from ";
-        if (query.toUpperCase().contains(" " + artifactName + " ")) {
+        if (query.toUpperCase().contains(artifactName)) {
           for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
             String[] col = dsk.getName().split("\\.");
 
@@ -334,9 +334,12 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           if (flag) {
             dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
             query = query + " ";
-            String artName = " " + artifactName + " ";
+            String artName = "FROM " + artifactName;
             logger.trace("dskFilter str = " + dskFilter);
-            query = query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter);
+            query = query.toUpperCase().trim().replaceAll("\\s{2,}", " ")
+                .replaceAll(artName.toUpperCase(), "FROM "+dskFilter);
+              String artName1 = "JOIN " + artifactName;
+              query = query.replaceAll(artName1.toUpperCase(),"JOIN "+dskFilter);
             logger.info("Logged query : " + query);
           }
         }

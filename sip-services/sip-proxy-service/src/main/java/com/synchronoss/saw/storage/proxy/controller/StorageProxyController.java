@@ -351,7 +351,7 @@ public class StorageProxyController {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
-          if (query.contains(" " + artifact + " ")) {
+          if (query.contains(artifact)) {
             dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);

@@ -66,16 +66,19 @@ public class ElasticSearchQueryBuilder {
       List<QueryBuilder> dskBuilder = new ArrayList<>();
       dskBuilder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, dskBuilder);
     // The below code to build filters
-    BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    buildBooleanQuery(BooleanCriteria.AND, dskBuilder,boolQueryBuilder);
+    BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
+      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    buildBooleanQuery(BooleanCriteria.AND, dskBuilder,boolQueryBuilderDsk);
+      boolQueryBuilder.must(boolQueryBuilderDsk);
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();
       List<QueryBuilder> builder = new ArrayList<>();
       builder = buildFilters(filters, builder);
-      boolQueryBuilder = buildBooleanQuery(sipQuery.getBooleanCriteria(), builder,boolQueryBuilder);
-      searchSourceBuilder.query(boolQueryBuilder);
+      BoolQueryBuilder boolQueryBuilderFilter = new BoolQueryBuilder();
+        boolQueryBuilderFilter = buildBooleanQuery(sipQuery.getBooleanCriteria(), builder,boolQueryBuilderFilter);
+        boolQueryBuilder.must(boolQueryBuilderFilter);
     }
-
+      searchSourceBuilder.query(boolQueryBuilder);
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     List<Filter> aggregationFilter =
@@ -523,18 +526,26 @@ public class ElasticSearchQueryBuilder {
    * @param sipQuery SIP Query.
    * @return Elasticsearch SearchSourceBuilder
    */
-  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery) {
+  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery , DataSecurityKey dataSecurityKey) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(0);
+      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    if (dataSecurityKey != null && dataSecurityKey.getDataSecuritykey().size() > 0) {
+      List<QueryBuilder> dskBuilder = new ArrayList<>();
+      dskBuilder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKey, dskBuilder);
+      // The below code to build filters
+      BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
+      buildBooleanQuery(BooleanCriteria.AND, dskBuilder, boolQueryBuilderDsk);
+        boolQueryBuilder.must(boolQueryBuilderDsk);
+      }
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
       builder = buildFilters(filters, builder);
-      // TODO: Future Implementation
-      //  builder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode,builder);
-      BoolQueryBuilder boolQueryBuilder = buildBooleanQuery(sipQuery, builder);
-      searchSourceBuilder.query(boolQueryBuilder);
+      BoolQueryBuilder boolQueryBuilderFilter = buildBooleanQuery(sipQuery, builder);
+      boolQueryBuilder.must(boolQueryBuilderFilter);
     }
+      searchSourceBuilder.query(boolQueryBuilder);
     QueryBuilderUtil.getAggregationBuilder(
         sipQuery.getArtifacts().get(0).getFields(), searchSourceBuilder);
     return searchSourceBuilder;
