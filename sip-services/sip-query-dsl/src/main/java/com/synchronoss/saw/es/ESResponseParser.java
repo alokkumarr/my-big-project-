@@ -92,7 +92,7 @@ public class ESResponseParser {
             ? dataField.getColumnName()
             : dataField.getDataField();
 
-        String columnName = fieldName != null && fieldName.split(REGEX).length > 2
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
             ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
             : fieldName;
 
@@ -109,7 +109,7 @@ public class ESResponseParser {
             ? field.getColumnName()
             : field.getDataField();
 
-        String columnName = fieldName != null && fieldName.split(REGEX).length > 2
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
             ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
             : fieldName;
 
