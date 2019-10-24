@@ -1,6 +1,8 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
@@ -18,6 +22,7 @@ import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +47,8 @@ public class SipGlobalFilterController {
   private static final Logger logger = LoggerFactory.getLogger(SipGlobalFilterController.class);
 
   @Autowired private StorageProxyService proxyService;
+
+  private static final String CUSTOMER_CODE = "customerCode";
 
   @RequestMapping(
       value = "/filters",
@@ -73,6 +80,16 @@ public class SipGlobalFilterController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+      // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+      // code.
+      if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+          DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+          List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
+              dataSecurityKeyDef.setName(CUSTOMER_CODE);
+              dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+              customerFilterDsks.add(dataSecurityKeyDef);
+              dataSecurityKey.getDataSecuritykey().addAll(customerFilterDsks);
+      }
     try {
       logger.trace(
           "Storage Proxy sync request object : {} ",
