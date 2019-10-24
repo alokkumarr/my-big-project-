@@ -16,9 +16,9 @@ import {
   ArtifactColumnReport,
   AnalysisDSL,
   SqlBuilderChart,
-  AnalysisChartDSL
+  AnalysisChartDSL,
+  isDSLAnalysis
 } from '../../types';
-import { isDSLAnalysis } from 'src/app/modules/analyze/types';
 
 interface ReportGridField {
   caption: string;
@@ -36,6 +36,24 @@ interface ReportGridField {
   changeColumnProp: Function;
   headerCellTemplate: string;
 }
+
+/**
+ * Converts datafield notation like 'sum@@double' to human
+ * friendly notation like 'sum(double)'
+ *
+ * Takes an array of data rows. Replaces keys in datafield
+ * notation to described human friendly notation.
+ *
+ * @param {{ [key: string]: any }} data
+ */
+export const dataFieldToHuman = (dataFieldName: string) => {
+  if (/\w@@\w/.test(dataFieldName)) {
+    const [agg, col] = dataFieldName.split('@@');
+    return `${agg}(${col})`;
+  }
+
+  return dataFieldName;
+};
 
 @Component({
   selector: 'chart-grid',
@@ -70,8 +88,10 @@ export class ChartGridComponent implements OnInit {
   public updates: any;
   public data: any[];
 
-  constructor(private _chartService: ChartService,
-    private _headerProgress: HeaderProgressService) {
+  constructor(
+    private _chartService: ChartService,
+    private _headerProgress: HeaderProgressService
+  ) {
     this.customizeColumns = this.customizeColumns.bind(this);
   }
 
@@ -151,31 +171,45 @@ export class ChartGridComponent implements OnInit {
       isDSLAnalysis(analysis) ? chartType : analysis.chartType,
       { chart, legend }
     );
-    this.chartOptions = setReverseProperty(this.chartOptions, analysis.sipQuery);
+    this.chartOptions = setReverseProperty(
+      this.chartOptions,
+      analysis.sipQuery
+    );
   }
 
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
+    const isDataField = /@@/.test(axisName);
     forEach(columns, column => {
-      if (axisName === column.name || axisName === column.columnName.split('.keyword')[0]) {
+      const isMatchingColumn = isDataField
+        ? axisName === column.dataField
+        : axisName === column.name ||
+          axisName === column.columnName.split('.keyword')[0];
+      if (isMatchingColumn) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
-        alias = column.alias || column.displayName;
+
+        /* If this is a data field, make it look user friendly */
+        alias =
+          column.alias ||
+          (isDataField
+            ? dataFieldToHuman(column.dataField)
+            : column.displayName);
         value =
           column.type === 'date'
             ? moment
-            .utc(
-              value,
-              this._chartService.getMomentDateFormat(columnFormat)
-            )
-            .format(
-              columnFormat === 'MMM d YYYY'
-                ? 'MMM DD YYYY'
-                : columnFormat === 'MMMM d YYYY, h:mm:ss a'
-                ? 'MMMM DD YYYY, h:mm:ss a'
-                : columnFormat
-            )
+                .utc(
+                  value,
+                  this._chartService.getMomentDateFormat(columnFormat)
+                )
+                .format(
+                  columnFormat === 'MMM d YYYY'
+                    ? 'MMM DD YYYY'
+                    : columnFormat === 'MMMM d YYYY, h:mm:ss a'
+                    ? 'MMMM DD YYYY, h:mm:ss a'
+                    : columnFormat
+                )
             : value;
         if (
           value &&
@@ -254,18 +288,19 @@ export class ChartGridComponent implements OnInit {
         map(sorts, sort =>
           sort.type === 'date'
             ? row =>
-              /* If the sort is for date column, parse dates to timestamp to make sure sorting is correct */
-              moment(
-                row[sort.columnName],
-                dateFormats[sort.columnName]
-              ).valueOf()
+                /* If the sort is for date column, parse dates to timestamp to make sure sorting is correct */
+                moment(
+                  row[sort.columnName],
+                  dateFormats[sort.columnName]
+                ).valueOf()
             : /* Otherwise, sort normally */
-            row => row[sort.columnName]
+              row => row[sort.columnName]
         ),
         map(sorts, 'order')
       );
     }
     const chartData = orderedData || data;
+
     this.chartToggleData = this.trimKeyword(chartData);
 
     return [

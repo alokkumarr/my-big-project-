@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpFilter from 'lodash/fp/filter';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
@@ -16,10 +15,10 @@ import {
   ArtifactColumns,
   ArtifactColumn,
   ArtifactColumnReport,
-  Artifact,
   Sort
 } from '../types';
 import { TYPE_MAP } from '../../consts';
+import { ArtifactDSL } from '../../models';
 
 @Component({
   selector: 'designer-sort',
@@ -28,7 +27,7 @@ import { TYPE_MAP } from '../../consts';
 })
 export class DesignerSortComponent implements OnInit {
   @Output() public sortsChange: EventEmitter<Sort[]> = new EventEmitter();
-  @Input() public artifacts: Artifact[];
+  @Input() public artifacts: ArtifactDSL[];
   @Input() public sorts: Sort[];
 
   public checkedFields: ArtifactColumns = [];
@@ -68,14 +67,13 @@ export class DesignerSortComponent implements OnInit {
 
   ngOnInit() {
     this.checkedFields = fpPipe(
-      fpFlatMap((artifact: Artifact) => {
-        return map(artifact.columns, column => {
+      fpFlatMap((artifact: ArtifactDSL) => {
+        return map(artifact.fields, column => {
           const cloned = clone(column);
-          cloned.artifactsName = artifact.artifactName;
+          cloned.artifactsName = artifact.artifactsName;
           return cloned;
         });
-      }),
-      fpFilter('checked')
+      })
     )(this.artifacts);
     this.availableFields = this.getAvailableFields(
       this.checkedFields,
@@ -108,7 +106,12 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
-  transform({ columnName, aggregate, type, artifactsName }: ArtifactColumnReport): Sort {
+  transform({
+    columnName,
+    aggregate,
+    type,
+    artifactsName
+  }: ArtifactColumnReport): Sort {
     return {
       artifactsName,
       aggregate,
@@ -120,12 +123,14 @@ export class DesignerSortComponent implements OnInit {
 
   getAvailableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
     return filter(checkedFields, field => {
-      return !find(
-        this.sorts,
-        ({ columnName, artifactsName }) =>
+      return (
+        !field.expression && // derived metrics are not supported for sorts
+        !find(this.sorts, ({ columnName, artifactsName }) =>
           isUndefined(artifactsName)
             ? columnName === field.columnName
-            : artifactsName === field.artifactsName && columnName === field.columnName
+            : artifactsName === field.artifactsName &&
+              columnName === field.columnName
+        )
       );
     });
   }

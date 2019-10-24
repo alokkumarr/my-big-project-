@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { requireIf } from '../../validators/required-if.validator';
+import { requireIf } from 'src/app/common/validators';
+
 import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS,
@@ -134,8 +135,9 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
     const kpiFilterSubscription = this.kpiFilterForm.valueChanges
       .pipe(debounceTime(500))
       .subscribe(data => {
-        this.kpiFilterForm.valid &&
-          this.onModelChange.emit(this.getFilterModel());
+        // User will select no value in preset options dropdown to remove the global filters already applied
+        // In that scenario the operation should carry on even if the form is invalid.
+        this.onModelChange.emit(this.getFilterModel());
       });
 
     this.listeners.push(kpiFilterSubscription);

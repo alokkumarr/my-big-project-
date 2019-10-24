@@ -7,9 +7,10 @@
   >
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="backdrop" *ngIf="!isViewMode()">
-      <div class="tile-actions gridster-item-content">
+      <div class="tile-actions">
         <button
           mat-icon-button
+          class="gridster-item-content"
           [attr.e2e]="'dashboard-edit-tile-button-' + idx"
           (click)="editTile(item)"
           *ngIf="item.kpi || item.bullet"
@@ -18,6 +19,7 @@
         </button>
         <button
           mat-icon-button
+          class="gridster-item-content"
           [attr.e2e]="'dashboard-remove-tile-button-' + idx"
           (click)="removeTile(item)"
         >
@@ -112,7 +114,7 @@
       ></observe-kpi-bullet>
     </ng-container>
 
-    <div class="dashboard-item-error-message" *ngIf="!item.success">
+    <div class="dashboard-item-error-message" *ngIf="item.success === false">
       <h2>This item could not be loaded. It may have been deleted.</h2>
     </div>
   </gridster-item>

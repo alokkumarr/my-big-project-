@@ -12,8 +12,7 @@ import {
   Filter,
   IToolbarActionData,
   Artifact,
-  Format,
-  isDSLAnalysis
+  Format
 } from '../types';
 import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import { Store } from '@ngxs/store';
@@ -25,11 +24,16 @@ import { DesignerPreviewDialogComponent } from '../designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
-import { ConfirmDialogData } from '../../../common/types';
+import { ConfirmDialogData, isDSLAnalysis } from '../../../common/types';
+import { ArtifactDSL } from 'src/app/models';
 
 @Injectable()
 export class AnalyzeDialogService {
-  constructor(public dialog: MatDialog, private router: Router,  private _store: Store) {}
+  constructor(
+    public dialog: MatDialog,
+    private router: Router,
+    private _store: Store
+  ) {}
 
   openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
     const data: AnalysisDialogData = {
@@ -67,7 +71,7 @@ export class AnalyzeDialogService {
     });
   }
 
-  openSortDialog(sorts: Sort[], artifacts: Artifact[]) {
+  openSortDialog(sorts: Sort[], artifacts: ArtifactDSL[]) {
     const data: IToolbarActionData = {
       action: 'sort',
       sorts,
@@ -93,7 +97,8 @@ export class AnalyzeDialogService {
       artifacts,
       booleanCriteria,
       supportsGlobalFilters,
-      isInRuntimeMode: false
+      isInRuntimeMode: false,
+      showFilterOptions: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
@@ -107,9 +112,12 @@ export class AnalyzeDialogService {
     const data: DesignerFilterDialogData = {
       filters,
       artifacts: isDSLAnalysis(analysis)
-        ? this._store.selectSnapshot(state => state.common.metrics[analysis.semanticId]).artifacts
+        ? this._store.selectSnapshot(
+            state => state.common.metrics[analysis.semanticId]
+          ).artifacts
         : analysis.artifacts,
-      isInRuntimeMode: true
+      isInRuntimeMode: true,
+      showFilterOptions: true
     };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
@@ -158,6 +166,7 @@ export class AnalyzeDialogService {
     return this.dialog.open(DateFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data: { format, availableFormats }
     } as MatDialogConfig);
   }

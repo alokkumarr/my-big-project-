@@ -8,18 +8,24 @@
 # Use CentOS base image.  Note: The version should follow the CentOS
 # version requirement stated in the SIP Operations Guide, which in
 # turn depends on the MapR Operating System Support Matrix.
-FROM centos:7.5.1804
+FROM centos:7.6.1810
 
-# initilize the arugument to download and install corretto (Java).
-ARG rpm=java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
-ARG path=https://d3pxv6yz143wms.cloudfront.net/8.212.04.2
-ARG key=0E50DA5A06C9F82E013C6561A5E4F647D043E83B
+# initilize the arugument to download and install OpenJDK Java latest.
+# since the required package is not available in configured 7.6 repo's,
+# we are downloading the java packages and its dependencies directly.
+# rpmd1 and rpmd2 are dependencies for rpm (as configured below).
+# openjdk-devel is being installed to satisfy the mapr dependency.
+
+ARG path=http://mirror.centos.org/centos/7/updates/x86_64/Packages/
+ARG rpmd1=java-1.8.0-openjdk-headless-1.8.0.222.b10-1.el7_7.x86_64.rpm
+ARG rpmd2=java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64.rpm
+ARG rpm=java-1.8.0-openjdk-devel-1.8.0.222.b10-1.el7_7.x86_64.rpm
 
 # Workaround: Package installations (like mapr-core which depends on
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
 # fix the version to the release chosen above.
-RUN echo "7.5.1804" > /etc/yum/vars/releasever
+RUN echo "7.6.1810" > /etc/yum/vars/releasever
 RUN rm /etc/yum.repos.d/*.repo
 COPY centos.repo /etc/yum.repos.d
 
@@ -92,24 +98,26 @@ RUN useradd mapr -u 500 -g mapr
 # System web application
 RUN echo mapr | passwd --stdin mapr
 
-# Download and verify the PGP signature for java and Installation.
-# Also install fontconfig remove a common source of configuration problems.
-# have recommended that Java images include font support.
+# Installing Java OpenJDK
+
 RUN curl -O $path/$rpm \
+    && curl -O $path/$rpmd1 \
+    && curl -O $path/$rpmd2 \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys $key \
-    && gpg --armor --export $key > corretto.asc \
-    && rpm --import corretto.asc \
-    && rpm -K $rpm \
-    && rpm -i $rpm \
-    && rm -r $GNUPGHOME corretto.asc $rpm \
-    && yum install -y fontconfig \
+    && yum install -y -q $rpmd1 \
+    && yum install -y -q $rpmd2 \
+    && yum install -y -q $rpm \
+    && rm -r $rpm $rpmd1 $rpmd2 \
     && yum clean all
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64/
+
+# COPY java.security into the directory
+COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
 
 # Add SIP container health check command
 COPY sip-health-check /root/
 
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD /root/sip-health-check
+

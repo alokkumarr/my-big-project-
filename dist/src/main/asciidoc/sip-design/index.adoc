@@ -303,6 +303,11 @@ and Observe modules in the store.
   . SIP Analyze Module
   . SIP Workbench Module
 
+=== SIP Alert service
+
+SIP Alert service provides API to manage an alert configurations and receive alerts when it meets
+the alert criteria to the specified channel.
+
 ==== Apache Spark
 
 The Apache Spark executor supports analyses of type report.
@@ -310,19 +315,19 @@ The Apache Spark executor supports analyses of type report.
 Reports are executed as Spark SQL queries running on an Apache Spark
 cluster.  The queried data is stored as Parquet files in the data
 lake.  The report execution functionality is provided by two
-components: the Transport Service and the Transport Service Executor.
+components: the SIP-storage proxy Service and the SIP Executor Service.
 
-The Transport Service provides an internal REST API for SIP Web to
+The SIP-storage proxy service provides an internal REST API for SIP Web to
 use, including operations to execute a report.  When a report is
-executed, the Transport Service writes a message requesting execution
+executed, the SIP-storage proxy Service writes a message requesting execution
 to a message queue.  The message queue is implemented using MapR
-streams.  The Transport Service Executor consumes messages from the
+streams.  The SIP Executor Service Executor consumes messages from the
 queue and executes queries accordingly.
 
 Executors are run in two different modes: fast and regular.  The fast
 executors read from the fast queue to which preview and onetime
 executions are sent, with expectations of lower latency using
-techniques such as preallocated Spark contexts.  The regular executors
+techniques such as pre-allocated Spark contexts.  The regular executors
 read from the regular queue to which scheduled executions are sent.
 Using two different queues limits the resources provided to
 potentially heavy and long-running scheduled executions to avoid
@@ -339,9 +344,9 @@ As a preventive measure, executors restart the Java virtual machine
 after handling an execution.  This avoids building up state between
 executions that can be a source of errors.
 
-When an analysis of type report is executed by the Transport Service,
+When an analysis of type report is executed by the SIP-storage proxy Service,
 the results are stored as newline-delimited JSON in the data lake.
-When results need to be read back by the Transport Service, it reads
+When results need to be read back by the SIP-storage proxy Service, it reads
 the newline-delimited JSON file in the data lake over the MapR-FS.
 The results can then be streamed to avoid reading the entire results
 into memory at the same time which might lead to out of memory errors.
@@ -370,11 +375,6 @@ Internally it uses the Quartz scheduler framework for create, manage
 and trigger analysis schedules with mariaDB as job store. The
 Scheduler Service does not monitor the actual execution or its
 results, but only triggers the start of execution.
-
-=== SIP Observe Service
-
-The SIP Observe Service enables creating, reading, updating and
-deleting dashboards.
 
 == SIP Security
 

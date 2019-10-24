@@ -20,7 +20,7 @@ public class Ticket implements Serializable {
   private String userFullName;
   private String defaultProdID;
   private String roleCode;
-  private String roleType;
+  private RoleType roleType;
   private Long createdTime;
   private List<TicketDSKDetails> dataSecurityKey;
 
@@ -30,6 +30,8 @@ public class Ticket implements Serializable {
   private String error;
   private String custID;
   private String custCode;
+  private Integer isJvCustomer;
+  private Integer filterByCustomerCode;
   private Long userId;
   private ArrayList<Products> products;
   /** This ticket will be valid till this time. */
@@ -85,12 +87,28 @@ public class Ticket implements Serializable {
     this.custCode = custCode;
   }
 
+  public Integer getIsJvCustomer() {
+    return isJvCustomer;
+  }
+
+  public void setIsJvCustomer(Integer jvCustomer) {
+    isJvCustomer = jvCustomer;
+  }
+
   public String getError() {
     return error;
   }
 
   public void setError(String error) {
     this.error = error;
+  }
+
+  public Integer getFilterByCustomerCode() {
+    return filterByCustomerCode;
+  }
+
+  public void setFilterByCustomerCode(Integer filterByCustomerCode) {
+    this.filterByCustomerCode = filterByCustomerCode;
   }
 
   public List<TicketDSKDetails> getDataSecurityKey() {
@@ -134,6 +152,8 @@ public class Ticket implements Serializable {
     sb.append("createdTime = " + createdTime + "\n");
     sb.append("validUpto = " + validUpto + "\n");
     sb.append("validityReason = " + validityReason + "\n");
+    sb.append("isJvCustomer = " + isJvCustomer + "\n");
+    sb.append("filterByCustomerCode = " + filterByCustomerCode + "\n");
     return sb.toString();
   }
 
@@ -210,12 +230,12 @@ public class Ticket implements Serializable {
   }
 
   /** @return the roleType */
-  public String getRoleType() {
+  public RoleType getRoleType() {
     return roleType;
   }
 
   /** @param roleType the roleType to set */
-  public void setRoleType(String roleType) {
+  public void setRoleType(RoleType roleType) {
     this.roleType = roleType;
   }
 

@@ -40,6 +40,11 @@
       <artifactId>sip-metadata-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>com.synchronoss.sip</groupId>
+      <artifactId>sip-alert-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

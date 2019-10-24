@@ -1,0 +1,170 @@
+<div fxLayout="column">
+  <mat-toolbar fxLayout="row">
+      <button
+        (click)="gotoRTISPage()"
+        mat-icon-button
+        style="margin-right: 10px;"
+      >
+        <mat-icon
+          class="back-button-icon"
+          fontIcon="icon-arrow-left"
+        ></mat-icon>
+      </button>
+      <div fxLayout="row" fxFlex="40">
+        <div class="rtis-registration-title" e2e="category-title">
+          RTIS REGISTRATION FORM
+        </div>
+      </div>
+    </mat-toolbar>
+</div>
+<mat-divider></mat-divider>
+<div class="registration-form">
+  <form
+    fxFlex
+    fxLayout="row wrap"
+    class="details-container"
+    #sourceDetails
+    novalidate
+    [formGroup]="detailsFormGroup"
+    autocomplete="false"
+  >
+    <section
+      fxFlex="100"
+      fxLayout="column"
+      fxLayoutAlign="space-around center"
+    >
+      <mat-form-field class="select-form-field" appearance="outline">
+        <mat-label i18n>Model</mat-label>
+        <mat-select [(value)]="model">
+          <mat-option value="countly">Countly</mat-option>
+          <mat-option value="generic">Generic</mat-option>
+          <mat-option value="simple-Json">Simple-Json</mat-option>
+          <mat-option value="simple">Simple</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Batch Size</mat-label>
+        <input
+          matInput
+          type="number"
+          name="batchSize"
+          formControlName="batchSize"
+          e2e="batch-size"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.batchSize.hasError('required')"
+          i18n
+        >
+          Batch Size is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+
+      <div style="width:50%;height: 35px;">
+        <mat-label i18n>Buffer Full Size</mat-label>
+        <mat-slide-toggle name="bufferFullSize"
+        formControlName="bufferFullSize"
+        e2e="batch-full-size"></mat-slide-toggle>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Event URL</mat-label>
+        <input
+          matInput
+          type="url"
+          name="eventUrl"
+          formControlName="eventUrl"
+          e2e="timeout"
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.timeout.hasError('required')"
+          i18n
+        >
+          Timeout is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Timeout In MS</mat-label>
+        <input
+          matInput
+          type="number"
+          name="timeout"
+          formControlName="timeout"
+          e2e="timeout"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.timeout.hasError('required')"
+          i18n
+        >
+          Timeout is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Stream/Queue</mat-label>
+        <input
+          matInput
+          name="streamQueue"
+          formControlName="streamQueue"
+          e2e="stream-queue"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.streamQueue.hasError('required')"
+          i18n
+        >
+          Stream/Queue is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label i18n>Topic</mat-label>
+        <input
+          matInput
+          name="streamTopic"
+          formControlName="streamTopic"
+          e2e="stream-topic"
+          required
+        />
+        <mat-error
+          e2e="route-name-error"
+          *ngIf="detailsFormGroup.controls.streamTopic.hasError('required')"
+          i18n
+        >
+          Topic is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </section>
+  </form>
+</div>
+<mat-divider></mat-divider>
+<div
+  fxLayoutAlign="space-around center"
+  style="padding: 10px 0px 0px 22px;">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!detailsFormGroup.valid"
+      (click)="createRegistration(detailsFormGroup.value)"
+      e2e="create-rtis-registration"
+      i18n
+    >
+      Create
+    </button>
+
+    <button
+      mat-button
+      (click)="gotoRTISPage()"
+      e2e="cancel-rtis-registration"
+      i18n
+    >
+      Cancel
+    </button>
+  </div>

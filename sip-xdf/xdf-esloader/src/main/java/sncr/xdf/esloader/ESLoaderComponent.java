@@ -1,5 +1,7 @@
 package sncr.xdf.esloader;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,15 +11,17 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple2;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.conf.Alias;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.ESLoader;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.alert.AlertQueueManager;
+import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
-import sncr.xdf.component.Component;
 import sncr.xdf.esloader.esloadercommon.ESHttpClient;
 import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
 import sncr.xdf.exceptions.FatalXDFException;
@@ -27,8 +31,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Created by skbm0001 on 29/1/2018.
@@ -71,7 +73,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             if (this.inputDataSets != null && !this.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = this.inputDataSets.keySet().iterator().next();
             }
-
             esDataset = this.inputDataSets.get(ESLOADER_DATASET);
             logger.debug("ES Dataset = " + esDataset);
 
@@ -109,6 +110,16 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
                 retVal = registerOrUpdateESDataset(indexType, esHttpClient);
             }
 
+            // check if Alert is enabled for the component and send the notification.
+            if (esLoaderConfig.getAlerts()!=null && esLoaderConfig.getAlerts().getDatapod()!=null)
+            {
+                String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+                AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+                Long createdTime = System.currentTimeMillis();
+                alertQueueManager.sendMessageToStream(esLoaderConfig.getAlerts().getDatapod(),createdTime
+                );
+                logger.info("Alert configure for the dataset sent notification to stream");
+            }
             return retVal;
         } catch (Exception ex) {
             logger.error(ex);

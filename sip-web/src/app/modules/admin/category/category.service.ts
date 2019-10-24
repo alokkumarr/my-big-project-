@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import * as isNumber from 'lodash/isNumber';
 import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
-import { map } from 'rxjs/operators';
 import { IAdminDataService } from '../admin-data-service.interface';
-import { Observable } from 'rxjs';
 
 interface CategoryResponse {
   categories: any[];
@@ -27,14 +28,19 @@ export class CategoryService implements IAdminDataService {
   constructor(
     public _adminService: AdminService,
     public _jwtService: JwtService
-  ) {
-    const token = _jwtService.getTokenObj();
-    const customerId = token.ticket.custID;
-    this.customerId = customerId;
+  ) {}
+
+  getCustomerId() {
+    if (!isNumber(this.customerId)) {
+      const token = this._jwtService.getTokenObj();
+      const customerId = token.ticket.custID;
+      this.customerId = parseInt(customerId, 10);
+    }
+    return this.customerId;
   }
 
   getList$(): Observable<any[]> {
-    const customerId = parseInt(this.customerId, 10);
+    const customerId = this.getCustomerId();
     return this._adminService
       .request<CategoryResponse>('categories/fetch', customerId)
       .pipe(map(resp => resp.categories));

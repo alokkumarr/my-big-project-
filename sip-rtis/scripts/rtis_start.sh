@@ -149,7 +149,7 @@ declare -r lib_classpath=$(
     print join(":", map { realpath($_) } glob($ARGV[0] . "/*"))' \
     $lib_dir
   )
-declare -r app_classpath="$conf_dir:$lib_classpath"
+declare -r app_classpath="$conf_dir:$lib_classpath:$(mapr classpath):$(hadoop classpath)"
 vlog app_classpath: $app_classpath
 
 declare java_args=''

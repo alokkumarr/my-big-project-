@@ -7,10 +7,13 @@ export interface ArtifactColumn {
   z;
   g;
   columnName: string;
+  dataField?: string;
   table: string;
   displayName: string;
   filterEligible: boolean;
   type: string;
+  expression?: string;
+  formula?: string;
   format: Format | string | null;
   aliasName: string;
   alias?: string;

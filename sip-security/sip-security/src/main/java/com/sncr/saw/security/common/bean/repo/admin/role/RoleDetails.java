@@ -1,12 +1,14 @@
 package com.sncr.saw.security.common.bean.repo.admin.role;
 
+import com.synchronoss.bda.sip.jwt.token.RoleType;
+
 public class RoleDetails {
 	
 	private long roleSysId;
 	private long custSysId;
 	private String roleName;
 	private String roleDesc;
-	private String roleType;
+	private RoleType roleType;
 	private String dsk;
 	private String activeStatusInd;
 	private String masterLoginId;
@@ -63,10 +65,10 @@ public class RoleDetails {
 	public void setRoleDesc(String roleDesc) {
 		this.roleDesc = roleDesc;
 	}
-	public String getRoleType() {
+	public RoleType getRoleType() {
 		return roleType;
 	}
-	public void setRoleType(String roleType) {
+	public void setRoleType(RoleType roleType) {
 		this.roleType = roleType;
 	}
 	public String getDsk() {

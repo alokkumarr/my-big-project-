@@ -13,7 +13,6 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includeSubModules>false</includeSubModules>
       <includes>
-        <include>${project.groupId}:sip-transport-service</include>
         <include>${project.groupId}:sip-executor-service</include>
         <include>${project.groupId}:sip-gateway-service</include>
         <include>${project.groupId}:sip-export-service</include>
@@ -22,6 +21,8 @@
         <include>${project.groupId}:sip-scheduler-service</include>
         <include>${project.groupId}:sip-storage-proxy-service</include>
         <include>${project.groupId}:sip-batch-ingestion-service</include>
+        <!--Alert module is a new micro service so following the pattern as sip instead of saw-->
+        <include>com.synchronoss.sip:sip-alert-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>

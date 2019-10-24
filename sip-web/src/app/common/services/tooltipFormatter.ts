@@ -1,14 +1,23 @@
 import * as Highcharts from 'highcharts/highcharts';
-import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
+import moment from 'moment';
 
 import {
   FLOAT_TYPES,
   NUMBER_TYPES,
   DATE_TYPES,
   AGGREGATE_TYPES_OBJ
-} from '../../modules/analyze/consts';
+} from '../consts';
 
+export const displayNameWithoutAggregateFor = (column): string => {
+  if (!column.dataField) {
+    return column.displayName;
+  }
+
+  const match = column.displayName.match(/\((.+)\)/);
+  return match ? match[1] : column.displayName;
+};
 /**
  * If the data type is float OR aggregate is percentage or average, we
  * show two decimal places. Else, no decimal places.
@@ -22,28 +31,6 @@ const getPrecision = (aggregate, type) => {
     : 0;
 };
 
-// const handleNaNIssue = (point, options) => {
-//   /**
-//    * In some cases point.value or point.y is received as 0. Which was causing the round()
-//    * to return NaN . So making sure that if value received is 0 then
-//    * it should return as it is. Also checking if option datatype
-//    * is float or double return the value with correct decimal precision.
-//    *
-//    */
-//   return point.value === 0 || point.y === 0
-//     ? point.value
-//       ? point.value.toFixed(getPrecision(options.aggregate, options.dataType))
-//       : point.y.toFixed(getPrecision(options.aggregate, options.dataType))
-//     : round(
-//         options.aggregate === 'percentagebyrow'
-//           ? round(point.percentage, 2)
-//           : point.y
-//           ? point.y
-//           : point.value,
-//         getPrecision(options.aggregate, options.dataType)
-//       ).toLocaleString();
-// };
-
 export function getTooltipFormats(fields, chartType) {
   return {
     headerFormat: `<table>`,
@@ -55,6 +42,10 @@ export function getTooltipFormats(fields, chartType) {
 function getXValue(point, fields, chartType) {
   const { x, g } = fields;
   const hasGroupBy = Boolean(g);
+
+  if (chartType === 'chart_scale') {
+    return point.name;
+  }
 
   if (chartType === 'pie') {
     return point.name;
@@ -71,9 +62,13 @@ function getXValue(point, fields, chartType) {
   }
   if (DATE_TYPES.includes(x.type)) {
     if (hasGroupBy) {
-      return moment(point.category).format(x.dateFormat);
+      return ['tsspline', 'tsPane'].includes(chartType)
+        ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
+        : point.category;
     }
-    return point.key;
+    return ['tsspline', 'tsPane'].includes(chartType)
+      ? moment(point.category).format('dddd, MMM Do YYYY, h:mm')
+      : point.key || point.category;
   }
 }
 
@@ -85,8 +80,26 @@ function getXLabel(point, fields, chartType) {
 }
 
 function getFieldLabelWithAggregateFun(field) {
-  const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
-  return field.alias || `${aggregate}(${field.displayName})`;
+  /* Don't try to apply aggregate to a derived metric */
+  if (field.expression) {
+    return field.alias || `${field.displayName}`;
+  } else {
+    const aggregate = AGGREGATE_TYPES_OBJ[field.aggregate].designerLabel;
+    return (
+      field.alias || `${aggregate}(${displayNameWithoutAggregateFor(field)})`
+    );
+  }
+}
+
+function getYValueBasedOnAggregate(field, point) {
+  switch (field.aggregate) {
+    case 'percentage':
+      return Math.round(point.y * 100) / 100 + '%';
+    case 'percentagebyrow':
+      return round(point.percentage, 2) + '%';
+    default:
+      return isUndefined(point.value) ? point.y : point.value;
+  }
 }
 
 /**
@@ -108,19 +121,16 @@ export function getTooltipFormatter(fields, chartType) {
     const seriesName = point.series.name;
     const xLabel = getXLabel(point, fields, chartType);
     const xValue = getXValue(point, fields, chartType);
-
     const xString = `<tr>
       <td><strong>${xLabel}:</strong></td>
       <td>${xValue}</td>
     </tr>`;
-
     const yLabel = fields.g
       ? getFieldLabelWithAggregateFun(fields.y[0])
       : seriesName;
-
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
-      <td>${point.y}</td>
+      <td>${getYValueBasedOnAggregate(fields.y[0], point)}</td>
     </tr>`;
 
     const zLabel = fields.z ? getFieldLabelWithAggregateFun(fields.z) : '';
@@ -128,7 +138,6 @@ export function getTooltipFormatter(fields, chartType) {
       <td><strong>${zLabel}:</strong></td>
       <td>${point.z}</td>
     </tr>`;
-
     return `${xString}
       ${yString}
       ${fields.z ? zString : ''}`;

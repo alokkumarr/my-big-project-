@@ -4,6 +4,7 @@
 package com.sncr.saw.security.common.bean.repo;
 
 import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,13 +27,13 @@ public class TicketDetails implements Serializable {
 	private String custCode;
 	private String compName;
 	private String roleCode;
-	private String roleType;
+	private RoleType roleType;
 	private List<TicketDSKDetails> dataSKey;
     private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
-	
-	
+	private Integer isJvCustomer;
+	private Integer filterByCustomerCode;
 
 	public Long getUserId() {
 		return userId;
@@ -139,15 +140,23 @@ public class TicketDetails implements Serializable {
 	/**
 	 * @return the roleType
 	 */
-	public String getRoleType() {
+	public RoleType getRoleType() {
 		return roleType;
+	}
+
+	public Integer getFilterByCustomerCode() {
+		return filterByCustomerCode;
+	}
+
+	public void setFilterByCustomerCode(Integer filterByCustomerCode) {
+		this.filterByCustomerCode = filterByCustomerCode;
 	}
 
 	/**
 	 * @param roleType
 	 *            the roleType to set
 	 */
-	public void setRoleType(String roleType) {
+	public void setRoleType(RoleType roleType) {
 		this.roleType = roleType;
 	}
 
@@ -157,5 +166,13 @@ public class TicketDetails implements Serializable {
 
 	public void setProducts(ArrayList<Products> products) {
 		this.products = products;
+	}
+
+	public Integer getIsJvCustomer() {
+		return isJvCustomer;
+	}
+
+	public void setIsJvCustomer(Integer isJvCustomer) {
+		this.isJvCustomer = isJvCustomer;
 	}
 }

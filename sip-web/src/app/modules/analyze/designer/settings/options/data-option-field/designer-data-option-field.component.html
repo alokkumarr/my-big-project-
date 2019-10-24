@@ -4,6 +4,7 @@
 >
   <mat-expansion-panel-header class="data-option__header">
     <mat-panel-title class="data-option__display-name">
+      <mat-icon [fontIcon]="typeIcon"></mat-icon>
       {{ artifactColumn.displayName }}
     </mat-panel-title>
   </mat-expansion-panel-header>
@@ -33,13 +34,12 @@
       <aggregate-chooser-u
         (change)="onAggregateChange($event)"
         [columnType]="artifactColumn.type"
+        [artifactColumn]="artifactColumn"
         [analysisType]="analysisType"
         [aggregate]="artifactColumn.aggregate"
         [sipQuery]="sipQuery"
         [analysisSubtype]="analysisSubtype"
-        [enablePercentByRow]="
-          checkChartType()
-        "
+        [enablePercentByRow]="checkChartType()"
         fxFlex="75"
       >
       </aggregate-chooser-u>
@@ -69,7 +69,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Limit :</label>
+      <label fxFlex i18n>Limit:</label>
       <designer-data-limit-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -101,7 +101,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Format :</label>
+      <label fxFlex i18n>Format:</label>
       <designer-date-format-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -116,7 +116,7 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Format :</label>
+      <label fxFlex i18n>Format:</label>
       <designer-data-format-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
@@ -133,13 +133,37 @@
       fxLayout="row"
       fxLayoutAlign="start center"
     >
-      <label fxFlex i18n>Region :</label>
+      <label fxFlex i18n>Region:</label>
       <designer-region-selector
         (change)="change.emit($event)"
         [artifactColumn]="artifactColumn"
         fxFlex="75"
       >
       </designer-region-selector>
+    </div>
+
+    <div
+      *ngIf="!!artifactColumn.formula"
+      fxLayout="column"
+      fxLayoutAlign="start stretch"
+      class="data-option__formula"
+    >
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <label fxFlex>Formula:</label>
+        <button
+          mat-icon-button
+          matTooltip="Edit Formula"
+          (click)="
+            change.emit({
+              subject: 'updateDerivedMetric',
+              column: artifactColumn
+            })
+          "
+        >
+          <mat-icon fontIcon="icon-edit"></mat-icon>
+        </button>
+      </div>
+      <pre>{{ artifactColumn.formula }}</pre>
     </div>
   </div>
 </mat-expansion-panel>

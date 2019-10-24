@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
+import * as sortBy from 'lodash/sortBy';
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
 import * as replace from 'lodash/replace';
@@ -10,14 +11,13 @@ import * as slice from 'lodash/slice';
 import { json2csv } from 'json-2-csv';
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
-import * as isUndefined from 'lodash/isUndefined';
 import { saveAs } from 'file-saver';
 import * as Blob from 'blob';
 import * as get from 'lodash/get';
 
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { checkNullinReportData } from './../../../common/utils/dataFlattener';
+import { wrapFieldValues } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
@@ -35,22 +35,20 @@ export class AnalyzeExportService {
       .then(data => {
         let exportData = get(data, 'data');
         let fields = this.getCheckedFieldsForExport(analysis, exportData);
-        fields = this.checkColumnName(fields);
+        fields = this.cleanColumnNames(fields);
         const columnNames = map(fields, 'columnName');
         const exportOptions = {
           trimHeaderFields: false,
-          emptyFieldValue: '',
+          emptyFieldValue: 'null',
           checkSchemaDifferences: false,
           delimiter: {
-            wrap: '"',
+            wrap: '',
             eol: '\r\n'
           },
-          columnNames
+          keys: columnNames
         };
 
-        exportData = ['report', 'esReport'].includes(analysisType)
-          ? checkNullinReportData(exportData)
-          : exportData;
+        exportData = wrapFieldValues(exportData);
 
         json2csv(
           exportData,
@@ -65,6 +63,7 @@ export class AnalyzeExportService {
               fields,
               analysis
             );
+            // const csvWithUnwrappedNulls = this.unwrapNulls(csvWithDisplayNames);
             this.exportCSV(csvWithDisplayNames, analysis.name);
           },
           exportOptions
@@ -72,6 +71,20 @@ export class AnalyzeExportService {
       });
   }
 
+  unwrapNulls(csv) {
+    return replace(csv, /"null"/g, 'null');
+  }
+
+  /**
+   * Replaces columnName with displayName or alias in column headers to make it
+   * more user friendly.
+   *
+   * @param {*} csv
+   * @param {*} fields
+   * @param {*} analysis
+   * @returns
+   * @memberof AnalyzeExportService
+   */
   replaceCSVHeader(csv, fields, analysis) {
     const firstNewLine = indexOf(csv, '\n');
     const firstRow = slice(csv, 0, firstNewLine).join('');
@@ -86,24 +99,42 @@ export class AnalyzeExportService {
       .map(columnName => {
         const field = fields.find(f => f.columnName === columnName);
         if (!field) {
-          return columnName;
+          return `"${columnName}`;
         }
         if (field.aggregate === 'distinctCount' && analysis.type === 'report') {
-          return `distinctCount(${field.alias || field.displayName})`;
+          return `"distinctCount(${field.alias || field.displayName})"`;
         }
-        return field.alias || field.displayName;
+        return `"${field.alias || field.displayName}"`;
       })
       .join(',');
     return replace(csv, firstRow, displayNames);
   }
 
+  /**
+   * Returns all the fields that are selected by user.
+   *
+   * @param {*} analysis
+   * @param {*} data
+   * @returns
+   * @memberof AnalyzeExportService
+   */
   getCheckedFieldsForExport(analysis, data) {
     /* If report was using designer mode, find checked columns */
     if (!analysis.designerEdit && isDSLAnalysis(analysis)) {
-      return flatMap(analysis.sipQuery.artifacts, artifact =>
-        fpPipe(
-          fpMap(fpPick(['columnName', 'alias', 'displayName', 'aggregate']))
-        )(artifact.fields)
+      return sortBy(
+        flatMap(analysis.sipQuery.artifacts, artifact =>
+          fpMap(
+            fpPick([
+              'columnName',
+              'alias',
+              'displayName',
+              'aggregate',
+              'visibleIndex'
+            ]),
+            artifact.fields
+          )
+        ),
+        ['visibleIndex']
       );
     } else if (!analysis.designerEdit) {
       return flatMap(analysis.sqlBuilder.dataFields, artifact =>
@@ -125,23 +156,18 @@ export class AnalyzeExportService {
     }
   }
 
-  checkColumnName(columns) {
+  /**
+   * Returns the column name without the .keyword in it.
+   *
+   * @param {*} columns
+   * @returns
+   * @memberof AnalyzeExportService
+   */
+  cleanColumnNames(columns) {
     forEach(columns, column => {
-      column.columnName = this.getColumnName(column.columnName);
+      column.columnName = (column.columnName || '').replace('.keyword', '');
     });
     return columns;
-  }
-
-  getColumnName(columnName) {
-    // take out the .keyword form the columnName
-    // if there is one
-    if (!isUndefined(columnName)) {
-      const split = columnName.split('.');
-      if (split[1]) {
-        return split[0];
-      }
-      return columnName;
-    }
   }
 
   exportCSV(str, fileName) {

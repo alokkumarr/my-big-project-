@@ -10,6 +10,7 @@ import {
 import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
 import * as orderBy from 'lodash/orderBy';
+import * as filter from 'lodash/filter';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
@@ -28,6 +29,7 @@ export class DesignerFilterRowComponent implements OnInit {
   @Input() public filter: Filter;
   @Input() public isInRuntimeMode: boolean;
   @Input() public supportsGlobalFilters: boolean;
+  @Input() public showFilterOptions: boolean;
 
   @ViewChild('auto', { read: ViewContainerRef })
   _autoComplete: ViewContainerRef;
@@ -38,7 +40,11 @@ export class DesignerFilterRowComponent implements OnInit {
 
   @Input('artifactColumns')
   set _artifactColumns(data: ArtifactColumn[]) {
-    this.artifactColumns = orderBy(data, 'displayName');
+    this.artifactColumns = filter(
+      orderBy(data, 'displayName'),
+      /* Remove derived metric columns */
+      col => !col.expression
+    );
   }
 
   constructor() {
@@ -127,6 +133,6 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   displayWith(artifactColumn) {
-    return artifactColumn ? artifactColumn.displayName: '';
+    return artifactColumn ? artifactColumn.displayName : '';
   }
 }

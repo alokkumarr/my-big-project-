@@ -34,7 +34,7 @@ public class DataExportController {
 
   @RequestMapping(value = "/{analysisId}/executions/{executionId}/data", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
-  public ListenableFuture<ResponseEntity<DataResponse>> exportAnalyses(
+  public ResponseEntity<DataResponse> exportAnalyses(
       @PathVariable("executionId") String executionId,
       @PathVariable("analysisId") String analysisId,
       HttpServletRequest request, HttpServletResponse response) {
@@ -48,27 +48,26 @@ public class DataExportController {
     logger.debug(request.getHeader("Authorization"));
     logger.debug(request.getHeader("Host"));
     ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
-    responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request, analysisId, analysisType,executionType);
-    return responseObjectFuture;
+
+    return exportService.dataToBeExportedAsync(executionId, request, analysisId, analysisType, executionType);
   }
 
-    @RequestMapping(value = "/latestExecution/{analysisId}/data", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public ListenableFuture<ResponseEntity<DataResponse>> exportLatestAnalyses(
-        @PathVariable("analysisId") String analysisId,
-        HttpServletRequest request, HttpServletResponse response) {
+  @RequestMapping(value = "/latestExecution/{analysisId}/data", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<DataResponse> exportLatestAnalyses(
+      @PathVariable("analysisId") String analysisId,
+      HttpServletRequest request, HttpServletResponse response) {
 
-        String analysisType = request.getParameter("analysisType");
-        if (analysisType.equals("") || analysisType.isEmpty()) {
-            analysisType = "report"; // by default assume that it's report
-        }
-        String executionType = request.getParameter("executionType");
-        logger.debug(request.getHeader("Authorization"));
-        logger.debug(request.getHeader("Host"));
-        ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
-        responseObjectFuture = exportService.dataToBeExportedAsync(null, request, analysisId, analysisType,executionType);
-        return responseObjectFuture;
+    String analysisType = request.getParameter("analysisType");
+    if (analysisType.equals("") || analysisType.isEmpty()) {
+      analysisType = "report"; // by default assume that it's report
     }
+    String executionType = request.getParameter("executionType");
+    logger.debug(request.getHeader("Authorization"));
+    logger.debug(request.getHeader("Host"));
+
+    return exportService.dataToBeExportedAsync(null, request, analysisId, analysisType, executionType);
+  }
 
 
     @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
@@ -85,11 +84,10 @@ public class DataExportController {
       Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
       Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
       Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
-      String type = (String) ((LinkedHashMap) dispatchBean).get("type");
       if (s3Obj == null
           && ftpObj == null
           && recipientsObj == null
-          && !type.equalsIgnoreCase("chart")) {
+          && !analysisType.equalsIgnoreCase("chart")) {
         throw new RuntimeException("Either one of the dispatcher(S3, ftp, email) is mandatory!!.");
       }
     } else {

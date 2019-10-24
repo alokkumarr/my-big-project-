@@ -4,7 +4,7 @@ import { ChartService } from '../../common/services/chart.service';
 import { MapDataService } from '../../common/components/charts/map-data.service';
 
 import { AnalyzeService } from './services/analyze.service';
-import { DesignerService } from './designer';
+import { DesignerService } from './designer/designer.module';
 import { AnalyzeDialogService } from './services/analyze-dialog.service';
 import { AnalyzeActionsService } from './actions/analyze-actions.service';
 

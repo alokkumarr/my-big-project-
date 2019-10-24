@@ -7,7 +7,7 @@ import { JwtService } from './jwt.service';
 const loginUrl = AppConfig.login.url;
 const refreshTokenEndpoint = 'getNewAccessToken';
 import { BehaviorSubject } from 'rxjs';
-import { CommonResetStateOnLogout } from '../actions/menu.actions';
+import { CommonResetStateOnLogout } from '../actions/common.actions';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 

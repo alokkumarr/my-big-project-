@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
@@ -9,12 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.google.gson.Gson;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.QueryBuilderUtil;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.SIPDSL;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
@@ -74,6 +77,10 @@ public class StorageProxyController {
   private String metaDataServiceExport;
 
   @Autowired private RestUtil restUtil;
+
+  public static final String CUSTOMER_CODE = "customerCode";
+
+  public Gson gson = new Gson();
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -225,13 +232,15 @@ public class StorageProxyController {
     if (sipdsl == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
+    Boolean isAlert = sipdsl.getType().equalsIgnoreCase("alert");
+    Ticket authTicket = request != null && !isAlert ? getTicket(request) : null;
+    if (authTicket == null && !isAlert) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+      List<TicketDSKDetails> dskList =
+          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -239,6 +248,7 @@ public class StorageProxyController {
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     String analysisType = sipdsl.getType();
+
     try {
       // proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody),
       // "contents");
@@ -300,7 +310,7 @@ public class StorageProxyController {
           ExecutionType executionType,
       HttpServletRequest request,
       HttpServletResponse response)
-      throws JsonProcessingException {
+      throws JsonProcessingException ,IllegalAccessException{
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
@@ -308,8 +318,8 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
-    if (authTicket == null && !isScheduledExecution) {
+    Ticket authTicket = request != null ? getTicket(request) : null;
+    if (authTicket == null) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
@@ -317,7 +327,6 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    List<Object> responseObjectFuture = null;
     SipQuery savedQuery =
         getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -325,8 +334,51 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
+    List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
+
+    // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
+    // code.
+    if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+      String analysisType = analysis.getType();
+      DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
+      List<String> artsName = getArtsNames(savedQuery);
+      List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
+      Boolean designerEdit =
+          analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+      if (analysisType.equalsIgnoreCase("report") && designerEdit) {
+        logger.trace("Artifact Name : " + artsName);
+        for (String artifact : artsName) {
+          String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
+          if (query.contains(" " + artifact + " ")) {
+            dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
+          }
+        }
+      } else {
+        for (String artifact : sipQueryArts) {
+            dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
+        }
+      }
+
+      List<DataSecurityKeyDef> dataSecurityKeyDefList;
+      if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
+        dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
+        dataSecurityKeyDefList.addAll(customerFilterDsks);
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+      } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
+        dataSecurityKeyDefList = customerFilterDsks;
+        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
+      }
+    }
+
+    logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
 
     try {
       Long startTime = new Date().getTime();
@@ -357,8 +409,10 @@ public class StorageProxyController {
                 executionType,
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
-      } else if (tempExecutionType) {
-        if (!analysis.getType().equalsIgnoreCase("report")) {
+      }
+      if (!analysis.getType().equalsIgnoreCase("report")) {
+        logger.info("analysis ." + "not a DL report");
+        if (tempExecutionType) {
           ExecutionResult executionResult =
               buildExecutionResult(
                   executeResponse.getExecutionId(),
@@ -370,6 +424,15 @@ public class StorageProxyController {
                   (List<Object>) executeResponse.getData());
           proxyService.saveTtlExecutionResult(executionResult);
         }
+        // return only requested data based on page no and page size, only for FE
+        List<Object> pagingData =
+            proxyService.pagingData(page, pageSize, (List<Object>) executeResponse.getData());
+        /* If FE is sending the page no and page size then we are setting only   data that
+         * corresponds to page no and page size in response instead of  total data.
+         * For DL reports skipping this step as response from DL is already paginated.
+         * */
+        executeResponse.setData(
+            pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
@@ -385,11 +448,14 @@ public class StorageProxyController {
       throw sipExeception;
     } catch (RuntimeException runTimeExecption) {
       throw runTimeExecption;
+    } catch (IllegalAccessException illegalArgumentException) {
+      throw illegalArgumentException;
     } catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
       throw new RuntimeException("Exception generated while processing incoming json.");
     }
-    logger.trace("response data {}", objectMapper.writeValueAsString(executeResponse));
+    logger.trace(
+        "response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
     return executeResponse;
   }
 
@@ -424,6 +490,7 @@ public class StorageProxyController {
     executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
     executionResult.setStatus("success");
     executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    executionResult.setRecordCount(data.size());
     return executionResult;
   }
 

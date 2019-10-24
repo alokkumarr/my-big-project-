@@ -51,6 +51,7 @@ gridster.dashboard-gridster {
       .backdrop {
         visibility: visible;
         opacity: 1;
+        z-index: 999;
       }
     }
 
@@ -73,6 +74,7 @@ gridster.dashboard-gridster {
         visibility: visible;
         opacity: 1;
         transition: visibility 500ms, opacity 500ms;
+        z-index: 999;
       }
     }
 

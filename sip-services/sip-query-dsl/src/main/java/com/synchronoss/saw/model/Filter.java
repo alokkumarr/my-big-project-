@@ -41,6 +41,9 @@ public class Filter {
   @JsonProperty("isGlobalFilter")
   private Boolean isGlobalFilter;
 
+  @JsonProperty("isAggregationFilter")
+  private Boolean isAggregationFilter;
+
   @JsonProperty("model")
   private Model model;
 
@@ -104,7 +107,21 @@ public class Filter {
     this.isGlobalFilter = isGlobalFilter;
   }
 
-  @JsonProperty("model")
+  /**
+   * Gets isAggregationFilter
+   *
+   * @return value of isAggregationFilter
+   */
+  public Boolean getAggregationFilter() {
+    return isAggregationFilter;
+  }
+
+  /** Sets isAggregationFilter */
+  public void setAggregationFilter(Boolean aggregationFilter) {
+    isAggregationFilter = aggregationFilter;
+  }
+
+    @JsonProperty("model")
   public Model getModel() {
     return model;
   }
@@ -123,6 +140,7 @@ public class Filter {
         .append("columnName", columnName)
         .append("isRuntimeFilter", isRuntimeFilter)
         .append("isGlobalFilter", isGlobalFilter)
+        .append("isAggregationFilter",isAggregationFilter)
         .append("model", model)
         .toString();
   }
@@ -135,6 +153,7 @@ public class Filter {
         .append(artifactsName)
         .append(columnName)
         .append(isGlobalFilter)
+        .append(isAggregationFilter)
         .append(type)
         .append(isOptional)
         .toHashCode();
@@ -155,6 +174,7 @@ public class Filter {
         .append(artifactsName, rhs.artifactsName)
         .append(columnName, rhs.columnName)
         .append(isGlobalFilter, rhs.isGlobalFilter)
+        .append(isAggregationFilter,rhs.isAggregationFilter)
         .append(type, rhs.type)
         .append(isOptional, rhs.isOptional)
         .isEquals();
