@@ -14,6 +14,7 @@ import { Select, Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as reduce from 'lodash/reduce';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -203,7 +204,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       }
       this._store.dispatch(
         new DesignerAddColumnToGroupAdapter(
-          column,
+          cloneDeep(column),
           event.currentIndex,
           adapterIndex
         )
