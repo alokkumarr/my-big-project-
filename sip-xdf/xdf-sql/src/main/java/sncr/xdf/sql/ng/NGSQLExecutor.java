@@ -57,6 +57,22 @@ public class NGSQLExecutor implements Serializable {
                 long st = System.currentTimeMillis();
                 descriptor.startTime =  st;
                 Dataset<Row> df = null;
+                
+                
+                Set<String> tablesFrmFile = new HashSet<String>();    
+				if (parent.getNgctx().datafileDFmap == null) {
+					tablesFrmFile = allTables.keySet();
+					
+				} else {
+					
+					for (String key : allTables.keySet()) {
+						if (!parent.getNgctx().datafileDFmap.containsKey(key)) {
+							tablesFrmFile.add(key);
+	
+						}
+					}
+				}
+                
 
 
                 Set<String> tablesFrmFile = new HashSet<String>();
