@@ -100,14 +100,14 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   constructGlobalFilter(model, kpiFilters) {
-    const globalFilters = this._kpi.filters.length === 1
+    const globalFilters = kpiFilters.length === 1
     // Check backward compatibility
     ? fpPipe(
       fpMap(filt => {
         filt.model = model;
         return filt;
       })
-    )(this._kpi.filters)
+    )(kpiFilters)
     : fpPipe(
       fpMap(filt => {
         if (filt.primaryKpiFilter) {
