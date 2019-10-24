@@ -73,23 +73,6 @@ public class NGSQLExecutor implements Serializable {
 					}
 				}
                 
-
-
-                Set<String> tablesFrmFile = new HashSet<String>();
-				if (parent.getNgctx().datafileDFmap == null) {
-					tablesFrmFile = allTables.keySet();
-
-				} else {
-
-					for (String key : allTables.keySet()) {
-						if (!parent.getNgctx().datafileDFmap.containsKey(key)) {
-							tablesFrmFile.add(key);
-
-						}
-					}
-				}
-
-
                 if (parent.getNgctx().inputDataSets.size() > 0) {
 
                     for (String tn : tablesFrmFile) {
