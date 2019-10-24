@@ -267,7 +267,8 @@ public class RestUtil {
           }
         }
         if (!isValid) {
-          throw new SipNotProcessedSipEntityException(nodeName + ":'" + nodeText + "' is not valid");
+          throw new SipNotProcessedSipEntityException(
+              nodeName + ":'" + nodeText + "' is not valid");
         }
       }
     }
