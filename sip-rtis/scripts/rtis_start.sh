@@ -160,8 +160,6 @@ then
         $java_opts \
         -Dhttps.port=$RTIS_PORT \
         -Dhttp.port=disabled \
-        -Dplay.server.https.keyStore.path=$KEY_STORE_PATH \
-        -Dplay.server.https.keyStore.password=$KEY_STORE_PASSWORD \
         -Dpidfile.path=$pidfile_path \
         -Dlog.dir=${log_dir} \
         -Duser.dir=${user_dir}

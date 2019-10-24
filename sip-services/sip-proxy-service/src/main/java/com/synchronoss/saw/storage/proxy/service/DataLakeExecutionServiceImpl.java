@@ -308,7 +308,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       for (String artifactName : semanticArtifactNames) {
         flag = false;
         dskFilter = " (Select * from ";
-        if (query.toUpperCase().contains(" " + artifactName + " ")) {
+        if (query.toUpperCase().contains(artifactName)) {
           for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
             String[] col = dsk.getName().split("\\.");
 
@@ -316,7 +316,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               flag = true;
               if (dskFilter.equalsIgnoreCase(tempStr)) dskFilter = dskFilter.concat(col[0]);
               if (!dskFilter.contains("WHERE")) {
-                dskFilter = dskFilter.concat(" WHERE " + dsk.getName() + " in (");
+                dskFilter = dskFilter.concat(" WHERE upper(" + dsk.getName() + ") in (");
               } else {
                 dskFilter = dskFilter.concat(" AND " + dsk.getName() + " in (");
               }
@@ -324,7 +324,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               int initFlag = 0;
               for (String value : values) {
                 dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
-                dskFilter = dskFilter.concat("'" + value + "'");
+                dskFilter = dskFilter.concat("upper('" + value + "')");
                 initFlag++;
               }
               dskFilter = dskFilter.concat(")");
@@ -334,9 +334,12 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
           if (flag) {
             dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
             query = query + " ";
-            String artName = " " + artifactName + " ";
+            String artName = "FROM " + artifactName;
             logger.trace("dskFilter str = " + dskFilter);
-            query = query.toUpperCase().replaceAll(artName.toUpperCase(), dskFilter);
+            query = query.trim().replaceAll("\\s{2,}", " ")
+                .replaceAll("(?i)"+artName.toUpperCase(), "FROM "+dskFilter);
+              String artName1 = "JOIN " + artifactName;
+              query = query.replaceAll("(?i)"+artName1.toUpperCase(),"JOIN "+dskFilter);
             logger.info("Logged query : " + query);
           }
         }
