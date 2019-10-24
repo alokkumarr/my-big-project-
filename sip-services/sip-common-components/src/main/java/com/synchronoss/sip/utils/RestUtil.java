@@ -53,7 +53,7 @@ public class RestUtil {
   private Boolean sipSslEnable;
 
   public static final String sanatizeAndValidateregEx =
-      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/]";
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()]";
   public static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
@@ -259,7 +259,6 @@ public class RestUtil {
             isValid = ESAPI.validator().isValidInput(
                 "Validating Digit " + "attributes value for intrusion", nodeText, "Digit",
                 nodeText.length(), false);
-
             logger.trace("Attribute is of type Json");
             ObjectMapper m = new ObjectMapper();
             JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));

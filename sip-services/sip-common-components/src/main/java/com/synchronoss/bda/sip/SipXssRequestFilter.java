@@ -49,29 +49,29 @@ public class SipXssRequestFilter extends GenericFilterBean {
         for (String data : valueString) {
           logger.trace("query parameter value: " + data);
           data = data.replaceAll(RestUtil.sanatizeAndValidateregEx, RestUtil.noSpace);
-          System.out.println(data);
-          Boolean queryIsValid =
-              ESAPI.validator().isValidInput("Validating query parameter value for intrusion", data,
-                  "Digit", data.length(), false);
-
-          if (!queryIsValid) {
-            queryIsValid =
+          if (data != null && !data.trim().equals(RestUtil.noSpace)) {
+            Boolean queryIsValid =
                 ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
-                    data, "SafeText", data.length(), false);
-            logger.trace("queryIsValid Query Parameter: " + queryIsValid);
-          }
-          if (!queryIsValid) {
-            res.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
-            logger.trace(
-                "Check for cross-site scripting: reflected in query parameter value: " + data);
-            throw new SipNotProcessedSipEntityException(
-                "Check for cross-site scripting: " + "reflected in query parameter value: " + data);
+                    data, "Digit", data.length(), false);
+            if (!queryIsValid) {
+              queryIsValid =
+                  ESAPI.validator().isValidInput("Validating query parameter value for intrusion",
+                      data, "SafeText", data.length(), false);
+              logger.trace("queryIsValid Query Parameter: " + queryIsValid);
+            }
+            if (!queryIsValid) {
+              res.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+              logger.trace(
+                  "Check for cross-site scripting: reflected in query parameter value: " + data);
+              throw new SipNotProcessedSipEntityException("Check for cross-site scripting: "
+                  + "reflected in query parameter value: " + data);
+            }
           }
         }
       }
     }
     if (!isValid) {
-      logger.info("Cross-site scripting: reflected: " + !isValid);
+      logger.trace("Cross-site scripting: reflected: " + !isValid);
       res.sendError(HttpStatus.UNAUTHORIZED.value(),
           "Cross-site scripting: reflected: " + !isValid);
       return;
