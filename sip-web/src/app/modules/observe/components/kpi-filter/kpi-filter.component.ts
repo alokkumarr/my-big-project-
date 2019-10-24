@@ -135,8 +135,9 @@ export class KPIFilterComponent implements OnInit, OnDestroy {
     const kpiFilterSubscription = this.kpiFilterForm.valueChanges
       .pipe(debounceTime(500))
       .subscribe(data => {
-        this.kpiFilterForm.valid &&
-          this.onModelChange.emit(this.getFilterModel());
+        // User will select no value in preset options dropdown to remove the global filters already applied
+        // In that scenario the operation should carry on even if the form is invalid.
+        this.onModelChange.emit(this.getFilterModel());
       });
 
     this.listeners.push(kpiFilterSubscription);

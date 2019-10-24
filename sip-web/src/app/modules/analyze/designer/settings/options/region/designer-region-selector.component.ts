@@ -41,10 +41,11 @@ export class DesignerRegionSelectorComponent implements OnInit {
   }
 
   onRegionSelected(geoRegion) {
-    const { table, columnName } = this.artifactColumn;
+    const { table, columnName, dataField } = this.artifactColumn;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         table,
+        dataField,
         columnName,
         geoRegion
       })

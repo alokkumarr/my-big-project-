@@ -171,7 +171,8 @@ export class DesignerAddArtifactColumn {
 export class DesignerRemoveArtifactColumn {
   static readonly type = '[Designer] Remove artifact column from analysis';
   constructor(
-    public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>
+    public artifactColumn: Partial<ArtifactColumnDSL & ArtifactColumnChart>,
+    public fieldArea?: string
   ) {}
 }
 
