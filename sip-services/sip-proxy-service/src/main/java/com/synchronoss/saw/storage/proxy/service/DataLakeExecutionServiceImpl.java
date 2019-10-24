@@ -316,7 +316,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               flag = true;
               if (dskFilter.equalsIgnoreCase(tempStr)) dskFilter = dskFilter.concat(col[0]);
               if (!dskFilter.contains("WHERE")) {
-                dskFilter = dskFilter.concat(" WHERE " + dsk.getName() + " in (");
+                dskFilter = dskFilter.concat(" WHERE upper(" + dsk.getName() + ") in (");
               } else {
                 dskFilter = dskFilter.concat(" AND " + dsk.getName() + " in (");
               }
@@ -324,7 +324,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               int initFlag = 0;
               for (String value : values) {
                 dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
-                dskFilter = dskFilter.concat("'" + value + "'");
+                dskFilter = dskFilter.concat("upper('" + value + "')");
                 initFlag++;
               }
               dskFilter = dskFilter.concat(")");
@@ -336,10 +336,10 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
             query = query + " ";
             String artName = "FROM " + artifactName;
             logger.trace("dskFilter str = " + dskFilter);
-            query = query.toUpperCase().trim().replaceAll("\\s{2,}", " ")
-                .replaceAll(artName.toUpperCase(), "FROM "+dskFilter);
+            query = query.trim().replaceAll("\\s{2,}", " ")
+                .replaceAll("(?i)"+artName.toUpperCase(), "FROM "+dskFilter);
               String artName1 = "JOIN " + artifactName;
-              query = query.replaceAll(artName1.toUpperCase(),"JOIN "+dskFilter);
+              query = query.replaceAll("(?i)"+artName1.toUpperCase(),"JOIN "+dskFilter);
             logger.info("Logged query : " + query);
           }
         }
