@@ -117,13 +117,18 @@
 			<version>2.7.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+		    <groupId>org.owasp.esapi</groupId>
+		    <artifactId>esapi</artifactId>
+		    <version>2.2.0.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
 			<scope>test</scope>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -203,6 +208,12 @@
 								<entry>
 									<name>/usr/lib/systemd/system/sip-gateway.service</name>
 									<file>src/main/system/sip-gateway.service</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-gateway-service/conf</name>
+									<collect>
+										<from>${project.basedir}/../../src/main/resources/properties</from>
+									</collect>
 								</entry>
 							</entries>
 							<afterInstallation>
