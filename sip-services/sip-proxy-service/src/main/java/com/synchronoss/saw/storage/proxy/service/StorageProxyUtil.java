@@ -16,6 +16,7 @@ import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
@@ -112,15 +113,14 @@ public class StorageProxyUtil {
   /**
    * This will fetch the SIP query from metadata and provide.
    *
-   * @param sipQuery
+   * @param semanticId
    * @return SipQuery
    */
   public static SipQuery getSipQuery(
-      SipQuery sipQuery,
+      String semanticId,
       String metaDataServiceExport,
       HttpServletRequest request,
       RestUtil restUtil) {
-    String semanticId = sipQuery != null ? sipQuery.getSemanticId() : null;
     logger.info(
         "URI being prepared"
             + metaDataServiceExport
@@ -307,4 +307,5 @@ public class StorageProxyUtil {
     }
     return artifactNames;
   }
+
 }

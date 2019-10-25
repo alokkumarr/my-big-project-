@@ -4,6 +4,9 @@
   </h2>
 </div>
 <div *ngIf="isTileSizeOk">
+  <div class="filter-icon-bullet" *ngIf="_kpi.filters.length > 1">
+    <mat-icon class="mat-icon icon-info-solid" fonticon="icon-info-solid" matTooltip="View Filters" (click)="displayFilters()"></mat-icon>
+  </div>
   <chart
     *ngIf="item.bullet.kpiDisplay === 'bullet' || !item.bullet.kpiDisplay"
     e2e="target-kpi"

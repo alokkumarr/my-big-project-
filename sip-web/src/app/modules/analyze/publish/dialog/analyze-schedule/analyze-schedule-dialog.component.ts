@@ -287,9 +287,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.startDateCorrectFlag =
       moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
-      emails: ['chart', 'map'].includes(this.data.analysis.type)
-        ? true
-        : !isEmpty(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
       startDate:

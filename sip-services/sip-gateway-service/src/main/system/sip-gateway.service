@@ -2,7 +2,7 @@
 Description=SIP Gateway
 
 [Service]
-ExecStart=/bin/sh -c "exec java -Xmx1G -jar /opt/bda/saw-gateway-service/saw-gateway.jar --spring.config.location=/opt/bda/saw-gateway-service/conf/application.yml"
+ExecStart=/bin/sh -c "exec java -Xmx1G -jar /opt/bda/saw-gateway-service/saw-gateway.jar -Dorg.owasp.esapi.resources=/opt/bda/saw-gateway-service/conf --spring.config.location=/opt/bda/saw-gateway-service/conf/application.yml"
 SyslogIdentifier=sip-gateway
 User=mapr
 Restart=on-failure

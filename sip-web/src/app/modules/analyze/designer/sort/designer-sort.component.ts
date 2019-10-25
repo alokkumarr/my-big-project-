@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpFilter from 'lodash/fp/filter';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
@@ -9,6 +8,7 @@ import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as take from 'lodash/take';
 import * as has from 'lodash/has';
+import * as uniqBy from 'lodash/uniqBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isUndefined from 'lodash/isUndefined';
 import * as takeRight from 'lodash/takeRight';
@@ -16,10 +16,11 @@ import {
   ArtifactColumns,
   ArtifactColumn,
   ArtifactColumnReport,
-  Artifact,
   Sort
 } from '../types';
 import { TYPE_MAP } from '../../consts';
+import { ArtifactDSL } from '../../models';
+import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
 
 @Component({
   selector: 'designer-sort',
@@ -28,7 +29,7 @@ import { TYPE_MAP } from '../../consts';
 })
 export class DesignerSortComponent implements OnInit {
   @Output() public sortsChange: EventEmitter<Sort[]> = new EventEmitter();
-  @Input() public artifacts: Artifact[];
+  @Input() public artifacts: ArtifactDSL[];
   @Input() public sorts: Sort[];
 
   public checkedFields: ArtifactColumns = [];
@@ -62,20 +63,23 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
+  displayNameFor(column) {
+    return displayNameWithoutAggregateFor(column);
+  }
+
   isSort(item) {
     return has(item, 'order');
   }
 
   ngOnInit() {
     this.checkedFields = fpPipe(
-      fpFlatMap((artifact: Artifact) => {
-        return map(artifact.columns, column => {
+      fpFlatMap((artifact: ArtifactDSL) => {
+        return map(artifact.fields, column => {
           const cloned = clone(column);
-          cloned.artifactsName = artifact.artifactName;
+          cloned.artifactsName = artifact.artifactsName;
           return cloned;
         });
-      }),
-      fpFilter('checked')
+      })
     )(this.artifacts);
     this.availableFields = this.getAvailableFields(
       this.checkedFields,
@@ -84,7 +88,7 @@ export class DesignerSortComponent implements OnInit {
     this.nameMap = reduce(
       this.checkedFields,
       (accumulator, field) => {
-        accumulator[field.columnName] = field.displayName;
+        accumulator[field.columnName] = this.displayNameFor(field);
         return accumulator;
       },
       {}
@@ -124,17 +128,20 @@ export class DesignerSortComponent implements OnInit {
   }
 
   getAvailableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
-    return filter(checkedFields, field => {
-      return (
-        !field.expression && // derived metrics are not supported for sorts
-        !find(this.sorts, ({ columnName, artifactsName }) =>
-          isUndefined(artifactsName)
-            ? columnName === field.columnName
-            : artifactsName === field.artifactsName &&
-              columnName === field.columnName
-        )
-      );
-    });
+    return uniqBy(
+      filter(checkedFields, field => {
+        return (
+          !field.expression && // derived metrics are not supported for sorts
+          !find(this.sorts, ({ columnName, artifactsName }) =>
+            isUndefined(artifactsName)
+              ? columnName === field.columnName
+              : artifactsName === field.artifactsName &&
+                columnName === field.columnName
+          )
+        );
+      }),
+      field => field.columnName
+    );
   }
 
   onSortOrderChange(sort, value) {

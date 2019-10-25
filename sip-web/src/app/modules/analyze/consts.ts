@@ -3,6 +3,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import moment from 'moment';
 
 import {
   NUMBER_TYPES,
@@ -493,3 +494,40 @@ export const STRING_FILTER_OPERATORS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(STRING_FILTER_OPERATORS);
+
+export const getFilterValue = (filter) => {
+  const { type } = filter;
+  if (!filter.model) {
+    return '';
+  }
+
+  const {
+    modelValues,
+    value,
+    operator,
+    otherValue,
+    preset,
+    lte,
+    gte
+  } = filter.model;
+
+  if (type === 'string') {
+    const operatoLabel = STRING_FILTER_OPERATORS_OBJ[operator].label;
+    return `: ${operatoLabel} ${modelValues.join(', ')}`;
+  } else if (NUMBER_TYPES.includes(type)) {
+    const operatoLabel = NUMBER_FILTER_OPERATORS_OBJ[operator].label;
+    if (operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
+      return `: ${operatoLabel} ${value}`;
+    }
+    return `: ${otherValue} ${operatoLabel} ${value}`;
+  } else if (DATE_TYPES.includes(type)) {
+    if (preset === CUSTOM_DATE_PRESET_VALUE) {
+      return `: From ${gte} To ${lte}`;
+    } else if (operator === 'BTW') {
+      return `: From ${moment(value).format('YYYY-MM-DD')} to ${moment(
+        otherValue
+      ).format('YYYY-MM-DD')}`;
+    }
+    return `: ${preset}`;
+  }
+};

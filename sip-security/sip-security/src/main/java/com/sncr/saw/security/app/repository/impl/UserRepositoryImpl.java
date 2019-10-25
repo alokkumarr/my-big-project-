@@ -1,7 +1,9 @@
 package com.sncr.saw.security.app.repository.impl;
 
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.Module;
@@ -35,6 +37,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,49 +80,109 @@ public class UserRepositoryImpl implements UserRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	/**
-	 * Authenticates sso user.
-	 * 
-	 * @param masterLoginId
-	 * @param password
-	 * @return
-	 */
+    @Autowired
+    private NSSOProperties nSSOProperties;
 
-	public boolean[] authenticateUser(String masterLoginId, String password) {
-		boolean isAuthenticated = false;
-		boolean isPasswordActive = false;
-		boolean[] ret = { false, false };
+  /**
+   * Authenticates sso user.
+   *
+   * @param masterLoginId
+   * @param password
+   * @return
+   */
+  public boolean[] authenticateUser(String masterLoginId, String password) {
+    boolean isAuthenticated = false;
+    boolean isPasswordActive = false;
+    boolean[] ret = {false, false, false};
 
-		password = Ccode.cencode(password).trim();
-		String pwd = password;
-		String sql = "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS " + "FROM USERS U, CUSTOMERS C "
-				+ "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? " + " AND U.ACTIVE_STATUS_IND = '1' "
-				+ "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
-		try {
-			PasswordDetails passwordDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, masterLoginId);
-					preparedStatement.setString(2, pwd);
-				}
-			}, new UserRepositoryImpl.PwdDetailExtractor());
+    int lockingTime = nSSOProperties.getLockingTime();
+    int maxInvalidPwdLimit = nSSOProperties.getMaxInvalidPwdLimit();
+    logger.debug("lockingTime : {} ",lockingTime);
+    logger.debug("maxInvalidPwdLimit : {} ",maxInvalidPwdLimit);
 
-			if (passwordDetails != null) {
-				isAuthenticated = true;
-				if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
-					isPasswordActive = true;
-				}
-				ret[0] = isAuthenticated;
-				ret[1] = isPasswordActive;
-			}
-		} catch (DataAccessException de) {
-			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
-			throw de;
-		} catch (Exception e) {
-			logger.error("Exception encountered while authenticating user : " + e.getMessage(), null, e);
-		}
+    password = Ccode.cencode(password).trim();
+    String pwd = password;
+    String sql =
+        "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS "
+            + "FROM USERS U, CUSTOMERS C "
+            + "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? "
+            + " AND U.ACTIVE_STATUS_IND = '1' "
+            + "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
+    try {
+      PasswordDetails passwordDetails =
+          jdbcTemplate.query(
+              sql,
+              new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                  preparedStatement.setString(1, masterLoginId);
+                  preparedStatement.setString(2, pwd);
+                }
+              },
+              new UserRepositoryImpl.PwdDetailExtractor());
 
-		return ret;
-	}
+      if (passwordDetails != null) {
+        isAuthenticated = true;
+        if (!isPwdExpired(
+            passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
+          isPasswordActive = true;
+        }
+        ret[0] = isAuthenticated;
+        ret[1] = isPasswordActive;
+      }
+      UserUnsuccessfulLoginAttemptBean userLoginCount = getUserUnsuccessfulLoginAttempt(masterLoginId);
+      if (userLoginCount != null && userLoginCount.getUserId() != null) {
+        if (userLoginCount.getInvalidPassWordCount() == null)
+          userLoginCount.setInvalidPassWordCount(0L);
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long diff = date.getTime() - userLoginCount.getLastUnsuccessLoginTime().getTime();
+        long diffMinutes = diff / (60 * 1000) % 60;
+        if (!isAuthenticated) {
+          logger.debug(
+              "Current dateTime : {} Last Unsuccessful login : {} ",
+              dateFormat.format(date),
+              dateFormat.format(userLoginCount.getLastUnsuccessLoginTime()));
+          logger.debug(
+              "Date.getTime : {} , Last Unsuccessful login time : {} ",
+              date.getTime(),
+              userLoginCount.getLastUnsuccessLoginTime().getTime());
+          logger.info("Diff in minutes : {} ", diffMinutes);
+          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit - 1
+              && diffMinutes < lockingTime) {
+            updateInvalidLoginCount(
+                userLoginCount.getUserSysId(),
+                (int) (userLoginCount.getInvalidPassWordCount() + 1));
+
+            ret[2] = true;
+            logger.info(
+                "Maximum Attempts reached, user account is locked.!!, Contact Administrator.");
+          } else {
+            updateInvalidLoginCount(
+                userLoginCount.getUserSysId(),
+                (int) (userLoginCount.getInvalidPassWordCount() + 1));
+          }
+        } else {
+          if (userLoginCount.getInvalidPassWordCount() >= maxInvalidPwdLimit
+              && diffMinutes < lockingTime) {
+            ret[2] = true; // Lock the account.
+            ret[0] =
+                false; // In locking period even though user gives right credentials, he shouldn't
+            // be allowed login till specified time.
+            logger.info("Maximum Attempts reached, user account is locked.!!");
+          } else {
+            updateInvalidLoginCount(userLoginCount.getUserSysId(), 0);
+          }
+        }
+      }
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error("Exception encountered while authenticating user : " + e.getMessage(), null, e);
+    }
+
+    return ret;
+  }
 
 	private boolean isPwdExpired(Date pwd_Modified_Date, int pwd_Expiration_Days) {
 		String sysDate = DateUtil.getSysDate(); // This is in MM/dd/yyyy
@@ -3227,5 +3291,79 @@ public class UserRepositoryImpl implements UserRepository {
       }
       return isValid;
     }
+  }
+
+  public UserUnsuccessfulLoginAttemptBean getUserUnsuccessfulLoginAttempt(String userId) {
+    UserUnsuccessfulLoginAttemptBean userList = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.UNSUCCESSFUL_LOGIN_ATTEMPT, U.LAST_UNSUCCESS_LOGIN_TIME "
+            + "  FROM USERS U WHERE U.USER_ID = ?";
+    try {
+      userList =
+          jdbcTemplate.query(
+              sql,
+              new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                  preparedStatement.setString(1, userId);
+                }
+              },
+              new UserRepositoryImpl.UserLoginCountExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+
+    return userList;
+  }
+
+  public class UserLoginCountExtractor implements ResultSetExtractor<UserUnsuccessfulLoginAttemptBean> {
+
+    @Override
+    public UserUnsuccessfulLoginAttemptBean extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+      UserUnsuccessfulLoginAttemptBean user = new UserUnsuccessfulLoginAttemptBean();
+      while (rs.next()) {
+        user.setUserSysId(rs.getLong("USER_SYS_ID"));
+        user.setUserId(rs.getString("USER_ID"));
+        user.setInvalidPassWordCount(rs.getLong("UNSUCCESSFUL_LOGIN_ATTEMPT"));
+        user.setLastUnsuccessLoginTime(rs.getDate("LAST_UNSUCCESS_LOGIN_TIME"));
+      }
+      return user;
+    }
+  }
+
+  public String updateInvalidLoginCount(Long userSysId, int count) {
+    String sql =
+        "update users u set u.UNSUCCESSFUL_LOGIN_ATTEMPT='"
+            + count
+            + "' "
+            + " , u.LAST_UNSUCCESS_LOGIN_TIME = sysdate() where u.USER_SYS_ID ='"
+            + userSysId
+            + "'";
+    String message = null;
+    try {
+
+      Integer cnt = jdbcTemplate.update(sql);
+
+      if (cnt == 0) {
+        message = "No user found for updating new password value.";
+      }
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while updating users table : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while updating unsuccess attempt for user " + e.getMessage(),
+          userSysId,
+          null,
+          e);
+      message = "Error encountered while updating Unsuccess login attempt count.";
+    }
+    return message;
   }
 }

@@ -41,20 +41,12 @@ export class ExportPageState {
 
   @Selector()
   static exportList(state: ExportPageModel): any[] {
-    const analyses = state.exportData.analyses.map(analysis => ({
-      ...analysis,
-      metricName: (state.metrics[analysis.semanticId] || {}).name
-    }));
-    return [...analyses, ...state.exportData.dashboards];
+    return state.exportData.analyses;
   }
 
   @Selector()
   static categoryAnalyses(state: ExportPageModel): any[] {
-    const analyses = state.categoryAnalyses.map(analysis => ({
-      ...analysis,
-      metricName: (state.metrics[analysis.semanticId] || {}).name
-    }));
-    return analyses;
+    return state.categoryAnalyses;
   }
 
   @Selector()
@@ -103,10 +95,7 @@ export class ExportPageState {
   }
 
   @Action(ExportLoadMetrics)
-  loadMetrics(
-    { patchState, getState }: StateContext<ExportPageModel>,
-    { categoryId }: ExportLoadAnalyses
-  ) {
+  loadMetrics({ patchState, getState }: StateContext<ExportPageModel>) {
     const metrics = getState().metrics;
     const newMetrics = {};
     return this.exportService.getMetricList$().pipe(

@@ -1,12 +1,24 @@
 package com.sncr.saw.security.app.repository.impl.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.service.TicketHelperImpl;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.Module;
+import com.sncr.saw.security.common.bean.Product;
+import com.sncr.saw.security.common.bean.RefreshToken;
+import com.sncr.saw.security.common.bean.ResetValid;
+import com.sncr.saw.security.common.bean.Role;
+import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -20,19 +32,12 @@ import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class UserRepositoryImplTest {
 

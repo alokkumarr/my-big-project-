@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
@@ -10,12 +11,16 @@ import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isFinite from 'lodash/isFinite';
 import * as moment from 'moment';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs';
 import { map as mapObservable } from 'rxjs/operators';
+import { WidgetFiltersComponent } from './../add-widget/widget-filters/widget-filters.component';
 
 @Component({
   selector: 'observe-kpi',
@@ -45,7 +50,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   constructor(
     public observe: ObserveService,
-    public globalFilterService: GlobalFilterService
+    public globalFilterService: GlobalFilterService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -63,6 +69,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     if (isEmpty(data)) {
       return;
     }
+
     this._kpi = data;
     this.dataFormat = get(this._kpi, 'dataFields.0.format');
     this.executeKPI(this._kpi);
@@ -85,41 +92,80 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       return this.executeKPI(this._kpi);
     }
 
-    const filter = defaults(
-      {},
-      {
-        model: filterModel
-      },
-      get(this._kpi, 'filters.0')
-    );
-    const kpi = defaults({}, { filters: [filter] }, this._kpi);
+    const kpiFilters = cloneDeep(this._kpi);
+    const filter = this.constructGlobalFilter(filterModel, kpiFilters.filters);
+    const kpi = defaults({}, { filters: filter }, kpiFilters);
 
     return this.executeKPI(kpi);
+  }
+
+  constructGlobalFilter(model, kpiFilters) {
+    const globalFilters = kpiFilters.length === 1
+    // Check backward compatibility
+    ? fpPipe(
+      fpMap(filt => {
+        filt.model = model;
+        return filt;
+      })
+    )(kpiFilters)
+    : fpPipe(
+      fpMap(filt => {
+        if (filt.primaryKpiFilter) {
+          filt.model = model;
+        }
+        return filt;
+      })
+    )(kpiFilters);
+    return globalFilters;
   }
 
   getFilterLabel() {
     if (!this._executedKPI && !this._kpi) {
       return '';
     }
-
-    const preset = get(
-      this._executedKPI || this._kpi,
+    const executedKpi = this._executedKPI || this._kpi;
+    let primaryFilter = get(
+      executedKpi,
+      'filters.0.model'
+    );
+    let preset = get(
+      executedKpi,
       'filters.0.model.preset'
     );
+    // For backward compatibility. identify the primary filter
+    // after adding new filters for already existing KPIs
+    if (isUndefined(preset)) {
+      executedKpi.filters.forEach(filt => {
+        if (filt.primaryKpiFilter) {
+          preset = filt.model.preset;
+          primaryFilter = filt.model;
+          return;
+        }
+      });
+    }
     const filter = get(this.datePresetObj, `${preset}.label`);
     if (filter === 'Custom') {
       const gte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        get(primaryFilter, 'gte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       const lte = moment(
-        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        get(primaryFilter, 'lte'),
         'YYYY-MM-DD HH:mm:ss'
       ).format('YYYY/MM/DD');
       return `${gte} - ${lte}`;
     } else {
       return filter;
     }
+  }
+
+  displayFilters() {
+    return this.dialog.open(WidgetFiltersComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data: this._kpi
+    } as MatDialogConfig);
   }
 
   executeKPI(kpi) {
