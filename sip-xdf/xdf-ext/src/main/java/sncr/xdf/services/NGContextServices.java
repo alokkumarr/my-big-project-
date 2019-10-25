@@ -120,24 +120,38 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     }
 
     private int initProject() {
-        int projectStatus = 0;
         try {
-            if (!services.prj.projectPresent(ngctx.applicationID)) {
-                logger.warn("With Project Id: "+ ngctx.applicationID);
-                services.prj.getProjectData(ngctx);
-                ngctx.serviceStatus.put(ComponentServices.Project, true);
-            } else {
-                logger.warn("Without Project Id: "+ ngctx.applicationID);
-                ngctx.serviceStatus.put(ComponentServices.Project, true);
-            }
+            services.prj.getProjectData(ngctx);
+            ngctx.serviceStatus.put(ComponentServices.Project, true);
         } catch (Exception e) {
-            String error = "component initialization (input-discovery/output-preparation) exception: "
-                + ExceptionUtils.getFullStackTrace(e);
+            String error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
             logger.error(error);
-            projectStatus = -1;
+            return -1;
+
         }
-        return projectStatus;
+        return 0;
     }
+
+//    private int initProject() {
+//        logger.debug(" initProject  ");
+//        int projectStatus = 0;
+//        try {
+////            if (!services.prj.projectPresent(ngctx.applicationID)) {
+////                logger.debug("With Project Id: "+ ngctx.applicationID);
+//                services.prj.getProjectData(ngctx);
+//                ngctx.serviceStatus.put(ComponentServices.Project, true);
+////            } else {
+////                logger.debug("Without Project Id: "+ ngctx.applicationID);
+////                ngctx.serviceStatus.put(ComponentServices.Project, true);
+////            }
+//        } catch (Exception e) {
+//            String error = "component initialization (input-discovery/output-preparation) exception: "
+//                + ExceptionUtils.getFullStackTrace(e);
+//            logger.error(error);
+//            projectStatus = -1;
+//        }
+//        return projectStatus;
+//    }
 
 
     public int registerOutputDataSet() {
