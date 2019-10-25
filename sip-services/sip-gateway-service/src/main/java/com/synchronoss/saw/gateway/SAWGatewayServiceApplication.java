@@ -8,12 +8,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 
-
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.synchronoss.saw", "com.synchronoss.sip.utils"})
 public class SAWGatewayServiceApplication {
 
   private static final Logger LOG = LoggerFactory.getLogger(SAWGatewayServiceApplication.class);
+
   public static void main(String[] args) {
     ConfigurableApplicationContext ctx =
         SpringApplication.run(SAWGatewayServiceApplication.class, args);
@@ -22,3 +22,5 @@ public class SAWGatewayServiceApplication {
   }
 
 }
+
+

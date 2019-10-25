@@ -43,7 +43,7 @@ enum MODE {
 export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
-  editorOptions = {
+  editorOptions: any = {
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,

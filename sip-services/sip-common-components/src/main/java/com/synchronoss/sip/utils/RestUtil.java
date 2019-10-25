@@ -1,5 +1,8 @@
 package com.synchronoss.sip.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -7,6 +10,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Iterator;
 import javax.net.ssl.SSLContext;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -16,6 +20,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,35 +52,27 @@ public class RestUtil {
   @Value("${sip.ssl.enable}")
   private Boolean sipSslEnable;
 
+  public static final String sanatizeAndValidateregEx =
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()]";
+  public static final String noSpace = "";
+
   /** creating rest template using SSL connection. */
   public RestTemplate restTemplate() {
 
     HttpClient client = null;
 
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore);
+    logger.trace("ssl enable?" + sipSslEnable + " restTemplate trustStore: " + trustStore
+        + " restTemplate keyStore: " + keyStore);
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
-        sslContext =
-            SSLContextBuilder.create()
-                .loadKeyMaterial(
-                    new File(keyStore),
-                    keyStorePassword.toCharArray(),
-                    keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
-                .build();
-        client =
-            HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .build();
+        sslContext = SSLContextBuilder.create()
+            .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
+                keyStorePassword.toCharArray())
+            .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray()).build();
+        client = HttpClients.custom().setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory(client);
         restTemplate = new RestTemplate(factory);
@@ -89,33 +86,23 @@ public class RestUtil {
   }
 
   /** creating rest template using SSL connection. */
-  public RestTemplate restTemplate(
-      String keyStore, String keyPassword, String trustStore, String trustPassword) {
+  public RestTemplate restTemplate(String keyStore, String keyPassword, String trustStore,
+      String trustPassword) {
     HttpClient client = null;
 
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore);
+    logger.trace("ssl enable?" + sipSslEnable + " restTemplate trustStore: " + trustStore
+        + " restTemplate keyStore: " + keyStore);
 
     RestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
-        sslContext =
-            SSLContextBuilder.create()
-                .loadKeyMaterial(
-                    new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
-                .build();
-        client =
-            HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .build();
+        sslContext = SSLContextBuilder.create()
+            .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(),
+                keyPassword.toCharArray())
+            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
+        client = HttpClients.custom().setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory(client);
         restTemplate = new RestTemplate(factory);
@@ -133,34 +120,22 @@ public class RestUtil {
    * AsyncRestTemplate changes to WebClient
    */
   public AsyncRestTemplate asyncRestTemplate() {
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore);
+    logger.trace("ssl enable?" + sipSslEnable + " restTemplate trustStore: " + trustStore
+        + " restTemplate keyStore: " + keyStore);
     AsyncRestTemplate restTemplate = null;
     if (sipSslEnable) {
       SSLContext sslContext = null;
       try {
-        sslContext =
-            SSLContextBuilder.create()
-                .loadKeyMaterial(
-                    new File(keyStore),
-                    keyStorePassword.toCharArray(),
-                    keyStorePassword.toCharArray())
-                .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray())
-                .build();
+        sslContext = SSLContextBuilder.create()
+            .loadKeyMaterial(new File(keyStore), keyStorePassword.toCharArray(),
+                keyStorePassword.toCharArray())
+            .loadTrustMaterial(new File(trustStore), trustStorePassword.toCharArray()).build();
       } catch (Exception e) {
         logger.error("Error occured while building SSL context", e);
       }
 
-      CloseableHttpAsyncClient httpclient =
-          HttpAsyncClients.custom()
-              .setSSLHostnameVerifier(new NoopHostnameVerifier())
-              .setSSLContext(sslContext)
-              .build();
+      CloseableHttpAsyncClient httpclient = HttpAsyncClients.custom()
+          .setSSLHostnameVerifier(new NoopHostnameVerifier()).setSSLContext(sslContext).build();
       AsyncClientHttpRequestFactory reqFactory =
           new HttpComponentsAsyncClientHttpRequestFactory(httpclient);
       restTemplate = new AsyncRestTemplate(reqFactory);
@@ -172,13 +147,8 @@ public class RestUtil {
 
   /** creating a https client. */
   public HttpClient getHttpClient() throws Exception {
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore);
+    logger.trace("ssl enable?" + sipSslEnable + " restTemplate trustStore: " + trustStore
+        + " restTemplate keyStore: " + keyStore);
     HttpClient client = null;
     PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     if (sipSslEnable) {
@@ -194,24 +164,15 @@ public class RestUtil {
   }
 
   /** ssl context using store passcode. */
-  private SSLContext getSsLContext(
-      String keyStore, String keyPassword, String trustStore, String trustPassword)
-      throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
-          KeyManagementException, UnrecoverableKeyException {
-    logger.trace(
-        "ssl enable?"
-            + sipSslEnable
-            + " restTemplate trustStore: "
-            + trustStore
-            + " restTemplate keyStore: "
-            + keyStore);
+  private SSLContext getSsLContext(String keyStore, String keyPassword, String trustStore,
+      String trustPassword) throws KeyStoreException, NoSuchAlgorithmException,
+      CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
+    logger.trace("ssl enable?" + sipSslEnable + " restTemplate trustStore: " + trustStore
+        + " restTemplate keyStore: " + keyStore);
 
-    SSLContext sslContext =
-        SSLContextBuilder.create()
-            .loadKeyMaterial(
-                new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
-            .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray())
-            .build();
+    SSLContext sslContext = SSLContextBuilder.create()
+        .loadKeyMaterial(new File(keyStore), keyPassword.toCharArray(), keyPassword.toCharArray())
+        .loadTrustMaterial(new File(trustStore), trustPassword.toCharArray()).build();
     return sslContext;
   }
 
@@ -239,4 +200,82 @@ public class RestUtil {
   public Boolean getSipSslEnable() {
     return sipSslEnable;
   }
+
+  /**
+   * Thsi method traverse the node & validates the value.
+   * 
+   * @param parentNode {@link JsonNode}
+   * @throws IOException {@link IOException}
+   */
+  public static void validateNodeValue(JsonNode parentNode) throws IOException {
+    Boolean isValid = Boolean.TRUE;
+    String nodeName = null;
+    String nodeText = null;
+    if (parentNode.isArray()) {
+      Iterator<JsonNode> iter = parentNode.elements();
+      while (iter.hasNext()) {
+        JsonNode node = iter.next();
+        if (node.isObject() || node.isArray()) {
+          validateNodeValue(node);
+        }
+      }
+    }
+    if (parentNode.isObject()) {
+      Iterator<String> iter = parentNode.fieldNames();
+      while (iter.hasNext()) {
+        nodeName = iter.next();
+        JsonNode node = parentNode.path(nodeName);
+        nodeText = node.asText().replaceAll(sanatizeAndValidateregEx, noSpace);
+        if (node.isObject() || node.isArray()) {
+          validateNodeValue(node);
+        } else {
+          // Validating for ESAPI constraints
+          if (nodeText != null && !nodeText.trim().equals(noSpace)) {
+            isValid = ESAPI.validator().isValidInput(
+                "Validating SafeString " + "attributes value for intrusion", nodeText, "SafeString",
+                node.asText().toString().length(), false);
+            isValid =
+                ESAPI.validator().isValidInput("Validating Email attributes value for intrusion",
+                    nodeText, "Email", node.asText().toString().length(), false);
+            isValid = ESAPI.validator().isValidInput(
+                "Validating Password " + "attributes value for intrusion", nodeText, "Password",
+                node.asText().toString().length(), false);
+            isValid = ESAPI.validator().isValidInput(
+                "Validating IPAddress " + "attributes value for intrusion", nodeText, "IPAddress",
+                nodeText.length(), false);
+
+            isValid =
+                ESAPI.validator().isValidInput("Validating URL " + "attributes value for intrusion",
+                    nodeText, "URL", nodeText.length(), false);
+
+            isValid =
+                ESAPI.validator().isValidInput("Validating Id " + "attributes value for intrusion",
+                    nodeText, "Id", nodeText.length(), false);
+
+            isValid = ESAPI.validator().isValidInput(
+                "Validating SafeText " + "attributes value for intrusion", nodeText, "SafeText",
+                nodeText.length(), false);
+
+            isValid = ESAPI.validator().isValidInput(
+                "Validating Digit " + "attributes value for intrusion", nodeText, "Digit",
+                nodeText.length(), false);
+            logger.trace("Attribute is of type Json");
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(m.writeValueAsString(nodeText));
+            validateNodeValue(rootNode);
+          }
+        }
+        if (!isValid) {
+          throw new SipNotProcessedSipEntityException(
+              nodeName + ":'" + nodeText + "' is not valid");
+        }
+      }
+    }
+    if (!isValid) {
+      throw new SipNotProcessedSipEntityException(nodeName + ":'" + nodeText + "' is not valid");
+    }
+
+  }
+
+
 }
