@@ -306,7 +306,7 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, payload)
-      .pipe(catchError(this.handleError('data', {})));
+      .pipe(catchError(this.handleError('data', null)));
   }
 
   /**
@@ -321,7 +321,7 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, payload)
-      .pipe(catchError(this.handleError('data', {})));
+      .pipe(catchError(this.handleError('data', null)));
   }
 
   /**
@@ -331,8 +331,13 @@ export class DatasourceService {
    * @param result - optional value to return as the observable result
    */
   public handleError<T>(operation = 'operation', result?: T) {
+    const message = error =>
+      get(error, 'error.message') || get(error, 'message') || error;
     return (error: any): Observable<T> => {
-      return of(result as T);
+      return of(
+        (result as T) ||
+          ({ error: true, message: error ? message(error) : {} } as any)
+      );
     };
   }
 

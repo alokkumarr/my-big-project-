@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isEmpty from 'lodash/isEmpty';
+import { first } from 'rxjs/operators';
 import { DatasourceService } from '../../../services/datasource.service';
 
 import { TestConnectivityComponent } from '../test-connectivity/test-connectivity.component';
@@ -81,8 +82,16 @@ export class CreateRouteDialogComponent {
     this.dialogRef.close();
   }
 
+  testRouteAPI(routeInfo) {
+    return this.datasourceService.testRouteWithBody(routeInfo).pipe(first());
+  }
+
   testRoute(routeInfo) {
-    this.datasourceService.testRouteWithBody(routeInfo).subscribe(data => {
+    this.testRouteAPI(routeInfo).subscribe(data => {
+      if (data && data.error) {
+        this.showConnectivityLog(data.message);
+        return;
+      }
       this.showConnectivityLog(data);
     });
   }
@@ -119,7 +128,12 @@ export class CreateRouteDialogComponent {
       return false;
     }
     const routeDetails = this.mapData();
-    this.dialogRef.close({ routeDetails, opType: this.opType });
+    this.testRouteAPI(this.detailsFormTestValue).subscribe(data => {
+      if (data && data.error) {
+        return;
+      }
+      this.dialogRef.close({ routeDetails, opType: this.opType });
+    });
   }
 
   /**

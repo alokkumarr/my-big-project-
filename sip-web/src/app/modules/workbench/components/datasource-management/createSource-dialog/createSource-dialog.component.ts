@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import * as isUndefined from 'lodash/isUndefined';
+import { first } from 'rxjs/operators';
 import { DatasourceService } from '../../../services/datasource.service';
 
 import { CHANNEL_TYPES, CHANNEL_UID } from '../../../wb-comp-configs';
@@ -92,19 +93,34 @@ export class CreateSourceDialogComponent {
       channelType: this.selectedSource,
       ...formData
     };
-    this.dialogRef.close({ sourceDetails, opType: this.opType });
+    this.testChannelAPI(this.detailsFormTestValue).subscribe(data => {
+      if (data && data.error) {
+        return;
+      }
+      this.dialogRef.close({ sourceDetails, opType: this.opType });
+    });
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
   }
 
-  testChannel(formData) {
+  testChannelAPI(formData) {
     const channelData = {
       channelType: this.selectedSource,
       ...formData
     };
-    this.datasourceService.testChannelWithBody(channelData).subscribe(data => {
+    return this.datasourceService
+      .testChannelWithBody(channelData)
+      .pipe(first());
+  }
+
+  testChannel(formData) {
+    this.testChannelAPI(formData).subscribe(data => {
+      if (data && data.error) {
+        this.showConnectivityLog(data.message);
+        return;
+      }
       this.showConnectivityLog(data);
     });
   }
