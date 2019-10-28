@@ -9,6 +9,7 @@ import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as toUpper from 'lodash/toUpper';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
@@ -33,6 +34,7 @@ import {
   DEFAULT_PIVOT_DATE_FORMAT
 } from '../../consts';
 import { getFormatter } from '../../utils/numberFormatter';
+import { displayNameWithoutAggregateFor } from '../../services/tooltipFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
@@ -375,6 +377,9 @@ export class PivotGridComponent implements OnDestroy {
           };
           if (cloned.aggregate) {
             delete cloned.caption;
+            cloned.displayName = `${toUpper(
+              cloned.aggregate
+            )}(${displayNameWithoutAggregateFor(cloned)})`;
             /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
              on sum */
