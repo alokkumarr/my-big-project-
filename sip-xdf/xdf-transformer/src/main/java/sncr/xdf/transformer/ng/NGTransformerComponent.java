@@ -11,7 +11,7 @@ import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
@@ -64,6 +64,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
     @Override
     protected int execute(){
         logger.debug("Processing NGTransformerComponent ......" );
+
         try {
             tempLocation = generateTempLocation(new DataSetHelper(ngctx, services.md),
                 null, null);
@@ -290,7 +291,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 };
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
-                "transformer", batchId);
+                "transformer", batchId, persistMode);
 
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
