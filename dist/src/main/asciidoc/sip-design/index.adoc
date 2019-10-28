@@ -312,10 +312,10 @@ the alert criteria to the specified channel.
 plantuml::sip-design/figure-alert-sequence.pum[]
 
 Source Data is ingested to the Datalake, XDF/RTPS will process the data and then it writes
-datapod Id into the Stream,the data in Stream in read by Stream consumer running in the
-SIP Alert service and then SIP Alert Service reads Alert rules configured for the datapod Id and
-Alert evaluation starts, if any of the alert rule is voilated then alert results will be written
-into Mapr-DB and Alert notification will be sent to the user.
+datapod Id into the Stream,the data in Stream is read by Stream Consumer running in the
+SIP Alert Service and then SIP Alert Service reads Alert Rules configured for the datapod Id and
+Alert evaluation starts, if any of the Alert Rule is voilated then Alert Results will be written
+into Mapr-DB and Alert Notification will be sent to the user.
 
 
 ==== Apache Spark
