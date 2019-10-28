@@ -6,6 +6,8 @@ package sncr.xdf.rtps.model;
  */
 
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.types.DataType;
@@ -188,6 +190,33 @@ public class GenericJsonModel {
                         fieldmap.put(name, DataTypes.createStructField(name, convertType(type), true));
                     });
                 }
+        );
+
+        return DataTypes.createStructType(fieldmap.values().toArray(new StructField[0]));
+    }
+    
+    
+    public static StructType createSchemaByEventType(String definitionsJson, String schemaKeyCol) throws RuntimeException {
+        Map<String, StructField> fieldmap = new HashMap<>();
+        JsonObject jo = new JsonParser().parse(definitionsJson).getAsJsonObject();
+        JsonArray objects = jo.get(CONF_OBJECTS).getAsJsonArray();
+
+        objects.forEach((v) -> {
+            JsonObject object = v.getAsJsonObject();
+            JsonArray fields = object.getAsJsonArray(CONF_FIELDS);
+            String nameObj = object.getAsJsonPrimitive(CONF_NAME).getAsString();
+            
+            if(nameObj.equals(schemaKeyCol)) {
+            	 fields.forEach((f) -> {
+                     String name = f.getAsJsonObject().get(CONF_NAME).getAsString();
+                     FieldType type =
+                             f.getAsJsonObject().has(CONF_TYPE) ?
+                                     FieldType.valueOf(f.getAsJsonObject().get(CONF_TYPE).getAsString()) : FieldType.STRING;
+                     fieldmap.put(name, DataTypes.createStructField(name, convertType(type), true));
+                 });
+             }
+            }
+           
         );
 
         return DataTypes.createStructType(fieldmap.values().toArray(new StructField[0]));
