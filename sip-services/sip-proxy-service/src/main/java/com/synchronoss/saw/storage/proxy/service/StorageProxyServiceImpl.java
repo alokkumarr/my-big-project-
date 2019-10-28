@@ -604,7 +604,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .equalsIgnoreCase(Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
       SearchSourceBuilder searchSourceBuilder =
-          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery);
+          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery ,dataSecurityKey);
       JsonNode percentageData =
           storageConnectorService.executeESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());

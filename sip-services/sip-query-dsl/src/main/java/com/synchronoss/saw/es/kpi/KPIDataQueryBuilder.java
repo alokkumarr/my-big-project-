@@ -1,5 +1,7 @@
 package com.synchronoss.saw.es.kpi;
 
+import static com.synchronoss.saw.es.ElasticSearchQueryBuilder.buildBooleanQuery;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -127,13 +129,17 @@ public class KPIDataQueryBuilder {
         }
       }
       ObjectMapper objectMapper = null;
+        List<QueryBuilder> dskBuilder = new ArrayList<>();
+      BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
       if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
         for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
           TermsQueryBuilder dataSecurityBuilder =
               new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
-          builder.add(dataSecurityBuilder);
+            dskBuilder.add(dataSecurityBuilder);
         }
+          buildBooleanQuery(BooleanCriteria.AND, dskBuilder, boolQueryBuilderDsk);
       }
+      boolQueryBuilder.must(boolQueryBuilderDsk);
       // make the query based on the filter given
       if (item.getType().value().equals(Filter.Type.STRING.value())) {
         builder = KPIQueryBuilderUtil.stringFilterKPI(item, builder);
@@ -145,18 +151,20 @@ public class KPIDataQueryBuilder {
         builder = KPIQueryBuilderUtil.numericFilterKPI(item, builder);
       }
     }
+    BoolQueryBuilder boolQueryBuilderfilter = new BoolQueryBuilder();
     BooleanCriteria booleanCriteria = kpiBuilder.getKpi().getBooleanCriteria();
     if (booleanCriteria != null && booleanCriteria == BooleanCriteria.OR) {
       builder.forEach(
           item -> {
-            boolQueryBuilder.should(item);
+              boolQueryBuilderfilter.should(item);
           });
     } else {
       builder.forEach(
           item -> {
-            boolQueryBuilder.must(item);
+              boolQueryBuilderfilter.must(item);
           });
     }
+    boolQueryBuilder.must(boolQueryBuilderfilter);
     searchSourceBuilder.query(boolQueryBuilder);
     List<DataField> dataFields = kpiBuilder.getKpi().getDataFields();
     for (DataField dataField : dataFields) {

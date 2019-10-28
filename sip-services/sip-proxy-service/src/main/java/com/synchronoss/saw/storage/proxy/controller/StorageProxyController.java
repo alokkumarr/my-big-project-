@@ -313,7 +313,7 @@ public class StorageProxyController {
       throws JsonProcessingException ,IllegalAccessException{
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
+      throw new JSONMissingSAWException("Analysis definition is missing in request body");
     }
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
@@ -328,7 +328,7 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     SipQuery savedQuery =
-        getSipQuery(analysis.getSipQuery(), metaDataServiceExport, request, restUtil);
+        getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -351,7 +351,7 @@ public class StorageProxyController {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
-          if (query.contains(" " + artifact + " ")) {
+          if (query.contains(artifact)) {
             dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
@@ -379,7 +379,6 @@ public class StorageProxyController {
     }
 
     logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
-
     try {
       Long startTime = new Date().getTime();
       logger.trace(

@@ -13,7 +13,7 @@ spring:
     banner-mode: "off"
 logging:
   level:
-    com.synchronoss.saw.gateway: TRACE
+    com.synchronoss.saw.gateway: INFO
 
 server:
   max-http-header-size: 65536
@@ -30,7 +30,7 @@ server:
     trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
     trust-store-password: sip@123
 
-connector: https
+connector: http
 saw-security-port: 9000
 
 analysis:
@@ -99,7 +99,16 @@ api:
             path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]semantic*'
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: GET
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: PUT
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]dslanalysis.*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
@@ -115,22 +124,22 @@ api:
         -   location: ${scheduler.service.host}
             method : DELETE
             path : '[/]scheduler.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]observe.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]filters.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]kpi.*'
         -   location: ${workbench.service.host}
@@ -140,15 +149,24 @@ api:
             method: GET
             path: '[/]internal/workbench.*'
         -   location: ${proxy.service.host}
+            method: GET
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/proxy.*'
-        -   location: ${datapod.service.host}
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
+            path: '[/]internal/proxy.*'
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
         -   location: ${batch.service.host}
