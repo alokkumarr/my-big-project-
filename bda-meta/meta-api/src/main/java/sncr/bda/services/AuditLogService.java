@@ -23,13 +23,18 @@ public class AuditLogService {
     private static final Logger logger = Logger.getLogger(AuditLogService.class);
     private AuditLogStore als;
     private String dlRoot;
-
+    private Boolean persistMode;
 
     public AuditLogService(String dlr) throws Exception {
         als = new AuditLogStore(dlr);
         dlRoot = dlr;
     }
 
+    public AuditLogService(String dlr, Boolean persistMode) throws Exception {
+        als = new AuditLogStore(dlr);
+        dlRoot = dlr;
+        this.persistMode = persistMode;
+    }
 
     /**
      * The audit log entry is processMap user activity log:
@@ -80,6 +85,8 @@ public class AuditLogService {
         return ale;
     }
 
+    public String generateAleId (ContextMetadata ctx) {return ctx.applicationID + MetadataStore.delimiter + UUID.randomUUID() + "_" + System.currentTimeMillis();}
+
     public String createAuditLog(ContextMetadata ctx, JsonObject ale) throws Exception {
         /* Audit log entry (ALE) id is a combination of the following:
          * <applicationId>::<UUID>_<time in nanoseconds>
@@ -90,8 +97,11 @@ public class AuditLogService {
          * milliseconds - Record the time of the log entry (Can be used for sorting purpose)
          *
          */
-        String ale_id = ctx.applicationID + MetadataStore.delimiter + UUID.randomUUID() + "_" + System.currentTimeMillis();
-        als.create(ale_id, ale.toString());
+        String ale_id = generateAleId(ctx);
+        logger.debug("createAuditLog persistMode  " + persistMode);
+        if (persistMode) {
+            als.create(ale_id, ale.toString());
+        }
         return ale_id;
     }
 }

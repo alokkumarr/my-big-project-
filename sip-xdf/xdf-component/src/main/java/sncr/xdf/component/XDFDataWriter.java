@@ -1,10 +1,10 @@
 package sncr.xdf.component;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import sncr.bda.core.file.HFileOperations;
 
 import java.util.List;
