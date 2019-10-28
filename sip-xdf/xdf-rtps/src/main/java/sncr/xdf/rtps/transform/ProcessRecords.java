@@ -378,31 +378,23 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				if (isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
 
 					ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-
 					final Dataset<Row> dataset = df;
-
 					executorService.submit(new Callable<Long>() {
-
 						@Override
-
 						public Long call() throws Exception {
-
 							try {
-
-								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(
-										dataset.filter(query).cache());
-
-								processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,
-										eventType);
-
+								Dataset<Row> data = dataset.filter(query).cache();
+								if(data.count()>0) {
+									RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
+	
+									processor.processDataWithDataFrame(ct.pipelineConfig, 
+											ct.pipelineConfigParams,
+											eventType);
+								}
 							} catch (Exception e) {
-
 								logger.error(e.getMessage());
-
 							}
-
 							return 1L;
-
 						}
 
 					});
@@ -410,17 +402,16 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				} else if (Boolean.valueOf(isTimeSeries)) {
 
 					try {
-
-						RTPSPipelineProcessor processor = new RTPSPipelineProcessor(df.filter(query).cache());
-
-						processor.processDataWithDataFrame(this.ngctx.pipelineConfig, this.ngctx.pipelineConfigParams,
-
-								eventType);
+						Dataset<Row> data =df.filter(query).cache();
+						if(data.count()>0) {
+							RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
+							processor.processDataWithDataFrame(this.ngctx.pipelineConfig, 
+									this.ngctx.pipelineConfigParams,
+									eventType);
+						}
 
 					} catch (Exception e) {
-
 						logger.error(e.getMessage());
-
 					}
 
 				}

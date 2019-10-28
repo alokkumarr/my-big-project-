@@ -161,7 +161,7 @@ public class XDFDataProcessor  extends AbstractComponent {
     		
 
     	} catch (Exception e) {
-    		logger.debug(e.getMessage());
+    		logger.error(e.getMessage());
     		System.exit(ret);
     	}
 
