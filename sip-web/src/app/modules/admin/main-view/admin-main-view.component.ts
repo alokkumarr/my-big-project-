@@ -186,12 +186,14 @@ export class AdminMainViewComponent implements OnDestroy {
   }
 
   setData(data) {
-    this.data = data;
-    if (this.filterObj.searchTerm) {
-      this.applySearchFilter(this.filterObj.searchTerm);
-    } else {
-      this.filteredData = data;
-    }
+    setTimeout(() => {
+      this.data = data;
+      if (this.filterObj.searchTerm) {
+        this.applySearchFilter(this.filterObj.searchTerm);
+      } else {
+        this.filteredData = data;
+      }
+    }, 100);
   }
 
   getService() {
