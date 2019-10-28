@@ -182,6 +182,8 @@ public class NGSQLExecutor implements Serializable {
                 	finalResult.printSchema();
                     pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
 
+                    descriptor.schema = pres.getSchema(parent.getNgctx(),finalResult);
+
                     long wt = System.currentTimeMillis();
                     descriptor.writeTime = (int) ((wt - exet) / 1000);
                     logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt - st) / 1000, (lt - st) / 1000, (exet - lt) / 1000, (wt - exet) / 1000));

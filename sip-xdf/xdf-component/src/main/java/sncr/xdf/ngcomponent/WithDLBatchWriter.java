@@ -1,8 +1,8 @@
 package sncr.xdf.ngcomponent;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.google.gson.JsonParser;
+import org.apache.spark.sql.Row;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +49,11 @@ public interface WithDLBatchWriter {
         WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
         return helper.writeDataset(DSMapKey.dataset, dataset, dataSetName, location, mode);
     }
+
+    default JsonElement getSchema(NGContext ngctx, Dataset<Row> finalResult){
+        WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
+        return helper.extractSqlSchema(finalResult);
+     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
     	
@@ -249,6 +254,10 @@ public interface WithDLBatchWriter {
             return numberOfFilesSuccessfullyCopied;
         }
 
+        private JsonElement extractSqlSchema(Dataset<Row> finalResult) {
+            JsonParser parser = new JsonParser();
+                return parser.parse(finalResult.schema().json());
+            }
 
         private Map<String, String> listOfRemovedPartitions = new HashMap<>();
 
