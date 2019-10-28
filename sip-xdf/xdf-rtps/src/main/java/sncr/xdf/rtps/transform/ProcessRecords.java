@@ -276,28 +276,9 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	
     	if(jsonRdd.count() > 0) {
     		 this.extractSchemaForEventTypes(sess, jsonRdd);
-    		/* if((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
-        		 JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
-        	     logger.debug("######## Reading completed through spark session #####" );
-        	 
-        	     df = sess.createDataFrame(rowRdd, schema);
-        	     logger.debug("######## Dataframe created #####" );
-        	} else {
-        		df = sess.read().json(jsonRdd).toDF();
-     	        logger.debug("######## Dataframe created #####" );
-        	}
-    		 
-    		 df.show();*/
         	
     	}
        
-    	
-    	
-    	
-    	
-       
-  	    NGContext context = this.ngctx;
-  	    
   	    
         if(this.ngctx != null ) {
         	
@@ -315,9 +296,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				rtaConfig = (JSONObject) jsonConfig.get("rta");
 				logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
 			}
-			
     	  
-				logger.debug("#### rta config is present for multi type");
 
 				/**
 				 * Multiple event types
@@ -345,7 +324,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					
 				logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
 				
-				Dataset df  = null;
+				Dataset<Row> df  = null;
 				
 				//List<StructField> structField = new ArrayList<StructField>();
 				//structField.add(eventSchema);
@@ -355,8 +334,12 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				JavaRDD<Row> rowRdd = sess.read().schema(schemaFields.get(eventType)).json(jsonRdd).toJavaRDD();
 
 				logger.debug("######## Reading completed through spark session #####");
-
-			    df = sess.createDataFrame(rowRdd, schemaFields.get(eventType));
+				if((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
+					df = sess.createDataFrame(rowRdd, schemaFields.get(eventType));
+				} else {
+					df = sess.read().json(jsonRdd).toDF();
+				}
+			    
                 
 			    logger.debug("##### Data frame created with specific schema ");
 			    df.show();
