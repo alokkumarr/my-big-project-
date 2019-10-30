@@ -218,6 +218,7 @@ export function alterReportData(data, analysis) {
 
   return data.map(row => {
     return mapValues(row, (value, key) => {
+      value = value === null ? 'null' : value;
       if (dateFields.includes(key)) {
         value = value.includes('Z')
           ? moment(value).utc().format('YYYY-MM-DD HH:mm:ss')
