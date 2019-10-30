@@ -22,6 +22,7 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         columnName: this.artifactColumn.columnName,
+        dataField: this.artifactColumn.dataField,
         table: this.artifactColumn.table,
         groupInterval,
         dateFormat

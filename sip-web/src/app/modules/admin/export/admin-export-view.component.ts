@@ -1,5 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
+import * as moment from 'moment';
+import * as get from 'lodash/get';
+import * as isEmpty from 'lodash/isEmpty';
+
 import { JwtService } from '../../../common/services';
 import {
   ResetExportPageState,
@@ -16,12 +24,6 @@ import { ExportPageState } from './state/export-page.state';
 import { ExportService } from './export.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import * as JSZip from 'jszip';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
-import * as get from 'lodash/get';
 
 @Component({
   selector: 'admin-export-view',
@@ -36,7 +38,7 @@ export class AdminExportViewComponent implements OnInit, OnDestroy {
   @Select(ExportPageState.categoryAnalyses)
   exportAnalyses$: Observable<any[]>;
 
-  isExportListEmpty$ = this.exportList$.pipe(map(list => list.length <= 0));
+  isExportListEmpty$ = this.exportList$.pipe(map(isEmpty));
   categorisedMenu$: Observable<MenuItem[]>;
 
   constructor(

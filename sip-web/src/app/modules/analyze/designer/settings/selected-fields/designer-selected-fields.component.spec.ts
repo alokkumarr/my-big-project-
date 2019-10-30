@@ -59,4 +59,16 @@ describe('Designer Component', () => {
   it('should create', () => {
     expect(component).toBeDefined();
   });
+
+  it('should remove column from group', () => {
+    const column = { columnName: 'abc', dataField: 'abc' };
+    const store = TestBed.get(Store);
+    const spy = spyOn(store, 'dispatch').and.returnValue(null);
+    component.groupAdapters = [];
+    component.removeFromGroup(
+      column as any,
+      { artifactColumns: [column] } as any
+    );
+    expect(spy).toHaveBeenCalled();
+  });
 });

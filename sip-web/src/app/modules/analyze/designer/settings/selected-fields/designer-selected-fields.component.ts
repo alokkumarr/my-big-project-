@@ -14,6 +14,7 @@ import { Select, Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as debounce from 'lodash/debounce';
 import * as has from 'lodash/has';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as reduce from 'lodash/reduce';
 import { AGGREGATE_TYPES_OBJ } from '../../../../../common/consts';
 import { DndPubsubService, DndEvent } from '../../../../../common/services';
@@ -22,7 +23,8 @@ import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   Filter,
-  DesignerChangeEvent
+  DesignerChangeEvent,
+  ArtifactColumnDSL
 } from '../../types';
 import { AnalyzeService } from '../../../services/analyze.service';
 import { DesignerState } from '../../state/designer.state';
@@ -32,6 +34,7 @@ import {
   DesignerMoveColumnInGroupAdapter,
   DesignerRemoveColumnFromGroupAdapter
 } from '../../actions/designer.actions';
+import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
 import { getFilterValue } from './../../../consts';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
@@ -109,9 +112,13 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  getDisplayName(filter) {
+  getDisplayNameForFilter(filter) {
     const table = filter.artifactsName || filter.tableName;
     return this.nameMap[table][filter.columnName] || [filter.columnName];
+  }
+
+  getDisplayNameForColumn(column: ArtifactColumnDSL) {
+    return displayNameWithoutAggregateFor(column);
   }
 
   onDndEvent(event: DndEvent) {
@@ -139,24 +146,22 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   removeFromGroup(
-    artifactColumn: ArtifactColumn,
+    artifactColumn: ArtifactColumnDSL,
     groupAdapter: IDEsignerSettingGroupAdapter
   ) {
-    artifactColumn.aliasName = '';
+    artifactColumn.alias = '';
     const columnIndex = findIndex(
       groupAdapter.artifactColumns,
-      ({ columnName }) => artifactColumn.columnName === columnName
+      ({ columnName, dataField }) =>
+        dataField
+          ? dataField === artifactColumn.dataField
+          : columnName === artifactColumn.columnName
     );
     const adapterIndex = this.groupAdapters.indexOf(groupAdapter);
     this._store.dispatch(
       new DesignerRemoveColumnFromGroupAdapter(columnIndex, adapterIndex)
     );
     this.onFieldsChange();
-    // this._designerService.removeArtifactColumnFromGroup(
-    //   artifactColumn,
-    //   groupAdapter
-    // );
-    // this.onFieldsChange();
   }
 
   onFieldsChange() {
@@ -199,7 +204,7 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
       }
       this._store.dispatch(
         new DesignerAddColumnToGroupAdapter(
-          column,
+          cloneDeep(column),
           event.currentIndex,
           adapterIndex
         )

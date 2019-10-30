@@ -18,7 +18,7 @@ const confAlertServiceStub = {
     return new Observable();
   },
   getAllAlerts: async () => {
-    return Promise.resolve();
+    return Promise.resolve({ alertRuleDetailsList: [], numberOfRecords: 11 });
   }
 };
 const alertDefinitionStub: AlertDefinition = {
@@ -100,5 +100,27 @@ describe('AlertsConfigurationComponent', () => {
 
   it('should delete Alert', () => {
     component.deleteAlert(alertDefinitionStub.alertConfig);
+  });
+
+  it('should set alertLoader data', () => {
+    component.data = null;
+    component.setAlertLoaderForGrid();
+    expect(component.data).toBeTruthy();
+  });
+
+  it('should set proper navTitle', () => {
+    component.addAlertClicked();
+    expect(component.navTitle).toEqual('Add Alert');
+    component.editAlert(alertDefinitionStub.alertConfig);
+    expect(component.navTitle).toEqual('Edit Alert');
+  });
+
+  it('should set proper pagingEnabled', () => {
+    component.enablePaging = false;
+    component.setAlertLoaderForGrid();
+    fixture.detectChanges();
+    component.data.load().then(() => {
+      return expect(component.enablePaging).toBeTruthy();
+    });
   });
 });

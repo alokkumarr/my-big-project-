@@ -13,7 +13,6 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.context.DSMapKey;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;

@@ -28,4 +28,28 @@ describe('DesignerFilterRowComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should return available fields that are not added to sort', () => {
+    const checkedFields = [
+      {
+        columnName: '1'
+      },
+      {
+        columnName: '2'
+      }
+    ];
+
+    component.sorts = [
+      {
+        columnName: '1'
+      }
+    ] as any;
+
+    const available = component.getAvailableFields(
+      checkedFields as any,
+      [] as any
+    );
+    expect(available.length).toEqual(1);
+    expect(available[0].columnName).toEqual('2');
+  });
 });

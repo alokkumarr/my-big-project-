@@ -12,7 +12,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.alert.AlertQueueManager;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
@@ -193,7 +193,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 };
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
-                "sql", batchId);
+                "sql", batchId, persistMode);
 
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();

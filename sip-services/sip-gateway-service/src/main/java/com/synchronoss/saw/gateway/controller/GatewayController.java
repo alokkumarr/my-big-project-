@@ -107,8 +107,8 @@ public class GatewayController {
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
-    logger.info("request info : "+ request);
-    logger.info("filePath info : "+ filePath);
+    logger.trace("Request info : "+ request.getRequestURI());
+    logger.trace("filePath info : "+ filePath);
     logger.trace("Accept {}",request.getHeader("Accept"));
     logger.trace("Authorization {}",request.getHeader("Authorization"));
     logger.trace("Content-type {}",request.getHeader("Content-type"));    
@@ -145,8 +145,7 @@ public class GatewayController {
             if(uploadfiles!=null && uploadfiles.length==0){throw new FileUploadException("There are no files to upload");}
             String uploadURI = request.getRequestURI();
             if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-              //uploadURI =getServiceUrl(uploadURI, request) + "?" + request.getQueryString();
-                uploadURI =getServiceUrl(uploadURI, request);
+                uploadURI = getServiceUrl(uploadURI, request);
             } else {
               uploadURI = getServiceUrl(uploadURI, request);
             }
@@ -262,12 +261,14 @@ public class GatewayController {
   
 
   private HttpUriRequest createHttpUriRequest(HttpServletRequest request, UserCustomerMetaData userRelatedMetaData) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
+    logger.trace("createHttpUriRequest starts here");
     URLRequestTransformer urlRequestTransformer = new URLRequestTransformer(apiGatewayProperties);
     ContentRequestTransformer contentRequestTransformer = new ContentRequestTransformer();
     HeadersRequestTransformer headersRequestTransformer = new HeadersRequestTransformer();
     headersRequestTransformer.setUserRelatedMetaData(userRelatedMetaData);
     headersRequestTransformer.setPredecessor(contentRequestTransformer);
     contentRequestTransformer.setPredecessor(urlRequestTransformer);
+    logger.trace("createHttpUriRequest ends here");
     return headersRequestTransformer.transform(request).build();
   }
 
@@ -279,10 +280,14 @@ public class GatewayController {
   
   @ExceptionHandler(value=NoHandlerFoundException.class)
   private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest)  {
+    logger.trace("Request Url: " + requestURI);
     Optional<Endpoint> endpoint =
             apiGatewayProperties.getEndpoints().stream()
                     .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
                     ).findFirst();
-    return endpoint.get().getLocation() + requestURI;
+    String endPoint = endpoint.get().getLocation() + requestURI;
+    logger.trace("Destination Url: " + endPoint);
+    return endPoint;
   }
+  
 }
