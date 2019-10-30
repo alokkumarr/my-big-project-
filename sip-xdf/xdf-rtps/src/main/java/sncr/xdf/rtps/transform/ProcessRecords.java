@@ -288,28 +288,37 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 			JSONObject rtaConfig = null;
 
-			Object config = this.ngctx.pipelineConfig.get("pipeline");
-			logger.debug("### Pipeline config in consumer ::" + this.ngctx.pipelineConfig);
-
-			if (config instanceof JSONObject) {
-				JSONObject jsonConfig = (JSONObject) config;
-				rtaConfig = (JSONObject) jsonConfig.get("rta");
-				logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+			
+			if(this.ngctx != null && this.ngctx.runningPipeLine) {
+				Object config = this.ngctx.pipelineConfig.get("pipeline");
+				logger.debug("### Pipeline config in consumer ::" + this.ngctx.pipelineConfig);
+				if (config instanceof JSONObject) {
+					JSONObject jsonConfig = (JSONObject) config;
+					rtaConfig = (JSONObject) jsonConfig.get("rta");
+					logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+				}
 			}
-    	  
+				String multiColName = null;
+				if(rtaConfig==null) {
+					multiColName = "EVENT_TYPE";
+				} else {
+
+					 multiColName = (String) rtaConfig.get("keyColumn");
+
+					if ( null == multiColName) {
+						logger.error("No multi column defined...ex: EVENT_TYPE");
+						return 255;
+					}
+
+					logger.debug("Multi column name " + multiColName);
+				
+				}
 
 				/**
 				 * Multiple event types
 				 */
-
-				Object multiColName = rtaConfig.get("keyColumn");
-
-				if (rtaConfig !=null && null == multiColName) {
-					logger.error("No multi column defined...ex: EVENT_TYPE");
-					return 255;
-				}
-
-				logger.debug("Multi column name " + multiColName);
+			
+				
 
 				//List<Row> multiColValues = df.select((String) multiColName).distinct().collectAsList();
 
@@ -319,9 +328,10 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				//Object threadPoolCnt = null;
 				//int numThreads = 0;
 				
-			final 	JSONObject rtaConfiguration = rtaConfig;
+			final JSONObject rtaConfiguration = rtaConfig;
+			final String keyColumn = multiColName;
 			this.schemaFields.forEach((eventType, eventSchema)->{
-					
+				
 				logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
 				
 				Dataset<Row> df  = null;
@@ -363,7 +373,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 				logger.debug("########## is Time series data ::" + isTimeSeries);
 
-				String query = multiColName + "== \'" + eventType + "\'";
+				String query = keyColumn + "== \'" + eventType + "\'";
 
 				logger.debug("Query:: " + query);
 
