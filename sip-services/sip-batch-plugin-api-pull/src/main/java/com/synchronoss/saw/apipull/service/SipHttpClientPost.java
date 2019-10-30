@@ -1,10 +1,8 @@
 package com.synchronoss.saw.apipull.service;
 
-import static org.apache.http.entity.ContentType.MULTIPART_FORM_DATA;
-
 import com.google.gson.Gson;
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
-import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +25,7 @@ public class SipHttpClientPost extends SipBaseHttpClient {
   String textData;
 
   RestTemplate restTemplate = new RestTemplate();
-  ApiResponse apiResponse = new ApiResponse();
+  SipApiResponse sipApiResponse = new SipApiResponse();
 
   public SipHttpClientPost(String host) {
     super(host);
@@ -91,7 +89,7 @@ public class SipHttpClientPost extends SipBaseHttpClient {
   }
 
   @Override
-  public ApiResponse execute() throws SipApiPullExecption {
+  public SipApiResponse execute() throws SipApiPullExecption {
     logger.trace("Inside Post Execute method !!");
     url = this.generateUrl(apiEndPoint, queryParams);
     logger.info("Url : {}", url);
@@ -117,12 +115,12 @@ public class SipHttpClientPost extends SipBaseHttpClient {
             restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
         logger.debug("Response Code : {}", response.getStatusCode());
         logger.debug("Response Body : {}", response.getBody());
-        apiResponse.setResponseBody(response.getBody().toString());
+        sipApiResponse.setResponseBody(response.getBody().toString());
         logger.debug("Response headers : {}", response.getHeaders().toString());
         HttpHeaders resHeaders = response.getHeaders();
-        apiResponse.setHttpHeaders(resHeaders);
-        apiResponse.setHttpStatus(response.getStatusCode());
-        return apiResponse;
+        sipApiResponse.setHttpHeaders(resHeaders);
+        sipApiResponse.setHttpStatus(response.getStatusCode());
+        return sipApiResponse;
 
       } else if (contentType == ContentType.APPLICATION_JSON.getMimeType()) {
         if (textData != null && textData.length() > 0) {
@@ -136,11 +134,11 @@ public class SipHttpClientPost extends SipBaseHttpClient {
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
           logger.debug("Response Code : {}", response.getStatusCode());
           logger.debug("Response Body : {}", response.getBody());
-          apiResponse.setResponseBody(response.getBody());
+          sipApiResponse.setResponseBody(response.getBody());
           logger.info("Response headers : {}", response.getHeaders().toString());
           HttpHeaders responseHeaders = response.getHeaders();
-          apiResponse.setHttpHeaders(responseHeaders);
-          apiResponse.setHttpStatus(response.getStatusCode());
+          sipApiResponse.setHttpHeaders(responseHeaders);
+          sipApiResponse.setHttpStatus(response.getStatusCode());
         }
       } else if (contentType == ContentType.TEXT_PLAIN.getMimeType()) {
         if (textData != null && textData.length() > 0) {
@@ -150,11 +148,11 @@ public class SipHttpClientPost extends SipBaseHttpClient {
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
           logger.debug("Response Code : {}", response.getStatusCode());
           logger.debug("Response Body : {}", response.getBody());
-          apiResponse.setResponseBody(response.getBody());
+          sipApiResponse.setResponseBody(response.getBody());
           logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
-          apiResponse.setHttpHeaders(resHeaders);
-          apiResponse.setHttpStatus(response.getStatusCode());
+          sipApiResponse.setHttpHeaders(resHeaders);
+          sipApiResponse.setHttpStatus(response.getStatusCode());
         }
       } else if (contentType == ContentType.APPLICATION_XML.getMimeType()) {
         if (textData != null && textData.length() > 0) {
@@ -167,11 +165,11 @@ public class SipHttpClientPost extends SipBaseHttpClient {
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
           logger.debug("Response Code : {}", response.getStatusCode());
           logger.debug("Response Body : {}", response.getBody());
-          apiResponse.setResponseBody(response.getBody());
+          sipApiResponse.setResponseBody(response.getBody());
           logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
-          apiResponse.setHttpHeaders(resHeaders);
-          apiResponse.setHttpStatus(response.getStatusCode());
+          sipApiResponse.setHttpHeaders(resHeaders);
+          sipApiResponse.setHttpStatus(response.getStatusCode());
         }
       } else if (contentType == ContentType.TEXT_XML.getMimeType()) {
         if (textData != null && textData.length() > 0) {
@@ -184,11 +182,11 @@ public class SipHttpClientPost extends SipBaseHttpClient {
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
           logger.debug("Response Code : {}", response.getStatusCode());
           logger.debug("Response Body : {}", response.getBody());
-          apiResponse.setResponseBody(response.getBody());
+          sipApiResponse.setResponseBody(response.getBody());
           logger.info("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
-          apiResponse.setHttpHeaders(resHeaders);
-          apiResponse.setHttpStatus(response.getStatusCode());
+          sipApiResponse.setHttpHeaders(resHeaders);
+          sipApiResponse.setHttpStatus(response.getStatusCode());
         }
       } else if (contentType == ContentType.TEXT_HTML.getMimeType()) {
         if (textData != null && textData.length() > 0) {
@@ -201,15 +199,15 @@ public class SipHttpClientPost extends SipBaseHttpClient {
               restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
           logger.debug("Response Code : {}", response.getStatusCode());
           logger.debug("Response Body : {}", response.getBody());
-          apiResponse.setResponseBody(response.getBody());
+          sipApiResponse.setResponseBody(response.getBody());
           logger.debug("Response headers : {}", response.getHeaders().toString());
           HttpHeaders resHeaders = response.getHeaders();
-          apiResponse.setHttpHeaders(resHeaders);
-          apiResponse.setHttpStatus(response.getStatusCode());
+          sipApiResponse.setHttpHeaders(resHeaders);
+          sipApiResponse.setHttpStatus(response.getStatusCode());
         }
       }
     }
 
-    return apiResponse;
+    return sipApiResponse;
   }
 }

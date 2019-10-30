@@ -1,7 +1,7 @@
 package com.synchronoss.saw.apipull.service;
 
-    import com.synchronoss.saw.apipull.pojo.ApiResponse;
+    import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 
 public interface BaseHttpClient {
-    public ApiResponse execute() throws Exception;
+    public SipApiResponse execute() throws Exception;
 }

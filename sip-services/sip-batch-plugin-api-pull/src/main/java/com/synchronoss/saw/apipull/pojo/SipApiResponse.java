@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse {
+public class SipApiResponse {
   Object responseBody;
   HttpStatus httpStatus;
   HttpHeaders httpHeaders;

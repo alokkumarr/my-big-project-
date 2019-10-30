@@ -2,7 +2,7 @@ package com.synchronoss.saw.apipull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.HttpMethod;
@@ -20,7 +20,7 @@ public class SipHttpClientTest {
 
   RestTemplate restTemplate;
   SipHttpClient sipHttpClient;
-  ApiResponse apiResponse;
+  SipApiResponse sipApiResponse;
   String url =
       "https://openweathermap.org/data/2.5/forecast/hourly?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
 
@@ -40,9 +40,9 @@ public class SipHttpClientTest {
     SipApiRequest sipApiRequest = new SipApiRequest();
     sipApiRequest.setUrl(url);
 
-    apiResponse = sipHttpClient.execute(sipApiRequest);
-    Assert.assertNotNull(apiResponse.getResponseBody());
-    Assert.assertNotNull(apiResponse.getHttpHeaders());
+    sipApiResponse = sipHttpClient.execute(sipApiRequest);
+    Assert.assertNotNull(sipApiResponse.getResponseBody());
+    Assert.assertNotNull(sipApiResponse.getHttpHeaders());
   }
 
   @Test
@@ -110,8 +110,8 @@ public class SipHttpClientTest {
     bodyParameters.setContent(objectNode);
     sipApiRequest.setBodyParameters(bodyParameters);
 
-    apiResponse = sipHttpClient.execute(sipApiRequest);
-    Assert.assertNotNull(apiResponse.getResponseBody());
-    Assert.assertNotNull(apiResponse.getHttpHeaders());
+    sipApiResponse = sipHttpClient.execute(sipApiRequest);
+    Assert.assertNotNull(sipApiResponse.getResponseBody());
+    Assert.assertNotNull(sipApiResponse.getHttpHeaders());
   }
 }

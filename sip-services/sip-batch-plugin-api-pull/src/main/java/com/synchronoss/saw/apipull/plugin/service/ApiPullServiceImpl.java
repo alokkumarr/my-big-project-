@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
-import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.ApiChannelMetadata;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
@@ -170,7 +169,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
         SipHttpClient sipHttpClient = new SipHttpClient();
 
         connectionLogs.append("Connecting to ").append(url).append("\n");
-        ApiResponse response = sipHttpClient.execute(apiRequest);
+        SipApiResponse response = sipHttpClient.execute(apiRequest);
 
         connectionLogs.append("Fetching data from ").append(url).append("\n");
         MediaType responseContentType = response.getHttpHeaders().getContentType();
@@ -313,7 +312,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
       SipHttpClient sipHttpClient = new SipHttpClient();
 
       connectionLogs.append("Connecting to ").append(url).append("\n");
-      ApiResponse response = sipHttpClient.execute(apiRequest);
+      SipApiResponse response = sipHttpClient.execute(apiRequest);
 
       connectionLogs.append("Fetching data from ").append(url).append("\n");
       HttpStatus httpStatus = response.getHttpStatus();
@@ -439,7 +438,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
       SipHttpClient sipHttpClient = new SipHttpClient();
 
       connectionLogs.append("Connecting to ").append(url).append("\n");
-      ApiResponse response = sipHttpClient.execute(apiRequest);
+      SipApiResponse response = sipHttpClient.execute(apiRequest);
 
       connectionLogs.append("Fetching data from ").append(url).append("\n");
       HttpStatus httpStatus = response.getHttpStatus();
@@ -644,7 +643,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
 
           logger.trace("Fetching API data");
 
-          ApiResponse response = sipHttpClient.execute(apiRequest);
+          SipApiResponse response = sipHttpClient.execute(apiRequest);
 
           logger.debug("API Response = " + response);
 

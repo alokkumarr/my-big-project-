@@ -1596,7 +1596,6 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("projectCode", "workbench");
     channel.put("channelType", "sftp");
     channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));
-    ;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route-" + name);
@@ -1801,10 +1800,19 @@ public class BatchIngestionIT extends BaseIT {
     childNode.put("apiEndPoint", "hourly");
     childNode.put("httpMethod", "GET");
     childNode.put("headerParameters", "[]");
-    childNode.put(
-        "queryParameters",
-        "[{\"key\":\"zip\",\"value\":\"94040\"},"
-            + "{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
+
+    ObjectNode queryParam1 = mapper.createObjectNode();
+    queryParam1.put("key", "zip");
+    queryParam1.put("value", "94040");
+
+    ObjectNode queryParam2 = mapper.createObjectNode();
+    queryParam2.put("key", "appid");
+    queryParam2.put("value", "b6907d289e10d714a6e88b30761fae22");
+
+    ArrayNode queryParamsArray = childNode.putArray("queryParameters");
+    queryParamsArray.add(queryParam1);
+    queryParamsArray.add(queryParam2);
+
     childNode.put("urlParameters", "[]");
     childNode.put("description", "api");
     ObjectNode root = mapper.createObjectNode();
@@ -1851,10 +1859,19 @@ public class BatchIngestionIT extends BaseIT {
     routeMetadata.put("apiEndPoint", "hourly");
     routeMetadata.put("httpMethod", "GET");
     routeMetadata.put("headerParameters", "[]");
-    routeMetadata.put(
-        "queryParameters",
-        "[{\"key\":\"zip\",\"value\":\"94040\"},"
-            + "{\"key\":\"appid\",\"value\":\"b6907d289e10d714a6e88b30761fae22\"}]");
+
+    ObjectNode queryParam1 = mapper.createObjectNode();
+    queryParam1.put("key", "zip");
+    queryParam1.put("value", "94040");
+
+    ObjectNode queryParam2 = mapper.createObjectNode();
+    queryParam2.put("key", "appid");
+    queryParam2.put("value", "b6907d289e10d714a6e88b30761fae22");
+
+    ArrayNode queryParamsArray = routeMetadata.putArray("queryParameters");
+    queryParamsArray.add(queryParam1);
+    queryParamsArray.add(queryParam2);
+
     routeMetadata.put("urlParameters", "[]");
     routeMetadata.put("lastModifiedLimitHours", "");
     ObjectNode schedulerNode = mapper.createObjectNode();
@@ -1869,7 +1886,9 @@ public class BatchIngestionIT extends BaseIT {
     return route;
   }
 
-  /** This test-case is check the scenario to create a route. */
+  /**
+   * This test-case is check the scenario to create a route.
+   */
   @Test
   public void createRouteForApiPull() throws JsonProcessingException {
     Long bisChannelSysId =

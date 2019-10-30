@@ -11,6 +11,7 @@ import com.synchronoss.saw.batch.model.BisProcessState;
 import com.synchronoss.saw.logs.constants.SourceType;
 import com.synchronoss.saw.logs.entities.BisJobEntity;
 import com.synchronoss.saw.logs.service.SipLogging;
+import java.util.Optional;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 /**
+ * Used to retry failed API ingestion jobs.
+ *
  * @author alok.kumarr
  * @since 3.4.0
  */
@@ -33,58 +35,90 @@ public class ApiPullRetryServiceImpl implements SipRetryContract {
   @Qualifier("apipullService")
   private ApiPullServiceImpl apiPullService;
 
-  @Autowired
-  private SipLogging sipLogService;
+  @Autowired private SipLogging sipLogService;
 
   @Override
-  public void retryFailedJob(Long channelId, Long routeId, String channelType, boolean isDisable,
-                             String pid, String status, Long jobId) throws NotFoundException {
-    logger.trace("inside transfer retry block for channel type {} : channelId {} starts here", channelType, channelId);
+  public void retryFailedJob(
+      Long channelId,
+      Long routeId,
+      String channelType,
+      boolean isDisable,
+      String pid,
+      String status,
+      Long jobId)
+      throws NotFoundException {
+    logger.trace(
+        "inside transfer retry block for channel type {} : channelId {} starts here",
+        channelType,
+        channelId);
     logger.trace("transferRetry with the process Id {}:", pid);
 
-    switch (channelType) {
-      case "apipull":
-        try {
-          Optional<BisRouteEntity> routeEntity = apiPullService.findRouteById(routeId);
-          if (routeEntity.isPresent()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-            BisRouteEntity bisRouteEntity = routeEntity.get();
+    try {
+      Optional<BisRouteEntity> routeEntity = apiPullService.findRouteById(routeId);
+      if (routeEntity.isPresent()) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        BisRouteEntity bisRouteEntity = routeEntity.get();
 
-            if (bisRouteEntity.getStatus() > 0) {
-              ObjectNode rootNode = (ObjectNode) objectMapper.readTree(bisRouteEntity.getRouteMetadata());
-              String destinationLocation = rootNode.get("destinationLocation").asText();
-              String sourceLocation = rootNode.get("sourceLocation").asText();
+        if (bisRouteEntity.getStatus() > 0) {
+          ObjectNode rootNode =
+              (ObjectNode) objectMapper.readTree(bisRouteEntity.getRouteMetadata());
 
-              BisJobEntity job = sipLogService.retriveJobById(jobId);
-              job.setJobStatus("INPROGRESS");
-              sipLogService.saveJob(job);
+          BisJobEntity job = sipLogService.retriveJobById(jobId);
+          job.setJobStatus("INPROGRESS");
+          sipLogService.saveJob(job);
 
-              logger.trace("sourceLocation inside transferRetry :" + sourceLocation);
-              logger.trace("destinationLocation inside transferRetry :" + destinationLocation);
-            }
-          }
-          if (sipLogService.checkAndDeleteLog(pid)) {
-            logger.info("deleted successfully the pid which had {} with pid {}", BisComponentState.HOST_NOT_REACHABLE, pid);
-          }
-        } catch (Exception ex) {
-          logger.error("Exception occurred while connecting to channel with the channel Id: {} and with process id {}", channelId, pid, ex);
-          sipLogService.upSertLogForExistingProcessStatus(channelId, routeId,
-              BisComponentState.HOST_NOT_REACHABLE.value(),
-              BisProcessState.FAILED.value(), SourceType.RETRY.name(), jobId);
+          String destinationLocation = rootNode.get("destinationLocation").asText();
+          String sourceLocation = rootNode.get("sourceLocation").asText();
+          logger.trace("sourceLocation inside transferRetry :" + sourceLocation);
+          logger.trace("destinationLocation inside transferRetry :" + destinationLocation);
         }
-        break;
-      default:
-        throw new NotFoundException("channelType does not support");
+      }
+      if (sipLogService.checkAndDeleteLog(pid)) {
+        logger.info(
+            "deleted successfully the pid which had {} with pid {}",
+            BisComponentState.HOST_NOT_REACHABLE,
+            pid);
+      }
+    } catch (Exception ex) {
+      logger.error(
+          "Exception occurred while connecting to channel"
+              + " with the channel Id: {} and with process id {}",
+          channelId,
+          pid,
+          ex);
+      sipLogService.upSertLogForExistingProcessStatus(
+          channelId,
+          routeId,
+          BisComponentState.HOST_NOT_REACHABLE.value(),
+          BisProcessState.FAILED.value(),
+          SourceType.RETRY.name(),
+          jobId);
     }
-    logger.info("inside transfer retry block for channel type : {} channelId : {} ends here.", channelType, channelId);
+
+    logger.info(
+        "inside transfer retry block for channel type : {} channelId : {} ends here.",
+        channelType,
+        channelId);
   }
 
   @Override
-  public void retryFailedFileTransfer(Long channelId, Long routeId, String fileName,
-                                      boolean isDisable, String source, Long jobId, String channelType) {
-    this.apiPullService.scanFilesForPattern(channelId, routeId, fileName,
-        isDisable, SourceType.RETRY.name(), Optional.of(jobId), channelType);
+  public void retryFailedFileTransfer(
+      Long channelId,
+      Long routeId,
+      String fileName,
+      boolean isDisable,
+      String source,
+      Long jobId,
+      String channelType) {
+    this.apiPullService.scanFilesForPattern(
+        channelId,
+        routeId,
+        fileName,
+        isDisable,
+        SourceType.RETRY.name(),
+        Optional.of(jobId),
+        channelType);
   }
 }

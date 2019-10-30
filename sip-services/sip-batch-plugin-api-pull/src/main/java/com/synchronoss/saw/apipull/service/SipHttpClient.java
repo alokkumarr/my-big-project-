@@ -1,7 +1,7 @@
 package com.synchronoss.saw.apipull.service;
 
 import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
-import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import com.synchronoss.saw.apipull.pojo.BodyParameters;
 import com.synchronoss.saw.apipull.pojo.HeaderParameter;
 import com.synchronoss.saw.apipull.pojo.QueryParameter;
@@ -19,11 +19,11 @@ import org.springframework.util.StringUtils;
 public class SipHttpClient {
   private static final Logger logger = LoggerFactory.getLogger(SipHttpClient.class);
 
-  public ApiResponse execute(SipApiRequest sipApiRequest) throws SipApiPullExecption {
+  public SipApiResponse execute(SipApiRequest sipApiRequest) throws SipApiPullExecption {
     boolean validRequest =
         !StringUtils.isEmpty(sipApiRequest.getUrl())
             && !StringUtils.isEmpty(sipApiRequest.getHttpMethod());
-    ApiResponse apiResponse = new ApiResponse();
+    SipApiResponse sipApiResponse = new SipApiResponse();
     if (validRequest) {
       String url = sipApiRequest.getUrl();
 
@@ -41,8 +41,8 @@ public class SipHttpClient {
             get.setHeaderParams(hp.getKey(), hp.getValue());
           }
         }
-        apiResponse = get.execute();
-        return apiResponse;
+        sipApiResponse = get.execute();
+        return sipApiResponse;
       } else {
         logger.debug("HttpMethod : {POST}");
         SipHttpClientPost post = new SipHttpClientPost(url);
@@ -73,8 +73,8 @@ public class SipHttpClient {
           post.setRawData(body.getContent().toString(), contentType);
         }
 
-        apiResponse = post.execute();
-        return apiResponse;
+        sipApiResponse = post.execute();
+        return sipApiResponse;
       }
 
     } else {

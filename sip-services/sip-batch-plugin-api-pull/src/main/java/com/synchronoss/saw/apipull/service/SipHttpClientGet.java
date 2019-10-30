@@ -1,7 +1,6 @@
 package com.synchronoss.saw.apipull.service;
 
-import com.synchronoss.saw.apipull.exceptions.SipApiPullExecption;
-import com.synchronoss.saw.apipull.pojo.ApiResponse;
+import com.synchronoss.saw.apipull.pojo.SipApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -27,8 +26,8 @@ public class SipHttpClientGet extends SipBaseHttpClient {
   }
 
   @Override
-  public ApiResponse execute() {
-    ApiResponse apiResponse = new ApiResponse();
+  public SipApiResponse execute() {
+    SipApiResponse sipApiResponse = new SipApiResponse();
     url = this.generateUrl(apiEndPoint, queryParams);
     logger.info("Url : {}", url);
 
@@ -40,10 +39,10 @@ public class SipHttpClientGet extends SipBaseHttpClient {
       ResponseEntity<Object> response =
           restTemplate.exchange(url, HttpMethod.GET, httpEntity, Object.class);
 
-      apiResponse.setResponseBody(response.getBody());
-      apiResponse.setHttpStatus(response.getStatusCode());
+      sipApiResponse.setResponseBody(response.getBody());
+      sipApiResponse.setHttpStatus(response.getStatusCode());
       HttpHeaders httpHeaders = response.getHeaders();
-      apiResponse.setHttpHeaders(httpHeaders);
+      sipApiResponse.setHttpHeaders(httpHeaders);
       logger.debug("Response Code : {}", response.getStatusCode());
       logger.debug("Response Body : {}", response.getBody());
       logger.debug("Response headers : {}", response.getHeaders().toString());
@@ -54,6 +53,6 @@ public class SipHttpClientGet extends SipBaseHttpClient {
       logger.error("Exception occurred");
       throw ex;
     }
-    return apiResponse;
+    return sipApiResponse;
   }
 }
