@@ -54,6 +54,9 @@ public class RestUtil {
 
   public static final String sanatizeAndValidateregEx =
       "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()]";
+
+    public static final String sanatizeAndValidateregExQuery =
+        "[=,<>,!=,<,>,<=,>=,!>,!<]";
   public static final String noSpace = "";
 
   /** creating rest template using SSL connection. */
@@ -225,7 +228,13 @@ public class RestUtil {
       while (iter.hasNext()) {
         nodeName = iter.next();
         JsonNode node = parentNode.path(nodeName);
-        nodeText = node.asText().replaceAll(sanatizeAndValidateregEx, noSpace);
+        if (nodeName.equalsIgnoreCase("query"))
+            nodeText=node.asText().replaceAll(sanatizeAndValidateregEx, noSpace)
+            // In case of Sql Query validate the additional operator possibly with sql syntax.
+                .replaceAll(sanatizeAndValidateregExQuery,noSpace);
+        else {
+            nodeText = node.asText().replaceAll(sanatizeAndValidateregEx, noSpace);
+        }
         if (node.isObject() || node.isArray()) {
           validateNodeValue(node);
         } else {
