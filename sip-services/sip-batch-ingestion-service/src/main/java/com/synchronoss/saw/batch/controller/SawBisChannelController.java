@@ -192,9 +192,8 @@ public class SawBisChannelController {
         String channelType = rootNode.get("channelType").textValue();
 
         if (channelType.equals(BisChannelType.SFTP.toString())) {
-          SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
           String secretPhrase = rootNode.get("password").asText();
-          secretPhrase = obfuscator.decrypt(secretPhrase);
+          secretPhrase = this.decryptPassword(secretPhrase);
           rootNode.put("password", secretPhrase);
         }
         bisChannelDto = new BisChannelDto();
@@ -256,9 +255,8 @@ public class SawBisChannelController {
       String channelType = rootNode.get("channelType").textValue();
 
       if (channelType.equals(BisChannelType.SFTP.toString())) {
-        SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
         String secretPhrase = rootNode.get("password").asText();
-        secretPhrase = obfuscator.decrypt(secretPhrase);
+        secretPhrase = this.decryptPassword(secretPhrase);
         rootNode.put("password", secretPhrase);
       }
       BeanUtils.copyProperties(channelEntityData, channelDto);
@@ -313,9 +311,8 @@ public class SawBisChannelController {
     String channelType = requestBody.getChannelType();
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
-      SipObfuscation obfuscator = new SipObfuscation(IntegrationUtils.secretKey);
       String secretPhrase = rootNode.get("password").asText();
-      secretPhrase = obfuscator.encrypt(secretPhrase);
+      secretPhrase = this.encryptPassword(secretPhrase);
       rootNode.put("password", secretPhrase);
       requestBody.setChannelMetadata(objectMapper.writeValueAsString(rootNode));
     }
@@ -458,7 +455,7 @@ public class SawBisChannelController {
 
     if (channelType.equals(BisChannelType.SFTP.toString())) {
       String secretPhrase = channelMetadata.get("password").asText();
-      String passwordPhrase = encryptPassword(secretPhrase);
+      String passwordPhrase = this.encryptPassword(secretPhrase);
       channelMetadata.put("password", passwordPhrase);
     }
 
