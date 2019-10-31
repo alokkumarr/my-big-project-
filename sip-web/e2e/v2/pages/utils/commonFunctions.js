@@ -142,10 +142,12 @@ module.exports = {
       .then(classes => classes.split(' ').includes(cls));
   },
   clickOnElement(el) {
+    browser.waitForAngular();
     this.waitFor.elementToBePresent(el);
     this.waitFor.elementToBeVisible(el);
     this.waitFor.elementToBeClickable(el);
     el.click();
+    browser.waitForAngular();
   },
   fillInput(el, value) {
     this.waitFor.elementToBeVisible(el);

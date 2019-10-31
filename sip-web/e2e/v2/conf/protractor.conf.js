@@ -51,6 +51,7 @@ let maxRetriesForFailedTests = SuiteSetup.distRun() ? 3 : 2;
  */
 const pageResolveTimeout = 1000;
 let run = SuiteSetup.islocalRun();
+const browserGetPageTimeout = 300000; // 5 min as sometime because of network slowness it can cause issues
 
 /**
  * All tests are running for customer
@@ -68,7 +69,8 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
-  directConnect: true,
+  directConnect: false,
+  getPageTimeout: browserGetPageTimeout,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -78,8 +80,8 @@ exports.config = {
       args: [
         'disable-extensions',
         'disable-web-security',
-        '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+        //'--start-fullscreen', // enable for Mac OS
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -119,11 +121,6 @@ exports.config = {
   },
   onPrepare: () => {
     retry.onPrepare();
-
-    browser
-      .manage()
-      .timeouts()
-      .pageLoadTimeout(pageLoadTimeout);
 
     browser
       .manage()
@@ -172,7 +169,6 @@ exports.config = {
     ).baseUrl;
 
     browser.get(browser.baseUrl);
-    browser.waitForAngular();
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
         return /login/.test(url);
