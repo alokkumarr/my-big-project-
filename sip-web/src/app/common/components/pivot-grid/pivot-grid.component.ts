@@ -306,9 +306,9 @@ export class PivotGridComponent implements OnDestroy {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({ name, groupInterval, manualFormat }) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(
-          clonedDataPoint[name],
+      forEach(columnsToFormat, ({ columnName, groupInterval, manualFormat }) => {
+        clonedDataPoint[columnName] = this.getFormattedDataValue(
+          clonedDataPoint[columnName],
           groupInterval,
           manualFormat
         );

@@ -49,6 +49,7 @@ export function substituteEmptyValues(data) {
 }
 
 export function flattenPivotData(data, sipQuery) {
+  data = alterDateInData(data, sipQuery);
   if (sipQuery.artifacts) {
     // const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
     //   ['row', 'column', 'data'].includes(field.area)
@@ -203,9 +204,9 @@ export function wrapFieldValues(data) {
   )(data);
 }
 
-export function alterReportData(data, analysis) {
+export function alterDateInData(data, sipQuery) {
   const dateFields = [];
-  flatMap(analysis.sipQuery.artifacts, artifact =>
+  flatMap(sipQuery.artifacts, artifact =>
     fpPipe(
       fpMap(fpPick(['columnName', 'type', 'aggregate'])),
       fpFilter(({ type, columnName, aggregate }) => {
@@ -234,7 +235,7 @@ export function flattenReportData(data, analysis) {
     return data;
   }
 
-  data = alterReportData(data, analysis);
+  data = alterDateInData(data, analysis.sipQuery);
 
   return data.map(row => {
     return mapKeys(row, (value, key) => {
