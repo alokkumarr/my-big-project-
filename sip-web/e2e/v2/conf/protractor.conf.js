@@ -69,7 +69,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
-  directConnect: false,
+  directConnect: true,
   getPageTimeout: browserGetPageTimeout,
   baseUrl: 'http://localhost:3000',
   capabilities: {
