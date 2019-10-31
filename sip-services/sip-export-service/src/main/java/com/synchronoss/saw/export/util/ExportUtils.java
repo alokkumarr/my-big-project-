@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
@@ -69,7 +70,20 @@ public class ExportUtils {
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
     for (Artifact artifact : sipQuery.getArtifacts()) {
-      fields.addAll(artifact.getFields());
+        String artifactName = artifact.getArtifactsName();
+      List<Field> artiFields = artifact.getFields();
+
+      for(Field artiField: artiFields) {
+        String artiFieldAlias = artiField.getAlias();
+        String artiFieldDispName = artiField.getDisplayName();
+
+        if (artiFieldAlias.equalsIgnoreCase("customerCode") ||
+            artiFieldDispName.equalsIgnoreCase("customerCode")) {
+          String tempAliasName = "customerCode";
+          artiField.setAlias(artifactName + "_" + tempAliasName);
+        }
+        fields.add(artiField);
+      }
     }
 
 
@@ -84,7 +98,7 @@ public class ExportUtils {
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
-              String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
+              String[] split = StringUtils.isEmpty(field.getAlias()) ? null : field.getAlias().split("\\.");
               String columnName;
               String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
               if (aggregationName != null && DISTINCT_COUNT_AGGREGATION.equalsIgnoreCase(aggregationName)) {
@@ -94,7 +108,13 @@ public class ExportUtils {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
                 header.put(columnName.trim(), aliasName);
               } else {
-                columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
+                if (field.getColumnName().equalsIgnoreCase("customerCode")) {
+                  columnName = aggregationName != null ? aggregationName.trim()
+                      + "(" + field.getAlias().trim() + ")" : field.getAlias();
+                } else {
+                  columnName = aggregationName != null ? aggregationName.trim()
+                      + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
+                }
                 header.put(columnName.trim(), aliasName);
               }
               break;
@@ -194,5 +214,73 @@ public class ExportUtils {
 
   public static String generateRandomStringDir() {
     return UUID.randomUUID().toString();
+  }
+
+  public static void main(String[] args) throws IOException {
+      String sipQueryStr = "{\n"
+          + "\t\t\t\"artifacts\": [{\n"
+          + "\t\t\t\t\"artifactsName\": \"sales\",\n"
+          + "\t\t\t\t\"fields\": [{\n"
+          + "\t\t\t\t\t\"alias\": \"\",\n"
+          + "\t\t\t\t\t\"columnName\": \"customerCode\",\n"
+          + "\t\t\t\t\t\"displayName\": \"CustomerCode\",\n"
+          + "\t\t\t\t\t\"type\": \"string\",\n"
+          + "\t\t\t\t\t\"visibleIndex\": 0,\n"
+          + "\t\t\t\t\t\"name\": \"customerCode\",\n"
+          + "\t\t\t\t\t\"table\": \"sales\"\n"
+          + "\t\t\t\t}, {\n"
+          + "\t\t\t\t\t\"alias\": \"\",\n"
+          + "\t\t\t\t\t\"columnName\": \"date\",\n"
+          + "\t\t\t\t\t\"displayName\": \"Date\",\n"
+          + "\t\t\t\t\t\"type\": \"date\",\n"
+          + "\t\t\t\t\t\"visibleIndex\": 2,\n"
+          + "\t\t\t\t\t\"dateFormat\": \"yyyy-MM-dd\",\n"
+          + "\t\t\t\t\t\"name\": \"date\",\n"
+          + "\t\t\t\t\t\"table\": \"sales\"\n"
+          + "\t\t\t\t}]\n"
+          + "\t\t\t}, {\n"
+          + "\t\t\t\t\"artifactsName\": \"product\",\n"
+          + "\t\t\t\t\"fields\": [{\n"
+          + "\t\t\t\t\t\"alias\": \"\",\n"
+          + "\t\t\t\t\t\"columnName\": \"customerCode\",\n"
+          + "\t\t\t\t\t\"displayName\": \"CustomerCode\",\n"
+          + "\t\t\t\t\t\"type\": \"string\",\n"
+          + "\t\t\t\t\t\"visibleIndex\": 1,\n"
+          + "\t\t\t\t\t\"name\": \"customerCode\",\n"
+          + "\t\t\t\t\t\"table\": \"product\"\n"
+          + "\t\t\t\t}]\n"
+          + "\t\t\t}],\n"
+          + "\t\t\t\"booleanCriteria\": \"AND\",\n"
+          + "\t\t\t\"filters\": [],\n"
+          + "\t\t\t\"sorts\": [],\n"
+          + "\t\t\t\"joins\": [{\n"
+          + "\t\t\t\t\"join\": \"inner\",\n"
+          + "\t\t\t\t\"criteria\": [{\n"
+          + "\t\t\t\t\t\"joinCondition\": {\n"
+          + "\t\t\t\t\t\t\"operator\": \"EQ\",\n"
+          + "\t\t\t\t\t\t\"left\": {\n"
+          + "\t\t\t\t\t\t\t\"artifactsName\": \"SALES\",\n"
+          + "\t\t\t\t\t\t\t\"columnName\": \"customerCode\"\n"
+          + "\t\t\t\t\t\t},\n"
+          + "\t\t\t\t\t\t\"right\": {\n"
+          + "\t\t\t\t\t\t\t\"artifactsName\": \"PRODUCT\",\n"
+          + "\t\t\t\t\t\t\t\"columnName\": \"customerCode\"\n"
+          + "\t\t\t\t\t\t}\n"
+          + "\t\t\t\t\t}\n"
+          + "\t\t\t\t}]\n"
+          + "\t\t\t}],\n"
+          + "\t\t\t\"store\": {},\n"
+          + "\t\t\t\"query\": \"SELECT sales.customerCode as sales_customerCode , sales.date, product.customerCode as product_customerCode  FROM SALES INNER JOIN PRODUCT ON SALES.customerCode = PRODUCT.customerCode\",\n"
+          + "\t\t\t\"semanticId\": \"workbench::sample-spark\"\n"
+          + "\t\t}";
+
+
+      ObjectMapper mapper = new ObjectMapper();
+
+      SipQuery sipQuery = mapper.readValue(sipQueryStr, SipQuery.class);
+
+      Map map = buildColumnHeaderMap(sipQuery);
+
+    System.out.println(map);
   }
 }
