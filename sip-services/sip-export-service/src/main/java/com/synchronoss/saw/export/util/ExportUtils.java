@@ -70,15 +70,15 @@ public class ExportUtils {
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
     for (Artifact artifact : sipQuery.getArtifacts()) {
-        String artifactName = artifact.getArtifactsName();
+      String artifactName = artifact.getArtifactsName();
       List<Field> artiFields = artifact.getFields();
 
       for(Field artiField: artiFields) {
         String artiFieldAlias = artiField.getAlias();
         String artiFieldDispName = artiField.getDisplayName();
 
-        if (artiFieldAlias.equalsIgnoreCase("customerCode") ||
-            artiFieldDispName.equalsIgnoreCase("customerCode")) {
+        if ((artifactName != null && artiFieldAlias.equalsIgnoreCase("customerCode")) ||
+            (artiFieldDispName!= null && artiFieldDispName.equalsIgnoreCase("customerCode"))) {
           String tempAliasName = "customerCode";
           artiField.setAlias(artifactName + "_" + tempAliasName);
         }
