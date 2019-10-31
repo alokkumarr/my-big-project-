@@ -20,8 +20,8 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
   @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
-  @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
-  @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterPublish: EventEmitter<AnalysisDSL> = new EventEmitter();
+  @Output() afterSchedule: EventEmitter<AnalysisDSL> = new EventEmitter();
   @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
   @Input() analysis: Analysis | AnalysisDSL;
   @Input() exclude: string;
