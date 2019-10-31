@@ -28,11 +28,11 @@ public class BisJobController extends BaseJobController {
   @Autowired
   @Lazy
   JobService<BisSchedulerJobDetails> bisService;
-  
-  
+
+
   /**
    * schedules a batch ingestion.
-   * 
+   *
    * @param jobDetail details of a job.
    * @return scheduleder response data.
    */
@@ -79,25 +79,25 @@ public class BisJobController extends BaseJobController {
   }
   /**
    * Unschedule a job.
-   * 
+   *
    * @param schedule key, job key..etc
    */
-  
+
   @RequestMapping(value = "bisscheduler/unschedule", method = RequestMethod.POST)
   public SchedulerResponse unschedule(@RequestBody ScheduleKeys schedule) {
     logger.info("JobController unschedule() method");
     boolean status =    bisService.unScheduleJob(schedule);
-    
+
     if (status) {
       return getServerResponse(ServerResponseCode.SUCCESS, true);
     } else {
       return getServerResponse(ServerResponseCode.ERROR, false);
     }
   }
-  
+
   /**
    * Deletes a job.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse
    */
@@ -123,12 +123,12 @@ public class BisJobController extends BaseJobController {
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
-  
+
   /**
    * Pause a job. Even a job is running currently
    * invoke pause job so as to pause all future
    * triggers for the job.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
@@ -139,7 +139,7 @@ public class BisJobController extends BaseJobController {
     if (bisService.isJobWithNamePresent(schedule)) {
 
       boolean isJobRunning = bisService.isJobRunning(schedule);
-      
+
 
       logger.info("Is job running :: ? " + isJobRunning);
       logger.info("Pausing now....");
@@ -151,17 +151,17 @@ public class BisJobController extends BaseJobController {
         logger.info("Pause Job failure!!");
         return getServerResponse(ServerResponseCode.ERROR, false);
       }
-  
+
     } else {
       logger.info("Job " + schedule  + "doesnt exists");
       // Job doesn't exist
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
-  
+
   /**
    * Resumes a job.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
@@ -192,10 +192,10 @@ public class BisJobController extends BaseJobController {
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
-  
+
   /**
    * Updates a job.
-   * 
+   *
    * @param jobDetail Job details
    * @return SchedulerResponse.
    */
@@ -214,7 +214,7 @@ public class BisJobController extends BaseJobController {
 
     // Edit Job
     if (bisService.isJobWithNamePresent(scheduleKeys)) {
-        
+
       logger.info("JobController job with details exists so update ");
 
       if (jobDetail.getCronExpression() == null
@@ -240,14 +240,24 @@ public class BisJobController extends BaseJobController {
       }
 
     } else {
-      logger.info("JobController job with details doesnt exists so cant update ");
-      return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
+      logger.info("Job not present. Creating new job");
+
+      boolean status = bisService.scheduleCronJob(jobDetail, BisCronJob.class);
+      if (status) {
+        logger.info("Job scheduled  successfully");
+        return getServerResponse(ServerResponseCode.SUCCESS, true);
+      } else {
+        logger.info("Failed to schedule job");
+        return getServerResponse(ServerResponseCode.ERROR, false);
+      }
+      //      logger.info("JobController job with details doesnt exists so cant update ");
+      //      return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
-  
+
   /**
    * Retrieves all jobs.
-   * 
+   *
    * @param schedule schedule key
    * @return
    */
@@ -259,10 +269,10 @@ public class BisJobController extends BaseJobController {
         bisService.getAllJobs(schedule.getGroupkey(), schedule.getCategoryId());
     return getServerResponse(ServerResponseCode.SUCCESS, list);
   }
-  
+
   /**
    * Retrieves a job details.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse.
    */
@@ -278,10 +288,10 @@ public class BisJobController extends BaseJobController {
     Map<String, Object> status = bisService.getJobDetails(schedule);
     return getServerResponse(ServerResponseCode.SUCCESS, status);
   }
-  
+
   /**
    * Checks if job is running.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse
    */
@@ -292,10 +302,10 @@ public class BisJobController extends BaseJobController {
     boolean status = bisService.isJobRunning(schedule);
     return getServerResponse(ServerResponseCode.SUCCESS, status);
   }
-  
+
   /**
    * Retrives a jobs state.
-   * 
+   *
    * @param schedule Details of schedule such as schedule key..etcc
    * @return state of job
    */
@@ -308,11 +318,11 @@ public class BisJobController extends BaseJobController {
   }
   /**
    * Stops a job.
-   * 
+   *
    * @param schedule data.
    * @return scheduler response.
    */
-  
+
   @RequestMapping(value = "bisscheduler/stop", method = RequestMethod.POST)
   public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule) {
     logger.info("JobController stopJob() method");
@@ -340,11 +350,11 @@ public class BisJobController extends BaseJobController {
   }
   /**
    * Starts a new job.
-   * 
+   *
    * @param schedule schedule key
    * @return SchedulerResponse
    */
-  
+
   @RequestMapping(value = "bisscheduler/start", method = RequestMethod.POST)
   public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule) {
     logger.info("JobController startJobNow() method");
@@ -373,10 +383,10 @@ public class BisJobController extends BaseJobController {
       return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
     }
   }
-  
+
   /**
    * Retrieves server response.
-   * 
+   *
    * @param responseCode respCode
    * @param data details
    * @return SchedulerResponse

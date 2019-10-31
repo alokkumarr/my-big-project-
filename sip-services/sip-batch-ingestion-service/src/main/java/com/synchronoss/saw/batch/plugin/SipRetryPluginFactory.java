@@ -1,5 +1,6 @@
 package com.synchronoss.saw.batch.plugin;
 
+import com.synchronoss.saw.apipull.plugin.service.ApiPullRetryServiceImpl;
 import com.synchronoss.saw.batch.extensions.SipRetryContract;
 import com.synchronoss.saw.batch.model.BisChannelType;
 import com.synchronoss.saw.batch.plugin.service.S3RetryServiceImpl;
@@ -12,33 +13,40 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SipRetryPluginFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SipIngestionPluginFactory.class);
+
+  @Autowired
+  private S3RetryServiceImpl s3RetryServiceImpl;
   @Autowired
   private SftpRetryServiceImpl sftpRetryServiceImpl;
-
   @Autowired
-  S3RetryServiceImpl s3RetryServiceImpl;
-
-  private static final Logger logger = LoggerFactory
-      .getLogger(SipIngestionPluginFactory.class);
+  private ApiPullRetryServiceImpl apiPullRetryService;
 
   /**
-   * Retrive instance based on ingestion type.
-   * 
+   * Retrieve instance based on ingestion type.
+   *
    * @param ingestionType channel type
    * @return pluginContract
    */
   public SipRetryContract getInstance(String ingestionType) {
 
     SipRetryContract sipRetryService = null;
-
-    if (ingestionType.equals(BisChannelType.SFTP.value())) {
-      sipRetryService = this.sftpRetryServiceImpl;
-    } else if (ingestionType.equals(BisChannelType.S3.value())) {
-      sipRetryService = this.s3RetryServiceImpl;
+    switch (BisChannelType.fromValue(ingestionType)) {
+      case SFTP:
+        sipRetryService = this.sftpRetryServiceImpl;
+        break;
+      case S3:
+        sipRetryService = this.s3RetryServiceImpl;
+        break;
+      case APIPULL:
+        sipRetryService = this.apiPullRetryService;
+        break;
+      default:
+        LOGGER.info("No instance found for the BIS retry process.");
     }
 
+    LOGGER.trace("Instance of retry process : {}", sipRetryService);
     return sipRetryService;
-
   }
-
 }

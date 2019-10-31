@@ -71,6 +71,7 @@ public abstract class SipPluginContract {
       backoff = @Backoff(delayExpression = "#{${sip.service.retry.delay}}"))
   public List<BisDataMetaInfo> immediateTransfer(BisConnectionTestPayload payload)
       throws SipNestedRuntimeException {
+    logger.info("Inside immediateTransfer");
     logger.info("It has been left empty intentionally because "
         + "it will be overriden on the respective plugin module if required");
     return new ArrayList<>();
@@ -86,6 +87,7 @@ public abstract class SipPluginContract {
       String filePattern, boolean isDisable, String source,
       Optional<Long> jobId, String channelType)
       throws SipNestedRuntimeException {
+    logger.info("Inside scanFilesForPattern");
     logger.info("It has been left empty intentionally because it "
         + "will be overriden on the respective plugin module if required");
     return new ArrayList<>();
