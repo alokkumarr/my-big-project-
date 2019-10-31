@@ -2,7 +2,7 @@
   "SORTING_CHARTS": {
     "sort_asc": {
       "SORTA001": {
-        "suites": ["critical", "regression", "development"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "chartType": "chart:combo",
         "description": "User should be able to add sort by asc order for combo charts"
