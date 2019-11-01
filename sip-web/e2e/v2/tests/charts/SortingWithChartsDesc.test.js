@@ -20,7 +20,7 @@ const Header = require('../../pages/components/Header');
 /**
  * LIMIT does't work with group by and more than one metric field
  */
-describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.js', () => {
+describe('Executing Sorting for charts tests from charts/SortingWithChartsDesc.test.js', () => {
   let analysisId;
   let host;
   let token;
@@ -30,7 +30,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   const groupName = 'String';
   const sizeByName = 'Float';
   beforeAll(() => {
-    logger.info('Starting charts/SortingWithCharts.test.js.....');
+    logger.info('Starting charts/SortingWithChartsDesc.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -58,8 +58,8 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   });
 
   using(
-    testDataReader.testData['SORTING_CHARTS']['sort_asc']
-      ? testDataReader.testData['SORTING_CHARTS']['sort_asc']
+    testDataReader.testData['SORTING_CHARTS']['sort_desc']
+      ? testDataReader.testData['SORTING_CHARTS']['sort_desc']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -95,7 +95,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
 
         // Apply sorting starts
         chartDesignerPage.clickOnSortButton();
-        chartDesignerPage.clickOnAscSortButtonByField(dimension);
+        chartDesignerPage.clickOnDescSortButtonByField(dimension);
         chartDesignerPage.clickOnApplySortButton();
         // Apply sorting ends
         //Save
@@ -121,7 +121,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
         executePage.clickOnEditLink();
         chartDesignerPage.clickOnSortButton();
         // Verify sort options are applied
-        chartDesignerPage.verifySortOptionsApplied([dimension], 'asc');
+        chartDesignerPage.verifySortOptionsApplied([dimension], 'desc');
         chartDesignerPage.clickOnApplySortButton();
         chartDesignerPage.clickOnSave();
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
@@ -135,7 +135,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
         testId: id,
         data: data,
         feature: 'SORTING_CHARTS',
-        dataProvider: 'sort_asc'
+        dataProvider: 'sort_desc'
       };
     }
   );
