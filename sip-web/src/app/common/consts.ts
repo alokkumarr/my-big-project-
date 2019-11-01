@@ -436,42 +436,6 @@ export const DATAPOD_CATEGORIES_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(DATAPOD_CATEGORIES);
 
-// TODO remove alertsModule when it's added into saw_security DB
-export const ALERTS_MODULE_MENU = {
-  prodCode: 'SAWD0000012131',
-  productModName: 'ALERTS',
-  productModDesc: 'Alerts Module',
-  productModCode: 'ALERT00001',
-  productModID: '333333',
-  moduleURL: 'alerts',
-  defaultMod: '1',
-  privilegeCode: 128,
-  prodModFeature: [
-    {
-      prodModFeatureName: 'Alerts',
-      prodModCode: 'ALERT00001',
-      productModuleSubFeatures: [
-        {
-          prodModFeatureName: 'View Alerts',
-          prodModFeatureDesc: 'View Alert',
-          defaultURL: 'view',
-          prodModFeatureID: 'viewAlert',
-          prodModFeatrCode: 'viewAlert',
-          roleId: 1
-        },
-        {
-          prodModFeatureName: 'Configure Alerts',
-          prodModFeatureDesc: 'Configure Alerts',
-          defaultURL: 'configure',
-          prodModFeatureID: 'configureAlert',
-          prodModFeatrCode: 'configureAlert',
-          roleId: 1
-        }
-      ]
-    }
-  ]
-};
-
 export const PRODUCT_MODULE_MOCK_MENU = {
   prodCode: 'SAWD0000012131',
   productModName: 'INSIGHTS',
