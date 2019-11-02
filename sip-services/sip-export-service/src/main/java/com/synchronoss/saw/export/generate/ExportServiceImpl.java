@@ -408,7 +408,8 @@ public class ExportServiceImpl implements ExportService {
     XlsxExporter xlsxExporter = new XlsxExporter();
     Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
-    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+    String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
+    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(sheetName);
     try {
       // write the data in excel sheet in batch
       long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;

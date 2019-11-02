@@ -195,4 +195,15 @@ public class ExportUtils {
   public static String generateRandomStringDir() {
     return UUID.randomUUID().toString();
   }
+
+  public static String prepareExcelSheetName(String analysisName) {
+    /*Excel sheet Name doesn't allow some special characters and length should be less than 31,so
+    removing the special characters from analysis name and prearing name with only first 31
+    characters*/
+    analysisName = analysisName.trim().replaceAll("[*/:\\\\?\\[\\]]", "");
+    if (analysisName.length() > 31) {
+      analysisName = analysisName.substring(0, 31);
+    }
+    return analysisName;
+  }
 }
