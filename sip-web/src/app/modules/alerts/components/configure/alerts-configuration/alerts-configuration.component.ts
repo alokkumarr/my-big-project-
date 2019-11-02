@@ -129,7 +129,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
       this._configureAlertService
         .getAllAlerts(options)
         .then(({ alertRuleDetailsList, numberOfRecords }) => {
-          // this.enablePaging = numberOfRecords > DEFAULT_PAGE_SIZE;
+          this.enablePaging = numberOfRecords > DEFAULT_PAGE_SIZE;
           return {
             data: alertRuleDetailsList,
             totalCount: numberOfRecords

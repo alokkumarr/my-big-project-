@@ -24,6 +24,7 @@ import {
   CommonSemanticService
 } from '../../../../../common/services';
 import { JobsPageComponent } from './jobs-page.component';
+import { CHANNEL_UID } from '../../../wb-comp-configs';
 
 const queryParams = { channelTypeId: '' };
 
@@ -82,4 +83,13 @@ describe('Jobs page', () => {
   it('should exist', async(() => {
     expect(fixture.componentInstance).not.toBeNull();
   }));
+
+  it('should transform source type for display', () => {
+    expect(
+      fixture.componentInstance.sourceTypeForDisplay(CHANNEL_UID.API)
+    ).toEqual('API');
+    expect(
+      fixture.componentInstance.sourceTypeForDisplay('abc' as any)
+    ).toEqual('ABC');
+  });
 });

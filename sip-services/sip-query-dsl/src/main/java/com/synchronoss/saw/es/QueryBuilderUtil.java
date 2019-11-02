@@ -153,10 +153,12 @@ public class QueryBuilderUtil {
             AggregationBuilders.cardinality(dataField).field(field.getColumnName());
         break;
       case PERCENTAGE:
+        String columnName =
+            field.getDataField() == null ? field.getColumnName() : field.getDataField();
         Script script =
             new Script(
                 "_value*100/"
-                    + field.getAdditionalProperties().get(field.getColumnName() + "_sum"));
+                    + field.getAdditionalProperties().get(columnName + "_sum"));
         aggregationBuilder =
             AggregationBuilders.sum(dataField).field(field.getColumnName()).script(script);
         break;

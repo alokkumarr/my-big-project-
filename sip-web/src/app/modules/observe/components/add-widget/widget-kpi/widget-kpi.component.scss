@@ -121,4 +121,44 @@ form {
       opacity: 0.5;
     }
   }
+
+  .format-data-kpi-header {
+    height: 50px !important;
+    padding: 0 20px 0 0;
+    background-color: transparent !important;
+    border-bottom: 1px solid #d1d3d3;
+  }
+
+  .format-data-kpi {
+    box-shadow: none;
+    display: contents;
+  }
+
+  .format-data-form {
+    margin-top: 5px;
+    font-size: 14px;
+    padding-top: 10px;
+
+    mat-form-field, div mat-form-field {
+      width: 100%;
+      height: 56px;
+    }
+  }
+
+  ::ng-deep .format-title {
+    font-size: 14px;
+  }
+
+  ::ng-deep .mat-expansion-panel-body {
+    padding: 0px;
+  }
+}
+
+.filter-kpis {
+  top: -28px;
+  margin-left: 83%;
+  font-size: 20px;
+  position: relative;
+  height: auto;
+  cursor: pointer;
 }

@@ -51,6 +51,7 @@ let maxRetriesForFailedTests = SuiteSetup.distRun() ? 3 : 2;
  */
 const pageResolveTimeout = 1000;
 let run = SuiteSetup.islocalRun();
+const browserGetPageTimeout = 300000; // 5 min as sometime because of network slowness it can cause issues
 
 /**
  * All tests are running for customer
@@ -69,6 +70,7 @@ exports.config = {
   customerCode: customerCode,
   useAllAngular2AppRoots: true,
   directConnect: true,
+  getPageTimeout: browserGetPageTimeout,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -123,11 +125,6 @@ exports.config = {
     browser
       .manage()
       .timeouts()
-      .pageLoadTimeout(pageLoadTimeout);
-
-    browser
-      .manage()
-      .timeouts()
       .implicitlyWait(implicitlyWait);
 
     // Allure reporter start
@@ -172,7 +169,6 @@ exports.config = {
     ).baseUrl;
 
     browser.get(browser.baseUrl);
-    browser.waitForAngular();
     return browser.wait(() => {
       return browser.getCurrentUrl().then(url => {
         return /login/.test(url);

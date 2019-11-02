@@ -7,6 +7,7 @@ export interface ArtifactColumn {
   z;
   g;
   columnName: string;
+  dataField?: string;
   table: string;
   displayName: string;
   filterEligible: boolean;

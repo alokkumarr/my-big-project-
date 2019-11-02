@@ -37,6 +37,24 @@ interface ReportGridField {
   headerCellTemplate: string;
 }
 
+/**
+ * Converts datafield notation like 'sum@@double' to human
+ * friendly notation like 'sum(double)'
+ *
+ * Takes an array of data rows. Replaces keys in datafield
+ * notation to described human friendly notation.
+ *
+ * @param {{ [key: string]: any }} data
+ */
+export const dataFieldToHuman = (dataFieldName: string) => {
+  if (/\w@@\w/.test(dataFieldName)) {
+    const [agg, col] = dataFieldName.split('@@');
+    return `${agg}(${col})`;
+  }
+
+  return dataFieldName;
+};
+
 @Component({
   selector: 'chart-grid',
   templateUrl: 'chart-grid.component.html',
@@ -162,14 +180,22 @@ export class ChartGridComponent implements OnInit {
   fetchColumnData(axisName, value) {
     let alias = axisName;
     const columns = this.analysis.sipQuery.artifacts[0].fields;
+    const isDataField = /@@/.test(axisName);
     forEach(columns, column => {
-      if (
-        axisName === column.name ||
-        axisName === column.columnName.split('.keyword')[0]
-      ) {
+      const isMatchingColumn = isDataField
+        ? axisName === column.dataField
+        : axisName === column.name ||
+          axisName === column.columnName.split('.keyword')[0];
+      if (isMatchingColumn) {
         const columnFormat =
           column.type === 'date' ? column.dateFormat : column.format;
-        alias = column.alias || column.displayName;
+
+        /* If this is a data field, make it look user friendly */
+        alias =
+          column.alias ||
+          (isDataField
+            ? dataFieldToHuman(column.dataField)
+            : column.displayName);
         value =
           column.type === 'date'
             ? moment
@@ -274,6 +300,7 @@ export class ChartGridComponent implements OnInit {
       );
     }
     const chartData = orderedData || data;
+
     this.chartToggleData = this.trimKeyword(chartData);
 
     return [

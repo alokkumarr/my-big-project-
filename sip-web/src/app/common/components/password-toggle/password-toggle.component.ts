@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef } from '@angular/core';
 
 const dummyPassword = '**********';
 
@@ -8,6 +8,9 @@ const dummyPassword = '**********';
   styleUrls: ['./password-toggle.component.scss']
 })
 export class PasswordToggleComponent implements OnInit {
+  // @ViewChild('passwords') passwords;
+  @ViewChild('passwordHide') passwordHide: ElementRef;
+  @ViewChild('passwordShow') passwordShow: ElementRef;
   public showPassword: boolean;
   public userPassword: String;
   public placeHolder: String;
@@ -15,6 +18,19 @@ export class PasswordToggleComponent implements OnInit {
   public shouldShowIcon: boolean;
 
   @Output() public change: EventEmitter<string> = new EventEmitter();
+
+  @Input('state')
+  set setState(state) {
+    if (!state) {
+      if (this.passwordHide) {
+        this.passwordHide.nativeElement.focus();
+      }
+
+      if (this.passwordShow) {
+        this.passwordShow.nativeElement.focus();
+      }
+    }
+  }
 
   @Input('placeholder')
   set setPlaceHolder(data) {

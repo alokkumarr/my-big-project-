@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as isEmpty from 'lodash/isEmpty';
 import {
@@ -13,12 +13,14 @@ import {
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+  @ViewChild('username') username: ElementRef;
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
     public _configService: ConfigService,
     public _router: Router,
-    public _route: ActivatedRoute
+    public _route: ActivatedRoute,
+    public element: ElementRef<HTMLElement>
   ) {}
 
   public dataHolder = {
@@ -26,12 +28,15 @@ export class LoginComponent implements OnInit {
     password: null
   };
 
+  public state: boolean;
+
   public states = {
     error: null
   };
 
   ngOnInit() {
     this.states.error = '';
+    this.state = true;
     this._route.queryParams.subscribe(({ changePassMsg }) => {
       if (changePassMsg) {
         this.states.error = changePassMsg;
@@ -40,6 +45,10 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    this.username.nativeElement.blur();
+    if (isEmpty(this.dataHolder.password)) {
+      this.username.nativeElement.blur();
+    }
     if (
       isEmpty(this.dataHolder.username) ||
       isEmpty(this.dataHolder.password)
@@ -54,6 +63,7 @@ export class LoginComponent implements OnInit {
     this._UserService.attemptAuth(params).then(data => {
       this.states.error = '';
       if (this._JwtService.isValid(data)) {
+        this.state = true;
         this._configService.getConfig().subscribe(
           () => {
             this._router.navigate(['']);
@@ -63,6 +73,8 @@ export class LoginComponent implements OnInit {
           }
         );
       } else {
+        this.state = false;
+        this.username.nativeElement.blur();
         this.states.error = this._JwtService.getValidityReason(data);
       }
     });

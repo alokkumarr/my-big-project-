@@ -17,8 +17,8 @@ import com.google.gson.JsonArray;
     import sncr.bda.conf.ESLoader;
     import sncr.bda.core.file.HFileOperations;
     import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.alert.AlertQueueManager;
-import sncr.xdf.context.ComponentServices;
+    import sncr.xdf.alert.AlertQueueManager;
+    import sncr.bda.conf.ComponentServices;
     import sncr.xdf.context.NGContext;
     import sncr.xdf.esloader.esloadercommon.ESHttpClient;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
@@ -101,7 +101,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
 
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
-            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId);
+            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId, persistMode);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.debug("Output datasets:");

@@ -90,18 +90,19 @@ public class SecurityController {
 
 		logger.info("Ticket will be created..");
 		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
-
 		Ticket ticket = new Ticket();
 		User user = null;
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
 		RefreshToken rToken = null;
+
 		try {
 			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
 					loginDetails.getPassword());
 
 			boolean isUserAuthentic = ret[0];
 			boolean isPassWordActive = ret[1];
+			boolean isAccountLocked = ret[2];
 			if (isUserAuthentic) {
 				if (isPassWordActive) {
 					user = new User();
@@ -112,7 +113,10 @@ public class SecurityController {
 				} else {
 					ticket.setValidityReason("Password Expired");
 				}
-			} else {
+			} else if (isAccountLocked) {
+        ticket.setValidityReason(
+            String.format("Account has been locked!!, Please try after sometime"));
+            } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
 			rToken = new RefreshToken();
@@ -134,7 +138,7 @@ public class SecurityController {
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),ticket.isValid(),ticket.getValidityReason());
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
@@ -543,6 +547,14 @@ public class SecurityController {
 			this.validity = validity;
 			this.message = message;
 		}
+
+		public LoginResponse(final String aToken, final  String rToken, boolean validity,
+            String message) {
+            this.aToken = aToken;
+            this.rToken = rToken;
+		    this.validity = validity;
+            this.message = message;
+        }
 	}
 
 	@SuppressWarnings("unused")

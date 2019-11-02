@@ -1,5 +1,10 @@
 import { requireIf } from './required-if.validator';
-import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  ReactiveFormsModule,
+  FormControl
+} from '@angular/forms';
 
 import { TestBed } from '@angular/core/testing';
 
@@ -44,5 +49,28 @@ describe('Required if Validator', () => {
     form.get('field1').setValue('');
     form.get('field2').updateValueAndValidity();
     expect(form.invalid).toBeFalsy();
+  });
+
+  it('should work if supplied with a function that returns form control', () => {
+    const fb: FormBuilder = TestBed.get(FormBuilder);
+    const localForm = fb.group({
+      field1: [''],
+      field2: [
+        '',
+        [
+          requireIf(
+            control => localForm.get('field1') as FormControl,
+            val => Boolean(val)
+          )
+        ]
+      ]
+    });
+    const expectedObj = { required: { value: '' } };
+    localForm.get('field1').setValue('abc');
+    localForm.get('field2').setValue('');
+    expect(localForm.invalid).toBeTruthy();
+    expect(localForm.get('field2').errors).toEqual(
+      jasmine.objectContaining(expectedObj)
+    );
   });
 });

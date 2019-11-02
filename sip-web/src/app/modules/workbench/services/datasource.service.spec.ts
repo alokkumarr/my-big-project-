@@ -92,6 +92,12 @@ describe('DatasourceService', () => {
     ).toBeTruthy();
   });
 
+  it('should handle an error with Observable', () => {
+    expect(
+      datasourceService.handleError('data', null)({}) instanceof Observable
+    ).toBeTruthy();
+  });
+
   it('testChannel should exist and return an Observable', () => {
     expect(
       datasourceService.testChannel('1') instanceof Observable

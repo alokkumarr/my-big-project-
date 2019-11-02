@@ -82,9 +82,7 @@ export class DatasourceService {
   }
 
   isDuplicateChannel(channelName): Observable<boolean> {
-    const endpoint = `${
-      this.api
-    }/ingestion/batch/channels/duplicate?channelName=${channelName}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/duplicate?channelName=${channelName}`;
 
     return this.http.get(endpoint).pipe(
       map(data => get(data, 'isDuplicate') as boolean),
@@ -136,9 +134,7 @@ export class DatasourceService {
   }
 
   isDuplicateRoute({ channelId, routeName }): Observable<boolean> {
-    const endpoint = `${
-      this.api
-    }/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelId}/duplicate-route?routeName=${routeName}`;
 
     return this.http.get(endpoint).pipe(
       map(data => get(data, 'isDuplicate') as boolean),
@@ -221,9 +217,7 @@ export class DatasourceService {
   updateRoute(channelID, routeID, payload): Observable<any> {
     payload.modifiedBy = this.jwt.getUserName();
 
-    const endpoint = `${
-      this.api
-    }/ingestion/batch/channels/${channelID}/routes/${routeID}`;
+    const endpoint = `${this.api}/ingestion/batch/channels/${channelID}/routes/${routeID}`;
 
     return this.http
       .put(endpoint, payload)
@@ -312,7 +306,7 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, payload)
-      .pipe(catchError(this.handleError('data', {})));
+      .pipe(catchError(this.handleError('data', null)));
   }
 
   /**
@@ -327,7 +321,7 @@ export class DatasourceService {
 
     return this.http
       .post(endpoint, payload)
-      .pipe(catchError(this.handleError('data', {})));
+      .pipe(catchError(this.handleError('data', null)));
   }
 
   /**
@@ -337,8 +331,13 @@ export class DatasourceService {
    * @param result - optional value to return as the observable result
    */
   public handleError<T>(operation = 'operation', result?: T) {
+    const message = error =>
+      get(error, 'error.message') || get(error, 'message') || error;
     return (error: any): Observable<T> => {
-      return of(result as T);
+      return of(
+        (result as T) ||
+          ({ error: true, message: error ? message(error) : {} } as any)
+      );
     };
   }
 
@@ -358,16 +357,12 @@ export class DatasourceService {
   }
 
   public getJobsByChannelId(channelId) {
-    const url = `${
-      this.api
-    }/ingestion/batch/logs/jobs/channels/${channelId}?offset=0`;
+    const url = `${this.api}/ingestion/batch/logs/jobs/channels/${channelId}?offset=0`;
     return this.http.get<Job[]>(url);
   }
 
   public getJobsByRouteName(channelId) {
-    const url = `${
-      this.api
-    }/ingestion/batch/logs/jobs/${channelId}/{routeId}?offset=0`;
+    const url = `${this.api}/ingestion/batch/logs/jobs/${channelId}/{routeId}?offset=0`;
     return this.http.get<Job[]>(url);
   }
 
@@ -376,9 +371,10 @@ export class DatasourceService {
       map(channels =>
         lodashMap(channels, channel => {
           const { channelName } = JSON.parse(channel.channelMetadata);
-          return {
+          return <ChannelForJobs>{
             id: channel.bisChannelSysId,
-            name: channelName
+            name: channelName,
+            channelType: channel.channelType
           };
         })
       )

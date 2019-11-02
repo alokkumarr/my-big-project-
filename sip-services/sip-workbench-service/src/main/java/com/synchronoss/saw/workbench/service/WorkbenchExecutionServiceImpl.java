@@ -27,8 +27,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
-import sncr.xdf.context.ComponentServices;
-import static sncr.xdf.context.ComponentServices.*;
+import sncr.bda.conf.ComponentServices;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {

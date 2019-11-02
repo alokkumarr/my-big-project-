@@ -187,6 +187,10 @@ public class SIPAggregationBuilder {
             if (dataField1.getLimitType() == Field.LimitType.BOTTOM) sortOrder = SortOrder.ASC;
             if (dataField1.getLimitValue() != null && dataField1.getLimitValue() > 0)
               size = dataField1.getLimitValue();
+            String columnName =
+                dataField1.getDataField() == null
+                    ? dataField1.getColumnName()
+                    : dataField1.getDataField();
             aggregationBuilder.subAggregation(
                 bucketSort(
                     BuilderUtil.BUCKET_SORT,
