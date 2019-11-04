@@ -9,6 +9,7 @@ import * as remove from 'lodash/remove';
 import * as toLower from 'lodash/toLower';
 import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -906,7 +907,8 @@ export class DesignerState {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
     const sipJoins = map(joins, join => {
-      const [leftCriteria, rightCriteria] = join.criteria;
+      const leftCriteria = find(join.criteria, crt => crt.side === 'left');
+      const rightCriteria = find(join.criteria, crt => crt.side === 'right');
       const leftJoin = {
         artifactsName: leftCriteria.tableName,
         columnName: leftCriteria.columnName
