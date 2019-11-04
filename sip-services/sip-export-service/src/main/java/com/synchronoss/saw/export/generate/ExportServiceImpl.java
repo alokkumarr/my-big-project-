@@ -656,14 +656,14 @@ public class ExportServiceImpl implements ExportService {
               // build export bean to process file
               ExportUtils.buildExportBean(exportBean, dispatchBean);
               String dir = UUID.randomUUID().toString();
-                String ExcelFileName =
+                String excelFileName =
                     ExportUtils.prepareFileName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
                 exportBean.setFileName(
                   publishedPath
                       + File.separator
                       + dir
                       + File.separator
-                      + ExcelFileName
+                      + excelFileName
                       + "."
                       + exportBean.getFileType());
 

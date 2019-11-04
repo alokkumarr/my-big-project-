@@ -196,15 +196,15 @@ public class ExportUtils {
     return UUID.randomUUID().toString();
   }
 
-  public static String prepareExcelSheetName(String analysisName) {
+      public static String prepareExcelSheetName(String excelSheetName) {
     /*Excel sheet Name doesn't allow some special characters and length should be less than 31,so
     removing the special characters from analysis name and prearing name with only first 31
     characters*/
-    analysisName = analysisName.trim().replaceAll("[*/:\\\\?\\[\\]]", "");
-    if (analysisName.length() > 31) {
-      analysisName = analysisName.substring(0, 31);
+    excelSheetName = excelSheetName.trim().replaceAll("[*/:\\\\?\\[\\]]", "");
+    if (excelSheetName.length() > 31) {
+      excelSheetName = excelSheetName.substring(0, 31);
     }
-    return analysisName;
+    return excelSheetName;
   }
 
   public static String prepareFileName(String name) {
