@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @ApiModel(value = "BIS_JOB", description = "Model for storing sip job entity")
 @Table(name = "BIS_JOB", catalog = "sip_bis", schema = "")
@@ -192,4 +193,25 @@ public class BisJobEntity implements Serializable {
   public void setRoutelEntity(BisRouteEntity routelEntity) {
     this.routelEntity = routelEntity;
   }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("jobId", jobId)
+            .append("jobName", jobName)
+            .append("startTime", startTime)
+            .append("endTime", endTime)
+            .append("jobStatus", jobStatus)
+            .append("totalCount", totalCount)
+            .append("successCount", successCount)
+            .append("filePattern", filePattern)
+            .append("channelType", channelType)
+            .append("createdDate", createdDate)
+            .append("createdBy", createdBy)
+            .append("updatedDate", updatedDate)
+            .append("updatedBy", updatedBy)
+            .append("channelEntity", channelEntity)
+            .append("routelEntity", routelEntity)
+            .toString();
+    }
 }

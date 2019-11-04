@@ -166,6 +166,10 @@ public class SipLogging {
       log.setTransferEndTime(metaInfo.getFileTransferEndTime());
       log.setTransferDuration(metaInfo.getFileTransferDuration());
       log.setRecdFileName(metaInfo.getReceivedDataName());
+
+      if (metaInfo.getDataSizeInBytes() != null) {
+        log.setRecdFileSize(metaInfo.getDataSizeInBytes());
+      }
       bisFileLogsRepository.saveAndFlush(log);
     }
   }

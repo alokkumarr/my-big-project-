@@ -215,7 +215,8 @@ public class SawBisRouteController {
               logger.debug("End Date system timezone = " + endDate);
               schedulerRequest.setEndDate(endDate.getTime());
             } else {
-              schedulerRequest.setEndDate(Long.MAX_VALUE);
+              // Set end date to Dec 31 2999 UTC. This will act as no end date
+              schedulerRequest.setEndDate(32503573800000L);
             }
             if (timezone != null) {
               schedulerRequest.setTimezone(timezone.asText());

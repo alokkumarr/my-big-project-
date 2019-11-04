@@ -109,6 +109,7 @@ bis:
   recheck-file-modified: false
   destination-fs-user: mapr
   duplicate-entry: true
+  http-pool-size: 50
  
   
 
