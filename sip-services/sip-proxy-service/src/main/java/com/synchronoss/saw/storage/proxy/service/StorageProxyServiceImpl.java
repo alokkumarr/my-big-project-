@@ -54,6 +54,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.util.BuilderUtil;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -615,8 +617,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
     logger.trace("ES -Query {} " + query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
+    // re-arrange data field based upon sort before flatten
+    boolean haveAggregate = dataFields.stream().anyMatch(field -> field.getAggregate() != null
+        && !field.getAggregate().value().isEmpty());
+    if (haveAggregate) {
+      dataFields = BuilderUtil.buildFieldBySort(dataFields, sipQuery.getSorts());
+    }
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
-    ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
+    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
     if (response.get("aggregations") != null)
       result = esResponseParser.parseData(response.get("aggregations"));
     else result = QueryBuilderUtil.buildReportData(response, dataFields);

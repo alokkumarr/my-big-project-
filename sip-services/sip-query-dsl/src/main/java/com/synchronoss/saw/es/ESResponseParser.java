@@ -15,20 +15,21 @@ import org.slf4j.LoggerFactory;
 
 public class ESResponseParser {
 
+  private static final Logger logger = LoggerFactory.getLogger(ESResponseParser.class);
+
   private static final String REGEX = "\\.";
   private static final String KEY = "key";
-  private static final String KEY_AS_STRING = "key_as_string";
-  private static final String BUCKETS = "buckets";
   private static final String VALUE = "value";
-  private static final Logger logger = LoggerFactory.getLogger(ESResponseParser.class);
+  private static final String BUCKETS = "buckets";
   private static String GROUP_BY_FIELD = "group_by_field";
+  private static final String KEY_AS_STRING = "key_as_string";
+
   private String[] groupByFields;
-  private List<Field> dataFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> dataFields, List<Field> aggregationFields) {
-    this.dataFields = dataFields;
+  public ESResponseParser(List<Field> aggregationFields) {
     this.aggregationFields = aggregationFields;
+    this.groupByFields = ElasticSearchQueryBuilder.groupByFields;
   }
 
   /**
@@ -128,7 +129,7 @@ public class ESResponseParser {
    * @return
    */
   public List<Object> parseData(JsonNode jsonNode) {
-    prepareGroupByFields(dataFields);
+    //prepareGroupByFields(dataFields);
     Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);
@@ -152,7 +153,9 @@ public class ESResponseParser {
     return columnName;
   }
 
-  /** @param jsonNode */
+  /**
+   * @param jsonNode
+   */
   private String childNodeName(JsonNode jsonNode) {
     Iterator<String> keys = jsonNode.fieldNames();
     while (keys.hasNext()) {
@@ -164,7 +167,9 @@ public class ESResponseParser {
     return null;
   }
 
-  /** Fetch the group By fields for parsing aggregation result. */
+  /**
+   * Fetch the group By fields for parsing aggregation result.
+   */
   private void prepareGroupByFields(List<Field> dataFields) {
     groupByFields = new String[dataFields.size() - aggregationFields.size()];
     int fieldCount = 0;
