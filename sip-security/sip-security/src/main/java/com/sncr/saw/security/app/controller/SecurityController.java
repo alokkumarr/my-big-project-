@@ -85,6 +85,10 @@ public class SecurityController {
 
     private final String AdminRole = "ADMIN";
 
+    private final Pattern hasNumber = Pattern.compile("\\d");
+
+    private final Pattern hasLowercase = Pattern.compile("[a-z]");
+
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
@@ -337,23 +341,59 @@ public class SecurityController {
 		String message = null;
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
+			valid.setValidityMessage(message);
+			valid.setValid(false);
+			return valid;
 		} else if (newPass.length() < 8) {
 			message = "New password should be minimum of 8 character.";
+			valid.setValidityMessage(message);
+			valid.setValid(false);
+			return valid;
 		} else if (oldPass.equals(newPass)) {
 			message = "Old password and new password should not be same.";
+			valid.setValidityMessage(message);
+			valid.setValid(false);
+			return valid;
 		} else if (loginId.equals(newPass)) {
 			message = "User Name can't be assigned as password.";
+            valid.setValidityMessage(message);
+            valid.setValid(false);
+            return valid;
 		}
+		int validPatternCnt= 0;
 		Pattern pCaps = Pattern.compile("[A-Z]");
 		Matcher m = pCaps.matcher(newPass);
 		if (!m.find()) {
 			message = "Password should contain atleast 1 uppercase character.";
+			validPatternCnt++;
 		}
 		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 		m = pSpeChar.matcher(newPass);
 		if (!m.find()) {
 			message = "Password should contain atleast 1 special character.";
+            validPatternCnt++;
 		}
+		m = hasNumber.matcher(newPass);
+		if (!m.find()) {
+		    message = "Password should contain at least one numeric character.";
+            validPatternCnt++;
+        }
+        m = hasLowercase.matcher(newPass);
+		if (!m.find()) {
+		    message = "Password should contain at least one lower-case character.";
+		    validPatternCnt++;
+        }
+
+    // Synchronoss password Policy : Must contain at least 3 of the 4 one uppercase
+    // character, one lowercase character, one numeric character, one special character
+    if (validPatternCnt > 1) {
+      message =
+          "Password must contain at least 3 of the 4 one uppercase character,"
+              + " one lowercase character, one numeric character, one special character ";
+    } else {
+      message = null;
+    }
+
 		if (message == null) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
@@ -471,24 +511,53 @@ public class SecurityController {
 		String rhc = changePasswordDetails.getRfc();
 
 		if (!cnfNewPass.equals(newPass)) {
-			message = "'New Password' and 'Verify password' does not match.";
+			valid.setValid(false);
+			valid.setValidityMessage("'New Password' and 'Verify password' does not match.");
+			return valid;
 		} else if (newPass.length() < 8) {
+		    valid.setValid(false);
 			message = "New password should be minimum of 8 character.";
+            valid.setValidityMessage(message);
+            return valid;
 		} else if (loginId.equals(newPass)) {
+		    valid.setValid(false);
 			message = "User Name can't be assigned as password.";
+			valid.setValidityMessage(message);
+			return valid;
 		}
 
-		Pattern pCaps = Pattern.compile("[A-Z]");
-		Matcher m = pCaps.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase character.";
-		}
+        int validPatternCnt= 0;
+        Pattern pCaps = Pattern.compile("[A-Z]");
+        Matcher m = pCaps.matcher(newPass);
+        if (!m.find()) {
+            message = "Password should contain atleast 1 uppercase character.";
+            validPatternCnt++;
+        }
+        Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
+        m = pSpeChar.matcher(newPass);
+        if (!m.find()) {
+            message = "Password should contain atleast 1 special character.";
+            validPatternCnt++;
+        }
+        m = hasNumber.matcher(newPass);
+        if (!m.find()) {
+            message = "Password should contain at least one numeric character.";
+            validPatternCnt++;
+        }
+        m = hasLowercase.matcher(newPass);
+        if (!m.find()) {
+            message = "Password should contain at least one lower-case character.";
+            validPatternCnt++;
+        }
 
-		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-		m = pSpeChar.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 special character.";
-		}
+        if (validPatternCnt > 1) {
+            message =
+                "Password must contain at least 3 of the 4 one uppercase character, one lowercase character, one "
+                    + "numeric character, one special character";
+        } else {
+            message = null;
+        }
+
         // Validate the hash key with userID before proceeding.
         ResetValid resetValid =  userRepository.validateResetPasswordDtls(rhc);
         if (!(resetValid.getValid() || (resetValid.getMasterLoginID()!=null &&
@@ -1059,6 +1128,7 @@ public class SecurityController {
 	public UsersList addUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
+        int validPatternCnt= 0;
 		try {
 			if (user != null) {
 				userList.setValid(true);
@@ -1066,22 +1136,47 @@ public class SecurityController {
 					if (user.getPassword().length() < 8) {
 						userList.setValidityMessage("New password should be minimum of 8 character.");
 						userList.setValid(false);
+						return userList;
 					} else if (user.getMasterLoginId().equals(user.getPassword())) {
 						userList.setValidityMessage("User Name can't be assigned as password.");
 						userList.setValid(false);
+                        return userList;
 					}
 					Pattern pCaps = Pattern.compile("[A-Z]");
 					Matcher m = pCaps.matcher(user.getPassword());
 					if (!m.find()) {
 						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
 						userList.setValid(false);
+                        validPatternCnt++;
 					}
 					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 					m = pSpeChar.matcher(user.getPassword());
 					if (!m.find()) {
 						userList.setValidityMessage("Password should contain atleast 1 special character.");
 						userList.setValid(false);
+                        validPatternCnt++;
 					}
+                    m = hasNumber.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain at least one numeric character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+                    m = hasLowercase.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain at least one lower-case character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+
+                    if (validPatternCnt > 1) {
+                        userList.setValidityMessage("Password must contain at least 3 of the 4 one uppercase character, one lowercase character, one "
+                                + "numeric character, one special character");
+                        userList.setValid(false);
+                    } else {
+                        userList.setValid(true);
+                        userList.setValidityMessage(null);
+                    }
 				} else {
 					userList.setValid(false);
 				}
@@ -1118,6 +1213,7 @@ public class SecurityController {
 	public UsersList updateUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
+        int validPatternCnt= 0;
 		try {
 			if (user != null) {
 				userList.setValid(true);
@@ -1125,22 +1221,47 @@ public class SecurityController {
 					if (user.getPassword().length() < 8) {
 						userList.setValidityMessage("New password should be minimum of 8 character.");
 						userList.setValid(false);
+						return userList;
 					} else if (user.getMasterLoginId().equals(user.getPassword())) {
 						userList.setValidityMessage("User Name can't be assigned as password.");
 						userList.setValid(false);
+                        return userList;
 					}
-					Pattern pCaps = Pattern.compile("[A-Z]");
-					Matcher m = pCaps.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
-						userList.setValid(false);
-					}
-					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-					m = pSpeChar.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 special character.");
-						userList.setValid(false);
-					}
+                    Pattern pCaps = Pattern.compile("[A-Z]");
+                    Matcher m = pCaps.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+                    Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
+                    m = pSpeChar.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain atleast 1 special character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+                    m = hasNumber.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain at least one numeric character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+                    m = hasLowercase.matcher(user.getPassword());
+                    if (!m.find()) {
+                        userList.setValidityMessage("Password should contain at least one lower-case character.");
+                        userList.setValid(false);
+                        validPatternCnt++;
+                    }
+
+                    if (validPatternCnt > 1) {
+                        userList.setValidityMessage("Password must contain at least 3 of the 4 one uppercase character, one lowercase character, one "
+                            + "numeric character, one special character");
+                        userList.setValid(false);
+                    } else {
+                        userList.setValid(true);
+                        userList.setValidityMessage(null);
+                    }
 				}
 				if (userList.getValid()) {
 					valid = userRepository.updateUser(user);
