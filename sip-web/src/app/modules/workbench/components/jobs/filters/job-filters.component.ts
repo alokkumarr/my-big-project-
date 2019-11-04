@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 import {
@@ -13,6 +14,7 @@ import {
   LoadRouteList
 } from '../../../state/workbench.actions';
 import { WorkbenchState } from '../../../state/workbench.state';
+import { CHANNEL_UID } from '../../../wb-comp-configs';
 const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
 
 @Component({
@@ -23,9 +25,19 @@ const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
 export class JobFiltersComponent implements OnInit {
   @Select(WorkbenchState.channelTypeList)
   channelTypeList$: Observable<ChannelType[]>;
-  @Select(WorkbenchState.channelList) channelList$: Observable<
+
+  @Select(WorkbenchState.channelList) _stateChannelList$: Observable<
     ChannelForJobs[]
   >;
+  refilterChannels$ = new BehaviorSubject(null);
+  channelList$ = combineLatest(
+    this._stateChannelList$,
+    this.refilterChannels$
+  ).pipe(
+    map(([channels]) =>
+      channels.filter(c => c.channelType === this.selectedChannelTypeId)
+    )
+  );
   @Select(WorkbenchState.routeList) routeList$: Observable<RouteForJobs[]>;
 
   @Select(WorkbenchState.selectedChannelTypeId)
@@ -35,7 +47,7 @@ export class JobFiltersComponent implements OnInit {
   @Select(WorkbenchState.selectedRouteId)
   selectedRouteId$: Observable<number>;
 
-  public selectedChannelTypeId;
+  public selectedChannelTypeId: CHANNEL_UID;
   public selectedChannelId;
   public selectedRouteId;
 
@@ -44,7 +56,7 @@ export class JobFiltersComponent implements OnInit {
 
   constructor(private _router: Router, private _store: Store) {
     this.selectedChannelTypeId$.subscribe(selectedChannelTypeId => {
-      this.selectedChannelTypeId = selectedChannelTypeId;
+      this.selectedChannelTypeId = selectedChannelTypeId as CHANNEL_UID;
     });
     this.selectedChannelId$.subscribe(selectedChannelId => {
       this.selectedChannelId = selectedChannelId;
@@ -67,6 +79,9 @@ export class JobFiltersComponent implements OnInit {
 
   onChannelTypeSelected(selectedChannelTypeId) {
     this.selectedChannelTypeId = selectedChannelTypeId;
+    this.selectedChannelId = null;
+    this.selectedRouteId = null;
+    this.refilterChannels$.next(null); // signal for channel refilter
     this.onFilterChange();
     // TODO when other channel types are supported load channels here
   }
@@ -126,9 +141,7 @@ export class JobFiltersComponent implements OnInit {
     const routeIdIdQueryParam = this.selectedRouteId
       ? `&routeId=${this.selectedRouteId}`
       : '';
-    const url = `${baseUrl}${
-      this.selectedChannelTypeId
-    }${channelIdQueryParam}${routeIdIdQueryParam}`;
+    const url = `${baseUrl}${this.selectedChannelTypeId}${channelIdQueryParam}${routeIdIdQueryParam}`;
     setTimeout(() => this.onFilterChange());
     this._router.navigateByUrl(url);
   }

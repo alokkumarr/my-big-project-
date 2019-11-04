@@ -73,7 +73,6 @@ public class NGSQLExecutor implements Serializable {
 					}
 				}
                 
-
                 if (parent.getNgctx().inputDataSets.size() > 0) {
 
                     for (String tn : tablesFrmFile) {
@@ -182,6 +181,8 @@ public class NGSQLExecutor implements Serializable {
                 	logger.info("Final result schema :: ");
                 	finalResult.printSchema();
                     pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, loc , "append");
+
+                    descriptor.schema = pres.getSchema(parent.getNgctx(),finalResult);
 
                     long wt = System.currentTimeMillis();
                     descriptor.writeTime = (int) ((wt - exet) / 1000);

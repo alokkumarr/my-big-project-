@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,7 +27,7 @@ public class BisConnectionTestPayload {
   private String url;
 
   @JsonProperty("portNo")
-  private Integer portNo = 21;
+  private Integer portNo;
 
   @JsonProperty("batchSize")
   private Integer batchSize = 0;
@@ -51,6 +52,24 @@ public class BisConnectionTestPayload {
 
   @JsonProperty("channelType")
   private BisChannelType channelType = BisChannelType.SFTP;
+
+  @JsonProperty("apiEndPoint")
+  private String apiEndPoint;
+
+  @JsonProperty("bodyParameters")
+  private Object bodyParameters;
+
+  @JsonProperty("queryParameters")
+  private List<Object> queryParameters;
+
+  @JsonProperty("headerParameters")
+  private List<Object> headerParameters;
+
+  @JsonProperty("urlParameters")
+  private List<Object> urlParameters;
+
+  @JsonProperty("httpMethod")
+  private String httpMethod;
 
   @JsonProperty("channelType")
   public BisChannelType getChannelType() {
@@ -186,8 +205,67 @@ public class BisConnectionTestPayload {
     this.routeId = routeId;
   }
 
-  @JsonIgnore
-  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonProperty("apiEndPoint")
+  public String getApiEndPoint() {
+    return apiEndPoint;
+  }
+
+  @JsonProperty("apiEndPoint")
+  public void setApiEndPoint(String apiEndPoint) {
+    this.apiEndPoint = apiEndPoint;
+  }
+
+  @JsonProperty("bodyParameters")
+  public Object getBodyParameters() {
+    return bodyParameters;
+  }
+
+  @JsonProperty("bodyParameters")
+  public void setBodyParameters(Object bodyParameters) {
+    this.bodyParameters = bodyParameters;
+  }
+
+  @JsonProperty("queryParameters")
+  public List<Object> getQueryParameters() {
+    return queryParameters;
+  }
+
+  @JsonProperty("queryParameters")
+  public void setQueryParameters(List<Object> queryParameters) {
+    this.queryParameters = queryParameters;
+  }
+
+  @JsonProperty("headerParameters")
+  public List<Object> getHeaderParameters() {
+    return headerParameters;
+  }
+
+  @JsonProperty("headerParameters")
+  public void setHeaderParameters(List<Object> headerParameters) {
+    this.headerParameters = headerParameters;
+  }
+
+  @JsonProperty("urlParameters")
+  public List<Object> getUrlParameters() {
+    return urlParameters;
+  }
+
+  @JsonProperty("urlParameters")
+  public void setUrlParameters(List<Object> urlParameters) {
+    this.urlParameters = urlParameters;
+  }
+
+  @JsonProperty("httpMethod")
+  public String getHttpMethod() {
+    return httpMethod;
+  }
+
+  @JsonProperty("httpMethod")
+  public void setHttpMethod(String httpMethod) {
+    this.httpMethod = httpMethod;
+  }
+
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
@@ -198,5 +276,4 @@ public class BisConnectionTestPayload {
   public void setAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
   }
-
 }

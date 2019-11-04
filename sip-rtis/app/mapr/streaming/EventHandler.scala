@@ -1,6 +1,7 @@
 package mapr.streaming
 
 import java.io.IOException
+import java.security.cert.X509Certificate
 import java.util
 import java.util.Map.Entry
 import java.util.Properties
@@ -10,6 +11,7 @@ import com.mapr.db.exceptions.TableExistsException
 import com.mapr.streams.Streams
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue}
 import exceptions.{ErrorCodes, RTException}
+import javax.net.ssl._
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.apache.hadoop.conf.Configuration
 import org.slf4j.{Logger, LoggerFactory}
@@ -19,7 +21,6 @@ import sncr.bda.core.file.HFileOperations
 import scala.collection.{Seq, mutable}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.reflect.io.File
 import scala.util.Random
 
 object EventHandler {
@@ -258,7 +259,18 @@ object EventHandler {
     val mainPath = if (conf.hasPath("stream.queue.location"))
       conf.getString("stream.queue.location") else "/main"
 
-    val result = scala.io.Source.fromURL(configURL).mkString
+    var result: String = null;
+    val connector = conf.getString("connector")
+    if (!connector.isEmpty && connector.equals("https")){
+      val sslContext = SSLContext.getInstance("SSL")
+      sslContext.init(null, Array(TrustAll), new java.security.SecureRandom())
+      HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory)
+      HttpsURLConnection.setDefaultHostnameVerifier(VerifiesAllHostNames)
+      result = scala.io.Source.fromURL(configURL).mkString
+    } else {
+      result = scala.io.Source.fromURL(configURL).mkString
+    }
+
     val config: List[mutable.HashMap[String, Any]] = RTISConfiguration.getConfig(result, mainPath)
 
     var streamList: List[mutable.HashMap[String, Any]] = null;
@@ -431,6 +443,17 @@ object EventHandler {
   }
 }
 
+object TrustAll extends X509TrustManager {
+  val getAcceptedIssuers = null
+
+  def checkClientTrusted(x509Certificates: Array[X509Certificate], s: String) = {}
+
+  def checkServerTrusted(x509Certificates: Array[X509Certificate], s: String) = {}
+}
+
+object VerifiesAllHostNames extends HostnameVerifier {
+  def verify(s: String, sslSession: SSLSession) = true
+}
 
 abstract class EventHandler {
 

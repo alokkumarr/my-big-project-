@@ -8,6 +8,7 @@ import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as take from 'lodash/take';
 import * as has from 'lodash/has';
+import * as uniqBy from 'lodash/uniqBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isUndefined from 'lodash/isUndefined';
 import * as takeRight from 'lodash/takeRight';
@@ -19,6 +20,7 @@ import {
 } from '../types';
 import { TYPE_MAP } from '../../consts';
 import { ArtifactDSL } from '../../models';
+import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
 
 @Component({
   selector: 'designer-sort',
@@ -61,6 +63,10 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
+  displayNameFor(column) {
+    return displayNameWithoutAggregateFor(column);
+  }
+
   isSort(item) {
     return has(item, 'order');
   }
@@ -82,7 +88,7 @@ export class DesignerSortComponent implements OnInit {
     this.nameMap = reduce(
       this.checkedFields,
       (accumulator, field) => {
-        accumulator[field.columnName] = field.displayName;
+        accumulator[field.columnName] = this.displayNameFor(field);
         return accumulator;
       },
       {}
@@ -122,17 +128,20 @@ export class DesignerSortComponent implements OnInit {
   }
 
   getAvailableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
-    return filter(checkedFields, field => {
-      return (
-        !field.expression && // derived metrics are not supported for sorts
-        !find(this.sorts, ({ columnName, artifactsName }) =>
-          isUndefined(artifactsName)
-            ? columnName === field.columnName
-            : artifactsName === field.artifactsName &&
-              columnName === field.columnName
-        )
-      );
-    });
+    return uniqBy(
+      filter(checkedFields, field => {
+        return (
+          !field.expression && // derived metrics are not supported for sorts
+          !find(this.sorts, ({ columnName, artifactsName }) =>
+            isUndefined(artifactsName)
+              ? columnName === field.columnName
+              : artifactsName === field.artifactsName &&
+                columnName === field.columnName
+          )
+        );
+      }),
+      field => field.columnName
+    );
   }
 
   onSortOrderChange(sort, value) {
