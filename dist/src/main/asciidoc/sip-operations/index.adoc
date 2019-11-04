@@ -813,6 +813,19 @@ The health check responses contain a `detail` propery with a
 human-readable explanation of the health check status, which can be
 used to further narrow down the cause for a possible failure.
 
+=== ElasticSearch Max records setting
+By default, ElasticSearch limits the number of records to 10000.
+If the user tries to query for more, it will throw an error.
+To allow this, max_result_window has to be set. Below is the syntax
+to set max_result_window:
+
+----
+curl -X PUT \
+  <ElasticSearch Host>/tmobile_cell_sites/_settings \
+  -H 'Content-Type: application/json' \
+  -d '{ "max_result_window" : 300000 }'
+----
+
 === General guideline for ElasticSearch script support
 
 SIP is using custom scripting of ElasticSearch to build and evaluate
