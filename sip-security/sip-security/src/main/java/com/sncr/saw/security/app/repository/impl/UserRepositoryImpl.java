@@ -530,11 +530,13 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.PrepareTicketExtractor());
 
-			// For Backward compatibility we do treat existing customers as JV by default. If there is entry missing for config_val then we treat that customer as JV.
 			String configValSql = "SELECT CV.FILTER_BY_CUSTOMER_CODE FROM CONFIG_VAL CV, CUSTOMERS C WHERE CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE";
 			Integer filterByCustCode = jdbcTemplate.query(configValSql,
                 preparedStatement -> {
                 }, new UserRepositoryImpl.customerCodeFilterExtractor());
+
+            // Maintain backward compatibility for existing customers as no customer code filters will be applied , considered as normal customer (Without customer code filter : as JV customer )  by default.
+             // Existing customer will be missing the entry in config_val and considered as normal customer (JV customer).
 			if (filterByCustCode == null) {
 			    filterByCustCode = 0;
             }
