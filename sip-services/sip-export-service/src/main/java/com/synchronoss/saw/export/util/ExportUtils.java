@@ -177,7 +177,7 @@ public class ExportUtils {
         String.valueOf(((LinkedHashMap) dispatchBean).get(FILE_TYPE)));
     exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
     String reportName =
-        String.valueOf(((LinkedHashMap) dispatchBean).get("name")).replaceAll("[\\\\]", "");
+        prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
     exportBean.setReportName(reportName);
     exportBean.setPublishDate(
         String.valueOf(((LinkedHashMap) dispatchBean).get(PUBLISHED_TIME)));
@@ -205,5 +205,13 @@ public class ExportUtils {
       analysisName = analysisName.substring(0, 31);
     }
     return analysisName;
+  }
+
+  public static String prepareFileName(String name) {
+    return name.replaceAll("[/\\\\]", "");
+  }
+
+  public static String prepareReportName(String name) {
+    return name.replaceAll("[\\\\]", "");
   }
 }

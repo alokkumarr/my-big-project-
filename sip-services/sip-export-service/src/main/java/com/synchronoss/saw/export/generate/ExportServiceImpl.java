@@ -243,20 +243,20 @@ public class ExportServiceImpl implements ExportService {
       }
       exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
       String reportName =
-          String.valueOf(((LinkedHashMap) dispatchBean).get("name")).replaceAll("[\\\\]", "");
+          ExportUtils.prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
       exportBean.setReportName(reportName);
       exportBean.setPublishDate(
           String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
       exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
       // consider default format as csv if file type is not provided.
-      String filename =
-          String.valueOf(((LinkedHashMap) dispatchBean).get("name")).replaceAll("[/\\\\]", "");
+      String fileName =
+         ExportUtils.prepareFileName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
       if (exportBean.getFileType() == null || exportBean.getFileType().isEmpty()) {
-        exportBean.setFileName(filename + ".csv");
+        exportBean.setFileName(fileName + ".csv");
         exportBean.setFileType(DEFAULT_FILE_TYPE);
       } else {
         exportBean.setFileName(
-               filename
+                fileName
                 + "."
                 + exportBean.getFileType());
       }
@@ -545,7 +545,8 @@ public class ExportServiceImpl implements ExportService {
                 ExportUtils.buildExportBean(exportBean, dispatchBean);
                 String dir = UUID.randomUUID().toString();
                 String fileName =
-                    String.valueOf(((LinkedHashMap) dispatchBean).get("name")).replaceAll("[/\\\\]", "");
+                    ExportUtils.prepareFileName(
+                        String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
                 exportBean.setFileName(
                     publishedPath
                         + File.separator
@@ -655,15 +656,14 @@ public class ExportServiceImpl implements ExportService {
               // build export bean to process file
               ExportUtils.buildExportBean(exportBean, dispatchBean);
               String dir = UUID.randomUUID().toString();
-                String filename =
-                    ((LinkedHashMap) dispatchBean).get("name").toString().replaceAll("[/\\\\]", "");
-
+                String ExcelFileName =
+                    ExportUtils.prepareFileName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
                 exportBean.setFileName(
                   publishedPath
                       + File.separator
                       + dir
                       + File.separator
-                      + filename
+                      + ExcelFileName
                       + "."
                       + exportBean.getFileType());
 
