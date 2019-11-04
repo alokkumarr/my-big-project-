@@ -44,6 +44,7 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT = "distinctCount";
   private static final String USER_FULL_NAME = "userFullName";
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
+  private static final String CUSTOMER_CODE = "customerCode";
 
   /**
    * Create Request header with common properties
@@ -77,10 +78,9 @@ public class ExportUtils {
         String artiFieldAlias = artiField.getAlias();
         String artiFieldDispName = artiField.getDisplayName();
 
-        if ((artifactName != null && artiFieldAlias.equalsIgnoreCase("customerCode")) ||
-            (artiFieldDispName!= null && artiFieldDispName.equalsIgnoreCase("customerCode"))) {
-          String tempAliasName = "customerCode";
-          artiField.setAlias(artifactName + "_" + tempAliasName);
+        if ((artifactName != null && artiFieldAlias.equalsIgnoreCase(CUSTOMER_CODE)) ||
+            (artiFieldDispName!= null && artiFieldDispName.equalsIgnoreCase(CUSTOMER_CODE))) {
+          artiField.setAlias(artifactName + "_" + CUSTOMER_CODE);
         }
         fields.add(artiField);
       }
