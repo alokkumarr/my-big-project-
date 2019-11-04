@@ -175,10 +175,10 @@ public class ExportUtils {
   public static void buildExportBean(ExportBean exportBean, Object dispatchBean) {
     exportBean.setFileType(
         String.valueOf(((LinkedHashMap) dispatchBean).get(FILE_TYPE)));
-    exportBean.setReportDesc(
-        String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
-    exportBean.setReportName(
-        String.valueOf(((LinkedHashMap) dispatchBean).get(NAME)));
+    exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
+    String reportName =
+        String.valueOf(((LinkedHashMap) dispatchBean).get("name")).replaceAll("[\\\\]", "");
+    exportBean.setReportName(reportName);
     exportBean.setPublishDate(
         String.valueOf(((LinkedHashMap) dispatchBean).get(PUBLISHED_TIME)));
     exportBean.setCreatedBy(
