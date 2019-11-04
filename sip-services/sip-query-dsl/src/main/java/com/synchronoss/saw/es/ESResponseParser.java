@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.model.Field;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,6 +17,7 @@ public class ESResponseParser {
 
   private static final Logger logger = LoggerFactory.getLogger(ESResponseParser.class);
 
+  private static final String REGEX = "\\.";
   private static final String KEY = "key";
   private static final String VALUE = "value";
   private static final String BUCKETS = "buckets";
@@ -85,23 +87,36 @@ public class ESResponseParser {
     // if result contains only aggregated fields.
     else if (groupByFields.length == 0 && childNode != null) {
       Map<String, Object> flatValues = new LinkedHashMap<>();
+
       for (Field dataField : aggregationFields) {
-        String columnName =
-            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
-        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
+        String fieldName = dataField.getDataField() == null
+            ? dataField.getColumnName()
+            : dataField.getDataField();
+
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
+            ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
+            : fieldName;
+
+        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
       }
       flatStructure.add(flatValues);
     } else {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
-      for (Field field : aggregationFields) {
-        logger.debug("Data field name {}", field);
-        String columnName =
-            field.getDataField() == null ? field.getColumnName() : field.getDataField();
+      aggregationFields.forEach(field -> {
+        logger.debug("Data field = {}", field);
 
-        logger.debug("Column Name : {} , Child Name : {}", columnName, childNode);
-        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
-      }
+        String fieldName = field.getDataField() == null
+            ? field.getColumnName()
+            : field.getDataField();
+
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
+            ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
+            : fieldName;
+
+        logger.trace("Column Name : {},  Child Node  : {}", fieldName, childNode);
+        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
+      });
       flatStructure.add(flatValues);
     }
     return flatStructure;
