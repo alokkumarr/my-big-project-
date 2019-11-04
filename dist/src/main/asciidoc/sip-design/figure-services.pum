@@ -18,6 +18,7 @@ package "Elasticsearch cluster" {
 [SIP Gateway] ..> [SIP Storage Proxy] : HTTP
 [SIP Gateway] ..> [SIP Transport] : HTTP
 [SIP Gateway] ..> [SIP Workbench] : HTTP
+[SIP Gateway] ..> [SIP Alert] : HTTP
 
 [SIP Datapod] ..> [MapR Services] : MapR client
 [SIP Observe] ..> [MapR Services] : MapR client
@@ -25,6 +26,7 @@ package "Elasticsearch cluster" {
 [SIP Semantic] ..> [MapR Services] : MapR client
 [SIP Transport] ..> [MapR Services] : MapR client
 [SIP Workbench] ..> [MapR Services] : MapR client
+[SIP Alert] ..> [MapR Services] : MapR client
 
 [SIP Transport] ..> [Apache Spark] : Spark client
 [SIP Workbench] ..> [Apache Spark] : Spark client
@@ -44,3 +46,4 @@ database MariaDB
 [SIP Scheduler] ..> [SIP Transport] : HTTP
 [SIP Semantic] ..> [SIP Transport] : HTTP
 [SIP Semantic] ..> [SIP Workbench] : HTTP
+[SIP Alert] ..> [SIP Storage Proxy] : HTTP

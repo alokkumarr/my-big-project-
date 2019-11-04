@@ -13,12 +13,14 @@ import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Sort.Order;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.util.BuilderUtil;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -34,11 +36,12 @@ import org.elasticsearch.search.sort.SortOrder;
 
 public class SIPAggregationBuilder {
 
+  private Random random;
+  private Integer querySize;
   public static final String DATE_FORMAT = "yyyy-MM-dd";
   private static final String GROUP_BY_FIELD = "group_by_field";
-  private Integer querySize;
 
-  private Random random;
+  int groupFieldCount = 0;
 
   public SIPAggregationBuilder(Integer querySize) {
     this.querySize = querySize;
@@ -46,20 +49,16 @@ public class SIPAggregationBuilder {
   }
 
   public static List<Field> getAggregationField(List<Field> dataFields) {
-    List<Field> aggregateFields = new ArrayList<>();
-    for (Field dataField : dataFields) {
-      if (dataField.getAggregate() != null || dataField.getFormula() != null) {
-        aggregateFields.add(dataField);
-      }
-    }
-    return aggregateFields;
+    return dataFields.stream().filter(
+        dataField -> dataField.getAggregate() != null || dataField.getFormula() != null)
+        .collect(Collectors.toList());
   }
 
   public static DateHistogramInterval groupInterval(GroupInterval groupInterval) {
     DateHistogramInterval histogramInterval = null;
     switch (groupInterval) {
       case ALL:
-        // For groupinterval ALL, no need to set any value. Refer line: 87.
+        // For group interval ALL, no need to set any value. Refer line: 87.
         break;
       case MONTH:
         histogramInterval = DateHistogramInterval.MONTH;
@@ -95,7 +94,10 @@ public class SIPAggregationBuilder {
       List<Filter> aggregationFilter,
       int fieldCount,
       int aggregatedFieldCount,
-      AggregationBuilder aggregationBuilder) {
+      AggregationBuilder aggregationBuilder,
+      List<Sort> sorts,
+      String[] groupByFields) {
+
     /** For Report find the list of Aggregate fields. */
     if ((fieldCount + aggregateFields.size()) < dataFields.size()) {
       Field dataField = dataFields.get(fieldCount + aggregatedFieldCount);
@@ -107,13 +109,15 @@ public class SIPAggregationBuilder {
             aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
-            aggregationBuilder);
+            aggregationBuilder,
+            sorts,
+            groupByFields);
       }
       if (aggregationBuilder == null) {
         // initialize the terms aggregation builder.
         if (dataField.getType().name().equals(Field.Type.DATE.name())
             || dataField.getType().name().equals(Field.Type.TIMESTAMP.name())) {
-
+          boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
             dataField.setDateFormat(DATE_FORMAT);
           if (dataField.getGroupInterval() != null
@@ -130,43 +134,46 @@ public class SIPAggregationBuilder {
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
                     .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
-                    .order(BucketOrder.key(false));
+                    .order(BucketOrder.key(order));
+            if (dataField.getAggregate() == null && dataField.getFormula() == null)
+              groupByFields[groupFieldCount++] = dataField.getColumnName();
           } else {
             aggregationBuilder =
                 AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
                     .format(dataField.getDateFormat())
                     .field(dataField.getColumnName())
+                    .order(BucketOrder.key(order))
                     .size(querySize);
+            if (dataField.getAggregate() == null && dataField.getFormula() == null)
+              groupByFields[groupFieldCount++] = dataField.getColumnName();
           }
         } else {
-
+          boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
           aggregationBuilder =
               AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
                   .field(dataField.getColumnName())
-
+                  .order(BucketOrder.key(order))
                   .size(querySize);
+          if (dataField.getAggregate() == null && dataField.getFormula() == null)
+            groupByFields[groupFieldCount++] = dataField.getColumnName();
         }
         for (Field dataField1 : aggregateFields) {
           if (dataField1.getExpression() != null) {
 
             /**
-             * Evaluate every operand in the expression as a separate datafield, store them in a
+             * Evaluate every operand in the expression as a separate data field, store them in a
              * custom field and then evaluate the entire expression and store it in the user
              * provided field.
              */
             String expressionStr = dataField1.getExpression();
-
             Expression expression = null;
             Gson gson = new Gson();
             if (expressionStr != null && expressionStr.length() != 0) {
               expression = gson.fromJson(expressionStr, Expression.class);
-
               String dataFieldName = dataField1.getDataField();
-
               expressionEvaluator(dataFieldName, expression, aggregationBuilder);
             }
           } else {
-
             aggregationBuilder.subAggregation(
                 QueryBuilderUtil.aggregationBuilderDataField(dataField1));
           }
@@ -186,14 +193,14 @@ public class SIPAggregationBuilder {
                     : dataField1.getDataField();
             aggregationBuilder.subAggregation(
                 bucketSort(
-                        "bucketSort",
-                        Arrays.asList(new FieldSortBuilder(columnName).order(sortOrder)))
+                    BuilderUtil.BUCKET_SORT,
+                    Arrays.asList(new FieldSortBuilder(dataField1.getColumnName()).order(sortOrder)))
                     .size(size));
           }
         }
         for (Filter filter : aggregationFilter) {
           Map<String, String> bucketsPathsMap = new HashMap<>();
-          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + ".value");
+          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
           Script script = QueryBuilderUtil.prepareAggregationFilter(filter);
           BucketSelectorPipelineAggregationBuilder bs =
               PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
@@ -205,10 +212,12 @@ public class SIPAggregationBuilder {
             aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
-            aggregationBuilder);
+            aggregationBuilder,
+            sorts,
+            groupByFields);
 
       } else {
-
+        boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
         AggregationBuilder aggregationBuilderMain = null;
         if (dataField.getType().name().equals(Field.Type.DATE.name())
             || dataField.getType().name().equals(Field.Type.TIMESTAMP.name())) {
@@ -228,33 +237,41 @@ public class SIPAggregationBuilder {
                     .format(dataField.getDateFormat())
                     .minDocCount(dataField.getMinDocCount())
                     .dateHistogramInterval(groupInterval(dataField.getGroupInterval()))
-                    .order(BucketOrder.key(false))
+                    .order(BucketOrder.key(order))
                     .subAggregation(aggregationBuilder);
+            if (dataField.getAggregate() == null && dataField.getFormula() == null)
+              groupByFields[groupFieldCount++] = dataField.getColumnName();
+
           } else {
             aggregationBuilderMain =
                 AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
                     .field(dataField.getColumnName())
                     .format(dataField.getDateFormat())
                     .subAggregation(aggregationBuilder)
-
+                    .order(BucketOrder.key(order))
                     .size(querySize);
+            if (dataField.getAggregate() == null && dataField.getFormula() == null)
+              groupByFields[groupFieldCount++] = dataField.getColumnName();
           }
         } else {
           aggregationBuilderMain =
               AggregationBuilders.terms(GROUP_BY_FIELD + "_" + ++fieldCount)
                   .field(dataField.getColumnName())
                   .subAggregation(aggregationBuilder)
-
+                  .order(BucketOrder.key(order))
                   .size(querySize);
+          if (dataField.getAggregate() == null && dataField.getFormula() == null)
+            groupByFields[groupFieldCount++] = dataField.getColumnName();
         }
-
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
             aggregationFilter,
             fieldCount,
             aggregatedFieldCount,
-            aggregationBuilderMain);
+            aggregationBuilderMain,
+            sorts,
+            groupByFields);
       }
     } else {
       return aggregationBuilder;
@@ -262,17 +279,14 @@ public class SIPAggregationBuilder {
   }
 
   /**
+   * Collect the valid filter from the filter lists
+   *
    * @param filters
    * @return
    */
   public static List<Filter> getAggregationFilter(List<Filter> filters) {
-    List<Filter> aggregationFilters = new ArrayList<>();
-    for (Filter filter : filters) {
-      if (filter.getAggregationFilter() != null && filter.getAggregationFilter()) {
-        aggregationFilters.add(filter);
-      }
-    }
-    return aggregationFilters;
+    return filters.stream().filter(filter -> filter.getAggregationFilter() != null
+        && filter.getAggregationFilter()).collect(Collectors.toList());
   }
 
   /**
@@ -289,17 +303,28 @@ public class SIPAggregationBuilder {
     // if only aggregation fields are there.
 
     if (aggregateFields.size() == dataFields.size()) {
-      for (Field dataField1 : aggregateFields) {
-        searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataField(dataField1));
+      for (Field field : aggregateFields) {
+        searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataField(field));
       }
     }
+  }
+
+  /**
+   * Check the desc sort order while building the ES query
+   *
+   * @param sorts
+   * @param columnName
+   * @return true if order matched else return false
+   */
+  public Boolean checkSortOrder(List<Sort> sorts, String columnName) {
+    return sorts.stream().anyMatch(s -> s.getColumnName().equalsIgnoreCase(columnName)
+        && s.getOrder().equals(Order.DESC));
   }
 
   private String expressionEvaluator(
       String dataFieldName, Expression expression, AggregationBuilder aggregationBuilder)
       throws SipDslProcessingException {
     StringBuilder expressionBuilder = new StringBuilder();
-
     Map<String, String> bucketsPathsMap = new HashMap<>();
 
     if (expression != null) {
@@ -307,18 +332,12 @@ public class SIPAggregationBuilder {
       String operator = expression.getOperator();
       if (operator != null) {
         Operand operand1 = expression.getOperand1();
-
         String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketsPathsMap);
-
         expressionBuilder.append(operand1Exp);
-
         if (expression.getOperand2() != null) {
           Operand operand2 = expression.getOperand2();
-
           String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketsPathsMap);
-
           expressionBuilder.append(expression.getOperator());
-
           expressionBuilder.append(operand2Exp);
         }
       } else {
@@ -331,9 +350,7 @@ public class SIPAggregationBuilder {
         } else {
           throw new SipDslProcessingException("Invalid expression");
         }
-
         String operandExp = operandEvaluator(operand, aggregationBuilder, bucketsPathsMap);
-
         expressionBuilder.append(operandExp);
       }
     }
@@ -352,43 +369,30 @@ public class SIPAggregationBuilder {
     StringBuilder operandBuilder = new StringBuilder();
     if (operand.getAggregate() != null) {
       Field aggField = new Field();
-
       aggField.setColumnName(operand.getColumn());
       aggField.setAggregate(Aggregate.fromValue(operand.getAggregate().toUpperCase()));
-
       String fieldName = operand.getAggregate() + "_" + operand.getColumn() + "_formula_" + random.nextInt(10000);
       aggField.setDataField(fieldName);
-
       aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(aggField));
-
-      bucketPathsMap.put(fieldName, fieldName + ".value");
-
+      bucketPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
       operandBuilder.append("params.").append(fieldName);
-
     } else if (operand.getOperand1() != null && operand.getOperator() != null) {
-
       operandBuilder.append("(");
       String operator = operand.getOperator();
-
       Operand operand1 = operand.getOperand1();
-
       String operand1Exp = operandEvaluator(operand1, aggregationBuilder, bucketPathsMap);
       operandBuilder.append(operand1Exp);
-
       Operand operand2 = operand.getOperand2();
 
       if (operand2 != null) {
         operandBuilder.append(operator);
-
         String operand2Exp = operandEvaluator(operand2, aggregationBuilder, bucketPathsMap);
         operandBuilder.append(operand2Exp);
       }
-
       operandBuilder.append(")");
     } else if (operand.getValue() != null) {
       operandBuilder.append(operand.getValue());
     }
-
     return operandBuilder.toString();
   }
 }
