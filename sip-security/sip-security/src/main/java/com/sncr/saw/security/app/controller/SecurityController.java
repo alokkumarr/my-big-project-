@@ -13,37 +13,60 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.ChangePasswordDetails;
+import com.sncr.saw.security.common.bean.CustProdModule;
+import com.sncr.saw.security.common.bean.CustomerProductSubModule;
+import com.sncr.saw.security.common.bean.LoginDetails;
+import com.sncr.saw.security.common.bean.Preference;
+import com.sncr.saw.security.common.bean.RandomHashcode;
+import com.sncr.saw.security.common.bean.RefreshToken;
+import com.sncr.saw.security.common.bean.ResetPwdDtls;
+import com.sncr.saw.security.common.bean.ResetValid;
+import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserPreferences;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
-import com.sncr.saw.security.common.bean.repo.admin.*;
+import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
+import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteRole;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteUser;
+import com.sncr.saw.security.common.bean.repo.admin.ModuleDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.PrivilegesList;
+import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.RolesList;
+import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
+import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
-import com.sncr.saw.security.common.bean.repo.dsk.*;
+import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
+import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
+import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
+import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
-import com.sncr.saw.security.app.service.TicketHelper;
+import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -52,10 +75,21 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author gsan0003
@@ -85,14 +119,6 @@ public class SecurityController {
 	private final ObjectMapper mapper = new ObjectMapper();
 
     private final String AdminRole = "ADMIN";
-
-    private final Pattern hasNumber = Pattern.compile("\\d");
-
-    private final Pattern hasLowercase = Pattern.compile("[a-z]");
-
-    private final Pattern hasUpperCase = Pattern.compile("[A-Z]");
-
-    private final Pattern hasSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -351,7 +377,7 @@ public class SecurityController {
 			return valid;
 		}
 
-		valid = validatePassword(newPass,loginId);
+		valid = PasswordValidation.validatePassword(newPass,loginId);
 
 		if (message == null) {
 			try {
@@ -476,7 +502,7 @@ public class SecurityController {
 			return valid;
 		}
 
-		valid = validatePassword(newPass,loginId);
+		valid = PasswordValidation.validatePassword(newPass,loginId);
 
         // Validate the hash key with userID before proceeding.
         ResetValid resetValid =  userRepository.validateResetPasswordDtls(rhc);
@@ -1052,7 +1078,7 @@ public class SecurityController {
 
 		try {
 			if (user != null) {
-			    Valid validity = validatePassword(user.getPassword(),user.getMasterLoginId());
+			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
                 userList.setValid(validity.getValid());
                 userList.setValidityMessage(validity.getValidityMessage());
 
@@ -1094,7 +1120,7 @@ public class SecurityController {
 			if (user != null) {
 				userList.setValid(true);
 				if (user.getPassword() != null) {
-				    Valid validity = validatePassword(user.getPassword(),user.getMasterLoginId());
+				    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
 					userList.setValid(validity.getValid());
 					userList.setValidityMessage(validity.getValidityMessage());
 				}
@@ -1794,66 +1820,5 @@ public class SecurityController {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
-    }
-
-    /**
-     * Validate Password as specified in Synchronoss Password Policy.
-     *
-     * @param pwd Password
-     * @param userName Login Id
-     * @return Valid Object
-     */
-    public Valid validatePassword(String pwd,String userName) {
-        String message = null;
-        Valid valid = new Valid();
-        valid.setValid(false);
-        if (StringUtils.isEmpty(pwd)) {
-            valid.setValidityMessage("Password can't be empty or null.!!");
-            return valid;
-        }
-        if (userName.equals(pwd)) {
-            message = "User Name can't be assigned as password.";
-            valid.setValidityMessage(message);
-            return valid;
-        }
-
-        if (pwd.length() < 8) {
-            message = "New password should be minimum of 8 character.";
-            valid.setValidityMessage(message);
-            return valid;
-        }
-
-        int validPatternCnt= 0;
-        Matcher m = hasUpperCase.matcher(pwd);
-        if (!m.find()) {
-            validPatternCnt++;
-        }
-
-        m = hasSpeChar.matcher(pwd);
-        if (!m.find()) {
-            validPatternCnt++;
-        }
-        m = hasNumber.matcher(pwd);
-        if (!m.find()) {
-            validPatternCnt++;
-        }
-        m = hasLowercase.matcher(pwd);
-        if (!m.find()) {
-            validPatternCnt++;
-        }
-
-        // Synchronoss password Policy : Must contain at least 3 of the 4 one uppercase
-        // character, one lowercase character, one numeric character, one special character
-        if (validPatternCnt > 1) {
-            message =
-                "Password must contain at least 3 of the 4 one uppercase character,"
-                    + " one lowercase character, one numeric character, one special character ";
-            valid.setValidityMessage(message);
-            return valid;
-        } else {
-            valid.setValid(true);
-            valid.setValidityMessage("Strong password.");
-            return valid;
-        }
     }
 }
