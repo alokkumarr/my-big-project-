@@ -14,6 +14,7 @@ import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -45,6 +47,7 @@ public class ElasticSearchQueryBuilder {
   private static final String VALUE = "value";
   private static final String SUM = "_sum";
   private static String appenderForGTLTE = "||/M";
+  public static String[] groupByFields;
 
   public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
       throws IOException, ProcessingException {
@@ -79,7 +82,15 @@ public class ElasticSearchQueryBuilder {
         boolQueryBuilder.must(boolQueryBuilderFilter);
     }
       searchSourceBuilder.query(boolQueryBuilder);
+
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
+    // rearrange data field based upon sort
+    boolean haveAggregate = dataFields.stream().anyMatch(field -> field.getAggregate() != null
+        && !field.getAggregate().value().isEmpty());
+    if (haveAggregate) {
+      dataFields = BuilderUtil.buildFieldBySort(dataFields, sipQuery.getSorts());
+    }
+
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     List<Filter> aggregationFilter =
         SIPAggregationBuilder.getAggregationFilter(sipQuery.getFilters());
@@ -91,7 +102,8 @@ public class ElasticSearchQueryBuilder {
             aggregationFields,
             aggregationFilter,
             searchSourceBuilder,
-            size);
+            size,
+            sipQuery.getSorts());
 
     return searchSourceBuilder.toString();
   }
@@ -249,7 +261,8 @@ public class ElasticSearchQueryBuilder {
       List<Field> aggregationFields,
       List<Filter> aggregationFilter,
       SearchSourceBuilder searchSourceBuilder,
-      Integer size) {
+      Integer size,
+      List<Sort> sorts) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
     if (aggregationFields.size() == 0) {
@@ -262,9 +275,10 @@ public class ElasticSearchQueryBuilder {
         reportAggregationBuilder.aggregationBuilder(
             dataFields, aggregationFields, searchSourceBuilder);
       } else {
+        groupByFields = new String[dataFields.size() - aggregationFields.size()];;
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder);
+                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder, sorts, groupByFields);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
