@@ -2,7 +2,16 @@ import { flattenReportData, wrapFieldValues } from './dataFlattener';
 
 describe('flattenReportData', () => {
   it('should remove keywords from reports', () => {
-    const analysis = { artifacts: [{ columns: [] }] };
+    const analysis = {
+      artifacts: [{
+        columns: []
+      }],
+      sipQuery: {
+        artifacts: [{
+          columns: []
+        }]
+      }
+    };
     const data = [{ 'string.keyword': 'abc' }];
     expect(flattenReportData(data, analysis)[0].string).toBeTruthy();
   });

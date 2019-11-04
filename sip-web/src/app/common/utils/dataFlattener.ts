@@ -205,6 +205,9 @@ export function wrapFieldValues(data) {
 }
 
 export function alterDateInData(data, sipQuery) {
+  if (isEmpty(data)) {
+    return data;
+  }
   const dateFields = [];
   flatMap(sipQuery.artifacts, artifact =>
     fpPipe(
