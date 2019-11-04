@@ -104,7 +104,12 @@ public class GenericJsonModel {
                     throw new RuntimeException("Transformation not found: " + transformerName);
                 }
             } else {
-                ret = new CopyField(sourceField, fieldName, fieldType, defaultVal);
+            	if(sourceField.equals("EVENT_TYPE")) {
+            		ret = new CopyField(sourceField, sourceField, fieldType, defaultVal);
+            	} else {
+            		ret = new CopyField(sourceField, fieldName, fieldType, defaultVal);
+            	}
+                
             }
         } else
             throw new RuntimeException("Invalid transformation definition: " + transformDef.toString());
@@ -183,7 +188,13 @@ public class GenericJsonModel {
             JsonObject object = v.getAsJsonObject();
             JsonArray fields = object.getAsJsonArray(CONF_FIELDS);
             fields.forEach((f) -> {
-                        String name = f.getAsJsonObject().get(CONF_NAME).getAsString();
+            			String source = f.getAsJsonObject().get(CONF_SOURCE).getAsString();
+                        String name = "";
+                        if(source.equalsIgnoreCase("EVENT_TYPE")) {
+                        	name = f.getAsJsonObject().get(CONF_SOURCE).getAsString();
+                        } else {
+                        	name = f.getAsJsonObject().get(CONF_NAME).getAsString();
+                        }
                         FieldType type =
                                 f.getAsJsonObject().has(CONF_TYPE) ?
                                         FieldType.valueOf(f.getAsJsonObject().get(CONF_TYPE).getAsString()) : FieldType.STRING;
@@ -208,7 +219,13 @@ public class GenericJsonModel {
             
             if(nameObj.equals(schemaKeyCol)) {
             	 fields.forEach((f) -> {
-                     String name = f.getAsJsonObject().get(CONF_NAME).getAsString();
+            		 String source = f.getAsJsonObject().get(CONF_SOURCE).getAsString();
+                     String name = "";
+                     if(source.equalsIgnoreCase("EVENT_TYPE")) {
+                     	name = f.getAsJsonObject().get(CONF_SOURCE).getAsString();
+                     } else {
+                     	name = f.getAsJsonObject().get(CONF_NAME).getAsString();
+                     }
                      FieldType type =
                              f.getAsJsonObject().has(CONF_TYPE) ?
                                      FieldType.valueOf(f.getAsJsonObject().get(CONF_TYPE).getAsString()) : FieldType.STRING;

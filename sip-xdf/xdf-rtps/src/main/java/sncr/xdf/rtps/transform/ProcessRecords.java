@@ -96,7 +96,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         String basePath, String batchPrefix, String outputType, Optional<NGContext> ngctx , Optional<InternalContext> ctx){
     	logger.debug("### Inside process records ####");
         this.inStream = inStream;
-        this.itcx = itcx;
         this.dataModel = dataModel;
         logger.debug("###### Data Model ::"+ this.dataModel);
         this.definitions = definitions;
@@ -245,10 +244,10 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     }
     
-    private void extractSchemaForEventTypes(SparkSession session,JavaRDD<String> jsonRdd) {
-    	logger.debug("Before inferring schema count ::"+ jsonRdd.count());
-    	Dataset<Row> dataset = session.read().json(jsonRdd).toDF();
-    	logger.debug("After inferring schema count ::"+ dataset.count());
+    
+    
+    
+    private void extractSchemaForEventTypes(SparkSession session,Dataset<Row> dataset) {
     	
     	List<Row> eventTypes = dataset.select((String) "EVENT_TYPE").distinct().collectAsList();
     	for (Row eventType : eventTypes) {
@@ -258,6 +257,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 			
 			this.schemaFields.put(eventType.getString(0), 
 					GenericJsonModel.createSchemaByEventType(definitions, eventType.getString(0)));
+			
 			
 			
     	}
@@ -275,7 +275,12 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	
     	
     	if(jsonRdd.count() > 0) {
-    		 this.extractSchemaForEventTypes(sess, jsonRdd);
+    		logger.debug("######## dataset size more than 0 #####" );
+    		Dataset<Row> dataset = sess.read().json(jsonRdd).toDF();
+    		logger.debug("######## converted to dataset from rdd #####" );
+    		this.extractSchemaForEventTypes(sess, dataset);
+    		logger.debug("schema fields::" + this.schemaFields.size());
+    		 
         	
     	}
        
@@ -307,7 +312,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 					if ( null == multiColName) {
 						logger.error("No multi column defined...ex: EVENT_TYPE");
-						return 255;
+						return 0;
 					}
 
 					logger.debug("Multi column name " + multiColName);
@@ -330,6 +335,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				
 			final JSONObject rtaConfiguration = rtaConfig;
 			final String keyColumn = multiColName;
+			logger.debug("schema fields::"+ this.schemaFields);
 			this.schemaFields.forEach((eventType, eventSchema)->{
 				
 				logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
@@ -352,11 +358,10 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 			    
                 
 			    logger.debug("##### Data frame created with specific schema ");
-			    df.show();
 
 				String isTimeSeries = null;
 				Object threadPoolCnt = null;
-				int numThreads = 0;
+				int numThreads = DEFAULT_THREAD_CNT;
 				if (rtaConfiguration != null) {
 
 					 isTimeSeries = (String) rtaConfiguration.get("isTimeSeries");
@@ -376,6 +381,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				String query = keyColumn + "== \'" + eventType + "\'";
 
 				logger.debug("Query:: " + query);
+				logger.debug("is pipeline ::"+ this.ngctx.runningPipeLine);
 
 				/**
 				 * 
@@ -385,8 +391,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				 * 
 				 */
 
-				if (isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) {
-
+				if ((isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) && this.ngctx.runningPipeLine ) {
+					logger.debug("Starting async pipeline"+ this.ngctx.runningPipeLine);
 					ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 					final Dataset<Row> dataset = df;
 					executorService.submit(new Callable<Long>() {
@@ -409,8 +415,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 					});
 
-				} else if (Boolean.valueOf(isTimeSeries)) {
-
+				} else if (Boolean.valueOf(isTimeSeries) && this.ngctx.runningPipeLine) {
+					logger.debug("Starting sync pipeline"+ this.ngctx.runningPipeLine);
 					try {
 						Dataset<Row> data =df.filter(query).cache();
 						if(data.count()>0) {
@@ -463,6 +469,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 		            }
 		            // Done with writing - safe to rename batch directory
 		            finalizeBatch(strTmpPath, path);
+		            logger.debug("Writing to datalake compled");
 		        } else {
 		        	logger.debug("base path not found or empty. Hence not writing to data lake");
 		        }
@@ -471,7 +478,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 		        if (logger.isTraceEnabled()) {
 		          logger.debug("Alert metrics to be be collected: " + df.count());
 		        }
-		        logger.debug("######## Data frame crated with XDF-RTPS ##########");
 
 			});
 
