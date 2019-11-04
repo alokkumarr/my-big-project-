@@ -253,7 +253,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	for (Row eventType : eventTypes) {
 			
 			logger.debug("#### Extracting schema for  eventType ::"+ eventType.getString(0));
-			logger.debug(GenericJsonModel.createSchemaByEventType(definitions, eventType.getString(0)));
 			
 			this.schemaFields.put(eventType.getString(0), 
 					GenericJsonModel.createSchemaByEventType(definitions, eventType.getString(0)));
@@ -278,7 +277,10 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     		logger.debug("######## dataset size more than 0 #####" );
     		Dataset<Row> dataset = sess.read().json(jsonRdd).toDF();
     		logger.debug("######## converted to dataset from rdd #####" );
-    		this.extractSchemaForEventTypes(sess, dataset);
+    		if((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
+    			this.extractSchemaForEventTypes(sess, dataset);
+    		}
+    		
     		logger.debug("schema fields::" + this.schemaFields.size());
     		 
         	
