@@ -119,7 +119,7 @@ export class CategoryService implements IAdminDataService {
       .pipe(
         map(resp => resp.modules),
         map(modules =>
-          reject(modules, ({ moduleName }) => moduleName === 'ALERT')
+          reject(modules, ({ moduleName }) => moduleName === 'ALERTS')
         )
       )
       .toPromise();
