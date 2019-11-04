@@ -78,8 +78,8 @@ public class ExportUtils {
         String artiFieldAlias = artiField.getAlias();
         String artiFieldDispName = artiField.getDisplayName();
 
-        if ((artifactName != null && artiFieldAlias.equalsIgnoreCase(CUSTOMER_CODE)) ||
-            (artiFieldDispName!= null && artiFieldDispName.equalsIgnoreCase(CUSTOMER_CODE))) {
+        if (CUSTOMER_CODE.equalsIgnoreCase(artiFieldAlias) ||
+            CUSTOMER_CODE.equalsIgnoreCase(artiFieldDispName)) {
           artiField.setAlias(artifactName + "_" + CUSTOMER_CODE);
         }
         fields.add(artiField);
