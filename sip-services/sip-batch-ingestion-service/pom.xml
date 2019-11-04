@@ -156,12 +156,17 @@
 			<artifactId>sip-batch-plugin-sftp</artifactId>
 			<version>${revision}</version>
 		</dependency>
+    <dependency>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>sip-batch-plugin-api-pull</artifactId>
+      <version>${revision}</version>
+    </dependency>
 		<dependency>
 			<groupId>com.synchronoss.saw</groupId>
 			<artifactId>sip-batch-log-service</artifactId>
 			<version>${revision}</version>
 		</dependency>
-                <dependency>
+    <dependency>
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>core</artifactId>
 			<version>${revision}</version>
@@ -193,9 +198,9 @@
 			<artifactId>spring-aspects</artifactId>
 		</dependency>
 		<dependency>
-		<groupId>com.synchronoss.saw</groupId>
-		<artifactId>sip-batch-plugin-s3</artifactId>
-		<version>${revision}</version>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>sip-batch-plugin-s3</artifactId>
+      <version>${revision}</version>
 		</dependency>
     <dependency>
       <groupId>com.synchronoss.bda.sip</groupId>

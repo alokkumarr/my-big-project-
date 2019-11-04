@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "headerParam": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": "object"
+      },
+      "datatype": {
+        "type": "string",
+        "default": "string"
+      }
+    }
+  },
+  "queryParam": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      }
+    }
+  },
+  "properties": {
+    "routeName": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "apiEndPoint": {
+      "type": "string"
+    },
+    "httpMethod": {
+      "type": "string",
+      "enum": ["GET", "POST", "PUT", "DELETE"],
+      "default": "GET"
+    },
+    "queryParameters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/queryParam"
+      }
+    },
+    "headerParameters": {
+      "type": "array",
+      "items" : {
+        "$ref": "#/headerParam"
+      }
+    },
+    "urlParameters": {
+      "type": "array",
+      "items": []
+    },
+    "bodyParameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "destinationLocation": {
+      "type": "string"
+    },
+    "schedulerExpression": {
+      "type": "object",
+      "properties" : {
+        "cronexp": {
+          "type": "string"
+        },
+        "activeTab": {
+          "type": "string"
+        },
+        "activeRadio": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "routeName",
+    "apiEndPoint",
+    "httpMethod",
+    "queryParameters",
+    "headerParams",
+    "urlParameters",
+    "bodyParams"
+  ]
+}
