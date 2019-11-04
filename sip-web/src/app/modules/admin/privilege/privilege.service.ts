@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import * as reject from 'lodash/reject';
 import { tap, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
@@ -187,12 +186,7 @@ export class PrivilegeService implements IAdminDataService {
   }) {
     return this._adminService
       .request<ModulesResponse>('modules/list', params)
-      .pipe(
-        map(resp => resp.modules),
-        map(modules =>
-          reject(modules, ({ moduleName }) => moduleName === 'ALERT')
-        )
-      )
+      .pipe(map(resp => resp.modules))
       .toPromise();
   }
 
