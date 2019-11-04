@@ -821,7 +821,7 @@ to set max_result_window:
 
 ----
 curl -X PUT \
-  <ElasticSearch Host>/tmobile_cell_sites/_settings \
+  <ElasticSearch Host>/<index_name>/_settings \
   -H 'Content-Type: application/json' \
   -d '{ "max_result_window" : 300000 }'
 ----
