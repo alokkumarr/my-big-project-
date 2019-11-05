@@ -250,16 +250,12 @@ public class ExportServiceImpl implements ExportService {
       exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
       // consider default format as csv if file type is not provided.
       String fileName =
-         ExportUtils.prepareFileName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+          ExportUtils.prepareFileName(
+              String.valueOf(((LinkedHashMap) dispatchBean).get("name")), exportBean.getFileType());
       if (exportBean.getFileType() == null || exportBean.getFileType().isEmpty()) {
-        exportBean.setFileName(fileName + ".csv");
         exportBean.setFileType(DEFAULT_FILE_TYPE);
-      } else {
-        exportBean.setFileName(
-                fileName
-                + "."
-                + exportBean.getFileType());
       }
+      exportBean.setFileName(fileName);
     }
     return exportBean;
   }
@@ -546,15 +542,10 @@ public class ExportServiceImpl implements ExportService {
                 String dir = UUID.randomUUID().toString();
                 String fileName =
                     ExportUtils.prepareFileName(
-                        String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+                        String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
+                        exportBean.getFileType());
                 exportBean.setFileName(
-                    publishedPath
-                        + File.separator
-                        + dir
-                        + File.separator
-                        + fileName
-                        + "."
-                        + exportBean.getFileType());
+                    publishedPath + File.separator + dir + File.separator + fileName);
 
                 try {
                   // create a directory with unique name in published location to avoid file
@@ -656,16 +647,12 @@ public class ExportServiceImpl implements ExportService {
               // build export bean to process file
               ExportUtils.buildExportBean(exportBean, dispatchBean);
               String dir = UUID.randomUUID().toString();
-                String excelFileName =
-                    ExportUtils.prepareFileName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-                exportBean.setFileName(
-                  publishedPath
-                      + File.separator
-                      + dir
-                      + File.separator
-                      + excelFileName
-                      + "."
-                      + exportBean.getFileType());
+              String excelFileName =
+                  ExportUtils.prepareFileName(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
+                      exportBean.getFileType());
+              exportBean.setFileName(
+                  publishedPath + File.separator + dir + File.separator + excelFileName);
 
               File cfile = new File(exportBean.getFileName());
               String fileName = cfile.getAbsolutePath();

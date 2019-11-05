@@ -43,6 +43,8 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT = "distinctCount";
   private static final String USER_FULL_NAME = "userFullName";
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
+  private static final String DEFAULT_FILE_TYPE = "csv";
+
 
   /**
    * Create Request header with common properties
@@ -207,8 +209,12 @@ public class ExportUtils {
     return excelSheetName;
   }
 
-  public static String prepareFileName(String name) {
-    return name.replaceAll("[/\\\\]", "");
+  public static String prepareFileName(String name, String fileType) {
+    name = name.replaceAll("[/\\\\]", "").concat(".");
+    if (fileType != null && !StringUtils.isEmpty(fileType)) {
+      return name.concat(fileType);
+    }
+    return name.concat(DEFAULT_FILE_TYPE);
   }
 
   public static String prepareReportName(String name) {
