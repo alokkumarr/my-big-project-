@@ -1,6 +1,5 @@
 package com.synchronoss.saw.export.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
@@ -40,11 +39,11 @@ public class ExportUtils {
   private static final String AUTHORIZATION = "Authorization";
   private static final String FILE_TYPE = "fileType";
   private static final String DESCRIPTION = "description";
+  private static final String CUSTOMER_CODE = "customerCode";
   private static final String PUBLISHED_TIME = "publishedTime";
   private static final String DISTINCT_COUNT = "distinctCount";
   private static final String USER_FULL_NAME = "userFullName";
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
-  private static final String CUSTOMER_CODE = "customerCode";
 
   /**
    * Create Request header with common properties
@@ -68,22 +67,18 @@ public class ExportUtils {
    * @return
    */
   public static Map<String, String> buildColumnHeaderMap(SipQuery sipQuery) {
+    boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
     for (Artifact artifact : sipQuery.getArtifacts()) {
       String artifactName = artifact.getArtifactsName();
-      List<Field> artiFields = artifact.getFields();
-
-      for(Field artiField: artiFields) {
-        String artiFieldAlias = artiField.getAlias();
-        String artiFieldDispName = artiField.getDisplayName();
-
-        if (CUSTOMER_CODE.equalsIgnoreCase(artiFieldAlias) ||
-            CUSTOMER_CODE.equalsIgnoreCase(artiFieldDispName)) {
-          artiField.setAlias(artifactName + "_" + CUSTOMER_CODE);
+      artifact.getFields().forEach(field -> {
+        // This is added to fix SIP-8811 customer Code column issue on DL report
+        if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
+          field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
         }
-        fields.add(artiField);
-      }
+        fields.add(field);
+      });
     }
 
 
@@ -93,12 +88,12 @@ public class ExportUtils {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
           if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
-              aliasName = field.getDisplayName().trim();
+            aliasName = field.getDisplayName().trim();
           }
           // look for DL report
-          if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
+          if (haveDLQuery) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
-              String[] split = StringUtils.isEmpty(field.getAlias()) ? null : field.getAlias().split("\\.");
+              String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               String columnName;
               String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
               if (aggregationName != null && DISTINCT_COUNT_AGGREGATION.equalsIgnoreCase(aggregationName)) {
@@ -108,13 +103,7 @@ public class ExportUtils {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
                 header.put(columnName.trim(), aliasName);
               } else {
-                if (field.getColumnName().equalsIgnoreCase("customerCode")) {
-                  columnName = aggregationName != null ? aggregationName.trim()
-                      + "(" + field.getAlias().trim() + ")" : field.getAlias();
-                } else {
-                  columnName = aggregationName != null ? aggregationName.trim()
-                      + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
-                }
+                columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
                 header.put(columnName.trim(), aliasName);
               }
               break;
