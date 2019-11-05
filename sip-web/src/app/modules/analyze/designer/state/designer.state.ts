@@ -73,7 +73,7 @@ import { CommonDesignerJoinsArray } from 'src/app/common/actions/common.actions'
 
 // setAutoFreeze(false);
 
-const defaultDesignerState: DesignerStateModel = {
+export const defaultDesignerState: DesignerStateModel = {
   groupAdapters: [],
   analysis: null,
   metric: null,
