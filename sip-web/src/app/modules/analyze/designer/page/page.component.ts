@@ -185,9 +185,7 @@ export class DesignerPageComponent implements OnInit {
                 ...analysis,
                 artifacts: this.fixArtifactsForSIPQuery(
                   analysis,
-                  isDSLAnalysis(analysis)
-                    ? cloneDeep(artifacts)
-                    : analysis.artifacts
+                  cloneDeep(artifacts)
                 ),
                 name:
                   this.designerMode === 'fork'
