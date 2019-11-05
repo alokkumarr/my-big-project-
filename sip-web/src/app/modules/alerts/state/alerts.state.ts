@@ -26,9 +26,10 @@ import {
   LoadSelectedAlertCount,
   LoadSelectedAlertRuleDetails,
   LoadAllAttributeValues,
-  EditAlertFilter
+  EditAlertFilter,
+  ResetAlertChartData
 } from './alerts.actions';
-import { AlertsStateModel, AlertFilterModel } from '../alerts.interface';
+import { AlertsStateModel, AlertFilterModel, AlertChartData } from '../alerts.interface';
 import {
   DATE_PRESETS_OBJ,
   CUSTOM_DATE_PRESET_VALUE,
@@ -50,21 +51,21 @@ export const defaultAlertFilters: AlertFilterModel[] = [
   }
 ];
 
+const defaultAlertChartData: AlertChartData = {
+  x: [],
+  y: [],
+};
+
 const defaultAlertsState: AlertsStateModel = {
   alertFilters: cloneDeep(defaultAlertFilters),
   editedAlertFilters: cloneDeep(defaultAlertFilters),
   editedAlertsValidity: lodashMap(defaultAlertFilters, () => false),
   allAlertsCountChartData: null,
   allAlertsSeverityChartData: null,
-  selectedAlertCountChartData: null,
+  selectedAlertCountChartData: cloneDeep(defaultAlertChartData),
   selectedAlertRuleDetails: null,
   allAttributeValues: null
 };
-
-const mapAlertCount2ChartData = map(countList => ({
-  x: lodashMap(orderAlertsCount(countList), ({ date }) => date),
-  y: lodashMap(orderAlertsCount(countList), ({ count }) => count)
-}));
 
 /**
  * reverse "DD-MM-YYYY" date format to "YYYY-MM-DD"
@@ -76,11 +77,18 @@ const reverseDateFormat = date => {
 const orderAlertsCount = alertCountList =>
   sortBy(alertCountList, ({ date }) => reverseDateFormat(date));
 
+const mapAlertCount2ChartData = map(countList => ({
+  x: lodashMap(orderAlertsCount(countList), ({ date }) => date),
+  y: lodashMap(orderAlertsCount(countList), ({ count }) => count)
+}));
+
+
+
 const severityColors = {
-  WARNING: '#a5b7ce',
-  LOW: '#24b18c',
-  MEDIUM: '#ffbe00',
-  CRITICAL: '#e4524c'
+  WARNING: '#999',
+  LOW: '#ffbe00',
+  MEDIUM: '#ff9000',
+  CRITICAL: '#d93e00'
 };
 
 /** Severity order map, gives the order of the severity in the chart */
@@ -245,7 +253,7 @@ export class AlertsState {
       .pipe(mapAlertCount2ChartData)
       .toPromise()
       .then(selectedAlertCountChartData => {
-        patchState({ selectedAlertCountChartData });
+       patchState({ selectedAlertCountChartData });
       });
   }
 
@@ -258,7 +266,7 @@ export class AlertsState {
       .getAlertRuleDetails(id)
       .toPromise()
       .then(selectedAlertRuleDetails => {
-        patchState({ selectedAlertRuleDetails });
+       patchState({ selectedAlertRuleDetails });
       });
   }
 
@@ -270,5 +278,10 @@ export class AlertsState {
       .then(allAttributeValues => {
         patchState({ allAttributeValues });
       });
+  }
+
+  @Action(ResetAlertChartData)
+  resetAlertChartData({ patchState }: StateContext<AlertsStateModel>) {
+    patchState({ selectedAlertCountChartData: cloneDeep(defaultAlertChartData) });
   }
 }
