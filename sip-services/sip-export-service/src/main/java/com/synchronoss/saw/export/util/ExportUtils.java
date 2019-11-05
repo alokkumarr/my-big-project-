@@ -1,5 +1,6 @@
 package com.synchronoss.saw.export.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.model.Artifact;
@@ -43,6 +44,7 @@ public class ExportUtils {
   private static final String DISTINCT_COUNT = "distinctCount";
   private static final String USER_FULL_NAME = "userFullName";
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
+  private static final String CUSTOMER_CODE = "customerCode";
 
   /**
    * Create Request header with common properties
@@ -69,7 +71,19 @@ public class ExportUtils {
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
     for (Artifact artifact : sipQuery.getArtifacts()) {
-      fields.addAll(artifact.getFields());
+      String artifactName = artifact.getArtifactsName();
+      List<Field> artiFields = artifact.getFields();
+
+      for(Field artiField: artiFields) {
+        String artiFieldAlias = artiField.getAlias();
+        String artiFieldDispName = artiField.getDisplayName();
+
+        if (CUSTOMER_CODE.equalsIgnoreCase(artiFieldAlias) ||
+            CUSTOMER_CODE.equalsIgnoreCase(artiFieldDispName)) {
+          artiField.setAlias(artifactName + "_" + CUSTOMER_CODE);
+        }
+        fields.add(artiField);
+      }
     }
 
 
@@ -84,7 +98,7 @@ public class ExportUtils {
           // look for DL report
           if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
-              String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
+              String[] split = StringUtils.isEmpty(field.getAlias()) ? null : field.getAlias().split("\\.");
               String columnName;
               String aggregationName = field.getAggregate() != null ? field.getAggregate().value() : null;
               if (aggregationName != null && DISTINCT_COUNT_AGGREGATION.equalsIgnoreCase(aggregationName)) {
@@ -94,7 +108,13 @@ public class ExportUtils {
                 columnName = aggregationName != null ? aggregationName.trim() + "(" + split[0].trim() + ")" : split[0];
                 header.put(columnName.trim(), aliasName);
               } else {
-                columnName = aggregationName != null ? aggregationName.trim() + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
+                if (field.getColumnName().equalsIgnoreCase("customerCode")) {
+                  columnName = aggregationName != null ? aggregationName.trim()
+                      + "(" + field.getAlias().trim() + ")" : field.getAlias();
+                } else {
+                  columnName = aggregationName != null ? aggregationName.trim()
+                      + "(" + field.getColumnName().trim() + ")" : field.getColumnName();
+                }
                 header.put(columnName.trim(), aliasName);
               }
               break;
