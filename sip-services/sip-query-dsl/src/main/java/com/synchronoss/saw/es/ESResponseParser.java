@@ -85,7 +85,7 @@ public class ESResponseParser {
       }
     }
     // if result contains only aggregated fields.
-    else if (groupByFields.length == 0 && childNode != null) {
+    else if (groupByFields != null && groupByFields.length == 0 && childNode != null) {
       Map<String, Object> flatValues = new LinkedHashMap<>();
 
       for (Field dataField : aggregationFields) {
