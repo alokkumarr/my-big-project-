@@ -348,7 +348,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    */
   checkForKPIs(): void {
     const tiles = get(this.dashboard, 'tiles', []);
-    const kpis = filter(tiles, t => t.type === 'kpi');
+    const kpis = filter(tiles, t => ['kpi', 'bullet'].includes(t.type));
     this.hasKPIs = kpis && kpis.length > 0;
   }
 
