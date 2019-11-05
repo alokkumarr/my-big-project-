@@ -359,9 +359,13 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   aggregateColumn(payload, value) {
-    payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     if (value === 'clear') {
+      if (isUndefined(payload.aggregate)) {
+        return;
+      }
       delete payload.aggregate;
+    } else {
+      payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     }
     this.change.emit({
       subject: 'aggregate',
