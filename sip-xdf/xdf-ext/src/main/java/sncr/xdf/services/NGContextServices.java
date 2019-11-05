@@ -10,7 +10,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
-import sncr.xdf.context.ComponentServices;
+import sncr.bda.conf.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.exceptions.XDFException;
@@ -65,6 +65,14 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
     }
 
+    public NGContextServices( ComponentServices[] cs, String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName,
+                              String batchID, Boolean persistMode){
+        ngctx = new NGContext(xdfRoot, componentConfiguration, applicationID, componentName, batchID, persistMode);
+        for (int i = 0; i < cs.length; i++) {
+            this.ngctx.serviceStatus.put(cs[i], false);
+        }
+    }
+
     public NGContext getNgctx(){
         return ngctx;
     }
@@ -81,11 +89,8 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
-            	
-            	logger.debug("#### Inside if all ::" );
-
-                services.md = new DLDataSetService(ngctx.xdfDataRootSys);
-                services.als = new AuditLogService(services.md.getRoot());
+                  services.md = new DLDataSetService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+                  services.als = new AuditLogService(services.md.getRoot(),ngctx.isPersistMode());
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.Project)){
@@ -99,8 +104,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             }
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
-            	logger.debug("#### Inside if TransformationMetadata ::" );
-                services.transformationMD = new TransformationService(ngctx.xdfDataRootSys);
+
+                    services.transformationMD = new TransformationService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+
                 if (initTransformation() != 0){
                     logger.error("Could not init transformation data");
                     return  -1;
@@ -119,7 +125,6 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         return 0;
     }
 
-
     private int initProject() {
         try {
             services.prj.getProjectData(ngctx);
@@ -132,6 +137,28 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         }
         return 0;
     }
+
+//    private int initProject() {
+//        logger.debug(" initProject  ");
+//        int projectStatus = 0;
+//        try {
+////            if (!services.prj.projectPresent(ngctx.applicationID)) {
+////                logger.debug("With Project Id: "+ ngctx.applicationID);
+//                services.prj.getProjectData(ngctx);
+//                ngctx.serviceStatus.put(ComponentServices.Project, true);
+////            } else {
+////                logger.debug("Without Project Id: "+ ngctx.applicationID);
+////                ngctx.serviceStatus.put(ComponentServices.Project, true);
+////            }
+//        } catch (Exception e) {
+//            String error = "component initialization (input-discovery/output-preparation) exception: "
+//                + ExceptionUtils.getFullStackTrace(e);
+//            logger.error(error);
+//            projectStatus = -1;
+//        }
+//        return projectStatus;
+//    }
+
 
     public int registerOutputDataSet() {
 
@@ -148,14 +175,15 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
                 try
                 {
-                  JsonObject ale = services.als.generateDSAuditLogEntry(ngctx, "INIT", ngctx.inputDataSets, ngctx.outputDataSets);
-                  String aleId = services.als.createAuditLog(ngctx, ale);
 
-                  ngctx.componentConfiguration.getOutputs().forEach(o ->
-                  {
+                    JsonObject ale = services.als.generateDSAuditLogEntry(ngctx, "INIT", ngctx.inputDataSets, ngctx.outputDataSets);
+                    String aleId = ngctx.isPersistMode() ? services.als.createAuditLog(ngctx, ale) : services.als.generateAleId(ngctx) ;
+
+                    ngctx.componentConfiguration.getOutputs().forEach(o ->
+                    {
                         logger.debug("Add output object to data object repository: " + o.getDataSet());
 
-                        if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
+                        if (ngctx.isPersistMode() && ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ) {
                             JsonElement ds = services.md.readOrCreateDataSet(ngctx, ngctx.outputDataSets.get(o.getDataSet()));
                             if (ds == null) {
                                 String error = "Could not create metadata for output dataset [" + o.getDataSet() + "]: " ;
@@ -183,9 +211,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                     });
                     ngctx.serviceStatus.put(ComponentServices.OutputDSMetadata, true);
                 } catch (Exception e) {
-                  logger.error("Could not create Audit log entry" +
-                      ExceptionUtils.getFullStackTrace(e));
-                  return -1;
+                    logger.error("Could not create Audit log entry" +
+                        ExceptionUtils.getFullStackTrace(e));
+                    return -1;
                 }
 
             }
@@ -207,8 +235,11 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         }
         logger.debug("######### setting transformation metadata");
         try {
-            ngctx.transformationID =
+            logger.info("ngctx.isPersistMode()" + ngctx.isPersistMode());
+            if(ngctx.isPersistMode()) {
+                ngctx.transformationID =
                     services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
+            }
             ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
             logger.debug("######### is transform metadata set??"+  ngctx.serviceStatus.
             		get(ComponentServices.TransformationMetadata));

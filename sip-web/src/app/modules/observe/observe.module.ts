@@ -13,6 +13,7 @@ import {
   DxDataGridComponent,
   DxDataGridModule
 } from 'devextreme-angular/ui/data-grid';
+import { DxCircularGaugeModule } from 'devextreme-angular';
 import { DxRangeSliderModule } from 'devextreme-angular/ui/range-slider';
 import { DxNumberBoxModule } from 'devextreme-angular/ui/number-box';
 
@@ -59,6 +60,7 @@ import { CommonModuleTs } from '../../common';
 import { FirstDashboardGuard } from './guards';
 import { ZoomAnalysisComponent } from './components/zoom-analysis/zoom-analysis.component';
 import { ObserveState } from './state/observe.state';
+import { WidgetFiltersComponent } from './components/add-widget/widget-filters/widget-filters.component';
 
 const components = [
   ObservePageComponent,
@@ -79,7 +81,8 @@ const components = [
   KPIFilterComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,
-  ZoomAnalysisComponent
+  ZoomAnalysisComponent,
+  WidgetFiltersComponent
 ];
 
 const GUARDS = [FirstDashboardGuard];
@@ -102,7 +105,8 @@ const GUARDS = [FirstDashboardGuard];
     UChartModule,
     CountoModule,
     DxDataGridModule,
-    DxTemplateModule
+    DxTemplateModule,
+    DxCircularGaugeModule
   ],
   declarations: components,
   entryComponents: components,

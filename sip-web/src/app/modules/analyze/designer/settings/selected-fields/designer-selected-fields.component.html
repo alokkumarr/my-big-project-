@@ -1,5 +1,5 @@
 <div
-  *ngFor="let adapter of (groupAdapters$ | async); let adapterIndex = index"
+  *ngFor="let adapter of groupAdapters$ | async; let adapterIndex = index"
   fxLayout="row"
   fxLayoutAlign="start center"
   class="selected-fields__container"
@@ -23,32 +23,36 @@
     [attr.e2e]="'designer-selected-container' + adapter.title"
     [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
   >
-    <mat-chip
-      *ngFor="let col of adapter.artifactColumns"
-      class="selected-fields__item"
-      [attr.e2e]="'designer-selected-field-' + (col.displayName || col.alias)"
-      [ngClass]="getFieldItemClass(col)"
-      cdkDrag
-      (cdkDragStarted)="dragStarted($event)"
-      (cdkDragReleased)="dragReleased($event)"
-      [cdkDragData]="col"
-      [removable]="true"
-      (removed)="removeFromGroup(col, adapter)"
-    >
-      <ng-container *ngIf="col.aggregate; else defaultTemplate">
-        <span
-          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
-          [innerHtml]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel"
-        >
-        </span>
-        <span> (&nbsp;{{ col.displayName || col.alias }}&nbsp;) </span>
-      </ng-container>
-      <ng-template #defaultTemplate>
-        {{ col.displayName || col.alias }}
-      </ng-template>
+    <perfect-scrollbar [config]="{}" [scrollIndicators]="false">
+      <mat-chip
+        *ngFor="let col of adapter.artifactColumns"
+        class="selected-fields__item"
+        [attr.e2e]="'designer-selected-field-' + (col.displayName || col.alias)"
+        [ngClass]="getFieldItemClass(col)"
+        cdkDrag
+        (cdkDragStarted)="dragStarted($event)"
+        (cdkDragReleased)="dragReleased($event)"
+        [cdkDragData]="col"
+        [removable]="true"
+        (removed)="removeFromGroup(col, adapter)"
+      >
+        <ng-container *ngIf="col.aggregate; else defaultTemplate">
+          <span
+            [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
+            [innerHtml]="
+              AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel
+            "
+          >
+          </span>
+          <span> (&nbsp;{{ getDisplayNameForColumn(col) }}&nbsp;) </span>
+        </ng-container>
+        <ng-template #defaultTemplate>
+          {{ col.displayName || col.alias }}
+        </ng-template>
 
-      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
-    </mat-chip>
+        <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+      </mat-chip>
+    </perfect-scrollbar>
   </mat-chip-list>
 </div>
 
@@ -77,12 +81,14 @@
       *ngFor="let filter of filters; let i = index"
       class="selected-fields__item"
       [attr.e2e]="
-        'applied-filter-' + getDisplayName(filter) + getFilterValue(filter)
+        'applied-filter-' +
+        getDisplayNameForFilter(filter) +
+        getFilterValue(filter)
       "
       [removable]="true"
       (removed)="removeFilter.emit(i)"
     >
-      {{ getDisplayName(filter) }}{{ getFilterValue(filter) }}
+      {{ getDisplayNameForFilter(filter) }}{{ getFilterValue(filter) }}
       <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
     </mat-chip>
   </mat-chip-list>

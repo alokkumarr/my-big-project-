@@ -1,8 +1,8 @@
-import {Component, Input, EventEmitter, Output} from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as get from 'lodash/get';
-import {AnalyzeDialogService} from '../../../../services/analyze-dialog.service';
-import {DesignerUpdateArtifactColumn} from '../../../actions/designer.actions';
-import {Store} from '@ngxs/store';
+import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
+import { DesignerUpdateArtifactColumn } from '../../../actions/designer.actions';
+import { Store } from '@ngxs/store';
 import {
   ArtifactColumnChart,
   Format,
@@ -31,7 +31,9 @@ const dateFormatsMap = {
   templateUrl: 'designer-date-format-selector.component.html'
 })
 export class DesignerDateFormatSelectorComponent {
-  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<
+    DesignerChangeEvent
+  > = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumnChart;
   @Input() public analysisType: string;
 
@@ -40,8 +42,7 @@ export class DesignerDateFormatSelectorComponent {
   constructor(
     private _analyzeDialogService: AnalyzeDialogService,
     private store: Store
-  ) {
-  }
+  ) {}
 
   onFormatChange(format: Format | string) {
     if (format) {
@@ -53,6 +54,7 @@ export class DesignerDateFormatSelectorComponent {
           this.store.dispatch(
             new DesignerUpdateArtifactColumn({
               columnName: this.artifactColumn.columnName,
+              dataField: this.artifactColumn.dataField,
               table: this.artifactColumn.table || this.artifactColumn.table,
               dateFormat: <string>format,
               groupInterval
@@ -66,6 +68,7 @@ export class DesignerDateFormatSelectorComponent {
           this.store.dispatch(
             new DesignerUpdateArtifactColumn({
               columnName: this.artifactColumn.columnName,
+              dataField: this.artifactColumn.dataField,
               table: this.artifactColumn.table || this.artifactColumn.table,
               dateFormat: <string>format
             })
@@ -76,12 +79,13 @@ export class DesignerDateFormatSelectorComponent {
           this.store.dispatch(
             new DesignerUpdateArtifactColumn({
               columnName: this.artifactColumn.columnName,
+              dataField: this.artifactColumn.dataField,
               table: this.artifactColumn.table || this.artifactColumn.table,
               format
             })
           );
       }
-      this.change.emit({subject: 'format'});
+      this.change.emit({ subject: 'format' });
     }
   }
 
@@ -98,8 +102,8 @@ export class DesignerDateFormatSelectorComponent {
     const columnFormat = this.artifactColumn.dateFormat;
     const dateFormats = get(dateFormatsMap, `${this.analysisType}.array`);
     this._analyzeDialogService
-    .openDateFormatDialog(<string>columnFormat, dateFormats)
-    .afterClosed()
-    .subscribe(format => this.onFormatChange(format));
+      .openDateFormatDialog(<string>columnFormat, dateFormats)
+      .afterClosed()
+      .subscribe(format => this.onFormatChange(format));
   }
 }

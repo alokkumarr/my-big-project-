@@ -5,15 +5,15 @@ spring:
     name: saw-gateway-service
   servlet:
     multipart:
-      enabled : true
+      enabled: true
       max-request-size: 25MB
       max-file-size: 25MB
       file-size-threshold: 2KB
   main:
-    banner-mode: 'off'
+    banner-mode: "off"
 logging:
   level:
-    com.synchronoss.saw.gateway: TRACE
+    com.synchronoss.saw.gateway: INFO
 
 server:
   max-http-header-size: 65536
@@ -23,60 +23,74 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
   servlet:
-    context-path: ''
+    context-path: ""
   ssl:
     key-store: /Users/spau0004/Desktop/keystore/keystore.jks
     key-store-password: sip@123
     trust-store: /Users/spau0004/Desktop/keystore/truststore.jks
     trust-store-password: sip@123
 
-connector: https
+connector: http
 saw-security-port: 9000
 
-
 analysis:
-    service:
-        host: http://localhost:9300
+  service:
+    host: http://localhost:9300
+alert:
+  service:
+    host: http://localhost:9620
 internal-analysis:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 metadata:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 semantic:
-    service:
-        host: http://localhost:9200
+  service:
+    host: http://localhost:9200
 security:
-    service:
-        host: ${connector}://localhost:${saw-security-port}/saw-security
+  service:
+    host: ${connector}://localhost:${saw-security-port}/saw-security
 export:
-    service:
-        host: http://localhost:9400
+  service:
+    host: http://localhost:9400
 observe:
-    service:
-        host: http://localhost:9500
+  service:
+    host: http://localhost:9500
 scheduler:
-    service:
-        host: http://localhost:9600
+  service:
+    host: http://localhost:9600
 workbench:
-    service:
-        host: http://localhost:9700
+  service:
+    host: http://localhost:9700
 proxy:
-    service:
-        host: http://localhost:9800
+  service:
+    host: http://localhost:9800
 datapod:
-    service:
-        host: http://localhost:9900
+  service:
+    host: http://localhost:9900
 batch:
-    service:
-        host: ${connector}://localhost:9642
-        
+  service:
+    host: ${connector}://localhost:9642
+
 api:
   gateway:
         endpoints:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
+        -   location: ${alert.service.host}
+            method: GET
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: POST
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: PUT
+            path: "[/]alerts.*"
+        -   location: ${alert.service.host}
+            method: DELETE
+            path: "[/]alerts.*"
         -   location: ${internal-analysis.service.host}
             method: GET
             path: '[/]analysis.*'
@@ -85,7 +99,16 @@ api:
             path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]semantic*'
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: GET
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: PUT
+            path: '[/]dslanalysis.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]dslanalysis.*'
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
@@ -101,22 +124,22 @@ api:
         -   location: ${scheduler.service.host}
             method : DELETE
             path : '[/]scheduler.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]observe.*'
-        -   location: ${observe.service.host}
+        -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]observe.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]filters.*'
-        -   location: ${internal-analysis.service.host}
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]kpi.*'
         -   location: ${workbench.service.host}
@@ -126,15 +149,24 @@ api:
             method: GET
             path: '[/]internal/workbench.*'
         -   location: ${proxy.service.host}
+            method: GET
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
             method: POST
             path: '[/]internal/proxy.*'
-        -   location: ${datapod.service.host}
+        -   location: ${proxy.service.host}
+            method: PUT
+            path: '[/]internal/proxy.*'
+        -   location: ${proxy.service.host}
+            method: DELETE
+            path: '[/]internal/proxy.*'
+        -   location: ${metadata.service.host}
             method: POST
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: GET
             path: '[/]internal/semantic.*'
-        -   location: ${datapod.service.host}
+        -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
         -   location: ${batch.service.host}
@@ -158,15 +190,14 @@ api:
         -   location: ${metadata.service.host}
             method: DELETE
             path: '[/]internal/rtisconfig.*'
-
 
 
 sip:
-   ssl:
-     enable : false
-   trust:
-       store: /Users/spau0004/Desktop/keystore/truststore.jks
-       password: sip@123
-   key:
-      store: /Users/spau0004/Desktop/keystore/keystore.jks
-      password: sip@123
+  ssl:
+    enable: false
+  trust:
+    store: /Users/spau0004/Desktop/keystore/truststore.jks
+    password: sip@123
+  key:
+    store: /Users/spau0004/Desktop/keystore/keystore.jks
+    password: sip@123

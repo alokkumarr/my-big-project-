@@ -99,6 +99,11 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     }
 
     this.checkDefaultDashboard();
+    // clear global filters so that global filters, don't stay stuck once set
+    this.onClearGlobalFilter({
+      analysisFilters: {},
+      kpiFilters: {}
+    });
   }
 
   ngOnDestroy() {
@@ -283,12 +288,18 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       this.sidenav.close();
       return;
     }
-    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || !isEmpty(data.analysisFilters)) {
+    if (
+      this.filters.haveAnalysisFiltersChanged(data.analysisFilters) ||
+      !isEmpty(data.analysisFilters)
+    ) {
       this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
 
-    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || !isEmpty(data.kpiFilters)) {
+    if (
+      this.filters.hasKPIFilterChanged(data.kpiFilters) ||
+      !isEmpty(data.kpiFilters)
+    ) {
       this.filters.lastKPIFilter = data.kpiFilters;
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
@@ -296,12 +307,18 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   onClearGlobalFilter(data) {
-    if (this.filters.haveAnalysisFiltersChanged(data.analysisFilters) || isEmpty(data.analysisFilters)) {
+    if (
+      this.filters.haveAnalysisFiltersChanged(data.analysisFilters) ||
+      isEmpty(data.analysisFilters)
+    ) {
       this.filters.lastAnalysisFilters = data.analysisFilters;
       this.filters.onApplyFilter.next(data.analysisFilters);
     }
 
-    if (this.filters.hasKPIFilterChanged(data.kpiFilters) || isEmpty(data.kpiFilters)) {
+    if (
+      this.filters.hasKPIFilterChanged(data.kpiFilters) ||
+      isEmpty(data.kpiFilters)
+    ) {
       this.filters.lastKPIFilter = data.kpiFilters;
       this.filters.onApplyKPIFilter.next(data.kpiFilters);
     }
@@ -331,7 +348,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
    */
   checkForKPIs(): void {
     const tiles = get(this.dashboard, 'tiles', []);
-    const kpis = filter(tiles, t => t.type === 'kpi');
+    const kpis = filter(tiles, t => ['kpi', 'bullet'].includes(t.type));
     this.hasKPIs = kpis && kpis.length > 0;
   }
 

@@ -1,3 +1,34 @@
+import { CHANNEL_UID } from '../wb-comp-configs';
+
+export interface DetailForm {
+  valid: boolean;
+  value: any;
+  testConnectivityValue: any;
+}
+
+export enum CHANNEL_OPERATION {
+  CREATE = 'create',
+  UPDATE = 'update'
+}
+
+export enum ROUTE_OPERATION {
+  CREATE = 'create',
+  UPDATE = 'update'
+}
+
+export enum CHANNEL_ACCESS {
+  READ = 'R',
+  READ_WRITE = 'RW'
+}
+
+export enum HTTP_METHODS {
+  POST = 'POST',
+  GET = 'GET',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+  PATCH = 'PATCH'
+}
+
 export interface ChannelObject {
   createdBy: string;
   productCode: string;
@@ -6,6 +37,59 @@ export interface ChannelObject {
   channelType: string;
   channelMetadata: string;
   status?: number;
+}
+
+export interface SFTPChannelMetadata {
+  channelName: string;
+  hostName: string;
+  portNo: string;
+  userName: string;
+  password: string;
+  description: string;
+  accessType: string;
+}
+
+export interface SFTPRouteMetadata {
+  routeName: string;
+  filePattern: string;
+  sourceLocation: string;
+  destinationLocation: string;
+  batchSize: number;
+  description?: string;
+  disableDuplicate?: boolean;
+  disableConcurrency?: boolean;
+  fileExclusions?: string;
+  lastModifiedLimitHours?: string;
+}
+
+export interface APIChannelMetadata {
+  channelName: string;
+  hostName: string;
+  portNo: number;
+  description?: string;
+  apiEndPoint?: string;
+  httpMethod: string;
+  bodyParameters?: {
+    content: string;
+  };
+  headerParameters: Array<{ key: string; value: string }>;
+  queryParameters: Array<{ key: string; value: string }>;
+  urlParameters: Array<{ key: string; value: string }>;
+}
+
+export interface APIRouteMetadata {
+  routeName: string;
+  description?: string;
+  destinationLocation: string;
+  lastModifiedLimitHours?: string;
+  apiEndPoint: string;
+  httpMethod: string;
+  bodyParameters?: {
+    content: string;
+  };
+  headerParameters: Array<{ key: string; value: string }>;
+  queryParameters: Array<{ key: string; value: string }>;
+  urlParameters: Array<{ key: string; value: string }>;
 }
 
 export interface Job {
@@ -50,6 +134,7 @@ export interface JobLog {
 export interface ChannelForJobs {
   id: number;
   name: string;
+  channelType: CHANNEL_UID;
 }
 
 export interface RouteForJobs {

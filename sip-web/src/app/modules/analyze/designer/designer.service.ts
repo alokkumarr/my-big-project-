@@ -1,13 +1,11 @@
 import * as forEach from 'lodash/forEach';
-import * as remove from 'lodash/remove';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpMap from 'lodash/fp/map';
+import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
-import * as take from 'lodash/take';
-import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as isEmpty from 'lodash/isEmpty';
@@ -15,11 +13,19 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as compact from 'lodash/compact';
 import * as isFunction from 'lodash/isFunction';
 import * as unset from 'lodash/unset';
+import * as toLower from 'lodash/toLower';
+import * as toUpper from 'lodash/toUpper';
+import * as some from 'lodash/some';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
-import { AnalysisType, Analysis } from '../types';
-import { AnalysisDSL, AnalysisPivotDSL } from '../../../models';
+import { AnalysisType, Analysis, Artifact } from '../types';
+import {
+  AnalysisDSL,
+  AnalysisPivotDSL,
+  QueryDSL,
+  ArtifactColumnDSL
+} from '../../../models';
 
 import {
   IDEsignerSettingGroupAdapter,
@@ -40,6 +46,7 @@ import {
   DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
 } from '../consts';
+import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -49,8 +56,8 @@ const onReorder = (columns: ArtifactColumns) => {
   });
 };
 
-const canAcceptNumberType = ({ type }: ArtifactColumnChart) =>
-  NUMBER_TYPES.includes(type);
+const canAcceptNumberType = ({ type, formula }: ArtifactColumnChart) =>
+  NUMBER_TYPES.includes(type) || !!formula;
 const canAcceptStringType = ({ type }: ArtifactColumnChart) =>
   type === 'string';
 const canAcceptDateType = ({ type }: ArtifactColumnChart) =>
@@ -59,10 +66,131 @@ const canAcceptGeoType = ({ geoType }: ArtifactColumnChart) =>
   geoType !== 'lngLat' && GEO_TYPES.includes(geoType);
 const canAcceptLngLat = ({ geoType }: ArtifactColumnChart) =>
   geoType === 'lngLat';
-const canAcceptAnyType = () => true;
+const canAcceptAnyType = ({ formula }: ArtifactColumnChart) => !formula;
 
 @Injectable()
 export class DesignerService {
+  static analysisSubType(analysis: AnalysisDSL): string {
+    const subTypePath =
+      analysis.type === 'chart'
+        ? 'chartOptions.chartType'
+        : 'mapOptions.mapType';
+    return fpGet(subTypePath, analysis);
+  }
+
+  static displayNameFor(column: ArtifactColumnDSL): string {
+    const match = column.displayName.match(/\((.+)\)/);
+    if (['z', 'y', 'data'].includes(column.area) && column.aggregate) {
+      return match
+        ? `${toUpper(column.aggregate)}(${match[1]})`
+        : `${toUpper(column.aggregate)}(${column.displayName})`;
+    }
+
+    return match ? match[1] : column.displayName;
+  }
+
+  /**
+   * Generates dataField value for column. Uses
+   * aggregate and column name to generate unique value.
+   * We don't support having more than one columns with
+   * exact same dataField.
+   *
+   * @param {ArtifactColumnDSL} column
+   * @returns {string}
+   * @memberof DesignerService
+   */
+  static dataFieldFor(column: ArtifactColumnDSL): string {
+    if (!column.columnName && !column.name) {
+      throw new Error(
+        `Cannot calculate data field for invalid column: ${JSON.stringify(
+          column,
+          null,
+          2
+        )}.`
+      );
+    }
+
+    const columnName = column.columnName || column.name;
+
+    if (!!column.aggregate) {
+      return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
+    }
+
+    return columnName;
+  }
+
+  /**
+   * Checks if column has unique data field in list of columns.
+   *
+   * @param {ArtifactColumnDSL} column
+   * @param {ArtifactColumnDSL[]} columns
+   * @returns {boolean}
+   * @memberof DesignerService
+   */
+  static isUniqueDataField(
+    column: ArtifactColumnDSL,
+    columns: ArtifactColumnDSL[]
+  ): boolean {
+    const dataField = DesignerService.dataFieldFor(column);
+    return !some(
+      columns,
+      (col: ArtifactColumnDSL) => this.dataFieldFor(col) === dataField
+    );
+  }
+
+  static unusedAggregates(
+    column: ArtifactColumnDSL,
+    columns: ArtifactColumnDSL[],
+    analysisType: string,
+    analysisSubtype: string
+  ): string[] {
+    // const alreadyUsedAggregates = compact(
+    //   (columns || [])
+    //     .filter(col => col.columnName === column.columnName)
+    //     .map(col => toLower(col.aggregate))
+    // );
+
+    // return difference(AGGREGATE_VALUES, alreadyUsedAggregates);
+
+    let aggregates = [];
+
+    if (NUMBER_TYPES.includes(column.type)) {
+      aggregates = AggregateChooserComponent.isAggregateEligible(analysisType);
+    }
+
+    return fpPipe(
+      fpFilter(agg =>
+        AggregateChooserComponent.isAggregateValid(
+          agg.value,
+          column,
+          columns,
+          analysisType,
+          analysisSubtype
+        )
+      ),
+      fpMap(agg => agg.value)
+    )(aggregates);
+  }
+
+  static canAddColumn(
+    column: ArtifactColumnDSL,
+    columns: ArtifactColumnDSL[],
+    analysisType: string,
+    analysisSubtype: string
+  ) {
+    if (!NUMBER_TYPES.includes(column.type) || !!column.expression) {
+      return !some(columns, col => col.columnName === column.columnName);
+    }
+    return (
+      DesignerService.unusedAggregates(
+        column,
+        columns,
+        analysisType,
+        analysisSubtype
+      ).length > 0
+    );
+  }
+
   constructor(private _analyzeService: AnalyzeService) {}
 
   createAnalysis(
@@ -139,8 +267,26 @@ export class DesignerService {
       return typeFn(column);
     };
 
-    const applyDataFieldDefaults = artifactColumn => {
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    const applyDataFieldDefaults = (
+      artifactColumn,
+      columns,
+      { analysisType, analysisSubType }
+    ) => {
+      if (!artifactColumn.formula) {
+        const unusedAggregates =
+          DesignerService.unusedAggregates(
+            artifactColumn,
+            columns,
+            analysisType,
+            analysisSubType
+          ) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
+      }
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
@@ -162,10 +308,14 @@ export class DesignerService {
         artifactColumns: [],
         canAcceptArtifactColumnOfType: canAcceptDataType,
         canAcceptArtifactColumn: canAcceptInData,
-        transform(artifactColumn: ArtifactColumnPivot) {
+        transform(
+          artifactColumn: ArtifactColumnPivot,
+          columns: ArtifactColumn[] = [],
+          options = {}
+        ) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn);
+          applyDataFieldDefaults(artifactColumn, columns, options);
         },
         reverseTransform: pivotReverseTransform,
         onReorder
@@ -238,7 +388,26 @@ export class DesignerService {
       };
     };
 
-    const applyDataFieldDefaults = artifactColumn => {
+    const applyDataFieldDefaults = (
+      artifactColumn,
+      columns,
+      { analysisType, analysisSubType }
+    ) => {
+      if (!artifactColumn.formula) {
+        const unusedAggregates =
+          DesignerService.unusedAggregates(
+            artifactColumn,
+            columns,
+            analysisType,
+            analysisSubType
+          ) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
+      }
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
 
@@ -254,10 +423,14 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[],
+        options = {}
+      ) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, columns, options);
       },
       reverseTransform: mapReverseTransform,
       onReorder
@@ -304,8 +477,7 @@ export class DesignerService {
   ): IDEsignerSettingGroupAdapter[] {
     const isStockChart = chartType.substring(0, 2) === 'ts';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
-      artifactColumn.area = null;
-      artifactColumn.checked = false;
+      artifactColumn['checked'] = false;
       artifactColumn.alias = '';
       unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
@@ -402,8 +574,26 @@ export class DesignerService {
       : canAcceptAnyType;
     const canAcceptInDimension = maxAllowedDecorator(canAcceptDimensionType);
 
-    const applyDataFieldDefaults = artifactColumn => {
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    const applyDataFieldDefaults = (
+      artifactColumn,
+      columns,
+      { analysisType, analysisSubType }
+    ) => {
+      if (!artifactColumn.formula) {
+        const unusedAggregates =
+          DesignerService.unusedAggregates(
+            artifactColumn,
+            columns,
+            analysisType,
+            analysisSubType
+          ) || [];
+        artifactColumn.aggregate =
+          unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
+
+        artifactColumn.dataField = DesignerService.dataFieldFor(<
+          ArtifactColumnDSL
+        >artifactColumn);
+      }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
       } else if (['tsspline', 'tsPane'].includes(chartType)) {
@@ -430,10 +620,14 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptMetricType,
       canAcceptArtifactColumn: canAcceptInMetric,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[],
+        options = {}
+      ) {
         artifactColumn.area = 'y';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, columns, options);
       },
       reverseTransform: chartReverseTransform,
       onReorder
@@ -447,10 +641,14 @@ export class DesignerService {
       artifactColumns: [],
       canAcceptArtifactColumnOfType: canAcceptSizeType,
       canAcceptArtifactColumn: canAcceptInSize,
-      transform(artifactColumn: ArtifactColumnChart) {
+      transform(
+        artifactColumn: ArtifactColumnChart,
+        columns: ArtifactColumn[],
+        options = {}
+      ) {
         artifactColumn.area = 'z';
         artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+        applyDataFieldDefaults(artifactColumn, columns, options);
       },
       reverseTransform: chartReverseTransform,
       onReorder
@@ -525,7 +723,6 @@ export class DesignerService {
       map: 'area'
     };
     fpPipe(
-      fpFilter('checked'),
       fpSortBy('areaIndex'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {
@@ -538,24 +735,6 @@ export class DesignerService {
     return groupAdapters;
   }
 
-  addArtifactColumnIntoAGroup(
-    artifactColumn: ArtifactColumn,
-    groupAdapters: IDEsignerSettingGroupAdapter[]
-  ): boolean {
-    let addedSuccessfully = false;
-
-    forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (
-        adapter.canAcceptArtifactColumn(adapter, groupAdapters)(artifactColumn)
-      ) {
-        this.addArtifactColumnIntoGroup(artifactColumn, adapter, 0);
-        addedSuccessfully = true;
-        return false;
-      }
-    });
-    return addedSuccessfully;
-  }
-
   getGroupsThatCanRecieve(
     artifactColumn: ArtifactColumn,
     groupAdapters: IDEsignerSettingGroupAdapter[]
@@ -563,38 +742,6 @@ export class DesignerService {
     return filter(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) =>
       adapter.canAcceptArtifactColumn(adapter, groupAdapters)(artifactColumn)
     );
-  }
-
-  addArtifactColumnIntoGroup(
-    artifactColumn: ArtifactColumn,
-    adapter: IDEsignerSettingGroupAdapter,
-    index: number
-  ) {
-    const array = adapter.artifactColumns;
-    adapter.transform(artifactColumn);
-
-    const firstN = take(array, index);
-    const lastN = takeRight(array, array.length - index);
-    adapter.artifactColumns = [...firstN, artifactColumn, ...lastN];
-    adapter.onReorder(adapter.artifactColumns);
-  }
-
-  removeArtifactColumnFromGroup(
-    artifactColumn: ArtifactColumn,
-    adapter: IDEsignerSettingGroupAdapter
-  ) {
-    adapter.reverseTransform(artifactColumn);
-    remove(
-      adapter.artifactColumns,
-      ({ columnName }) => artifactColumn.columnName === columnName
-    );
-    adapter.onReorder(adapter.artifactColumns);
-  }
-
-  removeAllArtifactColumnsFromGroup(adapter: IDEsignerSettingGroupAdapter) {
-    const cols = adapter.artifactColumns;
-    forEach(cols, col => adapter.reverseTransform(col));
-    adapter.artifactColumns = [];
   }
 
   getPartialPivotSqlBuilder(
@@ -710,5 +857,42 @@ export class DesignerService {
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderEsReport> {
     return filter(artifactColumns, 'checked');
+  }
+
+  /**
+   * Adds derived metrics for analysis to the artifacts for access in settings
+   *
+   * @param {Artifact[]} artifacts
+   * @param {QueryDSL} sipQuery
+   * @returns
+   * @memberof DesignerService
+   */
+  addDerivedMetricsToArtifacts(artifacts: Artifact[], sipQuery: QueryDSL) {
+    if (
+      isEmpty(fpGet('artifacts.0.fields', sipQuery)) ||
+      !artifacts ||
+      !fpGet('0.columns', artifacts)
+    ) {
+      return artifacts;
+    }
+
+    const existingDerivedMetrics: string[] = fpMap(
+      col => col.columnName,
+      fpFilter(col => !!col.expression, artifacts[0].columns)
+    );
+
+    const derivedMetrics: any[] = filter(
+      sipQuery.artifacts[0].fields,
+      field =>
+        !!field.expression && !existingDerivedMetrics.includes(field.columnName)
+    );
+
+    return [
+      {
+        ...artifacts[0],
+        columns: [...artifacts[0].columns, ...derivedMetrics]
+      },
+      ...artifacts.slice(1)
+    ];
   }
 }

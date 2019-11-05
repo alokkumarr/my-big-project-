@@ -71,7 +71,7 @@ public class Field {
 
   @JsonProperty("geoRegion")
   private GeoRegion geoRegion;
-  
+
   @JsonProperty("min_doc_count")
   private Integer minDocCount;
 
@@ -80,6 +80,12 @@ public class Field {
 
   @JsonProperty("visibleIndex")
   private Integer visibleIndex;
+
+  @JsonProperty("expression")
+  private String expression;
+
+  @JsonProperty("formula")
+  private String formula;
 
   @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -253,7 +259,27 @@ public class Field {
     this.areaIndex = areaIndex;
   }
 
-    @JsonAnyGetter
+  @JsonProperty("expression")
+  public String getExpression() {
+    return expression;
+  }
+
+  @JsonProperty("expression")
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
+
+  @JsonProperty("formula")
+  public String getFormula() {
+    return formula;
+  }
+
+  @JsonProperty("formula")
+  public void setFormula(String formula) {
+    this.formula = formula;
+  }
+
+  @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
     return this.additionalProperties;
   }
@@ -292,6 +318,8 @@ public class Field {
         .append("additionalProperties", additionalProperties)
         .append("format", format)
         .append("visibleIndex", visibleIndex)
+        .append("expression", expression)
+        .append("formula", formula)
         .toString();
   }
 
@@ -309,6 +337,8 @@ public class Field {
         .append(groupInterval)
         .append(format)
         .append(visibleIndex)
+        .append(expression)
+        .append(formula)
         .toHashCode();
   }
 
@@ -334,6 +364,8 @@ public class Field {
         .append(groupInterval, rhs.groupInterval)
         .append(format, rhs.format)
         .append(visibleIndex, rhs.visibleIndex)
+        .append(expression, rhs.expression)
+        .append(formula, rhs.formula)
         .isEquals();
   }
 
@@ -352,7 +384,9 @@ public class Field {
     DAY("day"),
     QUARTER("quarter"),
     WEEK("week"),
-    HOUR("hour");
+    HOUR("hour"),
+    MINUTE("minute"),
+    SECOND("second");
     private static final Map<String, GroupInterval> CONSTANTS =
         new HashMap<String, GroupInterval>();
 
@@ -386,51 +420,6 @@ public class Field {
     @JsonValue
     public String value() {
       return this.value;
-    }
-  }
-
-  public enum Aggregate {
-    AVG("avg"),
-    SUM("sum"),
-    MIN("min"),
-    MAX("max"),
-    COUNT("count"),
-    PERCENTAGE("percentage"),
-    PERCENTAGE_BY_ROW("percentagebyrow"),
-    DISTINCTCOUNT("distinctcount");
-
-    private static final Map<String, Aggregate> CONSTANTS = new HashMap<>();
-
-    static {
-      for (Aggregate c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
-    }
-
-    private final String value;
-
-    private Aggregate(String value) {
-      this.value = value;
-    }
-
-    @JsonCreator
-    public static Aggregate fromValue(String value) {
-      Aggregate constant = CONSTANTS.get(value.toLowerCase());
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
-    }
-
-    @Override
-    public String toString() {
-      return this.value.toLowerCase();
-    }
-
-    @JsonValue
-    public String value() {
-      return this.value.toLowerCase();
     }
   }
 

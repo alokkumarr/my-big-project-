@@ -1,0 +1,27 @@
+@import 'src/themes/base/colors';
+
+:host {
+  .small-tile--message {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: 0 10px;
+
+    h2 {
+      margin: 0;
+      color: $primary-grey-g4;
+    }
+  }
+
+  .filter-icon-bullet {
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    z-index: 9;
+    width: 100%;
+    margin: 7px 0px 0px -18px;
+    text-align: right;
+  }
+}

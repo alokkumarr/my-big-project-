@@ -7,7 +7,7 @@ import java.util.Map;
 
 
 public enum BisChannelType {
-  SFTP("sftp"), SCP("scp"), JDBC("jdbc"), S3("s3");
+  SFTP("sftp"), SCP("scp"), JDBC("jdbc"), S3("s3"), APIPULL("apipull");
   private final String value;
   private static final Map<String, BisChannelType> CONSTANTS =
       new HashMap<String, BisChannelType>();

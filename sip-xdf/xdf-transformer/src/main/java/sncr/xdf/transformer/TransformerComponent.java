@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.*;
 import org.apache.spark.sql.types.Metadata;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.alert.AlertQueueManager;
 import sncr.xdf.component.*;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.context.RequiredNamedParameters;
@@ -178,6 +180,18 @@ public class TransformerComponent extends Component implements WithMovableResult
             f.accept(outputs.get(RequiredNamedParameters.Output.toString()));
             f.accept(outputs.get(RequiredNamedParameters.Rejected.toString()));
 
+            // check if Alert is enabled for the component and send the message to queue.
+            if (ctx.componentConfiguration.getTransformer().getAlerts()!=null &&
+                ctx.componentConfiguration.getTransformer().getAlerts().getDatapod()!=null)
+            {
+                String metadataBasePath = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+                AlertQueueManager alertQueueManager = new AlertQueueManager(metadataBasePath);
+                Long createdTime = System.currentTimeMillis();
+                alertQueueManager.sendMessageToStream(ctx.componentConfiguration.getTransformer()
+                    .getAlerts().getDatapod(),createdTime
+                );
+                logger.info("Alert configure for the dataset sent notification to stream");
+            }
         }
         catch(Exception e){
             logger.error("Exception in main transformer module: ", e);

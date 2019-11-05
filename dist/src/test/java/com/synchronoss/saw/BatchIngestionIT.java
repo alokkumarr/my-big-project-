@@ -1596,7 +1596,6 @@ public class BatchIngestionIT extends BaseIT {
     channel.put("projectCode", "workbench");
     channel.put("channelType", "sftp");
     channel.put("channelMetadata", new ObjectMapper().writeValueAsString(channelMetadata));
-    ;
     ObjectNode routeMetadata = mapper.createObjectNode();
     routeMetadata.put("status", "active");
     routeMetadata.put("routeName", "route-" + name);
@@ -1784,5 +1783,142 @@ public class BatchIngestionIT extends BaseIT {
           .assertThat()
           .statusCode(200);
     }
+  }
+
+  /**
+   * This method is used to in test-case where creation of channel is required.
+   *
+   * @return object {@link ObjectNode}
+   * @throws JsonProcessingException exception.
+   */
+  private ObjectNode prepareChannelDataSetForApiPull() throws JsonProcessingException {
+    ObjectNode childNode = mapper.createObjectNode();
+    childNode.put("channelName", "docker-api-channel-" + testId());
+    childNode.put("channelType", "apipull");
+    childNode.put("hostName", "https://openweathermap.org/data/2.5/forecast/");
+    childNode.put("portNo", 22);
+    childNode.put("apiEndPoint", "hourly");
+    childNode.put("httpMethod", "GET");
+    childNode.put("headerParameters", "[]");
+
+    ObjectNode queryParam1 = mapper.createObjectNode();
+    queryParam1.put("key", "zip");
+    queryParam1.put("value", "94040");
+
+    ObjectNode queryParam2 = mapper.createObjectNode();
+    queryParam2.put("key", "appid");
+    queryParam2.put("value", "b6907d289e10d714a6e88b30761fae22");
+
+    ArrayNode queryParamsArray = childNode.putArray("queryParameters");
+    queryParamsArray.add(queryParam1);
+    queryParamsArray.add(queryParam2);
+
+    childNode.put("urlParameters", "[]");
+    childNode.put("description", "api");
+    ObjectNode root = mapper.createObjectNode();
+    root.put("createdBy", "sysadmin@synchronoss.com");
+    root.put("productCode", "SIP");
+    root.put("customerCode", "SNCR");
+    root.put("projectCode", "workbench");
+    root.put("channelType", "apipull");
+    root.put("channelMetadata", new ObjectMapper().writeValueAsString(childNode));
+    return root;
+  }
+
+  /** This test-case is check the scenario to create a channel. */
+  @Test
+  public void createChannelForApiPull() throws JsonProcessingException {
+
+    ValidatableResponse response =
+        given(authSpec)
+            .body(prepareChannelDataSetForApiPull())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200);
+    log.debug("createChannel () " + response.log());
+
+    // delete channel after testing
+    this.tearDownChannel();
+  }
+
+  /**
+   * This method is used to in test-case where creation of route is required.
+   *
+   * @param sourcePath parameter to set the sourceLocation.
+   * @return object {@link ObjectNode}
+   * @throws JsonProcessingException exception.
+   */
+  private ObjectNode prepareRouteDataSetForApiPull(String sourcePath)
+      throws JsonProcessingException {
+    ObjectNode routeMetadata = mapper.createObjectNode();
+    routeMetadata.put("routeName", "docker-api-route");
+    routeMetadata.put("sourceLocation", sourcePath);
+    routeMetadata.put("destinationLocation", "/data");
+    routeMetadata.put("apiEndPoint", "hourly");
+    routeMetadata.put("httpMethod", "GET");
+    routeMetadata.put("headerParameters", "[]");
+
+    ObjectNode queryParam1 = mapper.createObjectNode();
+    queryParam1.put("key", "zip");
+    queryParam1.put("value", "94040");
+
+    ObjectNode queryParam2 = mapper.createObjectNode();
+    queryParam2.put("key", "appid");
+    queryParam2.put("value", "b6907d289e10d714a6e88b30761fae22");
+
+    ArrayNode queryParamsArray = routeMetadata.putArray("queryParameters");
+    queryParamsArray.add(queryParam1);
+    queryParamsArray.add(queryParam2);
+
+    routeMetadata.put("urlParameters", "[]");
+    routeMetadata.put("lastModifiedLimitHours", "");
+    ObjectNode schedulerNode = mapper.createObjectNode();
+    schedulerNode.put("activeTab", "immediate");
+    schedulerNode.put("activeRadio", "currenttime");
+    schedulerNode.put("timezone", "Asia/Calcutta");
+    routeMetadata.set("schedulerExpression", schedulerNode);
+    routeMetadata.put("description", "");
+    ObjectNode route = mapper.createObjectNode();
+    route.put("createdBy", "admin@synchronoss.com");
+    route.put("routeMetadata", new ObjectMapper().writeValueAsString(routeMetadata));
+    return route;
+  }
+
+  /**
+   * This test-case is check the scenario to create a route.
+   */
+  @Test
+  public void createRouteForApiPull() throws JsonProcessingException {
+    Long bisChannelSysId =
+        given(authSpec)
+            .body(prepareChannelDataSetForApiPull())
+            .when()
+            .post(BATCH_CHANNEL_PATH)
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response()
+            .getBody()
+            .jsonPath()
+            .getLong("bisChannelSysId");
+    log.debug("bisChannelSysId createRoute : " + bisChannelSysId);
+    assertFalse(bisChannelSysId <= 0);
+    String routeUri = BATCH_CHANNEL_PATH + "/" + bisChannelSysId + "/" + BATCH_ROUTE;
+    ValidatableResponse response =
+        given(authSpec)
+            .body(prepareRouteDataSetForApiPull("/root/saw-batch-samples"))
+            .when()
+            .post(routeUri)
+            .then()
+            .assertThat()
+            .statusCode(200);
+    log.debug("createRoute () " + response.log());
+
+    // delete route after testing
+    this.tearDownRoute();
+    this.tearDownChannel();
   }
 }

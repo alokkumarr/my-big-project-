@@ -13,12 +13,14 @@ export interface ArtifactColumnDSL {
   alias: string;
   area: string;
   columnName: string;
-  dataField: string;
+  dataField?: string;
   displayType?: string;
   dateFormat?: string;
   format?: string | Format;
   displayName: string;
   groupInterval: string;
+  formula?: string;
+  expression?: string;
   limitType?: string; // todo
   visibleIndex?: number;
   limitValue?: any; // todo
@@ -58,6 +60,7 @@ export interface AnalysisBaseDSL {
   category: number | string;
   createdBy?: string; // email
   createdTime?: number;
+  updatedTimestamp?: number;
   crondetails?: any; // todo
   customerCode: string;
   dataSecurityKey?: string; // todo

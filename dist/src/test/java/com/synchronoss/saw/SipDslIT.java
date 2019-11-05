@@ -936,6 +936,285 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
+  public void testDerivedMetricSimpleArithmetic() throws IOException {
+    String fieldName = "simpleArithmetic";
+    String formula = "1 + 2";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"value\":1},\"operand2\":{\"value\":2}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
+
+    Assert.assertNotNull(responseData.get("data"));
+  }
+
+  @Test
+  public void testDerivedMetricWithAggregation() throws IOException {
+    String formula = "sum(integer) + 2";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"value\":2}}";
+    String fieldName = "arithmeticWithAgg";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
+
+    Assert.assertNotNull(responseData.get("data"));
+  }
+
+  @Test
+  public void testDerivedMetricWithAggregation2() throws IOException {
+    String formula = "sum(integer) + avg(integer)";
+    String fieldName = "arithmeticWithAgg";
+    String expression =
+        "{\"operator\":\"+\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"avg\",\"column\":\"integer\"}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
+
+    Assert.assertNotNull(responseData.get("data"));
+  }
+
+  @Test
+  public void testDerivedMetricWithMultipleOperators() throws IOException {
+
+    String fieldName = "multipleOperations";
+
+    String formula = "sum(double) - (avg(integer) + avg(double))";
+    String expression =
+        "{\"operator\":\"-\",\"operand1\":{\"aggregate\":\"sum\",\"column\":\"double\"},"
+            + "\"operand2\":{\"operator\":\"+\","
+            + "\"operand1\":{\"aggregate\":\"avg\",\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"avg\",\"column\":\"double\"}}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode responseData = response.getBody().as(ObjectNode.class);
+
+    Assert.assertNotNull(responseData.get("data"));
+  }
+
+  /**
+   * This is a test for negative scenario. The formula used here is <code>integer / sum(integer)
+   * </code>, which is not supported. In this case, the API will throw 500 Internal Server Error.
+   *
+   * @throws IOException - In case of invalid json
+   */
+  @Test
+  public void testderivedMetricWithSubAggregation() throws IOException {
+    String fieldName = "percentage";
+    String formula = "integer / sum(integer)";
+
+    String expression =
+        "{\"operator\":\"/\",\"operand1\":{\"column\":\"integer\"},"
+            + "\"operand2\":{\"aggregate\":\"sum\",\"column\":\"integer\"}}";
+
+    JsonNode payloadData = prepareDerivedMetricPayload(fieldName, formula, expression);
+
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payloadData)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(500)
+            .extract()
+            .response();
+  }
+
+  @Test
+  public void testExecutionWithGroupIntervalMinute() throws IOException {
+    String groupInterval = null;
+    Response reponseAtSecondLevel = getExecutedDataWithGroupInterval(groupInterval);
+    Assert.assertNotNull(reponseAtSecondLevel);
+    ArrayNode data = reponseAtSecondLevel.getBody().as(ObjectNode.class).withArray("data");
+    Assert.assertNotNull(data);
+    Long expectedValue = 0L;
+    for (JsonNode jsonNode : data) {
+      Long value = jsonNode.get("long").asLong();
+      expectedValue = expectedValue + value;
+    }
+    String groupIntervalMinute = "minute";
+    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(groupIntervalMinute);
+    Assert.assertNotNull(reponseAtMinuteLevel);
+    ArrayNode dataForMinuteGrouping =
+        reponseAtMinuteLevel.getBody().as(ObjectNode.class).withArray("data");
+    Assert.assertNotNull(dataForMinuteGrouping);
+    Assert.assertNotNull(dataForMinuteGrouping);
+    Long actualValue = dataForMinuteGrouping.get(0).get("long").asLong();
+    Assert.assertEquals(expectedValue, actualValue);
+  }
+
+  @Test
+  public void testExecutionWithGroupIntervalSecond() throws IOException {
+    String minuteGroupInterval = "minute";
+    Response reponseAtMinuteLevel = getExecutedDataWithGroupInterval(minuteGroupInterval);
+    ArrayNode dataForMinuteGrouping =
+        reponseAtMinuteLevel.getBody().as(ObjectNode.class).withArray("data");
+    Integer responseSizeForMinute = dataForMinuteGrouping.size();
+    String groupInterval = "second";
+    Response reponseAtSecondLevel = getExecutedDataWithGroupInterval(groupInterval);
+    Assert.assertNotNull(reponseAtSecondLevel);
+    ArrayNode dataForSecondGrouping =
+        reponseAtSecondLevel.getBody().as(ObjectNode.class).withArray("data");
+    Integer responseSizeForSecond = dataForSecondGrouping.size();
+    Assert.assertTrue(responseSizeForSecond > responseSizeForMinute);
+  }
+
+  private Response getExecutedDataWithGroupInterval(String groupInterval) throws IOException {
+    JsonNode payload = preparePayloadForGroupInterval(groupInterval);
+    Response response =
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(payload)
+            .post(
+                "/sip/services/internal/proxy/storage/execute?id="
+                    + analysisId
+                    + "&executionType=preview&page=1&pageSize=100")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    return response;
+  }
+
+  /**
+   * This Method prepares the payload with group interval specified.
+   *
+   * @return created payload.
+   */
+  private JsonNode preparePayloadForGroupInterval(String groupInterval) throws IOException {
+    JsonObject payload = testData;
+    JsonObject fieldWithGroupIntervalMinute = prepareFieldForGroupInterval(groupInterval);
+    JsonArray fields =
+        payload
+            .getAsJsonObject("sipQuery")
+            .getAsJsonArray("artifacts")
+            .get(0)
+            .getAsJsonObject()
+            .getAsJsonArray("fields");
+    for (int i = fields.size(); i > 0; i--) {
+      fields.remove(i - 1);
+    }
+    fields.add(prepareFieldForGroupInterval(groupInterval));
+
+    JsonObject field3 = new JsonObject();
+    field3.addProperty("dataField", "long");
+    field3.addProperty("columnName", "long");
+    field3.addProperty("displayName", "Long");
+    field3.addProperty("type", "long");
+    field3.addProperty("aggregate", "sum");
+    fields.add(field3);
+    JsonArray filters = payload.getAsJsonObject("sipQuery").getAsJsonArray("filters");
+    for (int j = filters.size(); j > 0; j--) {
+      filters.remove(j - 1);
+    }
+
+    JsonObject filter = new JsonObject();
+    filter.addProperty("type", "date");
+    filter.addProperty("tableName", "sample");
+    filter.addProperty("isOptional", false);
+    filter.addProperty("columnName", "date");
+    filter.addProperty("isRuntimeFilter", false);
+    filter.addProperty("isGlobalFilter", false);
+    JsonObject model = new JsonObject();
+    model.addProperty("format", "yyyy-MM-dd HH:mm:ss");
+    model.addProperty("operator", "NEQ");
+    model.addProperty("gte", "2019-10-16 11:05:00");
+    model.addProperty("lte", "2019-10-16 11:05:59");
+    filter.add("model", model);
+    filters.add(filter);
+
+    return mapper.readTree(payload.toString());
+  }
+
+  /**
+   * This Method prepares the field with specified group interval..
+   *
+   * @return field wit group interval.
+   */
+  private JsonObject prepareFieldForGroupInterval(String groupInterval) {
+    JsonObject field = new JsonObject();
+    field.addProperty("dataField", "date");
+    field.addProperty("area", "g-axis");
+    field.addProperty("columnName", "date");
+    field.addProperty("displayName", "Date");
+    field.addProperty("type", "date");
+    field.addProperty("dateFormat", "MM/dd/yyyy HH:mm:ss");
+    field.addProperty("groupInterval", groupInterval);
+    return field;
+  }
+
+  @Test
   public void exportData() throws IOException {
     ObjectNode analysis = testCreateDlAnalysis();
     String analysisId = analysis.get("analysisId").asText();
@@ -1127,6 +1406,76 @@ public class SipDslIT extends BaseIT {
       throw new IOException("Retrieve file failed: " + filename);
     }
     return outputStream.toString();
+  }
+
+  /**
+   * Prepares the payload for derived metric field.
+   *
+   * @param fieldName Name of the field
+   * @param formula Formula for the derived metrics
+   * @param expression Formula in json format
+   * @return JSON payload for the derived metric
+   */
+  private JsonNode prepareDerivedMetricPayload(String fieldName, String formula, String expression)
+      throws IOException {
+    JsonObject formulaField = new JsonObject();
+    formulaField.addProperty("area", "y");
+    formulaField.addProperty("dataField", fieldName);
+    formulaField.addProperty("columnName", fieldName);
+    formulaField.addProperty("displayName", "Derived Metric");
+
+    formulaField.addProperty("formula", formula);
+    formulaField.addProperty("expression", expression);
+    formulaField.addProperty("type", "double");
+    formulaField.addProperty("areaIndex", 0);
+
+    JsonObject dateField = new JsonObject();
+    dateField.addProperty("area", "x");
+    dateField.addProperty("columnName", "date");
+    dateField.addProperty("dataField", "date");
+    dateField.addProperty("displayName", "Date");
+    dateField.addProperty("groupInterval", "year");
+    dateField.addProperty("min_doc_count", 0);
+    dateField.addProperty("name", "date");
+    dateField.addProperty("type", "date");
+    dateField.addProperty("dateFormat", "MMM d YYYY");
+
+    JsonArray artifactFields = new JsonArray();
+    artifactFields.add(formulaField);
+    artifactFields.add(dateField);
+
+    JsonObject payload = testData;
+    JsonArray fields =
+        payload
+            .getAsJsonObject("sipQuery")
+            .getAsJsonArray("artifacts")
+            .get(0)
+            .getAsJsonObject()
+            .getAsJsonArray("fields");
+    for (int i = fields.size(); i > 0; i--) {
+      fields.remove(i - 1);
+    }
+
+    fields.add(formulaField);
+
+    fields.add(dateField);
+    JsonArray sorts = payload.getAsJsonObject("sipQuery").getAsJsonArray("sorts");
+    for (int i = sorts.size(); i > 0; i--) {
+      sorts.remove(i - 1);
+    }
+
+    JsonArray filters = payload.getAsJsonObject("sipQuery").getAsJsonArray("filters");
+    for (int i = filters.size(); i > 0; i--) {
+      filters.remove(i - 1);
+    }
+
+    JsonObject sortField = new JsonObject();
+    sortField.addProperty("order", "asc");
+    sortField.addProperty("columnName", "date");
+    sortField.addProperty("type", "date");
+    sorts.add(sortField);
+
+    return mapper.readTree(payload.toString());
   }
 
   /**

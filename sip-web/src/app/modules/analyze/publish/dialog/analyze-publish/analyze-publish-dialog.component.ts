@@ -6,10 +6,9 @@ import * as first from 'lodash/first';
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../common/services';
 import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dialog.component';
-import { Analysis } from '../../../types';
+import { AnalysisDSL } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
 import { USER_ANALYSIS_CATEGORY_NAME } from '../../../../../common/consts';
-import { isDSLAnalysis } from '../../../designer/types';
 
 @Component({
   selector: 'analyze-publish-dialog',
@@ -26,7 +25,7 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
     public _dialogRef: MatDialogRef<AnalyzePublishDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
-      analysis: Analysis;
+      analysis: AnalysisDSL;
     },
     public _analyzeService: AnalyzeService,
     public _jwt: JwtService
@@ -56,26 +55,16 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
   }
 
   onCategorySelected(value) {
-    if (isDSLAnalysis(this.data.analysis)) {
-      this.data.analysis.category = value;
-    } else {
-      this.data.analysis.categoryId = value;
-    }
+    this.data.analysis.category = value;
   }
 
   get categoryId() {
-    if (isDSLAnalysis(this.data.analysis)) {
-      return this.data.analysis.category;
-    } else {
-      return this.data.analysis.categoryId;
-    }
+    return this.data.analysis.category;
   }
 
   setDefaultCategory() {
     const analysis = this.data.analysis;
-    const categoryId = isDSLAnalysis(analysis)
-      ? analysis.category
-      : analysis.categoryId;
+    const categoryId = analysis.category;
     if (!categoryId) {
       const defaultCategory = find(
         this.categories,
@@ -83,11 +72,7 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent
       );
 
       if (defaultCategory) {
-        if (isDSLAnalysis(analysis)) {
-          analysis.category = first(defaultCategory.children).id;
-        } else {
-          analysis.categoryId = first(defaultCategory.children).id;
-        }
+        analysis.category = first(defaultCategory.children).id;
       }
     }
   }

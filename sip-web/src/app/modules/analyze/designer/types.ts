@@ -107,7 +107,11 @@ export interface IDEsignerSettingGroupAdapter {
     groupAdapters: Array<IDEsignerSettingGroupAdapter>
   ) => (artifactColumn: ArtifactColumn) => boolean;
   // a callback to possibly transform the artifactColumn added to a group
-  transform: (artifactColumn: ArtifactColumn) => void;
+  transform: (
+    artifactColumn: ArtifactColumn,
+    columns?: ArtifactColumn[],
+    options?: any
+  ) => void;
   // a callback to undo any transformations done to the element
   reverseTransform: (artifactColumn: ArtifactColumn) => void;
   // a callback to change soomething when the indexes change in artifactColumns
@@ -141,6 +145,10 @@ export interface DesignerChangeEvent {
     | 'changeQuery'
     | 'geoRegion'
     | 'chartType'
+    | 'expressionUpdated'
+    | 'derivedMetricAdded'
+    | 'addNewDerivedMetric'
+    | 'updateDerivedMetric'
     | 'mapSettings';
   column?: ArtifactColumn;
   data?: any;
