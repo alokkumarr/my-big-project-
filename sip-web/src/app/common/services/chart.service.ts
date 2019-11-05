@@ -452,8 +452,7 @@ export class ChartService {
         forEach(dateFields, ({ columnName, dateFormat }) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
           dataPoint[removeKeyword(columnName)] =
-            moment
-              .utc(dataPoint[removeKeyword(columnName)], momentDateFormat)
+            moment(dataPoint[removeKeyword(columnName)], momentDateFormat).utc()
               .unix() * 1000;
         });
       });

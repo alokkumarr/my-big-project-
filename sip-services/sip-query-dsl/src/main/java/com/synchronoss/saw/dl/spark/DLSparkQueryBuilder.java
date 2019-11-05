@@ -40,7 +40,7 @@ public class DLSparkQueryBuilder {
   private static final String ONLY_YEAR_FORMAT = "YYYY";
   private static final String EPOCH_SECOND = "epoch_second";
   private static final String EPOCH_MILLIS = "epoch_millis";
-    public static final String CUSTOMER_CODE = "customerCode";
+  public static final String CUSTOMER_CODE = "customerCode";
   private BooleanCriteria booleanCriteria;
 
   List<String> groupByColumns = new ArrayList<>();
