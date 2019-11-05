@@ -873,6 +873,8 @@ public class ExportServiceImpl implements ExportService {
     final SipQuery sipQuery = getSipQuery(analysisId);
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
 
+    logger.debug("Column headers = " + columnHeader);
+
     // clear export bean column header before building header
     exportBean.setColumnHeader(null);
 
