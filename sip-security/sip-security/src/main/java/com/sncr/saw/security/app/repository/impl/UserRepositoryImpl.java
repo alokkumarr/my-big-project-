@@ -530,10 +530,12 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.PrepareTicketExtractor());
 
-			String configValSql = "SELECT CV.FILTER_BY_CUSTOMER_CODE FROM CONFIG_VAL CV, CUSTOMERS C WHERE CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE";
-			Integer filterByCustCode = jdbcTemplate.query(configValSql,
-                preparedStatement -> {
-                }, new UserRepositoryImpl.customerCodeFilterExtractor());
+			String configValSql = "SELECT CV.FILTER_BY_CUSTOMER_CODE FROM CONFIG_VAL CV, CUSTOMERS C WHERE CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE AND CV.CONFIG_VAL_OBJ_GROUP=? ";
+      Integer filterByCustCode =
+          jdbcTemplate.query(
+              configValSql,
+              preparedStatement -> preparedStatement.setString(1, ticketDetails.getCustCode()),
+              new UserRepositoryImpl.customerCodeFilterExtractor());
 
             // Maintain backward compatibility for existing customers as no customer code filters will be applied , considered as normal customer (Without customer code filter : as JV customer )  by default.
              // Existing customer will be missing the entry in config_val and considered as normal customer (JV customer).
