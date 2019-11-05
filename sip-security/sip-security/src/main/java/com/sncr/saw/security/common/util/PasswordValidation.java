@@ -71,7 +71,6 @@ public class PasswordValidation {
       return valid;
     } else {
       valid.setValid(true);
-      valid.setValidityMessage("Strong password.");
       return valid;
     }
   }

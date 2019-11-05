@@ -379,7 +379,7 @@ public class SecurityController {
 
 		valid = PasswordValidation.validatePassword(newPass,loginId);
 
-		if (message == null) {
+		if (message == null && valid.getValid()) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
 				if (message != null && message.equals("Password Successfully Changed.")) {
@@ -511,7 +511,7 @@ public class SecurityController {
             message= "Reset link is not valid or expired ";
 
 		try {
-			if (message == null) {
+			if (message == null && valid.getValid()) {
 				message = userRepository.rstchangePassword(loginId, newPass,rhc);
 				if (message == null) {
 					message = "Password Successfully Changed.";
