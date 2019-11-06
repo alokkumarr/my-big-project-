@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.conf.ComponentServices;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
 
@@ -33,21 +33,21 @@ public class XdfContextProvider {
         ComponentServices[] pcs = {ComponentServices.OutputDSMetadata, ComponentServices.Project,
             ComponentServices.TransformationMetadata, ComponentServices.Spark};
         cfg = NGContextServices.analyzeAndValidateParserConf(config);
-        ngCtxSvc = new NGContextServices(pcs, root, cfg, project, component, batch,true);
+        ngCtxSvc = new NGContextServices(pcs, root, cfg, project, component, batch);
         break;
       case "sql":
         ComponentServices[] scs = {ComponentServices.InputDSMetadata,
             ComponentServices.OutputDSMetadata, ComponentServices.Project,
             ComponentServices.TransformationMetadata, ComponentServices.Spark};
         cfg = NGContextServices.analyzeAndValidateSqlConf(config);
-        ngCtxSvc = new NGContextServices(scs, root, cfg, project, component, batch,true);
+        ngCtxSvc = new NGContextServices(scs, root, cfg, project, component, batch);
         break;
       case "transformer":
         ComponentServices[] tcs = {ComponentServices.InputDSMetadata,
             ComponentServices.OutputDSMetadata, ComponentServices.Project,
             ComponentServices.TransformationMetadata, ComponentServices.Spark};
         cfg = NGContextServices.analyzeAndValidateTransformerConf(config);
-        ngCtxSvc = new NGContextServices(tcs, root, cfg, project, component, batch,true);
+        ngCtxSvc = new NGContextServices(tcs, root, cfg, project, component, batch);
         break;
       default:
         ngCtxSvc = null;

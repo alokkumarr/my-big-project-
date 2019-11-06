@@ -7,6 +7,7 @@ import static sncr.bda.base.MetadataStore.delimiter;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,6 @@ public class DLDataSetService {
     protected static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Map<String, Map<String, Object>> repository;
     private DataSetStore dsStore;
-    private Boolean persistMode;
 
     public String getRoot() {
         return dsStore.getRoot();
@@ -56,11 +56,6 @@ public class DLDataSetService {
         repository = new HashMap();
     }
 
-    public DLDataSetService(String fsr, Boolean persistMode) throws Exception {
-        dsStore = new DataSetStore(fsr);
-        repository = new HashMap<>();
-        this.persistMode = persistMode;
-    }
 
     public void writeDLFSMeta(ContextMetadata ctx) throws Exception {
 
@@ -140,32 +135,37 @@ public class DLDataSetService {
      * @return
      */
     public JsonElement readOrCreateDataSet(ContextMetadata ctx, Map<String, Object> o) {
-        JsonElement ds = null;
         try {
             String id = generateDSID(ctx, o);
             if (!o.containsKey(DataSetProperties.Id.toString()))
                 o.put(DataSetProperties.Id.toString(), id);
-            ds = (persistMode) ? dsStore.read(id) : null;
+            JsonElement ds = dsStore.read(id);
             JsonElement je = createDSDescriptor(id, ctx, o);
             if (ds == null) {
-                if (persistMode) dsStore.create(id, je);
+                dsStore.create(id, je);
                 return je;
             } else {
                 logger.debug("Metadata found");
+                JsonObject datasetObject = ds.getAsJsonObject();
                 JsonObject oldSystem = ds.getAsJsonObject()
                     .get(DataSetProperties.System.toString()).getAsJsonObject();
                 JsonObject newSystem = je.getAsJsonObject()
                     .get(DataSetProperties.System.toString()).getAsJsonObject();
+
                 oldSystem = checkAndUpdateSystemParams(id, oldSystem, newSystem);
-                if (oldSystem != null && persistMode) {
+
+                if (oldSystem != null) {
                     ds.getAsJsonObject().add(DataSetProperties.System.toString(), oldSystem);
+
                     dsStore.update(id, ds);
                 }
+
+
                 return ds;
             }
         } catch (Exception e) {
             logger.error("Could not read or create Data set: ", e);
-            return ds;
+            return null;
         }
     }
 
@@ -324,10 +324,7 @@ public class DLDataSetService {
       ds.getAsJsonObject().add("transformations", trans);
       ds.getAsJsonObject().add("asOfNow", status);
 
-      logger.debug("########## DLDataSetService : JsonElement updateDS = " + persistMode);
-
-      if (persistMode)
-            dsStore.update(id, ds);
+      dsStore.update(id, ds);
       return ds;
   }
     

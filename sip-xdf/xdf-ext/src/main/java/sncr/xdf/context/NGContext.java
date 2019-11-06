@@ -7,13 +7,13 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.conf.ComponentServices;
 import sncr.bda.context.ContextMetadata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /**
  * Created by srya0001 on 9/6/2017.
  *
@@ -43,13 +43,6 @@ public class NGContext extends ContextMetadata {
         this.componentName = componentName;
     }
 
-    public NGContext(String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName, String batchID, Boolean persistMode){
-        super(componentName, batchID, applicationID);
-        xdfDataRootSys = xdfRoot;
-        this.componentConfiguration  = componentConfiguration;
-        this.componentName = componentName;
-        this.persistMode = persistMode;
-    }
 
     public Map<String, Map<String, Object>> inputDataSets = new HashMap<>();
     public Map<String, Map<String, Object>> outputDataSets = new HashMap<>();
@@ -61,7 +54,7 @@ public class NGContext extends ContextMetadata {
 
     public String dataSetName;
     public boolean runningPipeLine;
-    private boolean persistMode = true;
+    public boolean persistMode;
     public String pipeComponentName;
 
     @Override
@@ -117,13 +110,5 @@ public class NGContext extends ContextMetadata {
         s.append("\n");
 
         return s.toString();
-    }
-
-    public boolean isPersistMode() {
-        return persistMode;
-    }
-
-    public void setPersistMode(boolean persistMode) {
-        this.persistMode = persistMode;
     }
 }

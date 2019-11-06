@@ -20,16 +20,11 @@ public class TransformationService {
 
     private static final Logger logger = Logger.getLogger(TransformationService.class);
     private final TransformationStore ts;
-    private Boolean persistMode;
 
     public TransformationService(String xdfDataRootSys) throws Exception {
         ts = new TransformationStore(xdfDataRootSys);
     }
 
-    public TransformationService(String xdfDataRootSys, Boolean persistMode) throws Exception {
-        ts = new TransformationStore(xdfDataRootSys);
-        this.persistMode = persistMode;
-    }
 
     public String readOrCreateTransformation(ContextMetadata ctx, ComponentConfiguration componentConfiguration) throws Exception {
 
@@ -63,7 +58,6 @@ public class TransformationService {
     }
 
     public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID) throws Exception {
-        logger.debug("TransformationService:updateStatus persistMode : " + persistMode);
-        if (persistMode) ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID);
+        ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID);
     }
 }
