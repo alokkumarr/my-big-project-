@@ -48,13 +48,6 @@ public class SipXssRequestFilter extends GenericFilterBean {
         List<String> valueString = canonicalizedMap.get(key);
         for (String data : valueString) {
           logger.trace("query parameter value: " + data);
-          if (data.contains(RestUtil.checkQueryParam)) {
-            res.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
-            logger.trace(
-                "Check for cross-site scripting: reflected in query parameter value: " + data);
-            throw new SipNotProcessedSipEntityException(
-                "Check for cross-site scripting: " + "reflected in query parameter value: " + data);
-          }
           data = data.replaceAll(RestUtil.sanatizeAndValidateregEx, RestUtil.noSpace);
           if (data != null && !data.trim().equals(RestUtil.noSpace)) {
             Boolean queryIsValid =
