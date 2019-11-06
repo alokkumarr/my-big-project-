@@ -19,7 +19,7 @@ import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.bda.conf.ComponentServices;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.parser.parsers.NGJsonFileParser;
 import sncr.xdf.parser.parsers.NGParquetFileParser;
@@ -281,6 +281,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
                 retval =  -1;
             }
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+
+            logger.debug("NGCSVFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
 
         } else if (parserInputFileFormat.equals(ParserInputFileFormat.JSON))
         {
@@ -301,6 +304,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation,
                 outputDataSetName, outputDataSetMode, outputFormat, pkeys));
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataset.cache());
+            logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName +  ngctx.datafileDFmap.get(ngctx.dataSetName).count());
+            logger.debug("NGJsonFileParser ==> dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size() + "\n");
         } else
             if (parserInputFileFormat.equals(ParserInputFileFormat.PARQUET))
             {
@@ -867,7 +872,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 ComponentServices.Spark,
             };
             ComponentConfiguration cfg = NGParser.analyzeAndValidate(configAsStr);
-            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId, persistMode);
+            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.warn("Output datasets:");
