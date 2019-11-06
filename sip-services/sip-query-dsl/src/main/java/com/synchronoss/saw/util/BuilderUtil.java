@@ -519,19 +519,19 @@ public class BuilderUtil {
   public static List<Field> buildFieldBySort(List<Field> dataFields, List<Sort> sorts) {
     List<Field> fields = new ArrayList<>();
     dataFields.forEach(field -> {
-      boolean anySortMatch = sorts.stream().anyMatch(p -> p.getColumnName().equalsIgnoreCase(field.getColumnName()));
-      if (!anySortMatch) {
+      boolean sortMatch = sorts.stream().anyMatch(p -> p.getColumnName().equalsIgnoreCase(field.getColumnName()));
+      if (sortMatch) {
         fields.add(field);
       }
     });
-
-    Collections.reverse(dataFields);
+    Collections.reverse(fields);
     dataFields.forEach(field -> {
       if (!fields.contains(field)) {
         fields.add(field);
       }
     });
 
+    Collections.reverse(fields);
     return fields;
   }
 }
