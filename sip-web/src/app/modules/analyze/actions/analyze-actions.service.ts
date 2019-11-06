@@ -6,7 +6,7 @@ import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { ExecuteService } from '../services/execute.service';
 import { PublishService } from '../services/publish.service';
-import { Analysis } from '../types';
+import { AnalysisDSL } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
@@ -20,7 +20,6 @@ import {
   EXECUTION_MODES,
   EXECUTION_DATA_MODES
 } from '../services/analyze.service';
-import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
 export class AnalyzeActionsService {
@@ -90,7 +89,10 @@ export class AnalyzeActionsService {
     }
   }
 
-  overwrite(parentAnalysis: Analysis, childAnalysis: Analysis): Analysis {
+  overwrite(
+    parentAnalysis: AnalysisDSL,
+    childAnalysis: AnalysisDSL
+  ): AnalysisDSL {
     const preserveFields = [
       'id',
       'createdBy',
@@ -118,9 +120,14 @@ export class AnalyzeActionsService {
     });
   }
 
-  publishAnalysis(analysis: Analysis, execute, type) {
+  publishAnalysis(
+    analysis: AnalysisDSL,
+    execute,
+    type,
+    lastCategoryId: number | string
+  ) {
     const publish = (a = analysis) =>
-      this._publishService.publishAnalysis(a, execute, type);
+      this._publishService.publishAnalysis(a, execute, type, lastCategoryId);
 
     const overwriteParent = (parent, child) => {
       /* Update parent analysis with child's changes, then delete child. */
@@ -147,12 +154,8 @@ export class AnalyzeActionsService {
             return publish();
           }
           /* The destination category is different from parent analysis's category. Publish it normally */
-          const parentAnalysisCategoryId = isDSLAnalysis(parentAnalysis)
-            ? parentAnalysis.category
-            : parentAnalysis.categoryId;
-          const childAnalysisCategoryId = isDSLAnalysis(analysis)
-            ? analysis.category
-            : analysis.categoryId;
+          const parentAnalysisCategoryId = parentAnalysis.category;
+          const childAnalysisCategoryId = analysis.category;
           if (
             parentAnalysisCategoryId.toString() !==
             childAnalysisCategoryId.toString()
@@ -162,10 +165,7 @@ export class AnalyzeActionsService {
 
           /* If the parent has been modified since fork/editing, allow user to choose whether
            they want to overwrite the parent analysis */
-          if (
-            analysis.updatedTimestamp <
-            (<Analysis>parentAnalysis).updatedTimestamp
-          ) {
+          if (analysis.updatedTimestamp < parentAnalysis.updatedTimestamp) {
             return this.showPublishOverwriteConfirmation()
               .afterClosed()
               .toPromise()
@@ -189,21 +189,26 @@ export class AnalyzeActionsService {
       );
   }
 
-  openPublishModal(analysis, type) {
+  openPublishModal(analysis: AnalysisDSL, type) {
     switch (type) {
       case 'publish':
-        return new Promise<Analysis>((resolve, reject) => {
+        return new Promise<AnalysisDSL>((resolve, reject) => {
           this.dialog
             .open(AnalyzePublishDialogComponent, {
               width: 'auto',
               height: 'auto',
-              data: { analysis }
+              data: { analysis: clone(analysis) }
             } as MatDialogConfig)
             .afterClosed()
             .subscribe(modifiedAnalysis => {
-              if (analysis) {
+              if (modifiedAnalysis) {
                 const execute = true;
-                this.publishAnalysis(modifiedAnalysis, execute, type).then(
+                this.publishAnalysis(
+                  modifiedAnalysis,
+                  execute,
+                  type,
+                  analysis.category
+                ).then(
                   publishedAnalysis => {
                     if (!publishedAnalysis) {
                       return reject();
@@ -213,7 +218,7 @@ export class AnalyzeActionsService {
                         ? 'Analysis has been updated.'
                         : 'Analysis schedule changes have been updated.'
                     );
-                    resolve(publishedAnalysis as Analysis);
+                    resolve(publishedAnalysis);
                   },
                   () => {
                     reject();
@@ -225,7 +230,7 @@ export class AnalyzeActionsService {
         break;
 
       case 'schedule':
-        return new Promise<Analysis>((resolve, reject) => {
+        return new Promise<AnalysisDSL>((resolve, reject) => {
           this.dialog
             .open(AnalyzeScheduleDialogComponent, {
               width: 'auto',
@@ -247,7 +252,7 @@ export class AnalyzeActionsService {
                           ? 'Analysis has been updated.'
                           : 'Analysis schedule changes have been updated.'
                       );
-                      resolve(updatedAnalysis as Analysis);
+                      resolve(updatedAnalysis);
                     },
                     () => {
                       reject();

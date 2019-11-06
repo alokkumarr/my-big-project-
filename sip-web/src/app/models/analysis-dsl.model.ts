@@ -60,6 +60,7 @@ export interface AnalysisBaseDSL {
   category: number | string;
   createdBy?: string; // email
   createdTime?: number;
+  updatedTimestamp?: number;
   crondetails?: any; // todo
   customerCode: string;
   dataSecurityKey?: string; // todo

@@ -44,3 +44,8 @@ export class LoadAllAttributeValues {
   static readonly type = '[Alerts] Load all attribute values';
   constructor() {}
 }
+
+export class ResetAlertChartData {
+  static readonly type = '[Alerts] Reset alert chart data';
+  constructor() {}
+}
