@@ -5,30 +5,59 @@ import * as flatMap from 'lodash/flatMap';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
+import * as toLower from 'lodash/toLower';
 
 import {
   Artifact,
   JsPlumbCanvasChangeEvent,
   DesignerChangeEvent
 } from '../../types';
-import { QueryDSL, Join } from 'src/app/models';
+import { QueryDSL, Join, ArtifactDSL } from 'src/app/models';
 
-function getConditionOnSide(joinCondition, side: 'left' | 'right') {
-  const { artifactsName, columnName } = joinCondition[side];
+/**
+ * Reverses the sides of left and right joins if they are incorrect.
+ * Basically, if table1 is to left of table2, then join should be from
+ * right edge of table1 to left edge of table2.
+ *
+ * @param {*} joinCondition
+ * @param {ArtifactDSL[]} artifacts
+ * @param {('left' | 'right')} side
+ * @returns
+ */
+function getConditionOnSide(
+  joinCondition,
+  artifacts: ArtifactDSL[],
+  side: 'left' | 'right'
+) {
+  const leftSide = joinCondition.left;
+  const rightSide = joinCondition.right;
+  const [leftArtifact] = artifacts
+    .map(a => toLower(a.artifactsName))
+    .filter(name =>
+      [
+        toLower(leftSide.artifactsName),
+        toLower(rightSide.artifactsName)
+      ].includes(name)
+    );
+
   return {
-    tableName: artifactsName,
-    columnName,
-    side
+    tableName: joinCondition[side].artifactsName,
+    columnName: joinCondition[side].columnName,
+    side: isEmpty(artifacts)
+      ? side
+      : toLower(joinCondition[side].artifactsName) === leftArtifact
+      ? 'right'
+      : 'left'
   };
 }
 
-export function refactorJoins(joins) {
+export function refactorJoins(joins, artifacts) {
   const analysisJoins = fpPipe(
     fpFilter(join => !join.type),
     fpMap(join => {
       const criteria = flatMap(join.criteria, ({ joinCondition }) => [
-        getConditionOnSide(joinCondition, 'left'),
-        getConditionOnSide(joinCondition, 'right')
+        getConditionOnSide(joinCondition, artifacts, 'left'),
+        getConditionOnSide(joinCondition, artifacts, 'right')
       ]);
       return {
         type: join.join,
@@ -62,7 +91,7 @@ export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() useAggregate: boolean;
   @Input('sipQuery') set setJoins(sipQuery: QueryDSL) {
-    this.joins = refactorJoins(sipQuery.joins);
+    this.joins = refactorJoins(sipQuery.joins, sipQuery.artifacts);
   }
   @Input('artifacts')
   set setArtifacts(artifacts: Artifact[]) {
