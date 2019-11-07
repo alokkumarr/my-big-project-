@@ -1,11 +1,9 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
@@ -19,22 +17,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.net.ftp.FTPClient;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.UserAccount;
-import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.FileEntry;
-import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 /**
  * Integration test that lists metrics, creates an analysis, saves it, executes it and lists the
@@ -541,13 +529,13 @@ public class AnalyzeIT extends BaseIT {
     ObjectNode key = keys.addObject();
     key.put("customerCode", "SYNCHRONOSS");
     key.put("module", "observe");
-    key.put("semanticId", "dd2335a1-fa77-4db2-b50b-5391ac7117de");
+    key.put("semanticId", "workbench::sample-elasticsearch");
     key.put("analysisType", "kpi");
     ObjectNode kpi = mapper.createObjectNode();
     kpi.put("id", "abc-123");
     kpi.put("name", "Integer");
     kpi.put("tableName", "sample");
-    kpi.put("semanticId", "dd2335a1-fa77-4db2-b50b-5391ac7117de");
+    kpi.put("semanticId", "workbench::sample-elasticsearch");
     ArrayNode dataFields = kpi.putArray("dataFields");
     ObjectNode fields = mapper.createObjectNode();
     fields.put("columnName", "integer");
