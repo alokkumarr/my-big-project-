@@ -58,9 +58,9 @@ if [ ! -e $marker ]; then
     replication="{ $default.replication: 1, $default.min.replication: 1 }"
     # Loop retrying until MapR is ready to accept configuration
     # updates
-    while ! maprcli config save -values "$replication" > /dev/null; do
-        sleep 5
-    done
+   # while ! maprcli config save -values "$replication" > /dev/null; do
+    #    sleep 5
+    #done
     # Create marker file to ensure configuration is only run once
     touch $marker
 fi

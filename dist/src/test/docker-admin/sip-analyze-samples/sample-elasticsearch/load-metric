@@ -2,7 +2,7 @@
 #
 # Load sample Elasticsearch metric (for pivot/chart)
 #
-set -eu
+set -eux
 
 dir=$(dirname $0)
 

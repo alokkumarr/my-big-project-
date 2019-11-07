@@ -6,11 +6,11 @@
 # healthy: services up and running and responding.
 
 # Exit on any error, to indicate failing health check
-set -eu
+set -eux
 
 # Ensure all systemd services are up and running
 systemctl is-system-running --quiet
-
+secure=True
 services_pass=/var/run/sip-health-check-services-pass
 
 # Ensure SIP services are accessible and healthy (for HAProxy to route
@@ -21,7 +21,11 @@ if [ "$(hostname)" == "sip-proxy" ]; then
     if [ ! -e $services_pass ]; then
         # Request services health status: if response is 503 Service
         # Unavailable, curl will exit with non-zero status code
+        if [ $secure == "True" ] ; then
+        curl -k -f https://localhost/saw/services/actuator/health
+        else
         curl -s -f http://localhost/saw/services/actuator/health
+        fi
         # Mark services health check as having passed once, which is
         # enough to ensure that integration tests can proceed.  After
         # the initial pass the services health does not need to be
