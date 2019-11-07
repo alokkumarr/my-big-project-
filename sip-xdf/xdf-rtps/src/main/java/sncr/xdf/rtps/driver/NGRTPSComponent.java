@@ -21,7 +21,7 @@ import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Rtps;
 import sncr.bda.core.file.HFileOperations;
-import sncr.bda.conf.ComponentServices;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;

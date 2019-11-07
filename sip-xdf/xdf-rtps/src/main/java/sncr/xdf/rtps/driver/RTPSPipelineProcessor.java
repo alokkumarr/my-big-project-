@@ -1,30 +1,28 @@
 package sncr.xdf.rtps.driver;
 
-import com.google.gson.Gson;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
+import sncr.xdf.context.ComponentServices;
+
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.core.file.HFileOperations;
-import sncr.bda.conf.ComponentServices;
-import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
-import sncr.xdf.services.NGContextServices;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import sncr.xdf.transformer.ng.NGTransformerComponent;
-import sncr.xdf.parser.NGParser;
-import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.esloader.NGESLoaderComponent;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.parser.NGParser;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.sql.ng.NGSQLComponent;
+import sncr.xdf.transformer.ng.NGTransformerComponent;
 
 public class RTPSPipelineProcessor {
 

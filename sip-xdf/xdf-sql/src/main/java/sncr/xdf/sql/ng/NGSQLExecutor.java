@@ -73,6 +73,7 @@ public class NGSQLExecutor implements Serializable {
 					}
 				}
                 
+
                 if (parent.getNgctx().inputDataSets.size() > 0) {
 
                     for (String tn : tablesFrmFile) {

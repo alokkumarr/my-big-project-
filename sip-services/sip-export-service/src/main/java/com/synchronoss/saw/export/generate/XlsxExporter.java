@@ -29,7 +29,8 @@ public class XlsxExporter implements IFileExporter {
   @Override
   public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) {
     Workbook workBook = new XSSFWorkbook();
-    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
+    String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
+    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
     addxlsxRows(exportBean, workBook, sheet, recordRowList);
     return workBook;
   }
