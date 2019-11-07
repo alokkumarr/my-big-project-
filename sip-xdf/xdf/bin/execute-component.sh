@@ -28,6 +28,7 @@ declare -A COMP_MC=(
     [parser]=sncr.xdf.parser.NGParser
     [pipeline]=sncr.xdf.ngprocessor.XDFDataProcessor
     [transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
+    [rtps]=sncr.xdf.rtps.driver.NGRTPSComponent
 )
 
 function usage()
@@ -51,6 +52,7 @@ usage: $0
      parser     - XDF Parser
      es-loader  - XDF ElasticSearch Loader
      zero       - XDF Zero component
+     rtps		    - XDF Rtps component
 
 Example:
     $0 -m zero -a project1 -b BATCHID0001 -c app_conf.jcfg -r hdfs:///data/bda

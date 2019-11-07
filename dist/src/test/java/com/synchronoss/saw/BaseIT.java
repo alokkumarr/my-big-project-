@@ -52,7 +52,7 @@ public class BaseIT {
     String host = System.getProperty("saw.docker.host");
     String port;
     String secure = System.getProperty("sip.cloud.secure");
-    if (secure.equalsIgnoreCase("True")) {
+    if (secure!=null && secure.equalsIgnoreCase("True")) {
       port = System.getProperty("sip.docker.secure.port");
       RestAssured.useRelaxedHTTPSValidation();
       RestAssured.baseURI = "https://" + host + ":" + port + "/";

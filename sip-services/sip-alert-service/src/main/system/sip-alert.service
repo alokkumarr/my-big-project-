@@ -6,6 +6,7 @@ Type=notify
 ExecStart=/bin/sh -c "exec java -Xmx1G -Dloader.path=BOOT-INF/lib,$(sip-mapr-classpath) -jar /opt/bda/sip-alert-service/sip-alert*.jar --spring.config.location=/opt/bda/sip-alert-service/conf/application.yml"
 SyslogIdentifier=sip-alert
 User=mapr
+EnvironmentFile=/etc/bda/mapr-ticket.env
 Restart=on-failure
 # Allow service to exit on SIGTERM, if socket-activated
 SuccessExitStatus=143
