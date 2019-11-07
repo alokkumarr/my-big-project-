@@ -34,7 +34,9 @@ import org.springframework.web.client.RestTemplate;
 @SuppressWarnings("deprecation")
 @Service
 public class RestUtil {
-
+ 
+  // TODO: This below RegEx needs to exposed in application.yml
+  // for these has been deactivated.
   public static final String sanatizeAndValidateregEx =
       "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/();~`=&"
       // below are the symbols of the currencies
