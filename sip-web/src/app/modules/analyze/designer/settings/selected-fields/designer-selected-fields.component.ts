@@ -4,7 +4,8 @@ import {
   OnDestroy,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  ViewChildren
 } from '@angular/core';
 import { CdkDragDrop, CdkDrag } from '@angular/cdk/drag-drop';
 import { Subject, Observable, Subscription } from 'rxjs';
@@ -36,6 +37,7 @@ import {
 } from '../../actions/designer.actions';
 import { displayNameWithoutAggregateFor } from 'src/app/common/services/tooltipFormatter';
 import { getFilterValue } from './../../../consts';
+import { PerfectScrollbarComponent } from 'ngx-perfect-scrollbar';
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 
 @Component({
@@ -44,6 +46,7 @@ const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
   styleUrls: ['designer-selected-fields.component.scss']
 })
 export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
+  @ViewChildren(PerfectScrollbarComponent) scrollbars;
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Output() removeFilter = new EventEmitter();
@@ -79,11 +82,14 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    const self = this;
     this._store.dispatch(new DesignerInitGroupAdapters());
     this.subscribeToMetrics();
-    const subscription = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
-    this.subscriptions.push(subscription);
-    this.groupAdapters$.subscribe(adapters => {
+
+    const dndSub = this._dndPubsub.subscribe(this.onDndEvent.bind(this));
+    this.subscriptions.push(dndSub);
+
+    const adapterSub = this.groupAdapters$.subscribe(adapters => {
       this.canAcceptMap = reduce(
         adapters,
         (acc, adapter) => {
@@ -93,7 +99,14 @@ export class DesignerSelectedFieldsComponent implements OnInit, OnDestroy {
         {}
       );
       this.groupAdapters = adapters;
+      /* Update the scroll bars in case fields have exceeded the bounds */
+      if (self.scrollbars) {
+        self.scrollbars.forEach(bar => {
+          bar.directiveRef.update();
+        });
+      }
     });
+    this.subscriptions.push(adapterSub);
   }
 
   subscribeToMetrics() {
