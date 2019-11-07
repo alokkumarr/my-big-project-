@@ -11,6 +11,7 @@ CREATE PROCEDURE onboard_customer (IN l_customer_code varchar(50) , IN l_product
    DECLARE l_module_sys_id_analyze  INT ;
    DECLARE l_module_sys_id_observe  INT ;
    DECLARE l_module_sys_id_workbench  INT ;
+   DECLARE l_config_val_sys_id INT ;
 
    DECLARE l_cust_prod_sys_id INT ;
    DECLARE l_prod_mod_sys_id_analyze INT ;
@@ -87,8 +88,10 @@ l_product_sys_id LANDING_PROD_SYS_ID,1 ACTIVE_STATUS_IND,Now() CREATED_DATE,'onb
 NULL MODIFIED_DATE,NULL MODIFIED_BY,
 360 PASSWORD_EXPIRY_DAYS,concat(l_customer_code,'.COM') DOMAIN_NAME,is_jv_customer IS_JV_CUSTOMER;
 
+select max(CONFIG_VAL_SYS_ID)+1 into l_config_val_sys_id  from CONFIG_VAL;
+
 INSERT INTO CONFIG_VAL (CONFIG_VAL_SYS_ID,CONFIG_VAL_CODE,CONFIG_VALUE,CONFIG_VAL_DESC,CONFIG_VAL_OBJ_TYPE,CONFIG_VAL_OBJ_GROUP,ACTIVE_STATUS_IND, CREATED_DATE,CREATED_BY,INACTIVATED_DATE,INACTIVATED_BY,MODIFIED_DATE,MODIFIED_BY,FILTER_BY_CUSTOMER_CODE)
-SELECT l_customer_sys_id CONFIG_VAL_SYS_ID, 'es-analysis-auto-refresh' CONFIG_VAL_CODE,NULL CONFIG_VALUE,'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page' CONFIG_VAL_DESC,'CUSTOMER' CONFIG_VAL_OBJ_TYPE,
+SELECT l_config_val_sys_id CONFIG_VAL_SYS_ID, 'es-analysis-auto-refresh' CONFIG_VAL_CODE,NULL CONFIG_VALUE,'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page' CONFIG_VAL_DESC,'CUSTOMER' CONFIG_VAL_OBJ_TYPE,
 l_customer_code CONFIG_VAL_OBJ_GROUP, 1 ACTIVE_STATUS_IND, Now() CREATED_DATE,'onboard' CREATED_BY,NULL INACTIVATED_DATE,NULL INACTIVATED_BY,NULL MODIFIED_DATE,NULL MODIFIED_BY,filter_by_customer_code FILTER_BY_CUSTOMER_CODE;
 
 select max(cust_prod_sys_id)+1 into l_cust_prod_sys_id from customer_products;
