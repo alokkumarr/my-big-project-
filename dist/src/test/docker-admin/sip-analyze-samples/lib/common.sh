@@ -1,7 +1,7 @@
 #
 # Functions shared across sample SAW metric load scripts
 #
-set -eux
+set -eu
 secure=$1
 if [ $secure == "https:" ]; then
 export MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket"
