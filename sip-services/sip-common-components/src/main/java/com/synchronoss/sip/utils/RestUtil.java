@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestUtil {
 
   public static final String sanatizeAndValidateregEx =
-      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()]";
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()`]";
   public static final String sanatizeAndValidateregExQuery = "[=,<>,!=,<,>,<=,>=,!>,!<]";
   public static final String noSpace = "";
   private static final Logger logger = LoggerFactory.getLogger(RestUtil.class);
