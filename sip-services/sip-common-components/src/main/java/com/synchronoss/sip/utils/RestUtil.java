@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestUtil {
 
   public static final String sanatizeAndValidateregEx =
-      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/();~`"
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/();~`=&"
       // below are the symbols of the currencies
       + "$دإ؋֏ƒ$ман৳лвب฿¥₡₱čج£Ξ€₾₵₪₹ع﷼៛₩₭₨Łде₮₦/ł￥Ди₽₣ست₤₺₴₫Ƀ]";
   public static final String sanatizeAndValidateregExQuery = "[=,<>,!=,<,>,<=,>=,!>,!<]";
