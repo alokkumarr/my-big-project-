@@ -104,7 +104,7 @@ public interface WithDataSet {
     }
 
     default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetHelper aux) throws Exception {
-
+    	 DataSetHelper.logger.debug("#### Inside discoverInputDataSetsWithMetadata ###");
         String project = aux.ctx.applicationID;
         DataSetHelper.logger.debug("Set projects " + project);
 

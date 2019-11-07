@@ -44,6 +44,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
     public NGSQLComponent() {  super(); }
 
+    @Override
     protected int execute(){
         /* Workaround: If executed through Apache Livy the logging
          * level will be WARN by default and at the moment no way to

@@ -1,9 +1,14 @@
-package synchronoss.spark.drivers.rt;
+package sncr.xdf.rtps.driver;
 
 
 import com.mapr.db.Admin;
 import com.mapr.db.exceptions.TableExistsException;
 import com.mapr.streams.Streams;
+
+import sncr.bda.conf.Rtps;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
+
 import com.mapr.streams.StreamDescriptor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -12,6 +17,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -19,16 +26,18 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.ojai.store.DocumentStore;
-import synchronoss.data.generic.model.GenericJsonModelValidator;
-import synchronoss.spark.functions.rt.*;
-import synchronoss.spark.rt.common.ConfigurationHelper;
-import synchronoss.spark.rt.common.FileUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import sncr.xdf.rtps.common.FileUtils;
+import sncr.xdf.rtps.model.GenericJsonModelValidator;
+import sncr.xdf.rtps.common.ConfigurationHelper;
+import sncr.xdf.rtps.transform.ProcessRecords;
 
 
 /**
@@ -46,7 +55,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
     private static final String RT_USER = "mapr";
     private static final String RT_GROUP = "mapr";
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();
         driver.run(args[0]);
     }
@@ -56,7 +65,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
      * @param   appConfig configuration object
      * @return  new Java Streaming context initialized with provided configuration
      */
-    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig){
+    protected JavaStreamingContext createContext(String instanceName, com.typesafe.config.Config appConfig, Optional<NGContext> ngctx , Optional<InternalContext> ctx){
 
 
         // Validate configuration and settings
@@ -140,12 +149,29 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
 
         //Batch Interval
         Integer batchInterval = appConfig.getInt("spark.batch.interval");
-        JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchInterval));
+        //JavaStreamingContext jssc = new JavaStreamingContext(ctx.sparkSession.sparkContext(), Durations.seconds(batchInterval));
+        
+        JavaSparkContext jsCtx =  null;
+        JavaStreamingContext jssc = null;
+        
+        /**
+         * Create or Use spark context from InternalContext
+         */
+        if(ctx.isPresent()) {
+        	ctx.get().sparkSession.sparkContext();
+			jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(sparkConf));
+			jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        } else {
+        	jssc =  new JavaStreamingContext(sparkConf, Durations.seconds(batchInterval));
+        }
+        
 
+        logger.info("Java streaming context created" );
         // Create stream
         JavaInputDStream<ConsumerRecord<String, String>> eventsStream
             = KafkaUtils.createDirectStream(jssc, LocationStrategies.PreferConsistent(),
                                             ConsumerStrategies.<String, String>Subscribe(src, kafkaParams));
+        logger.info("########### KafkaUtils.createDirectStream() completed ######" );
         // Configuration for ElasticSearch
         Map<String, String> esConfig = new HashMap<>();
 
@@ -161,7 +187,155 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             .foreachRDD(new ProcessRecords(eventsStream,
                                           model, fieldDefinitions,
                                           esIndex, esConfig,
-                                          outputPath, this.appName, outputType));
+                                          outputPath, this.appName, outputType,  ngctx ,  ctx));
+        return jssc;
+    }
+    
+    
+    
+    protected JavaStreamingContext createContext(String instanceName, Rtps rtpsPros,  Optional<NGContext> ngctx , Optional<InternalContext> ctx){
+
+
+        // Validate configuration and settings
+        if(!checkConfiguration(rtpsPros)){
+            System.exit(-1);
+        }
+
+        // Get field definition
+        String model = rtpsPros.getFields().getModel();
+        String fieldDefinitions = null;
+
+        if(model.toLowerCase().equals(DM_GENERIC)) {
+            if(rtpsPros.getFields().getDefinitionFile() == null ||
+            		rtpsPros.getFields().getDefinitionFile().isEmpty()) {
+                logger.error("Definition file path is missing in configuration (fields.definition.file)");
+                System.exit(-1);
+            }
+            String fieldDefinitionPath = rtpsPros.getFields().getDefinitionFile();
+            try {
+                fieldDefinitions = FileUtils.readFile(fieldDefinitionPath);
+                logger.debug(fieldDefinitions);
+                // Validate
+                if (!GenericJsonModelValidator.validate(fieldDefinitions)) {
+                    throw new Exception("Incorrect object definition file");
+                }
+            } catch (Exception e) {
+                logger.error("Can't process fields definition file : " + fieldDefinitionPath);
+                logger.error(e.getMessage());
+                System.exit(-1);
+            }
+        }
+
+        // Spark application context settings
+        SparkConf sparkConf = new SparkConf();
+        
+        ConfigurationHelper.initConfigForSpark(sparkConf, rtpsPros.getSpark());
+        //ConfigurationHelper.initConfig(sparkConf, appConfig, "spark.", false);
+        
+        logger.info("Spark settings");
+        logger.info(sparkConf);
+
+        // Hardcoded Spark parameters - we don't want them to be overwritten in configuration in any case
+        sparkConf.set("spark.app.name", instanceName);
+
+        //Processing pipeline
+        logger.info("Starting " + model + " processing model.");
+        String outputPath = rtpsPros.getMaprfs().getPath();
+        String outputType = (rtpsPros.getMaprfs().getOutputType() == null || rtpsPros.getMaprfs().getOutputType().isEmpty()) ?
+        		"parquet": rtpsPros.getMaprfs().getOutputType() ;
+
+        if (outputType.equals("parquet") || outputType.equals("json")) {
+            logger.info("Data output type is  " + outputType);
+        } else {
+            logger.error("Invalid data output type :" + outputType + " . Please set maprfs.outputType configuration parameter to 'parquet' or 'json'");
+            System.exit(-1);
+        }
+        if(checkOutputPath(outputPath) != 0){
+            logger.error("Can't create output directory " + outputPath);
+            System.exit(-1);
+        }
+        logger.info("Output directory " + outputPath);
+
+
+        // MapR Streams configuration parameters
+        HashMap<String, Object> kafkaParams = new HashMap<>();
+        
+        
+        ConfigurationHelper.initConfig(kafkaParams, rtpsPros.getStreams());
+        // !!!!!!!!!!!!! NEED CLEANUP !!!!!!!!!!!!!!!!!!!
+     //   ConfigurationHelper.initConfig2(kafkaParams, appConfig, "streams.", true);
+        // Setup MapR kafka consumer
+        
+        
+        String configuredSource = rtpsPros.getStreams().getTopic();
+
+        // Validate if stream/topic exists
+        if(validateStream(configuredSource) != 0){
+            logger.error("Can't connect to the stream " + configuredSource);
+            System.exit(-1);
+        }
+
+        // We have to create list with single string
+        List<String> src = new ArrayList<>();
+        src.add(configuredSource);
+
+        logger.info("Connection to stream : " + src);
+        // We have to modify/enforce some kafka parameters
+        fixKafkaParams(kafkaParams);
+
+        logger.info("Modified Kafka parameters:" + kafkaParams);
+
+        //Batch Interval
+        Integer batchInterval  = Integer.valueOf(rtpsPros.getSpark().getBatchInterval());
+        //JavaStreamingContext jssc = new JavaStreamingContext(ctx.sparkSession.sparkContext(), Durations.seconds(batchInterval));
+        
+        JavaSparkContext jsCtx =  null;
+        JavaStreamingContext jssc = null;
+        
+        /**
+         * Create or Use spark context from InternalContext
+         */
+        if(ctx.isPresent()) {
+        	ctx.get().sparkSession.sparkContext();
+			jsCtx = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(sparkConf));
+			jssc = new JavaStreamingContext(jsCtx, Durations.seconds(batchInterval));
+        } else {
+        	jssc =  new JavaStreamingContext(sparkConf, Durations.seconds(batchInterval));
+        }
+
+        logger.info("Java streaming context created" );
+        // Create stream
+        JavaInputDStream<ConsumerRecord<String, String>> eventsStream
+            = KafkaUtils.createDirectStream(jssc, LocationStrategies.PreferConsistent(),
+                                            ConsumerStrategies.<String, String>Subscribe(src, kafkaParams));
+        logger.info("########### KafkaUtils.createDirectStream() completed ######" );
+        // Configuration for ElasticSearch
+        Map<String, String> esConfig = new HashMap<>();
+        
+        
+
+        String esIndex = null;
+        logger.info("streams:: " + rtpsPros.getStreams());
+        logger.info("########### ConfigurationHelper.initConfigForEs() starting ######" );
+        ConfigurationHelper.initConfigForEs(esConfig, rtpsPros.getStreams(), Optional.of("es"));
+        logger.info("########### ConfigurationHelper.initConfigForEs() completed ######" );
+        if(rtpsPros.getEs() != null ) {
+        	  esIndex = rtpsPros.getEs().getIndex();
+        }
+      
+        
+       // if (appConfig.hasPath("es")) {
+        //    ConfigurationHelper.initConfig(esConfig, appConfig, "es.", false);
+        //    esIndex = rtpsPros.getEs().getIndex();
+       // }
+        logger.info("Elastic Search settings");
+        logger.info(esConfig);
+
+        eventsStream
+            .foreachRDD(new ProcessRecords(eventsStream,
+                                          model, fieldDefinitions,
+                                          esIndex, esConfig,
+                                          outputPath, this.appName, outputType, ngctx, ctx));
         return jssc;
     }
 
@@ -182,6 +356,23 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         }
         return true;
     }
+    
+    
+	private boolean checkConfiguration(Rtps rtpsProps) {
+
+		boolean isMaprfsPath = rtpsProps.getMaprfs().getPath() == null || rtpsProps.getMaprfs().getPath().isEmpty();
+
+		boolean isFieldsModel = rtpsProps.getFields().getModel() == null || rtpsProps.getFields().getModel().isEmpty();
+
+		boolean isStreamsTopic = rtpsProps.getStreams().getTopic() == null
+				|| rtpsProps.getStreams().getTopic().isEmpty();
+
+		boolean isSparkBatchInterval = rtpsProps.getSpark().getBatchInterval() == null
+				|| rtpsProps.getSpark().getBatchInterval().isEmpty();
+
+		return !(isMaprfsPath || isFieldsModel || isStreamsTopic || isSparkBatchInterval);
+
+	}
 
     private void fixKafkaParams(Map<String, Object> kafkaParams) {
 
@@ -220,6 +411,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch(Exception e){
             logger.error(e.getMessage());
+            e.printStackTrace();
             return -1;
         }
         return 0;
@@ -262,6 +454,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch (Exception e){
             logger.error(e.getMessage());
+            e.printStackTrace();
         }
         return retval ;
     }

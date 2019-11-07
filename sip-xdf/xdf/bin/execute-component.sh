@@ -3,6 +3,7 @@
 DRYRUN=${DRYRUN:-}
 #VERBOSE=${VERBOSE:-}
 
+ 
 CMD_DIR=$( cd $(dirname $0) && pwd -P )
 : ${CMD_DIR:?no value}
 source $CMD_DIR/app_env || exit
@@ -24,6 +25,7 @@ declare -A COMP_MC=(
     [parser]=sncr.xdf.parser.NGParser
     [pipeline]=sncr.xdf.ngprocessor.XDFDataProcessor
     [transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
+    [rtps]=sncr.xdf.rtps.driver.NGRTPSComponent
 )
 
 function usage()
@@ -47,7 +49,8 @@ usage: $0
      parser     - XDF Parser
      es-loader  - XDF ElasticSearch Loader
      zero       - XDF Zero component
-
+     rtps		- XDF Rtps component
+ 
 Example:
     $0 -m zero -a project1 -b BATCHID0001 -c app_conf.jcfg -r hdfs:///data/bda
 ----------------------------------------------------------------
@@ -103,7 +106,6 @@ MAIN_CLASS=${COMP_MC[$COMPONENT_NAME]}
     error "Unknown XDF component (-m): $COMPONENT_NAME"
     usage 1
 }
-
 #SR?? Validate config file
 #?? file://
 #( <${CONFIG_FILE} ) || exit
@@ -126,6 +128,7 @@ if [[ $CONFIG_FILE == file://* ]];
 then
     CONFIG_FILE_PATH=${CONFIG_FILE:7}
 fi
+
 
 SPARK_MEMORY_CONFIG="$(cat $CONFIG_FILE_PATH | jq -r '.parameters | .[] | select(.name == "spark.driver.memory")| .value ')"
 echo "SPARK DRIVER MEMORY:: $SPARK_MEMORY_CONFIG"
