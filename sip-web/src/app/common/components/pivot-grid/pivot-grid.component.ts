@@ -9,6 +9,7 @@ import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as toUpper from 'lodash/toUpper';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
@@ -33,10 +34,11 @@ import {
   DEFAULT_PIVOT_DATE_FORMAT
 } from '../../consts';
 import { getFormatter } from '../../utils/numberFormatter';
+import { displayNameWithoutAggregateFor } from '../../services/tooltipFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
-  columnName: 'dataField',
+  dataField: 'dataField',
   aggregate: 'summaryType'
 };
 
@@ -281,7 +283,7 @@ export class PivotGridComponent implements OnDestroy {
   getFormatter(format) {
     // Pivot grid auto converts given moment to local dates. It's important to
     // re-convert it to the zone we used to provide dates to normalise it.
-    return value => moment(value, format).format(format);
+    return value => moment.utc(value, format).format(format);
   }
 
   preProcessData(data) {
@@ -305,9 +307,9 @@ export class PivotGridComponent implements OnDestroy {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({ name, groupInterval, manualFormat }) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(
-          clonedDataPoint[name],
+      forEach(columnsToFormat, ({ columnName, groupInterval, manualFormat }) => {
+        clonedDataPoint[columnName] = this.getFormattedDataValue(
+          clonedDataPoint[columnName],
           groupInterval,
           manualFormat
         );
@@ -334,7 +336,7 @@ export class PivotGridComponent implements OnDestroy {
         return moment.utc(value).format(formatToApply);
       case 'year':
       default:
-        return moment(value, this.getMomentFormat(format)).toDate();
+        return moment.utc(value, this.getMomentFormat(format)).toDate();
     }
   }
 
@@ -373,10 +375,16 @@ export class PivotGridComponent implements OnDestroy {
                   : { precision: conditionalPrecision, percentage: percent })
             )
           };
-          /* We're aggregating values in backend. Aggregating it again using
+          if (cloned.aggregate) {
+            delete cloned.caption;
+            cloned.displayName = `${toUpper(
+              cloned.aggregate
+            )}(${displayNameWithoutAggregateFor(cloned)})`;
+            /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
              on sum */
-          cloned.aggregate = 'sum';
+            cloned.aggregate = 'sum';
+          }
         } else {
           cloned.dataType = cloned.type;
         }
@@ -386,7 +394,10 @@ export class PivotGridComponent implements OnDestroy {
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
 
-        cloned.dataField = cloned.columnName;
+        cloned.dataField =
+          cloned.area === 'data' && cloned.dataField
+            ? cloned.dataField
+            : cloned.columnName;
 
         if (DATE_TYPES.includes(cloned.type)) {
           // disable sorting for the fields that have a type string because of manual formatting

@@ -16,6 +16,7 @@
     *ngIf="!isInQueryMode"
     (change)="change.emit($event)"
     [artifacts]="artifacts"
+    [sipQuery]="analysis.sipQuery"
     [useAggregate]="analysis.type === 'esReport'"
   >
   </designer-settings-multi-table>

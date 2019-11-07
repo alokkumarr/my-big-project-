@@ -26,11 +26,13 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
-import com.sncr.saw.security.common.util.TicketHelper;
+import com.sncr.saw.security.app.service.TicketHelper;
+import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,9 @@ public class SecurityController {
 	@Autowired
 	private NSSOProperties nSSOProperties;
 
+    @Autowired
+    private TicketHelper tHelper;
+
 	@Autowired
 	SSORequestHandler ssoRequestHandler;
 
@@ -85,19 +90,19 @@ public class SecurityController {
 
 		logger.info("Ticket will be created..");
 		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
-
 		Ticket ticket = new Ticket();
 		User user = null;
-		TicketHelper tHelper = new TicketHelper(userRepository);
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
 		RefreshToken rToken = null;
+
 		try {
 			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
 					loginDetails.getPassword());
 
 			boolean isUserAuthentic = ret[0];
 			boolean isPassWordActive = ret[1];
+			boolean isAccountLocked = ret[2];
 			if (isUserAuthentic) {
 				if (isPassWordActive) {
 					user = new User();
@@ -108,7 +113,10 @@ public class SecurityController {
 				} else {
 					ticket.setValidityReason("Password Expired");
 				}
-			} else {
+			} else if (isAccountLocked) {
+        ticket.setValidityReason(
+            String.format("Account has been locked!!, Please try after sometime"));
+            } else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
 			rToken = new RefreshToken();
@@ -130,7 +138,7 @@ public class SecurityController {
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),ticket.isValid(),ticket.getValidityReason());
 	}
 
 	   @RequestMapping(value = "/auth/customer/details", method = RequestMethod.POST)
@@ -203,7 +211,6 @@ public class SecurityController {
 
 			Ticket ticket = null;
 			User user = null;
-			TicketHelper tHelper = new TicketHelper(userRepository);
 			ticket = new Ticket();
 			ticket.setMasterLoginId(masterLoginId);
 			ticket.setValid(false);
@@ -247,7 +254,6 @@ public class SecurityController {
 
 		Ticket ticket = null;
 		User user = null;
-		TicketHelper tHelper = new TicketHelper(userRepository);
 		ticket = new Ticket();
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
@@ -279,13 +285,14 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 * This method will be Deprecated since its uses user input as ticket Id.
+     * Logout ticketid should be extracted from token see method {@link #logout(String)}
 	 * @param ticketID
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.POST)
 	public String doLogout(@RequestBody String ticketID) {
-		TicketHelper tHelper = new TicketHelper(userRepository);
 		Gson gson = new Gson();
 		try {
 			return gson.toJson(tHelper.logout(ticketID));
@@ -293,6 +300,26 @@ public class SecurityController {
 			return de.getMessage();
 		}
 	}
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(value = "/auth/doLogout", method = RequestMethod.GET)
+    public String logout(@RequestHeader("Authorization") String token) {
+        token = token.replaceAll("Bearer", "").trim();
+        Ticket ticket = null;
+        try {
+             ticket = TokenParser.retrieveTicket(token);
+        } catch (IOException e) {
+            logger.error("Error occurred while parsing the Token");
+        }
+        try {
+            return tHelper.logout(ticket.getTicketId());
+        } catch (DataAccessException de) {
+            return de.getMessage();
+        }
+    }
 
 	/**
 	 *
@@ -492,7 +519,6 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/auth/reCreateTicket", method = RequestMethod.POST)
 	public String reCreateTicket(@RequestBody String ticketId) {
-		TicketHelper tHelper = new TicketHelper(userRepository);
 		logger.info("ReCreating process start for ticket", ticketId, null);
 		Ticket ticket = tHelper.reCreateTicket(ticketId,
 				nSSOProperties.getValidityMins() != null ? Long.parseLong(nSSOProperties.getValidityMins()) : 720);
@@ -521,6 +547,14 @@ public class SecurityController {
 			this.validity = validity;
 			this.message = message;
 		}
+
+		public LoginResponse(final String aToken, final  String rToken, boolean validity,
+            String message) {
+            this.aToken = aToken;
+            this.rToken = rToken;
+		    this.validity = validity;
+            this.message = message;
+        }
 	}
 
 	@SuppressWarnings("unused")
@@ -609,10 +643,11 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 * No longer being used , mark as deprecated .
 	 * @param analysis
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping(value = "/auth/analysis/createAnalysis", method = RequestMethod.POST)
 	public Valid createAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
@@ -645,10 +680,11 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 *  No longer being used , mark as deprecated .
 	 * @param analysis
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping(value = "/auth/analysis/update", method = RequestMethod.POST)
 	public Valid updateAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
@@ -681,10 +717,11 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 *  No longer being used , mark as deprecated .
 	 * @param analysis
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping(value = "/auth/analysis/delete", method = RequestMethod.POST)
 	public Valid deleteAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
@@ -716,10 +753,11 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 *  No longer being used , mark as deprecated .
 	 * @param featureId
 	 * @return
 	 */
+	@Deprecated
 	@RequestMapping(value = "/auth/analysis/fetch/{featureId}", method = RequestMethod.GET)
 	public AnalysisSummaryList getAnalysisByFeatureID(@PathVariable("featureId") Long featureId) {
 		return userRepository.getAnalysisByFeatureID(featureId);
@@ -1759,7 +1797,7 @@ public class SecurityController {
      *
      * @return
      */
-	@RequestMapping(value= "/auth/admin/user/preferences/upsert", method = RequestMethod.POST)
+	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
     public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
 	    String jwtToken = JWTUtils.getToken(request);
@@ -1774,7 +1812,7 @@ public class SecurityController {
      *
      * @return
      */
-    @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.POST)
+    @RequestMapping(value= "/auth/user/preferences/delete", method = RequestMethod.POST)
     public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
@@ -1794,7 +1832,7 @@ public class SecurityController {
      *
      * @return
      */
-    @RequestMapping(value= "/auth/admin/user/preferences/fetch", method = RequestMethod.GET)
+    @RequestMapping(value= "/auth/user/preferences/fetch", method = RequestMethod.GET)
     public Object fetchUserPreferences(HttpServletRequest request, HttpServletResponse response) {
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());

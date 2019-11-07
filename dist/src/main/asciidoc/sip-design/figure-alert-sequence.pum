@@ -1,0 +1,34 @@
+== Authentication ==
+
+Client -> "SIP Security Service": Authentication request
+"SIP Security Service" --> Client: Authentication response
+
+== Alert Rule Creation ==
+
+Client -> "SIP Gateway Service": request
+"SIP Gateway Service" -> "SIP Alert Service": request
+
+"SIP Alert Service" -> "MapR-DB": Create Alert Rule
+"MapR-DB" --> "SIP Alert Service": Return Alert Rule ID
+
+"SIP Alert Service" --> "SIP Gateway Service": response
+"SIP Gateway Service" --> Client: response
+
+== Alert Generation ==
+
+"Source Data" -> "Datalake": ingest data
+
+"Datalake" -> "SIP XDF/RTPS": Data processing
+
+"SIP XDF/RTPS" -> "Stream": Sends datapod id
+"Stream" -> "SIP Alert Service": Notify the data received
+
+"SIP Alert Service" --> "MapR-DB": Reads Alert Rules for datapod id
+"MapR-DB" -> "SIP Alert Service": Returns the Alert Rules
+
+"SIP Alert Service" --> "SIP Proxy Service": Execution request
+"SIP Proxy Service" -> "SIP Alert Service": Execution response
+
+"SIP Alert Service" --> "MapR-DB": Write results
+"SIP Alert Service" --> "SIP Notification Service": Send Alert Notification
+

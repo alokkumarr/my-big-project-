@@ -1,10 +1,24 @@
 package com.sncr.saw.security.app.repository.impl.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.TicketHelper;
+import com.sncr.saw.security.app.service.TicketHelperImpl;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.Module;
+import com.sncr.saw.security.common.bean.Product;
+import com.sncr.saw.security.common.bean.RefreshToken;
+import com.sncr.saw.security.common.bean.ResetValid;
+import com.sncr.saw.security.common.bean.Role;
+import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -14,22 +28,16 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class UserRepositoryImplTest {
 
@@ -306,7 +314,8 @@ public class UserRepositoryImplTest {
         nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
         nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
         nssoProperties.setValidityMins("10");
-        SSORequestHandler ssoRequestHandler = new SSORequestHandler(userRepositoryDAO,nssoProperties);
+        TicketHelper ticketHelper = new TicketHelperImpl(userRepositoryDAO);
+        SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties,ticketHelper);
         SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
 		assertNotNull("Valid access Token not found, Authentication failed ",ssoResponse.getaToken());
 		assertNotNull("Valid refresh Token not found, Authentication failed",ssoResponse.getrToken());
@@ -353,7 +362,7 @@ public class UserRepositoryImplTest {
 		Ticket ticket = new Ticket();
 		ticket.setMasterLoginId("Sawadmin@synchronoss.com");
 		ticket.setDefaultProdID("1");
-		ticket.setRoleType("ADMIN");
+		ticket.setRoleType(RoleType.ADMIN);
 		ticket.setUserFullName("SAW ADMIN");
 		ticket.setWindowId("1");
 		String ticketId = "1";

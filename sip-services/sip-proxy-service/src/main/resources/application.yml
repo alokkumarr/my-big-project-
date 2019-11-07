@@ -23,8 +23,8 @@ schema:
    file: /Users/spau0004/code/SIP/saw-services/saw-proxy-service/src/main/resources/schema/proxy-schema.json
 elastic-search:
            cluster-name: elasticsearch
-           transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net,es-rd602.ana.dev.vaste.sncrcorp.net
-           transport-ports: 9200,9200
+           transport-hosts: es-rd611.eng-sip.dev01.us-west.sncrcloud.net,es-rd612.eng-sip.dev01.us-west.sncrcloud.net,es-rd613.eng-sip.dev01.us-west.sncrcloud.net
+           transport-ports: 9200,9200,9200
            sslEnabled: false
            keyStorePath: /codebase/sip/server.keystore
            storePassword: es123

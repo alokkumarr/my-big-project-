@@ -39,10 +39,13 @@ public class ExportUtils {
   private static final String AUTHORIZATION = "Authorization";
   private static final String FILE_TYPE = "fileType";
   private static final String DESCRIPTION = "description";
+  private static final String CUSTOMER_CODE = "customerCode";
   private static final String PUBLISHED_TIME = "publishedTime";
   private static final String DISTINCT_COUNT = "distinctCount";
   private static final String USER_FULL_NAME = "userFullName";
   private static final String DISTINCT_COUNT_AGGREGATION = "distinctcount";
+  private static final String DEFAULT_FILE_TYPE = "csv";
+
 
   /**
    * Create Request header with common properties
@@ -66,10 +69,18 @@ public class ExportUtils {
    * @return
    */
   public static Map<String, String> buildColumnHeaderMap(SipQuery sipQuery) {
+    boolean haveDLQuery = sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty();
     // collect all the fields to build column sequence
     List<Field> fields = new ArrayList<>();
     for (Artifact artifact : sipQuery.getArtifacts()) {
-      fields.addAll(artifact.getFields());
+      String artifactName = artifact.getArtifactsName();
+      artifact.getFields().forEach(field -> {
+        // This is added to fix SIP-8811 customer Code column issue on DL report
+        if (haveDLQuery && artifactName != null && CUSTOMER_CODE.matches(field.getColumnName())) {
+          field.setColumnName(artifactName.concat("_").concat(field.getColumnName()));
+        }
+        fields.add(field);
+      });
     }
 
 
@@ -78,8 +89,11 @@ public class ExportUtils {
       for (int visibleIndex = 0; visibleIndex < fields.size(); visibleIndex++) {
         for (Field field : fields) {
           String aliasName = field.getAlias() != null && !field.getAlias().isEmpty() ? field.getAlias() : null;
+          if (aliasName == null && !StringUtils.isEmpty(field.getDisplayName())) {
+            aliasName = field.getDisplayName().trim();
+          }
           // look for DL report
-          if (sipQuery.getQuery() != null && !sipQuery.getQuery().isEmpty()) {
+          if (haveDLQuery) {
             if (field.getVisibleIndex() != null && field.getVisibleIndex().equals(visibleIndex)) {
               String[] split = StringUtils.isEmpty(field.getColumnName()) ? null : field.getColumnName().split("\\.");
               String columnName;
@@ -172,10 +186,10 @@ public class ExportUtils {
   public static void buildExportBean(ExportBean exportBean, Object dispatchBean) {
     exportBean.setFileType(
         String.valueOf(((LinkedHashMap) dispatchBean).get(FILE_TYPE)));
-    exportBean.setReportDesc(
-        String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
-    exportBean.setReportName(
-        String.valueOf(((LinkedHashMap) dispatchBean).get(NAME)));
+    exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get(DESCRIPTION)));
+    String reportName =
+        prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+    exportBean.setReportName(reportName);
     exportBean.setPublishDate(
         String.valueOf(((LinkedHashMap) dispatchBean).get(PUBLISHED_TIME)));
     exportBean.setCreatedBy(
@@ -191,5 +205,28 @@ public class ExportUtils {
 
   public static String generateRandomStringDir() {
     return UUID.randomUUID().toString();
+  }
+
+      public static String prepareExcelSheetName(String excelSheetName) {
+    /*Excel sheet Name doesn't allow some special characters and length should be less than 31,so
+    removing the special characters from analysis name and prearing name with only first 31
+    characters*/
+    excelSheetName = excelSheetName.trim().replaceAll("[*/:\\\\?\\[\\]]", "");
+    if (excelSheetName.length() > 31) {
+      excelSheetName = excelSheetName.substring(0, 31);
+    }
+    return excelSheetName;
+  }
+
+  public static String prepareFileName(String name, String fileType) {
+    name = name.replaceAll("[/\\\\]", "").concat(".");
+    if (fileType != null && !StringUtils.isEmpty(fileType)) {
+      return name.concat(fileType);
+    }
+    return name.concat(DEFAULT_FILE_TYPE);
+  }
+
+  public static String prepareReportName(String name) {
+    return name.replaceAll("[\\\\]", "");
   }
 }

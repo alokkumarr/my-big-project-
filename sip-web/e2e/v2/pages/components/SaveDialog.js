@@ -29,7 +29,6 @@ class SaveDialog extends FilterDialog {
 
   clickOnSaveAndCloseDialogButton(landingPageAfterSave = null) {
     commonFunctions.clickOnElement(this._saveAndCloseButton);
-    commonFunctions.waitFor.elementToBeVisible(this._saveAndCloseButton);
     if (landingPageAfterSave) {
       commonFunctions.waitFor.pageToBeReady(landingPageAfterSave);
     } else {

@@ -5,6 +5,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as mapValues from 'lodash/mapValues';
 import * as orderBy from 'lodash/orderBy';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
@@ -16,6 +17,9 @@ import * as fpSplit from 'lodash/fp/split';
 import { ArtifactColumnDSL } from 'src/app/models';
 import * as forEach from 'lodash/forEach';
 import { NUMBER_TYPES } from './../consts';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPick from 'lodash/fp/pick';
+import * as moment from 'moment';
 
 // function substituteEmptyValues(data, fields) {
 //   return flatMap(fields, field =>
@@ -45,6 +49,7 @@ export function substituteEmptyValues(data) {
 }
 
 export function flattenPivotData(data, sipQuery) {
+  data = alterDateInData(data, sipQuery);
   if (sipQuery.artifacts) {
     // const columnRowFields = sipQuery.artifacts[0].fields.filter(field =>
     //   ['row', 'column', 'data'].includes(field.area)
@@ -199,14 +204,33 @@ export function wrapFieldValues(data) {
   )(data);
 }
 
-export function checkNullinReportData(data) {
-  return fpPipe(
-    fpMap(
-      fpMapValues(value => {
-        return value === null ? 'null' : value;
+export function alterDateInData(data, sipQuery) {
+  if (isEmpty(data)) {
+    return data;
+  }
+  const dateFields = [];
+  flatMap(sipQuery.artifacts, artifact =>
+    fpPipe(
+      fpMap(fpPick(['columnName', 'type', 'aggregate'])),
+      fpFilter(({ type, columnName, aggregate }) => {
+        if (type === 'date' && !['count', 'distinctCount', 'distinctcount'].includes(aggregate)) {
+          dateFields.push(columnName);
+        }
       })
-    )
-  )(data);
+    )(artifact.fields)
+  );
+
+  return data.map(row => {
+    return mapValues(row, (value, key) => {
+      value = value === null ? 'null' : value;
+      if (dateFields.includes(key)) {
+        value = value.includes('Z')
+          ? moment(value).utc().format('YYYY-MM-DD HH:mm:ss')
+          : value;
+      }
+      return value;
+    });
+  });
 }
 
 export function flattenReportData(data, analysis) {
@@ -214,7 +238,8 @@ export function flattenReportData(data, analysis) {
     return data;
   }
 
-  data = checkNullinReportData(data);
+  data = alterDateInData(data, analysis.sipQuery);
+
   return data.map(row => {
     return mapKeys(row, (value, key) => {
       /* If the column has aggregation, preserve the aggregate name when removing keyword */

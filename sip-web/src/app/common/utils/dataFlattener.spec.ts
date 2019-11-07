@@ -1,10 +1,34 @@
-import { flattenReportData, wrapFieldValues } from './dataFlattener';
+import { flattenReportData, wrapFieldValues, alterDateInData } from './dataFlattener';
 
 describe('flattenReportData', () => {
   it('should remove keywords from reports', () => {
-    const analysis = { artifacts: [{ columns: [] }] };
+    const analysis = {
+      artifacts: [{
+        columns: []
+      }],
+      sipQuery: {
+        artifacts: [{
+          columns: []
+        }]
+      }
+    };
     const data = [{ 'string.keyword': 'abc' }];
     expect(flattenReportData(data, analysis)[0].string).toBeTruthy();
+  });
+
+  it('should format dates without adding a day', () => {
+    const sipQuery = {
+      artifacts: [{
+        artifactsName: 'tmobile_cell_sites',
+        fields: [{
+          columnName: 'timestamp',
+          type: 'date',
+          aggregate: 'sum'
+        }]
+      }]
+    };
+    const data = [{ 'timestamp': '01/16/2019 20:31:23' }];
+    expect(alterDateInData(data, sipQuery)).toEqual([{ 'timestamp': '01/16/2019 20:31:23' }]);
   });
 });
 

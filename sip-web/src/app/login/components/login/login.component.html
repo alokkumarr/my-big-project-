@@ -9,7 +9,7 @@
     <span>have an account yet contact your system administrator</span>
   </div>
 
-  <form #loginForm="ngForm" name="loginForm" class="login-form" method="post">
+  <form #loginForm="ngForm" name="loginForm" class="login-form" method="post" (submit)="login()">
     <div
       class="error-msg"
       e2e="error-msg-section"
@@ -19,6 +19,7 @@
     <mat-form-field>
       <input
         matInput
+        #username
         maxlength="30"
         [(ngModel)]="dataHolder.username"
         [ngModelOptions]="{ standalone: true }"
@@ -35,6 +36,7 @@
     <password-toggle
       [placeholder]="'Password'"
       (change)="passwordChanged($event)"
+      [state]="state"
     >
     </password-toggle>
 
@@ -47,7 +49,6 @@
         color="primary"
         e2e="login-btn"
         type="submit"
-        (click)="login()"
       >
         Login
       </button>

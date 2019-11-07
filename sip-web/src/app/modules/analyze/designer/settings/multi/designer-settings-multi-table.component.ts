@@ -1,15 +1,86 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
-import { Store } from '@ngxs/store';
+import * as flatMap from 'lodash/flatMap';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
+import * as toLower from 'lodash/toLower';
 
 import {
   Artifact,
-  SqlBuilderReport,
   JsPlumbCanvasChangeEvent,
   DesignerChangeEvent
 } from '../../types';
-import { QueryDSL } from 'src/app/models';
+import { QueryDSL, Join, ArtifactDSL } from 'src/app/models';
+
+/**
+ * Reverses the sides of left and right joins if they are incorrect.
+ * Basically, if table1 is to left of table2, then join should be from
+ * right edge of table1 to left edge of table2.
+ *
+ * @param {*} joinCondition
+ * @param {ArtifactDSL[]} artifacts
+ * @param {('left' | 'right')} side
+ * @returns
+ */
+function getConditionOnSide(
+  joinCondition,
+  artifacts: ArtifactDSL[],
+  side: 'left' | 'right'
+) {
+  const leftSide = joinCondition.left;
+  const rightSide = joinCondition.right;
+  const [leftArtifact] = artifacts
+    .map(a => toLower(a.artifactsName))
+    .filter(name =>
+      [
+        toLower(leftSide.artifactsName),
+        toLower(rightSide.artifactsName)
+      ].includes(name)
+    );
+
+  return {
+    tableName: joinCondition[side].artifactsName,
+    columnName: joinCondition[side].columnName,
+    side: isEmpty(artifacts)
+      ? side
+      : toLower(joinCondition[side].artifactsName) === leftArtifact
+      ? 'right'
+      : 'left'
+  };
+}
+
+export function refactorJoins(joins, artifacts) {
+  const analysisJoins = fpPipe(
+    fpFilter(join => !join.type),
+    fpMap(join => {
+      const criteria = flatMap(join.criteria, ({ joinCondition }) => [
+        getConditionOnSide(joinCondition, artifacts, 'left'),
+        getConditionOnSide(joinCondition, artifacts, 'right')
+      ]);
+      return {
+        type: join.join,
+        criteria
+      };
+    })
+  )(joins);
+  return !isEmpty(analysisJoins) ? analysisJoins : joins;
+}
+
+function setDefaultArtifactPosition(artifacts: Artifact[]) {
+  // set the x, y coordiantes of the artifacts (tables in jsplumb)
+  const defaultXPosition = 20;
+  const defaultSpacing = 400;
+  let xPosition = defaultXPosition;
+  forEach(artifacts, (artifact: Artifact) => {
+    if (isEmpty(artifact.artifactPosition)) {
+      artifact.artifactPosition = [xPosition, 0];
+      xPosition += defaultSpacing;
+    }
+  });
+  return artifacts;
+}
 
 @Component({
   selector: 'designer-settings-multi-table',
@@ -19,65 +90,19 @@ import { QueryDSL } from 'src/app/models';
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() useAggregate: boolean;
+  @Input('sipQuery') set setJoins(sipQuery: QueryDSL) {
+    this.joins = refactorJoins(sipQuery.joins, sipQuery.artifacts);
+  }
   @Input('artifacts')
   set setArtifacts(artifacts: Artifact[]) {
-    const analysis = this._store.selectSnapshot(state => state.designerState.analysis);;
-    this.sqlBuilder = analysis.sipQuery;
-    this.artifacts = this.setDefaultArtifactPosition(artifacts);
+    this.artifacts = setDefaultArtifactPosition(artifacts);
   }
   @Input() data;
   public artifacts: Artifact[];
-  public sqlBuilder: QueryDSL | SqlBuilderReport;
-  constructor(
-    private _store: Store
-  ) {}
+
+  public joins: Join[];
 
   onChange(event: JsPlumbCanvasChangeEvent) {
     this.change.emit(event);
-  }
-
-  setDefaultArtifactPosition(artifacts: Artifact[]) {
-    // set the x, y coordiantes of the artifacts (tables in jsplumb)
-    const defaultXPosition = 20;
-    const defaultSpacing = 400;
-    let xPosition = defaultXPosition;
-    forEach(artifacts, (artifact: Artifact) => {
-      if (isEmpty(artifact.artifactPosition)) {
-        artifact.artifactPosition = [xPosition, 0];
-        xPosition += defaultSpacing;
-      }
-    });
-    return artifacts;
-  }
-
-  refactor(joins) {
-    const analysisJoins = [];
-    let DSLState = false;
-    joins.forEach(join => {
-      const DSLCriteria = [];
-      if (!join.type) {
-        DSLState = true;
-        join.criteria.forEach(dslCRT => {
-          DSLCriteria.push({
-            tableName: dslCRT.joinCondition['left'].artifactsName,
-            columnName: dslCRT.joinCondition['left'].columnName,
-            side: 'left'
-          });
-          DSLCriteria.push({
-            tableName: dslCRT.joinCondition['right'].artifactsName,
-            columnName: dslCRT.joinCondition['right'].columnName,
-            side: 'right'
-          });
-
-        });
-        const dslJoin = {
-          type: join.join,
-          criteria: DSLCriteria
-        };
-        analysisJoins.push(dslJoin);
-      }
-    });
-    joins = DSLState ? analysisJoins : joins;
-    return joins;
   }
 }

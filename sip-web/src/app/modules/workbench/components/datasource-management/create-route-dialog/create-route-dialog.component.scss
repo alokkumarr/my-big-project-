@@ -2,6 +2,7 @@
 
 ::ng-deep .createroute-dialog {
   height: calc(100% - 48px);
+  box-shadow: none !important;
 
   .mat-card-content {
     height: calc(100% - 36px);
@@ -67,13 +68,12 @@
   .selected {
     border: 3px $primary-blue-b1 solid;
   }
-  
-  #disableDuplicate{
-  		margin: 2px 0 63px 17px;
+
+  #disableDuplicate {
+    margin: 2px 0 63px 17px;
   }
-  
-  #disableConcurrency{
-  		margin: 2px 0 63px 0;
+
+  #disableConcurrency {
+    margin: 2px 0 63px 0;
   }
 }
-

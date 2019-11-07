@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
@@ -16,8 +15,6 @@ import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
 import { isDSLAnalysis } from '../../../designer/types';
 
-const SEMICOLON = 186;
-
 @Component({
   selector: 'analyze-schedule-dialog',
   templateUrl: './analyze-schedule-dialog.component.html',
@@ -28,8 +25,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   dateFormat = 'mm/dd/yyyy';
   hasSchedule = false;
   cronValidateField = false;
-  regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
-  separatorKeys = [ENTER, COMMA, SEMICOLON];
   emails: string[] = [];
   repeatIntervals = ['DAYS', 'WEEKS'];
   repeatInterval = this.repeatIntervals[0];
@@ -76,7 +71,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   isEligibleToZip: boolean;
   fileType: string;
   startDateCorrectFlag = true;
-  zipFormatFlag: boolean = false;
+  zipFormatFlag = false;
   constructor(
     public _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -102,10 +97,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
     this.fileType =
       get(this.data.analysis, 'type') === 'pivot' ? 'xlsx' : 'csv';
-  }
-
-  trackByIndex(index) {
-    return index;
   }
 
   onCategorySelected(value) {
@@ -186,7 +177,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
               this.ftp = ftp;
               this.s3Bucket = s3;
             }
-            this.emails = emailList;
             this.hasSchedule = true;
             this.fileType = fileType;
             this.zipFormatFlag = zip;
@@ -297,9 +287,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     this.startDateCorrectFlag =
       moment(this.crondetails.startDate) > moment().subtract(2, 'minutes');
     const validateFields = {
-      emails: ['chart', 'map'].includes(this.data.analysis.type)
-        ? true
-        : this.validateEmails(this.emails),
       schedule: this.validateSchedule(),
       publish: this.validatePublishSelection(),
       startDate:
@@ -339,44 +326,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     return true;
   }
 
-  validateEmails(emailsList) {
-    let emailsAreValid = true;
-    if (!isEmpty(emailsList)) {
-      fpPipe(
-        fpMap(email => {
-          if (!this.validateThisEmail(email)) {
-            emailsAreValid = false;
-            this.emailValidateFlag = true;
-          }
-        })
-      )(emailsList);
-    }
-    return emailsAreValid;
-  }
-
-  validateThisEmail(oneEmail) {
-    return this.regexOfEmail.test(oneEmail.toLowerCase());
-  }
-
-  addEmail(event) {
-    const { input, value } = event;
-
-    // Add our fruit
-    const trimmed = (value || '').trim();
-    if (trimmed) {
-      this.emails.push(trimmed);
-    }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
-  }
-
-  removeEmail(index) {
-    if (index >= 0) {
-      this.emails.splice(index, 1);
-    }
+  onEmailsChange(emails) {
+    this.emails = emails;
   }
 
   onLocationSelected(value) {

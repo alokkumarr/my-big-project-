@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.exceptions.MissingFieldException;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.Criteria;
 import com.synchronoss.saw.model.Field;
@@ -275,7 +276,7 @@ public class DlReportConverter implements AnalysisSipDslConverter {
     if (sortObject.has("aggregate")) {
       String aggregate = sortObject.get("aggregate").getAsString();
 
-      sort.setAggregate(Sort.Aggregate.fromValue(aggregate));
+      sort.setAggregate(Aggregate.fromValue(aggregate));
     }
 
     return sort;

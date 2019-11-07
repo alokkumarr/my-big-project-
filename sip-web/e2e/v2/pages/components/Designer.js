@@ -18,7 +18,7 @@ class Designer extends SaveDialog {
       by.xpath(`//*[contains(text(),' CHART OPTIONS')]`)
     );
     this._fieldsSection = name =>
-      element(by.css(`[e2e=designer-data-option-${name}]`));
+      element(by.css(`[e2e='designer-data-option-${name}']`));
     this._topNBtn = element(by.css(`[e2e='top-btn']`));
     this._bottomNBtn = element(by.css(`[e2e='bottom-btn']`));
     this._limitValue = element(by.css(`[e2e='limit-value']`));

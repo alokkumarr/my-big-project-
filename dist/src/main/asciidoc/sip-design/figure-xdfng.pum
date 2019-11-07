@@ -1,8 +1,8 @@
 
 
 left to right direction
-[Data source]
-
+[Batch Data source]
+[Real Time Data source]
 package SIP {
  node "XDF-NG" {
 
@@ -10,6 +10,11 @@ package SIP {
         [SQL]
         [Transformer]
         [ESLoader]
+       
+    }
+ node "RTIS" {
+        [postEvent]
+	
        
     }
     
@@ -28,14 +33,17 @@ package SIP {
       
     
     node "XDF-NG" {
-
+        [RTPS/RTA]
         [Parser]
         [SQL]
         [Transformer]
         [ESLoader]
        
     }
-    [Data source] ..> [Parser]: Batch data
+    [Batch Data source] ..> [Parser]: Batch pipeline
+    [Real Time Data source] ..>[postEvent]: Real Time data
+    [postEvent]..>[RTPS/RTA]: Consumes message
+    [RTPS/RTA]..> [Parser]: Real Time Pipeline
     [Parser] ..> [SQL] : In memory
    
     [SQL] ..> [Transformer]: In memory
@@ -45,4 +53,3 @@ package SIP {
 
    
 }
-

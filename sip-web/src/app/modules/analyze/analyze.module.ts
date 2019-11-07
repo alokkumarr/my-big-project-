@@ -22,8 +22,6 @@ import { AnalyzePublishDialogModule } from './publish';
 import { AnalyzeModuleGlobal } from './analyze.global.module';
 import { DesignerPageComponent } from './designer/designer.module';
 
-import { AnalyzeFilterModule } from './designer/filter';
-
 import { AnalyzePageComponent } from './page';
 import { AnalyzeState } from './state/analyze.state';
 
@@ -49,7 +47,6 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
     AnalyzeViewModule,
     ExecutedViewModule,
     AnalyzeActionsModule,
-    AnalyzeFilterModule,
     AnalyzePublishDialogModule
   ],
   declarations: [...COMPONENTS],

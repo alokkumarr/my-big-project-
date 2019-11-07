@@ -359,9 +359,13 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   aggregateColumn(payload, value) {
-    payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     if (value === 'clear') {
+      if (isUndefined(payload.aggregate)) {
+        return;
+      }
       delete payload.aggregate;
+    } else {
+      payload.aggregate = value === 'distinctcount' ? 'distinctCount' : value;
     }
     this.change.emit({
       subject: 'aggregate',
@@ -423,6 +427,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       .open(component, {
         width: 'auto',
         height: 'auto',
+        autoFocus: false,
         data: currentData
       } as MatDialogConfig)
       .afterClosed()
@@ -511,7 +516,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkForCustCode(columnName, table) {
-    return columnName === TABLE_CUSTCODE_COLUMNNAME && this.analysis.type === 'report' ? `${table}_${columnName}` : columnName;
+    return columnName === TABLE_CUSTCODE_COLUMNNAME &&
+      this.analysis.type === 'report'
+      ? `${table}_${columnName}`
+      : columnName;
   }
 
   getDataField(column: ArtifactColumnReport) {

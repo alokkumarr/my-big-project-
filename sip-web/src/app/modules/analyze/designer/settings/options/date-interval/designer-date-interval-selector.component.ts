@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {ArtifactColumnPivot, DesignerChangeEvent} from '../../../types';
-import {DATE_INTERVALS, PIVOT_DATE_FORMATS} from '../../../../consts';
-import {DesignerUpdateArtifactColumn} from './../../../actions/designer.actions';
-import {Store} from '@ngxs/store';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { ArtifactColumnPivot, DesignerChangeEvent } from '../../../types';
+import { DATE_INTERVALS, DATE_INTERVALS_OBJ } from '../../../../consts';
+import { DesignerUpdateArtifactColumn } from './../../../actions/designer.actions';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'designer-date-interval-selector',
@@ -13,25 +13,21 @@ export class DesignerDateIntervalSelectorComponent implements OnInit {
   @Input() artifactColumn: ArtifactColumnPivot;
   public DATE_INTERVALS = DATE_INTERVALS;
 
-  constructor(private _store: Store) {
-  }
+  constructor(private _store: Store) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   onDateIntervalChange(groupInterval) {
-    // if (this.artifactColumn.dateInterval !== 'day') {
-    //   format = DEFAULT_DATE_FORMAT.value;
-    // }
-    const monthFormat = PIVOT_DATE_FORMATS[4].value;
+    const dateFormat = DATE_INTERVALS_OBJ[groupInterval].formatForBackEnd;
     this._store.dispatch(
       new DesignerUpdateArtifactColumn({
         columnName: this.artifactColumn.columnName,
+        dataField: this.artifactColumn.dataField,
         table: this.artifactColumn.table,
         groupInterval,
-        ...{dateFormat: groupInterval === 'month' ? monthFormat : null}
+        dateFormat
       })
     );
-    this.change.emit({subject: 'dateInterval'});
+    this.change.emit({ subject: 'dateInterval' });
   }
 }

@@ -8,11 +8,11 @@ import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
 import com.synchronoss.saw.es.SIPAggregationBuilder;
+import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Field.Aggregate;
 import com.synchronoss.saw.model.Field.Type;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.Model;
@@ -63,7 +63,11 @@ public class SIPDSLTest {
     List<Field> aggregationFields = SIPAggregationBuilder.getAggregationField(dataFields);
     JsonNode jsonNode =
         objectMapper.readTree(new File(classLoader.getResource("response_sample.json").getPath()));
-    ESResponseParser esResponseParser = new ESResponseParser(dataFields, aggregationFields);
+    ElasticSearchQueryBuilder.groupByFields = new String[2];
+    ElasticSearchQueryBuilder.groupByFields[1] = "date";
+    ElasticSearchQueryBuilder.groupByFields[0] = "string";
+
+    ESResponseParser esResponseParser = new ESResponseParser(aggregationFields);
     List<Object> result = esResponseParser.parseData(jsonNode);
     Assert.assertTrue(result.size() > 0);
   }
@@ -197,7 +201,7 @@ public class SIPDSLTest {
     sort.setColumnName("integer");
     sort.setOrder(Order.DESC);
     sort.setType(Sort.Type.INTEGER);
-    sort.setAggregate(Sort.Aggregate.SUM);
+    sort.setAggregate(Aggregate.SUM);
     sipdsl.getSipQuery().setSorts(Collections.singletonList(sort));
 
     String assertForAggSort = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());

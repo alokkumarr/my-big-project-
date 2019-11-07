@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.model.Field;
+import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
 import java.io.IOException;
@@ -13,12 +15,18 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.threeten.extra.YearQuarter;
 
 public class BuilderUtil {
+
+  public static final String VALUE = ".value";
   public static final String SUFFIX = ".keyword";
+  public static final String BUCKET_SORT = "bucketSort";
+
   public static final int SIZE =
       ((System.getProperty("aggr.es.size") != null
               && !System.getProperty("aggr.es.size").equals(""))
@@ -440,5 +448,90 @@ public class BuilderUtil {
     }
 
     return dynamicConvertor;
+  }
+
+  /**
+   * calulates lte date and gte date based on presetCal and forms dynamicConverter.
+   *
+   * @param presetCal
+   * @return Dynamic Converter
+   */
+  public static DynamicConvertor getDynamicConvertForPresetCal(String presetCal) {
+    presetCal = presetCal.trim();
+    final String hypen = "-";
+    if (!presetCal.contains(hypen)) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid format");
+    }
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DynamicConvertor dynamicConvertor = new DynamicConvertor();
+    LocalDateTime now = LocalDateTime.now();
+    int indexOfHyphen = presetCal.indexOf(hypen);
+    int length = presetCal.length();
+    String presetType = presetCal.substring(indexOfHyphen + 1, length);
+    Long presetNumber;
+    try {
+      presetNumber = Long.valueOf(presetCal.substring(0, indexOfHyphen));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("presetCal " + presetCal + " is in invalid format");
+    }
+    if (presetNumber < 0) {
+      throw new RuntimeException("Lookback period cannot be negative");
+    }
+    switch (presetType.toUpperCase()) {
+      case "DAY":
+        LocalDateTime frm = now.minusDays(presetNumber);
+        dynamicConvertor.setGte(frm.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "HOUR":
+        LocalDateTime fromDateTime = now.minusHours(presetNumber);
+        dynamicConvertor.setGte(fromDateTime.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "MINUTE":
+        LocalDateTime fromDate = now.minusMinutes(presetNumber);
+        dynamicConvertor.setGte(fromDate.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "MONTH":
+        LocalDateTime fromDateForMonth = now.minusMonths(presetNumber);
+        dynamicConvertor.setGte(fromDateForMonth.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      case "WEEK":
+        LocalDateTime fromDateForWeek = now.minusWeeks(presetNumber);
+        dynamicConvertor.setGte(fromDateForWeek.format(dateTimeFormatter));
+        dynamicConvertor.setLte(now.format(dateTimeFormatter));
+        break;
+      default:
+        throw new IllegalArgumentException("presetCal " + presetCal + " not present");
+    }
+    return dynamicConvertor;
+  }
+
+  /**
+   * Re-arrange the query field for ES sorting.
+   *
+   * @param dataFields
+   * @param sorts
+   * @return list of fields
+   */
+  public static List<Field> buildFieldBySort(List<Field> dataFields, List<Sort> sorts) {
+    List<Field> fields = new ArrayList<>();
+    dataFields.forEach(field -> {
+      boolean sortMatch = sorts.stream().anyMatch(p -> p.getColumnName().equalsIgnoreCase(field.getColumnName()));
+      if (sortMatch) {
+        fields.add(field);
+      }
+    });
+    Collections.reverse(fields);
+    dataFields.forEach(field -> {
+      if (!fields.contains(field)) {
+        fields.add(field);
+      }
+    });
+
+    Collections.reverse(fields);
+    return fields;
   }
 }

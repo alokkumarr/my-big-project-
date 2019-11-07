@@ -29,6 +29,7 @@ export class DesignerFilterRowComponent implements OnInit {
   @Input() public filter: Filter;
   @Input() public isInRuntimeMode: boolean;
   @Input() public supportsGlobalFilters: boolean;
+  @Input() public showFilterOptions: boolean;
 
   @ViewChild('auto', { read: ViewContainerRef })
   _autoComplete: ViewContainerRef;

@@ -1,0 +1,50 @@
+/dfs/opt/bda/apps/rta-iot_demo_sunil/conf/rta-iot_demo_sunil.conf
+#
+# Application instance configuration file,
+# use double quotes around ${ :..: } placeholders if required
+#
+spark {
+  master            = "yarn"
+  executor.memory   = 2G
+  cores.max         = 1
+  batch.interval    = 3
+  app.name          = "rta-iot_demo_sunil"
+  executor.extraJavaOptions = "-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote -Dio.netty.leakDetectionLevel=advanced"
+  driver.extraJavaOptions   = "-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote"
+  sql.ui.retainedExecutions     = 30
+  streaming.ui.retainedBatches  = 100
+}
+
+fields {
+  model             = "generic"                             # const literal
+#  model             = "simple-json"
+  definition.file   = "file:///dfs/opt/bda/apps/rta-iot_demo_sunil-1.0.0_dev/conf/schema.json" # appl specific
+}
+
+# es {
+#  nodes               = "172.31.208.83"        # csv
+#  cluster.name        = "sip_dev_es" #"SNCR-SCDEV-elasticsearch"
+# #  mapping.id          = "DocumentID" # appl specific
+# #  index               = "rta-iot_demo_{yyyy.MM.dd}/{EVENT_TYPE}" # appl specific
+#   index               = "rta-iot_demo_sunil/{EVENT_TYPE}"               # appl specific
+# #   index               = "rta-iot_demo/sensor          # appl specific
+#   net.http.auth.user  = "none"
+#   net.http.auth.pass  = "none"
+# }
+
+maprfs {
+  path        = "hdfs:///data/bda/rta-iot_demo_sunil/raw"
+#  outputType  = "parquet"
+  outputType  = "json"
+}
+
+streams {
+  topic       = "/bda/data/streams/sip-iotsb:data"
+  group.id    = "rta-iot_demo_sunil"
+  client.id   = "rta-iot_demo_sunil"
+}
+
+monitoring {
+  controlfile.path  = "file:///dfs/var/bda/rta-iot_demo_sunil/run/rta-iot_demo_sunil.pid"
+  interval          = 1
+}

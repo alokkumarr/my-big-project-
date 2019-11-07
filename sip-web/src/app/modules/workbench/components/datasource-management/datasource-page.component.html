@@ -206,26 +206,6 @@
             fxLayout.lt-md="column"
           >
             <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="access-type" i18n
-                >Access Type :
-              </span>
-              <span>{{ selectedSourceData?.accessType }}</span>
-            </div>
-            <mat-divider [vertical]="true"></mat-divider>
-            <div class="details-content" fxFlex="50" fxLayout="row">
-              <span class="prop-name" e2e="description" i18n
-                >Description :
-              </span>
-              <span>{{ selectedSourceData?.description }}</span>
-            </div>
-          </div>
-          <mat-divider></mat-divider>
-          <div
-            fxLayout="row"
-            fxLayoutalign="start center"
-            fxLayout.lt-md="column"
-          >
-            <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="created-by" i18n>Created By : </span>
               <span>{{
                 selectedSourceData?.modifiedBy || selectedSourceData?.createdBy
@@ -249,6 +229,32 @@
             fxLayout="row"
             fxLayoutalign="start center"
             fxLayout.lt-md="column"
+          >
+            <div
+              class="details-content"
+              fxFlex="50"
+              fxLayout="row"
+              *ngIf="selectedSourceType === 'sftp'"
+            >
+              <span class="prop-name" e2e="access-type" i18n
+                >Access Type :
+              </span>
+              <span>{{ selectedSourceData?.accessType }}</span>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div class="details-content" fxFlex="50" fxLayout="row">
+              <span class="prop-name" e2e="description" i18n
+                >Description :
+              </span>
+              <span>{{ selectedSourceData?.description }}</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <div
+            fxLayout="row"
+            fxLayoutalign="start center"
+            fxLayout.lt-md="column"
+            *ngIf="selectedSourceType === 'sftp'"
           >
             <div class="details-content" fxFlex="50" fxLayout="row">
               <span class="prop-name" e2e="user-name" i18n>User Name : </span>
@@ -299,13 +305,14 @@
           <mat-divider></mat-divider>
           <dx-data-grid
             class="routes-grid"
+            [columns]="columns"
             [dataSource]="routesData"
             [showBorders]="false"
             [columnAutoWidth]="false"
             [showColumnLines]="false"
             (onToolbarPreparing)="onRoutesToolbarPreparing($event)"
             [rowAlternationEnabled]="true"
-            keyExpr="bisRouteSysId"
+            keyExpr="bisChannelSysId"
             [width]="'100%'"
             [wordWrapEnabled]="true"
             [allowColumnResizing]="true"
@@ -325,75 +332,6 @@
               showScrollbar="always"
               [useNative]="false"
             ></dxo-scrolling>
-            <dxi-column
-              caption="Route Name"
-              dataField="routeName"
-              alignment="left"
-              cellTemplate="routeNameTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Created By"
-              dataField="createdBy"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="File Pattern"
-              dataField="filePattern"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Schedule"
-              dataField="schedulerExpression"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-              [calculateCellValue]="calculateScheduleCellValue"
-            ></dxi-column>
-            <dxi-column
-              caption="Next Fire Time"
-              dataField="nextFireTime"
-              alignment="left"
-              cellTemplate="dateTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Last Fire Time"
-              dataField="lastFireTime"
-              alignment="left"
-              cellTemplate="dateTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Source Location"
-              dataField="sourceLocation"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Destination Location"
-              dataField="destinationLocation"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Description"
-              dataField="description"
-              alignment="left"
-              cellTemplate="e2eTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Last Modified"
-              dataField="createdDate"
-              alignment="left"
-              cellTemplate="modifiedCreatedTemplate"
-            ></dxi-column>
-            <dxi-column
-              caption="Actions"
-              dataField="bisRouteSysId"
-              alignment="center"
-              cellTemplate="actionsTemplate"
-              [allowFiltering]="false"
-              [allowSorting]="false"
-            ></dxi-column>
 
             <div *dxTemplate="let data of 'nameTemplate'">
               <div
