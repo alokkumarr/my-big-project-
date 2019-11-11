@@ -47,6 +47,9 @@ export class PrivilegeRowComponent {
     }),
     {}
   );
+
+  hasOnlyAccessPrivilege = false;
+
   @Input('allowedPrivileges') set _allowedPrivileges(privileges: string[]) {
     if (!privileges) {
       return;
@@ -59,6 +62,10 @@ export class PrivilegeRowComponent {
       }),
       {}
     );
+    this.hasOnlyAccessPrivilege =
+      allowedPrivilegeList &&
+      allowedPrivilegeList.length === 1 &&
+      this.allowedPrivileges['ACCESS'];
   }
 
   onPrivilegeClicked(index) {
