@@ -300,6 +300,153 @@ Execute the following steps to install XDF-NG:
   XDF-NG package
 
         rpm -ivh bda-xdf-nextgen-*.rpm
+        
+==== Configuring XDF-NG
+
+XDF Pipeline executes sequence of components like parser, transformer,sql 
+..etc against the data set. 
+
+XDF-NG batch pipeline can be configured as below.
+
+	{
+		"pipeline": [
+			{
+				"component": "parser",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_parse_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "transformer",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_transformer_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "sql",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_sql_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "esloader",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				       test_esloader_temperature.template.jconf",
+				"persist": "true"
+			}
+	
+		]
+	}
+	
+==== Configuring XDF-RTPS
+
+  RTPS gets installed as part of XDF-NG. If RTPS is configured as one of the
+  component in pipeline, then RTA service gets started when pipeline is
+  triggered. RTA service starts listening to real time data and executes
+  pipline components with the real time data whenever data is pushed to
+  RTA via RTIS
+
+		{
+			"pipeline": [{
+				"component": "rtps",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_RTPS.jconf.template",
+				    
+			},
+			{
+				"component": "parser",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "transformer",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_transformer_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "sql",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				    test_sql_temperature.template.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "esloader",
+				"configuration": "file:///dfs/opt/bda/apps/test/
+				   test_esloader_temperature.template.jconf",
+				"persist": "true"
+			}
+	
+		]
+	}
+		      
+	    
+	        
+   
+	      
+==== Configuring XDF-RTA for multiple types
+
+   XDF-RTPS can be configured to invoke different pipeline based on value
+   of one of the columns in real time dataset. 
+   Ex: Based on event type in IOT, each event type invokes separately
+   configured pipeline.
+     
+{
+	"pipeline": {
+		"rta": {
+			"component": "rtps",
+			"configuration": "file:///dfs/opt/bda/apps/test/test_RTPS.jconf",
+			"keyColumn": "EVENT_TYPE",
+			"isTimeSeries": "true"
+		},
+
+		"tempHumidity": [{
+				"component": "parser",
+				"configuration": "file:///dfs/opt/bda/apps/test/temp_parser.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "transformer",
+				"configuration": "file:///dfs/opt/bda/apps/test/temp_transformer.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "sql",
+				"configuration": "file:///dfs/opt/bda/apps/test/temp__sql.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "esloader",
+				"configuration": "file:///dfs/opt/bda/apps/apps/test/temp__esloader.jconf",
+				"persist": "true"
+			}
+		],
+
+		"motion": [{
+				"component": "parser",
+				"configuration": "file:///dfs/opt/bda/apps/apps/test/motion_parse.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "transformer",
+				"configuration": "file:///dfs/opt/bda/apps/test/motion_transformer.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "sql",
+				"configuration": "file:///dfs/opt/bda/apps/test/motion__sql.jconf",
+				"persist": "true"
+			},
+			{
+				"component": "esloader",
+				"configuration": "file:///dfs/opt/bda/apps/test/motion_esloader.jconf",
+				"persist": "true"
+			}
+		]
+	}
+}
+
 
 === RTPS
 
@@ -812,6 +959,19 @@ used to manuall inspect it:
 The health check responses contain a `detail` propery with a
 human-readable explanation of the health check status, which can be
 used to further narrow down the cause for a possible failure.
+
+=== ElasticSearch Max records setting
+By default, ElasticSearch limits the number of records to 10000.
+If the user tries to query for more, it will throw an error.
+To allow this, max_result_window has to be set. Below is the syntax
+to set max_result_window:
+
+----
+curl -X PUT \
+  <ElasticSearch Host>/<index_name>/_settings \
+  -H 'Content-Type: application/json' \
+  -d '{ "max_result_window" : 300000 }'
+----
 
 === General guideline for ElasticSearch script support
 

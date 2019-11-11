@@ -84,7 +84,7 @@ public interface WithDataSet {
         {
            if (input.size() > 0 )
             {
-                Iterator<?> itr = input.iterator();
+                Iterator itr = input.iterator();
                 while (itr.hasNext())
                 {
                     Input dsInput = (Input) itr.next();
@@ -104,7 +104,7 @@ public interface WithDataSet {
     }
 
     default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetHelper aux) throws Exception {
-
+    	 DataSetHelper.logger.debug("#### Inside discoverInputDataSetsWithMetadata ###");
         String project = aux.ctx.applicationID;
         DataSetHelper.logger.debug("Set projects " + project);
 
@@ -263,7 +263,6 @@ public interface WithDataSet {
                 throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
             }
 
-            @SuppressWarnings("unchecked")
             List<String> pk = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
 
             if (pk != null) {
@@ -400,7 +399,7 @@ public interface WithDataSet {
 
                 JsonObject userData = null;
                 if (userDataObject != null) {
-                    userData =  new Gson().toJsonTree((LinkedTreeMap<?, ?>)userDataObject).getAsJsonObject();
+                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
                     if (userData != null) {
                         resOutput.put(DataSetProperties.UserData.name(), userData);
                     }
@@ -435,7 +434,7 @@ public interface WithDataSet {
             if (!aux.ctx.runningPipeLine && !HFileOperations.exists(location)) {
                 throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
             } else {
-                Map<String, Object> res = new HashMap<>();
+                Map<String, Object> res = new HashMap();
 
                 FileStatus[] fst = HFileOperations.getFilesStatus(location);
                 boolean dsEmpty = (fst == null ||  fst.length == 0);

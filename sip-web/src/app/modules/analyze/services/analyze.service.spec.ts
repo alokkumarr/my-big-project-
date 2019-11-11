@@ -16,7 +16,9 @@ class JwtServiceStub {
   }
 }
 class ToastServiceStub {}
-class MenuServiceStub {}
+class MenuServiceStub {
+  getMenu() {}
+}
 const StoreStub = {};
 const analysis = {
   schedule: {
@@ -47,21 +49,9 @@ describe('Analyze Service', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should read a non DSL analysis', () => {
-    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
-      asyncData({ contents: { analyze: [{}] } } as any)
-    );
-
-    service
-      .readAnalysisNonDSL('abc', {})
-      .then((res: any) => expect(res).toEqual({}));
-
-    expect(spy.calls.count()).toEqual(1);
-  });
-
   it('should read analysis', () => {
-    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
-      asyncData({ contents: { analyze: [{}] } } as any)
+    spy = spyOn(TestBed.get(HttpClient), 'get').and.returnValue(
+      asyncData({ analysis: {} } as any)
     );
 
     service
@@ -71,6 +61,37 @@ describe('Analyze Service', () => {
     expect(spy.calls.count()).toEqual(1);
   });
 
+  it('should delete analysis', () => {
+    spy = spyOn(TestBed.get(HttpClient), 'delete').and.returnValue(
+      asyncData({ analysis: {} } as any)
+    );
+
+    service.deleteAnalysis({} as any);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should save analysis', () => {
+    const updateSpy = spyOn(service, 'updateAnalysis').and.returnValue({});
+    const createSpy = spyOn(service, 'createAnalysis').and.returnValue({});
+
+    service.saveAnalysis({ id: null } as any);
+    expect(createSpy).toHaveBeenCalled();
+    expect(updateSpy).not.toHaveBeenCalled();
+
+    service.saveAnalysis({ id: 1 } as any);
+    expect(updateSpy).toHaveBeenCalled();
+  });
+
+  it('should get categories', () => {
+    const menuPromise = Promise.resolve({});
+    spy = spyOn(TestBed.get(MenuService), 'getMenu').and.returnValue(
+      menuPromise
+    );
+
+    expect(service.getCategories(false)).toEqual(menuPromise);
+    expect(spy).toHaveBeenCalled();
+  });
+
   it('should fetch cron details', () => {
     spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
       asyncData({ contents: { analyze: [{}] } } as any)
@@ -78,7 +99,7 @@ describe('Analyze Service', () => {
 
     service
       .getCronDetails({})
-      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+      .then((res: any) => expect(res).toEqual({ contents: { analyze: [{}] } }));
 
     expect(spy.calls.count()).toEqual(1);
   });
@@ -90,7 +111,7 @@ describe('Analyze Service', () => {
 
     service
       .getAllCronJobs({})
-      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+      .then((res: any) => expect(res).toEqual({ contents: { analyze: [{}] } }));
 
     expect(spy.calls.count()).toEqual(1);
   });
@@ -102,7 +123,7 @@ describe('Analyze Service', () => {
 
     service
       .getAllCronJobs(analysis)
-      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+      .then((res: any) => expect(res).toEqual({ contents: { analyze: [{}] } }));
 
     expect(spy.calls.count()).toEqual(1);
   });
@@ -114,22 +135,27 @@ describe('Analyze Service', () => {
 
     service
       .getlistFTP('SYNC')
-      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+      .then((res: any) => expect(res).toEqual({ contents: { analyze: [{}] } }));
 
     expect(spy.calls.count()).toEqual(1);
   });
 
+  it('change schedule', () => {
+    spy = spyOn(service, 'postRequest').and.returnValue({
+      toPromise: () => {}
+    });
 
-  it('fetch all cron detials', () => {
-    spy = spyOn(TestBed.get(HttpClient), 'post').and.returnValue(
-      asyncData({ contents: { analyze: [{}] } } as any)
-    );
+    const newSchedule = { scheduleState: 'new' };
+    service.changeSchedule({ schedule: newSchedule });
+    expect(spy).toHaveBeenCalledWith('scheduler/schedule', newSchedule);
 
-    service
-      .changeSchedule(analysis)
-      .then((res: any) => expect(res).toEqual(({ contents: ({ analyze: [({  }) ] }) })));
+    const updateSchedule = { scheduleState: 'exist' };
+    service.changeSchedule({ schedule: updateSchedule });
+    expect(spy).toHaveBeenCalledWith('scheduler/update', updateSchedule);
 
-    expect(spy.calls.count()).toEqual(1);
+    const deleteSchedule = { scheduleState: 'delete' };
+    service.changeSchedule({ schedule: deleteSchedule });
+    expect(spy).toHaveBeenCalledWith('scheduler/delete', deleteSchedule);
   });
 
   describe('calcNameMap', () => {

@@ -3,10 +3,15 @@ package sncr.xdf.ngcomponent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.conf.ComponentConfiguration;
@@ -16,16 +21,12 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.readers.DLBatchReader;
-import sncr.bda.conf.ComponentServices;
+import sncr.xdf.alert.AlertQueueManager;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.WithDataSet;
 import sncr.xdf.services.WithProjectScope;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -59,7 +60,11 @@ public abstract class AbstractComponent implements WithContext{
     protected InternalContext ctx;
     protected String componentName = "unnamed";
     protected final Services services = new Services();
+    protected Dataset inputDataFrame;
+    protected boolean isRealTime = false;
+
     protected static boolean persistMode = true;
+
     protected DLBatchReader reader;
 
     /**
@@ -77,6 +82,35 @@ public abstract class AbstractComponent implements WithContext{
         }
     }
 
+    
+    /**
+     * The constructor is to be used when component is running with different services than NGContext has.
+     * ngctx should not be null & Dataset cannot be null
+     * @param ngctx
+     * @param inputDataFrame
+     * This has been added as a part of SIP-7758
+     */
+    /**
+     * @param ngctx
+     * @param cs
+     * @param inputDataFrame
+     */
+    public AbstractComponent(NGContext ngctx,  Dataset<?> inputDataFrame){
+        if (ngctx == null)
+            throw new IllegalArgumentException("NGContext must not be null");
+        if (inputDataFrame == null)
+            throw new IllegalArgumentException("DataSet must not be null");
+
+        this.ngctx = ngctx;
+        this.inputDataFrame = inputDataFrame;
+        if (this.ngctx.serviceStatus.isEmpty())
+            throw new IllegalArgumentException("NGContext is not initialized correctly");
+        /*for (int i = 0; i < cs.length; i++) {
+            this.ngctx.serviceStatus.put(cs[i], false);
+        }*/
+    }
+    
+    
     /**
      * The constructor is to be used in component asynchronous execution
      * NGContext must be initialized, output datasets must be pre-registered.
@@ -109,12 +143,13 @@ public abstract class AbstractComponent implements WithContext{
             return -1;
         }
         ngctx.setStartTs();
-        if ( ngctx.isPersistMode() && updateStatus() != 0 ){
+        if (updateStatus() != 0){
             error = "Could not update datasets / could not create Audit log " +
                 "entry";
             logger.error(error);
             return -1;
         }
+        
         int ret = execute();
         if (ngctx.runningPipeLine) {
               ret = moveAndArchiveForPipeline(ret);
@@ -151,8 +186,8 @@ public abstract class AbstractComponent implements WithContext{
     
     public int moveAndArchiveForPipeline(int ret)
 	{
- 		if (ret == 0) {
-            if (ngctx.isPersistMode()) {
+		if (ret == 0) {
+			if (ngctx.persistMode) {
 				ret = move();
 			}
 			if (ret == 0) {
@@ -230,21 +265,22 @@ public abstract class AbstractComponent implements WithContext{
     private int initServices(){
 
         try {
-
-            if (ngctx.serviceStatus.containsKey(ComponentServices.Project) &&
-                this instanceof WithProjectScope)
-                services.prj = (WithProjectScope) this;
+        	logger.debug("### Inside init services");
 
             if (ngctx.serviceStatus.containsKey(ComponentServices.InputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
                 ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
             {
-                services.md = new DLDataSetService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
-                services.als = new AuditLogService(services.md.getRoot(),ngctx.isPersistMode());
+                services.md = new DLDataSetService(ngctx.xdfDataRootSys);
+                services.als = new AuditLogService(services.md.getRoot());
             }
 
+            if (ngctx.serviceStatus.containsKey(ComponentServices.Project) &&
+                this instanceof WithProjectScope)
+                services.prj = (WithProjectScope) this;
+
             if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
-                services.transformationMD = new TransformationService(ngctx.xdfDataRootSys,ngctx.isPersistMode());
+                services.transformationMD = new TransformationService(ngctx.xdfDataRootSys);
             }
 
             if (this instanceof WithDataSet) {
@@ -262,6 +298,7 @@ public abstract class AbstractComponent implements WithContext{
     }
 
     private int initInputDataSets() {
+    	logger.debug("#### Input datasets start ###");
         int rc = 0;
         try {
 
@@ -270,11 +307,13 @@ public abstract class AbstractComponent implements WithContext{
 
                 if (ngctx.componentConfiguration.getInputs() != null &&
                     ngctx.componentConfiguration.getInputs().size() > 0) {
-                    logger.warn("Extracting meta data");
+                    logger.debug("Extracting meta data");
 
                     WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ngctx, services.md);
 
                     if (ngctx.serviceStatus.containsKey(ComponentServices.InputDSMetadata)) {
+                    	logger.debug("#### Inside InputDS Metadata ###");
+                    	
                         ngctx.inputDataSets = services.mddl.discoverInputDataSetsWithMetadata(dsaux);
                         ngctx.inputs = services.mddl.discoverDataParametersWithMetaData(dsaux);
 
@@ -282,10 +321,7 @@ public abstract class AbstractComponent implements WithContext{
                         ctx.mdInputDSMap = services.md.loadExistingDataSets(ngctx, ngctx.inputDataSets);
                         ctx.mdInputDSMap.forEach((id, ids) -> {
                             try {
-
-                                if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata) && ngctx.isPersistMode())
-
-//                                    if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
+                                if (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))
                                     services.md.getDSStore().addTransformationConsumer(id, ngctx.transformationID);
                             } catch (Exception e) {
                                 logger.error("INput DS analysis error: " + ExceptionUtils.getFullStackTrace(e));
@@ -429,6 +465,7 @@ public abstract class AbstractComponent implements WithContext{
      * @throws Exception
      */
     public final boolean initComponent(JavaSparkContext jsc) throws Exception {
+    	logger.debug("Inside init component");
 
         if (ngctx == null){
             throw new Exception("Incorrect call, the method can be called only NGContext is initialized");
@@ -445,9 +482,10 @@ public abstract class AbstractComponent implements WithContext{
             logger.error("Could not create internal context: ", e);
             return false;
         }
-
+        logger.debug("initializing services");
         //Initialization part-3: Initialize services.
         int rc = initServices();
+        logger.debug("initializing services completed");
         if (rc != 0) {
             error = "Could not initialize component services.";
             logger.error(error);
@@ -455,25 +493,18 @@ public abstract class AbstractComponent implements WithContext{
         }
 
         //Initialization part-4: Initialize trasnsformation metadata.
+        logger.debug("####### Initialize transformation metadata###" +  ngctx.serviceStatus);
+        logger.debug("transformationMD is null??"+ services.transformationMD);
+        logger.debug("Has TransformationMetdata????"+ ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
+        logger.debug(services.transformationMD == null &&
+            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata));
+        
         if (services.transformationMD == null &&
-//            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
-//
-//            try {
-//                ngctx.transformationID =
-//                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-//                ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
-//            } catch (Exception e) {
-//                String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
-//                logger.error(error);
-//                return false;
-//            }
-//        }
-            (ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata))){
+            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
+
             try {
-                if (ngctx.isPersistMode()) {
-                    ngctx.transformationID =
-                        services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-                }
+                ngctx.transformationID =
+                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
                 ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
             } catch (Exception e) {
                 String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
@@ -547,29 +578,12 @@ public abstract class AbstractComponent implements WithContext{
         }
 
         //Initialization part-4: Initialize trasnsformation metadata.
-//        if (services.transformationMD == null &&
-//            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
-//
-//            try {
-//                ngctx.transformationID =
-//                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-//                ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
-//            } catch (Exception e) {
-//                String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
-//                logger.error(error);
-//                return false;
-//            }
-//        }
-
-        //Initialization part-4: Initialize trasnsformation metadata.
         if (services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
 
             try {
-                if (ngctx.isPersistMode()) {
-                    ngctx.transformationID =
-                        services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-                }
+                ngctx.transformationID =
+                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
                 ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
             } catch (Exception e) {
                 String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
@@ -636,28 +650,12 @@ public abstract class AbstractComponent implements WithContext{
         }
 
         //Initialization part-4: Initialize SQL metadata.
-//        if (services.transformationMD == null &&
-//            ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
-//
-//            try {
-//                ngctx.transformationID =
-//                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-//                ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
-//            } catch (Exception e) {
-//                String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
-//                logger.error(error);
-//                return false;
-//            }
-//        }
-
         if (services.transformationMD == null &&
             ngctx.serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
 
             try {
-                if (ngctx.isPersistMode()) {
-                    ngctx.transformationID =
-                        services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
-                }
+                ngctx.transformationID =
+                    services.transformationMD.readOrCreateTransformation(ngctx, ngctx.componentConfiguration);
                 ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, true);
             } catch (Exception e) {
                 String error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
@@ -693,7 +691,6 @@ public abstract class AbstractComponent implements WithContext{
     //dev
     protected abstract int execute();
 
-
     protected int move(){
         int ret = 0;
         if(this instanceof WithDLBatchWriter){
@@ -721,6 +718,7 @@ public abstract class AbstractComponent implements WithContext{
                 ((ret == 1)? "PARTIAL":
                     "FAILED");
 
+        logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
         int rc[] = {0}; rc[0] = 0;
         try {
 
@@ -769,10 +767,11 @@ public abstract class AbstractComponent implements WithContext{
 
                             services.md.updateDS(id, ngctx, ds, schema, recordCount, size);
 
+
+
                         }
                         else{
-                            logger.warn("The component " + ngctx.componentName
-                                + " was not able to get schema from NG context, assume something went wrong");
+                            logger.warn("The component was not able to get schema from NG context, assume something went wrong");
                             services.md.updateDS(id, ngctx, ds, schema, 0, 0);
                         }
                         
@@ -784,13 +783,9 @@ public abstract class AbstractComponent implements WithContext{
                         return;
                     }
                 });
-
-                logger.debug("ngctx.isPersistMode() is : "+ ngctx.isPersistMode());
-                if(ngctx.isPersistMode()) {
-                    services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID);
-                    // logger.info("Status updating to:::"+  services.transformationMD.ts.);
-
-                }
+                logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+                
+                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID);
                // logger.info("Status updating to:::"+  services.transformationMD.ts.);
 
             }

@@ -7,10 +7,7 @@ const loginUrl = AppConfig.login.url;
 
 @Injectable()
 export class UserAssignmentService {
-
-  constructor(
-    private _http: HttpClient
-  ) {}
+  constructor(private _http: HttpClient) {}
 
   getList(customerId) {
     return this.getRequest('auth/admin/user-assignments');
@@ -19,17 +16,17 @@ export class UserAssignmentService {
   addSecurityGroup(data) {
     let path;
     switch (data.mode) {
-    case 'create':
-      const requestCreateBody = {
-        description: isUndefined(data.description) ? '' : data.description,
-        securityGroupName: data.securityGroupName
-      };
-      path = 'auth/admin/security-groups';
-      return this.postRequest(path, requestCreateBody);
-    case 'edit':
-      path = `auth/admin/security-groups/${data.secGroupSysId}/name`;
-      const requestEditBody = [data.securityGroupName, data.description];
-      return this.putrequest(path, requestEditBody);
+      case 'create':
+        const requestCreateBody = {
+          description: isUndefined(data.description) ? '' : data.description,
+          securityGroupName: data.securityGroupName
+        };
+        path = 'auth/admin/security-groups';
+        return this.postRequest(path, requestCreateBody);
+      case 'edit':
+        path = `auth/admin/security-groups/${data.secGroupSysId}/name`;
+        const requestEditBody = [data.securityGroupName, data.description];
+        return this.putrequest(path, requestEditBody);
     }
   }
 
@@ -40,15 +37,17 @@ export class UserAssignmentService {
     };
     const path = `auth/admin/security-groups/${data.groupSelected.secGroupSysId}/dsk-attribute-values`;
     switch (data.mode) {
-    case 'create':
-      return this.postRequest(path, requestBody);
-    case 'edit':
-      return this.putrequest(path, requestBody);
+      case 'create':
+        return this.postRequest(path, requestBody);
+      case 'edit':
+        return this.putrequest(path, requestBody);
     }
   }
 
   getSecurityAttributes(request) {
-    return this.getRequest(`auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`);
+    return this.getRequest(
+      `auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`
+    );
   }
 
   getSecurityGroups() {
@@ -69,23 +68,17 @@ export class UserAssignmentService {
   }
 
   putrequest(path, requestBody) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-        'Access-Control-Allow-Method': 'PUT'
-      })
-    };
-    return this._http.put(`${loginUrl}/${path}`, requestBody, httpOptions).toPromise();
+    return this._http.put(`${loginUrl}/${path}`, requestBody).toPromise();
   }
 
   postRequest(path: string, params: Object) {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json'
+        'Content-Type': 'application/json'
       })
     };
-    return this._http.post(`${loginUrl}/${path}`, params, httpOptions).toPromise();
+    return this._http
+      .post(`${loginUrl}/${path}`, params, httpOptions)
+      .toPromise();
   }
 }

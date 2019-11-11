@@ -12,7 +12,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.alert.AlertQueueManager;
-import sncr.bda.conf.ComponentServices;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
@@ -44,6 +44,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
     public NGSQLComponent() {  super(); }
 
+    @Override
     protected int execute(){
         /* Workaround: If executed through Apache Livy the logging
          * level will be WARN by default and at the moment no way to
@@ -193,7 +194,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 };
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
-                "sql", batchId, persistMode);
+                "sql", batchId);
 
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();

@@ -198,9 +198,7 @@ export class AnalyzeService {
     options.take = options.take || 10;
     let url = '';
     const page = floor(options.skip / options.take) + 1;
-    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-      options.analysisType
-    }`;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`;
     if (options.isDSL) {
       url = `internal/proxy/storage/${analysisId}/lastExecutions/data`;
       // Load full data for charts, pivot etc. Use pagination only for
@@ -249,9 +247,7 @@ export class AnalyzeService {
         ? '&executionType=onetime'
         : '';
 
-    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${
-      options.analysisType
-    }${onetimeExecution}`;
+    const queryParams = `page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`;
 
     let url = '';
     if (options.isDSL) {
@@ -292,33 +288,14 @@ export class AnalyzeService {
     analysisId,
     hasDSL: boolean,
     customHeaders = {}
-  ): Promise<Analysis | AnalysisDSL> {
-    return hasDSL
-      ? this.readAnalysisDSL(analysisId).toPromise()
-      : this.readAnalysisNonDSL(analysisId, customHeaders);
-  }
-
-  readAnalysisNonDSL(analysisId, customHeaders = {}): Promise<Analysis> {
-    const payload = this.getRequestParams([
-      ['contents.action', 'read'],
-      ['contents.keys.[0].id', analysisId]
-    ]);
-    return <Promise<Analysis>>this.postRequest(
-      `analysis`,
-      payload,
-      customHeaders
-    )
-      .toPromise()
-      .then(fpGet(`contents.analyze.[0]`));
-  }
-
-  readAnalysisDSL(analysisId): Observable<AnalysisDSL> {
-    return <Observable<AnalysisDSL>>(
-      this._http.get(`${apiUrl}/dslanalysis/${analysisId}`).pipe(
+  ): Promise<AnalysisDSL> {
+    return <Promise<AnalysisDSL>>this._http
+      .get(`${apiUrl}/dslanalysis/${analysisId}`)
+      .pipe(
         first(),
         map((resp: { analysis: AnalysisDSL }) => resp.analysis)
       )
-    );
+      .toPromise();
   }
 
   previewExecution(model, options = {}) {
@@ -394,32 +371,11 @@ export class AnalyzeService {
     return this.postRequest(`exports/listFTP`, custCode).toPromise();
   }
 
-  deleteAnalysis(model: Analysis | AnalysisDSL): Promise<any> {
-    return !!(<AnalysisDSL>model).sipQuery
-      ? this.deleteAnalysisDSL(model as AnalysisDSL).toPromise()
-      : this.deleteAnalysisNonDSL(model as Analysis);
-  }
-
-  deleteAnalysisDSL(model: AnalysisDSL): Observable<any> {
-    return <Observable<AnalysisDSL>>(
-      this._http.delete(`${apiUrl}/dslanalysis/${model.id}`).pipe(first())
-    );
-  }
-
-  deleteAnalysisNonDSL(model: Analysis): Promise<Analysis> {
-    if (
-      !this._jwtService.hasPrivilege('DELETE', {
-        subCategoryId: model.categoryId,
-        creatorId: model.userId
-      })
-    ) {
-      return Promise.reject(new Error('Access denied.'));
-    }
-    const payload = this.getRequestParams([
-      ['contents.action', 'delete'],
-      ['contents.keys.[0].id', model.id]
-    ]);
-    return <Promise<Analysis>>this.postRequest(`analysis`, payload).toPromise();
+  deleteAnalysis(model: AnalysisDSL): Promise<any> {
+    return <Promise<AnalysisDSL>>this._http
+      .delete(`${apiUrl}/dslanalysis/${model.id}`)
+      .pipe(first())
+      .toPromise();
   }
 
   getlistS3Buckets(custCode) {

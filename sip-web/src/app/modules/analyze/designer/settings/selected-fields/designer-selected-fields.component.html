@@ -12,46 +12,52 @@
   >
     {{ adapter.title }}:
   </div>
-  <mat-chip-list
-    class="selected-fields__list"
+  <perfect-scrollbar
+    [config]="{
+      suppressScrollX: true
+    }"
     fxFlex="90"
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    [cdkDropListData]="adapter"
-    [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
-    (cdkDropListDropped)="drop($event, adapterIndex)"
-    [attr.e2e]="'designer-selected-container' + adapter.title"
     [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
   >
-    <mat-chip
-      *ngFor="let col of adapter.artifactColumns"
-      class="selected-fields__item"
-      [attr.e2e]="'designer-selected-field-' + (col.displayName || col.alias)"
-      [ngClass]="getFieldItemClass(col)"
-      cdkDrag
-      (cdkDragStarted)="dragStarted($event)"
-      (cdkDragReleased)="dragReleased($event)"
-      [cdkDragData]="col"
-      [removable]="true"
-      (removed)="removeFromGroup(col, adapter)"
+    <mat-chip-list
+      class="selected-fields__list"
+      [attr.e2e]="'designer-selected-container' + adapter.title"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      [cdkDropListData]="adapter"
+      [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
+      (cdkDropListDropped)="drop($event, adapterIndex)"
     >
-      <ng-container *ngIf="col.aggregate; else defaultTemplate">
-        <span
-          [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
-          [innerHtml]="
-            AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel
-          "
-        >
-        </span>
-        <span> (&nbsp;{{ getDisplayNameForColumn(col) }}&nbsp;) </span>
-      </ng-container>
-      <ng-template #defaultTemplate>
-        {{ col.displayName || col.alias }}
-      </ng-template>
+      <mat-chip
+        *ngFor="let col of adapter.artifactColumns"
+        class="selected-fields__item"
+        [attr.e2e]="'designer-selected-field-' + (col.displayName || col.alias)"
+        [ngClass]="getFieldItemClass(col)"
+        cdkDrag
+        (cdkDragStarted)="dragStarted($event)"
+        (cdkDragReleased)="dragReleased($event)"
+        [cdkDragData]="col"
+        [removable]="true"
+        (removed)="removeFromGroup(col, adapter)"
+      >
+        <ng-container *ngIf="col.aggregate; else defaultTemplate">
+          <span
+            [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
+            [innerHtml]="
+              AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].designerLabel
+            "
+          >
+          </span>
+          <span> (&nbsp;{{ getDisplayNameForColumn(col) }}&nbsp;) </span>
+        </ng-container>
+        <ng-template #defaultTemplate>
+          {{ col.displayName || col.alias }}
+        </ng-template>
 
-      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
-    </mat-chip>
-  </mat-chip-list>
+        <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+  </perfect-scrollbar>
 </div>
 
 <div

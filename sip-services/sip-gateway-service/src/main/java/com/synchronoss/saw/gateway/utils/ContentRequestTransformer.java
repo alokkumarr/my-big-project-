@@ -1,8 +1,5 @@
 package com.synchronoss.saw.gateway.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.bda.sip.exception.SipNotProcessedSipEntityException;
-import com.synchronoss.sip.utils.RestUtil;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -26,13 +23,14 @@ public class ContentRequestTransformer extends ProxyRequestTransformer {
     RequestBuilder requestBuilder = predecessor.transform(request);
     String requestContent = request.getReader().lines().collect(Collectors.joining(""));
     logger.trace("Request Content: " + requestContent);
-    ObjectMapper objectMapper = new ObjectMapper();
+
     if (!requestContent.isEmpty()) {
-      try {
-        RestUtil.validateNodeValue(objectMapper.readTree(requestContent));
-      } catch (IOException ex) {
-        throw new SipNotProcessedSipEntityException(requestContent + " is not valid.");
-      }
+      /* Commenting this one due to SIP-8892 it's related other issues
+       * while validating it.
+       * ObjectMapper objectMapper = new ObjectMapper(); try {
+       * RestUtil.validateNodeValue(objectMapper.readTree(requestContent)); } catch (IOException ex)
+       * { throw new SipNotProcessedSipEntityException(requestContent + " is not valid."); }
+       */
       StringEntity entity = new StringEntity(requestContent, ContentType.APPLICATION_JSON);
       requestBuilder.setEntity(entity);
     }

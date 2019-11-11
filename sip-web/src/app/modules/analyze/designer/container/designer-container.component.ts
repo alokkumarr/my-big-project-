@@ -20,6 +20,8 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as includes from 'lodash/includes';
+import * as keys from 'lodash/keys';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
@@ -1017,7 +1019,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.cleanSorts();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         this.areMinRequirmentsMet = this.canRequestData();
-      break;
+        break;
       case 'aggregate':
         this._store.dispatch(
           new DesignerUpdateArtifactColumn({
@@ -1034,9 +1036,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           });
         });
         if (!isEmpty(this.data)) {
+          const rowKeys = keys(this.data[0]);
           this.data.map(row => {
-            if (row[event.column.name]) {
-              row[event.column.name] = '';
+            const key = find(rowKeys, k => includes(k, event.column.name));
+            if (row[key]) {
+              row[key] = '';
             }
           });
         }
