@@ -1,0 +1,18 @@
+{
+        "USERMANAGEMENT": {
+          "positiveTests": {
+            "USER001": {
+              "suites": ["smoke", "sanity", "critical", "regression","development"],
+              "user": "masterAdmin",
+              "roleselection": "ADMIN",
+              "firstName": "Raja",
+              "middleName": "Sekhar",
+              "lastName": "D",
+              "loginID": "loginID",
+              "pwd": "Raja@1234",
+              "email": "drazsekhar@gmail.com",
+              "description": "masterAdmin should be able to login with valid credentials"
+            }
+          }
+        }
+      }

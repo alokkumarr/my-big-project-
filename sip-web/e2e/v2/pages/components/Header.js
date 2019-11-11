@@ -36,6 +36,9 @@ class Header extends SideNav {
       by.xpath('//a[contains(@class,"module-workbench")]')
     );
     this._toastMessage = element(by.css(`[id="toast-container"]`));
+    this._adminLink = element(
+            by.xpath('//a[contains(@class,"module-admin")]')
+    );
   }
 
   clickOnModuleLauncher() {
