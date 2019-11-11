@@ -157,44 +157,44 @@ public class SIPAggregationBuilder {
           if (dataField.getAggregate() == null && dataField.getFormula() == null)
             groupByFields[groupFieldCount++] = dataField.getColumnName();
         }
-        for (Field dataField1 : aggregateFields) {
-          if (dataField1.getExpression() != null) {
+        for (Field field : aggregateFields) {
+          if (field.getExpression() != null) {
 
             /**
              * Evaluate every operand in the expression as a separate data field, store them in a
              * custom field and then evaluate the entire expression and store it in the user
              * provided field.
              */
-            String expressionStr = dataField1.getExpression();
-            Expression expression = null;
+            String expressionStr = field.getExpression();
             Gson gson = new Gson();
             if (expressionStr != null && expressionStr.length() != 0) {
-              expression = gson.fromJson(expressionStr, Expression.class);
-              String dataFieldName = dataField1.getDataField();
+              Expression expression = gson.fromJson(expressionStr, Expression.class);
+              String dataFieldName = field.getDataField();
               expressionEvaluator(dataFieldName, expression, aggregationBuilder);
             }
           } else {
             aggregationBuilder.subAggregation(
-                QueryBuilderUtil.aggregationBuilderDataField(dataField1));
+                QueryBuilderUtil.aggregationBuilderDataField(field));
           }
-          SortOrder sortOrder;
+
 
           Integer size = new Integer(BuilderUtil.SIZE);
-          Field.LimitType limitType = dataField1.getLimitType();
+          Field.LimitType limitType = field.getLimitType();
           if (limitType != null) {
             // Default Order will be descending order.
-            sortOrder = SortOrder.DESC;
-            if (dataField1.getLimitType() == Field.LimitType.BOTTOM) sortOrder = SortOrder.ASC;
-            if (dataField1.getLimitValue() != null && dataField1.getLimitValue() > 0)
-              size = dataField1.getLimitValue();
+            SortOrder sortOrder = SortOrder.DESC;
+            if (field.getLimitType() == Field.LimitType.BOTTOM) sortOrder = SortOrder.ASC;
+            if (field.getLimitValue() != null && field.getLimitValue() > 0)
+              size = field.getLimitValue();
             String columnName =
-                dataField1.getDataField() == null
-                    ? dataField1.getColumnName()
-                    : dataField1.getDataField();
+                field.getDataField() == null
+                    ? field.getColumnName()
+                    : field.getDataField();
+
             aggregationBuilder.subAggregation(
                 bucketSort(
                     BuilderUtil.BUCKET_SORT,
-                    Arrays.asList(new FieldSortBuilder(dataField1.getColumnName()).order(sortOrder)))
+                    Arrays.asList(new FieldSortBuilder(columnName).order(sortOrder)))
                     .size(size));
           }
         }
@@ -218,7 +218,7 @@ public class SIPAggregationBuilder {
 
       } else {
         boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
-        AggregationBuilder aggregationBuilderMain = null;
+        AggregationBuilder aggregationBuilderMain;
         if (dataField.getType().name().equals(Field.Type.DATE.name())
             || dataField.getType().name().equals(Field.Type.TIMESTAMP.name())) {
           if (dataField.getDateFormat() == null || dataField.getDateFormat().isEmpty())
