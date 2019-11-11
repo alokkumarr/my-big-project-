@@ -1,0 +1,92 @@
+{
+	"rtps": {
+		"fields": [{
+			"model": "generic",
+			"definition.file": "file:///dfs/opt/bda/apps/rta-iot_demo_sunil-1.0.0_dev/conf/schema.json"
+		}],
+		"spark": {
+			"master": "yarn",
+			"executor.memory": "2G",
+			"cores.max ": "1",
+			"batch.interval": "3",
+			"app.name": "rta-iot_demo_sunil",
+			"executor.extraJavaOptions": "-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote -Dio.netty.leakDetectionLevel=advanced",
+			"driver.extraJavaOptions": "-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote",
+			"sql.ui.retainedExecutions": "30",
+			"streaming.ui.retainedBatches": "100"
+		},
+		"maprfs": {
+			"path": "hdfs:///data/bda/rta-iot_demo_sunil/raw",
+			"outputType": "json"
+		},
+		"streams": {
+			"topic": "/bda/data/streams/sip-iotsb:data",
+			"group.id": "rta-iot_demo_sunil",
+			"client.id": "rta-iot_demo_sunil"
+		},
+		"monitoring": {
+			"controlfile.path": "file:///dfs/var/bda/rta-iot_demo_sunil/run/rta-iot_demo_sunil.pid",
+			"interval": "1"
+		}
+	},
+	"outputs": [{
+			"name": "output",
+			"dataSet": "RTPS_OUT",
+			"catalog": "dout",
+			"format": "csv",
+			"metadata": {
+				"createdBy": "Aksu",
+				"description": "rtps component test",
+				"tags": [
+					"XDF",
+					"NG",
+					"Metadata"
+				]
+			}
+		},
+		{
+			"name": "rejected",
+			"dataSet": "RTPS_REJ",
+			"catalog": "dout",
+			"format": "json",
+			"metadata": {
+				"createdBy": "Aksu",
+				"description": "Parser-Rejected component test",
+				"tags": [
+					"XDF",
+					"NG",
+					"Metadata"
+				]
+			}
+		}
+	],
+	"parameters": [{
+			"name": "spark.master",
+			"value": "yarn"
+		},
+		{
+			"name": "spark.driver.memory",
+			"value": "2g"
+		},
+		{
+			"name": "spark.cores.max",
+			"value": "1"
+		},
+		{
+			"name": "spark.executor.memory",
+			"value": "2g"
+		},
+		{
+			"name": "spark.executor.cores",
+			"value": "1"
+		},
+		{
+			"name": "spark.executor.instances",
+			"value": "1"
+		},
+		{
+			"name": "spark.yarn.tags",
+			"value": "XNG-TC"
+		}
+	]
+}

@@ -434,7 +434,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   loadAnalysisById(analysisId, isDSL: boolean) {
     return this._analyzeService
       .readAnalysis(analysisId, isDSL)
-      .then((analysis: Analysis) => {
+      .then((analysis: AnalysisDSL) => {
         this.analysis = analysis;
         // this._analyzeService
         //   .getLastExecutionData(this.analysis.id, {

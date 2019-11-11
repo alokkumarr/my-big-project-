@@ -133,7 +133,7 @@ export const stockChartOptions = defaultsDeep(
   {
     plotOptions: {
       series: {
-        turboThreshold: 5000,
+        turboThreshold: 0,
         dataGrouping: {
           enabled: false
         }

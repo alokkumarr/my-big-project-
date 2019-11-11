@@ -79,19 +79,19 @@
       }
 
       .warning {
-        color: $primary-warning;
+        color: $alert-severity-warning;
       }
 
       .low {
-        color: $secondary-green;
+        color: $alert-severity-low
       }
 
       .medium {
-        color: $secondary-yellow;
+        color: $alert-severity-medium;
       }
 
       .critical {
-        color: $secondary-red;
+        color: $alert-severity-critical;
       }
     }
   }

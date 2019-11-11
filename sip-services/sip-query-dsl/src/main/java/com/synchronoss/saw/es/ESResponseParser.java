@@ -2,29 +2,34 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.synchronoss.saw.model.Field;
+
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ESResponseParser {
 
-  private static final String KEY = "key";
-  private static final String KEY_AS_STRING = "key_as_string";
-  private static final String BUCKETS = "buckets";
-  private static final String VALUE = "value";
   private static final Logger logger = LoggerFactory.getLogger(ESResponseParser.class);
+
+  private static final String REGEX = "\\.";
+  private static final String KEY = "key";
+  private static final String VALUE = "value";
+  private static final String BUCKETS = "buckets";
   private static String GROUP_BY_FIELD = "group_by_field";
+  private static final String KEY_AS_STRING = "key_as_string";
+
   private String[] groupByFields;
-  private List<Field> dataFields;
   private List<Field> aggregationFields;
 
-  public ESResponseParser(List<Field> dataFields, List<Field> aggregationFields) {
-    this.dataFields = dataFields;
+  public ESResponseParser(List<Field> aggregationFields) {
     this.aggregationFields = aggregationFields;
+    this.groupByFields = ElasticSearchQueryBuilder.groupByFields;
   }
 
   /**
@@ -80,26 +85,38 @@ public class ESResponseParser {
       }
     }
     // if result contains only aggregated fields.
-    else if (groupByFields.length == 0 && childNode != null) {
+    else if (groupByFields != null && groupByFields.length == 0 && childNode != null) {
       Map<String, Object> flatValues = new LinkedHashMap<>();
+
       for (Field dataField : aggregationFields) {
-        String columnName =
-            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
-        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
+        String fieldName = dataField.getDataField() == null
+            ? dataField.getColumnName()
+            : dataField.getDataField();
+
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
+            ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
+            : fieldName;
+
+        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
       }
       flatStructure.add(flatValues);
     } else {
       Map<String, Object> flatValues = new LinkedHashMap<>();
       flatValues.putAll(dataObj);
-      for (Field dataField : aggregationFields) {
-        logger.debug("Datafield = " + dataField);
-        String columnName =
-            dataField.getDataField() == null ? dataField.getColumnName() : dataField.getDataField();
+      aggregationFields.forEach(field -> {
+        logger.debug("Data field = {}", field);
 
-        logger.debug("Column Name = " + columnName);
-        logger.debug("Child Node = " + childNode);
-        flatValues.put(columnName, childNode.get(columnName).get(VALUE));
-      }
+        String fieldName = field.getDataField() == null
+            ? field.getColumnName()
+            : field.getDataField();
+
+        String columnName = fieldName != null && fieldName.split(REGEX).length >= 2
+            ? Arrays.stream(fieldName.split(REGEX)).findFirst().get()
+            : fieldName;
+
+        logger.trace("Column Name : {},  Child Node  : {}", fieldName, childNode);
+        flatValues.put(columnName, childNode.get(fieldName).get(VALUE));
+      });
       flatStructure.add(flatValues);
     }
     return flatStructure;
@@ -112,7 +129,7 @@ public class ESResponseParser {
    * @return
    */
   public List<Object> parseData(JsonNode jsonNode) {
-    prepareGroupByFields(dataFields);
+    //prepareGroupByFields(dataFields);
     Map<String, Object> dataObj = new LinkedHashMap<>();
     List<Object> flatStructure = new ArrayList<>();
     flatStructure = jsonNodeParser(jsonNode, dataObj, flatStructure, 0);
@@ -136,7 +153,9 @@ public class ESResponseParser {
     return columnName;
   }
 
-  /** @param jsonNode */
+  /**
+   * @param jsonNode
+   */
   private String childNodeName(JsonNode jsonNode) {
     Iterator<String> keys = jsonNode.fieldNames();
     while (keys.hasNext()) {
@@ -148,7 +167,9 @@ public class ESResponseParser {
     return null;
   }
 
-  /** Fetch the group By fields for parsing aggregation result. */
+  /**
+   * Fetch the group By fields for parsing aggregation result.
+   */
   private void prepareGroupByFields(List<Field> dataFields) {
     groupByFields = new String[dataFields.size() - aggregationFields.size()];
     int fieldCount = 0;

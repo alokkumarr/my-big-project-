@@ -45,6 +45,16 @@ public class ComponentConfiguration {
     @SerializedName("parameters")
     @Expose
     private List<Parameter> parameters = new ArrayList<Parameter>();
+    
+    /**
+     * RTPS specific properties
+     * 
+     */
+    @SerializedName("rtps")
+    @Expose
+    private Rtps rtps;
+    
+    
     /**
      * Parser specific properties
      * 
@@ -242,6 +252,17 @@ public class ComponentConfiguration {
     public ComponentConfiguration withParameters(List<Parameter> parameters) {
         this.parameters = parameters;
         return this;
+    }
+    
+    
+    /**
+     * RTPS specific properties
+     * 
+     * @return
+     *     The rtps
+     */
+    public Rtps getRtps() {
+        return rtps;
     }
 
     /**

@@ -45,30 +45,43 @@
     border: 1px solid $primary-grey-g1;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    height: 28px;
+    height: 32px;
     border-right: none;
   }
 
-  .selected-fields__list {
-    width: 100%;
-    height: 28px;
-    max-height: 28px;
-    padding: 2px;
-    min-height: 24px;
+  perfect-scrollbar {
+    max-height: 32px !important;
+
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     border: 1px solid $primary-grey-g1;
-    overflow: hidden;
 
     &.highlighted {
       border: 1px solid $primary-blue-b2;
     }
 
+    ::ng-deep .ps {
+      min-width: 100% !important;
+
+      & > .ps__rail-y {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .selected-fields__list {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 30px;
+    max-height: 30px;
+    padding: 2px;
+    min-height: 24px;
+
     ::ng-deep .mat-chip-list-wrapper {
-      max-height: 28px;
-      height: 28px;
-      overflow-y: auto;
-      padding-top: 1px;
+      max-height: 26px;
+      height: 26px;
+      margin: 0;
     }
   }
 }

@@ -242,20 +242,20 @@ public class ExportServiceImpl implements ExportService {
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
       }
       exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-      exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+      String reportName =
+          ExportUtils.prepareReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+      exportBean.setReportName(reportName);
       exportBean.setPublishDate(
           String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
       exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
       // consider default format as csv if file type is not provided.
+      String fileName =
+          ExportUtils.prepareFileName(
+              String.valueOf(((LinkedHashMap) dispatchBean).get("name")), exportBean.getFileType());
       if (exportBean.getFileType() == null || exportBean.getFileType().isEmpty()) {
-        exportBean.setFileName(((LinkedHashMap) dispatchBean).get("name") + ".csv");
         exportBean.setFileType(DEFAULT_FILE_TYPE);
-      } else {
-        exportBean.setFileName(
-            ((LinkedHashMap) dispatchBean).get("name")
-                + "."
-                + exportBean.getFileType());
       }
+      exportBean.setFileName(fileName);
     }
     return exportBean;
   }
@@ -408,7 +408,8 @@ public class ExportServiceImpl implements ExportService {
     XlsxExporter xlsxExporter = new XlsxExporter();
     Workbook workBook = new SXSSFWorkbook();
     workBook.getSpreadsheetVersion();
-    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+    String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
+    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(sheetName);
     try {
       // write the data in excel sheet in batch
       long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
@@ -539,14 +540,12 @@ public class ExportServiceImpl implements ExportService {
                 // build export bean to process file
                 ExportUtils.buildExportBean(exportBean, dispatchBean);
                 String dir = UUID.randomUUID().toString();
+                String fileName =
+                    ExportUtils.prepareFileName(
+                        String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
+                        exportBean.getFileType());
                 exportBean.setFileName(
-                    publishedPath
-                        + File.separator
-                        + dir
-                        + File.separator
-                        + ((LinkedHashMap) dispatchBean).get("name")
-                        + "."
-                        + exportBean.getFileType());
+                    publishedPath + File.separator + dir + File.separator + fileName);
 
                 try {
                   // create a directory with unique name in published location to avoid file
@@ -648,14 +647,12 @@ public class ExportServiceImpl implements ExportService {
               // build export bean to process file
               ExportUtils.buildExportBean(exportBean, dispatchBean);
               String dir = UUID.randomUUID().toString();
+              String excelFileName =
+                  ExportUtils.prepareFileName(
+                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
+                      exportBean.getFileType());
               exportBean.setFileName(
-                  publishedPath
-                      + File.separator
-                      + dir
-                      + File.separator
-                      + ((LinkedHashMap) dispatchBean).get("name")
-                      + "."
-                      + exportBean.getFileType());
+                  publishedPath + File.separator + dir + File.separator + excelFileName);
 
               File cfile = new File(exportBean.getFileName());
               String fileName = cfile.getAbsolutePath();
@@ -872,6 +869,8 @@ public class ExportServiceImpl implements ExportService {
 
     final SipQuery sipQuery = getSipQuery(analysisId);
     Map<String, String> columnHeader = ExportUtils.buildColumnHeaderMap(sipQuery);
+
+    logger.debug("Column headers = " + columnHeader);
 
     // clear export bean column header before building header
     exportBean.setColumnHeader(null);

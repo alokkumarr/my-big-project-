@@ -18,6 +18,7 @@ import * as get from 'lodash/get';
 import { AnalyzeActionsService } from '../actions';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { wrapFieldValues } from './../../../common/utils/dataFlattener';
+import { alterDateInData } from './../../../common/utils/dataFlattener';
 import { isDSLAnalysis } from '../designer/types';
 
 @Injectable()
@@ -49,6 +50,9 @@ export class AnalyzeExportService {
         };
 
         exportData = wrapFieldValues(exportData);
+        exportData = ['report', 'esReport'].includes(analysisType)
+          ? alterDateInData(exportData, analysis.sipQuery)
+          : exportData;
 
         json2csv(
           exportData,

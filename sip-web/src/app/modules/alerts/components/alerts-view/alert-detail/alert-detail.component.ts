@@ -9,7 +9,8 @@ import {
 } from '../../../alerts.interface';
 import {
   LoadSelectedAlertRuleDetails,
-  LoadSelectedAlertCount
+  LoadSelectedAlertCount,
+  ResetAlertChartData
 } from '../../../state/alerts.actions';
 import { AlertsState } from '../../../state/alerts.state';
 
@@ -37,6 +38,7 @@ export class AlertDetailComponent implements OnInit {
     this.alertIds = alertIds;
     if (alertIds) {
       this._store.dispatch([
+        new ResetAlertChartData(),
         new LoadSelectedAlertRuleDetails(alertIds.alertRulesSysId),
         new LoadSelectedAlertCount(alertIds.alertRulesSysId)
       ]);

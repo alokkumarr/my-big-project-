@@ -82,7 +82,7 @@ describe('Designer Settings Multi Table', () => {
   });
 
   it('should refactor old joins to new joins', () => {
-    const joins = refactorJoins(oldJoins);
+    const joins = refactorJoins(oldJoins, []);
     expect(joins).toEqual(newJoins);
   });
 });
