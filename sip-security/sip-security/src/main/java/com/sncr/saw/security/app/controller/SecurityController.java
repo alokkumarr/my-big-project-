@@ -255,8 +255,11 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/dskDetails", method = RequestMethod.GET)
 	public DataSecurityKeys dskDetailsByUserId(@RequestParam(value = "userId") String userId, HttpServletResponse response) {
+		DataSecurityKeys securityKeys = new DataSecurityKeys();
 		if (userId == null || userId.isEmpty()) {
-			response.setStatus(401);
+			response.setStatus(400);
+			securityKeys.setMessage("User Id can not be null or blank");
+			return securityKeys;
 		}
 		return userRepository.fetchDSKDetailByUserId(userId);
 	}
