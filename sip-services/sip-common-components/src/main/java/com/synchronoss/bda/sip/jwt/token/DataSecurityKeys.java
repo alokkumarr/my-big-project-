@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Model class of data security key.
+ *
  * @author alok.kumarr
  * @since 3.4.0
  */
@@ -15,7 +17,7 @@ public class DataSecurityKeys implements Serializable {
   private List<TicketDSKDetails> dataSecurityKeys;
 
   /**
-   * Gets message
+   * Gets message.
    *
    * @return value of message
    */
@@ -23,15 +25,13 @@ public class DataSecurityKeys implements Serializable {
     return message;
   }
 
-  /**
-   * Sets value of message
-   */
+  /** Sets value of message.  */
   public void setMessage(String message) {
     this.message = message;
   }
 
   /**
-   * Gets dataSecurityKeys
+   * Gets dataSecurityKeys.
    *
    * @return value of dataSecurityKeys
    */
@@ -39,9 +39,7 @@ public class DataSecurityKeys implements Serializable {
     return dataSecurityKeys;
   }
 
-  /**
-   * Sets value of dataSecurityKeys
-   */
+  /** Sets value of dataSecurityKeys.  */
   public void setDataSecurityKeys(List<TicketDSKDetails> dataSecurityKeys) {
     this.dataSecurityKeys = dataSecurityKeys;
   }

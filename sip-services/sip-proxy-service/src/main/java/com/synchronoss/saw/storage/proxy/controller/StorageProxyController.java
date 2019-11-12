@@ -267,8 +267,10 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList = new ArrayList<>();
     // fetch DSK details for scheduled
-    if (isScheduledExecution && authTicket.getMasterLoginId() != null) {
-      dskList = getDSKDetailsByUser(sipSecurityHost, authTicket.getMasterLoginId(), restUtil);
+    String userId = authTicket.getMasterLoginId();
+    if (isScheduledExecution && userId != null) {
+      dskList = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
+      executeResponse.setUserId(userId);
     } else {
       dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
     }
