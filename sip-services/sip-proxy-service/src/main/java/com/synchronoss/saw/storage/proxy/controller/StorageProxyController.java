@@ -379,9 +379,8 @@ public class StorageProxyController {
          * */
         executeResponse.setData(
             pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
-        if (isScheduledExecution && userId != null) {
-          executeResponse.setUserId(userId);
-        }
+        // return user id with data in execution results
+        if (userId != null) executeResponse.setUserId(userId);
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
