@@ -12,18 +12,22 @@
   >
     {{ adapter.title }}:
   </div>
-  <mat-chip-list
-    class="selected-fields__list"
+  <perfect-scrollbar
+    [config]="{
+      suppressScrollX: true
+    }"
     fxFlex="90"
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    [cdkDropListData]="adapter"
-    [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
-    (cdkDropListDropped)="drop($event, adapterIndex)"
-    [attr.e2e]="'designer-selected-container' + adapter.title"
     [class.highlighted]="isDragInProgress && canAcceptMap[adapter.title]"
   >
-    <perfect-scrollbar [config]="{}" [scrollIndicators]="false">
+    <mat-chip-list
+      class="selected-fields__list"
+      [attr.e2e]="'designer-selected-container' + adapter.title"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      [cdkDropListData]="adapter"
+      [cdkDropListEnterPredicate]="acceptPredicateFor(adapter)"
+      (cdkDropListDropped)="drop($event, adapterIndex)"
+    >
       <mat-chip
         *ngFor="let col of adapter.artifactColumns"
         class="selected-fields__item"
@@ -52,8 +56,8 @@
 
         <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
       </mat-chip>
-    </perfect-scrollbar>
-  </mat-chip-list>
+    </mat-chip-list>
+  </perfect-scrollbar>
 </div>
 
 <div
