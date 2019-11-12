@@ -62,13 +62,7 @@ export class ObserveService {
     };
     const analysis = await this.analyze.readAnalysis(id, true, skipToastHeader);
 
-    // If dsl analysis is successfully returned, use it
-    if (analysis) {
-      return analysis;
-    }
-
-    // Otherwise, try to get the analysis from legacy api
-    return this.analyze.readAnalysis(id, false, skipToastHeader);
+    return analysis;
   }
 
   getRequest<T>(path) {
