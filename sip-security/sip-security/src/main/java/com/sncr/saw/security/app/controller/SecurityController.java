@@ -61,6 +61,7 @@ import java.util.regex.Pattern;
  *
  */
 @RestController
+@RequestMapping("/sip-security")
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
@@ -1775,7 +1776,7 @@ public class SecurityController {
 	 * service.  Used by load balancer to route requests to healthy
 	 * instances of the service to provide high availability.
 	 */
-	@RequestMapping("/saw-security/actuator/health")
+	@RequestMapping("/sip-security/actuator/health")
 	public ResponseEntity<ObjectNode> health() {
 		String status = "UP";
 		HttpStatus httpStatus = HttpStatus.OK;

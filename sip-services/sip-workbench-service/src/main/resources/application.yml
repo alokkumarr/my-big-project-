@@ -36,13 +36,13 @@ connector: http
 workbench:
         project-key: "workbench"
         project-path: "/Desktop" 
-        project-root: "/Users/spau0004"
+        project-root: "/var/sip"
         preview-limit: 10000
-        livy-uri: http://localhost:8998
+        livy-uri: https://mapr:mapr@localhost:8998
         storage-url: ${connector}://localhost:9800
 
 metastore:
-    base:  hdfs:///main/   
+    base:  hdfs:///var/sip
 
 sip:
    ssl:
