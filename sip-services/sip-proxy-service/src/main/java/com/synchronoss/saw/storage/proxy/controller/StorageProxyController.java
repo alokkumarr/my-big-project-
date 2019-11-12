@@ -270,7 +270,6 @@ public class StorageProxyController {
     String userId = authTicket.getMasterLoginId();
     if (isScheduledExecution && userId != null) {
       dskList = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
-      executeResponse.setUserId(userId);
     } else {
       dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
     }
@@ -380,6 +379,9 @@ public class StorageProxyController {
          * */
         executeResponse.setData(
             pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
+        if (isScheduledExecution && userId != null) {
+          executeResponse.setUserId(userId);
+        }
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
