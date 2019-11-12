@@ -269,63 +269,56 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     	
     	logger.debug("######## Inside process json records #####" + jsonRdd.count());
     	
-        SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
-    	logger.debug("######## Reading through spark session #####" );
-    	
-    	
-    	if(jsonRdd.count() > 0) {
-    		logger.debug("######## dataset size more than 0 #####" );
-    		Dataset<Row> dataset = sess.read().json(jsonRdd).toDF();
-    		logger.debug("######## converted to dataset from rdd #####" );
-    		if((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
-    			this.extractSchemaForEventTypes(sess, dataset);
-    		}
-    		
-    		logger.debug("schema fields::" + this.schemaFields.size());
-    		 
-        	
-    	}
-       
-  	    
-        if(this.ngctx != null ) {
-        	
-			logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
-
-			logger.debug("####" + this.ngctx.pipelineConfigParams);
-
-			JSONObject rtaConfig = null;
-
-			
-			if(this.ngctx != null && this.ngctx.runningPipeLine) {
-				Object config = this.ngctx.pipelineConfig.get("pipeline");
-				logger.debug("### Pipeline config in consumer ::" + this.ngctx.pipelineConfig);
-				if (config instanceof JSONObject) {
-					JSONObject jsonConfig = (JSONObject) config;
-					rtaConfig = (JSONObject) jsonConfig.get("rta");
-					logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+        try {
+			SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
+			logger.debug("######## Reading through spark session #####");
+			if (jsonRdd.count() > 0) {
+				logger.debug("######## dataset size more than 0 #####");
+				Dataset<Row> dataset = sess.read().json(jsonRdd).toDF();
+				logger.debug("######## converted to dataset from rdd #####");
+				if ((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY))) {
+					this.extractSchemaForEventTypes(sess, dataset);
 				}
+
+				logger.debug("schema fields::" + this.schemaFields.size());
+
 			}
+			if (this.ngctx != null) {
+
+				logger.debug("######## Triggering pipeline as part of RTPS listener pipe line config ##########");
+
+				logger.debug("####" + this.ngctx.pipelineConfigParams);
+
+				JSONObject rtaConfig = null;
+
+				if (this.ngctx != null && this.ngctx.runningPipeLine) {
+					Object config = this.ngctx.pipelineConfig.get("pipeline");
+					logger.debug("### Pipeline config in consumer ::" + this.ngctx.pipelineConfig);
+					if (config instanceof JSONObject) {
+						JSONObject jsonConfig = (JSONObject) config;
+						rtaConfig = (JSONObject) jsonConfig.get("rta");
+						logger.debug("### Pipeline config in RTPS pipeline ::" + rtaConfig);
+					}
+				}
 				String multiColName = null;
-				if(rtaConfig==null) {
+				if (rtaConfig == null) {
 					multiColName = "EVENT_TYPE";
 				} else {
 
-					 multiColName = (String) rtaConfig.get("keyColumn");
+					multiColName = (String) rtaConfig.get("keyColumn");
 
-					if ( null == multiColName) {
+					if (null == multiColName) {
 						logger.error("No multi column defined...ex: EVENT_TYPE");
 						return 0;
 					}
 
 					logger.debug("Multi column name " + multiColName);
-				
+
 				}
 
 				/**
 				 * Multiple event types
 				 */
-			
-				
 
 				//List<Row> multiColValues = df.select((String) multiColName).distinct().collectAsList();
 
@@ -334,167 +327,157 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				NGContext ct = this.ngctx;
 				//Object threadPoolCnt = null;
 				//int numThreads = 0;
-				
-			final JSONObject rtaConfiguration = rtaConfig;
-			final String keyColumn = multiColName;
-			logger.debug("schema fields::"+ this.schemaFields);
-			this.schemaFields.forEach((eventType, eventSchema)->{
-				
-				logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
-				
-				Dataset<Row> df  = null;
-				
-				//List<StructField> structField = new ArrayList<StructField>();
-				//structField.add(eventSchema);
-				//StructType fieldSchema = DataTypes.createStructType(structField);
-				
-				
-				JavaRDD<Row> rowRdd = sess.read().schema(schemaFields.get(eventType)).json(jsonRdd).toJavaRDD();
 
-				logger.debug("######## Reading completed through spark session #####");
-				if((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
-					df = sess.createDataFrame(rowRdd, schemaFields.get(eventType));
-				} else {
-					df = sess.read().json(jsonRdd).toDF();
-				}
-			    
-                
-			    logger.debug("##### Data frame created with specific schema ");
+				final JSONObject rtaConfiguration = rtaConfig;
+				final String keyColumn = multiColName;
+				logger.debug("schema fields::" + this.schemaFields);
+				this.schemaFields.forEach((eventType, eventSchema) -> {
 
-				String isTimeSeries = null;
-				Object threadPoolCnt = null;
-				int numThreads = DEFAULT_THREAD_CNT;
-				if (rtaConfiguration != null) {
+					logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
 
-					 isTimeSeries = (String) rtaConfiguration.get("isTimeSeries");
+					Dataset<Row> df = null;
 
-				     threadPoolCnt = rtaConfiguration.get("numberOfThreads");
+					//List<StructField> structField = new ArrayList<StructField>();
+					//structField.add(eventSchema);
+					//StructType fieldSchema = DataTypes.createStructType(structField);
 
-					 numThreads = threadPoolCnt == null ? DEFAULT_THREAD_CNT
+					JavaRDD<Row> rowRdd = sess.read().schema(schemaFields.get(eventType)).json(jsonRdd).toJavaRDD();
 
-							: Integer.valueOf((Integer) threadPoolCnt);
-
-					logger.debug("###### Number of threads used only if non timeseries::" + numThreads);
-
-				}
-
-				logger.debug("########## is Time series data ::" + isTimeSeries);
-
-				String query = keyColumn + "== \'" + eventType + "\'";
-
-				logger.debug("Query:: " + query);
-				logger.debug("is pipeline ::"+ this.ngctx.runningPipeLine);
-
-				/**
-				 * 
-				 * Process asynchronously if not time series. Process synchronously if time
-				 * 
-				 * series
-				 * 
-				 */
-
-				if ((isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) && this.ngctx.runningPipeLine ) {
-					logger.debug("Starting async pipeline"+ this.ngctx.runningPipeLine);
-					ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
-					final Dataset<Row> dataset = df;
-					executorService.submit(new Callable<Long>() {
-						@Override
-						public Long call() throws Exception {
-							try {
-								Dataset<Row> data = dataset.filter(query).cache();
-								if(data.count()>0) {
-									RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
-	
-									processor.processDataWithDataFrame(ct.pipelineConfig, 
-											ct.pipelineConfigParams,
-											eventType);
-								}
-							} catch (Exception e) {
-								logger.error(e.getMessage());
-							}
-							return 1L;
-						}
-
-					});
-
-				} else if (Boolean.valueOf(isTimeSeries) && this.ngctx.runningPipeLine) {
-					logger.debug("Starting sync pipeline"+ this.ngctx.runningPipeLine);
-					try {
-						Dataset<Row> data =df.filter(query).cache();
-						if(data.count()>0) {
-							RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
-							processor.processDataWithDataFrame(this.ngctx.pipelineConfig, 
-									this.ngctx.pipelineConfigParams,
-									eventType);
-						}
-
-					} catch (Exception e) {
-						logger.error(e.getMessage());
+					logger.debug("######## Reading completed through spark session #####");
+					if ((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY))) {
+						df = sess.createDataFrame(rowRdd, schemaFields.get(eventType));
+					} else {
+						df = sess.read().json(jsonRdd).toDF();
 					}
 
-				}
-				
-				
-				// Elastic Search
-		        if (esIndex != null && !esIndex.isEmpty()) {
-		            // Store batch in ES
-		            Dataset<Row> df2;
-		            if (esColumns != null && esColumns.size() > 0)
-		                df2 = df.select(scala.collection.JavaConversions.asScalaBuffer(esColumns));
-		            else
-		                df2 = df;
+					logger.debug("##### Data frame created with specific schema ");
 
-		            // See configuration files for detailed explanations
-		            // on how data is written to ES
-		            // We use ES.Hadoop settings to control this flow
-		            String currentEsIndex = parseIndexName(esIndex, new Date()) + esType;
-		            JavaEsSparkSQL.saveToEs(df2, currentEsIndex, esConfig);
-		        } else {
-		        	logger.debug("ES information not found. Not writing to elastic search");
-		        }
-		        //======================================================================
-		        // Data Lake
-		        // Store it in file system as separate directory
-		        if(basePath != null && !basePath.isEmpty() & df != null) {
-		            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
-		            Date batchDt = new Date(tm.milliseconds());
-		            String batchName = batchPrefix + sdf.format(batchDt);
-		            String path = basePath + File.separator + batchName;
-		            String strTmpPath = basePath + File.separator + "__TMP-" + batchName;
+					String isTimeSeries = null;
+					Object threadPoolCnt = null;
+					int numThreads = DEFAULT_THREAD_CNT;
+					if (rtaConfiguration != null) {
 
-		            if (outputType.equals("parquet")) {
-		                df.write().mode(SaveMode.Append).parquet(strTmpPath);
-		            } else if (outputType.equals("json")) {
-		                df.write().mode(SaveMode.Append).json(strTmpPath);
-		            } else {
-		                logger.error("Invalid output type :" + outputType);
-		            }
-		            // Done with writing - safe to rename batch directory
-		            finalizeBatch(strTmpPath, path);
-		            logger.debug("Writing to datalake compled");
-		        } else {
-		        	logger.debug("base path not found or empty. Hence not writing to data lake");
-		        }
+						isTimeSeries = (String) rtaConfiguration.get("isTimeSeries");
 
-		        /* Alert metrics collection */
-		        if (logger.isTraceEnabled()) {
-		          logger.debug("Alert metrics to be be collected: " + df.count());
-		        }
+						threadPoolCnt = rtaConfiguration.get("numberOfThreads");
 
-			});
+						numThreads = threadPoolCnt == null ? DEFAULT_THREAD_CNT
 
+								: Integer.valueOf((Integer) threadPoolCnt);
+
+						logger.debug("###### Number of threads used only if non timeseries::" + numThreads);
+
+					}
+
+					logger.debug("########## is Time series data ::" + isTimeSeries);
+
+					String query = keyColumn + "== \'" + eventType + "\'";
+
+					logger.debug("Query:: " + query);
+					logger.debug("is pipeline ::" + this.ngctx.runningPipeLine);
+
+					/**
+					 * 
+					 * Process asynchronously if not time series. Process synchronously if time
+					 * 
+					 * series
+					 * 
+					 */
+
+					if ((isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) && this.ngctx.runningPipeLine) {
+						logger.debug("Starting async pipeline" + this.ngctx.runningPipeLine);
+						ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+						final Dataset<Row> dataset = df;
+						executorService.submit(new Callable<Long>() {
+							@Override
+							public Long call() throws Exception {
+								try {
+									Dataset<Row> data = dataset.filter(query).cache();
+									if (data.count() > 0) {
+										RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
+
+										processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,
+												eventType);
+									}
+								} catch (Exception e) {
+									logger.error(e.getMessage());
+								}
+								return 1L;
+							}
+
+						});
+
+					} else if (Boolean.valueOf(isTimeSeries) && this.ngctx.runningPipeLine) {
+						logger.debug("Starting sync pipeline" + this.ngctx.runningPipeLine);
+						try {
+							Dataset<Row> data = df.filter(query).cache();
+							if (data.count() > 0) {
+								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
+								processor.processDataWithDataFrame(this.ngctx.pipelineConfig,
+										this.ngctx.pipelineConfigParams, eventType);
+							}
+
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+						}
+
+					}
+
+					// Elastic Search
+					if (esIndex != null && !esIndex.isEmpty()) {
+						// Store batch in ES
+						Dataset<Row> df2;
+						if (esColumns != null && esColumns.size() > 0)
+							df2 = df.select(scala.collection.JavaConversions.asScalaBuffer(esColumns));
+						else
+							df2 = df;
+
+						// See configuration files for detailed explanations
+						// on how data is written to ES
+						// We use ES.Hadoop settings to control this flow
+						String currentEsIndex = parseIndexName(esIndex, new Date()) + esType;
+						JavaEsSparkSQL.saveToEs(df2, currentEsIndex, esConfig);
+					} else {
+						logger.debug("ES information not found. Not writing to elastic search");
+					}
+					//======================================================================
+					// Data Lake
+					// Store it in file system as separate directory
+					if (basePath != null && !basePath.isEmpty() & df != null) {
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+						Date batchDt = new Date(tm.milliseconds());
+						String batchName = batchPrefix + sdf.format(batchDt);
+						String path = basePath + File.separator + batchName;
+						String strTmpPath = basePath + File.separator + "__TMP-" + batchName + File.separator  + eventType;
+						logger.debug("Writing to temporary path"+ strTmpPath);
+						
+						if (outputType.equals("parquet")) {
+							
+							df.write().mode(SaveMode.Append).parquet(strTmpPath);
+						} else if (outputType.equals("json")) {
+							df.write().mode(SaveMode.Append).json(strTmpPath);
+						} else {
+							logger.error("Invalid output type :" + outputType);
+						}
+						// Done with writing - safe to rename batch directory
+						finalizeBatch(strTmpPath, path);
+						logger.debug("Writing to datalake compled");
+					} else {
+						logger.debug("base path not found or empty. Hence not writing to data lake");
+					}
+
+					/* Alert metrics collection */
+					if (logger.isTraceEnabled()) {
+						logger.debug("Alert metrics to be be collected: " + df.count());
+					}
+
+				});
+
+			} 
+		} catch (Exception exception) {
+			logger.error("Exception while processing RTA message "+ exception.getMessage());
 		}
-        
-
-        
-        
-        
-        
-    
-
-    
-        
-        return 0;
+		return 0;
     
 }
     
