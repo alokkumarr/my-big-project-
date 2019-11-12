@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
+import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
 const namePattern = /^[a-zA-Z]*$/;
 const loginIdPattern = /^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/;
@@ -30,6 +31,7 @@ export class UserEditDialogComponent extends BaseDialogComponent {
     }
   ];
 
+  public passwordError = '';
   constructor(
     public _userService: UserService,
     public _fb: FormBuilder,
@@ -55,6 +57,11 @@ export class UserEditDialogComponent extends BaseDialogComponent {
     // if the password wasn't changed, set it to null
     if (this.data.mode === 'edit' && formValues.password === dummyPassword) {
       formValues.password = null;
+    } else {
+      this.passwordError = validatePassword(formValues.password);
+      if (this.passwordError) {
+        return;
+      }
     }
     const model = {
       ...this.data.model,
