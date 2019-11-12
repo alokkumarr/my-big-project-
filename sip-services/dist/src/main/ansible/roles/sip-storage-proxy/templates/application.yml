@@ -96,6 +96,8 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+  security:
+    host: ${connector}://localhost:9000/saw-security
 {% if sip_secure %}
   ssl:
     enable : true

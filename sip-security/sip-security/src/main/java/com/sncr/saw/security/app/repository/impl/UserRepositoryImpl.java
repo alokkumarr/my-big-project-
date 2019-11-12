@@ -26,6 +26,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
@@ -64,9 +65,9 @@ import org.springframework.stereotype.Repository;
 /**
  * This class is used to do CRUD operations on the Mariadb data base having nsso
  * tables.
- * 
+ *
  * @author girija.sankar
- * 
+ *
  */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -74,7 +75,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
 	private final JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -197,7 +198,7 @@ public class UserRepositoryImpl implements UserRepository {
 		} else {
 			pwd_Expiration_Date = addDays(new Date(), pwd_Expiration_Days);
 		}
-		
+
 
 		int dateDiff = DateUtil.getNumberOfDays(DateUtil.getDateString(pwd_Expiration_Date, DateUtil.PATTERN_MMDDYYYY),
 				sysDate);
@@ -370,11 +371,10 @@ public class UserRepositoryImpl implements UserRepository {
 
 	/**
 	 * inserts ticket into sso db
-	 * 
-	
+	 *
 	 * @param ticket
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	@Override
 	public void insertTicketDetails(Ticket ticket) throws Exception {
@@ -382,7 +382,6 @@ public class UserRepositoryImpl implements UserRepository {
 		try {
 			String insertSql = "insert into TICKET(TICKET_ID,WINDOW_ID,MASTER_LOGIN_ID,USER_NAME,PRODUCT_CODE,ROLE_TYPE,CREATED_TIME,VALID_UPTO,VALID_INDICATOR,CREATED_DATE,UPDATED_DATE,INACTIVATED_DATE,DESCRIPTION) "
 					+ "values (?,?,?,?,?,?,?,?,?,sysdate(),sysdate(),?,?)";
-			// ticket.setRoleType("Basic");
 			Object[] params = new Object[] { ticket.getTicketId(), ticket.getWindowId(), ticket.getMasterLoginId(),
 					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType().name(), ticket.getCreatedTime(),
 					ticket.getValidUpto(), isValid, null, ticket.getValidityReason() };
@@ -446,7 +445,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ " : " + e.getMessage(), null, e);
 			throw e;
 		}
-	}	
+	}
 
 	@Override
 	public String updateUserPass(String masterLoginId, String newPassEncrp) {
@@ -496,10 +495,9 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PwdDetailExtractor implements ResultSetExtractor<PasswordDetails> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
-		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
-		 * .sql.ResultSet)
+		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java.sql.ResultSet)
 		 */
 		@Override
 		public PasswordDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -572,7 +570,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUST_PROD_SYS_ID=CPM.CUST_PROD_SYS_ID) INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=CP.CUSTOMER_SYS_ID)"
 					+ " INNER JOIN MODULES M ON (M.MODULE_SYS_ID=PM.MODULE_SYS_ID) INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) JOIN `PRIVILEGES` PV ON(CP.CUST_PROD_SYS_ID=PV.CUST_PROD_SYS_ID AND CPM.CUST_PROD_MOD_SYS_ID=PV.CUST_PROD_MOD_SYS_ID) "
 					+ " JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
-					+ " JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF ON " 
+					+ " JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF ON "
 					+ " (CPM.CUST_PROD_MOD_SYS_ID = CPMF.CUST_PROD_MOD_SYS_ID AND "
 					+ " PV.CUST_PROD_MOD_FEATURE_SYS_ID = CPMF.CUST_PROD_MOD_FEATURE_SYS_ID) "
 					+ " WHERE upper(U.USER_ID)=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND PV.ACTIVE_STATUS_IND=1 AND PV.PRIVILEGE_CODE <> '0' "
@@ -624,8 +622,6 @@ public class UserRepositoryImpl implements UserRepository {
 						preparedStatement.setString(2, ticketDetails.getRoleCode());
 					}
 				}, new UserRepositoryImpl.PrepareProdModFeatureExtractor());
-			
-				
 				String sql6 = "SELECT DISTINCT"
 				+ "   U.USER_SYS_ID, "
 				+ "   R.ROLE_SYS_ID, "
@@ -715,89 +711,8 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setDataSKey(dskList);
 
 
-
-				/**
-				 * String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE,
-				 * P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM
-				 * CUSTOMER_PRODUCT_MODULE_FEATURES CPMF " + "INNER JOIN
-				 * `PRIVILEGES` P ON (P.CUST_PROD_MOD_FEATURE_SYS_ID =
-				 * CPMF.CUST_PROD_MOD_FEATURE_SYS_ID) INNER JOIN " +
-				 * "ROLE_PRIVILEGES RP ON(RP.PRIVILEGE_SYS_ID =
-				 * P.PRIVILEGE_SYS_ID AND RP.ACTIVE_STATUS_IND =
-				 * P.ACTIVE_STATUS_IND) " + "INNER JOIN CUSTOMER_PRODUCT_MODULES
-				 * CPM ON(CPM.CUST_PROD_MOD_SYS_ID = CPMF.CUST_PROD_MOD_SYS_ID)
-				 * INNER JOIN " + "CUSTOMER_PRODUCTS CP ON(CP.CUST_PROD_SYS_ID =
-				 * CPM.CUST_PROD_SYS_ID) INNER JOIN USERS U
-				 * ON(U.ROLE_SYS_ID=RP.ROLE_SYS_ID AND U.CUSTOMER_SYS_ID =
-				 * CP.CUSTOMER_SYS_ID) " + "INNER JOIN ROLES R
-				 * ON(R.ROLE_SYS_ID=U.ROLE_SYS_ID and
-				 * RP.ROLE_SYS_ID=R.ROLE_SYS_ID) INNER JOIN " + "`PRIVILEGES` PV
-				 * ON (CPMF.CUST_PROD_MOD_FEATURE_SYS_ID=PV.
-				 * CUST_PROD_MOD_FEATURE_SYS_ID) WHERE " + "CP.ACTIVE_STATUS_IND
-				 * = CPM.ACTIVE_STATUS_IND AND CPM.ACTIVE_STATUS_IND =
-				 * CPMF.ACTIVE_STATUS_IND " + "AND CPMF.ACTIVE_STATUS_IND =
-				 * U.ACTIVE_STATUS_IND AND CPMF.ACTIVE_STATUS_IND = 1 AND
-				 * UPPER(U.USER_ID)=?";
-				 * 
-				 * if(onlyDef){ sql2 = sql2 + " AND CPM.DEFAULT = 1 AND
-				 * CPMF.DEFAULT = 1"; }
-				 * 
-				 * ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv =
-				 * jdbcTemplate.query(sql2, new PreparedStatementSetter() {
-				 * public void setValues(PreparedStatement preparedStatement)
-				 * throws SQLException { preparedStatement.setString(1,
-				 * masterLoginId); } }, new
-				 * UserRepositoryImpl.PrepareProdModFeaturePrivExtractor());
-				 * 
-				 * /**ArrayList<ProductModuleFeaturePrivileges>
-				 * productModuleFeaturePrivilegesSorted = null;
-				 * ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
-				 * ArrayList<ProductModuleFeatures> prodModFeatrs = new
-				 * ArrayList<ProductModuleFeatures>(); ProductModuleFeatures
-				 * prodModFeatures = null; for (int i = 0; i <
-				 * ticketDetails.getProductModules().size(); i++) {
-				 * prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
-				 * prodModFeatures = new ProductModuleFeatures(); for (int y =
-				 * 0; y < prodModFeatr.size(); y++) { if
-				 * (ticketDetails.getProductModules().get(i).getProdCode()
-				 * .equals(prodModFeatr.get(y).getProdCode()) &&
-				 * prodModFeatr.get(y).getProdModCode()
-				 * .equals(ticketDetails.getProductModules().get(i).
-				 * getProductModCode())) {
-				 * 
-				 * productModuleFeaturePrivilegesSorted = new
-				 * ArrayList<ProductModuleFeaturePrivileges>(); for (int z = 0;
-				 * z < prodModFeatrPriv.size(); z++) { if
-				 * (prodModFeatr.get(y).getProdModFeatureName()
-				 * .equals(prodModFeatrPriv.get(z).getProdModFeatrName())) {
-				 * 
-				 * productModuleFeaturePrivilegesSorted.add(prodModFeatrPriv.get
-				 * (z));
-				 * 
-				 * }
-				 * 
-				 * } prodModFeatr.get(y).setProdModFeatrPriv(
-				 * productModuleFeaturePrivilegesSorted);
-				 * prodModFeatrSorted.add(prodModFeatr.get(y));
-				 * 
-				 * } }
-				 * prodModFeatures.setProdCode(ticketDetails.getProductModules()
-				 * .get(i).getProdCode());
-				 * prodModFeatures.setProdModCode(ticketDetails.
-				 * getProductModules().get(i).getProductModCode());
-				 * prodModFeatures.setProdModDesc(ticketDetails.
-				 * getProductModules().get(i).getProductModDesc());
-				 * prodModFeatures.setProdModFeatrPriv(prodModFeatrSorted);
-				 * prodModFeatures.setprodModName(ticketDetails.
-				 * getProductModules().get(i).getProductModName());
-				 * prodModFeatrs.add(prodModFeatures);
-				 * 
-				 * } ticketDetails.setProductModuleFeatures(prodModFeatrs);
-				 **/
-				
-				
-						ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
-				ArrayList<ProductModules> prodModSorted = null;
+				ArrayList<ProductModuleFeature> prodModFeatrChildSorted;
+				ArrayList<ProductModules> prodModSorted;
 				for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
 					prodModSorted = new ArrayList<ProductModules>();
 					for (int x = 0; x < prodMods.size(); x++) {
@@ -842,27 +757,6 @@ public class UserRepositoryImpl implements UserRepository {
 										&& prodModFeatrParentsCopy.get(y).getProdModCode()
 												.equals(prodMods.get(x).getProductModCode())
 										&& prodModFeatrParentsCopy.get(y).getProductModuleSubFeatures().size()>0 ) {
-
-									/**
-									 * productModuleFeaturePrivilegesSorted =
-									 * new
-									 * ArrayList<ProductModuleFeaturePrivileges>
-									 * (); for (int z = 0; z <
-									 * prodModFeatrPriv.size(); z++) { if
-									 * (prodModFeatr.get(y).
-									 * getProdModFeatureName()
-									 * .equals(prodModFeatrPriv.get(z).
-									 * getProdModFeatrName())) {
-									 * 
-									 * productModuleFeaturePrivilegesSorted.add(
-									 * prodModFeatrPriv.get(z));
-									 * 
-									 * }
-									 * 
-									 * }
-									 * prodModFeatr.get(y).setProdModFeatrPriv(
-									 * productModuleFeaturePrivilegesSorted);
-									 **/
 									prodModFeatrSorted.add(prodModFeatrParentsCopy.get(y));
 								}
 
@@ -931,7 +825,33 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	@Override
+  @Override
+  public DataSecurityKeys fetchDSKDetailByUserId(String userId) {
+    String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
+        + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
+        + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
+        + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
+        + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
+        + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
+    Map<String,List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
+      @Override public void setValues(PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(1, userId);
+      }
+    }, new UserRepositoryImpl.DSKValuesExtractor());
+    // DSK values should be array in JSON object hence converting into list.
+    List<TicketDSKDetails> dskList = new ArrayList<>();
+    for (String key : dskValueMapping.keySet()) {
+      TicketDSKDetails dskDetails = new TicketDSKDetails();
+      dskDetails.setName(key);
+      dskDetails.setValues(dskValueMapping.get(key));
+      dskList.add(dskDetails);
+    }
+		DataSecurityKeys securityKeys = new DataSecurityKeys();
+    securityKeys.setDataSecurityKeys(dskList);
+	  return securityKeys;
+  }
+
+  @Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
 		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
@@ -967,7 +887,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PrepareTicketExtractor implements ResultSetExtractor<TicketDetails> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
 		 * .sql.ResultSet)
@@ -1015,7 +935,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PrepareProductExtractor implements ResultSetExtractor<ArrayList<Products>> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
 		 * .sql.ResultSet)
@@ -1041,7 +961,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PrepareProdModExtractor implements ResultSetExtractor<ArrayList<ProductModules>> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
 		 * .sql.ResultSet)
@@ -1070,7 +990,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PrepareProdModFeatureExtractor implements ResultSetExtractor<ArrayList<ProductModuleFeature>> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
 		 * .sql.ResultSet)
@@ -1101,7 +1021,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private class PrepareProdModFeatureChildExtractor implements ResultSetExtractor<ArrayList<ProductModuleFeature>> {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
 		 * .sql.ResultSet)
@@ -1128,30 +1048,6 @@ public class UserRepositoryImpl implements UserRepository {
 			return prodModFeaList;
 		}
 	}
-	/*
-	 * private class PrepareProdModFeaturePrivExtractor implements
-	 * ResultSetExtractor<ArrayList<ProductModuleFeaturePrivileges>> {
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.jdbc.core.ResultSetExtractor#extractData(java
-	 * .sql.ResultSet)
-	 * 
-	 * @Override public ArrayList<ProductModuleFeaturePrivileges>
-	 * extractData(ResultSet rs) throws SQLException, DataAccessException {
-	 * ProductModuleFeaturePrivileges productModulesFeatrPriv = null;
-	 * ArrayList<ProductModuleFeaturePrivileges> prodModFeaPrivList = new
-	 * ArrayList<ProductModuleFeaturePrivileges>();
-	 * 
-	 * while (rs.next()) { productModulesFeatrPriv = new
-	 * ProductModuleFeaturePrivileges();
-	 * productModulesFeatrPriv.setPrivCode(rs.getString("privilege_code"));
-	 * productModulesFeatrPriv.setProdModFeatrName(rs.getString("feature_name"))
-	 * ; productModulesFeatrPriv.setPrivDesc(rs.getString("privilege_desc"));
-	 * productModulesFeatrPriv.setPrivName(rs.getString("privilege_name"));
-	 * prodModFeaPrivList.add(productModulesFeatrPriv); } return
-	 * prodModFeaPrivList; } }
-	 */
 
 	public class UserCredentialsExtractor implements ResultSetExtractor<User> {
 
@@ -1644,8 +1540,6 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.roleDetailExtractor());
 
-			
-		
 			List<Long> featureSysIdList;
 			ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
 
@@ -1668,9 +1562,6 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.CPMFDetailExtractor());
 
-			
-			
-	
 			 String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
 										+ "FROM "
 										+ "( SELECT  FEATURE_CODE from customer_product_module_features "
@@ -1683,8 +1574,6 @@ public class UserRepositoryImpl implements UserRepository {
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
-					
-					
 					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 					Long roleSysId = roleId;
 					String sql4 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
@@ -1698,12 +1587,10 @@ public class UserRepositoryImpl implements UserRepository {
 						}
 
 					}, new UserRepositoryImpl.PrivDetailExtractor());
-					
 					if (privExists) {
 						roleList.get(y).setPrivExists(true);
-					} 
-					
-				
+					}
+
 					if ((!featureSysIdList.isEmpty()) && featureSysIdList.get(0) != 0) {
 						Long custProdModFeatr = featureSysIdList.get(0);
 						// check if priv exists for My analysis
@@ -1828,8 +1715,6 @@ public class UserRepositoryImpl implements UserRepository {
 	public Valid addRole(RoleDetails role) {
 		Valid valid = new Valid();
 		Long roleId;
-		
-	
 		List<Long> featureSysIdList;
 		ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
 		String sql = "INSERT INTO ROLES (CUSTOMER_SYS_ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ROLE_TYPE, "
@@ -1890,8 +1775,6 @@ public class UserRepositoryImpl implements UserRepository {
 				// privilege
 				// if yes check if My Analysis priv exists, if not create
 
-				
-				
 				String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
 							  + "FROM "
 							  + "( SELECT  FEATURE_CODE from customer_product_module_features "
@@ -1902,12 +1785,8 @@ public class UserRepositoryImpl implements UserRepository {
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
-					
-					
 					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 
-					
-					
 					for (Long featureSysId : featureSysIdList ) {
 						if (featureSysId != 0) {
 							Long custProdModFeatr = featureSysId;
@@ -1915,31 +1794,6 @@ public class UserRepositoryImpl implements UserRepository {
 							insertMyAnalysisPrivileges(role, roleId, custProdMod, custProd, custProdModFeatr);
 						}
 					}
-					// Removing else part if there are no sub category then it should not be the part of privilege table.
-					/*else {
-						// create feature
-						String sql6 = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID, "
-								+ "DEFAULT_URL, FEATURE_NAME, FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,`DEFAULT`, "
-								+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
-								+ " VALUES (?, '/', 'My Analysis', 'My Analysis', ?, ?,'1', '1', sysdate(), ?) ";
-
-						StringBuffer feature_Code = new StringBuffer();
-						feature_Code.append("MYANALYSIS_").append(custProdMod);
-						StringBuffer feature_type = new StringBuffer();
-						feature_type.append("PARENT_").append(feature_Code);
-						jdbcTemplate.update(sql6, new PreparedStatementSetter() {
-							public void setValues(PreparedStatement preparedStatement) throws SQLException {
-								preparedStatement.setLong(1, custProdMod);
-								preparedStatement.setString(2, feature_Code.toString());
-								preparedStatement.setString(3, feature_type.toString());
-								preparedStatement.setString(4, role.getMasterLoginId());
-							}
-						});
-						Long newFeatureId = getFeatureSysId(sql3, custProdMod);
-						insertMyAnalysisPrivileges(role, roleId, custProdMod, custProd, newFeatureId);
-			
-				
-					}*/
 				}
 			}
 
@@ -2023,8 +1877,6 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	
-	
 	private List<Long> getFeatureSysId(String sql3, Long custProdMod) {
 		return jdbcTemplate.query(sql3, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -2063,20 +1915,14 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	
-	
 	public class MyAnalysisDetailExtractor implements ResultSetExtractor<List<Long>> {
 
 		@Override
 		public List<Long> extractData(ResultSet rs) throws SQLException, DataAccessException {
 			List<Long> featureIdList = new ArrayList<>();
 			while (rs.next()) {
-				
-				
 				featureIdList.add(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
 			}
-			
-			
 			return featureIdList;
 		}
 	}
@@ -2183,7 +2029,6 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		return privExists;
 	}
-	
 
 	private PrivilegeDetails fetchIfPrivExists(Long roleId, Long custProdModFeatureId) {
 		PrivilegeDetails priv = null;
@@ -2200,19 +2045,19 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		return priv;
 	}
-	
+
 	public class PrivilegeExtractor implements ResultSetExtractor<PrivilegeDetails> {
 
 		@Override
 		public PrivilegeDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-			PrivilegeDetails privilege = null;			
+			PrivilegeDetails privilege = null;
 			while (rs.next()) {
-				privilege = new PrivilegeDetails();								
+				privilege = new PrivilegeDetails();
 				privilege.setPrivilegeDesc(rs.getString("PRIVILEGE_DESC"));
-				privilege.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));				
+				privilege.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));
 			}
-			return privilege;	
+			return privilege;
 		}
 	}
 
@@ -2231,9 +2076,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<PrivilegeDetails> getPrivileges(Long customerId) {
 		ArrayList<PrivilegeDetails> privList = null;
-		
-	
-	
+
 		String sql = "SELECT DISTINCT C.CUSTOMER_SYS_ID, CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID, M.MODULE_NAME, "
 					 + "PC.CUST_PROD_MOD_FEATURE_SYS_ID AS CATEGORY_ID,PC.FEATURE_CODE, CPMF.CUST_PROD_MOD_FEATURE_SYS_ID AS SUB_CATEGORY_ID, PC.FEATURE_NAME, "
 					 + "CPMF.FEATURE_NAME AS SUB_FEATURE_NAME, CPMF.FEATURE_TYPE, PV.PRIVILEGE_SYS_ID, PV.PRIVILEGE_DESC, "
@@ -2300,11 +2143,11 @@ public class UserRepositoryImpl implements UserRepository {
 		} catch (Exception e) {
 			logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
 		}
-		
+
 		return privList;
-			
+
 	}
-	
+
 	public class privilegeDetailExtractor implements ResultSetExtractor<ArrayList<PrivilegeDetails>> {
 
 		@Override
@@ -2314,12 +2157,11 @@ public class UserRepositoryImpl implements UserRepository {
 			ArrayList<PrivilegeDetails> privList = new ArrayList<PrivilegeDetails>();
 			while (rs.next()) {
 				privilege = new PrivilegeDetails();
-				
+
 				privilege.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
 				privilege.setProductName(rs.getString("PRODUCT_NAME"));
 				privilege.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
 				privilege.setModuleName(rs.getString("MODULE_NAME"));
-				
 				privilege.setCategoryId(rs.getLong("CATEGORY_ID"));
 				privilege.setCategoryCode(rs.getString("FEATURE_CODE"));
 				privilege.setSubCategoryId(rs.getLong("SUB_CATEGORY_ID"));
@@ -2332,10 +2174,10 @@ public class UserRepositoryImpl implements UserRepository {
 				privilege.setRoleId(rs.getLong("ROLE_SYS_ID"));
 				privList.add(privilege);
 			}
-			return privList;	
+			return privList;
 		}
 	}
-	
+
 	@Override
 	public List<Product> getProductsDropDownList(Long customerId) {
 		ArrayList<Product> productsList = null;
@@ -2375,7 +2217,7 @@ public class UserRepositoryImpl implements UserRepository {
 			return productList;
 		}
 	}
-	
+
 	@Override
 	public List<Module> getModulesDropDownList(Long customerId, Long productId) {
 		ArrayList<Module> modulesList = null;
@@ -2419,7 +2261,7 @@ public class UserRepositoryImpl implements UserRepository {
 			return modulesList;
 		}
 	}
-	
+
 	@Override
 	public List<Category> getCategoriesDropDownList(Long customerId, Long moduleId, boolean catOnly) {
 		ArrayList<Category> categoriesList = null;
@@ -2434,7 +2276,7 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "WHERE C.CUSTOMER_SYS_ID= ? AND CPM.CUST_PROD_MOD_SYS_ID = ? AND CPMF.ACTIVE_STATUS_IND = 1  "
 				+ "AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
 				+ "AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND");
-		
+
 		if(catOnly){
 			sql.append(" AND CPMF.FEATURE_TYPE LIKE 'PARENT%'");
 		}
@@ -2445,8 +2287,8 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setLong(1, customerId);
 					preparedStatement.setLong(2, moduleId);
 				}
-			}, new UserRepositoryImpl.categoryListDetailExtractor());					
-			
+			}, new UserRepositoryImpl.categoryListDetailExtractor());
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB: " + de.getMessage(), null, de);
 			throw de;
@@ -2542,7 +2384,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 
-	
+
 
 	public class categoryListDetailExtractor implements ResultSetExtractor<ArrayList<Category>> {
 
@@ -2563,9 +2405,6 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	
-
-		
 	public Valid upsertPrivilege(AddPrivilegeDetails addPrivilegeDetails) {
 		Valid valid = new Valid();
 		// Add privilege at subcategory level functional implementation are as follows.
@@ -2592,7 +2431,7 @@ public class UserRepositoryImpl implements UserRepository {
 				   return insertList.size();
 			   }
 
-		
+
 			   public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
 				   SubCategoriesPrivilege subCategoriesPrivilege = insertList.get(i);
 				   if (subCategoriesPrivilege.getPrivilegeId() == 0) {
@@ -2632,107 +2471,7 @@ public class UserRepositoryImpl implements UserRepository {
 				   }
 			   }
 		   });
-	/*String sql1 = "SELECT * FROM PRIVILEGES " + " WHERE CUST_PROD_SYS_ID = ? AND CUST_PROD_MOD_SYS_ID=?"
-				+ " AND CUST_PROD_MOD_FEATURE_SYS_ID =? AND ROLE_SYS_ID = ?";
-		boolean privExists = false;
-		
-		
-
-		try {
-		
-		
-			privExists = jdbcTemplate.query(sql1, preparedStatement -> {
-                preparedStatement.setLong(1, addPrivilegeDetails.getProductId());
-                preparedStatement.setLong(2, addPrivilegeDetails.getModuleId());
-                preparedStatement.setLong(3, addPrivilegeDetails.getCategoryId());
-                preparedStatement.setLong(4, addPrivilegeDetails.getRoleId());
-            }, new UserRepositoryImpl.PrivExistsExtractor());
-
-			if (!privExists) {
-				
-				//Check if privilege exists for the product/module, if no then create privileges for them.
-				
-				
-				
-				insertPMFAccessPrivilege(addPrivilegeDetails.getMasterLoginId(), addPrivilegeDetails.getRoleId(), addPrivilegeDetails.getModuleId(), addPrivilegeDetails.getProductId());
-				// Check if this is a child or a parent category
-
-				// if child - Then insert privilege "view" for parent and then
-				// insert privilege for child
-
-				
-				
-				if (addPrivilegeDetails.getCategoryType().split("_")[0].equals("CHILD")) {
-
-					//Get Parent feature id
-					String sql2 = "select CUST_PROD_MOD_FEATURE_SYS_ID from CUSTOMER_PRODUCT_MODULE_FEATURES"
-							+ " WHERE FEATURE_CODE=?";
-					
-					Long featurId = null;
-					featurId = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
-						public void setValues(PreparedStatement preparedStatement) throws SQLException {							
-							preparedStatement.setString(1, privilege.getCategoryType().split("_")[1]);
-						}
-					}, new UserRepositoryImpl.featureIdExtractor());
-					
-					
-					// check if privilege exists for parent
-
-					String sql3 = "SELECT * FROM PRIVILEGES " + " WHERE CUST_PROD_SYS_ID = ? AND CUST_PROD_MOD_SYS_ID=?"
-							+ " AND CUST_PROD_MOD_FEATURE_SYS_ID =? AND ROLE_SYS_ID = ?";
-					boolean pExists = false;
-					Long parentFeatureId = featurId;
-					pExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-						public void setValues(PreparedStatement preparedStatement) throws SQLException {
-							preparedStatement.setLong(1, privilege.getProductId());
-							preparedStatement.setLong(2, privilege.getModuleId());
-							preparedStatement.setLong(3, parentFeatureId);
-							preparedStatement.setLong(4, privilege.getRoleId());
-						}
-					}, new UserRepositoryImpl.PrivExistsExtractor());
-					//if there is no priv for parent. then create priv with "View" option only
-					if (!pExists) {
-
-						String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
-								+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
-								+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
-						jdbcTemplate.update(sql4, new PreparedStatementSetter() {
-							public void setValues(PreparedStatement preparedStatement) throws SQLException {
-								preparedStatement.setLong(1, privilege.getProductId());
-								preparedStatement.setLong(2, privilege.getModuleId());
-								preparedStatement.setLong(3, parentFeatureId);
-								preparedStatement.setLong(4, privilege.getRoleId());
-								preparedStatement.setLong(5, 0);
-								preparedStatement.setLong(6, 32768);
-								preparedStatement.setString(7, "View");
-								preparedStatement.setString(8, privilege.getMasterLoginId());
-							}
-						});
-					}
-
-				} 
-
-				String sql5 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
-						+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
-						+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
-				jdbcTemplate.update(sql5, new PreparedStatementSetter() {
-					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setLong(1, privilege.getProductId());
-						preparedStatement.setLong(2, privilege.getModuleId());
-						preparedStatement.setLong(3, privilege.getCategoryId());
-						preparedStatement.setLong(4, privilege.getRoleId());
-						preparedStatement.setLong(5, 0);
-						preparedStatement.setLong(6, privilege.getPrivilegeCode());
-						preparedStatement.setString(7, privilege.getPrivilegeDesc());
-						preparedStatement.setString(8, privilege.getMasterLoginId());
-					}
-				
-				
-				});*/
-			
 				valid.setValid(true);
-			
-			
 		} catch (Exception e) {
 			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
 			valid.setValid(false);
@@ -2800,7 +2539,7 @@ public class UserRepositoryImpl implements UserRepository {
 			return privExists;
 		}
 	}
-	
+
 	public class featureIdExtractor implements ResultSetExtractor<Long> {
 
 		@Override
@@ -2812,7 +2551,7 @@ public class UserRepositoryImpl implements UserRepository {
 			return privExists;
 		}
 	}
-	
+
 	@Override
 	public boolean deletePrivilege(Long privId) {
 
@@ -2830,7 +2569,7 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public List<CategoryDetails> getCategories(Long customerId) {
 		ArrayList<CategoryDetails> categoryList = null;
@@ -2848,28 +2587,28 @@ public class UserRepositoryImpl implements UserRepository {
 				+ " WHERE "
 				+ " P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
 				+ " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  AND C.CUSTOMER_SYS_ID=?");
-		
-			
+
+
 		try {
 			categoryList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setLong(1, customerId);
 				}
 			}, new UserRepositoryImpl.CategoryDetailExtractor());
-			
+
 			ArrayList<CategoryDetails> categoryParentSorted = new ArrayList<CategoryDetails>();
 			ArrayList<CategoryDetails> categoryChildSorted = new ArrayList<CategoryDetails>();
 			ArrayList<SubCategoryDetails> subCategory = null;
-			
+
 			for(CategoryDetails catDetails : categoryList){
-								
+
 					if (catDetails.getCategoryType().split("_")[0].equals("PARENT")) {
 						categoryParentSorted.add(catDetails);
 					} else if (catDetails.getCategoryType().split("_")[0].equals("CHILD")) {
 						categoryChildSorted.add(catDetails);
-					}				
+					}
 			}
-			
+
 			for(CategoryDetails catPDetails : categoryParentSorted){
 				subCategory = new ArrayList<SubCategoryDetails>();
 				for(CategoryDetails catCDetails : categoryChildSorted){
@@ -2879,25 +2618,25 @@ public class UserRepositoryImpl implements UserRepository {
 						subCategories.setSubCategoryName(catCDetails.getCategoryName());
 						subCategories.setSubCategoryDesc(catCDetails.getCategoryDesc());
 						subCategories.setActivestatusInd(catCDetails.getActiveStatusInd());
-						subCategory.add(subCategories);	
+						subCategory.add(subCategories);
 					}
-									
-				}		
+
+				}
 				catPDetails.setSubCategories(subCategory);
 				catList.add(catPDetails);
-			}		
-			
+			}
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
 		} catch (Exception e) {
 			logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
 		}
-		
+
 		return catList;
-			
+
 	}
-	
+
 	public class CategoryDetailExtractor implements ResultSetExtractor<ArrayList<CategoryDetails>> {
 
 		@Override
@@ -2907,21 +2646,21 @@ public class UserRepositoryImpl implements UserRepository {
 			ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
 			while (rs.next()) {
 				category = new CategoryDetails();
-				
+
 				category.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
 				category.setProductName(rs.getString("PRODUCT_NAME"));
 				category.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
 				category.setModuleName(rs.getString("MODULE_NAME"));
 				category.setCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
 				category.setCategoryName(rs.getString("FEATURE_NAME"));
-				category.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));		
+				category.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
 				category.setCategoryCode(rs.getString("FEATURE_CODE"));
 				category.setCategoryType(rs.getString("FEATURE_TYPE"));
 				category.setCategoryDesc(rs.getString("FEATURE_DESC"));
 				category.setActiveStatusInd(rs.getLong("ACTIVE_STATUS_IND"));
 				catList.add(category);
 			}
-			return catList;	
+			return catList;
 		}
 	}
 
@@ -3030,7 +2769,7 @@ public class UserRepositoryImpl implements UserRepository {
 			return catExists;
 		}
 	}
-	
+
 	@Override
 	public boolean checkSubCatExists(CategoryDetails category) {
 		Boolean catExists;
@@ -3063,15 +2802,15 @@ public class UserRepositoryImpl implements UserRepository {
 			return catExists;
 		}
 	}
-	
+
 	private boolean checkIfSubCatExists(CategoryDetails category) {
 		Boolean catExists;
 		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
 				+ " WHERE FEATURE_TYPE = ? ";
 		try {
 			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {					
-					preparedStatement.setString(1, "CHILD_"+category.getCategoryCode());					
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, "CHILD_"+category.getCategoryCode());
 				}
 			}, new UserRepositoryImpl.SubCatExistsExtractor());
 		} catch (Exception e) {
@@ -3152,7 +2891,7 @@ public class UserRepositoryImpl implements UserRepository {
 		return categoryList;
 
 	}
-	
+
 	public class SubCategoryDetailExtractor implements ResultSetExtractor<ArrayList<SubCategoryDetails>> {
 
 		@Override
@@ -3161,32 +2900,32 @@ public class UserRepositoryImpl implements UserRepository {
 
 			SubCategoryDetails subCategory = null;
 			ArrayList<SubCategoryDetails> subCatList = new ArrayList<SubCategoryDetails>();
-			while (rs.next()) {				
-				subCategory = new SubCategoryDetails();	
+			while (rs.next()) {
+				subCategory = new SubCategoryDetails();
 				subCategory.setSubCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
 				subCategory.setSubCategoryName(rs.getString("FEATURE_NAME"));
 				subCategory.setSubCategoryDesc(rs.getString("FEATURE_DESC"));
 				subCategory.setActivestatusInd(rs.getLong("ACTIVE_STATUS_IND"));
 				subCatList.add(subCategory);
 			}
-			return subCatList;	
+			return subCatList;
 		}
 	}
-	
-	
+
+
 
 	@Override
 	public Valid updateCategory(CategoryDetails category) {
 		Valid valid = new Valid();
-		
+
 		//Update Parent Category
 		String sql = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_NAME=?,FEATURE_DESC=?,FEATURE_CODE=?,"
-				+ "FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=? WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";				
+				+ "FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=? WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";
 
 		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
 		StringBuffer featureCode = new StringBuffer();
-		StringBuffer featureType = new StringBuffer();	
-		
+		StringBuffer featureType = new StringBuffer();
+
 		if (category.isIscatNameChanged()) {
 			for (int i = 0; i < categoryCode.length; i++) {
 				featureCode.append(categoryCode[i]);
@@ -3197,7 +2936,7 @@ public class UserRepositoryImpl implements UserRepository {
 			featureCode.append(category.getCategoryCode());
 			featureType.append(category.getCategoryType());
 		}
-		
+
 		try {
 
 			jdbcTemplate.update(sql, new PreparedStatementSetter() {
@@ -3216,18 +2955,18 @@ public class UserRepositoryImpl implements UserRepository {
 				//Update Child Category
 				String sql1 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_NAME=?,FEATURE_DESC=?,"
 						+ "FEATURE_CODE=?,FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
-						+ " WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";				
+						+ " WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";
 				String[] subCategoryCode = category.getSubCategories().get(0).getSubCategoryName().toUpperCase().split(" ");
 				StringBuffer subFeatureCode = new StringBuffer();
 				StringBuffer subFeatureType = new StringBuffer();
-				
-				
+
+
 					for (int i = 0; i < subCategoryCode.length; i++) {
 						subFeatureCode.append(subCategoryCode[i]);
 					}
 					subFeatureCode.append(category.getSubCategories().get(0).getSubCategoryId());
 					subFeatureType.append("CHILD_" + featureCode);
-				
+
 				jdbcTemplate.update(sql1, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
 						preparedStatement.setString(1, category.getSubCategories().get(0).getSubCategoryName());
@@ -3239,37 +2978,37 @@ public class UserRepositoryImpl implements UserRepository {
 						preparedStatement.setLong(7, category.getSubCategories().get(0).getSubCategoryId());
 					}
 				});
-				
+
 				//Update FeatureType of all sub categories
 				if (category.isIscatNameChanged()) {
-									
+
 					//update all sub categories with new feature type
-				
+
 					String sql2 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_TYPE=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
-							+ " WHERE FEATURE_TYPE=?";		
+							+ " WHERE FEATURE_TYPE=?";
 					jdbcTemplate.update(sql2, new PreparedStatementSetter() {
-						public void setValues(PreparedStatement preparedStatement) throws SQLException {							
-							preparedStatement.setString(1, subFeatureType.toString());							
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {
+							preparedStatement.setString(1, subFeatureType.toString());
 							preparedStatement.setString(2, category.getMasterLoginId());
 							preparedStatement.setString(3, "CHILD_"+category.getCategoryCode());
 						}
 					});
 				}
-				
+
 			} else if (category.isIscatNameChanged() && checkIfSubCatExists(category)) {
 				//update all sub categories with new feature type
-				
+
 				String sql3 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_TYPE=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
-						+ " WHERE FEATURE_TYPE=?";		
+						+ " WHERE FEATURE_TYPE=?";
 				jdbcTemplate.update(sql3, new PreparedStatementSetter() {
-					public void setValues(PreparedStatement preparedStatement) throws SQLException {							
-						preparedStatement.setString(1, "CHILD_"+ featureCode);							
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, "CHILD_"+ featureCode);
 						preparedStatement.setString(2, category.getMasterLoginId());
 						preparedStatement.setString(3, "CHILD_"+category.getCategoryCode());
 					}
 				});
 			}
-			
+
 			valid.setValid(true);
 		} catch (Exception e) {
 			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);

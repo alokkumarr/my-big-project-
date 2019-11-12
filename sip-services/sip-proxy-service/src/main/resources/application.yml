@@ -59,5 +59,7 @@ metadata:
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:
+  security:
+    host: ${connector}://localhost:9000/saw-security
   ssl:
     enable: false

@@ -28,6 +28,7 @@ import com.sncr.saw.security.common.bean.repo.dsk.*;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -244,6 +245,20 @@ public class SecurityController {
 					Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
 							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
 		}
+	}
+
+	/**
+	 * Fetch the data security details by the master login id
+	 *
+	 * @param userId
+	 * @return details of dsl
+	 */
+	@RequestMapping(value = "/dskDetails", method = RequestMethod.GET)
+	public DataSecurityKeys dskDetailsByUserId(@RequestParam(value = "userId") String userId, HttpServletResponse response) {
+		if (userId == null || userId.isEmpty()) {
+			response.setStatus(401);
+		}
+		return userRepository.fetchDSKDetailByUserId(userId);
 	}
 
 	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)

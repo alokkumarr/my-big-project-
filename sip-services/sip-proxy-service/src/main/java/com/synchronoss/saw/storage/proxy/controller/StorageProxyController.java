@@ -1,7 +1,8 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
@@ -71,79 +72,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
-  @Autowired private StorageProxyService proxyService;
 
   @Value("${metadata.service.host}")
   private String metaDataServiceExport;
 
+  @Value("${sip.security.host}")
+  private String sipSecurityHost;
+
   @Autowired private RestUtil restUtil;
+  @Autowired private StorageProxyService proxyService;
 
   public static final String CUSTOMER_CODE = "customerCode";
 
-  public Gson gson = new Gson();
-
-  /**
-   * This method is used to get the data based on the storage type<br>
-   * perform conversion based on the specification asynchronously.
-   *
-   * @param requestBody
-   * @return
-   */
-  // @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  // @RequestMapping(value = "/internal/proxy/storage/async", method = RequestMethod.POST, produces=
-  // MediaType.APPLICATION_JSON_UTF8_VALUE)
-  // @ResponseStatus(HttpStatus.ACCEPTED)
-  public CompletableFuture<StorageProxy> retrieveStorageDataAsync(
-      @RequestBody StorageProxy requestBody) {
-    logger.debug("Request Body:{}", requestBody);
-    if (requestBody == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
-    }
-    CompletableFuture<StorageProxy> responseObjectFuture = null;
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      logger.trace(
-          "Storage Proxy async request object : {} ", objectMapper.writeValueAsString(requestBody));
-      responseObjectFuture =
-          CompletableFuture.supplyAsync(
-                  () -> {
-                    StorageProxy proxyResponseData = null;
-                    try {
-                      proxyResponseData = proxyService.execute(requestBody);
-                    } catch (IOException e) {
-                      logger.error("While retrieving data there is an exception.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    } catch (ProcessingException e) {
-                      logger.error(
-                          "Exception generated while validating incoming json against schema.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    } catch (Exception e) {
-                      logger.error("Exception generated while processing incoming json.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    }
-                    return proxyResponseData;
-                  })
-              .handle(
-                  (res, ex) -> {
-                    if (ex != null) {
-                      logger.error("While retrieving data there is an exception.", ex);
-                      res.setStatusMessage(ex.getCause().toString());
-                      return res;
-                    }
-                    return res;
-                  });
-    } catch (IOException e) {
-      throw new JSONProcessingSAWException("expected missing on the request body");
-    } catch (ReadEntitySAWException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
-    }
-    return responseObjectFuture;
-  }
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -325,8 +265,14 @@ public class StorageProxyController {
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
     }
-    List<TicketDSKDetails> dskList =
-        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
+    List<TicketDSKDetails> dskList = new ArrayList<>();
+    // fetch DSK details for scheduled
+    if (isScheduledExecution && authTicket.getMasterLoginId() != null) {
+      dskList = getDSKDetailsByUser(sipSecurityHost, authTicket.getMasterLoginId(), restUtil);
+    } else {
+      dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
+    }
+
     SipQuery savedQuery =
         getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -334,7 +280,7 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-    List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
+    List<String> sipQueryArts = getArtifactsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
 
@@ -343,7 +289,7 @@ public class StorageProxyController {
     if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
       String analysisType = analysis.getType();
       DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-      List<String> artsName = getArtsNames(savedQuery);
+      List<String> artsName = getArtifactsNames(savedQuery);
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
       Boolean designerEdit =
           analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
@@ -352,7 +298,7 @@ public class StorageProxyController {
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
           if (query.contains(artifact)) {
-            dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
             dataSecurityKeyDef = new DataSecurityKeyDef();
@@ -378,7 +324,7 @@ public class StorageProxyController {
       }
     }
 
-    logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
+    logger.debug("Final DataSecurity Object : " , dataSecurityKeyNode);
     try {
       Long startTime = new Date().getTime();
       logger.trace(
