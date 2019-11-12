@@ -38,7 +38,7 @@ workbench:
         project-path: "/Desktop" 
         project-root: "/var/sip"
         preview-limit: 10000
-        livy-uri: https://mapr:mapr@localhost:8998
+        livy-uri: http://localhost:8998
         storage-url: ${connector}://localhost:9800
 
 metastore:
