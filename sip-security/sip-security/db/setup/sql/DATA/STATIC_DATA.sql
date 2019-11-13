@@ -16,6 +16,7 @@ INSERT INTO schema_version VALUES ('9', '9', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('10', '10', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('11', '11', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('12', '12', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('23', '23', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 /** It is intentional not to include new entry for schema_version('13') to make sure V13__ONBOARD_CUST_DDL.sql is run for all migration **/
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
