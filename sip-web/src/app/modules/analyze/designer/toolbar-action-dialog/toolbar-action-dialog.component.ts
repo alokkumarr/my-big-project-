@@ -6,8 +6,6 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
-import * as fpMap from 'lodash/fp/map';
-import * as fpPipe from 'lodash/fp/pipe';
 
 @Component({
   selector: 'toolbar-action-dialog',
@@ -44,21 +42,15 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   }
 
   validateSaving(analysisName) {
-    let validationStateFail = false;
     const analysisNameLength = analysisName.length;
     // Due to an error in generating an excel file during dispatch opearation,
     // we need to apply the following length and special character rules.
     this.validateCheck = {
-      validateLength: analysisNameLength === 0 || analysisNameLength > 31 ? false : true,
+      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? false : true,
       validateCharacters: /^[0-9a-zA-Z _-]+$/.test(analysisName)
     };
-    fpPipe(
-      fpMap(check => {
-        if (check === false) {
-          validationStateFail = true;
-        }
-      })
-    )(this.validateCheck);
+    const { validateLength, validateCharacters } = this.validateCheck;
+    const validationStateFail = !validateLength || !validateCharacters;
     return validationStateFail;
   }
 
