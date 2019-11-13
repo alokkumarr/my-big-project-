@@ -17,7 +17,7 @@ export class AdminListViewComponent implements OnInit {
     | 'user'
     | 'role'
     | 'privilege'
-    | 'categories'
+    | 'category'
     | 'user assignments';
   @Input() highlightTerm: string;
   @Output() editRow: EventEmitter<any> = new EventEmitter();

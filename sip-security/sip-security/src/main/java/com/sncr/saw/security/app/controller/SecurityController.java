@@ -1626,6 +1626,7 @@ public class SecurityController {
 		Valid valid = null;
 		try {
 			if (category != null) {
+			 if(!userRepository.checkIsAlertModule(category.getModuleId())){
 				if (!userRepository.checkCatExists(category)) {
 					valid = userRepository.addCategory(category);
 					if (valid.getValid()) {
@@ -1639,8 +1640,12 @@ public class SecurityController {
 					catList.setValid(false);
 					catList.setValidityMessage(
 							"Category Name already exists for this Customer Product Module Combination. ");
-				}
-			} else {
+          }
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Adding Categories and Sub Categories for Alert Module is not allowed. ");
+        }
+      } else {
 				catList.setValid(false);
 				catList.setValidityMessage("Mandatory request params are missing");
 			}

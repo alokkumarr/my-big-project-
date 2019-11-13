@@ -3392,4 +3392,22 @@ public class UserRepositoryImpl implements UserRepository {
     }
     return message;
   }
+
+  @Override
+  public boolean checkIsAlertModule(Long moduleId) {
+    String sql = "select M.MODULE_NAME from MODULES M where M.MODULE_SYS_ID =?";
+    try {
+      String moduleName =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> preparedStatement.setLong(1, moduleId),
+              new UserRepositoryImpl.StringExtractor("MODULE_NAME"));
+      if (moduleName.equalsIgnoreCase("ALERTS")) {
+        return true;
+      }
+    } catch (Exception e) {
+      logger.error("Exception encountered while ", e);
+    }
+    return false;
+  }
 }
