@@ -1643,7 +1643,7 @@ public class SecurityController {
           }
         } else {
           catList.setValid(false);
-          catList.setValidityMessage("cannot add Categories and Sub Categories for Alert Module");
+          catList.setValidityMessage("Adding Categories and Sub Categories for Alert Module is not allowed. ");
         }
       } else {
 				catList.setValid(false);
