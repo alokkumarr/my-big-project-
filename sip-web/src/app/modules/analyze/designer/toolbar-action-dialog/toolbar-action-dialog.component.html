@@ -17,6 +17,16 @@
                         (descriptionChange)="onDescriptionChange($event)"
                         [description]="data.description">
   </designer-description>
+  <!-- Validation error messages for the user to correct the
+  incorrect analysis name entered. -->
+  <div class="name-validation" *ngIf="validateSaving(data.analysis.name)" fxLayout="column">
+    <span *ngIf="!validateCheck.validateLength">
+      * Analysis Name cannot be empty or exceed 31 characters.
+    </span>
+    <span *ngIf="!validateCheck.validateCharacters">
+      * Analysis Name cannot contain special characters.
+    </span>
+  </div>
   <designer-save *ngSwitchCase="'save'"
                  (nameChange)="onNameChange($event)"
                  [designerMode]="data.designerMode"
@@ -44,14 +54,14 @@
         <button *ngSwitchCase="'save'"
                 (click)="save('saveAndClose')"
                 e2e="save-dialog-save-analysis"
-                [disabled]="validateSaving()"
+                [disabled]="validateSaving(data.analysis.name)"
                 mat-raised-button color="primary" i18n>
           Save & Close
         </button>
         <button *ngSwitchCase="'save'"
                 (click)="save('save')"
                 e2e="dialog-save-analysis"
-                [disabled]="validateSaving()"
+                [disabled]="validateSaving(data.analysis.name)"
                 mat-button i18n>
           Save
         </button>
