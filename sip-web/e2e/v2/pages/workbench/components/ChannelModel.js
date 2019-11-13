@@ -33,6 +33,7 @@ class ChannelModel extends TestConnectivity {
     this._testConnectivity = element(
       by.css(`[e2e="channel-test-connect-btn-model"]`)
     );
+    this._hostName = element(by.css(`[e2e="host-name-input"]`));
   }
 
   clickOnChannelType(name) {
@@ -92,6 +93,16 @@ class ChannelModel extends TestConnectivity {
   clickOnUpdateChannel() {
     commonFunctions.clickOnElement(this._channelUpdateBtn);
   }
+
+  fillHostName(hostName) {
+    commonFunctions.fillInput(this._hostName, hostName);
+  }
+
+  selectMethodType(method) {}
+
+  addHeaders(headers) {}
+
+  addQueryParams(queryParams) {}
 }
 
 module.exports = ChannelModel;
