@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -50,6 +52,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
     analysis.setCreatedTime(Instant.now().toEpochMilli());
+    validateAnalysisName(analysis.getName());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
         String query = getDlQuery(analysis);
@@ -71,6 +74,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public Analysis updateAnalysis(Analysis analysis, Ticket ticket) throws SipUpdateEntityException {
     analysis.setModifiedTime(Instant.now().toEpochMilli());
+    validateAnalysisName(analysis.getName());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
         String query = getDlQuery(analysis);
@@ -227,5 +231,30 @@ public class AnalysisServiceImpl implements AnalysisService {
       return analysis.getSipQuery().getQuery();
     }
     return null;
+  }
+  /**
+   * Validates the Analysis Name.
+   *
+   * @param analysisName analysis name
+   */
+  private static void validateAnalysisName(String analysisName) {
+    if (analysisName == null) {
+      throw new IllegalArgumentException("analysisName must not be null");
+    }
+    int length = analysisName.length();
+    if (length >= 1 && length <= 30) {
+      Pattern special = Pattern.compile("[!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]");
+      Matcher hasSpecial = special.matcher(analysisName);
+      if (hasSpecial.find()) {
+        throw new IllegalArgumentException(
+            "Analysis name must not consists of special characters except '- _'");
+      }
+    } else {
+      throw new IllegalArgumentException(
+          String.format(
+              "analysisName %s is invalid - character count MUST be greater than or equal to 1 and "
+                  + "less than or equal to 30",
+              analysisName));
+    }
   }
 }
