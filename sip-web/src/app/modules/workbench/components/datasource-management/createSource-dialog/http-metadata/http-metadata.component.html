@@ -136,7 +136,7 @@
           <input
             matInput
             name="name-of-header"
-            [e2e]="'e2e-name-of-header-' + i"
+            [attr.e2e]="'e2e-name-of-header-' + i"
             formControlName="key"
             required
             autocomplete="off"
@@ -146,7 +146,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderFields[i] | async"
               [value]="option"
-              [attr.e2e]="option"
+              [attr.e2e]="'header-name-options-' + i + '-' + option"
             >
               {{ option }}
             </mat-option>
@@ -172,7 +172,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderValues[i] | async"
               [value]="option"
-              [attr.e2e]="option"
+              [attr.e2e]="'header-value-options-' + i + '-' + option"
             >
               {{ option }}
             </mat-option>
