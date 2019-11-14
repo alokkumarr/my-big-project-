@@ -117,4 +117,13 @@ describe('Designer Chart Component', () => {
     // disabled state is set to false.
     expect(checkAnalysisNameChar).toBeFalsy();
   });
+
+  it('should accept a correct analysis name with multi byte characters', () => {
+    const checkAnalysisNameChar = fixture.componentInstance.validateSaving(
+      'Untitled Analysis 😴 漢字'
+    );
+    // should accept a correct form of analysis name
+    // disabled state is set to false.
+    expect(checkAnalysisNameChar).toBeFalsy();
+  });
 });
