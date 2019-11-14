@@ -17,6 +17,8 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.sip.utils.Privileges;
+import com.synchronoss.sip.utils.Privileges.PRIVILEGE_NAMES;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -542,5 +544,34 @@ public class SipMetadataUtils {
         getCatIds(p.getProductModuleSubFeatures(), list);
       }
     }
+  }
+
+  /**
+   * Validate privileges for the user.
+   *
+   * @param productList Products associated with the user
+   * @param analysis Analysis request body
+   * @return validation response
+   */
+  public static Boolean validatePrivilege(
+      ArrayList<Products> productList, Analysis analysis, PRIVILEGE_NAMES privName) {
+    Privileges priv = new Privileges();
+    for (Products product : productList) {
+      ArrayList<ProductModules> productModulesList = product.getProductModules();
+      for (ProductModules productModule : productModulesList) {
+        ArrayList<ProductModuleFeature> prodModFeatureList = productModule.getProdModFeature();
+        for (ProductModuleFeature productModuleFeature : prodModFeatureList) {
+          ArrayList<ProductModuleFeature> productModuleSubFeatureList =
+              productModuleFeature.getProductModuleSubFeatures();
+          for (ProductModuleFeature prodModSubFeature : productModuleSubFeatureList) {
+            if (prodModSubFeature.getProdModFeatureID() == Long.parseLong(analysis.getCategory())) {
+              Long privCode = prodModSubFeature.getPrivilegeCode();
+              return priv.isPriviegePresent(privName, privCode);
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 }

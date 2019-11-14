@@ -46,4 +46,29 @@ public class SipCommonUtils {
     }
     return authHeader;
   }
+
+  /**
+   * Functions returns the binary equivalent given a decimal num.
+   *
+   * @param n decimal integer
+   * @return binary integer data
+   */
+  public static int[] decToBinary(Long n) {
+    int privCode[] = new int[16];
+    int j = 0;
+
+    for (Long i = 15L; i >= 0; i--) {
+      Long k = n >> i;
+      if ((k & 1) > 0) privCode[j++] = 1;
+      else privCode[j++] = 0;
+    }
+
+    String binCode = "";
+    for (int ind : privCode) {
+      binCode = binCode.concat(String.valueOf(ind));
+    }
+    logger.info(String.format("Binary Equivalent of : %s is = %s ", n, binCode));
+
+    return privCode;
+  }
 }

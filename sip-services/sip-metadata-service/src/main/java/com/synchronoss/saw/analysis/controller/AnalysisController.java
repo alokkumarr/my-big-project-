@@ -1,16 +1,20 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
+import static com.synchronoss.saw.util.SipMetadataUtils.validatePrivilege;
 
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
 import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.Privileges.PRIVILEGE_NAMES;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -73,15 +77,24 @@ public class AnalysisController {
       response.setStatus(400);
       return analysisResponse;
     }
-
     String id = UUID.randomUUID().toString();
     analysis.setId(id);
 
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
       response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication tol=ken");
+      analysisResponse.setMessage("Invalid authentication token");
+      return analysisResponse;
     }
+
+    ArrayList<Products> productList = authTicket.getProducts();
+
+    if (!validatePrivilege(productList, analysis, PRIVILEGE_NAMES.CREATE)) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Unauthorized");
+      return analysisResponse;
+    }
+
     analysis.setCreatedBy(authTicket.getUserFullName());
     analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, authTicket));
@@ -127,7 +140,17 @@ public class AnalysisController {
     if (authTicket == null) {
       response.setStatus(401);
       analysisResponse.setMessage("Invalid authentication token");
+      return analysisResponse;
     }
+
+    ArrayList<Products> productList = authTicket.getProducts();
+
+    if (!validatePrivilege(productList, analysis, PRIVILEGE_NAMES.EDIT)) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Unauthorized");
+      return analysisResponse;
+    }
+
     analysis.setModifiedBy(authTicket.getUserFullName());
     analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, authTicket));
@@ -162,6 +185,13 @@ public class AnalysisController {
       response.setStatus(401);
       analysisResponse.setMessage("Invalid authentication tol=ken");
     }
+    ArrayList<Products> productList = authTicket.getProducts();
+    Analysis analysis = analysisService.getAnalysis(id, authTicket);
+    if (analysis!= null && !validatePrivilege(productList, analysis, PRIVILEGE_NAMES.DELETE)) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Unauthorized");
+      return analysisResponse;
+    }
     analysisService.deleteAnalysis(id, authTicket);
     analysisResponse.setMessage("Analysis deleted successfully");
     analysisResponse.setAnalysisId(id);
@@ -192,10 +222,21 @@ public class AnalysisController {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = null; //getTicket(request);
-    /**
-     * if (authTicket == null) { response.setStatus(401); analysisResponse.setMessage("Invalid
-     * authentication token"); }
-     */
+
+    if (authTicket == null) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Invalid authentication token");
+      return analysisResponse;
+    }
+
+    ArrayList<Products> productList = authTicket.getProducts();
+    Analysis analysis = analysisService.getAnalysis(id, authTicket);
+    if (analysis != null && !validatePrivilege(productList, analysis, PRIVILEGE_NAMES.ACCESS)) {
+      response.setStatus(401);
+      analysisResponse.setMessage("Unauthorized");
+      return analysisResponse;
+    }
+
     analysisResponse.setAnalysis(analysisService.getAnalysis(id, authTicket));
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
