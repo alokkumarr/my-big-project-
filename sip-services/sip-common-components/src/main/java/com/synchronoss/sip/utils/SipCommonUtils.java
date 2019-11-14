@@ -54,13 +54,16 @@ public class SipCommonUtils {
    * @return binary integer data
    */
   public static int[] decToBinary(Long n) {
-    int privCode[] = new int[16];
+    int[] privCode = new int[16];
     int j = 0;
 
     for (Long i = 15L; i >= 0; i--) {
       Long k = n >> i;
-      if ((k & 1) > 0) privCode[j++] = 1;
-      else privCode[j++] = 0;
+      if ((k & 1) > 0) {
+        privCode[j++] = 1;
+      } else {
+        privCode[j++] = 0;
+      }
     }
 
     String binCode = "";

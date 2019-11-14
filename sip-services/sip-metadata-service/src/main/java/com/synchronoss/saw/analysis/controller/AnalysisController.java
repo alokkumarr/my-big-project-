@@ -10,7 +10,7 @@ import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
 import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
-import com.synchronoss.sip.utils.Privileges.PRIVILEGE_NAMES;
+import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -89,7 +89,7 @@ public class AnalysisController {
 
     ArrayList<Products> productList = authTicket.getProducts();
 
-    if (!validatePrivilege(productList, analysis, PRIVILEGE_NAMES.CREATE)) {
+    if (!validatePrivilege(productList, analysis, PrivilegeNames.CREATE)) {
       response.setStatus(401);
       analysisResponse.setMessage("Unauthorized");
       return analysisResponse;
@@ -145,7 +145,7 @@ public class AnalysisController {
 
     ArrayList<Products> productList = authTicket.getProducts();
 
-    if (!validatePrivilege(productList, analysis, PRIVILEGE_NAMES.EDIT)) {
+    if (!validatePrivilege(productList, analysis, PrivilegeNames.EDIT)) {
       response.setStatus(401);
       analysisResponse.setMessage("Unauthorized");
       return analysisResponse;
@@ -187,7 +187,7 @@ public class AnalysisController {
     }
     ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    if (analysis!= null && !validatePrivilege(productList, analysis, PRIVILEGE_NAMES.DELETE)) {
+    if (analysis != null && !validatePrivilege(productList, analysis, PrivilegeNames.DELETE)) {
       response.setStatus(401);
       analysisResponse.setMessage("Unauthorized");
       return analysisResponse;
@@ -221,7 +221,7 @@ public class AnalysisController {
       @PathVariable(name = "id") String id) {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    Ticket authTicket = null; //getTicket(request);
+    Ticket authTicket = getTicket(request);
 
     if (authTicket == null) {
       response.setStatus(401);
@@ -231,7 +231,7 @@ public class AnalysisController {
 
     ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    if (analysis != null && !validatePrivilege(productList, analysis, PRIVILEGE_NAMES.ACCESS)) {
+    if (analysis != null && !validatePrivilege(productList, analysis, PrivilegeNames.ACCESS)) {
       response.setStatus(401);
       analysisResponse.setMessage("Unauthorized");
       return analysisResponse;

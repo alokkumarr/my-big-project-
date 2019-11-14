@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 public class Privileges {
 
-  EnumMap<PRIVILEGE_NAMES, Integer> privilegeCodes;
+  EnumMap<PrivilegeNames, Integer> privilegeCodes;
 
   private static final Logger logger = LoggerFactory.getLogger(SipCommonUtils.class);
 
-  public enum PRIVILEGE_NAMES {
+  public enum PrivilegeNames {
     ACCESS,
     CREATE,
     EXECUTE,
@@ -24,25 +24,33 @@ public class Privileges {
     ALL
   }
 
+  /** Default constructor to intaialize enumMap. */
   public Privileges() {
-    privilegeCodes = new EnumMap<>(PRIVILEGE_NAMES.class);
-    privilegeCodes.put(PRIVILEGE_NAMES.ACCESS, 0);
-    privilegeCodes.put(PRIVILEGE_NAMES.CREATE, 1);
-    privilegeCodes.put(PRIVILEGE_NAMES.EXECUTE, 2);
-    privilegeCodes.put(PRIVILEGE_NAMES.PUBLISH, 3);
-    privilegeCodes.put(PRIVILEGE_NAMES.FORK, 4);
-    privilegeCodes.put(PRIVILEGE_NAMES.EDIT, 5);
-    privilegeCodes.put(PRIVILEGE_NAMES.EXPORT, 6);
-    privilegeCodes.put(PRIVILEGE_NAMES.DELETE, 7);
-    privilegeCodes.put(PRIVILEGE_NAMES.ALL, 8);
+    privilegeCodes = new EnumMap<>(PrivilegeNames.class);
+    privilegeCodes.put(PrivilegeNames.ACCESS, 0);
+    privilegeCodes.put(PrivilegeNames.CREATE, 1);
+    privilegeCodes.put(PrivilegeNames.EXECUTE, 2);
+    privilegeCodes.put(PrivilegeNames.PUBLISH, 3);
+    privilegeCodes.put(PrivilegeNames.FORK, 4);
+    privilegeCodes.put(PrivilegeNames.EDIT, 5);
+    privilegeCodes.put(PrivilegeNames.EXPORT, 6);
+    privilegeCodes.put(PrivilegeNames.DELETE, 7);
+    privilegeCodes.put(PrivilegeNames.ALL, 8);
   }
 
-  public boolean isPriviegePresent(PRIVILEGE_NAMES privName, Long dec) {
-    int privCode[] = decToBinary(dec);
+  /**
+   * Validate and check whether privilege is present.
+   *
+   * @param privName Privilege Name
+   * @param dec Decimal number
+   * @return Boolean value
+   */
+  public boolean isPriviegePresent(PrivilegeNames privName, Long dec) {
+    int[] privCode = decToBinary(dec);
     int privValue = privilegeCodes.get(privName);
 
     logger.info(String.format("Privilege Name : %s , Privilege Value : %d ", privName, privValue));
-    if (privCode[privilegeCodes.get(PRIVILEGE_NAMES.ALL)] == 1 || privCode[privValue] == 1) {
+    if (privCode[privilegeCodes.get(PrivilegeNames.ALL)] == 1 || privCode[privValue] == 1) {
       return true;
     }
 
