@@ -46,11 +46,11 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     // Due to an error in generating an excel file during dispatch opearation,
     // we need to apply the following length and special character rules.
     this.validateCheck = {
-      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? false : true,
-      validateCharacters: /^[0-9a-zA-Z _-]+$/.test(analysisName)
+      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
+      validateCharacters: /[!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
     };
     const { validateLength, validateCharacters } = this.validateCheck;
-    const validationStateFail = !validateLength || !validateCharacters;
+    const validationStateFail = validateLength || validateCharacters;
     return validationStateFail;
   }
 
