@@ -25,7 +25,7 @@
           <mat-option
             *ngFor="let method of httpMethods"
             [value]="method"
-            [e2e]="'e2e-http-method-' + method"
+            [attr.e2e]="'e2e-http-method-' + method"
             i18n
             >{{ method }}</mat-option
           >
@@ -146,7 +146,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderFields[i] | async"
               [value]="option"
-              [e2e]="'e2e-'option"
+              [attr.e2e]="option"
             >
               {{ option }}
             </mat-option>
@@ -162,7 +162,7 @@
           <input
             matInput
             name="value-of-header"
-            [e2e]="'e2e-value-of-header-' + i"
+            [attr.e2e]="'e2e-value-of-header-' + i"
             formControlName="value"
             required
             [matAutocomplete]="headerValueAuto"
@@ -172,7 +172,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderValues[i] | async"
               [value]="option"
-              [e2e]="option"
+              [attr.e2e]="option"
             >
               {{ option }}
             </mat-option>
@@ -186,7 +186,7 @@
           mat-icon-button
           (click)="removeHeader(i)"
           fxFlex="0 1 auto"
-          [e2e]="'e2e-remove-header-' + i"
+          [attr.e2e]="'e2e-remove-header-' + i"
         >
           <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
@@ -237,7 +237,7 @@
           <input
             matInput
             name="name-of-query-param"
-            [e2e]="'e2e-name-of-query-param-' + i"
+            [attr.e2e]="'e2e-name-of-query-param-' + i"
             formControlName="key"
             required
             autocomplete="off"
@@ -254,7 +254,7 @@
           <input
             matInput
             name="value-of-query-parameter"
-            [e2e]="'e2e-value-of-query-parameter-' + i"
+            [attr.e2e]="'e2e-value-of-query-parameter-' + i"
             formControlName="value"
             required
             autocomplete="off"
@@ -268,7 +268,7 @@
           mat-icon-button
           (click)="removeQueryParam(i)"
           fxFlex="0 1 auto"
-          [e2e]="'e2e-remove-query-param-btn-' + i"
+          [attr.e2e]="'e2e-remove-query-param-btn-' + i"
         >
           <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
