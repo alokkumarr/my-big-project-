@@ -146,6 +146,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderFields[i] | async"
               [value]="option"
+              [e2e]="'e2e-'option"
             >
               {{ option }}
             </mat-option>
