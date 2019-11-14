@@ -1,7 +1,6 @@
 /*******************************************************************************
  Add default category and subcategory to Alert Module
 ********************************************************************************/
--- Correcting module Name
 UPDATE MODULES SET MODULE_NAME='ALERTS' WHERE MODULE_NAME= 'ALERT';
 
 SELECT @PRODUCT_SYS_ID := PRODUCT_SYS_ID from PRODUCTS WHERE PRODUCT_CODE = 'SAWD000001';
@@ -11,7 +10,6 @@ SELECT @CUST_PROD_MOD_SYS_ID :=CUST_PROD_MOD_SYS_ID FROM CUSTOMER_PRODUCT_MODULE
 
 
 
---Adding Categories and sub categories and their priviliges
 INSERT INTO MODULE_PRIVILEGES (`MODULE_SYS_ID`,`PRIVILEGE_CODES_SYS_ID`) SELECT M.MODULE_SYS_ID ,PC.PRIVILEGE_CODES_SYS_ID FROM MODULES M , privilege_codes PC WHERE M.MODULE_NAME = 'ALERTS' and PC.PRIVILEGE_CODES_NAME = 'ACCESS';
 
 INSERT INTO `CUSTOMER_PRODUCT_MODULE_FEATURES` (`CUST_PROD_MOD_SYS_ID`,`DEFAULT_URL`,`FEATURE_NAME`,`FEATURE_DESC`,`FEATURE_CODE`,`FEATURE_TYPE`,`DEFAULT`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) VALUES (@CUST_PROD_MOD_SYS_ID,'/','Alerts','Alerts','ALERT12','PARENT_ALERT12',0,1,NOW(),'admin');
