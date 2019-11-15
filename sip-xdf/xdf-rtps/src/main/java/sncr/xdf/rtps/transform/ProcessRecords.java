@@ -29,6 +29,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.VoidFunction2;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -46,6 +47,7 @@ import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -171,6 +173,14 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         CommitOffsets(in, tm);
     }
 
+    
+    private List<Row> getEventTypes(JavaRDD<ConsumerRecord<String, String>> in, SparkSession session){
+    	SparkConf cnf = in.context().getConf();
+    	JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleRecord());
+    	Dataset<Row> dataset = session.read().json(stringRdd).toDF();
+    	List<Row> eventTypes = dataset.select((String) "EVENT_TYPE").distinct().collectAsList();
+    	return eventTypes;
+    }
     // We have to support time based indexes
     // Configuration can specify index name with multiple date/time formats in curly brackets
     // In this case we will create index name based on current timestamp
@@ -200,29 +210,56 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     private void ProcessSimpleRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
         JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleRecord());
-        SaveSimpleBatch(stringRdd, tm);
         SparkConf cnf = in.context().getConf();
-        processJsonRecords(stringRdd, tm, cnf, this.itcx,DM_SIMPLE);
+        SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
+        List<Row> types = getEventTypes(in,sess);
+        for(Row event: types) {
+        	String eventType = (String) event.get(0);
+        	SaveSimpleBatch(stringRdd, tm,eventType);
+        }
+        
+        
     }
 
     private void ProcessSimpleJsonRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
     	logger.debug("Beginning simple-json processing...");
         JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleJsonRecord());
         logger.debug("String rdd conversion completed saving batch...");
-        SaveSimpleBatch(stringRdd, tm);
-        logger.debug("retriving spark configuration");
         SparkConf cnf = in.context().getConf();
+        SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
+        List<Row> types = getEventTypes(in,sess);
+        for(Row event: types) {
+        	String eventType = (String) event.get(0);
+        	logger.debug("EVENT TYPE::"+ eventType);
+        	String query = "EVENT_TYPE" + "== \'" + eventType + "\'";
+        	/*JavaRDD<String> eventData = stringRdd.filter(new Function<String, Boolean>(){
+
+				@Override
+				public Boolean call(String data) throws Exception {
+					JSONParser parser = new JSONParser();
+					JSONObject json = (JSONObject) parser.parse(data);
+					return json.get("EVENT_TYPE").equals(eventType);
+					
+				}
+        		
+        	});*/
+        	 SaveSimpleBatch(stringRdd, tm,eventType);
+        	 
+        }
+        logger.debug("retriving spark configuration");
         logger.debug("Invoking json processing");
-        processJsonRecords(stringRdd, tm, cnf, this.itcx,DM_SIMPLE_JSON);
     }
 
-    private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm){
+    private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm, String eventType){
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
             Date batchDt = new Date(tm.milliseconds());
             String batchName = batchPrefix + sdf.format(batchDt);
-            String path = basePath + File.separator + batchName;
-            String strTmpPath = basePath + File.separator + "__TMP-" + batchName;
+            String path = basePath + File.separator + batchName + File.separator + eventType;;
+            String strTmpPath = basePath + File.separator + "__TMP-" + 
+            			batchName + File.separator + eventType;
+            
+            logger.debug("Temp path::"+ strTmpPath);
             // Save data as TEMP
             stringRdd.saveAsTextFile(strTmpPath);
             // Rename and cleanup
@@ -334,15 +371,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				this.schemaFields.forEach((eventType, eventSchema) -> {
 
 					logger.debug("Processing for event : " + eventType + "with schema : " + eventSchema);
-
 					Dataset<Row> df = null;
-
-					//List<StructField> structField = new ArrayList<StructField>();
-					//structField.add(eventSchema);
-					//StructType fieldSchema = DataTypes.createStructType(structField);
-
 					JavaRDD<Row> rowRdd = sess.read().schema(schemaFields.get(eventType)).json(jsonRdd).toJavaRDD();
-
 					logger.debug("######## Reading completed through spark session #####");
 					if ((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY))) {
 						df = sess.createDataFrame(rowRdd, schemaFields.get(eventType));
@@ -351,20 +381,15 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					}
 
 					logger.debug("##### Data frame created with specific schema ");
-
 					String isTimeSeries = null;
 					Object threadPoolCnt = null;
 					int numThreads = DEFAULT_THREAD_CNT;
 					if (rtaConfiguration != null) {
 
 						isTimeSeries = (String) rtaConfiguration.get("isTimeSeries");
-
 						threadPoolCnt = rtaConfiguration.get("numberOfThreads");
-
 						numThreads = threadPoolCnt == null ? DEFAULT_THREAD_CNT
-
 								: Integer.valueOf((Integer) threadPoolCnt);
-
 						logger.debug("###### Number of threads used only if non timeseries::" + numThreads);
 
 					}
@@ -393,11 +418,15 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 							public Long call() throws Exception {
 								try {
 									Dataset<Row> data = dataset.filter(query).cache();
+									
+									logger.debug("Event type :::"+ eventType);
+									
 									if (data.count() > 0) {
 										RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
-
 										processor.processDataWithDataFrame(ct.pipelineConfig, ct.pipelineConfigParams,
 												eventType);
+									} else {
+										return 1L;
 									}
 								} catch (Exception e) {
 									logger.error(e.getMessage());
@@ -411,10 +440,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 						logger.debug("Starting sync pipeline" + this.ngctx.runningPipeLine);
 						try {
 							Dataset<Row> data = df.filter(query).cache();
+							logger.debug("Event type :::"+ eventType);
 							if (data.count() > 0) {
 								RTPSPipelineProcessor processor = new RTPSPipelineProcessor(data);
 								processor.processDataWithDataFrame(this.ngctx.pipelineConfig,
 										this.ngctx.pipelineConfigParams, eventType);
+							}else {
+								return;
 							}
 
 						} catch (Exception e) {
@@ -447,7 +479,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
 						Date batchDt = new Date(tm.milliseconds());
 						String batchName = batchPrefix + sdf.format(batchDt);
-						String path = basePath + File.separator + batchName;
+						String path = basePath + File.separator + batchName + File.separator  + eventType;
 						String strTmpPath = basePath + File.separator + "__TMP-" + batchName + File.separator  + eventType;
 						logger.debug("Writing to temporary path"+ strTmpPath);
 						
