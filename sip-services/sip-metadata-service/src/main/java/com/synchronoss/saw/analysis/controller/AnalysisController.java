@@ -1,7 +1,7 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
-import static com.synchronoss.saw.util.SipMetadataUtils.validatePrivilege;
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -88,10 +89,11 @@ public class AnalysisController {
     }
 
     ArrayList<Products> productList = authTicket.getProducts();
+    Long category = Long.parseLong(analysis.getCategory());
 
-    if (!validatePrivilege(productList, analysis, PrivilegeNames.CREATE)) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Unauthorized");
+    if (!validatePrivilege(productList, category, PrivilegeNames.CREATE)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
 
@@ -144,10 +146,10 @@ public class AnalysisController {
     }
 
     ArrayList<Products> productList = authTicket.getProducts();
-
-    if (!validatePrivilege(productList, analysis, PrivilegeNames.EDIT)) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Unauthorized");
+    Long category = Long.parseLong(analysis.getCategory());
+    if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
 
@@ -187,9 +189,10 @@ public class AnalysisController {
     }
     ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    if (analysis != null && !validatePrivilege(productList, analysis, PrivilegeNames.DELETE)) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Unauthorized");
+    Long category = Long.parseLong(analysis.getCategory());
+    if (analysis != null && !validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
     analysisService.deleteAnalysis(id, authTicket);
@@ -231,9 +234,10 @@ public class AnalysisController {
 
     ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    if (analysis != null && !validatePrivilege(productList, analysis, PrivilegeNames.ACCESS)) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Unauthorized");
+    Long category = Long.parseLong(analysis.getCategory());
+    if (analysis != null && !validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
 

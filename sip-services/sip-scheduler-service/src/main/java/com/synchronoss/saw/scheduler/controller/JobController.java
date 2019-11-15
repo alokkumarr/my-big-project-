@@ -1,5 +1,10 @@
 package com.synchronoss.saw.scheduler.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
+import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.scheduler.job.CronJob;
 import com.synchronoss.saw.scheduler.job.SimpleJob;
 import com.synchronoss.saw.scheduler.modal.FetchByCategoryBean;
@@ -7,12 +12,16 @@ import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
+import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,12 +40,30 @@ public class JobController extends BaseJobController{
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
 	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail,
-        @RequestHeader("Authorization") String authToken){
+        @RequestHeader("Authorization") String authToken) throws IllegalAccessException, IOException {
 		logger.info("JobController schedule() start here.");
 		String auth = authToken;
 		logger.debug("Auth = "+auth);
 		jobDetail.setAuth(auth);
+		String token = null;
 
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            throw new IllegalAccessException("Missing or invalid Authorization header.");
+        } else {
+            token = auth.substring(7);
+        }
+
+        Ticket authTicket = TokenParser.retrieveTicket(token);
+        if (authTicket == null) {
+            logger.error("Invalid authentication token");
+            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+        }
+        ArrayList<Products> productList = authTicket.getProducts();
+        Long category = Long.parseLong(jobDetail.getCategoryID());
+        if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
+            logger.error("Invalid authentication token, Unauthorized access!!");
+            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+        }
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);

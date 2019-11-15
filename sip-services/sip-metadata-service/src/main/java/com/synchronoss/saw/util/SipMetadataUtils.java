@@ -545,33 +545,4 @@ public class SipMetadataUtils {
       }
     }
   }
-
-  /**
-   * Validate privileges for the user.
-   *
-   * @param productList Products associated with the user
-   * @param analysis Analysis request body
-   * @return validation response
-   */
-  public static Boolean validatePrivilege(
-      ArrayList<Products> productList, Analysis analysis, PrivilegeNames privName) {
-    Privileges priv = new Privileges();
-    for (Products product : productList) {
-      ArrayList<ProductModules> productModulesList = product.getProductModules();
-      for (ProductModules productModule : productModulesList) {
-        ArrayList<ProductModuleFeature> prodModFeatureList = productModule.getProdModFeature();
-        for (ProductModuleFeature productModuleFeature : prodModFeatureList) {
-          ArrayList<ProductModuleFeature> productModuleSubFeatureList =
-              productModuleFeature.getProductModuleSubFeatures();
-          for (ProductModuleFeature prodModSubFeature : productModuleSubFeatureList) {
-            if (prodModSubFeature.getProdModFeatureID() == Long.parseLong(analysis.getCategory())) {
-              Long privCode = prodModSubFeature.getPrivilegeCode();
-              return priv.isPriviegePresent(privName, privCode);
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
 }

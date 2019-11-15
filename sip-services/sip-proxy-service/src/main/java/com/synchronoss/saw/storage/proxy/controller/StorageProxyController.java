@@ -4,6 +4,7 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArts
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.google.gson.Gson;
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -30,6 +32,7 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
+import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import com.synchronoss.sip.utils.RestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -318,6 +321,7 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
+    boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
     Ticket authTicket = request != null ? getTicket(request) : null;
     if (authTicket == null) {
       response.setStatus(401);
@@ -325,6 +329,21 @@ public class StorageProxyController {
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
     }
+
+    ArrayList<Products> productList = authTicket.getProducts();
+    Long category = Long.parseLong(analysis.getCategory());
+    if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
+      response.setStatus(401);
+      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    } else if (isScheduledExecution
+        && !validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
+      response.setStatus(401);
+      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    } else if (!validatePrivilege(productList, category, PrivilegeNames.EXECUTE)) {
+      response.setStatus(401);
+      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    }
+
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     SipQuery savedQuery =
