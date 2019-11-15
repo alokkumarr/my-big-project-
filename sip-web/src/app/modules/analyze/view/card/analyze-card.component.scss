@@ -96,6 +96,10 @@ mat-card-title.mat-card-title {
   > a {
     font-size: 18px;
     font-weight: 700;
+    white-space: nowrap;
+    overflow-x: hidden;
+    display: block;
+    text-overflow: ellipsis;
   }
 }
 
