@@ -17,14 +17,15 @@ import com.google.gson.JsonArray;
     import sncr.bda.conf.ESLoader;
     import sncr.bda.core.file.HFileOperations;
     import sncr.bda.datasets.conf.DataSetProperties;
-    import sncr.xdf.alert.AlertQueueManager;
-    import sncr.bda.conf.ComponentServices;
+import sncr.xdf.alert.AlertQueueManager;
+import sncr.xdf.context.ComponentServices;
     import sncr.xdf.context.NGContext;
     import sncr.xdf.esloader.esloadercommon.ESHttpClient;
     import sncr.xdf.esloader.esloadercommon.ElasticSearchLoader;
     import sncr.xdf.exceptions.FatalXDFException;
     import sncr.xdf.exceptions.XDFException;
-    import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.exceptions.XDFException.ErrorCodes;
+import sncr.xdf.ngcomponent.AbstractComponent;
     import sncr.xdf.ngcomponent.WithSpark;
     import sncr.xdf.services.NGContextServices;
     import sncr.xdf.services.WithDataSet;
@@ -101,7 +102,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
 
             ComponentConfiguration cfg = NGContextServices.analyzeAndValidateEsLoaderConf(configAsStr);
-            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId, persistMode);
+            ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "esloader", batchId);
             ngCtxSvc.initContext();
             ngCtxSvc.registerOutputDataSet();
             logger.debug("Output datasets:");
@@ -537,6 +538,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
         return dataSetmap;
     }
+
 }
 
 

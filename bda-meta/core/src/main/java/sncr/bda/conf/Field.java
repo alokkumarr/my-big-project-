@@ -11,124 +11,144 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class Field {
 
-    @SerializedName("name")
-    @Expose
-    private String name;
-    @SerializedName("type")
-    @Expose
-    private String type;
-    @SerializedName("format")
-    @Expose
-    private String format;
+	@SerializedName("name")
+	@Expose
+	private String name;
+	@SerializedName("type")
+	@Expose
+	private String type;
+	@SerializedName("format")
+	@Expose
+	private String format;
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Field() {
-    }
+	@SerializedName("model")
+	@Expose
+	private String model;
+	@SerializedName("definition.file")
+	@Expose
+	private String definitionFile;
 
-    /**
-     * 
-     * @param name
-     * @param format
-     * @param type
-     */
-    public Field(String name, String type, String format) {
-        this.name = name;
-        this.type = type;
-        this.format = format;
-    }
+	/**
+	 * No args constructor for use in serialization
+	 * 
+	 */
+	public Field() {
+	}
 
-    /**
-     * 
-     * @return
-     *     The name
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * 
+	 * @param name
+	 * @param format
+	 * @param type
+	 */
+	public Field(String name, String type, String format, String model, String definitionFile) {
+		this.name = name;
+		this.type = type;
+		this.format = format;
+		this.model = model;
+		this.definitionFile = definitionFile;
+	}
 
-    /**
-     * 
-     * @param name
-     *     The name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+	/**
+	 * 
+	 * @return The name
+	 */
+	public String getName() {
+		return name;
+	}
 
-    public Field withName(String name) {
-        this.name = name;
-        return this;
-    }
+	/**
+	 * 
+	 * @param name The name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * 
-     * @return
-     *     The type
-     */
-    public String getType() {
-        return type;
-    }
+	public Field withName(String name) {
+		this.name = name;
+		return this;
+	}
 
-    /**
-     * 
-     * @param type
-     *     The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+	/**
+	 * 
+	 * @return The type
+	 */
+	public String getType() {
+		return type;
+	}
 
-    public Field withType(String type) {
-        this.type = type;
-        return this;
-    }
+	/**
+	 * 
+	 * @param type The type
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    /**
-     * 
-     * @return
-     *     The format
-     */
-    public String getFormat() {
-        return format;
-    }
+	public Field withType(String type) {
+		this.type = type;
+		return this;
+	}
 
-    /**
-     * 
-     * @param format
-     *     The format
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
+	/**
+	 * 
+	 * @return The format
+	 */
+	public String getFormat() {
+		return format;
+	}
 
-    public Field withFormat(String format) {
-        this.format = format;
-        return this;
-    }
+	/**
+	 * 
+	 * @param format The format
+	 */
+	public void setFormat(String format) {
+		this.format = format;
+	}
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
+	public Field withFormat(String format) {
+		this.format = format;
+		return this;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(name).append(type).append(format).toHashCode();
-    }
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if ((other instanceof Field) == false) {
-            return false;
-        }
-        Field rhs = ((Field) other);
-        return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).append(format, rhs.format).isEquals();
-    }
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(name).append(type).append(format).toHashCode();
+	}
+
+	public String getModel() {
+		return model;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	public String getDefinitionFile() {
+		return definitionFile;
+	}
+
+	public void setDefinitionFile(String definitionFile) {
+		this.definitionFile = definitionFile;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) {
+			return true;
+		}
+		if ((other instanceof Field) == false) {
+			return false;
+		}
+		Field rhs = ((Field) other);
+		return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).append(format, rhs.format).
+				append(model, rhs.model).append(definitionFile, rhs.definitionFile).isEquals();
+	}
 
 }

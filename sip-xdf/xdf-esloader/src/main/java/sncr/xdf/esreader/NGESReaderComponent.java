@@ -14,5 +14,4 @@ public class NGESReaderComponent extends AbstractComponent implements WithSpark 
         return 0;
     }
 
-
 }

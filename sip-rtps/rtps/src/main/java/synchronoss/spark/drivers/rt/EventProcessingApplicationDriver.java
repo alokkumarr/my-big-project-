@@ -220,7 +220,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch(Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
             return -1;
         }
         return 0;
@@ -263,7 +262,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             }
         } catch (Exception e){
             logger.error(e.getMessage());
-            e.printStackTrace();
         }
         return retval ;
     }

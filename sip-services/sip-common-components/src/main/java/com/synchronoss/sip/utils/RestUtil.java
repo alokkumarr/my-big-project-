@@ -34,9 +34,13 @@ import org.springframework.web.client.RestTemplate;
 @SuppressWarnings("deprecation")
 @Service
 public class RestUtil {
-
+ 
+  // TODO: This below RegEx needs to exposed in application.yml
+  // for these has been deactivated.
   public static final String sanatizeAndValidateregEx =
-      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/()]";
+      "[-+.^:,\\\",*,\\\\\\\\,\\[\\]_{}/@!%?\\s+\\p{L}/();~`=&"
+      // below are the symbols of the currencies
+      + "$دإ؋֏ƒ$ман৳лвب฿¥₡₱čج£Ξ€₾₵₪₹ع﷼៛₩₭₨Łде₮₦/ł￥Ди₽₣ست₤₺₴₫Ƀ]";
   public static final String sanatizeAndValidateregExQuery = "[=,<>,!=,<,>,<=,>=,!>,!<]";
   public static final String noSpace = "";
   private static final Logger logger = LoggerFactory.getLogger(RestUtil.class);

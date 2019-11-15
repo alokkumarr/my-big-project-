@@ -11,7 +11,8 @@ import { of } from 'rxjs';
 const DndPubsubServiceStub = {
   subscribe: () => ({
     unsubscribe: () => {}
-  })
+  }),
+  emit: () => {}
 };
 
 const StoreStub = {
@@ -70,5 +71,13 @@ describe('Designer Component', () => {
       { artifactColumns: [column] } as any
     );
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should notify of drag start', () => {
+    const spy = spyOn(TestBed.get(DndPubsubService), 'emit').and.returnValue(
+      {}
+    );
+    component.dragStarted();
+    expect(spy).toHaveBeenCalledWith('dragStart');
   });
 });
