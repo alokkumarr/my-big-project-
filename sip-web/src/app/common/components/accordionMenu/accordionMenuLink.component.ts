@@ -30,6 +30,14 @@ export class AccordionMenuLinkComponent implements OnInit {
     this.expanded = false;
     this.expandLoadedPanel();
     this.active = false;
+    const path = location.hash.split('#')[1];
+    if (/^\/observe/.test(path)) {
+      if (!this.hasChildren()) {
+        this.metadata.children.sort(function (a, b) {
+          return a.data.createdAt.localeCompare(b.data.createdAt);
+        });
+      }
+    }
   }
 
   /**
