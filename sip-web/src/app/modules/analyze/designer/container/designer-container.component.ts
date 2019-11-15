@@ -1437,12 +1437,10 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
    * If an artifactColumn is unselected, it should be cleared out from the sorts.
    */
   cleanSorts() {
-    console.log(this.sorts);
     const selectedFields = map(
       this._store.selectSnapshot(DesignerState.allSelectedFields),
       field => field.columnName
     );
-    console.log(selectedFields);
     const sorts = filter(this.sorts, sort =>
       selectedFields.includes(sort.columnName)
     );
