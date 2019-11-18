@@ -15,6 +15,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
+import * as includes from 'lodash/includes';
 // import { setAutoFreeze } from 'immer';
 // import produce from 'immer';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -282,10 +283,18 @@ export class DesignerState {
       artifacts,
       artifact => !isEmpty(artifact.fields)
     );
+
+    // if sort is applied for the field that is removed, remove sort from SIPQUERY
+    const sorts = filter(sipQuery.sorts, sort =>
+      sort.columnName !== artifactColumn.columnName
+    );
+
+    console.log(sorts);
+
     patchState({
       analysis: {
         ...analysis,
-        sipQuery: { ...sipQuery, artifacts: sortedArtifacts }
+        sipQuery: { ...sipQuery, artifacts: sortedArtifacts, sorts }
       }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());
