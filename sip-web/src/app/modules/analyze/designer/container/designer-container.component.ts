@@ -26,6 +26,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import { Store, Select } from '@ngxs/store';
 import { Observable, Subscription } from 'rxjs';
 import { takeWhile, finalize, map as map$ } from 'rxjs/operators';
+import * as fpFilter from 'lodash/fp/filter';
 
 import {
   flattenPivotData,
@@ -41,7 +42,6 @@ import {
   AnalysisType,
   SqlBuilder,
   SqlBuilderPivot,
-  SqlBuilderChart,
   Artifact,
   DesignerToolbarAciton,
   Sort,
@@ -501,8 +501,11 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if ((this.analysisStarter || this.analysis).type !== 'chart') {
       return;
     }
-    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
-    forEach(sqlBuilder.nodeFields, node => {
+
+    const dimensionGroupFields = fpFilter(({ area }) => {
+      return area !== 'y';
+    })((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
+    forEach(dimensionGroupFields, node => {
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
           sortCol => node.columnName === sortCol.columnName
@@ -952,7 +955,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       [sortProp]: this.sorts,
       ...partialSqlBuilder
     };
-
     return sqlBuilder;
   }
 
@@ -1441,10 +1443,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       this._store.selectSnapshot(DesignerState.allSelectedFields),
       field => field.columnName
     );
-    const sorts = filter(this.sorts, sort =>
+    this.sorts = filter(this.sorts, sort =>
       selectedFields.includes(sort.columnName)
     );
-    this.sorts = this.sorts.splice(0, this.sorts.length);
-    this.sorts = cloneDeep(sorts);
   }
 }
