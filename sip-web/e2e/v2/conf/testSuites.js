@@ -65,6 +65,7 @@ const REGRESSION = [
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
+  TEST_BASE_DIR + 'bis/APIPullChannelCreateDelete.test.js'
 ];
 
 module.exports = {

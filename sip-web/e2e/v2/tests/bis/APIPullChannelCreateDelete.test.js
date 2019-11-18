@@ -43,25 +43,17 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
       it(`${id}:${data.description}`, () => {
         logger.warn(`Running testCase with id: ${id}`);
         logger.warn(`Data: ` + JSON.stringify(data));
-        const channelName = `${
+
+        data.channelInfo.channelName = `${
           data.channelInfo.channelName
         }${Utils.randomId()}`;
-        const channelDescription = `${
-          data.channelName
+
+        data.channelInfo.desc = `${
+          data.channelInfo.channelName
         } description created at ${Utils.randomId()}`;
 
-        let channelInfo = {
-          sourceType: data.sourceType,
-          channelName,
-          access: data.accessType,
-          sftpHost: Constants.SFTP_DETAILS.sftpHost,
-          sftpPort: Constants.SFTP_DETAILS.sftpPort,
-          sftpUser: Constants.SFTP_DETAILS.sftpUser,
-          sftpPwd: Constants.SFTP_DETAILS.sftpPassword,
-          desc: channelDescription,
-          created: users.admin.firstName + ' ' + users.admin.lastName,
-          status: data.status
-        };
+        data.channelInfo.created =
+          users.admin.firstName + ' ' + users.admin.lastName;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user);
@@ -76,28 +68,31 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         const channelActions = new ChannelActions();
         channelActions.clickOnChannelType(data.sourceType);
         channelActions.clickOnChannelNextButton();
-        channelActions.fillChannelName(channelInfo.channelName);
+        channelActions.fillChannelName(data.channelInfo.channelName);
         channelActions.fillHostName(data.channelInfo.hostName);
         if (data.channelInfo.port)
           channelActions.fillPortNumber(data.channelInfo.port);
         channelActions.selectMethodType(data.channelInfo.method);
+        channelActions.fillEndPoint(data.channelInfo.endPoint);
+        if (data.channelInfo.method === 'POST')
+          channelActions.fillRequestBody(JSON.stringify(data.channelInfo.body));
         if (data.channelInfo.headers)
           channelActions.addHeaders(data.channelInfo.headers);
         if (data.channelInfo.queryParams)
           channelActions.addQueryParams(data.channelInfo.queryParams);
-        channelActions.fillDescription(channelInfo.desc);
+        channelActions.fillDescription(data.channelInfo.desc);
         channelActions.clickOnTestConnectivity();
         channelActions.verifyTestConnectivityLogs(data.testConnectivityMessage);
         channelActions.closeTestConnectivity();
         channelActions.clickOnCreateButton();
-        // // Verifications
-        // dataSourcesPage.verifyChannelDetailsInListView(
-        //   channelInfo.channelName,
-        //   channelInfo.sftpHost,
-        //   channelInfo.status
-        // );
-        // dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
-        // dataSourcesPage.verifyCurrentDisplayedChannel(channelInfo);
+        // Verifications
+        dataSourcesPage.verifyChannelDetailsInListView(
+          data.channelInfo.channelName,
+          data.channelInfo.hostName,
+          data.channelInfo.status
+        );
+        dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
+        dataSourcesPage.verifyCurrentDisplayedApiChannel(data.channelInfo);
         dataSourcesPage.clickOnDeleteChannel();
         dataSourcesPage.clickOnConfirmYesButton();
         dataSourcesPage.verifyChannelNotDeleted();

@@ -2,7 +2,6 @@
   "BIS_APIPULL": {
     "createAndDeleteChannel": {
       "APCHANNEL001": {
-        "id": "APCHANNEL001",
         "suites": ["critical", "regression"],
         "user": "admin",
         "sourceType": "API",
@@ -11,13 +10,56 @@
           "hostName": "https://jsonplaceholder.typicode.com",
           "port": "",
           "method": "GET",
-          "headers": {},
-          "queryParams": {},
-          "endPoint": "/posts"
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
         },
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be able to create and delete a channel"
+        "testConnectivityMessage": "Connection Status = 200",
+        "description": "Admin should be able to create and delete an api pull with GET"
+      },
+      "APCHANNEL002": {
+        "suites": ["critical", "regression"],
+        "user": "admin",
+        "sourceType": "API",
+        "channelInfo": {
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "status": 1
+        },
+        "testConnectivityMessage": "Connection Status = 201",
+        "description": "Admin should be able to create and delete an api pull with POST"
+      },
+      "APCHANNEL003": {
+        "suites": ["critical", "development"],
+        "user": "admin",
+        "sourceType": "API",
+        "channelInfo": {
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "testConnectivityMessage": "Connection Status = 201",
+        "description": "Admin should be able to create and delete an api pull GET request with headers"
       }
     },
     "updateAndDeleteChannel": {

@@ -34,6 +34,15 @@ class ChannelModel extends TestConnectivity {
       by.css(`[e2e="channel-test-connect-btn-model"]`)
     );
     this._hostName = element(by.css(`[e2e="host-name-input"]`));
+    this._requestTab = element(by.css(`[e2e='e2e-request-tab']`));
+    this._methodTypeSelect = element(by.css(`[e2e='e2e-http-method-select']`));
+    this._methodTypeOption = name =>
+      element(by.css(`[e2e='e2e-http-method-${name}']`));
+    this._endPoint = element(by.css(`[e2e='e2e-api-endpoint']`));
+    this._headersTab = element(by.css(`[e2e='e2e-headers-tab']`));
+    this._addHeaderBtn = element(by.css(`[e2e='e2e-add-header-btn']`));
+    this._headerName = element(by.css(`[name='name-of-header']`));
+    this._requestBody = element(by.css(`[e2e='e2e-body-parameter-content']`));
   }
 
   clickOnChannelType(name) {
@@ -98,9 +107,29 @@ class ChannelModel extends TestConnectivity {
     commonFunctions.fillInput(this._hostName, hostName);
   }
 
-  selectMethodType(method) {}
+  selectMethodType(method) {
+    commonFunctions.clickOnElement(this._requestTab);
+    commonFunctions.clickOnElement(this._methodTypeSelect);
+    commonFunctions.clickOnElement(this._methodTypeOption(method));
+  }
 
-  addHeaders(headers) {}
+  fillEndPoint(endPoint) {
+    commonFunctions.fillInput(this._endPoint, endPoint);
+  }
+  fillRequestBody(body) {
+    commonFunctions.fillInput(this._requestBody, body);
+  }
+
+  addHeaders(headers) {
+    commonFunctions.clickOnElement(this._headersTab);
+    let count = 0;
+    for (const [key, value] of Object.entries(headers)) {
+      commonFunctions.clickOnElement(this._addHeaderBtn);
+      commonFunctions.clickOnElement(this._headerName);
+      console.log(key, value);
+      count++;
+    }
+  }
 
   addQueryParams(queryParams) {}
 }

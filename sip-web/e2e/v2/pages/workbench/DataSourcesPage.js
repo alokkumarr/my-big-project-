@@ -291,6 +291,36 @@ class DataSourcesPage extends DeleteModel {
       this._jobLogProcessState(`DATA_RECEIVED`).isDisplayed()
     ).toBeTruthy();
   }
+
+  /**
+   *
+   * @param {Object} channelInfo
+   * contains all the property which are displayed in current displayed channel
+   */
+  verifyCurrentDisplayedApiChannel(channelInfo) {
+    commonFunctions.waitFor.elementToBeVisible(this._channelNameDetail);
+    commonFunctions.validateText(
+      this._channelNameDetail,
+      channelInfo.channelName
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('host-name'),
+      channelInfo.hostName
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('port-number'),
+      channelInfo.port
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('created-by'),
+      channelInfo.created
+    );
+
+    commonFunctions.validateText(
+      this._channelAttributes('description'),
+      channelInfo.desc
+    );
+  }
 }
 
 module.exports = DataSourcesPage;
