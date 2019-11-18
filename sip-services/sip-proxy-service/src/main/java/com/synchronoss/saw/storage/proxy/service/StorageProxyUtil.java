@@ -10,13 +10,15 @@ import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
+import com.synchronoss.bda.sip.jwt.token.ProductModules;
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
-import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.storage.proxy.model.SemanticNode;
@@ -307,5 +309,35 @@ public class StorageProxyUtil {
     }
     return artifactNames;
   }
+
+  /**
+   * checks for Private Category.
+   *
+   * @param ticket Ticket
+   * @param categoryId String
+   * @return Long Category Id for User.
+   */
+  public static Long checkForPrivateCategory(Ticket ticket) {
+    Long privCategoryForUser = null;
+    for (Products product : ticket.getProducts()) {
+      List<ProductModules> productModules = product.getProductModules();
+      for (ProductModules prodMod : productModules) {
+        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
+        for (ProductModuleFeature prodModFeat : productModuleFeature) {
+          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
+            List<ProductModuleFeature> productModuleSubfeatures =
+                prodModFeat.getProductModuleSubFeatures();
+            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
+              if (prodModSubFeat.getProdModFeatureName().equalsIgnoreCase("Drafts")) {
+                privCategoryForUser = prodModSubFeat.getProdModFeatureID();
+                return privCategoryForUser;
+              }
+            }
+          }
+        }
+      }
+    }
+        return privCategoryForUser;
+    }
 
 }

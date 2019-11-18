@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkForPrivateCategory;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
@@ -331,7 +332,14 @@ public class StorageProxyController {
     }
 
     ArrayList<Products> productList = authTicket.getProducts();
-    Long category = Long.parseLong(analysis.getCategory());
+    Long category =
+        analysis.getCategory() == null
+            ? checkForPrivateCategory(authTicket)
+            : Long.parseLong(analysis.getCategory());
+    if (category == null) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        throw new SipDslProcessingException(HttpStatus.BAD_REQUEST.getReasonPhrase());
+    }
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
       response.setStatus(401);
       throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
