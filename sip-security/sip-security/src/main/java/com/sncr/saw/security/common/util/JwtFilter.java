@@ -68,13 +68,13 @@ public class JwtFilter extends GenericFilterBean {
 
       // This checks the validity of the token. logging out does not need
       // the token to be active.
-      if (!request.getRequestURI().equals("/saw-security/auth/doLogout")) {
+      if (!request.getRequestURI().equals("/sip-security/auth/doLogout")) {
           mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
           response.sendError(401, "Token has expired. Please re-login.");
         }
-        else if (request.getRequestURI().startsWith("/saw-security/auth/admin")
+        else if (request.getRequestURI().startsWith("/sip-security/auth/admin")
             && !ticket.getRoleType().equals(RoleType.ADMIN)) {
           response.sendError(401, "You are not authorized to perform this operation.");
         }

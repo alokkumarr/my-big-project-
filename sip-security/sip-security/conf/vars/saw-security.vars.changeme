@@ -16,7 +16,6 @@ db.init.password=CHANGEME # devpass
 #Tomcat port|server address|context-path
 server.port=CHANGEME # 9000
 server.address=CHANGEME # 127.0.0.1
-server.context-path=CHANGEME # /saw-security
 
 #Ticket Validity in Mins 
 ticket.validity.mins=CHANGEME # 20
