@@ -47,7 +47,7 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     // we need to apply the following length and special character rules.
     this.validateCheck = {
       validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
-      validateCharacters: /[!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
+      validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
     };
     const { validateLength, validateCharacters } = this.validateCheck;
     const validationStateFail = validateLength || validateCharacters;
