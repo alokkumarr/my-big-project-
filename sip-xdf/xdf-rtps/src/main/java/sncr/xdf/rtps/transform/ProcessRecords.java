@@ -232,6 +232,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         	String eventType = (String) event.get(0);
         	logger.debug("EVENT TYPE::"+ eventType);
         	String query = "EVENT_TYPE" + "== \'" + eventType + "\'";
+        	this.schemaFields.put(eventType, null);
         	/*JavaRDD<String> eventData = stringRdd.filter(new Function<String, Boolean>(){
 
 				@Override
@@ -246,24 +247,36 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         	 SaveSimpleBatch(stringRdd, tm,eventType);
         	 
         }
+        processJsonRecords(stringRdd, tm, cnf, this.itcx,DM_SIMPLE_JSON);
         logger.debug("retriving spark configuration");
         logger.debug("Invoking json processing");
     }
 
+    /**
+     * @param stringRdd
+     * @param tm
+     * @param eventType
+     */
     private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm, String eventType){
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
             Date batchDt = new Date(tm.milliseconds());
             String batchName = batchPrefix + sdf.format(batchDt);
-            String path = basePath + File.separator + batchName + File.separator + eventType;;
+            String path = basePath  + File.separator + batchName ;
             String strTmpPath = basePath + File.separator + "__TMP-" + 
-            			batchName + File.separator + eventType;
+            			batchName;
             
             logger.debug("Temp path::"+ strTmpPath);
+            
             // Save data as TEMP
-            stringRdd.saveAsTextFile(strTmpPath);
+            try {
+				stringRdd.saveAsTextFile(strTmpPath);
+			} catch (Exception e) {
+				logger.error(e.getLocalizedMessage());
+			}
             // Rename and cleanup
             finalizeBatch(strTmpPath, path);
+            
         }
     }
 
@@ -475,12 +488,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					//======================================================================
 					// Data Lake
 					// Store it in file system as separate directory
-					if (basePath != null && !basePath.isEmpty() & df != null) {
+					if (basePath != null && !basePath.isEmpty() & df != null && 
+							(model.equals(DM_GENERIC) || model.equals(DM_COUNTLY)) ) {
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
 						Date batchDt = new Date(tm.milliseconds());
 						String batchName = batchPrefix + sdf.format(batchDt);
-						String path = basePath + File.separator + batchName + File.separator  + eventType;
-						String strTmpPath = basePath + File.separator + "__TMP-" + batchName + File.separator  + eventType;
+						String path = basePath + File.separator + batchName ;
+						String strTmpPath = basePath + File.separator + "__TMP-" + batchName ;
 						logger.debug("Writing to temporary path"+ strTmpPath);
 						
 						if (outputType.equals("parquet")) {
@@ -497,7 +511,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					} else {
 						logger.debug("base path not found or empty. Hence not writing to data lake");
 					}
-
+					this.schemaFields.clear();
 					/* Alert metrics collection */
 					if (logger.isTraceEnabled()) {
 						logger.debug("Alert metrics to be be collected: " + df.count());
@@ -524,7 +538,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
             Path tmpPath = new Path(strTmpPath);
 
-            RemoteIterator<LocatedFileStatus> it = fs.listFiles(tmpPath, false);
+            /*RemoteIterator<LocatedFileStatus> it = fs.listFiles(tmpPath, false);
             while (it.hasNext()) {
                 Path pathToDelete = it.next().getPath();
                 // We have to delete all non-parquet files/directories
@@ -532,12 +546,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                 if(pathToDelete.getName().startsWith("_S")) {
                     fs.delete(pathToDelete, true);
                 }
-            }
+            }*/
             // Results are ready - make it final
             // !!!!!!!!!!!Should use another technique for rename
+            logger.debug("renaming "+ tmpPath + " to "+ finalPath);
             fs.rename(tmpPath, new Path(finalPath));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+        	logger.error(e.getLocalizedMessage());
         }
         return 0;
     }
