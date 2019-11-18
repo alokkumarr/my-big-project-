@@ -244,7 +244,7 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     int length = analysisName.length();
     if (length >= 1 && length <= 30) {
-      Pattern special = Pattern.compile("[!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]");
+      Pattern special = Pattern.compile("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]");
       Matcher hasSpecial = special.matcher(analysisName);
       if (hasSpecial.find()) {
         throw new IllegalArgumentException(
