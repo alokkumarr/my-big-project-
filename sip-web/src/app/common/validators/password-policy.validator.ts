@@ -65,13 +65,19 @@ const validateSpecialChar: PasswordValidator = (password, errors) => {
 };
 
 export const validatePassword = (password: string): string => {
-  const errors = fpPipe(
+  const errors: PasswordError[] = fpPipe(
     curry(validateLength)(password),
     curry(validateLowercase)(password),
     curry(validateUppercase)(password),
     curry(validateNumber)(password),
     curry(validateSpecialChar)(password)
   )([]);
+
+  /* If length is ok, then password should pass if there's only one error.
+  Meaning, if 3 of 4 conditions pass, it's a pass. */
+  if (!errors.includes(PasswordError.shortLength) && errors.length === 1) {
+    return '';
+  }
   return errors.map(passwordErrorToMessage).join('\n');
 };
 

@@ -9,19 +9,21 @@ describe('Password Validator', () => {
     expect(validatePassword('Pass1!').length).not.toEqual(0);
   });
 
-  it('should fail a password without lowercase', () => {
-    expect(validatePassword('PPPPPPPPP1!').length).not.toEqual(0);
-  });
+  it('should fail if more than one character tests fail', () => {
+    /* Should pass for only special character missing */
+    expect(validatePassword('Password11').length).toEqual(0);
 
-  it('should fail a password without uppercase', () => {
-    expect(validatePassword('ppppppppp1!').length).not.toEqual(0);
-  });
+    /* Should pass for only number missing */
+    expect(validatePassword('Password!!').length).toEqual(0);
 
-  it('should fail a password without number', () => {
-    expect(validatePassword('Passwordsss$!').length).not.toEqual(0);
-  });
+    /* Should pass for only uppercase missing */
+    expect(validatePassword('password1!').length).toEqual(0);
 
-  it('should fail a password without special chars', () => {
-    expect(validatePassword('Passwordsss11123').length).not.toEqual(0);
+    /* Should pass for only lowercase missing */
+    expect(validatePassword('PASSWORD1!').length).toEqual(0);
+
+    /* Should fail for more than one case failing. Here, uppercase and special
+    character is missing */
+    expect(validatePassword('password11').length).not.toEqual(0);
   });
 });
