@@ -518,10 +518,11 @@ public class StorageProxyController {
       logger.trace("Extracting auth ticket details");
       Ticket authTicket = request != null ? getTicket(request) : null;
 
-      List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
-      logger.debug("DSK List = " + dskList);
+      List<TicketDSKDetails> dskList =
+          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
+      logger.debug("DSK List size = " + dskList);
 
-      if (dskList.size() == 0) {
+      if (dskList == null || dskList.size() == 0) {
         return proxyService.fetchDslExecutionsList(queryId);
       } else {
         return new ArrayList<>();
@@ -563,11 +564,12 @@ public class StorageProxyController {
 
     Ticket authTicket = request != null ? getTicket(request) : null;
 
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+    List<TicketDSKDetails> dskList =
+        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     logger.debug("DSK List = " + dskList);
 
     // If user is associated with any datasecurity key, return empty data
-    if (dskList.size() != 0) {
+    if (dskList != null && dskList.size() != 0) {
       return new ExecutionResponse();
     }
 
@@ -614,10 +616,11 @@ public class StorageProxyController {
 
     Ticket authTicket = request != null ? getTicket(request) : null;
 
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
+    List<TicketDSKDetails> dskList =
+        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     logger.debug("DSK List = " + dskList);
 
-    if (dskList.size() != 0) {
+    if (dskList != null && dskList.size() != 0) {
       return new ExecutionResponse();
     }
     if (analysisType != null && analysisType.equals("report")) {
