@@ -20,6 +20,24 @@ class ChannelActions extends ChannelModel {
     this.fillDescription(channelInfo.desc);
     this.clickOnCreateButton();
   }
+
+  createNewApiChannel(channelInfo) {
+    this.clickOnChannelType(channelInfo.sourceType);
+    this.clickOnChannelNextButton();
+    this.fillChannelName(channelInfo.channelName);
+    this.fillHostName(channelInfo.hostName);
+    if (channelInfo.port) channelActions.fillPortNumber(channelInfo.port);
+    this.selectMethodType(channelInfo.method);
+    this.fillEndPoint(channelInfo.endPoint);
+    if (channelInfo.method === 'POST') this.fillRequestBody(JSON.stringify(channelInfo.body));
+    if (channelInfo.headers) this.addHeaders(channelInfo.headers);
+    if (channelInfo.queryParams) this.addQueryParams(channelInfo.queryParams);
+    this.fillDescription(channelInfo.desc);
+    this.clickOnTestConnectivity();
+    this.verifyTestConnectivityLogs(channelInfo.testConnectivityMessage);
+    this.closeTestConnectivity();
+    this.clickOnCreateButton();
+  }
 }
 
 module.exports = ChannelActions;

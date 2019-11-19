@@ -4,8 +4,9 @@
       "APCHANNEL001": {
         "suites": ["critical", "regression"],
         "user": "admin",
-        "sourceType": "API",
         "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
           "channelName": "e2e",
           "hostName": "https://jsonplaceholder.typicode.com",
           "port": "",
@@ -16,14 +17,14 @@
           "body": null,
           "status": 1
         },
-        "testConnectivityMessage": "Connection Status = 200",
         "description": "Admin should be able to create and delete an api pull with GET"
       },
       "APCHANNEL002": {
-        "suites": ["critical", "regression"],
+        "suites": ["regression"],
         "user": "admin",
-        "sourceType": "API",
         "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 201",
+          "sourceType": "API",
           "channelName": "e2e",
           "hostName": "https://jsonplaceholder.typicode.com",
           "port": "",
@@ -37,14 +38,14 @@
           },
           "status": 1
         },
-        "testConnectivityMessage": "Connection Status = 201",
         "description": "Admin should be able to create and delete an api pull with POST"
       },
       "APCHANNEL003": {
-        "suites": ["critical", "development"],
+        "suites": ["regression"],
         "user": "admin",
-        "sourceType": "API",
         "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
           "channelName": "e2e",
           "hostName": "https://jsonplaceholder.typicode.com",
           "port": "",
@@ -58,162 +59,153 @@
           "body": null,
           "status": 1
         },
-        "testConnectivityMessage": "Connection Status = 201",
         "description": "Admin should be able to create and delete an api pull GET request with headers"
+      },
+      "APCHANNEL004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to create and delete an api pull GET request with headers and query params"
+      },
+      "APCHANNEL005": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e片仮名",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to create and delete an api pull GET request with headers, query params and multibyte chars"
       }
     },
     "updateAndDeleteChannel": {
-      "CHANN003": {
-        "id": "CHANN003",
+      "APCHANNEL006": {
         "suites": ["critical", "regression"],
         "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be able to update and delete a channel"
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to update and delete an api pull with GET"
       },
-      "CHANN004": {
-        "id": "CHANN004",
+      "APCHANNEL007": {
         "suites": ["regression"],
         "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be able to update and delete a channel with multibytchars"
-      }
-    },
-    "deActivateChannel": {
-      "CHANN005": {
-        "id": "CHANN005",
-        "suites": ["critical", "regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to de-activate and delete a channel"
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 201",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "status": 1
+        },
+        "description": "Admin should be able to update and delete an api pull with POST"
       },
-      "CHANN006": {
-        "id": "CHANN006",
+      "APCHANNEL008": {
         "suites": ["regression"],
         "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be able to de-activate and delete a channel with multibytchars"
-      }
-    },
-    "createAndDeleteRoute": {
-      "CHANN007": {
-        "id": "CHANN007",
-        "suites": ["critical", "regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "routeName": "e2eRoute",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to create and delete a route"
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to update and delete an api pull GET request with headers"
       },
-      "CHANN008": {
-        "id": "CHANN008",
+      "APCHANNEL009": {
         "suites": ["regression"],
         "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "routeName": "e2eRoutee到e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to create and delete a route with multibytchars"
-      }
-    },
-    "activateDeactivateRoute": {
-      "CHANN009": {
-        "id": "CHANN009",
-        "suites": ["regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "routeName": "e2eRoute",
-        "accessType": "rw",
-        "status": 1,
-        "type": "Activate",
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to activate a route"
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to update and delete an api pull GET request with headers and query params"
       },
-      "CHANN010": {
-        "id": "CHANN010",
-        "suites": ["critical", "regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "routeName": "e2eRoutee到e",
-        "accessType": "rw",
-        "status": 1,
-        "type": "Activate",
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to activate a route with multibytchars"
-      },
-      "CHANN011": {
-        "id": "CHANN011",
+      "APCHANNEL010": {
         "suites": ["regression"],
         "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "routeName": "e2eRoutee到e",
-        "accessType": "rw",
-        "status": 1,
-        "type": "Deactivate",
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to de-Activate a route with multibytchars"
-      },
-      "CHANN012": {
-        "id": "CHANN012",
-        "suites": ["regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "routeName": "e2eRoute",
-        "accessType": "rw",
-        "status": 1,
-        "type": "Deactivate",
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to de-Activate a route"
-      }
-    },
-    "routeSchedule": {
-      "CHANN013": {
-        "id": "CHANN013",
-        "suites": ["regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e2e",
-        "routeName": "e2eRoute",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to schedule a route and it should run as per define schedule"
-      },
-      "CHANN014": {
-        "id": "CHANN014",
-        "suites": ["regression"],
-        "user": "admin",
-        "sourceType": "SFTP",
-        "channelName": "e到e",
-        "routeName": "e2eRoutee到e",
-        "accessType": "rw",
-        "status": 1,
-        "testConnectivityMessage": "Connection successful!!",
-        "description": "Admin should be to schedule a route with multibytchars and it should run as per define schedule"
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e片仮名",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to update and delete an api pull GET request with headers, query params and multibyte chars"
       }
     }
   }

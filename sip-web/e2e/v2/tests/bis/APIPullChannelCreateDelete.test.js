@@ -44,16 +44,11 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         logger.warn(`Running testCase with id: ${id}`);
         logger.warn(`Data: ` + JSON.stringify(data));
 
-        data.channelInfo.channelName = `${
-          data.channelInfo.channelName
-        }${Utils.randomId()}`;
+        data.channelInfo.channelName = `${data.channelInfo.channelName}${Utils.randomId()}`;
 
-        data.channelInfo.desc = `${
-          data.channelInfo.channelName
-        } description created at ${Utils.randomId()}`;
+        data.channelInfo.desc = `${data.channelInfo.channelName} description created at ${Utils.randomId()}`;
 
-        data.channelInfo.created =
-          users.admin.firstName + ' ' + users.admin.lastName;
+        data.channelInfo.created = users.admin.firstName + ' ' + users.admin.lastName;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user);
@@ -66,23 +61,19 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         dataSourcesPage.clickOnAddChannelButton();
 
         const channelActions = new ChannelActions();
-        channelActions.clickOnChannelType(data.sourceType);
+        channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
         channelActions.fillChannelName(data.channelInfo.channelName);
         channelActions.fillHostName(data.channelInfo.hostName);
-        if (data.channelInfo.port)
-          channelActions.fillPortNumber(data.channelInfo.port);
+        if (data.channelInfo.port) channelActions.fillPortNumber(data.channelInfo.port);
         channelActions.selectMethodType(data.channelInfo.method);
         channelActions.fillEndPoint(data.channelInfo.endPoint);
-        if (data.channelInfo.method === 'POST')
-          channelActions.fillRequestBody(JSON.stringify(data.channelInfo.body));
-        if (data.channelInfo.headers)
-          channelActions.addHeaders(data.channelInfo.headers);
-        if (data.channelInfo.queryParams)
-          channelActions.addQueryParams(data.channelInfo.queryParams);
+        if (data.channelInfo.method === 'POST') channelActions.fillRequestBody(JSON.stringify(data.channelInfo.body));
+        if (data.channelInfo.headers) channelActions.addHeaders(data.channelInfo.headers);
+        if (data.channelInfo.queryParams) channelActions.addQueryParams(data.channelInfo.queryParams);
         channelActions.fillDescription(data.channelInfo.desc);
         channelActions.clickOnTestConnectivity();
-        channelActions.verifyTestConnectivityLogs(data.testConnectivityMessage);
+        channelActions.verifyTestConnectivityLogs(data.channelInfo.testConnectivityMessage);
         channelActions.closeTestConnectivity();
         channelActions.clickOnCreateButton();
         // Verifications
