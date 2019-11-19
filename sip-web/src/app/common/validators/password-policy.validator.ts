@@ -4,6 +4,7 @@ import * as curry from 'lodash/curry';
 import * as trim from 'lodash/trim';
 
 export enum PasswordError {
+  matchesUsername,
   shortLength,
   lowercaseMissing,
   uppercaseMissing,
@@ -21,6 +22,8 @@ type PasswordValidator = (
 
 const passwordErrorToMessage = (error: PasswordError): string => {
   switch (error) {
+    case PasswordError.matchesUsername:
+      return `Password cannot be same as username.`;
     case PasswordError.shortLength:
       return `Password should have at least ${requiredMinimumLength} characters.`;
     case PasswordError.lowercaseMissing:
@@ -32,6 +35,16 @@ const passwordErrorToMessage = (error: PasswordError): string => {
     case PasswordError.specialCharMissing:
       return `Password should have a special character (${specialCharsAllowed}).`;
   }
+};
+
+const validateUsername = (
+  password: string,
+  username: string,
+  errors: PasswordError[]
+): PasswordError[] => {
+  return trim(password) === trim(username)
+    ? [...errors, PasswordError.matchesUsername]
+    : errors;
 };
 
 const validateLength: PasswordValidator = (password, errors) => {
@@ -64,8 +77,12 @@ const validateSpecialChar: PasswordValidator = (password, errors) => {
     : [...errors, PasswordError.specialCharMissing];
 };
 
-export const validatePassword = (password: string): string => {
+export const validatePassword = (
+  password: string,
+  username: string = null
+): string => {
   const errors: PasswordError[] = fpPipe(
+    curry(validateUsername)(password)(username),
     curry(validateLength)(password),
     curry(validateLowercase)(password),
     curry(validateUppercase)(password),
@@ -73,9 +90,14 @@ export const validatePassword = (password: string): string => {
     curry(validateSpecialChar)(password)
   )([]);
 
-  /* If length is ok, then password should pass if there's only one error.
-  Meaning, if 3 of 4 conditions pass, it's a pass. */
-  if (!errors.includes(PasswordError.shortLength) && errors.length === 1) {
+  /* If length is ok, and password is different from user name,
+     then password should pass if there's only one error.
+     Meaning, if 3 of 4 conditions pass, it's a pass. */
+  if (
+    !errors.includes(PasswordError.shortLength) &&
+    !errors.includes(PasswordError.matchesUsername) &&
+    errors.length === 1
+  ) {
     return '';
   }
   return errors.map(passwordErrorToMessage).join('\n');

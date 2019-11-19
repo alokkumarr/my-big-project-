@@ -58,7 +58,10 @@ export class UserEditDialogComponent extends BaseDialogComponent {
     if (this.data.mode === 'edit' && formValues.password === dummyPassword) {
       formValues.password = null;
     } else {
-      this.passwordError = validatePassword(formValues.password);
+      this.passwordError = validatePassword(
+        formValues.password,
+        formValues.masterLoginId
+      );
       if (this.passwordError) {
         return;
       }

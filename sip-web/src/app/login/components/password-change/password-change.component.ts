@@ -71,7 +71,8 @@ export class PasswordChangeComponent {
   }
 
   validatePassword() {
-    this.newPasswordError = validatePassword(this.formData.newPwd);
+    const username = this._JwtService.getLoginId();
+    this.newPasswordError = validatePassword(this.formData.newPwd, username);
     this.confPasswordError =
       this.formData.newPwd !== this.formData.confNewPwd
         ? 'Needs to be same as new password.'

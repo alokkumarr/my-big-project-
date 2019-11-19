@@ -9,6 +9,11 @@ describe('Password Validator', () => {
     expect(validatePassword('Pass1!').length).not.toEqual(0);
   });
 
+  it('should fail if equal to username', () => {
+    expect(validatePassword('Password1!', 'Password1!').length).not.toEqual(0);
+    expect(validatePassword('Password1!', 'testuser').length).toEqual(0);
+  });
+
   it('should fail if more than one character tests fail', () => {
     /* Should pass for only special character missing */
     expect(validatePassword('Password11').length).toEqual(0);
