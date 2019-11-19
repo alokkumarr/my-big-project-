@@ -198,7 +198,7 @@ public class AnalysisServiceImpl implements AnalysisService {
           + "&executionType=scheduled"
           + "&userId="+ userId;
 
-    logger.info("Execute URL for dispatch :", url);
+    logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
     restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
