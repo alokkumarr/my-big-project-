@@ -29,6 +29,7 @@ import * as unionWith from 'lodash/unionWith';
 import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -420,18 +421,19 @@ export class DashboardGridComponent
 
       this.observe.readAnalysis(tile.id).then(
         data => {
-          tile.analysis =
+          if (isEmpty(data)) {
+            tile.success = false;
+            this.dashboard.push(tile);
+            tileLoaded();
+          } else {
+            tile.analysis =
             data.type === 'map' ? this.fetchGeoAnalysis(data) : data;
-          tile.success = true;
-          this.addAnalysisTile(tile);
-          tileLoaded();
-          this.getDashboard.emit({ changed: true, dashboard: this.model });
-          this.refreshTile(tile);
-        },
-        () => {
-          tile.success = false;
-          this.dashboard.push(tile);
-          tileLoaded();
+            tile.success = true;
+            this.addAnalysisTile(tile);
+            tileLoaded();
+            this.getDashboard.emit({ changed: true, dashboard: this.model });
+            this.refreshTile(tile);
+          }
         }
       );
     });
