@@ -227,7 +227,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
       scheduleState: this.scheduleState,
-      zip: this.zipFormatFlag
+      zip: this.zipFormatFlag,
+      userId: this.token.ticket.userId
     };
     this.triggerSchedule();
   }
@@ -263,6 +264,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         metricName: analysis.metricName,
         type: analysis.type,
         userFullName: analysis.userFullName || analysis.createdBy,
+        userId: this.token.ticket.userId,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
         categoryID: isDSLAnalysis(analysis)
