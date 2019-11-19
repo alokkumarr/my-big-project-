@@ -248,6 +248,9 @@ public class StorageProxyController {
       @ApiParam(value = "execution type", required = false)
           @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
+      @ApiParam(value = "user id", required = false)
+      @RequestParam(name = "userId", required = false)
+          String userId,
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException ,IllegalAccessException{
@@ -267,7 +270,6 @@ public class StorageProxyController {
     }
     List<TicketDSKDetails> dskList = new ArrayList<>();
     // fetch DSK details for scheduled
-    String userId = authTicket.getMasterLoginId();
     if (isScheduledExecution && userId != null) {
       dskList = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
     } else {

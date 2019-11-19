@@ -182,27 +182,24 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void executeDslAnalysis(String analysisId,String auth) {
+  public void executeDslAnalysis(String analysisId, String userId) {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId;
     logger.trace("URL for request body : ", dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
     Analysis analysis = analysisResponse.getAnalysis();
     logger.trace("Analysis request body : ", analysisResponse.getAnalysis());
-    HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", auth);
-    headers.set("Content-Type","application/json");
-    logger.info("Header auth for execute api : ", auth);
 
     String url = proxyAnalysisUrl
           + "/execute?id="
           + analysisId
           + "&size="
           + dispatchRowLimit
-          + "&executionType=scheduled";
+          + "&executionType=scheduled"
+          + "&userId="+ userId;
 
     logger.info("Execute URL for dispatch :", url);
-    HttpEntity<?> requestEntity = new HttpEntity<>(analysis,headers);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
     restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
   }

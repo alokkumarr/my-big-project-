@@ -71,6 +71,8 @@ public class SchedulerJobDetail implements Serializable {
 
   private String auth;
 
+  private String userId;
+
   /**
    * Gets analysisID
    *
@@ -345,7 +347,15 @@ public class SchedulerJobDetail implements Serializable {
     this.auth = auth;
   }
 
-   /**
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
+
+  /**
    * @param out
    * @throws IOException
    */
@@ -371,6 +381,7 @@ public class SchedulerJobDetail implements Serializable {
     out.writeObject(s3);
     out.writeObject(zip);
     out.writeObject(auth);
+    out.writeObject(userId);
   }
 
   /**
@@ -451,9 +462,17 @@ public class SchedulerJobDetail implements Serializable {
         if (authObj instanceof String) {
             auth = (String) authObj;
         }
-
     } catch (OptionalDataException e) {
       logger.error("Unable to read auth Object :{}", e.getMessage());
+    }
+
+    try {
+      Object userIdObj = in.readObject();
+      if (userIdObj instanceof String) {
+        userId = (String) userIdObj;
+      }
+    } catch (OptionalDataException e) {
+      logger.error("Unable to read user Id Object :{}", e.getMessage());
     }
   }
 
