@@ -228,7 +228,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       jobName: analysis.id,
       scheduleState: this.scheduleState,
       zip: this.zipFormatFlag,
-      userId: this.token.ticket.userId
+      userId: this.token.ticket.masterLoginId
     };
     this.triggerSchedule();
   }
@@ -246,6 +246,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           .local()
           .format();
       }
+
       analysis.schedule = {
         scheduleState: this.scheduleState,
         activeRadio: crondetails.activeRadio,
@@ -264,7 +265,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         metricName: analysis.metricName,
         type: analysis.type,
         userFullName: analysis.userFullName || analysis.createdBy,
-        userId: this.token.ticket.userId,
+        userId: this.token.ticket.masterLoginId,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
         categoryID: isDSLAnalysis(analysis)
