@@ -289,7 +289,7 @@ public class StorageProxyController {
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
-    if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+    if (authTicket != null && authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
       String analysisType = analysis.getType();
       DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
       List<String> artsName = getArtifactsNames(savedQuery);
