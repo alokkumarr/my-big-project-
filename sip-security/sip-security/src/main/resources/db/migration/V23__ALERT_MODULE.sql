@@ -1,12 +1,9 @@
 /*******************************************************************************
  Add default category and subcategory to Alert Module
 ********************************************************************************/
-DROP PROCEDURE IF EXISTS alerts_insert;
-
 DELIMITER //
-CREATE PROCEDURE alerts_insert()
 
-BEGIN
+BEGIN NOT ATOMIC
 
 DECLARE n INT;
 DECLARE i INT;
@@ -96,9 +93,6 @@ End;
 //
 
 DELIMITER ;
-
--- Call the above procedure to insert the rows.
-call alerts_insert();
 
 /*******************************************************************************
    Modifying the onboard_customer procedure
