@@ -25,6 +25,10 @@ const dialogStub = {
   open: () => {}
 };
 
+const analysisStub = {
+  type: 'pivot'
+};
+
 describe('Designer Component', () => {
   let component: DesignerContainerComponent;
   let fixture: ComponentFixture<DesignerContainerComponent>;
@@ -51,6 +55,7 @@ describe('Designer Component', () => {
     component.artifacts = [
       { artifactName: 'xyz', columns: [{ columnName: 'abc' }] }
     ] as any;
+    component.analysis = analysisStub as any;
     fixture.detectChanges();
   });
 
@@ -161,5 +166,10 @@ describe('Designer Component', () => {
         column
       });
     }));
+  });
+
+  it('should check filterSelectedFilter function ', () => {
+    const filtersColumns = fixture.componentInstance.checkNodeForSorts();
+    expect(filtersColumns).not.toBeNull();
   });
 });

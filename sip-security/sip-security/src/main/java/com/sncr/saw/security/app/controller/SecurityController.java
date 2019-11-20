@@ -13,36 +13,60 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.sncr.saw.security.common.bean.*;
+import com.sncr.saw.security.common.bean.ChangePasswordDetails;
+import com.sncr.saw.security.common.bean.CustProdModule;
+import com.sncr.saw.security.common.bean.CustomerProductSubModule;
+import com.sncr.saw.security.common.bean.LoginDetails;
+import com.sncr.saw.security.common.bean.Preference;
+import com.sncr.saw.security.common.bean.RandomHashcode;
+import com.sncr.saw.security.common.bean.RefreshToken;
+import com.sncr.saw.security.common.bean.ResetPwdDtls;
+import com.sncr.saw.security.common.bean.ResetValid;
+import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserPreferences;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
-import com.sncr.saw.security.common.bean.repo.admin.*;
+import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
+import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteRole;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteUser;
+import com.sncr.saw.security.common.bean.repo.admin.ModuleDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.PrivilegesList;
+import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.RolesList;
+import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
+import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
-import com.sncr.saw.security.common.bean.repo.dsk.*;
+import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
+import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
+import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
+import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
-import com.sncr.saw.security.app.service.TicketHelper;
+import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.bind.annotation.*;
-
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -51,10 +75,21 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author gsan0003
@@ -337,28 +372,19 @@ public class SecurityController {
 		String message = null;
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
-		} else if (newPass.length() < 8) {
-			message = "New password should be minimum of 8 character.";
-		} else if (oldPass.equals(newPass)) {
-			message = "Old password and new password should not be same.";
-		} else if (loginId.equals(newPass)) {
-			message = "User Name can't be assigned as password.";
+			valid.setValidityMessage(message);
+			valid.setValid(false);
+			return valid;
 		}
-		Pattern pCaps = Pattern.compile("[A-Z]");
-		Matcher m = pCaps.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase character.";
-		}
-		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-		m = pSpeChar.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 special character.";
-		}
-		if (message == null) {
+
+		valid = PasswordValidation.validatePassword(newPass,loginId);
+
+		if (message == null && valid.getValid()) {
 			try {
 				message = userRepository.changePassword(loginId, newPass, oldPass);
 				if (message != null && message.equals("Password Successfully Changed.")) {
 					valid.setValid(true);
+                    valid.setValidityMessage(message);
 				}
 
 			} catch (DataAccessException de) {
@@ -367,7 +393,7 @@ public class SecurityController {
 				return valid;
 			}
 		}
-		valid.setValidityMessage(message);
+
 		return valid;
 	}
 
@@ -471,24 +497,13 @@ public class SecurityController {
 		String rhc = changePasswordDetails.getRfc();
 
 		if (!cnfNewPass.equals(newPass)) {
-			message = "'New Password' and 'Verify password' does not match.";
-		} else if (newPass.length() < 8) {
-			message = "New password should be minimum of 8 character.";
-		} else if (loginId.equals(newPass)) {
-			message = "User Name can't be assigned as password.";
+			valid.setValid(false);
+			valid.setValidityMessage("'New Password' and 'Verify password' does not match.");
+			return valid;
 		}
 
-		Pattern pCaps = Pattern.compile("[A-Z]");
-		Matcher m = pCaps.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase character.";
-		}
+		valid = PasswordValidation.validatePassword(newPass,loginId);
 
-		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-		m = pSpeChar.matcher(newPass);
-		if (!m.find()) {
-			message = "Password should contain atleast 1 special character.";
-		}
         // Validate the hash key with userID before proceeding.
         ResetValid resetValid =  userRepository.validateResetPasswordDtls(rhc);
         if (!(resetValid.getValid() || (resetValid.getMasterLoginID()!=null &&
@@ -496,10 +511,11 @@ public class SecurityController {
             message= "Reset link is not valid or expired ";
 
 		try {
-			if (message == null) {
+			if (message == null && valid.getValid()) {
 				message = userRepository.rstchangePassword(loginId, newPass,rhc);
 				if (message == null) {
 					message = "Password Successfully Changed.";
+					valid.setValidityMessage(message);
 					valid.setValid(true);
 				}
 			}
@@ -508,7 +524,7 @@ public class SecurityController {
 			valid.setError(de.getMessage());
 			return valid;
 		}
-		valid.setValidityMessage(message);
+
 		return valid;
 	}
 
@@ -1059,32 +1075,13 @@ public class SecurityController {
 	public UsersList addUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
+
 		try {
 			if (user != null) {
-				userList.setValid(true);
-				if (user.getPassword() != null) {
-					if (user.getPassword().length() < 8) {
-						userList.setValidityMessage("New password should be minimum of 8 character.");
-						userList.setValid(false);
-					} else if (user.getMasterLoginId().equals(user.getPassword())) {
-						userList.setValidityMessage("User Name can't be assigned as password.");
-						userList.setValid(false);
-					}
-					Pattern pCaps = Pattern.compile("[A-Z]");
-					Matcher m = pCaps.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
-						userList.setValid(false);
-					}
-					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-					m = pSpeChar.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 special character.");
-						userList.setValid(false);
-					}
-				} else {
-					userList.setValid(false);
-				}
+			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
+                userList.setValid(validity.getValid());
+                userList.setValidityMessage(validity.getValidityMessage());
+
 				if (userList.getValid()) {
 					valid = userRepository.addUser(user);
 					if (valid.getValid()) {
@@ -1118,30 +1115,16 @@ public class SecurityController {
 	public UsersList updateUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
+        int validPatternCnt= 0;
 		try {
 			if (user != null) {
 				userList.setValid(true);
 				if (user.getPassword() != null) {
-					if (user.getPassword().length() < 8) {
-						userList.setValidityMessage("New password should be minimum of 8 character.");
-						userList.setValid(false);
-					} else if (user.getMasterLoginId().equals(user.getPassword())) {
-						userList.setValidityMessage("User Name can't be assigned as password.");
-						userList.setValid(false);
-					}
-					Pattern pCaps = Pattern.compile("[A-Z]");
-					Matcher m = pCaps.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
-						userList.setValid(false);
-					}
-					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-					m = pSpeChar.matcher(user.getPassword());
-					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 special character.");
-						userList.setValid(false);
-					}
+				    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
+					userList.setValid(validity.getValid());
+					userList.setValidityMessage(validity.getValidityMessage());
 				}
+
 				if (userList.getValid()) {
 					valid = userRepository.updateUser(user);
 					if (valid.getValid()) {
