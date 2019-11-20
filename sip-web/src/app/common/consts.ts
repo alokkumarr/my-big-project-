@@ -312,7 +312,7 @@ export const AGGREGATE_TYPES = [
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
-    valid: ['chart']
+    valid: ['chart', 'map']
   }
   // {
   //   label: 'Median',
