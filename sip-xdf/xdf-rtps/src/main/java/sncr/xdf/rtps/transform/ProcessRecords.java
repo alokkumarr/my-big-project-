@@ -511,17 +511,22 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					} else {
 						logger.debug("base path not found or empty. Hence not writing to data lake");
 					}
-					this.schemaFields.clear();
+					
+					
 					/* Alert metrics collection */
 					if (logger.isTraceEnabled()) {
 						logger.debug("Alert metrics to be be collected: " + df.count());
 					}
 
 				});
+				if(this.schemaFields != null) {
+					this.schemaFields.clear();
+				}
 
 			} 
 		} catch (Exception exception) {
 			logger.error("Exception while processing RTA message "+ exception.getMessage());
+			exception.printStackTrace();
 		}
 		return 0;
     

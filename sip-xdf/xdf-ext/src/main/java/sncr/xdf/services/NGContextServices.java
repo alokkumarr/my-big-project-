@@ -48,7 +48,7 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     public NGContextServices( ComponentServices[] cs, String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName, String batchID){
         ngctx = new NGContext(xdfRoot, componentConfiguration, applicationID, componentName, batchID);
         for (int i = 0; i < cs.length; i++) {
-        	logger.debug("Inside NG context services putting in service status");
+        	logger.debug("Inside NG context services putting in service status"+ cs[i]);
             this.ngctx.serviceStatus.put(cs[i], false);
             logger.debug("##### service status length"+  this.ngctx.serviceStatus.size());
         }
@@ -102,9 +102,14 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                     return  -1;
                 }
             }
-
-            if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata))  services.mddl =  this;
-
+            logger.debug("#### Initializing mddl" + this);
+            logger.debug("#### Value mddl"+ services.mddl);
+            if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
+            	logger.debug("Inside if ::");
+            	services.mddl =  this;
+            	logger.debug("#### Value mddl"+ services.mddl);
+            }
+            
         }
         catch(Exception e){
             String error = "Services initialization has failed: " + ExceptionUtils.getFullStackTrace(e);
@@ -132,6 +137,9 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     public int registerOutputDataSet() {
 
         final int[] rc2 = {0};
+        logger.debug("registering outputdataset");
+        logger.debug("services ::"+ services);
+        logger.debug("mddl ::"+ services.mddl);
         if (services.mddl != null) {
 
             if (ngctx.componentConfiguration.getOutputs() != null && ngctx.componentConfiguration.getOutputs().size() > 0) {
