@@ -85,6 +85,8 @@ public class SecurityController {
 
     private final String AdminRole = "ADMIN";
 
+    private final String ALERTS = "ALERTS";
+
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
@@ -1626,7 +1628,7 @@ public class SecurityController {
 		Valid valid = null;
 		try {
 			if (category != null) {
-			 if(!userRepository.checkIsAlertModule(category.getModuleId())){
+			 if(!userRepository.checkIsModulePresent(category.getModuleId(),ALERTS)){
 				if (!userRepository.checkCatExists(category)) {
 					valid = userRepository.addCategory(category);
 					if (valid.getValid()) {

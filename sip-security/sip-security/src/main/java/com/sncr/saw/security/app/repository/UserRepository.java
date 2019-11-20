@@ -59,7 +59,7 @@ public interface UserRepository {
 	List<CategoryDetails> getCategories(Long customerId);
 	Valid addCategory(CategoryDetails category);
 	boolean checkCatExists(CategoryDetails category);
-  boolean checkIsAlertModule(Long moduleId);
+    boolean checkIsModulePresent(Long moduleId,String moduleName);
 	boolean deleteCategory(Long categoryId);
 	List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode);
 	List<SubCategoryWithPrivilegeDetails> getSubCategoriesWithPrivilege(CustomerProductSubModule cpsm);
