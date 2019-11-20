@@ -3,7 +3,6 @@ package com.synchronoss.saw.analysis.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
@@ -13,16 +12,16 @@ import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
-import com.synchronoss.saw.model.Artifact;
 import com.synchronoss.saw.util.SipMetadataUtils;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.sip.utils.SipCommonUtils;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,6 @@ import sncr.bda.base.MaprConnection;
 public class AnalysisServiceImpl implements AnalysisService {
 
   private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
-  Gson gson = new Gson();
 
   @Value("${metastore.base}")
   @NotNull
@@ -52,7 +50,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public Analysis createAnalysis(Analysis analysis, Ticket ticket) throws SipCreateEntityException {
     analysis.setCreatedTime(Instant.now().toEpochMilli());
-    validateAnalysisName(analysis.getName());
+    SipCommonUtils.validateName(analysis.getName());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
         String query = getDlQuery(analysis);
@@ -74,7 +72,7 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public Analysis updateAnalysis(Analysis analysis, Ticket ticket) throws SipUpdateEntityException {
     analysis.setModifiedTime(Instant.now().toEpochMilli());
-    validateAnalysisName(analysis.getName());
+    SipCommonUtils.validateName(analysis.getName());
     try {
       if (analysis.getType().equalsIgnoreCase("report")) {
         String query = getDlQuery(analysis);
@@ -98,19 +96,19 @@ public class AnalysisServiceImpl implements AnalysisService {
     try {
       // Create executionResult table if doesn't exists.
       new AnalysisMetadata(executionResultTable, basePath);
-      logger.debug("Delete Analysis called for analysis :{}", analysisId);
+      logger.trace("Delete Analysis called for analysis :{}", analysisId);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
       String[] fields = {"executionId", "dslQueryId"};
       ObjectMapper objectMapper = new ObjectMapper();
       ObjectNode node = objectMapper.createObjectNode();
       ObjectNode objectNode = node.putObject("$eq");
       objectNode.put("dslQueryId", analysisId);
-      logger.debug("Deleting Execution results for analysisId :{}", analysisId);
+      logger.trace("Deleting Execution results for analysisId :{}", analysisId);
       boolean res = maprConnection.deleteByMaprDBQuery(fields, node.toString());
       if (res == true) {
-        logger.info("Execution results deleted succesfully!!");
+        logger.info("Execution results deleted successfully!!");
       } else {
-        logger.debug("Problem deleting exec results");
+        logger.trace("Problem deleting exec results");
       }
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
       analysisMetadataStore.delete(analysisId);
@@ -122,11 +120,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Override
   public Analysis getAnalysis(String analysisId, Ticket ticket) throws SipReadEntityException {
-    Document doc;
     Analysis analysis;
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.readDocumet(analysisId);
+      Document doc = analysisMetadataStore.readDocumet(analysisId);
       if (doc == null) {
         return null;
       }
@@ -143,14 +140,13 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public List<Analysis> getAnalysisByCategory(String categoryId, Ticket ticket)
       throws SipReadEntityException {
-    List<Document> doc = null;
-    Analysis analysis;
+
     List<Analysis> analysisList = new ArrayList<>();
     Map<String, String> category = new HashMap<>();
     category.put("category", categoryId);
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.searchAll(category);
+      List<Document> doc = analysisMetadataStore.searchAll(category);
       if (doc == null) {
         return null;
       }
@@ -169,37 +165,11 @@ public class AnalysisServiceImpl implements AnalysisService {
   @Override
   public List<Analysis> getAnalysisByCategoryForUserId(
       String categoryId, Long userId, Ticket ticket) throws SipReadEntityException {
-    List<Document> doc = null;
-    List<Analysis> objDocs = new ArrayList<>();
-    try {
-      analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.searchByCategoryForUserId(categoryId, userId);
-      if (doc == null) {
-        return null;
-      }
-      for (Document d : doc) {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        objDocs.add(objectMapper.readValue(d.asJsonString(), Analysis.class));
-      }
-    } catch (Exception e) {
-      logger.error("Exception occurred while fetching analysis by category for userId", e);
-      throw new SipReadEntityException(
-          "Exception occurred while fetching analysis by category for userId", e);
-    }
-    return objDocs;
-  }
 
-  /**
-   * Retrieves all analyses from Mapr DB.
-   *
-   * @return List of Analysis
-   */
-  public List<Analysis> getAllAnalyses() {
-    List<Document> doc = null;
     List<Analysis> objDocs = new ArrayList<>();
     try {
       analysisMetadataStore = new AnalysisMetadata(tableName, basePath);
-      doc = analysisMetadataStore.searchAll();
+      List<Document> doc = analysisMetadataStore.searchByCategoryForUserId(categoryId, userId);
       if (doc == null) {
         return null;
       }
@@ -231,31 +201,5 @@ public class AnalysisServiceImpl implements AnalysisService {
       return analysis.getSipQuery().getQuery();
     }
     return null;
-  }
-
-  /**
-   * Validates the Analysis Name.
-   *
-   * @param analysisName analysis name
-   */
-  private static void validateAnalysisName(String analysisName) {
-    if (analysisName == null) {
-      throw new IllegalArgumentException("analysisName must not be null");
-    }
-    int length = analysisName.length();
-    if (length >= 1 && length <= 30) {
-      Pattern special = Pattern.compile("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]");
-      Matcher hasSpecial = special.matcher(analysisName);
-      if (hasSpecial.find()) {
-        throw new IllegalArgumentException(
-            "Analysis name must not consists of special characters except '- _'");
-      }
-    } else {
-      throw new IllegalArgumentException(
-          String.format(
-              "analysisName %s is invalid - character count MUST be greater than or equal to 1 and "
-                  + "less than or equal to 30",
-              analysisName));
-    }
   }
 }
