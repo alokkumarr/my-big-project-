@@ -21,9 +21,7 @@ class ChannelActions extends ChannelModel {
     this.clickOnCreateButton();
   }
 
-  createNewApiChannel(channelInfo) {
-    this.clickOnChannelType(channelInfo.sourceType);
-    this.clickOnChannelNextButton();
+  fillChannleInfo(channelInfo) {
     this.fillChannelName(channelInfo.channelName);
     this.fillHostName(channelInfo.hostName);
     if (channelInfo.port) channelActions.fillPortNumber(channelInfo.port);
@@ -33,10 +31,12 @@ class ChannelActions extends ChannelModel {
     if (channelInfo.headers) this.addHeaders(channelInfo.headers);
     if (channelInfo.queryParams) this.addQueryParams(channelInfo.queryParams);
     this.fillDescription(channelInfo.desc);
+  }
+
+  testAndVerifyTestConnectivity(testConnectivityMessage) {
     this.clickOnTestConnectivity();
-    this.verifyTestConnectivityLogs(channelInfo.testConnectivityMessage);
+    this.verifyTestConnectivityLogs(testConnectivityMessage);
     this.closeTestConnectivity();
-    this.clickOnCreateButton();
   }
 }
 

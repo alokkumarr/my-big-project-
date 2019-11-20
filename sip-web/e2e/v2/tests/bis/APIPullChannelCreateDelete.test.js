@@ -61,20 +61,12 @@ describe('BIS API PULL tests: APIPullChannelCreateDelete.test.js', () => {
         dataSourcesPage.clickOnAddChannelButton();
 
         const channelActions = new ChannelActions();
+
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
-        channelActions.fillChannelName(data.channelInfo.channelName);
-        channelActions.fillHostName(data.channelInfo.hostName);
-        if (data.channelInfo.port) channelActions.fillPortNumber(data.channelInfo.port);
-        channelActions.selectMethodType(data.channelInfo.method);
-        channelActions.fillEndPoint(data.channelInfo.endPoint);
-        if (data.channelInfo.method === 'POST') channelActions.fillRequestBody(JSON.stringify(data.channelInfo.body));
-        if (data.channelInfo.headers) channelActions.addHeaders(data.channelInfo.headers);
-        if (data.channelInfo.queryParams) channelActions.addQueryParams(data.channelInfo.queryParams);
-        channelActions.fillDescription(data.channelInfo.desc);
-        channelActions.clickOnTestConnectivity();
-        channelActions.verifyTestConnectivityLogs(data.channelInfo.testConnectivityMessage);
-        channelActions.closeTestConnectivity();
+
+        channelActions.fillChannleInfo(data.channelInfo);
+        channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
         channelActions.clickOnCreateButton();
         // Verifications
         dataSourcesPage.verifyChannelDetailsInListView(

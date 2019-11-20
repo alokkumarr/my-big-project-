@@ -61,42 +61,22 @@ describe('BIS API PULL tests: APIPullChannelUpdateDelete.test.js', () => {
         dataSourcesPage.clickOnAddChannelButton();
 
         const channelActions = new ChannelActions();
-        channelActions.createNewApiChannel(data.channelInfo);
-        let updatedChannelInfo = {
-          channelName: `${data.channelInfo.channelName}-up`,
-          hostName: `${data.channelInfo.hostName}`,
-          port: `${data.channelInfo.port}`,
-          method: `${data.channelInfo.method}`,
-          endPoint: `${data.channelInfo.endPoint}`,
-          headers: data.channelInfo.headers,
-          queryParams: data.channelInfo.queryParams,
-          desc: `${data.channelInfo.desc}-up`,
-          testConnectivityMessage: `${data.channelInfo.testConnectivityMessage}`,
-          status: `${data.channelInfo.status}`,
-          created: `${data.channelInfo.created}`
-        };
+
+        channelActions.clickOnChannelType(data.channelInfo.sourceType);
+        channelActions.clickOnChannelNextButton();
+
+        channelActions.fillChannleInfo(data.channelInfo);
+        channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
+        channelActions.clickOnCreateButton();
+
+        let updatedChannelInfo = Object.assign({}, data.channelInfo);
+        updatedChannelInfo.channelName = `${updatedChannelInfo.channelName}-up`;
+        updatedChannelInfo.desc = `${updatedChannelInfo.desc}-up`;
         //update
         dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
         dataSourcesPage.clickOnEditChannel();
-        channelActions.fillChannelName(updatedChannelInfo.channelName);
-        channelActions.fillHostName(updatedChannelInfo.hostName);
-        if (updatedChannelInfo.port) channelActions.fillPortNumber(updatedChannelInfo.port);
-        channelActions.selectMethodType(updatedChannelInfo.method);
-        channelActions.fillEndPoint(updatedChannelInfo.endPoint);
-        if (updatedChannelInfo.method === 'POST')
-          channelActions.fillRequestBody(JSON.stringify(updatedChannelInfo.body));
-        if (updatedChannelInfo.headers) {
-          channelActions.clearHeader();
-          channelActions.addHeaders(updatedChannelInfo.headers);
-        }
-        if (updatedChannelInfo.queryParams) {
-          channelActions.clearQueryParams();
-          channelActions.addQueryParams(updatedChannelInfo.queryParams);
-        }
-        channelActions.fillDescription(updatedChannelInfo.desc);
-        channelActions.clickOnTestConnectivity();
-        channelActions.verifyTestConnectivityLogs(updatedChannelInfo.testConnectivityMessage);
-        channelActions.closeTestConnectivity();
+        channelActions.fillChannleInfo(updatedChannelInfo);
+        channelActions.testAndVerifyTestConnectivity(updatedChannelInfo.testConnectivityMessage);
         channelActions.clickOnUpdateChannel();
         // Verifications
         dataSourcesPage.verifyChannelDetailsInListView(

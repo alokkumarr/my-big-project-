@@ -17,7 +17,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to create and delete an api pull with GET"
+        "description": "Admin should be able to create and delete an api pull channel with GET"
       },
       "APCHANNEL002": {
         "suites": ["regression"],
@@ -38,7 +38,7 @@
           },
           "status": 1
         },
-        "description": "Admin should be able to create and delete an api pull with POST"
+        "description": "Admin should be able to create and delete an api pull channel with POST"
       },
       "APCHANNEL003": {
         "suites": ["regression"],
@@ -59,7 +59,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to create and delete an api pull GET request with headers"
+        "description": "Admin should be able to create and delete an api pull channel GET request with headers"
       },
       "APCHANNEL004": {
         "suites": ["regression"],
@@ -80,7 +80,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to create and delete an api pull GET request with headers and query params"
+        "description": "Admin should be able to create and delete an api pull channel GET request with headers and query params"
       },
       "APCHANNEL005": {
         "suites": ["regression"],
@@ -101,7 +101,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to create and delete an api pull GET request with headers, query params and multibyte chars"
+        "description": "Admin should be able to create and delete an api pull channel GET request with headers, query params and multibyte chars"
       }
     },
     "updateAndDeleteChannel": {
@@ -121,7 +121,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to update and delete an api pull with GET"
+        "description": "Admin should be able to update and delete an api pull channel with GET"
       },
       "APCHANNEL007": {
         "suites": ["regression"],
@@ -142,7 +142,7 @@
           },
           "status": 1
         },
-        "description": "Admin should be able to update and delete an api pull with POST"
+        "description": "Admin should be able to update and delete an api pull channel with POST"
       },
       "APCHANNEL008": {
         "suites": ["regression"],
@@ -163,7 +163,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to update and delete an api pull GET request with headers"
+        "description": "Admin should be able to update and delete an api pull channel GET request with headers"
       },
       "APCHANNEL009": {
         "suites": ["regression"],
@@ -184,7 +184,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to update and delete an api pull GET request with headers and query params"
+        "description": "Admin should be able to update and delete an api pull channel GET request with headers and query params"
       },
       "APCHANNEL010": {
         "suites": ["regression"],
@@ -205,7 +205,7 @@
           "body": null,
           "status": 1
         },
-        "description": "Admin should be able to update and delete an api pull GET request with headers, query params and multibyte chars"
+        "description": "Admin should be able to update and delete an api pull channel GET request with headers, query params and multibyte chars"
       }
     }
   }
