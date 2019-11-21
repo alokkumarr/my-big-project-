@@ -58,7 +58,7 @@ public class DataSecurityKeys implements Serializable {
   }
 
   /** Sets value of isJVCustomer.  */
-  public void setIsJvCustomer(Integer isJVCustomer) {
+  public void setIsJvCustomer(Integer isJvCustomer) {
     this.isJvCustomer = isJvCustomer;
   }
 
