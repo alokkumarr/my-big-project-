@@ -14,6 +14,9 @@ public class DataSecurityKeys implements Serializable {
   private static final long serialVersionUID = 7546190895561288031L;
 
   private String message;
+  private String customerCode;
+  private Integer isJVCustomer;
+  private Integer filterByCustomerCode;
   private List<TicketDSKDetails> dataSecurityKeys;
 
   /**
@@ -28,6 +31,49 @@ public class DataSecurityKeys implements Serializable {
   /** Sets value of message.  */
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  /**
+   * Gets customerCode.
+   *
+   * @return value of customerCode
+   */
+  public String getCustomerCode() {
+    return customerCode;
+  }
+
+  /** Sets value of customerCode.  */
+  public void setCustomerCode(String customerCode) {
+    this.customerCode = customerCode;
+  }
+
+
+  /**
+   * Gets isJVCustomer.
+   *
+   * @return value of isJVCustomer
+   */
+  public Integer getIsJVCustomer() {
+    return isJVCustomer;
+  }
+
+  /** Sets value of isJVCustomer.  */
+  public void setIsJVCustomer(Integer isJVCustomer) {
+    this.isJVCustomer = isJVCustomer;
+  }
+
+  /**
+   * Gets filterByCustomerCode.
+   *
+   * @return value of filterByCustomerCode
+   */
+  public Integer getFilterByCustomerCode() {
+    return filterByCustomerCode;
+  }
+
+  /** Sets value of filterByCustomerCode.  */
+  public void setFilterByCustomerCode(Integer filterByCustomerCode) {
+    this.filterByCustomerCode = filterByCustomerCode;
   }
 
   /**

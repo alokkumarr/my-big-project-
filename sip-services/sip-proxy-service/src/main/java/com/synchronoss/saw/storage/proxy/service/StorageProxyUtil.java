@@ -117,19 +117,18 @@ public class StorageProxyUtil {
    * @param restUtil
    * @return list of dsk details
    */
-  public static List<TicketDSKDetails> getDSKDetailsByUser(String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
-    List<TicketDSKDetails> dskDetailsList = null;
-    try {
+  public static DataSecurityKeys getDSKDetailsByUser(String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
+		DataSecurityKeys dataSecurityKeys = null;
+  	try {
       RestTemplate restTemplate = restUtil.restTemplate();
       String url = securityServiceUrl.concat("?userId=").concat(masterLoginId);
       logger.trace("SIP security url to fetch DSK details :", url);
 
-      DataSecurityKeys dskDetails =  restTemplate.getForObject(url, DataSecurityKeys.class);
-      dskDetailsList = dskDetails.getDataSecurityKeys();
+			dataSecurityKeys = restTemplate.getForObject(url, DataSecurityKeys.class);
     } catch (Exception ex) {
       logger.error("Error while fetching DSK details by user", ex.getMessage());
     }
-    return dskDetailsList;
+    return dataSecurityKeys;
   }
 
   /**
@@ -308,7 +307,7 @@ public class StorageProxyUtil {
    * @throws Exception when unable to create directory path.
    */
   public static void createDirIfNotExists(String path, int retries) throws Exception {
-   try {
+   /*try {
         if (!HFileOperations.exists(path))
       HFileOperations.createDir(path);
     } catch (Exception e) {
@@ -317,7 +316,7 @@ public class StorageProxyUtil {
       }
       Thread.sleep(5 * 1000);
       createDirIfNotExists(path, retries - 1);
-    }
+    }*/
   }
 
   public static List<String> getArtifactsNames(SipQuery sipQuery) {

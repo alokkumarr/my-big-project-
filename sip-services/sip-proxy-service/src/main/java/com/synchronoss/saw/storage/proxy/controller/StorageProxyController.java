@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.google.gson.Gson;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -269,9 +268,11 @@ public class StorageProxyController {
       return executeResponse;
     }
     List<TicketDSKDetails> dskList = new ArrayList<>();
+    DataSecurityKeys dataSecurityKeys = null;
     // fetch DSK details for scheduled
     if (isScheduledExecution && userId != null) {
-      dskList = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
+      dataSecurityKeys = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
+      dskList = dataSecurityKeys.getDataSecurityKeys();
     } else {
       dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
     }
@@ -289,20 +290,26 @@ public class StorageProxyController {
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
-    if (authTicket != null && authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+    boolean filterDSKByCustomerCode = authTicket != null && authTicket.getIsJvCustomer() != 1
+				    && authTicket.getFilterByCustomerCode() == 1;
+    boolean scheduledDSKbyCustomerCode = authTicket == null && isScheduledExecution
+        && dataSecurityKeys != null  && dataSecurityKeys.getIsJVCustomer() != 1
+        && dataSecurityKeys.getFilterByCustomerCode() == 1;
+    if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
       String analysisType = analysis.getType();
       DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
       List<String> artsName = getArtifactsNames(savedQuery);
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
       Boolean designerEdit =
           analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+      String customerCode = dataSecurityKeys!= null ? dataSecurityKeys.getCustomerCode() : authTicket.getCustCode();
       if (analysisType.equalsIgnoreCase("report") && designerEdit) {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
           if (query.contains(artifact)) {
             dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
-            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
             customerFilterDsks.add(dataSecurityKeyDef);
             dataSecurityKeyDef = new DataSecurityKeyDef();
           }
@@ -310,7 +317,7 @@ public class StorageProxyController {
       } else {
         for (String artifact : sipQueryArts) {
             dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
-            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
             customerFilterDsks.add(dataSecurityKeyDef);
             dataSecurityKeyDef = new DataSecurityKeyDef();
         }

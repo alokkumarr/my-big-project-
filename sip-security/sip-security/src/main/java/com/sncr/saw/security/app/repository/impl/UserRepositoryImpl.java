@@ -846,10 +846,23 @@ public class UserRepositoryImpl implements UserRepository {
       dskDetails.setValues(dskValueMapping.get(key));
       dskList.add(dskDetails);
     }
+
+    String fetchJVDetails = "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST," +
+				"USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID " +
+				"AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
+		Map<String,String> jvDetails = jdbcTemplate.query(fetchJVDetails, new PreparedStatementSetter() {
+			@Override public void setValues(PreparedStatement preparedStatement) throws SQLException {
+				preparedStatement.setString(1, userId);
+			}
+		}, new UserRepositoryImpl.JVDetailExtractor());
+
+
 		DataSecurityKeys securityKeys = new DataSecurityKeys();
     securityKeys.setDataSecurityKeys(dskList);
-    securityKeys.setMessage("Success");
-	  return securityKeys;
+    securityKeys.setCustomerCode(jvDetails.get("customerCode"));
+		securityKeys.setIsJVCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
+		securityKeys.setFilterByCustomerCode(Integer.parseInt(jvDetails.get("filterByCustomerCode")));
+    return securityKeys;
   }
 
   @Override
@@ -872,6 +885,20 @@ public class UserRepositoryImpl implements UserRepository {
 		return ticket;
 
 	}
+
+	private class JVDetailExtractor implements ResultSetExtractor<Map<String, String>> {
+		Map<String , String> values = new HashMap<>();
+		@Override
+		public Map<String, String> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+			while(resultSet.next()) {
+				values.put("customerCode", resultSet.getString("CUSTOMER_CODE"));
+				values.put("isJVCustomer", resultSet.getString("IS_JV_CUSTOMER"));
+				values.put("filterByCustomerCode", resultSet.getString("FILTER_BY_CUSTOMER_CODE"));
+			}
+			return values;
+		}
+	}
+
 
 	private class customerCodeFilterExtractor implements ResultSetExtractor<Integer> {
 
