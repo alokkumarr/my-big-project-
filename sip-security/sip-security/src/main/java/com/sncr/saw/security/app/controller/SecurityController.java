@@ -376,7 +376,7 @@ public class SecurityController {
 			valid.setValid(false);
 			return valid;
 		} else if (newPass.equals(oldPass)) {
-            message = "'Old' and 'New password' can't be same.";
+            message = "Old password and new password should not be same.";
             valid.setValidityMessage(message);
             valid.setValid(false);
             return valid;
@@ -390,7 +390,12 @@ public class SecurityController {
 				if (message != null && message.equals("Password Successfully Changed.")) {
 					valid.setValid(true);
                     valid.setValidityMessage(message);
-				}
+                    return valid;
+				} else if (message.equals("Value provided for old Password did not match.")) {
+				    valid.setValid(false);
+				    valid.setValidityMessage(message);
+				    return valid;
+                }
 
 			} catch (DataAccessException de) {
 				valid.setValidityMessage("Database error. Please contact server Administrator.");
