@@ -375,7 +375,12 @@ public class SecurityController {
 			valid.setValidityMessage(message);
 			valid.setValid(false);
 			return valid;
-		}
+		} else if (newPass.equals(oldPass)) {
+            message = "'Old' and 'New password' can't be same.";
+            valid.setValidityMessage(message);
+            valid.setValid(false);
+            return valid;
+        }
 
 		valid = PasswordValidation.validatePassword(newPass,loginId);
 
