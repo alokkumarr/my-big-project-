@@ -307,7 +307,7 @@ public class StorageProxyUtil {
    * @throws Exception when unable to create directory path.
    */
   public static void createDirIfNotExists(String path, int retries) throws Exception {
-   /*try {
+   try {
         if (!HFileOperations.exists(path))
       HFileOperations.createDir(path);
     } catch (Exception e) {
@@ -316,7 +316,7 @@ public class StorageProxyUtil {
       }
       Thread.sleep(5 * 1000);
       createDirIfNotExists(path, retries - 1);
-    }*/
+    }
   }
 
   public static List<String> getArtifactsNames(SipQuery sipQuery) {
