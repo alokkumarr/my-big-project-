@@ -290,24 +290,27 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private void ProcessCountlyRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
         JavaRDD<String> jsonRdd = in.mapPartitions(new TransformCountlyRecord());
         SparkConf cnf = in.context().getConf();
-        processJsonRecords(jsonRdd, tm, cnf, this.itcx,DM_COUNTLY);
+       processJsonRecords(jsonRdd, tm, cnf, this.itcx,DM_COUNTLY);
 
     }
     
     
     
     
-    private void extractSchemaForEventTypes(SparkSession session,Dataset<Row> dataset) {
-    	
+    private void extractSchemaForEventTypes(SparkSession session,Dataset<Row> dataset, String model) {
+    	if ((model.equals(DM_COUNTLY))) {
+			logger.debug("Setting countly schema"+ schema);
+			this.schemaFields.put(DM_COUNTLY, schema);
+		} else {
     	List<Row> eventTypes = dataset.select((String) "EVENT_TYPE").distinct().collectAsList();
     	for (Row eventType : eventTypes) {
 			
 			logger.debug("#### Extracting schema for  eventType ::"+ eventType.getString(0));
 			
-			this.schemaFields.put(eventType.getString(0), 
-					GenericJsonModel.createSchemaByEventType(definitions, eventType.getString(0)));
 			
-			
+				this.schemaFields.put(eventType.getString(0), 
+						GenericJsonModel.createSchemaByEventType(definitions, eventType.getString(0)));
+			}
 			
     	}
     	
@@ -327,7 +330,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				Dataset<Row> dataset = sess.read().json(jsonRdd).toDF();
 				logger.debug("######## converted to dataset from rdd #####");
 				if ((model.equals(DM_GENERIC) || model.equals(DM_COUNTLY))) {
-					this.extractSchemaForEventTypes(sess, dataset);
+					this.extractSchemaForEventTypes(sess, dataset, model);
 				}
 
 				logger.debug("schema fields::" + this.schemaFields.size());
@@ -422,7 +425,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 					 * 
 					 */
 
-					if ((isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) && this.ngctx.runningPipeLine) {
+					if ((isTimeSeries == null || !Boolean.valueOf(isTimeSeries)) && this.ngctx.runningPipeLine && !model.equals(DM_COUNTLY)) {
 						logger.debug("Starting async pipeline" + this.ngctx.runningPipeLine);
 						ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 						final Dataset<Row> dataset = df;
@@ -449,7 +452,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
 						});
 
-					} else if (Boolean.valueOf(isTimeSeries) && this.ngctx.runningPipeLine) {
+					} else if (Boolean.valueOf(isTimeSeries) && this.ngctx.runningPipeLine && !model.equals(DM_COUNTLY)) {
 						logger.debug("Starting sync pipeline" + this.ngctx.runningPipeLine);
 						try {
 							Dataset<Row> data = df.filter(query).cache();
