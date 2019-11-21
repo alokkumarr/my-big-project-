@@ -293,7 +293,7 @@ public class StorageProxyController {
     boolean filterDSKByCustomerCode = authTicket != null && authTicket.getIsJvCustomer() != 1
 				    && authTicket.getFilterByCustomerCode() == 1;
     boolean scheduledDSKbyCustomerCode = authTicket == null && isScheduledExecution
-        && dataSecurityKeys != null  && dataSecurityKeys.getIsJVCustomer() != 1
+        && dataSecurityKeys != null  && dataSecurityKeys.getIsJvCustomer() != 1
         && dataSecurityKeys.getFilterByCustomerCode() == 1;
     if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
       String analysisType = analysis.getType();

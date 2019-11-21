@@ -860,7 +860,7 @@ public class UserRepositoryImpl implements UserRepository {
 		DataSecurityKeys securityKeys = new DataSecurityKeys();
     securityKeys.setDataSecurityKeys(dskList);
     securityKeys.setCustomerCode(jvDetails.get("customerCode"));
-		securityKeys.setIsJVCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
+		securityKeys.setIsJvCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
 		securityKeys.setFilterByCustomerCode(Integer.parseInt(jvDetails.get("filterByCustomerCode")));
     return securityKeys;
   }

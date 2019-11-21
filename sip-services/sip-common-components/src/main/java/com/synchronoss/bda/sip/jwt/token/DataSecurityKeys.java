@@ -15,7 +15,7 @@ public class DataSecurityKeys implements Serializable {
 
   private String message;
   private String customerCode;
-  private Integer isJVCustomer;
+  private Integer isJvCustomer;
   private Integer filterByCustomerCode;
   private List<TicketDSKDetails> dataSecurityKeys;
 
@@ -53,13 +53,13 @@ public class DataSecurityKeys implements Serializable {
    *
    * @return value of isJVCustomer
    */
-  public Integer getIsJVCustomer() {
-    return isJVCustomer;
+  public Integer getIsJvCustomer() {
+    return isJvCustomer;
   }
 
   /** Sets value of isJVCustomer.  */
-  public void setIsJVCustomer(Integer isJVCustomer) {
-    this.isJVCustomer = isJVCustomer;
+  public void setIsJvCustomer(Integer isJVCustomer) {
+    this.isJvCustomer = isJvCustomer;
   }
 
   /**
