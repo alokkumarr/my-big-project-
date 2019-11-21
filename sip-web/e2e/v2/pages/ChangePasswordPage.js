@@ -9,7 +9,9 @@ class ChangePasswordPage {
     this._oldPassword = element(by.css(`[placeholder='Old Password']`));
     this._newPassword = element(by.css(`[placeholder='New Password']`));
     this._confirmPassword = element(by.css(`[placeholder='Confirm Password']`));
-    this._errorMessage = element(by.xpath(`//*[contains(@id,'mat-error')]/pre`));
+    //this._errorMessage = element(by.xpath(`//*[contains(@id,'mat-error')]/pre`));
+    this._errorMessage = element(by.css(`[e2e='error-msg']`));
+
     this._changeButton = element(by.buttonText('Change'));
     this._cancelButton = element(by.buttonText('Cancel'));
   }
