@@ -3394,7 +3394,7 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public boolean checkIsAlertModule(Long moduleId) {
+  public boolean checkIsModulePresent(Long moduleId, String modName) {
     String sql = "select M.MODULE_NAME from MODULES M where M.MODULE_SYS_ID =?";
     try {
       String moduleName =
@@ -3402,7 +3402,7 @@ public class UserRepositoryImpl implements UserRepository {
               sql,
               preparedStatement -> preparedStatement.setLong(1, moduleId),
               new UserRepositoryImpl.StringExtractor("MODULE_NAME"));
-      if (moduleName.equalsIgnoreCase("ALERTS")) {
+      if (moduleName.equalsIgnoreCase(modName)) {
         return true;
       }
     } catch (Exception e) {

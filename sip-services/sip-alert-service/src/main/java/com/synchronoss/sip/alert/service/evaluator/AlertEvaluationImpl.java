@@ -220,6 +220,7 @@ public class AlertEvaluationImpl implements AlertEvaluation {
           model1.setGte(dynamicConverter.getGte());
           model1.setLte(dynamicConverter.getLte());
           eachFilter.setModel(model1);
+          filters.add(eachFilter);
         } else {
           filters.add(eachFilter);
         }
