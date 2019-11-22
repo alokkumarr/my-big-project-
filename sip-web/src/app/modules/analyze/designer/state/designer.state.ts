@@ -282,10 +282,16 @@ export class DesignerState {
       artifacts,
       artifact => !isEmpty(artifact.fields)
     );
+
+    // if sort is applied for the field that is removed, remove sort from SIPQUERY
+    const sorts = filter(sipQuery.sorts, sort =>
+      sort.columnName !== artifactColumn.columnName
+    );
+
     patchState({
       analysis: {
         ...analysis,
-        sipQuery: { ...sipQuery, artifacts: sortedArtifacts }
+        sipQuery: { ...sipQuery, artifacts: sortedArtifacts, sorts }
       }
     });
     return dispatch(new DesignerApplyChangesToArtifactColumns());

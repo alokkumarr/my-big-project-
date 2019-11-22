@@ -60,6 +60,7 @@ export class PivotGridComponent implements OnDestroy {
   @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string | 'designer';
   @Input() showFieldDetails;
+  @Input() name;
 
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
