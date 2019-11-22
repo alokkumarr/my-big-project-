@@ -29,7 +29,9 @@ describe('Executing login tests from ChangePasswd.test.js', () => {
   });
 
   using(
-    testDataReader.testData['CHANGEPWD']['negativeTests'] ? testDataReader.testData['CHANGEPWD']['negativeTests'] : {},
+    testDataReader.testData['CHANGEPWD']['negativeTests']
+      ? testDataReader.testData['CHANGEPWD']['negativeTests']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         let loginPage = new LoginPage();
@@ -42,12 +44,19 @@ describe('Executing login tests from ChangePasswd.test.js', () => {
         changePwd.clickOnChangeButton();
         changePwd.verifyError(data.expected.message);
         header.doLogout();
-      }).result.testInfo = { testId: id, data: data, feature: 'CHANGEPWD', dataProvider: 'negativeTests' };
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'CHANGEPWD',
+        dataProvider: 'negativeTests'
+      };
     }
   );
 
   using(
-    testDataReader.testData['CHANGEPWD']['positiveTests'] ? testDataReader.testData['CHANGEPWD']['positiveTests'] : {},
+    testDataReader.testData['CHANGEPWD']['positiveTests']
+      ? testDataReader.testData['CHANGEPWD']['positiveTests']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         let loginPage = new LoginPage();
@@ -60,14 +69,23 @@ describe('Executing login tests from ChangePasswd.test.js', () => {
         const time = new Date().getTime();
         data.newpassword = `Test@${time}`;
 
-        changePwd.doChangePwd(users.anyUser.password, data.newpassword, data.newpassword);
+        changePwd.doChangePwd(
+          users.anyUser.password,
+          data.newpassword,
+          data.newpassword
+        );
         changePwd.clickOnChangeButton();
-        changePwd.verifyError(data.expected.message);
         header.verifyChangePassword();
+        changePwd.verifyError(data.expected.message);
         loginPage.doLogin(users[data.user].loginId, data.newpassword);
         header.verifyLogo();
         header.doLogout();
-      }).result.testInfo = { testId: id, data: data, feature: 'CHANGEPWD', dataProvider: 'positiveTests' };
+      }).result.testInfo = {
+        testId: id,
+        data: data,
+        feature: 'CHANGEPWD',
+        dataProvider: 'positiveTests'
+      };
     }
   );
 });
