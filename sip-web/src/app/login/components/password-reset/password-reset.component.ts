@@ -43,6 +43,12 @@ export class PasswordResetComponent implements OnInit {
     });
   }
 
+  get allErrors(): string {
+    return [this.errorMsg, this.newPasswordError, this.confPasswordError]
+      .filter(error => Boolean(error))
+      .join('\n');
+  }
+
   validatePassword() {
     this.newPasswordError = validatePassword(this.newPwd, this.username);
     this.confPasswordError =
