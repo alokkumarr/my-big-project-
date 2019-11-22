@@ -825,7 +825,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testScheduleForMultiTenancy() throws IOException, InterruptedException {
-    analysisId = createAnalysis(customToken);
+    JsonObject data = testData;
+    data.addProperty("category", "48");
+    analysisId = createAnalysis(customToken, data);
 
     ObjectNode scheduleObj = scheduleData();
     scheduleObj.put("activeRadio", "currenttime");
@@ -855,7 +857,7 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testCreateAnalysis() throws IOException {
-    analysisId = createAnalysis(token);
+    analysisId = createAnalysis(token, testData);
     deleteAnalysis(analysisId, token);
   }
 
@@ -882,29 +884,31 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testGetAnalysis() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testGetAnalysisByCategory() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId + "?category=5")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testDeleteAnalysis() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
@@ -915,24 +919,26 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testListExecutions() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/executions")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testLastExecutionsData() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/lastExecutions/data")
         .then()
         .assertThat()
         .statusCode(200);
+    deleteAnalysis(analysisId, token);
   }
 
   @Test
@@ -1505,9 +1511,9 @@ public class SipDslIT extends BaseIT {
    * @return Analysis id
    * @throws IOException IoException
    */
-  public String createAnalysis(String token) throws IOException {
+  public String createAnalysis(String token, JsonObject data) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
             .header("Authorization", "Bearer " + token)

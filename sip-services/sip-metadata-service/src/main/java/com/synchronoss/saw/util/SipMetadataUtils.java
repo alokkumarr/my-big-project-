@@ -17,6 +17,8 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.sip.utils.Privileges;
+import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
