@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 public class SipCommonUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(SipCommonUtils.class);
-	private static final String INVALID_FILE_PATTERN = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -60,7 +59,7 @@ public class SipCommonUtils {
     // validate name length and avoid any invalid specific symbol for file name
     boolean hasValidLength = name.length() >= 1 && name.length() <= 30;
     if (hasValidLength) {
-      if (name.matches(SipCommonUtils.INVALID_FILE_PATTERN)) {
+      if (name.matches("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]")) {
         throw new IllegalArgumentException(
             "Analysis name must not consists of special characters except '- _'");
       }

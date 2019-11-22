@@ -13,6 +13,7 @@ import com.synchronoss.saw.exceptions.SipDeleteEntityException;
 import com.synchronoss.saw.exceptions.SipReadEntityException;
 import com.synchronoss.saw.exceptions.SipUpdateEntityException;
 import com.synchronoss.saw.util.SipMetadataUtils;
+import com.synchronoss.sip.utils.SipCommonUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 
-import com.synchronoss.sip.utils.SipCommonUtils;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
