@@ -52,7 +52,7 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
 	public FilterRegistrationBean jwtFilter() {
 		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
 		registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(), ticketHelper));
-		registrationBean.addUrlPatterns("/auth/*");
+		registrationBean.addUrlPatterns("/sip-security/auth/*");
 
 		return registrationBean;
 	}
