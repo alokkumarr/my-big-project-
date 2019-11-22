@@ -34,12 +34,7 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -53,9 +48,9 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithESRe
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const reportName = `e2e dl report ${new Date().toString()}`;
-
-        const reportDescription = `e2e es report description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const reportName = `e2e ${now}`;
+        const reportDescription = `e2e es report description ${now}`;
         const analysisType = 'table:report';
         const tables = data.tables;
         const loginPage = new LoginPage();
