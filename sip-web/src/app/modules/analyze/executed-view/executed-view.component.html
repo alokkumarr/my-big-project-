@@ -142,9 +142,12 @@
       <mat-card class="executed-view-analysis">
         <filter-chips-u
           *ngIf="
-          executedAnalysis &&
             executedAnalysis &&
-            !(executedAnalysis.type === 'report' && executedAnalysis.designerEdit) &&
+            executedAnalysis &&
+            !(
+              executedAnalysis.type === 'report' &&
+              executedAnalysis.designerEdit
+            ) &&
             (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
               .length > 0
           "
@@ -211,6 +214,7 @@
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"
+              [actionBus]="actionBus$"
             >
             </executed-map-view>
           </div>
