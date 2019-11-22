@@ -97,7 +97,7 @@ metadata:
 
 sip:
   security:
-    host: ${connector}://localhost:9000/internal/sip-security/dsk
+    host: ${connector}://localhost:9000/internal/sip-security
 {% if sip_secure %}
   ssl:
     enable : true
