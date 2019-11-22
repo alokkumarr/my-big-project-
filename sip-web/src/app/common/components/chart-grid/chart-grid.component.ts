@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import * as orderBy from 'lodash/orderBy';
 import * as isEmpty from 'lodash/isEmpty';
@@ -62,6 +62,7 @@ export const dataFieldToHuman = (dataFieldName: string) => {
 })
 export class ChartGridComponent implements OnInit {
   @Input() updater: BehaviorSubject<Object[]>;
+  @Input() actionBus: Subject<Object[]>;
   @Input('analysis')
   set setAnalysis(analysis: AnalysisDSL) {
     this.analysis = analysis;

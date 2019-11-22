@@ -11,7 +11,7 @@ class LoginPage {
     this._userName = element(by.css(`[e2e='username-input']`));
     this._password = element(by.css(`[e2e='password-input']`));
     this._loginButton = element(by.css(`[e2e='login-btn']`));
-    this._errorMessage = element(by.css(`[e2e='error-msg-section']`));
+    this._errorMessage = element(by.css(`[e2e='error-msg']`));
   }
 
   fillUserNameField(userName) {
