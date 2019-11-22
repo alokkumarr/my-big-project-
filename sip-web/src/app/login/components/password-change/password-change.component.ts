@@ -66,6 +66,12 @@ export class PasswordChangeComponent {
     });
   }
 
+  get allErrors(): string {
+    return [this.errorMsg, this.newPasswordError, this.confPasswordError]
+      .filter(error => Boolean(error))
+      .join('\n');
+  }
+
   cancel() {
     this._router.navigate(['login']);
   }
@@ -75,7 +81,7 @@ export class PasswordChangeComponent {
     this.newPasswordError = validatePassword(this.formData.newPwd, username);
     this.confPasswordError =
       this.formData.newPwd !== this.formData.confNewPwd
-        ? 'Needs to be same as new password.'
+        ? 'Confirm Password needs to be same as new password.'
         : '';
   }
 
