@@ -40,6 +40,13 @@ const users = {
     firstName: 'at',
     lastName: 'userreset'
   },
+  userTwoReset: {
+    loginId: 'at.userTwor.' + globalVariables.e2eId,
+    roleName: roles.userOne.roleName,
+    status: 'ACTIVE',
+    firstName: 'at',
+    lastName: 'userreset'
+  },
   // Password and email is common to all users, recorded under anyUser
   anyUser: {
     password: 'Password1!',
