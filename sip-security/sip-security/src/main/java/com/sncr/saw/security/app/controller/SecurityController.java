@@ -120,6 +120,8 @@ public class SecurityController {
 
     private final String AdminRole = "ADMIN";
 
+    private final String ALERTS = "ALERTS";
+
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
@@ -1619,6 +1621,7 @@ public class SecurityController {
 		Valid valid = null;
 		try {
 			if (category != null) {
+			 if(!userRepository.checkIsModulePresent(category.getModuleId(),ALERTS)){
 				if (!userRepository.checkCatExists(category)) {
 					valid = userRepository.addCategory(category);
 					if (valid.getValid()) {
@@ -1632,8 +1635,12 @@ public class SecurityController {
 					catList.setValid(false);
 					catList.setValidityMessage(
 							"Category Name already exists for this Customer Product Module Combination. ");
-				}
-			} else {
+          }
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Adding Categories and Sub Categories for Alert Module is not allowed. ");
+        }
+      } else {
 				catList.setValid(false);
 				catList.setValidityMessage("Mandatory request params are missing");
 			}
