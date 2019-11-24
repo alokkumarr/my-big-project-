@@ -19,6 +19,7 @@
     >
       <mat-checkbox
         type="checkbox"
+        [hidden]="hasOnlyAccessPrivilege"
         (change)="onAllClicked()"
         [checked]="privilegeCodeList[8]"
       >

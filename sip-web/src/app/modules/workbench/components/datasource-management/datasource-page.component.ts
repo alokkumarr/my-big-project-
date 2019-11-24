@@ -140,7 +140,14 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   selectChannel(channel) {
-    this.selectedSourceData = channel;
+    if (!channel) {
+      this.selectedSourceData = channel;
+      return;
+    }
+
+    this.selectedSourceData = this.unFilteredSourceData.find(
+      source => source.bisChannelSysId === channel.bisChannelSysId
+    );
   }
 
   sourceSelectedType(sourceType, channelCount) {

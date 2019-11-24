@@ -23,7 +23,7 @@ const analysisStub = {
 @Component({
   selector: 'pivot-grid',
   template: '<h1> Pivot </h1>',
-  inputs: ['artifactColumns', 'sorts', 'updater', 'mode', 'data']
+  inputs: ['artifactColumns', 'sorts', 'updater', 'mode', 'data', 'name']
 })
 class PivotGridStubComponent {}
 
