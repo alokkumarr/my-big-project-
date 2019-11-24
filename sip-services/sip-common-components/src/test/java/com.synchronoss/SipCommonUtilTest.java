@@ -14,7 +14,7 @@ public class SipCommonUtilTest {
     Assert.assertEquals(getBinaryCode(decToBinary(128L)), "0000000010000000");
     Assert.assertEquals(getBinaryCode(decToBinary(33280L)), "1000001000000000");
     Assert.assertEquals(getBinaryCode(decToBinary(49152L)), "1100000000000000");
-    System.out.println(getBinaryCode(decToBinary(35328L)));
+    Assert.assertEquals(getBinaryCode(decToBinary(35328L)), "1000101000000000");
   }
 
   @Test

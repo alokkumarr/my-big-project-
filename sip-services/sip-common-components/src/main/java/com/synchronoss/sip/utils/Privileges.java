@@ -46,10 +46,15 @@ public class Privileges {
    * @return Boolean value
    */
   public boolean isPriviegePresent(PrivilegeNames privName, Long dec) {
+    if (dec == null || privName == null) {
+      return false;
+    }
     int[] privCode = decToBinary(dec);
     int privValue = privilegeCodes.get(privName);
 
     logger.info(String.format("Privilege Name : %s , Privilege Value : %d ", privName, privValue));
+
+
     if (privCode[privilegeCodes.get(PrivilegeNames.ALL)] == 1 || privCode[privValue] == 1) {
       return true;
     }

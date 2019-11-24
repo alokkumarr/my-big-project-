@@ -32,6 +32,7 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+import org.springframework.http.HttpStatus;
 
 public class SipDslIT extends BaseIT {
   String analysisId = "f37cde24-b833-46ba-ae2d-42e286c3fc39";
@@ -40,6 +41,7 @@ public class SipDslIT extends BaseIT {
   protected JsonObject testDataForDl = null;
   protected JsonObject sipQueryDl = null;
   protected String customToken;
+  protected String tokenForNegativeCases;
   private static final String TENANT_A = "TenantA";
   private static final String TENANT_B = "TenantB";
   private static final String TENANT_C = "TenantC";
@@ -47,7 +49,10 @@ public class SipDslIT extends BaseIT {
 
   @Before
   public void setUpData() throws JsonProcessingException {
-    customToken = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
+    customToken = authenticate("sawadmin@" + TENANT_A + ".com",
+        "Sawsyncnewuser1!");
+    tokenForNegativeCases = authenticate("reviewer@synchronoss.com",
+        "Sawsyncnewuser1!");
     testData = new JsonObject();
     testData.addProperty("type", "esReport");
     testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
@@ -1544,5 +1549,20 @@ public class SipDslIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void testCrudForNegativeCases() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+      testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .body(jsonNode)
+        .when()
+        .post("/sip/services/dslanalysis/")
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
   }
 }

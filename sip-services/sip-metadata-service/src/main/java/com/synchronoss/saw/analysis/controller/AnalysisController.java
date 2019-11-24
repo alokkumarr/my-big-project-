@@ -1,9 +1,8 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
-import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 
-import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
@@ -14,7 +13,6 @@ import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -82,17 +80,8 @@ public class AnalysisController {
     analysis.setId(id);
 
     Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication token");
-      return analysisResponse;
-    }
-
-    ArrayList<Products> productList = authTicket.getProducts();
-    Long category = Long.parseLong(analysis.getCategory());
-
-    if (!validatePrivilege(productList, category, PrivilegeNames.CREATE)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response = validateTicket(authTicket, PrivilegeNames.CREATE, analysis);
+    if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -139,16 +128,8 @@ public class AnalysisController {
 
     Ticket authTicket = getTicket(request);
 
-    if (authTicket == null) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication token");
-      return analysisResponse;
-    }
-
-    ArrayList<Products> productList = authTicket.getProducts();
-    Long category = Long.parseLong(analysis.getCategory());
-    if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis);
+    if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -183,15 +164,9 @@ public class AnalysisController {
       @PathVariable(name = "id") String id) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
-    if (authTicket == null) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication tol=ken");
-    }
-    ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    Long category = Long.parseLong(analysis.getCategory());
-    if (analysis != null && !validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis);
+    if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -225,18 +200,9 @@ public class AnalysisController {
 
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
-
-    if (authTicket == null) {
-      response.setStatus(401);
-      analysisResponse.setMessage("Invalid authentication token");
-      return analysisResponse;
-    }
-
-    ArrayList<Products> productList = authTicket.getProducts();
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    Long category = Long.parseLong(analysis.getCategory());
-    if (analysis != null && !validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis);
+    if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }

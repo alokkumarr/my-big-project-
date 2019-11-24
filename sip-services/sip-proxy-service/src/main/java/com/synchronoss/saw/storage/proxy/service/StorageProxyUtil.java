@@ -10,9 +10,6 @@ import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.synchronoss.bda.sip.jwt.TokenParser;
-import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
-import com.synchronoss.bda.sip.jwt.token.ProductModules;
-import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
@@ -43,6 +40,9 @@ public class StorageProxyUtil {
 
   private static final String METASTORE = "services/metadata";
   private static List<String> dataLakeJunkIds;
+
+  private static final String FEATURE_NAME = "My Analysis";
+  private static final String MODULE_FEATURE_NAME = "Drafts";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -314,30 +314,37 @@ public class StorageProxyUtil {
    * checks for Private Category.
    *
    * @param ticket Ticket
-   * @param categoryId String
    * @return Long Category Id for User.
    */
   public static Long checkForPrivateCategory(Ticket ticket) {
-    Long privCategoryForUser = null;
-    for (Products product : ticket.getProducts()) {
-      List<ProductModules> productModules = product.getProductModules();
-      for (ProductModules prodMod : productModules) {
-        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
-        for (ProductModuleFeature prodModFeat : productModuleFeature) {
-          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
-            List<ProductModuleFeature> productModuleSubfeatures =
-                prodModFeat.getProductModuleSubFeatures();
-            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
-              if (prodModSubFeat.getProdModFeatureName().equalsIgnoreCase("Drafts")) {
-                privCategoryForUser = prodModSubFeat.getProdModFeatureID();
-                return privCategoryForUser;
-              }
-            }
-          }
-        }
-      }
-    }
-        return privCategoryForUser;
-    }
-
+    final Long[] privateCategory = {null};
+    if (ticket != null && ticket.getProducts() != null && ticket.getProducts().size() > 0)
+      ticket
+          .getProducts()
+          .forEach(
+              product -> {
+                if (product != null && product.getProductModules() != null) {
+                  product
+                      .getProductModules()
+                      .forEach(
+                          prodMod -> {
+                            if (prodMod != null
+                                && FEATURE_NAME.equalsIgnoreCase(prodMod.getProductModName())) {
+                              prodMod
+                                  .getProdModFeature()
+                                  .forEach(
+                                      prodModFeat -> {
+                                        if (prodModFeat != null
+                                            && MODULE_FEATURE_NAME.equalsIgnoreCase(
+                                                prodModFeat.getProdModFeatureName())
+                                            && privateCategory[0] != null) {
+                                          privateCategory[0] = prodModFeat.getProdModFeatureID();
+                                        }
+                                      });
+                            }
+                          });
+                }
+              });
+    return privateCategory[0];
+  }
 }

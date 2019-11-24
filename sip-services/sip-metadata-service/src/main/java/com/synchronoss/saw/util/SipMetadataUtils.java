@@ -1,5 +1,7 @@
 package com.synchronoss.saw.util;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -17,7 +19,6 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
-import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -461,7 +463,7 @@ public class SipMetadataUtils {
   }
 
   /**
-   * checks  category is private or not.
+   * checks category is private or not.
    *
    * @param ticket Ticket
    * @param categoryId String
@@ -490,7 +492,7 @@ public class SipMetadataUtils {
   }
 
   /**
-   * check  category is authorized for user.
+   * check category is authorized for user.
    *
    * @param authTicket ticket
    * @param categoryId category id
@@ -544,5 +546,32 @@ public class SipMetadataUtils {
         getCatIds(p.getProductModuleSubFeatures(), list);
       }
     }
+  }
+
+    /**
+     *validate auth ticket for null and privileges.
+     *
+     * @param authTicket JWT Ticket
+     * @param privilegeNames privileges
+     * @param analysis Request Body
+     * @return
+     */
+  public static HttpServletResponse validateTicket(
+      Ticket authTicket, PrivilegeNames privilegeNames, Analysis analysis) {
+    HttpServletResponse response = null;
+    if (authTicket == null) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      return response;
+    }
+
+    ArrayList<Products> productList = authTicket.getProducts();
+    Long category = Long.parseLong(analysis.getCategory());
+
+    if (!validatePrivilege(productList, category, privilegeNames)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      return response;
+    }
+
+    return response;
   }
 }
