@@ -46,4 +46,29 @@ public class SipCommonUtils {
     }
     return authHeader;
   }
+
+  /**
+   * Validates the Name for file, analysis etc.
+   *
+   * @param name  name
+   */
+  public static void validateName(String name) {
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("analysisName must not be null");
+    }
+    // validate name length and avoid any invalid specific symbol for file name
+    boolean hasValidLength = name.length() >= 1 && name.length() <= 30;
+    if (hasValidLength) {
+      if (name.matches("[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]")) {
+        throw new IllegalArgumentException(
+            "Analysis name must not consists of special characters except '- _'");
+      }
+    } else {
+      throw new IllegalArgumentException(
+          String.format(
+              "analysisName %s is invalid - character count MUST be greater than or equal to 1 and "
+                  + "less than or equal to 30",
+              name));
+    }
+  }
 }

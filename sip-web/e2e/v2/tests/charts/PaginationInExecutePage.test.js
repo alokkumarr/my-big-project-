@@ -62,8 +62,9 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
