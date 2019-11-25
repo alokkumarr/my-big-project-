@@ -442,8 +442,8 @@ public class RTPSPipelineProcessor {
 
 			logger.trace("Output datasets:   ");
 
-			ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.trace(id));
-			ngESCtxSvc.registerOutputDataSet();
+			ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.debug(id));
+			//ngESCtxSvc.registerOutputDataSet();
 
 			String dataSetInKey = config.getInputs().get(0).getDataSet();
 

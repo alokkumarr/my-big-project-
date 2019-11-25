@@ -2,10 +2,7 @@ var appRoot = require('app-root-path');
 
 const TEST_BASE_DIR = appRoot + '/e2e/v2/tests/';
 
-const SMOKE = [
-  TEST_BASE_DIR + 'login-logout/login.test.js',
-  TEST_BASE_DIR + 'login-logout/logout.test.js'
-];
+const SMOKE = [TEST_BASE_DIR + 'login-logout/login.test.js', TEST_BASE_DIR + 'login-logout/logout.test.js'];
 
 const SANITY = [...SMOKE, TEST_BASE_DIR + 'ForgotPassword/preResetPwd.test.js'];
 // ALL the test with minimal data set so that all the functionality is touched
@@ -57,10 +54,7 @@ const CRITICAL = [
   TEST_BASE_DIR + 'charts/SortingWithChartsDesc.test.js'
 ];
 // All tests which were executed in critical with larger data set
-const REGRESSION = [
-  ...CRITICAL,
-  TEST_BASE_DIR + 'change-password/changepassword.test.js'
-];
+const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',

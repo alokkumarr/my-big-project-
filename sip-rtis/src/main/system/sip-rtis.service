@@ -7,6 +7,7 @@ NotifyAccess=all
 ExecStart=/opt/bda/sip-rtis/sbin/rtis_start.sh --fxj
 SyslogIdentifier=sip-rtis
 User=mapr
+EnvironmentFile=/etc/bda/mapr-ticket.env
 Restart=on-failure
 # Consider Java exiting from SIGTERM using exit status 143 to be
 # successful
