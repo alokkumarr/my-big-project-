@@ -65,7 +65,7 @@ describe('BIS API PULL tests: APIPullChannelUpdateDelete.test.js', () => {
         channelActions.clickOnChannelType(data.channelInfo.sourceType);
         channelActions.clickOnChannelNextButton();
 
-        channelActions.fillChannleInfo(data.channelInfo);
+        channelActions.fillApiChannleInfo(data.channelInfo);
         channelActions.testAndVerifyTestConnectivity(data.channelInfo.testConnectivityMessage);
         channelActions.clickOnCreateButton();
 
@@ -75,7 +75,7 @@ describe('BIS API PULL tests: APIPullChannelUpdateDelete.test.js', () => {
         //update
         dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
         dataSourcesPage.clickOnEditChannel();
-        channelActions.fillChannleInfo(updatedChannelInfo, true);
+        channelActions.fillApiChannleInfo(updatedChannelInfo, true);
         channelActions.testAndVerifyTestConnectivity(updatedChannelInfo.testConnectivityMessage);
         channelActions.clickOnUpdateChannel();
         // Verifications

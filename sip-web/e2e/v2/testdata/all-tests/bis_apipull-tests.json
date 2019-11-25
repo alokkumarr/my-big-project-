@@ -187,7 +187,7 @@
         "description": "Admin should be able to update and delete an api pull channel GET request with headers and query params"
       },
       "APCHANNEL010": {
-        "suites": ["regression"],
+        "suites": ["regression", "development"],
         "user": "admin",
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
@@ -206,6 +206,44 @@
           "status": 1
         },
         "description": "Admin should be able to update and delete an api pull channel GET request with headers, query params and multibyte chars"
+      }
+    },
+    "ActivateDeactivateAndDeleteChannel": {
+      "APCHANNEL011": {
+        "suites": ["critical", "regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to dectivate and delete an api pull channel with GET"
+      },
+      "APCHANNEL012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "description": "Admin should be able to dectivate, activate again and delete an api pull channel with GET"
       }
     }
   }

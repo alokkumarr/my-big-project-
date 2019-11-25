@@ -21,7 +21,7 @@ class ChannelActions extends ChannelModel {
     this.clickOnCreateButton();
   }
 
-  fillChannleInfo(channelInfo, update = false) {
+  fillApiChannleInfo(channelInfo, update = false) {
     this.fillChannelName(channelInfo.channelName);
     this.fillHostName(channelInfo.hostName);
     if (channelInfo.port) channelActions.fillPortNumber(channelInfo.port);
