@@ -21,15 +21,21 @@ class ChannelActions extends ChannelModel {
     this.clickOnCreateButton();
   }
 
-  fillChannleInfo(channelInfo) {
+  fillChannleInfo(channelInfo, update = false) {
     this.fillChannelName(channelInfo.channelName);
     this.fillHostName(channelInfo.hostName);
     if (channelInfo.port) channelActions.fillPortNumber(channelInfo.port);
     this.selectMethodType(channelInfo.method);
     this.fillEndPoint(channelInfo.endPoint);
     if (channelInfo.method === 'POST') this.fillRequestBody(JSON.stringify(channelInfo.body));
-    if (channelInfo.headers) this.addHeaders(channelInfo.headers);
-    if (channelInfo.queryParams) this.addQueryParams(channelInfo.queryParams);
+    if (channelInfo.headers) {
+      if (update) this.clearHeader();
+      this.addHeaders(channelInfo.headers);
+    }
+    if (channelInfo.queryParams) {
+      if (update) this.clearQueryParams();
+      this.addQueryParams(channelInfo.queryParams);
+    }
     this.fillDescription(channelInfo.desc);
   }
 
