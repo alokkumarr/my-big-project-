@@ -3,7 +3,11 @@
 
 CMD_DIR=$( cd $(dirname $0); pwd )
 CMD_NAM=$( basename $0 )
-
+MAPR_HOME=/opt/mapr
+isSecure=$(head -1 ${MAPR_HOME}/conf/mapr-clusters.conf | grep -o 'secure=\w*' | cut -d= -f2)
+ if [ "$isSecure" = "true" ] && [ -f "${MAPR_HOME}/conf/mapruserticket" ]; then
+        export MAPR_TICKETFILE_LOCATION="${MAPR_HOME}/conf/mapruserticket"
+ fi
 # execute_rtps.sh <APPL_CONF> [<log4j_conf>]
 usage() {
     echo "Usage: $CMD_NAM <APPL_CONF> [<log4j_conf>]"
