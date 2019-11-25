@@ -27,15 +27,19 @@
 # So install it as a workaround.
 - name: Install which for MapR classpath command
   yum: name=which state=present
-# ignore_errors for the below statement as it checking gracefully
-# if mapr cluster configured in secured mode the set the ticket
-# location
-- name: Copy the mapr authentication ticket
-  command : "install -C -o mapr -g mapr /opt/mapr/conf/mapruserticket /opt/mapr/conf/maprticket_5000"
-  when: sip_secure
-  ignore_errors: yes
-- name: Setup mapr ticket Location
-  lineinfile: dest=/home/mapr/.bashrc line='export MAPR_TICKETFILE_LOCATION=/opt/mapr/conf/maprticket_5000'
-  when: sip_secure
-  ignore_errors: yes
 
+# Create Mapr-ticket enviroment file to export mapr ticket.
+- name: Create mapr-ticket.env file
+  file:
+    path: /etc/bda/mapr-ticket.env
+    state: touch
+    owner: mapr
+    group: mapr
+    mode: '0644'
+- name: Updating a environment variable in /etc/bda/mapr-ticket.env
+  blockinfile:
+    path: /etc/bda/mapr-ticket.env
+    marker: "# {mark} Export Mapr ticket "
+    block: |
+      MAPR_TICKETFILE_LOCATION="/opt/mapr/conf/mapruserticket"
+  when: sip_secure
