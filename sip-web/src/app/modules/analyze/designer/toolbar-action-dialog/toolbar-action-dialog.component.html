@@ -19,7 +19,7 @@
   </designer-description>
  <!-- Validation error messages for the user to correct the
   incorrect analysis name entered. -->
-  <div class="name-validation" *ngIf="validateSaving(data.analysis.name)" fxLayout="column">
+  <div class="name-validation" *ngIf="data.action === 'save' && validateSaving(data.analysis.name)" fxLayout="column">
     <span *ngIf="validateCheck.validateLength">
       * Analysis Name cannot be empty or exceed 30 characters.
     </span>
