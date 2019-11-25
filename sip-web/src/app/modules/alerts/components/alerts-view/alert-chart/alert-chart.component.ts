@@ -12,7 +12,7 @@ import { AlertChartData } from '../../../alerts.interface';
   styleUrls: ['alert-chart.component.scss']
 })
 export class AlertChartComponent implements OnInit {
-  @ViewChild('container') container: ElementRef;
+  @ViewChild('container', { static: true }) container: ElementRef;
 
   @Input() title: string;
   @Input() dateFilter: string;
