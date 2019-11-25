@@ -4,8 +4,7 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const categories = require('../../helpers/data-generation/categories');
-const subCategories = require('../../helpers/data-generation/subCategories')
-  .createSubCategories;
+const subCategories = require('../../helpers/data-generation/subCategories').createSubCategories;
 const Constants = require('../../helpers/Constants');
 const globalVariables = require('../../helpers/data-generation/globalVariables');
 const commonFunctions = require('../../pages/utils/commonFunctions');
@@ -50,13 +49,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.ES_REPORT
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.ES_REPORT);
       });
 
       // Logout by clearing the storage
@@ -85,29 +78,12 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
               displayedValue: data.displayedValue // This week
             }
           ];
-          let name =
-            Constants.ES_REPORT +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          let name = `e2e ${currentTime}`;
           let description =
-            'Description:' +
-            Constants.ES_REPORT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+            'Description:' + Constants.ES_REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
           let analysisType = Constants.ES_REPORT;
           //Create new analysis.
-          let analysis = new AnalysisHelper().createNewAnalysis(
-            host,
-            token,
-            name,
-            description,
-            analysisType,
-            null
-          );
+          let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
           expect(analysis).toBeTruthy();
           analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
@@ -133,9 +109,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
-          chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
-          ]);
+          chartDesignerPage.validateAppliedFilters(analysisType, [data.fieldName]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
 
@@ -153,11 +127,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
 
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
 
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
@@ -176,11 +146,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
           // executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);
@@ -194,11 +160,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters, Constants.ES_REPORT);

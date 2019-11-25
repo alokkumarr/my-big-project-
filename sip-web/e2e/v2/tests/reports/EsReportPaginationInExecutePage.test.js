@@ -32,12 +32,7 @@ describe('Executing pagination in execute page for reports from reports/EsReport
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
@@ -52,8 +47,9 @@ describe('Executing pagination in execute page for reports from reports/EsReport
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const reportName = `e2e es report ${new Date().toString()}`;
-        const reportDescription = `e2e es report description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const reportName = `e2e ${now}`;
+        const reportDescription = `e2e es report description ${now}`;
         const analysisType = 'table:report';
         const tables = data.tables;
         const loginPage = new LoginPage();

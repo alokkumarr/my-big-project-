@@ -4,8 +4,7 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const categories = require('../../helpers/data-generation/categories');
-const subCategories = require('../../helpers/data-generation/subCategories')
-  .createSubCategories;
+const subCategories = require('../../helpers/data-generation/subCategories').createSubCategories;
 const Constants = require('../../helpers/Constants');
 const globalVariables = require('../../helpers/data-generation/globalVariables');
 const commonFunctions = require('../../pages/utils/commonFunctions');
@@ -51,13 +50,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.REPORT
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.REPORT);
       });
 
       // Logout by clearing the storage
@@ -86,25 +79,11 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
               displayedValue: data.displayedValue // This week
             }
           ];
-          let name =
-            Constants.REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          let description =
-            'Description:' +
-            Constants.REPORT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          let name = `e2e ${currentTime}`;
+          let description = 'Description:' + Constants.REPORT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
           let analysisType = Constants.REPORT;
           //Create new analysis.
-          let analysis = new AnalysisHelper().createNewAnalysis(
-            host,
-            token,
-            name,
-            description,
-            analysisType,
-            null
-          );
+          let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
           expect(analysis).toBeTruthy();
           analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
@@ -130,9 +109,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
-          chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
-          ]);
+          chartDesignerPage.validateAppliedFilters(analysisType, [data.fieldName]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
 
@@ -148,11 +125,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
 
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
 
           chartDesignerPage.clickOnApplyFilterButton();
           header.clickOnToastMessage();
@@ -171,11 +144,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
           executePage.verifyAppliedFilter(filters, Constants.REPORT);
@@ -189,11 +158,7 @@ describe('Executing reportPromptFilters tests from reportPromptFilters.test.js',
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           //header.clickOnToastMessage();
           executePage.verifyAppliedFilter(filters, Constants.REPORT);
