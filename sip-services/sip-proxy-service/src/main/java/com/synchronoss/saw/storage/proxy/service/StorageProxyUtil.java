@@ -336,8 +336,7 @@ public class StorageProxyUtil {
                                       prodModFeat -> {
                                         if (prodModFeat != null
                                             && MODULE_FEATURE_NAME.equalsIgnoreCase(
-                                                prodModFeat.getProdModFeatureName())
-                                            && privateCategory[0] != null) {
+                                                prodModFeat.getProdModFeatureName())) {
                                           privateCategory[0] = prodModFeat.getProdModFeatureID();
                                         }
                                       });
