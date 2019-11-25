@@ -45,6 +45,9 @@ describe('DatasourcePageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DatasourceComponent);
     component = fixture.componentInstance;
+    component.unFilteredSourceData = [
+      { bisChannelSysId: 1, channelName: 'abc' }
+    ];
     component.show = true;
     fixture.detectChanges();
   });
@@ -60,6 +63,13 @@ describe('DatasourcePageComponent', () => {
 
       component.togglePWD();
       expect(component.show).toBeTruthy();
+    });
+  });
+
+  describe('select channel', () => {
+    it('should select channel based on id', () => {
+      component.selectChannel({ bisChannelSysId: 1 });
+      expect(component.selectedSourceData.channelName).toEqual('abc');
     });
   });
 });
