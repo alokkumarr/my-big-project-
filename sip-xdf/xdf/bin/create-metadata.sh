@@ -7,6 +7,11 @@
 #
 ####################################
 
+MAPR_HOME=/opt/mapr
+isSecure=$(head -1 ${MAPR_HOME}/conf/mapr-clusters.conf | grep -o 'secure=\w*' | cut -d= -f2)
+ if [ "$isSecure" = "true" ] && [ -f "${MAPR_HOME}/conf/mapruserticket" ]; then
+        export MAPR_TICKETFILE_LOCATION="${MAPR_HOME}/conf/mapruserticket"
+ fi
 XDF_DATA_ROOT=${1:=/data/bda/datalake}
 
 hadoop fs -mkdir /data/bda/datalake/.metadata
