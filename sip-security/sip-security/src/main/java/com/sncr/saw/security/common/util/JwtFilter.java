@@ -17,16 +17,19 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.GenericFilterBean;
 @Service
 public class JwtFilter extends GenericFilterBean {
 
+  private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+
   private final String jwtSecretKey;
-
-  private static final ObjectMapper mapper = new ObjectMapper();
-
   private final  TicketHelper ticketHelper;
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   public JwtFilter(String jwtSecretKey , TicketHelper ticketHelper) {
     this.jwtSecretKey = jwtSecretKey;
@@ -68,13 +71,15 @@ public class JwtFilter extends GenericFilterBean {
 
       // This checks the validity of the token. logging out does not need
       // the token to be active.
-      if (!request.getRequestURI().equals("/sip-security/auth/doLogout")) {
+      String requestURI = request.getRequestURI();
+      logger.trace("Request Header URI : " + requestURI);
+      if (!requestURI.equals("/sip-security/auth/doLogout")) {
           mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
           response.sendError(401, "Token has expired. Please re-login.");
         }
-        else if (request.getRequestURI().startsWith("/sip-security/auth/admin")
+        else if (requestURI.startsWith("/sip-security/auth/admin")
             && !ticket.getRoleType().equals(RoleType.ADMIN)) {
           response.sendError(401, "You are not authorized to perform this operation.");
         }
