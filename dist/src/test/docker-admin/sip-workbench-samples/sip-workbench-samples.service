@@ -6,6 +6,6 @@ After=sip-deploy.service
 Type=oneshot
 ExecStart=/root/saw-workbench-samples/sample-csv/load
 SyslogIdentifier=sip-workbench-samples
-
+EnvironmentFile=/etc/bda/secure.env
 [Install]
 WantedBy=sip-deploy.service

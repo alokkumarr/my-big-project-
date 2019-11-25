@@ -51,14 +51,8 @@ class TestDataGenerator {
       'generate roles for user'
     );
 
-    roles.admin.roleId = adminHelper.getRoleIdByRoleName(
-      rolesListWithAdmin,
-      roles.admin.roleName
-    );
-    roles.userOne.roleId = adminHelper.getRoleIdByRoleName(
-      rolesListWithUser,
-      roles.userOne.roleName
-    );
+    roles.admin.roleId = adminHelper.getRoleIdByRoleName(rolesListWithAdmin, roles.admin.roleName);
+    roles.userOne.roleId = adminHelper.getRoleIdByRoleName(rolesListWithUser, roles.userOne.roleName);
 
     // Generate users
     utils.validApiCall(
@@ -108,6 +102,19 @@ class TestDataGenerator {
       adminHelper.generateUser(
         apiUrl,
         users.userOneReset,
+        roles.userOne.roleId,
+        token,
+        activeStatusInd,
+        customerId,
+        users.anyUser.email,
+        users.anyUser.password
+      ),
+      'generate user for userOne'
+    );
+    utils.validApiCall(
+      adminHelper.generateUser(
+        apiUrl,
+        users.userTwoReset,
         roles.userOne.roleId,
         token,
         activeStatusInd,
@@ -206,8 +213,7 @@ class TestDataGenerator {
         productId,
         users.anyUser.email
       ),
-      'generatePrivilege for ' +
-        JSON.stringify(createSubCategories.createAnalysis)
+      'generatePrivilege for ' + JSON.stringify(createSubCategories.createAnalysis)
     );
 
     //Generate privileges for User
@@ -238,8 +244,7 @@ class TestDataGenerator {
         productId,
         users.anyUser.email
       ),
-      'generatePrivilege userOne with ' +
-        JSON.stringify(createSubCategories.createAnalysis)
+      'generatePrivilege userOne with ' + JSON.stringify(createSubCategories.createAnalysis)
     );
 
     // Generate analyses
@@ -333,8 +338,7 @@ class TestDataGenerator {
         users.anyUser.email,
         2
       ),
-      'generatePrivilege for admin with ' +
-        createSubCategories.observeSubCategory
+      'generatePrivilege for admin with ' + createSubCategories.observeSubCategory
     );
 
     utils.validApiCall(
@@ -349,8 +353,7 @@ class TestDataGenerator {
         users.anyUser.email,
         2
       ),
-      'generatePrivilege for user with ' +
-        createSubCategories.observeSubCategory
+      'generatePrivilege for user with ' + createSubCategories.observeSubCategory
     );
     // Workbench section
     // Add all privilege to Data Ingestion Service category with sub cat  Channel Management to workbench moduleId =4
@@ -396,8 +399,7 @@ class TestDataGenerator {
         users.anyUser.email,
         4
       ),
-      'generatePrivilege for admin with ' +
-        createSubCategories.workbenchSubCategory
+      'generatePrivilege for admin with ' + createSubCategories.workbenchSubCategory
     );
   }
 }
