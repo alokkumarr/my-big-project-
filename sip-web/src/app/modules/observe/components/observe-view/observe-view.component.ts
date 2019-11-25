@@ -24,7 +24,7 @@ import {
 import { PREFERENCES } from '../../../../common/services/configuration.service';
 
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
-import { map, catchError, flatMap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
@@ -206,32 +206,23 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
   deleteDashboard(): void {
     const dashboardId = this.dashboard.entityId;
-    this.observe
-      .deleteDashboard(this.dashboard)
-      .pipe(
-        flatMap(() => {
-          if (
-            this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
-            dashboardId
-          ) {
-            return this.configService.deleteConfig(
-              [
-                {
-                  key: PREFERENCES.DEFAULT_DASHBOARD,
-                  value: dashboardId
-                }
-              ],
-              true
-            );
-          } else {
-            return of(true);
+    this.configService
+      .deleteConfig(
+        [
+          {
+            key: PREFERENCES.DEFAULT_DASHBOARD,
+            value: dashboardId
           }
-        })
+        ],
+        true
       )
-      .subscribe(() => {
-        this.observe.reloadMenu().subscribe(menu => {
-          this.observe.updateSidebar(menu);
-          this.guard.redirectToFirstDash(null, menu, true);
+      .toPromise()
+      .then(() => {
+        this.observe.deleteDashboard(this.dashboard).subscribe(() => {
+          this.observe.reloadMenu().subscribe(menu => {
+            this.observe.updateSidebar(menu);
+            this.guard.redirectToFirstDash(null, menu, true);
+          });
         });
       });
   }
