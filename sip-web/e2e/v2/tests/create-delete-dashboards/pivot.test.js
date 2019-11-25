@@ -18,11 +18,9 @@ const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
 describe('Running create and delete dashboards with Pivot in create-delete-dashboards/pivot.test.js', () => {
-  const subCategoryName =
-    subCategories.createSubCategories.observeSubCategory.name;
+  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
-  const analysisSubCategoryName =
-    subCategories.createSubCategories.createAnalysis.name;
+  const analysisSubCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   let host;
   let token;
@@ -81,19 +79,10 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
           }
 
           const currentTime = new Date().getTime();
-
-          const name =
-            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          const description =
-            'AT Description:' +
-            PIVOT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription =
-            'AT Dashboard description ' + currentTime;
+          const dashboardDescription = 'AT Dashboard description ' + currentTime;
 
           let analysis = new ObserveHelper().addAnalysisByApi(
             host,
@@ -120,9 +109,7 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
           dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
-          dashboardDesigner.clickOnCategoryOrMetricName(
-            analysisSubCategoryName
-          );
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);

@@ -18,11 +18,9 @@ const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
 describe('Running create and delete dashboards with charts in create-delete-dashboards/charts.test.js', () => {
-  const subCategoryName =
-    subCategories.createSubCategories.observeSubCategory.name;
+  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
-  const analysisSubCategoryName =
-    subCategories.createSubCategories.createAnalysis.name;
+  const analysisSubCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   let host;
   let token;
@@ -81,32 +79,12 @@ describe('Running create and delete dashboards with charts in create-delete-dash
           }
           const currentTime = new Date().getTime();
           const subType = data.chartType.split(':')[1];
-          const name =
-            'AT ' +
-            data.chartType +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
-          const description =
-            'AT Description:' +
-            data.chartType +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription =
-            'AT Dashboard description ' + currentTime;
+          const dashboardDescription = 'AT Dashboard description ' + currentTime;
 
-          let analysis = new ObserveHelper().addAnalysisByApi(
-            host,
-            token,
-            name,
-            description,
-            CHART,
-            subType
-          );
+          let analysis = new ObserveHelper().addAnalysisByApi(host, token, name, description, CHART, subType);
           expect(analysis).toBeTruthy();
           assert.isNotNull(analysis, 'analysis cannot be null');
           analysesDetails.push(analysis);
@@ -124,9 +102,7 @@ describe('Running create and delete dashboards with charts in create-delete-dash
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
           dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
-          dashboardDesigner.clickOnCategoryOrMetricName(
-            analysisSubCategoryName
-          );
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);

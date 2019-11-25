@@ -61,6 +61,7 @@ public class SipDslIT extends BaseIT {
     testData.addProperty("modifiedBy", "sipadmin@synchronoss.com");
     testData.addProperty("category", "5");
     testData.addProperty("userId", 1);
+    testData.addProperty("name", "Untitled Analysis");
 
     sipQuery = new JsonObject();
 
