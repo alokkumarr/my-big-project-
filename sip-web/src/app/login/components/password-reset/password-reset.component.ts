@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import * as isEmpty from 'lodash/isEmpty';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UserService } from '../../../common/services';
+import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
 @Component({
   selector: 'password-reset',
@@ -16,6 +16,8 @@ export class PasswordResetComponent implements OnInit {
   ) {}
 
   public errorMsg;
+  public newPasswordError: string;
+  public confPasswordError: string;
   public username;
   public confNewPwd;
   public rhcToken;
@@ -41,9 +43,24 @@ export class PasswordResetComponent implements OnInit {
     });
   }
 
+  get allErrors(): string {
+    return [this.errorMsg, this.newPasswordError, this.confPasswordError]
+      .filter(error => Boolean(error))
+      .join('\n');
+  }
+
+  validatePassword() {
+    this.newPasswordError = validatePassword(this.newPwd, this.username);
+    this.confPasswordError =
+      this.newPwd !== this.confNewPwd
+        ? 'Needs to be same as new password.'
+        : '';
+  }
+
   resetPwd() {
-    if (isEmpty(this.newPwd) || isEmpty(this.confNewPwd)) {
-      this.errorMsg = 'Please enter all required fields';
+    this.validatePassword();
+    if (this.newPasswordError || this.confPasswordError) {
+      return;
     } else {
       this._UserService.resetPwd(this).then((res: any) => {
         this.errorMsg = res.validityMessage;

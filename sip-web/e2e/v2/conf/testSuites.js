@@ -57,7 +57,7 @@ const CRITICAL = [
   TEST_BASE_DIR + 'bis/APIPullChannelActivateDeActivate.test.js'
 ];
 // All tests which were executed in critical with larger data set
-const REGRESSION = [...CRITICAL, TEST_BASE_DIR + 'change-password/changepassword.test.js'];
+const REGRESSION = [...CRITICAL];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',

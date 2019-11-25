@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import * as cloneDeep from 'lodash/cloneDeep';
 import {
   formatNumber,
   isFormatted
@@ -51,11 +52,9 @@ export class DesignerDataFormatSelectorComponent implements OnInit {
   }
 
   openDataFormatDialog() {
+    const clonedFormat = cloneDeep(this.artifactColumn.format);
     this._analyzeDialogService
-      .openDataFormatDialog(
-        <Format>this.artifactColumn.format,
-        this.artifactColumn.type
-      )
+      .openDataFormatDialog(clonedFormat, this.artifactColumn.type)
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }
