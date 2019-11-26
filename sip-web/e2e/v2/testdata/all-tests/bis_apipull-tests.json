@@ -187,7 +187,7 @@
         "description": "Admin should be able to update and delete an api pull channel GET request with headers and query params"
       },
       "APCHANNEL010": {
-        "suites": ["regression", "development"],
+        "suites": ["regression"],
         "user": "admin",
         "channelInfo": {
           "testConnectivityMessage": "Connection Status = 200",
@@ -244,6 +244,338 @@
           "status": 1
         },
         "description": "Admin should be able to dectivate, activate again and delete an api pull channel with GET"
+      }
+    },
+    "createAndDeleteRoute": {
+      "APIROUTE001": {
+        "suites": ["critical", "regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Create a route with GET request without header and query params"
+      },
+      "APIROUTE002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 201",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "testConnectivityMessage": "Connection Status = 201"
+        },
+        "description": "Admin should be able to create and delete an api pull route with POST"
+      },
+      "APIROUTE003": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull route GET request with headers"
+      },
+      "APIROUTE004": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull channel GET request with headers and query params"
+      },
+      "APIROUTE005": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e片仮名",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2er片仮名",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull route GET request with headers, query params and multibyte chars"
+      }
+    },
+    "updateAndDeleteRoute": {
+      "APIROUTE006": {
+        "suites": ["critical", "regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Update a route with GET request without header and query params"
+      },
+      "APIROUTE007": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 201",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "testConnectivityMessage": "Connection Status = 201"
+        },
+        "description": "Admin should be able to create and delete an api pull route with POST"
+      },
+      "APIROUTE008": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull route GET request with headers"
+      },
+      "APIROUTE009": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull channel GET request with headers and query params"
+      },
+      "APIROUTE010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 200",
+          "sourceType": "API",
+          "channelName": "e2e片仮名",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2er片仮名",
+          "destination": "",
+          "method": "GET",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "queryParams": { "userId": 1 },
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to create and delete an api pull route GET request with headers, query params and multibyte chars"
       }
     }
   }

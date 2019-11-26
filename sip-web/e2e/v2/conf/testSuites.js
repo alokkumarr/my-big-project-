@@ -54,7 +54,9 @@ const CRITICAL = [
   TEST_BASE_DIR + 'charts/SortingWithChartsDesc.test.js',
   TEST_BASE_DIR + 'bis/APIPullChannelCreateDelete.test.js',
   TEST_BASE_DIR + 'bis/APIPullChannelUpdateDelete.test.js',
-  TEST_BASE_DIR + 'bis/APIPullChannelActivateDeActivate.test.js'
+  TEST_BASE_DIR + 'bis/APIPullChannelActivateDeActivate.test.js',
+  TEST_BASE_DIR + 'bis/APIPullRouteCreateDelete.test.js',
+  TEST_BASE_DIR + 'bis/APIPullRouteUpdateDelete.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

@@ -41,6 +41,10 @@ class DataSourcesPage extends DeleteModel {
     this._sourceLocation = value => element(by.css(`[e2e='route-sourceLocation-${value}']`));
     this._destLocation = value => element(by.css(`[e2e='route-destinationLocation-${value}']`));
     this._description = value => element(by.css(`[e2e='route-description-${value}']`));
+    this._createdBy = element(by.xpath(`//*[contains(@e2e,'route-createdBy')]`));
+    this._scheduleInfo = element(by.xpath(`//*[contains(@e2e,'route-schedulerExpression-')]`));
+    this._nextFireTime = element(by.xpath(`//*[contains(@e2e,'route-nextFireTime-')]`));
+    this._editRoute = element(by.css(`[e2e='edit-route-btn']`));
 
     //Jobs page
     this._channelName = value => element(by.css(`[e2e='job-channelName-${value}']`));
@@ -140,10 +144,15 @@ class DataSourcesPage extends DeleteModel {
     commonFunctions.clickOnElement(this._closeRouteLogsModel);
   }
 
-  verifyRouteDetails(routeInfo) {
+  verifyRouteDetails(routeInfo, apipull = false) {
     commonFunctions.waitFor.elementToBeVisible(this._routeName(routeInfo.routeName));
-    commonFunctions.waitFor.elementToBeVisible(this._sourceLocation(routeInfo.source));
-    commonFunctions.waitFor.elementToBeVisible(this._filePattern(routeInfo.filePattern));
+    if (!apipull) {
+      commonFunctions.waitFor.elementToBeVisible(this._sourceLocation(routeInfo.source));
+      commonFunctions.waitFor.elementToBeVisible(this._filePattern(routeInfo.filePattern));
+    }
+    commonFunctions.validateHasText(this._createdBy);
+    commonFunctions.validateHasText(this._scheduleInfo);
+    commonFunctions.validateHasText(this._nextFireTime);
     commonFunctions.waitFor.elementToBeVisible(this._destLocation(routeInfo.destination));
     commonFunctions.waitFor.elementToBeVisible(this._description(routeInfo.desc));
   }
@@ -226,6 +235,10 @@ class DataSourcesPage extends DeleteModel {
     commonFunctions.validateText(this._channelAttributes('created-by'), channelInfo.created);
 
     commonFunctions.validateText(this._channelAttributes('description'), channelInfo.desc);
+  }
+
+  clickOnEditRoute() {
+    commonFunctions.clickOnElement(this._editRoute);
   }
 }
 
