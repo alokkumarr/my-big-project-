@@ -16,6 +16,7 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;
   progressSub;
   filterValid = true;
+  validateCheck: any;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -40,10 +41,17 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.progressSub.unsubscribe();
   }
 
-  validateSaving() {
-    const validateState =
-      this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
-    return validateState;
+  validateSaving(analysisName) {
+    const analysisNameLength = analysisName.length;
+    // Due to an error in generating an excel file during dispatch opearation,
+    // we need to apply the following length and special character rules.
+    this.validateCheck = {
+      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
+      validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
+    };
+    const { validateLength, validateCharacters } = this.validateCheck;
+    const validationStateFail = validateLength || validateCharacters;
+    return validationStateFail;
   }
 
   onBack() {

@@ -18,11 +18,9 @@ const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
 describe('Running create and delete dashboards with ES Report in create-delete-dashboards/esReport.test.js', () => {
-  const subCategoryName =
-    subCategories.createSubCategories.observeSubCategory.name;
+  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
-  const analysisSubCategoryName =
-    subCategories.createSubCategories.createAnalysis.name;
+  const analysisSubCategoryName = subCategories.createSubCategories.createAnalysis.name;
 
   let host;
   let token;
@@ -68,9 +66,7 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
   });
 
   using(
-    testDataReader.testData['ES_REPORT']['dashboard']
-      ? testDataReader.testData['ES_REPORT']['dashboard']
-      : {},
+    testDataReader.testData['ES_REPORT']['dashboard'] ? testDataReader.testData['ES_REPORT']['dashboard'] : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
@@ -80,19 +76,11 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
             assert.isNotNull(token, 'token cannot be null');
           }
           const currentTime = new Date().getTime();
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
 
-          const name =
-            'AT ' + ES_REPORT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          const description =
-            'AT Description:' +
-            ES_REPORT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription =
-            'AT Dashboard description ' + currentTime;
+          const dashboardDescription = 'AT Dashboard description ' + currentTime;
 
           let analysis = new ObserveHelper().addAnalysisByApi(
             host,
@@ -119,9 +107,7 @@ describe('Running create and delete dashboards with ES Report in create-delete-d
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
           dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
-          dashboardDesigner.clickOnCategoryOrMetricName(
-            analysisSubCategoryName
-          );
+          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
