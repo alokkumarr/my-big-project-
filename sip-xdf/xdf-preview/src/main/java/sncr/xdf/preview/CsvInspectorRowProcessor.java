@@ -118,11 +118,11 @@ public class CsvInspectorRowProcessor extends ObjectRowProcessor {
 
     private void processFieldNames(Object[] names){
         for(Object o : names){
-            fieldNames.add(scrubFieldName(o.toString()));
+            fieldNames.add(sanitizeFieldName(o.toString()));
         }
     }
 
-    private String scrubFieldName(String fieldName) {
+    private String sanitizeFieldName(String fieldName) {
         logger.debug("scrubFieldName - FieldName :"+ fieldName);
         String invalidCharRegex = "[^a-zA-Z0-9_ ]";
         if(fieldName != null && !fieldName.trim().isEmpty()){
