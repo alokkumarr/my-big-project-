@@ -47,6 +47,7 @@ public class Privileges {
    */
   public boolean isPriviegePresent(PrivilegeNames privName, Long dec) {
     if (dec == null || privName == null) {
+      logger.error("PrivName or decimal code acn't be null!!");
       return false;
     }
     int[] privCode = decToBinary(dec);

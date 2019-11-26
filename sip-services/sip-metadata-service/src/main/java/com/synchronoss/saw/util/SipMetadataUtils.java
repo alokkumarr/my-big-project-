@@ -561,7 +561,7 @@ public class SipMetadataUtils {
       PrivilegeNames privilegeNames,
       Analysis analysis,
       HttpServletResponse response) {
-    if (authTicket == null) {
+    if (authTicket == null || analysis == null) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return response;
     }

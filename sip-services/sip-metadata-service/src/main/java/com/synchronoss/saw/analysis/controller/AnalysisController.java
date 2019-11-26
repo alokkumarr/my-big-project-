@@ -73,7 +73,7 @@ public class AnalysisController {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     if (analysis == null) {
       analysisResponse.setMessage("Analysis definition can't be null for create request");
-      response.setStatus(400);
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       return analysisResponse;
     }
     String id = UUID.randomUUID().toString();
@@ -81,7 +81,7 @@ public class AnalysisController {
 
     Ticket authTicket = getTicket(request);
     response = validateTicket(authTicket, PrivilegeNames.CREATE, analysis, response);
-    if (response != null) {
+    if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -129,7 +129,7 @@ public class AnalysisController {
     Ticket authTicket = getTicket(request);
 
     response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);
-    if (response != null) {
+    if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -166,7 +166,7 @@ public class AnalysisController {
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
     response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
-    if (response != null) {
+    if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -202,7 +202,7 @@ public class AnalysisController {
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
     response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);
-    if (response != null) {
+    if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }

@@ -351,7 +351,7 @@ public class StorageProxyUtil {
                                                             prodModSubFeat
                                                                 .getProdModFeatureName())) {
                                                       privateCategory[0] =
-                                                          prodModFeat.getProdModFeatureID();
+                                                          prodModSubFeat.getProdModFeatureID();
                                                     }
                                                   });
                                         }

@@ -4,9 +4,6 @@ import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
-import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
-import com.synchronoss.bda.sip.jwt.token.ProductModules;
-import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import java.io.IOException;
@@ -108,7 +105,6 @@ public class SipCommonUtils {
   public static Boolean validatePrivilege(
       ArrayList<Products> productList, Long category, PrivilegeNames privName) {
     Privileges priv = new Privileges();
-
     if (!CollectionUtils.isEmpty(productList)) {
       for (Products product : productList) {
         ArrayList<ProductModules> productModulesList =

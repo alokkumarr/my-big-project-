@@ -19,6 +19,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +50,8 @@ public class SipDslIT extends BaseIT {
 
   @Before
   public void setUpData() throws JsonProcessingException {
-    customToken = authenticate("sawadmin@" + TENANT_A + ".com",
-        "Sawsyncnewuser1!");
-    tokenForNegativeCases = authenticate("reviewer@synchronoss.com",
-        "Sawsyncnewuser1!");
+    customToken = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
+    tokenForNegativeCases = authenticate("reviewer@synchronoss.com", "Sawsyncnewuser1!");
     testData = new JsonObject();
     testData.addProperty("type", "esReport");
     testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
@@ -67,6 +66,25 @@ public class SipDslIT extends BaseIT {
     testData.addProperty("category", "5");
     testData.addProperty("userId", 1);
     testData.addProperty("name", "Untitled Analysis");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
+    testData.addProperty("category", "5");
+
+    Instant instant = Instant.now();
+    JsonObject analysis = new JsonObject();
+    analysis.addProperty("type", "esReport");
+    analysis.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
+    analysis.addProperty("id", analysisId);
+    analysis.addProperty(CUSTOMER_CODE, "SYNCHRONOSS");
+    analysis.addProperty("projectCode", "workbench");
+    analysis.addProperty("module", "ANALYZE");
+    analysis.addProperty("createdTime", instant.getEpochSecond());
+    analysis.addProperty("createdBy", "sipadmin@synchronoss.com");
+    analysis.addProperty("modifiedTime", instant.getEpochSecond());
+    analysis.addProperty("modifiedBy", "sipadmin@synchronoss.com");
+    analysis.addProperty("category", "5");
+    analysis.addProperty("userId", 1);
+    analysis.addProperty("name", "Untitled Analysis");
+    testData.add("analysis", analysis);
 
     sipQuery = new JsonObject();
 
@@ -552,7 +570,8 @@ public class SipDslIT extends BaseIT {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
-    String customTok = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
+    String customTok = authenticate("sawadmin@" + TENANT_A + ".com",
+        "Sawsyncnewuser1!");
     Response response = execute(customTok, jsonNode);
     Assert.assertNotNull(response);
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
@@ -1498,6 +1517,9 @@ public class SipDslIT extends BaseIT {
    * @return Response Object
    */
   public Response execute(String custToken, JsonNode body) {
+      if (body.has("category")) {
+          ((ObjectNode)body).remove("category");
+      }
     return given(spec)
         .header("Authorization", "Bearer " + custToken)
         .body(body)
@@ -1553,9 +1575,9 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testCrudForNegativeCases() throws IOException {
+  public void testCreateAnalysisForUnauthorizedPermissions() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-      testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
     JsonNode jsonNode = objectMapper.readTree(testData.toString());
     given(spec)
         .header("Authorization", "Bearer " + tokenForNegativeCases)
@@ -1565,5 +1587,141 @@ public class SipDslIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void testUpdateAnalysisForUnauthorizedPermissions() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+
+    jsonNode = objectMapper.readTree(testData.toString());
+    given(spec)
+        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .body(jsonNode)
+        .when()
+        .put("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void testDeleteAnalysisForUnauthorizedPermissions() {
+    given(spec)
+        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .delete("/sip/services/dslanalysis/" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void testExecuteAnalysisForUnauthorizedPermissions() throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+
+    ObjectNode upsertPrivilege = prepareDataForModifyingPrivilege();
+
+    // Remove Execute Privilege and test whether api responds with UNAUTHORIZED.
+    modifyPrivilege(upsertPrivilege);
+
+    tokenForNegativeCases = authenticate("reviewer@synchronoss.com", "Sawsyncnewuser1!");
+
+    JsonObject sipDsl = testData;
+
+    JsonObject field1 = new JsonObject();
+    field1.addProperty("dataField", CUSTOMER_CODE);
+    field1.addProperty("area", "x-axis");
+    field1.addProperty("alias", CUSTOMER_CODE);
+    field1.addProperty("columnName", CUSTOMER_CODE + ".keyword");
+    field1.addProperty("displayName", CUSTOMER_CODE);
+    field1.addProperty("type", "string");
+    JsonArray artifactFields = new JsonArray();
+    artifactFields.add(field1);
+
+    JsonElement js = new JsonArray();
+    sipDsl
+        .get("sipQuery")
+        .getAsJsonObject()
+        .get("artifacts")
+        .getAsJsonArray()
+        .get(0)
+        .getAsJsonObject()
+        .get("fields")
+        .getAsJsonArray()
+        .set(1, field1);
+    sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
+    sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
+
+    JsonNode body = mapper.readTree(sipDsl.toString());
+
+    given(spec)
+        .header("Authorization", "Bearer " + tokenForNegativeCases)
+        .body(body)
+        .when()
+        .post("/sip/services/internal/proxy/storage/execute?id=" + analysisId)
+        .then()
+        .assertThat()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+
+    upsertPrivilege.put("privilegeCode", 37376);
+    upsertPrivilege.put("privilegeDesc", "View, Publish, Export");
+    ObjectNode subCatPriv = mapper.createObjectNode();
+    subCatPriv.put("privilegeCode", 45568);
+    subCatPriv.put("privilegeDesc", "View, Execute, Publish, Export");
+    subCatPriv.put("privilegeId", 8);
+    subCatPriv.put("subCategoryId", 4);
+    ArrayNode subCatNew = mapper.createArrayNode();
+    subCatNew.add(subCatPriv);
+    upsertPrivilege.put("subCategoriesPrivilege", subCatNew);
+
+    // Modify the privileges as original.
+    modifyPrivilege(upsertPrivilege);
+  }
+
+  public ObjectNode prepareDataForModifyingPrivilege() {
+    ObjectNode upsertPrivilege = mapper.createObjectNode();
+    upsertPrivilege.put("categoryCode", "F0000000001");
+    upsertPrivilege.put("categoryId", 2);
+    upsertPrivilege.put("categoryName", "CANNED ANALYSIS");
+    upsertPrivilege.put("categoryType", "PARENT_F0000000001");
+    upsertPrivilege.put("customerId", 1);
+    upsertPrivilege.put("masterLoginId", "sawadmin@synchronoss.com");
+    upsertPrivilege.put("moduleId", 1);
+    upsertPrivilege.put("moduleName", "ANALYZE");
+    upsertPrivilege.put("privilegeCode", 45568);
+    upsertPrivilege.put("privilegeDesc", "View, Execute, Publish, Export");
+    upsertPrivilege.put("privilegeId", 8);
+    upsertPrivilege.put("productId", 1);
+    upsertPrivilege.put("productName", "SAW Demo");
+    upsertPrivilege.put("roleId", 4);
+    upsertPrivilege.put("roleName", "REVIEWER");
+    upsertPrivilege.put("subCategoryId", 4);
+    upsertPrivilege.put("subCategoryName", "OPTIMIZATION");
+
+    ArrayNode subCat = mapper.createArrayNode();
+    ObjectNode subCatPriv = mapper.createObjectNode();
+    subCatPriv.put("privilegeCode", 37376);
+    subCatPriv.put("privilegeDesc", "View, Publish, Export");
+    subCatPriv.put("privilegeId", 8);
+    subCatPriv.put("subCategoryId", 4);
+
+    subCat.add(subCatPriv);
+    upsertPrivilege.put("subCategoriesPrivilege", subCat);
+
+    return upsertPrivilege;
+  }
+
+  public void modifyPrivilege(ObjectNode body) {
+    given(spec)
+        .contentType(ContentType.JSON)
+        .header("Authorization", "Bearer " + token)
+        .body(body)
+        .when()
+        .post("/sip/security/auth/admin/cust/manage/privileges/upsert")
+        .then()
+        .assertThat()
+        .statusCode(200);
   }
 }

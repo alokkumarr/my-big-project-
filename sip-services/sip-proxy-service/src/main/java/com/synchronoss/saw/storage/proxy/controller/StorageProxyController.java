@@ -60,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,6 +73,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(
     value =
         "The controller provides operations pertaining to polyglot persistence layer of synchronoss analytics platform ")
+@ApiResponses(
+    value = {
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(
+            code = 403,
+            message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+    })
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
@@ -289,7 +301,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/execute",
       method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
   public ExecuteAnalysisResponse executeAnalysis(
       @ApiParam(
               value = "Storage object that needs to be added/updated/deleted to the store",
@@ -325,7 +337,7 @@ public class StorageProxyController {
     boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
     Ticket authTicket = request != null ? getTicket(request) : null;
     if (authTicket == null) {
-      response.setStatus(401);
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
@@ -336,20 +348,29 @@ public class StorageProxyController {
         analysis.getCategory() == null
             ? checkForPrivateCategory(authTicket)
             : Long.parseLong(analysis.getCategory());
+    logger.debug("Cat " + category);
     if (category == null) {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        throw new SipDslProcessingException(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      logger.error("BAD REQUEST : category should not be null!!");
+      executeResponse.setData(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      return executeResponse;
     }
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
-      response.setStatus(401);
-      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      logger.error("UNAUTHORIZED ACCESS : User don't have the PUBLISH privilege!!");
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
     } else if (isScheduledExecution
         && !validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
-      response.setStatus(401);
-      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      logger.error("UNAUTHORIZED ACCESS : User don't have the EXPORT||SCHEDULED privilege!!");
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
     } else if (!validatePrivilege(productList, category, PrivilegeNames.EXECUTE)) {
-      response.setStatus(401);
-      throw new SipDslProcessingException(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      logger.error("UNAUTHORIZED ACCESS : User don't have the EXECUTE privilege!!");
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
     }
 
     List<TicketDSKDetails> dskList =
