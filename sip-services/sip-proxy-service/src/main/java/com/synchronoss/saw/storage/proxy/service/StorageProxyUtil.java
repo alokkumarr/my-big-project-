@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.base.MaprConnection;
 import sncr.bda.core.file.HFileOperations;
@@ -318,26 +319,41 @@ public class StorageProxyUtil {
    */
   public static Long checkForPrivateCategory(Ticket ticket) {
     final Long[] privateCategory = {null};
-    if (ticket != null && ticket.getProducts() != null && ticket.getProducts().size() > 0)
+    if (ticket != null && !CollectionUtils.isEmpty(ticket.getProducts()))
       ticket
           .getProducts()
           .forEach(
               product -> {
-                if (product != null && product.getProductModules() != null) {
+                if (product != null && !CollectionUtils.isEmpty(product.getProductModules())) {
                   product
                       .getProductModules()
                       .forEach(
                           prodMod -> {
                             if (prodMod != null
-                                && FEATURE_NAME.equalsIgnoreCase(prodMod.getProductModName())) {
+                                && !CollectionUtils.isEmpty(prodMod.getProdModFeature())) {
                               prodMod
                                   .getProdModFeature()
                                   .forEach(
                                       prodModFeat -> {
                                         if (prodModFeat != null
-                                            && MODULE_FEATURE_NAME.equalsIgnoreCase(
+                                            && !CollectionUtils.isEmpty(
+                                                prodModFeat.getProductModuleSubFeatures())
+                                            && FEATURE_NAME.equalsIgnoreCase(
                                                 prodModFeat.getProdModFeatureName())) {
-                                          privateCategory[0] = prodModFeat.getProdModFeatureID();
+                                          prodModFeat
+                                              .getProductModuleSubFeatures()
+                                              .forEach(
+                                                  prodModSubFeat -> {
+                                                    if (prodModSubFeat != null
+                                                        && prodModSubFeat.getProdModFeatureName()
+                                                            != null
+                                                        && MODULE_FEATURE_NAME.equalsIgnoreCase(
+                                                            prodModSubFeat
+                                                                .getProdModFeatureName())) {
+                                                      privateCategory[0] =
+                                                          prodModFeat.getProdModFeatureID();
+                                                    }
+                                                  });
                                         }
                                       });
                             }

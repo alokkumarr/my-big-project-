@@ -80,7 +80,7 @@ public class AnalysisController {
     analysis.setId(id);
 
     Ticket authTicket = getTicket(request);
-    response = validateTicket(authTicket, PrivilegeNames.CREATE, analysis);
+    response = validateTicket(authTicket, PrivilegeNames.CREATE, analysis, response);
     if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -128,7 +128,7 @@ public class AnalysisController {
 
     Ticket authTicket = getTicket(request);
 
-    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis);
+    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);
     if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -165,7 +165,7 @@ public class AnalysisController {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis);
+    response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
     if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -201,7 +201,7 @@ public class AnalysisController {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis);
+    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);
     if (response != null) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;

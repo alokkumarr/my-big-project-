@@ -548,17 +548,19 @@ public class SipMetadataUtils {
     }
   }
 
-    /**
-     *validate auth ticket for null and privileges.
-     *
-     * @param authTicket JWT Ticket
-     * @param privilegeNames privileges
-     * @param analysis Request Body
-     * @return
-     */
+  /**
+   * validate auth ticket for null and privileges.
+   *
+   * @param authTicket JWT Ticket
+   * @param privilegeNames privileges
+   * @param analysis Request Body
+   * @return
+   */
   public static HttpServletResponse validateTicket(
-      Ticket authTicket, PrivilegeNames privilegeNames, Analysis analysis) {
-    HttpServletResponse response = null;
+      Ticket authTicket,
+      PrivilegeNames privilegeNames,
+      Analysis analysis,
+      HttpServletResponse response) {
     if (authTicket == null) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return response;
