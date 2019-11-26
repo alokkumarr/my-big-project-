@@ -570,8 +570,7 @@ public class SipDslIT extends BaseIT {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
-    String customTok = authenticate("sawadmin@" + TENANT_A + ".com",
-        "Sawsyncnewuser1!");
+    String customTok = authenticate("sawadmin@" + TENANT_A + ".com", "Sawsyncnewuser1!");
     Response response = execute(customTok, jsonNode);
     Assert.assertNotNull(response);
     ObjectNode attUserRes = response.getBody().as(ObjectNode.class);
@@ -1517,9 +1516,9 @@ public class SipDslIT extends BaseIT {
    * @return Response Object
    */
   public Response execute(String custToken, JsonNode body) {
-      if (body.has("category")) {
-          ((ObjectNode)body).remove("category");
-      }
+    if (body.has("category")) {
+      ((ObjectNode) body).remove("category");
+    }
     return given(spec)
         .header("Authorization", "Bearer " + custToken)
         .body(body)
@@ -1618,7 +1617,6 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testExecuteAnalysisForUnauthorizedPermissions() throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     testData.addProperty("semanticId", "workbench::sample-elasticsearch");
 
     ObjectNode upsertPrivilege = prepareDataForModifyingPrivilege();
@@ -1627,8 +1625,6 @@ public class SipDslIT extends BaseIT {
     modifyPrivilege(upsertPrivilege);
 
     tokenForNegativeCases = authenticate("reviewer@synchronoss.com", "Sawsyncnewuser1!");
-
-    JsonObject sipDsl = testData;
 
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
@@ -1640,6 +1636,7 @@ public class SipDslIT extends BaseIT {
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
 
+    JsonObject sipDsl = testData;
     JsonElement js = new JsonArray();
     sipDsl
         .get("sipQuery")
@@ -1654,6 +1651,7 @@ public class SipDslIT extends BaseIT {
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
 
+    ObjectMapper mapper = new ObjectMapper();
     JsonNode body = mapper.readTree(sipDsl.toString());
 
     given(spec)
@@ -1680,6 +1678,11 @@ public class SipDslIT extends BaseIT {
     modifyPrivilege(upsertPrivilege);
   }
 
+  /**
+   * Prepare dataset for modifying privileges to test different scenario's
+   *
+   * @return ObjectNode
+   */
   public ObjectNode prepareDataForModifyingPrivilege() {
     ObjectNode upsertPrivilege = mapper.createObjectNode();
     upsertPrivilege.put("categoryCode", "F0000000001");
@@ -1700,19 +1703,24 @@ public class SipDslIT extends BaseIT {
     upsertPrivilege.put("subCategoryId", 4);
     upsertPrivilege.put("subCategoryName", "OPTIMIZATION");
 
-    ArrayNode subCat = mapper.createArrayNode();
     ObjectNode subCatPriv = mapper.createObjectNode();
     subCatPriv.put("privilegeCode", 37376);
     subCatPriv.put("privilegeDesc", "View, Publish, Export");
     subCatPriv.put("privilegeId", 8);
     subCatPriv.put("subCategoryId", 4);
 
+    ArrayNode subCat = mapper.createArrayNode();
     subCat.add(subCatPriv);
     upsertPrivilege.put("subCategoriesPrivilege", subCat);
 
     return upsertPrivilege;
   }
 
+  /**
+   * Call upsert api to modify the privileges.
+   *
+   * @param body Request body
+   */
   public void modifyPrivilege(ObjectNode body) {
     given(spec)
         .contentType(ContentType.JSON)
