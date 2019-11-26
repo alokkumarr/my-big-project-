@@ -144,7 +144,7 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     }
 
     private String sanitizeFieldName(String fieldName) {
-        logger.debug("scrubFieldName - FieldName :"+ fieldName);
+        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
         String invalidCharRegex = "[^a-zA-Z0-9_ ]";
         if(fieldName != null && !fieldName.trim().isEmpty()){
             fieldName = fieldName.trim().replaceAll(invalidCharRegex, "")
