@@ -121,7 +121,7 @@ public class StorageProxyUtil {
 		DataSecurityKeys dataSecurityKeys = null;
   	try {
       RestTemplate restTemplate = restUtil.restTemplate();
-      String url = securityServiceUrl.concat("?userId=").concat(masterLoginId);
+      String url = securityServiceUrl.concat("/dsk?userId=").concat(masterLoginId);
       logger.trace("SIP security url to fetch DSK details :", url);
 
 			dataSecurityKeys = restTemplate.getForObject(url, DataSecurityKeys.class);

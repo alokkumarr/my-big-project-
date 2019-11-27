@@ -60,6 +60,6 @@ metadata:
 
 sip:
   security:
-    host: ${connector}://localhost:9000/internal/sip-security/dsk
+    host: ${connector}://localhost:9000/internal/sip-security
   ssl:
     enable: false
