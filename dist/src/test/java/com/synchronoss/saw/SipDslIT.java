@@ -1679,7 +1679,7 @@ public class SipDslIT extends BaseIT {
   }
 
   /**
-   * Prepare dataset for modifying privileges to test different scenario's
+   * Prepare dataset for modifying privileges to test different scenario's.
    *
    * @return ObjectNode
    */
