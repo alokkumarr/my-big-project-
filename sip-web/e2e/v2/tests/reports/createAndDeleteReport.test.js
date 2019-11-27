@@ -33,12 +33,7 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
@@ -47,14 +42,13 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   });
 
   using(
-    testDataReader.testData['CREATEREPORT']['dlreport']
-      ? testDataReader.testData['CREATEREPORT']['dlreport']
-      : {},
+    testDataReader.testData['CREATEREPORT']['dlreport'] ? testDataReader.testData['CREATEREPORT']['dlreport'] : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
-          const reportName = `e2e dl report ${new Date().toString()}`;
-          const reportDescription = `e2e dl report description ${new Date().toString()}`;
+          const now = new Date().getTime();
+          const reportName = `e2e ${now}`;
+          const reportDescription = `e2e dl report description ${now}`;
           const analysisType = 'table:report';
           const tables = data.tables;
           const loginPage = new LoginPage();
@@ -112,15 +106,13 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   );
 
   using(
-    testDataReader.testData['CREATEREPORT']['esreport']
-      ? testDataReader.testData['CREATEREPORT']['esreport']
-      : {},
+    testDataReader.testData['CREATEREPORT']['esreport'] ? testDataReader.testData['CREATEREPORT']['esreport'] : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
-          const reportName = `e2e dl report ${new Date().toString()}`;
-          console.log(reportName);
-          const reportDescription = `e2e dl report description ${new Date().toString()}`;
+          const now = new Date().getTime();
+          const reportName = `e2e ${now}`;
+          const reportDescription = `e2e dl report description ${now}`;
           const analysisType = 'table:report';
           const tables = data.tables;
           const loginPage = new LoginPage();

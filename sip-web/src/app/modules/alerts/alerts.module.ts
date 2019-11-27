@@ -5,6 +5,7 @@ import { DxSelectBoxModule } from 'devextreme-angular/ui/select-box';
 
 import { RouterModule } from '@angular/router';
 import { routes } from './routes';
+import { AlertRedirectGuard, AlertPrivilegeGuard } from './guards';
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { ObserveService } from '../observe/services/observe.service';
 import {
@@ -47,7 +48,12 @@ const components = [
     NgxsModule.forFeature([AlertsState])
   ],
   entryComponents: components,
-  providers: [IsAdminGuard, ObserveService],
+  providers: [
+    IsAdminGuard,
+    ObserveService,
+    AlertRedirectGuard,
+    AlertPrivilegeGuard
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AlertsModule {}

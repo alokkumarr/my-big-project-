@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { IsUserLoggedInGuard } from '../../common/guards';
 import { IsAdminGuard } from '../admin/guards';
+import { AlertRedirectGuard, AlertPrivilegeGuard } from './guards';
 
 import { AlertsPageComponent } from './components/alerts-page/alerts-page.component';
 import { AlertsViewComponent } from './components/alerts-view/alerts-view.component';
@@ -20,12 +21,13 @@ export const routes: Routes = [
     children: [
       {
         path: 'view',
-        component: AlertsViewComponent
+        component: AlertsViewComponent,
+        canActivate: [AlertPrivilegeGuard]
       },
       {
         path: 'configure',
         component: AlertsConfigurationComponent,
-        canActivate: [IsAdminGuard]
+        canActivate: [AlertPrivilegeGuard]
       },
       {
         path: 'add',
@@ -35,7 +37,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'view'
+        canActivate: [AlertRedirectGuard]
       }
     ]
   }

@@ -45,12 +45,7 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -58,14 +53,13 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   });
 
   using(
-    testDataReader.testData['SORTING_CHARTS']['sort_asc']
-      ? testDataReader.testData['SORTING_CHARTS']['sort_asc']
-      : {},
+    testDataReader.testData['SORTING_CHARTS']['sort_asc'] ? testDataReader.testData['SORTING_CHARTS']['sort_asc'] : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
