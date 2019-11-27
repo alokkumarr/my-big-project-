@@ -48,7 +48,8 @@ public class JobController extends BaseJobController{
 		String token = null;
 
         if (auth == null || !auth.startsWith("Bearer ")) {
-            throw new IllegalAccessException("Missing or invalid Authorization header.");
+            logger.error("Invalid authentication token");
+            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
         }
 
         Ticket authTicket = TokenParser.retrieveTicket(auth.substring(7));

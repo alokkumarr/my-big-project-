@@ -618,7 +618,7 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testDlExecuteWithCustCodeFilter() throws IOException {
     JsonObject sipDsl = testDataForDl;
-    sipDsl.addProperty("category", "48");
+    sipDsl.remove("category");
     sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
 
     JsonObject field1 = new JsonObject();

@@ -2,6 +2,7 @@ package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
+import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,7 +71,8 @@ public class AnalysisController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
   public AnalysisResponse createAnalysis(
-      HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis) {
+      HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis,
+      @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     if (analysis == null) {
       analysisResponse.setMessage("Analysis definition can't be null for create request");
@@ -78,6 +81,12 @@ public class AnalysisController {
     }
     String id = UUID.randomUUID().toString();
     analysis.setId(id);
+
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
 
     Ticket authTicket = getTicket(request);
     response = validateTicket(authTicket, PrivilegeNames.CREATE, analysis, response);
@@ -116,15 +125,22 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestBody Analysis analysis,
-      @PathVariable(name = "id") String id) {
+      @PathVariable(name = "id") String id,
+      @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
 
     if (analysis == null) {
       analysisResponse.setMessage("Analysis definition can't be null for update request");
-      response.setStatus(400);
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
       return analysisResponse;
     }
     analysis.setId(id);
+
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
 
     Ticket authTicket = getTicket(request);
 
@@ -161,8 +177,14 @@ public class AnalysisController {
   public AnalysisResponse deleteAnalysis(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") String id) {
+      @PathVariable(name = "id") String id,
+      @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
     response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
@@ -196,9 +218,14 @@ public class AnalysisController {
   public AnalysisResponse getAnalysis(
       HttpServletRequest request,
       HttpServletResponse response,
-      @PathVariable(name = "id") String id) {
-
+      @PathVariable(name = "id") String id,
+      @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
     response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);

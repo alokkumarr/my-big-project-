@@ -5,6 +5,7 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArts
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
+import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -57,6 +58,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,14 +77,14 @@ import org.springframework.web.bind.annotation.RestController;
         "The controller provides operations pertaining to polyglot persistence layer of synchronoss analytics platform ")
 @ApiResponses(
     value = {
-        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(
-            code = 403,
-            message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+      @ApiResponse(code = 400, message = "Bad Request"),
+      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+      @ApiResponse(
+          code = 403,
+          message = "Accessing the resource you were trying to reach is forbidden"),
+      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+      @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
     })
 public class StorageProxyController {
 
@@ -255,8 +257,8 @@ public class StorageProxyController {
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-      List<TicketDSKDetails> dskList =
-          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
+    List<TicketDSKDetails> dskList =
+        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -325,14 +327,20 @@ public class StorageProxyController {
           @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
       HttpServletRequest request,
-      HttpServletResponse response)
-      throws JsonProcessingException ,IllegalAccessException{
+      HttpServletResponse response,
+      @RequestHeader("Authorization") String authToken)
+      throws JsonProcessingException, IllegalAccessException {
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
       throw new JSONMissingSAWException("Analysis definition is missing in request body");
     }
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
+    }
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
     Ticket authTicket = request != null ? getTicket(request) : null;
@@ -376,7 +384,8 @@ public class StorageProxyController {
     List<TicketDSKDetails> dskList =
         authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     SipQuery savedQuery =
-        getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
+        getSipQuery(
+            analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -384,7 +393,7 @@ public class StorageProxyController {
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
@@ -400,7 +409,7 @@ public class StorageProxyController {
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
           if (query.contains(artifact)) {
-            dataSecurityKeyDef.setName(artifact + "."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
             customerFilterDsks.add(dataSecurityKeyDef);
             dataSecurityKeyDef = new DataSecurityKeyDef();
@@ -408,10 +417,10 @@ public class StorageProxyController {
         }
       } else {
         for (String artifact : sipQueryArts) {
-            dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
-            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
-            customerFilterDsks.add(dataSecurityKeyDef);
-            dataSecurityKeyDef = new DataSecurityKeyDef();
+          dataSecurityKeyDef.setName(artifact.toUpperCase() + "." + CUSTOMER_CODE);
+          dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+          customerFilterDsks.add(dataSecurityKeyDef);
+          dataSecurityKeyDef = new DataSecurityKeyDef();
         }
       }
 
@@ -551,10 +560,17 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/{id}/executions",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
   public List<?> listExecutions(
       @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id")
-          String queryId) {
+          String queryId,
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestHeader("Authorization") String authToken) {
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      return Collections.singletonList(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       return proxyService.fetchDslExecutionsList(queryId);
@@ -574,7 +590,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/{executionId}/executions/data",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
   public ExecutionResponse executionsData(
       @ApiParam(value = "page number", required = false)
           @RequestParam(name = "page", required = false)
@@ -589,7 +605,16 @@ public class StorageProxyController {
           @RequestParam(name = "analysisType", required = false)
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
-          String executionId) {
+          String executionId,
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestHeader("Authorization") String authToken) {
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      ExecutionResponse executeResponse = new ExecutionResponse();
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
+    }
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
     }
@@ -613,7 +638,7 @@ public class StorageProxyController {
       value = "/internal/proxy/storage/{id}/lastExecutions/data",
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
   public ExecutionResponse lastExecutionsData(
       @ApiParam(value = "page number", required = false)
           @RequestParam(name = "page", required = false)
@@ -628,8 +653,17 @@ public class StorageProxyController {
           @RequestParam(name = "analysisType", required = false)
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
-          String analysisId) {
+          String analysisId,
+      HttpServletResponse response,
+      HttpServletRequest request,
+      @RequestHeader("Authorization") String authToken) {
 
+    if (!authValidation(request, authToken)) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      ExecutionResponse executeResponse = new ExecutionResponse();
+      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return executeResponse;
+    }
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);
     }
