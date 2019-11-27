@@ -45,7 +45,7 @@
     <!-- This is to control where the cloud environment
     to be activated secure or not. Default value is set to False
     -->
-    <sip.cloud.secure>${sip-cloud-secure}</sip.cloud.secure>
+    <sip.cloud.secure>False</sip.cloud.secure>
   </properties>
   <dependencies>
     <dependency>
