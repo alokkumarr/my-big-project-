@@ -75,6 +75,9 @@ class ExecutePage extends ConfirmationModel {
           `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
         )
       );
+    this._ScheduleButton = element(by.cssContainingText('button','Schedule'));
+    this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
+    this._scheduledInPreviousVersionTab = element(by.cssContainingText('td','scheduled'))
   }
 
   verifyTitle(title) {
@@ -236,5 +239,31 @@ class ExecutePage extends ConfirmationModel {
       })();
     });
   }
+  /*Method to click on schedule option*/
+  clickOnSchedule() {
+    commonFunctions.clickOnElement(this._ScheduleButton);
+    browser.sleep(2000); //Need to Add Because Schedule Popup Should load
+  }
+  /*Method to click on previous version tab*/
+  clickOnPreviousVersionTab() {
+    commonFunctions.clickOnElement(this._previousversionTab);
+  }
+  /*Method to verify report is scheduled*/
+  verifyScheduledInPreviousVersion() {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledInPreviousVersionTab);
+    element(
+      this._scheduledInPreviousVersionTab.getText().then(value => {
+        if (value) {
+          expect(value.trim().toUpperCase()).toEqual('SCHEDULED');
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled, it was expected to be present but found false'
+          );
+        }
+      })
+    );
+  }
+
 }
 module.exports = ExecutePage;

@@ -51,7 +51,9 @@ const CRITICAL = [
   TEST_BASE_DIR + 'reports/DLReportPaginationInPreviewPage.test.js',
   TEST_BASE_DIR + 'geolocation/createAndDelete.test.js',
   TEST_BASE_DIR + 'charts/forkFromCardViewDelete.test.js',
-  TEST_BASE_DIR + 'charts/SortingWithChartsDesc.test.js'
+  TEST_BASE_DIR + 'charts/SortingWithChartsDesc.test.js',
+  TEST_BASE_DIR + 'schedule/scheduleDLReports.test.js',
+  TEST_BASE_DIR + 'schedule/scheduleESReports.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];
@@ -59,10 +61,10 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
+
 ];
 
 module.exports = {
-  SMOKE,
   SANITY,
   CRITICAL,
   REGRESSION,
