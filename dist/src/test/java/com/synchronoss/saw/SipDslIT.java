@@ -63,11 +63,9 @@ public class SipDslIT extends BaseIT {
     testData.addProperty("createdBy", "sipadmin@synchronoss.com");
     testData.addProperty("modifiedTime", 1543921879);
     testData.addProperty("modifiedBy", "sipadmin@synchronoss.com");
-    testData.addProperty("category", "5");
     testData.addProperty("userId", 1);
     testData.addProperty("name", "Untitled Analysis");
     testData.addProperty("semanticId", "workbench::sample-elasticsearch-TenantA");
-    testData.addProperty("category", "5");
 
     Instant instant = Instant.now();
     JsonObject analysis = new JsonObject();
@@ -81,7 +79,6 @@ public class SipDslIT extends BaseIT {
     analysis.addProperty("createdBy", "sipadmin@synchronoss.com");
     analysis.addProperty("modifiedTime", instant.getEpochSecond());
     analysis.addProperty("modifiedBy", "sipadmin@synchronoss.com");
-    analysis.addProperty("category", "5");
     analysis.addProperty("userId", 1);
     analysis.addProperty("name", "Untitled Analysis");
     testData.add("analysis", analysis);
@@ -247,7 +244,6 @@ public class SipDslIT extends BaseIT {
     testDataForDl.addProperty("createdBy", "sipadmin@synchronoss.com");
     testDataForDl.addProperty("modifiedTime", 1543921879);
     testDataForDl.addProperty("modifiedBy", "sipadmin@synchronoss.com");
-    testDataForDl.addProperty("category", "5");
     testDataForDl.addProperty("userId", 1);
     testDataForDl.addProperty("designerEdit", false);
     JsonObject artifact1 = new JsonObject();
@@ -618,7 +614,6 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testDlExecuteWithCustCodeFilter() throws IOException {
     JsonObject sipDsl = testDataForDl;
-    sipDsl.remove("category");
     sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
 
     JsonObject field1 = new JsonObject();
@@ -882,14 +877,18 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testCreateAnalysis() throws IOException {
-    analysisId = createAnalysis(token, testData);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     deleteAnalysis(analysisId, token);
   }
 
   @Test
   public void testUpdateAnalysis() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(jsonNode)
@@ -909,7 +908,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testGetAnalysis() throws IOException {
-    analysisId = createAnalysis(token, testData);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId)
@@ -921,7 +922,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testGetAnalysisByCategory() throws IOException {
-    analysisId = createAnalysis(token, testData);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/dslanalysis/" + analysisId + "?category=5")
@@ -933,7 +936,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testDeleteAnalysis() throws IOException {
-    analysisId = createAnalysis(token, testData);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .delete("/sip/services/dslanalysis/" + analysisId)
@@ -944,7 +949,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testListExecutions() throws IOException {
-    analysisId = createAnalysis(token, testData);
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    analysisId = createAnalysis(token, data);
     given(spec)
         .header("Authorization", "Bearer " + token)
         .get("/sip/services/internal/proxy/storage/" + analysisId + "/executions")
@@ -956,6 +963,8 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testLastExecutionsData() throws IOException {
+    JsonObject data = testData;
+    data.addProperty("category", "5");
     analysisId = createAnalysis(token, testData);
     given(spec)
         .header("Authorization", "Bearer " + token)
@@ -1577,8 +1586,10 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testCreateAnalysisForUnauthorizedPermissions() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
-    JsonNode jsonNode = objectMapper.readTree(testData.toString());
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     given(spec)
         .header("Authorization", "Bearer " + tokenForNegativeCases)
         .body(jsonNode)
@@ -1592,10 +1603,12 @@ public class SipDslIT extends BaseIT {
   @Test
   public void testUpdateAnalysisForUnauthorizedPermissions() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
     JsonNode jsonNode = objectMapper.readTree(testData.toString());
 
-    jsonNode = objectMapper.readTree(testData.toString());
+    jsonNode = objectMapper.readTree(data.toString());
     given(spec)
         .header("Authorization", "Bearer " + tokenForNegativeCases)
         .body(jsonNode)
@@ -1618,7 +1631,9 @@ public class SipDslIT extends BaseIT {
 
   @Test
   public void testExecuteAnalysisForUnauthorizedPermissions() throws IOException {
-    testData.addProperty("semanticId", "workbench::sample-elasticsearch");
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    data.addProperty("semanticId", "workbench::sample-elasticsearch");
 
     ObjectNode upsertPrivilege = prepareDataForModifyingPrivilege();
 
@@ -1637,7 +1652,7 @@ public class SipDslIT extends BaseIT {
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
 
-    JsonObject sipDsl = testData;
+    JsonObject sipDsl = data;
     JsonElement js = new JsonArray();
     sipDsl
         .get("sipQuery")
