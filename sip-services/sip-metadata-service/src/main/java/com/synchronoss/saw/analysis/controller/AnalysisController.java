@@ -3,6 +3,7 @@ package com.synchronoss.saw.analysis.controller;
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
+import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -273,8 +274,8 @@ public class AnalysisController {
     if (isCatgryAuthorized) {
       Long userId = authTicket.getUserId();
       SipMetadataUtils.checkCategoryAccessible(authTicket, categoryId);
-      Boolean privateCategory = SipMetadataUtils.checkPrivateCategory(authTicket, categoryId);
-      if (privateCategory) {
+      Long privateCat = checkForPrivateCategory(authTicket);
+      if (privateCat != null && categoryId.equalsIgnoreCase(String.valueOf(privateCat))) {
         return analysisService.getAnalysisByCategoryForUserId(categoryId, userId, authTicket);
       }
       return analysisService.getAnalysisByCategory(categoryId, authTicket);

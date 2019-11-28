@@ -1,12 +1,12 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkForPrivateCategory;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
+import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;

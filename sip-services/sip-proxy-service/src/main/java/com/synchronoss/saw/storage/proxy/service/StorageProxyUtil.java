@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.base.MaprConnection;
 import sncr.bda.core.file.HFileOperations;
@@ -42,9 +41,6 @@ public class StorageProxyUtil {
 
   private static final String METASTORE = "services/metadata";
   private static List<String> dataLakeJunkIds;
-
-  private static final String FEATURE_NAME = "My Analysis";
-  private static final String MODULE_FEATURE_NAME = "Drafts";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -330,57 +326,5 @@ public class StorageProxyUtil {
       artifactList.stream().forEach(artifact -> artifactNames.add(artifact.getArtifactsName().toUpperCase()));
     }
     return artifactNames;
-  }
-
-  /**
-   * checks for Private Category.
-   *
-   * @param ticket Ticket
-   * @return Long Category Id for User.
-   */
-  public static Long checkForPrivateCategory(Ticket ticket) {
-    final Long[] privateCategory = {null};
-    if (ticket != null && !CollectionUtils.isEmpty(ticket.getProducts()))
-      ticket
-          .getProducts()
-          .forEach(
-              product -> {
-                if (product != null && !CollectionUtils.isEmpty(product.getProductModules())) {
-                  product
-                      .getProductModules()
-                      .forEach(
-                          prodMod -> {
-                            if (prodMod != null
-                                && !CollectionUtils.isEmpty(prodMod.getProdModFeature())) {
-                              prodMod
-                                  .getProdModFeature()
-                                  .forEach(
-                                      prodModFeat -> {
-                                        if (prodModFeat != null
-                                            && !CollectionUtils.isEmpty(
-                                                prodModFeat.getProductModuleSubFeatures())
-                                            && FEATURE_NAME.equalsIgnoreCase(
-                                                prodModFeat.getProdModFeatureName())) {
-                                          prodModFeat
-                                              .getProductModuleSubFeatures()
-                                              .forEach(
-                                                  prodModSubFeat -> {
-                                                    if (prodModSubFeat != null
-                                                        && prodModSubFeat.getProdModFeatureName()
-                                                            != null
-                                                        && MODULE_FEATURE_NAME.equalsIgnoreCase(
-                                                            prodModSubFeat
-                                                                .getProdModFeatureName())) {
-                                                      privateCategory[0] =
-                                                          prodModSubFeat.getProdModFeatureID();
-                                                    }
-                                                  });
-                                        }
-                                      });
-                            }
-                          });
-                }
-              });
-    return privateCategory[0];
   }
 }

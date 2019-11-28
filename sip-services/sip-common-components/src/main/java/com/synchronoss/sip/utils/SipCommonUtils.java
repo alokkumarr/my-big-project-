@@ -17,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 public class SipCommonUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(SipCommonUtils.class);
+  private static final String FEATURE_NAME = "My Analysis";
+  private static final String MODULE_FEATURE_NAME = "Drafts";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -151,5 +153,57 @@ public class SipCommonUtils {
       return false;
     }
     return true;
+  }
+
+  /**
+   * checks for Private Category.
+   *
+   * @param ticket Ticket
+   * @return Long Category Id for User.
+   */
+  public static Long checkForPrivateCategory(Ticket ticket) {
+    final Long[] privateCategory = {null};
+    if (ticket != null && !CollectionUtils.isEmpty(ticket.getProducts()))
+      ticket
+          .getProducts()
+          .forEach(
+              product -> {
+                if (product != null && !CollectionUtils.isEmpty(product.getProductModules())) {
+                  product
+                      .getProductModules()
+                      .forEach(
+                          prodMod -> {
+                            if (prodMod != null
+                                && !CollectionUtils.isEmpty(prodMod.getProdModFeature())) {
+                              prodMod
+                                  .getProdModFeature()
+                                  .forEach(
+                                      prodModFeat -> {
+                                        if (prodModFeat != null
+                                            && !CollectionUtils.isEmpty(
+                                                prodModFeat.getProductModuleSubFeatures())
+                                            && FEATURE_NAME.equalsIgnoreCase(
+                                                prodModFeat.getProdModFeatureName())) {
+                                          prodModFeat
+                                              .getProductModuleSubFeatures()
+                                              .forEach(
+                                                  prodModSubFeat -> {
+                                                    if (prodModSubFeat != null
+                                                        && prodModSubFeat.getProdModFeatureName()
+                                                            != null
+                                                        && MODULE_FEATURE_NAME.equalsIgnoreCase(
+                                                            prodModSubFeat
+                                                                .getProdModFeatureName())) {
+                                                      privateCategory[0] =
+                                                          prodModSubFeat.getProdModFeatureID();
+                                                    }
+                                                  });
+                                        }
+                                      });
+                            }
+                          });
+                }
+              });
+    return privateCategory[0];
   }
 }

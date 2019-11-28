@@ -463,35 +463,6 @@ public class SipMetadataUtils {
   }
 
   /**
-   * checks category is private or not.
-   *
-   * @param ticket Ticket
-   * @param categoryId String
-   * @return Boolean.
-   */
-  public static Boolean checkPrivateCategory(Ticket ticket, String categoryId) {
-    for (Products product : ticket.getProducts()) {
-      List<ProductModules> productModules = product.getProductModules();
-      for (ProductModules prodMod : productModules) {
-        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
-        for (ProductModuleFeature prodModFeat : productModuleFeature) {
-          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
-            List<ProductModuleFeature> productModuleSubfeatures =
-                prodModFeat.getProductModuleSubFeatures();
-            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
-              String cat = String.valueOf(prodModSubFeat.getProdModFeatureID());
-              if (categoryId.equalsIgnoreCase(cat)) {
-                return true;
-              }
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
    * check category is authorized for user.
    *
    * @param authTicket ticket
