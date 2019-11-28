@@ -2,9 +2,11 @@ package com.sncr.saw.security.app.controller.external;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.ProductModuleRepository;
+import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.RoleCategoryPrivilege;
+import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import io.swagger.annotations.Api;
@@ -17,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author alok.kumarr
@@ -28,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ExternalSecurityController {
 
 	@Autowired
+	private RoleRepository roleRepository;
+	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private NSSOProperties nSSOProperties;
@@ -35,11 +42,17 @@ public class ExternalSecurityController {
 	private ProductModuleRepository productModuleRepository;
 
 	@RequestMapping(value = "/createRoleCategoryPrivilege", method = RequestMethod.POST)
-	public RoleCategoryPrivilege createRoleCategoryPrivilege(HttpServletRequest request,
-																													 HttpServletResponse response,
-																													 @RequestBody RoleCategoryPrivilege roleCategoryPrivilege) {
+	public Object createRoleCategoryPrivilege(HttpServletRequest request,
+																						HttpServletResponse response,
+																						@RequestBody RoleCategoryPrivilege roleCategoryPrivilege) {
 
 		RoleCategoryPrivilege categoryPrivilege = new RoleCategoryPrivilege();
+		if (roleCategoryPrivilege == null) {
+			response.setStatus(HttpStatus.BAD_REQUEST.value());
+			categoryPrivilege.setMessage("Body is missing.");
+			return categoryPrivilege;
+		}
+
 		String jwtToken = JWTUtils.getToken(request);
 		String[] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
 		String roleType = extractValuesFromToken[3];
@@ -54,18 +67,39 @@ public class ExternalSecurityController {
 		categoryPrivilege.setModuleName(moduleName);
 		categoryPrivilege.setProductName(productName);
 
-		boolean hasValidNames = productModuleRepository.validateModuleProductName(productName, moduleName, masterLoginId);
-		if (hasValidNames) {
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			categoryPrivilege.setMessage("Product and Module does not exist for this user.");
+		List<ProductModuleDetails> moduleNameList = productModuleRepository.getModuleProductName(masterLoginId);
+		Long customerSysId = null;
+		if (moduleNameList != null && !moduleNameList.isEmpty()) {
+			customerSysId = moduleNameList.stream().findFirst().get().getCustomerSysId();
+			Set<String> moduleNames = moduleNameList.stream().map(pmd -> pmd.getModuleName()).collect(Collectors.toSet());
+			Set<String> productNames = moduleNameList.stream().map(pmd -> pmd.getProductName()).collect(Collectors.toSet());
+			boolean hasValidNames = productNames.contains(productName) && moduleNames.contains(moduleName);
+			if (!hasValidNames) {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				categoryPrivilege.setMessage("Product and Module does not exist for this user.");
+			}
 		}
 
-		Role role = roleCategoryPrivilege.getRole();
-		if (role != null && (role.getCustomerCode().isEmpty() || role.getRoleName().isEmpty())) {
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			categoryPrivilege.setMessage("Customer Code and Role Name can't be blank or empty.");
-		} else if (role.isAutoCreate()) {
+		Role inputRole = roleCategoryPrivilege.getRole();
+		if (inputRole != null && customerSysId != null) {
+			if (inputRole.getCustomerCode().isEmpty() || inputRole.getRoleType().isEmpty()) {
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				categoryPrivilege.setMessage("Customer Code and Role Name can't be blank or empty.");
+			} else if (inputRole.isAutoCreate()) {
+				List<Role> roles = userRepository.getRoletypesDropDownList();
+				// check if role type not exist then add new role type
+				if (roles != null && !roles.isEmpty()) {
+					boolean roleExist = roles.stream().anyMatch(role -> inputRole.getRoleType().equalsIgnoreCase(role.getRoleName()));
+					if (!roleExist) {
+						roleRepository.addNewRoleType(inputRole);
+					}
+				}
+				// add new roles details
+				roleRepository.createNewRoleDao(customerSysId, inputRole);
+				categoryPrivilege.setMessage("Role has been created successfully.");
+			} else {
 
+			}
 		}
 		return categoryPrivilege;
 	}
