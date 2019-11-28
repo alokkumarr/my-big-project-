@@ -1,4 +1,4 @@
-  @import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 $back-button-size: 32px;
 
@@ -9,7 +9,6 @@ $back-button-size: 32px;
 filter-chips-u {
   padding: 11px 0 10px 10px;
 }
-
 
 .back-button-icon.mat-icon {
   font-size: $back-button-size;
@@ -40,10 +39,24 @@ filter-chips-u {
 
   .analysis__title {
     font-size: 24px;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow-x: hidden;
+    display: block;
+    text-overflow: ellipsis;
+    max-width: 1100px;
   }
 
   .analysis__subheader {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .mat-toolbar {
+    .analysis__title {
+      max-width: 700px;
+    }
   }
 }
 
@@ -92,11 +105,25 @@ filter-chips-u {
   }
 }
 
-.chart-data-grid .dx-datagrid .dx-datagrid-rowsview .dx-datagrid-content table tbody tr.dx-data-row td {
+.chart-data-grid
+  .dx-datagrid
+  .dx-datagrid-rowsview
+  .dx-datagrid-content
+  table
+  tbody
+  tr.dx-data-row
+  td {
   text-align: left !important;
 }
 
-.chart-data-grid .dx-datagrid .dx-datagrid-headers .dx-datagrid-content table tbody tr.dx-header-row td {
+.chart-data-grid
+  .dx-datagrid
+  .dx-datagrid-headers
+  .dx-datagrid-content
+  table
+  tbody
+  tr.dx-header-row
+  td {
   text-align: left !important;
 }
 
