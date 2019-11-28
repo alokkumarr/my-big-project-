@@ -142,14 +142,11 @@ public class SipCommonUtils {
   /**
    * Validate the auth token.
    *
-   * @param request Http Request
    * @param authToken authorization token
    * @return Boolean flag
    */
-  public static boolean authValidation(HttpServletRequest request, String authToken) {
-    if (authToken == null
-        || !authToken.startsWith("Bearer ")
-        || !("OPTIONS".equals(request.getMethod()))) {
+  public static boolean authValidation(String authToken) {
+    if (authToken == null || !authToken.startsWith("Bearer ")) {
       logger.error("Invalid authentication token {}", authToken);
       return false;
     }

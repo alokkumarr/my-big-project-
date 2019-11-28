@@ -82,7 +82,7 @@ public class AnalysisController {
     String id = UUID.randomUUID().toString();
     analysis.setId(id);
 
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -136,7 +136,7 @@ public class AnalysisController {
     }
     analysis.setId(id);
 
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -180,7 +180,7 @@ public class AnalysisController {
       @PathVariable(name = "id") String id,
       @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
@@ -221,7 +221,7 @@ public class AnalysisController {
       @PathVariable(name = "id") String id,
       @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;

@@ -336,7 +336,7 @@ public class StorageProxyController {
     }
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
@@ -567,7 +567,7 @@ public class StorageProxyController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken) {
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return Collections.singletonList(HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
@@ -609,7 +609,7 @@ public class StorageProxyController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken) {
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
       executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
@@ -658,7 +658,7 @@ public class StorageProxyController {
       HttpServletRequest request,
       @RequestHeader("Authorization") String authToken) {
 
-    if (!authValidation(request, authToken)) {
+    if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
       executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
