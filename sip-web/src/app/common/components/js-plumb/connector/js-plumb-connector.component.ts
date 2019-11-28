@@ -11,7 +11,8 @@ import {
   OnDestroy
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
+import * as filter from 'lodash/filter';
 
 import {
   Join,
@@ -26,7 +27,7 @@ import { JsPlumbJoinLabelComponent } from '../join-label';
   selector: 'js-plumb-connector-u',
   template: `
     <div #target></div>
-    `
+  `
 })
 export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   @Output() change: EventEmitter<JoinChangeEvent> = new EventEmitter();
@@ -53,10 +54,14 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   }
 
   detach() {
-    if (this._connection) {
-      if (!isEmpty(this._connection.endpoints)) {
-        this.plumbInstance.detach(this._connection);
-      }
+    const [source, target] = this.join.criteria;
+    const connections = this.findAllConnections(source, target);
+    if (!isEmpty(connections)) {
+      forEach(connections, connection => {
+        if (!isEmpty(connection.endpoints)) {
+          this.plumbInstance.detach(connection);
+        }
+      });
       this._connection = null;
     }
   }
@@ -66,14 +71,16 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       const [source, target] = this.join.criteria;
-      this._connection = this.findConnection(source, target);
+      const connections = this.findAllConnections(source, target);
 
       // if the connection is not found, create one
       // this happens when opening a new analysis with joins
-      if (!this._connection) {
+      if (isEmpty(connections)) {
         this._connection = this.plumbInstance.connect({
           uuids: [this.getIdentifier(source), this.getIdentifier(target)]
         });
+      } else {
+        this._connection = connections[0];
       }
 
       const connectionPayload: ConnectionPayload = {
@@ -119,22 +126,43 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
     return `${tableName}:${columnName}:${side}`;
   }
 
-  findConnection(source: JoinCriterion, target: JoinCriterion) {
+  findAllConnections(source: JoinCriterion, target: JoinCriterion) {
     const connections = this.plumbInstance.getConnections();
-    return find(connections, connection => {
+    return filter(connections, connection => {
       const [sourceEndpoint, targetEndpoint] = connection.endpoints;
-      const sourcePayload = <EndpointPayload>sourceEndpoint.getParameter(
-        'endpointPayload'
+      const sourcePayload = <EndpointPayload>(
+        sourceEndpoint.getParameter('endpointPayload')
       );
-      const targetPayload = <EndpointPayload>targetEndpoint.getParameter(
-        'endpointPayload'
+      const targetPayload = <EndpointPayload>(
+        targetEndpoint.getParameter('endpointPayload')
       );
+
+      /* Match sides in reverse too because we don't support having more than
+         one connection between two columns as a valid use case.
+      */
+
       return (
-        sourcePayload.column.columnName === source.columnName &&
-        sourcePayload.artifactName === source.tableName &&
-        targetPayload.column.columnName === target.columnName &&
-        targetPayload.artifactName === target.tableName
+        (this.compare(sourcePayload, source) &&
+          this.compare(targetPayload, target)) ||
+        (this.compare(targetPayload, source) &&
+          this.compare(sourcePayload, target))
       );
     });
+  }
+
+  /**
+   * Compares jsplumb endpoint payload (represents a column) with a
+   * column in join criteria.
+   *
+   * @param {EndpointPayload} payload
+   * @param {JoinCriterion} column
+   * @returns {boolean}
+   * @memberof JsPlumbConnectorComponent
+   */
+  compare(payload: EndpointPayload, column: JoinCriterion): boolean {
+    return (
+      payload.column.columnName === column.columnName &&
+      payload.artifactName === column.tableName
+    );
   }
 }

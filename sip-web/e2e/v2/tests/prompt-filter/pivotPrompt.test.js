@@ -4,8 +4,7 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const categories = require('../../helpers/data-generation/categories');
-const subCategories = require('../../helpers/data-generation/subCategories')
-  .createSubCategories;
+const subCategories = require('../../helpers/data-generation/subCategories').createSubCategories;
 const Constants = require('../../helpers/Constants');
 const globalVariables = require('../../helpers/data-generation/globalVariables');
 const commonFunctions = require('../../pages/utils/commonFunctions');
@@ -50,13 +49,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.PIVOT
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.PIVOT);
       });
 
       // Logout by clearing the storage
@@ -96,25 +89,11 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
             ];
           }
 
-          let name =
-            Constants.PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          let description =
-            'Description:' +
-            Constants.PIVOT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          let name = `e2e ${currentTime}`;
+          let description = 'Description:' + Constants.PIVOT + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
           let analysisType = Constants.PIVOT;
           //Create new analysis.
-          let analysis = new AnalysisHelper().createNewAnalysis(
-            host,
-            token,
-            name,
-            description,
-            analysisType,
-            null
-          );
+          let analysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, null);
           expect(analysis).toBeTruthy();
           analyses.push(analysis.analysisId);
           const loginPage = new LoginPage();
@@ -140,9 +119,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
-          chartDesignerPage.validateAppliedFilters(analysisType, [
-            data.fieldName
-          ]);
+          chartDesignerPage.validateAppliedFilters(analysisType, [data.fieldName]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
 
@@ -160,11 +137,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
 
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
 
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
@@ -183,11 +156,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters, Constants.PIVOT);
@@ -201,11 +170,7 @@ describe('Executing pivotFilters tests from prompt-filter/pivotPrompt.test.js', 
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(
-            data.fieldType,
-            data.operator,
-            data.value
-          );
+          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
           chartDesignerPage.clickOnApplyFilterButton();
           browser.sleep(2000); // Added because of some issues on bamboo : SIP-7298
           //header.clickOnToastMessage();

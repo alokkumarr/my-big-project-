@@ -155,10 +155,9 @@ export class AnalyzeDialogService {
     return this.dialog.open(DataFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
-      data: {
-        format,
-        type
-      }
+      autoFocus: false,
+      restoreFocus: false,
+      data: { format, type }
     } as MatDialogConfig);
   }
 

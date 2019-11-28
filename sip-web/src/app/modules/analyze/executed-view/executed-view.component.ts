@@ -83,7 +83,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   hasExecution = false;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
-  chartActionBus$: Subject<Object> = new Subject<Object>();
+  actionBus$: Subject<Object> = new Subject<Object>();
   public filters: Filter[] = [];
 
   @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
@@ -131,7 +131,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       if (
         !filtr.isRuntimeFilter &&
         !filtr.isGlobalFilter &&
-        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+        filtr.type === 'date' && filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
@@ -717,9 +717,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       });
       break;
     case 'chart':
-      // TODO add export for Maps
       this.chartUpdater$.next({ export: true });
-      this.chartActionBus$.next({ export: true });
       break;
     case 'map':
       if (get(this.analysis, 'mapOptions.mapType') === 'map') {
@@ -732,7 +730,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
         }
         this._htmlService.turnHtml2pdf(this.mapView.nativeElement, this.analysis.name);
       } else {
-        this.chartUpdater$.next({ export: true });
+        this.actionBus$.next({ export: true });
       }
       break;
     default:

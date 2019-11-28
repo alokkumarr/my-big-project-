@@ -5,11 +5,17 @@
 # Start from SIP base image
 FROM sip-base:${project.version}
 
+ARG secure_enviroment
 # Install MapR client
 RUN yum -y -q install mapr-client
 
+RUN echo $secure_enviroment
 # Configure MapR client
-RUN /opt/mapr/server/configure.sh -N sip-mapr -c -C sip-mapr:7222
+RUN if [ $secure_enviroment == "True" ]; then \
+    /opt/mapr/server/configure.sh -N sip -c -C sip-mapr:7222 -secure -dare ; \
+    else \
+    /opt/mapr/server/configure.sh -N sip -c -C sip-mapr:7222 ; \
+    fi
 
 # Workaround: Despite the "log4j.log" file path workaround in
 # "dist/src/main/ansible/roles/saw-maprclient/tasks/main.yml", there

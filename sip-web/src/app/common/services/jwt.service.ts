@@ -9,8 +9,7 @@ import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
-  USER_ANALYSIS_SUBCATEGORY_NAME,
-  ALERTS_MODULE_MENU
+  USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../consts';
 
 const PRIVILEGE_CODE_LENGTH = 16;
@@ -137,9 +136,6 @@ export class JwtService {
       return null;
     }
     const parsedJwt = this.parseJWT(this.get());
-
-    // TODO remove alertsModule when it's added into saw_security DB
-    parsedJwt.ticket.products[0].productModules.push(ALERTS_MODULE_MENU);
 
     return parsedJwt;
   }

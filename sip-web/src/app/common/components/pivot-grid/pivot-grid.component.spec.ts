@@ -14,6 +14,7 @@ class PivotStubComponent {
   @Input() public sorts;
   @Input() public artifactColumns;
   @Input() public data;
+  @Input() public name;
 }
 
 describe('Pivot grid Component', () => {

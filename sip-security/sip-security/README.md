@@ -99,7 +99,7 @@ Run SAW-Security
 
  1. Run as `Spring boot application` from Spring Tool Suite
  2. Open browser & enter
-    http://localhost:9000/saw-security/swagger-ui.html
+    http://localhost:9000/sip-security/swagger-ui.html
 
   
 

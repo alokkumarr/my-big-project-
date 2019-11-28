@@ -7,11 +7,34 @@
 # configuration.
 #
 set -eu
-
+secure=$1
 marker=/etc/sip-mapr-configure-marker
 
 host=sip-mapr
 disk=/opt/mapr/disk
+
+setup_secure_client()
+{
+  echo "Mapr-client setup"
+  maprfile=/opt/mapr/conf/mapruserticket
+  ssl_truststore=/opt/mapr/conf/ssl_truststore
+  # Check until maprticket is not created.
+   while [ ! -f ${maprfile} ]
+    do
+     sleep 5
+    done
+    sshpass -p "root" scp ${maprfile} sip-app1:${maprfile}
+    sshpass -p "root" scp ${maprfile} sip-app2:${maprfile}
+    sshpass -p "root" scp ${maprfile} sip-admin:${maprfile}
+    sshpass -p "root" scp ${ssl_truststore} sip-app1:${ssl_truststore}
+    sshpass -p "root" scp ${ssl_truststore} sip-app2:${ssl_truststore}
+    sshpass -p "root" scp ${ssl_truststore} sip-admin:${ssl_truststore}
+    # Sip-services runs with mapr user ,change the permission to mapr user
+    # So SIP-services can use these tickets.
+    sshpass -p "root" ssh sip-app1 "chown mapr:mapr ${maprfile}"
+    sshpass -p "root" ssh sip-app2 "chown mapr:mapr ${maprfile}"
+    sshpass -p "root" ssh sip-admin "chown mapr:mapr ${maprfile}"
+}
 
 if [ ! -e $marker ]; then
     echo "Configuring MapR for SIP"
@@ -19,18 +42,26 @@ if [ ! -e $marker ]; then
     # Note: Ensure the disk size is large enough (for example 5G is
     # too little) to ensure that MapR-FS can start up
     fallocate -l 20G $disk
+    if [ $secure == "secure" ]; then
+    /opt/mapr/server/configure.sh -C $host -Z $host -D $disk -N sip -genkeys -secure -dare
+    else
     /opt/mapr/server/configure.sh -C $host -Z $host -D $disk -N sip
+    fi
     # Refresh the roles for mapr configuration.
     /opt/mapr/server/configure.sh -R
+
+    if [ $secure == "secure" ]; then
+      setup_secure_client
+    fi
     # Set replication to 1 for single-node cluster
     default=cldb.volumes.default
     replication="{ $default.replication: 1, $default.min.replication: 1 }"
     # Loop retrying until MapR is ready to accept configuration
     # updates
-    while ! maprcli config save -values "$replication" > /dev/null; do
-        sleep 5
-    done
-
+   # while ! maprcli config save -values "$replication" > /dev/null; do
+    #    sleep 5
+    #done
     # Create marker file to ensure configuration is only run once
     touch $marker
 fi
+

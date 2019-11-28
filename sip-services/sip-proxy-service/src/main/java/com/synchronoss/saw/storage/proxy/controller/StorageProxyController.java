@@ -1,7 +1,8 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.google.gson.Gson;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -71,16 +72,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
-  @Autowired private StorageProxyService proxyService;
 
   @Value("${metadata.service.host}")
   private String metaDataServiceExport;
 
+  @Value("${sip.security.host}")
+  private String sipSecurityHost;
+
   @Autowired private RestUtil restUtil;
+  @Autowired private StorageProxyService proxyService;
 
   public static final String CUSTOMER_CODE = "customerCode";
-
-  public Gson gson = new Gson();
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -308,6 +310,9 @@ public class StorageProxyController {
       @ApiParam(value = "execution type", required = false)
           @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
+      @ApiParam(value = "user id", required = false)
+      @RequestParam(name = "userId", required = false)
+          String userId,
       HttpServletRequest request,
       HttpServletResponse response)
       throws JsonProcessingException, IllegalAccessException {
@@ -318,15 +323,23 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    Ticket authTicket = request != null ? getTicket(request) : null;
-    if (authTicket == null) {
+    Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
+    if (authTicket == null && !isScheduledExecution) {
       response.setStatus(401);
       logger.error("Invalid authentication token");
       executeResponse.setData(Collections.singletonList("Invalid authentication token"));
       return executeResponse;
     }
-    List<TicketDSKDetails> dskList =
-        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
+    List<TicketDSKDetails> dskList = new ArrayList<>();
+    DataSecurityKeys dataSecurityKeys = null;
+    // fetch DSK details for scheduled
+    if (isScheduledExecution && userId != null) {
+      dataSecurityKeys = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
+      dskList = dataSecurityKeys.getDataSecurityKeys();
+    } else {
+      dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
+    }
+
     SipQuery savedQuery =
         getSipQuery(
             analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
@@ -335,36 +348,42 @@ public class StorageProxyController {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-    List<String> sipQueryArts = getArtsNames(analysis.getSipQuery());
+    List<String> sipQueryArts = getArtifactsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
         QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
-    if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
+    boolean filterDSKByCustomerCode = authTicket != null && authTicket.getIsJvCustomer() != 1
+				    && authTicket.getFilterByCustomerCode() == 1;
+    boolean scheduledDSKbyCustomerCode = authTicket == null && isScheduledExecution
+        && dataSecurityKeys != null  && dataSecurityKeys.getIsJvCustomer() != 1
+        && dataSecurityKeys.getFilterByCustomerCode() == 1;
+    if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
       String analysisType = analysis.getType();
       DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-      List<String> artsName = getArtsNames(savedQuery);
+      List<String> artsName = getArtifactsNames(savedQuery);
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
       Boolean designerEdit =
           analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+      String customerCode = dataSecurityKeys!= null ? dataSecurityKeys.getCustomerCode() : authTicket.getCustCode();
       if (analysisType.equalsIgnoreCase("report") && designerEdit) {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
           String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
           if (query.contains(artifact)) {
             dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
-            dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
+            dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
             customerFilterDsks.add(dataSecurityKeyDef);
             dataSecurityKeyDef = new DataSecurityKeyDef();
           }
         }
       } else {
         for (String artifact : sipQueryArts) {
-          dataSecurityKeyDef.setName(artifact.toUpperCase() + "." + CUSTOMER_CODE);
-          dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
-          customerFilterDsks.add(dataSecurityKeyDef);
-          dataSecurityKeyDef = new DataSecurityKeyDef();
+            dataSecurityKeyDef.setName(artifact.toUpperCase()+"."+CUSTOMER_CODE);
+            dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
+            customerFilterDsks.add(dataSecurityKeyDef);
+            dataSecurityKeyDef = new DataSecurityKeyDef();
         }
       }
 
@@ -379,7 +398,7 @@ public class StorageProxyController {
       }
     }
 
-    logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKeyNode));
+    logger.debug("Final DataSecurity Object : " , dataSecurityKeyNode);
     try {
       Long startTime = new Date().getTime();
       logger.trace(
@@ -435,6 +454,8 @@ public class StorageProxyController {
          * */
         executeResponse.setData(
             pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
+        // return user id with data in execution results
+        if (userId != null) executeResponse.setUserId(userId);
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

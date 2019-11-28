@@ -1,70 +1,114 @@
-<dx-data-grid [customizeColumns]="config.customizeColumns"
-              [columnAutoWidth]="config.columnAutoWidth"
-              [columnMinWidth]="config.columnMinWidth"
-              [columnResizingMode]="config.columnResizingMode"
-              [allowColumnReordering]="config.allowColumnReordering"
-              [allowColumnResizing]="config.allowColumnResizing"
-              [showColumnHeaders]="config.showColumnHeaders"
-              [showColumnLines]="config.showColumnLines"
-              [showRowLines]="config.showRowLines"
-              [showBorders]="config.showBorders"
-              [rowAlternationEnabled]="config.rowAlternationEnabled"
-              [hoverStateEnabled]="config.hoverStateEnabled"
-              [wordWrapEnabled]="config.wordWrapEnabled"
-              [scrolling]="config.scrolling"
-              [sorting]="config.sorting"
-              [dataSource]="data"
-              [columns]="config.columns"
-              [pager]="config.pager"
-              [paging]="config.paging"
-              [width]="config.width"
-              [height]="config.height"
+<dx-data-grid
+  [customizeColumns]="config.customizeColumns"
+  [columnAutoWidth]="config.columnAutoWidth"
+  [columnMinWidth]="config.columnMinWidth"
+  [columnResizingMode]="config.columnResizingMode"
+  [allowColumnReordering]="config.allowColumnReordering"
+  [allowColumnResizing]="config.allowColumnResizing"
+  [showColumnHeaders]="config.showColumnHeaders"
+  [showColumnLines]="config.showColumnLines"
+  [showRowLines]="config.showRowLines"
+  [showBorders]="config.showBorders"
+  [rowAlternationEnabled]="config.rowAlternationEnabled"
+  [hoverStateEnabled]="config.hoverStateEnabled"
+  [wordWrapEnabled]="config.wordWrapEnabled"
+  [scrolling]="config.scrolling"
+  [sorting]="config.sorting"
+  [dataSource]="data"
+  [columns]="config.columns"
+  [pager]="config.pager"
+  [paging]="config.paging"
+  [width]="config.width"
+  [height]="config.height"
 >
-
   <div *dxTemplate="let cell of 'linkCellTemplate'">
-    <a [innerHtml]="cell.text | highlight: searchTerm"
-       (click)="rowClick.emit(cell.data)"
-       [matTooltip]="getLinkTooltip()"
+    <a
+      [innerHtml]="cell.text | highlight: searchTerm"
+      (click)="rowClick.emit(cell.data)"
+      [matTooltip]="getLinkTooltip()"
     >
     </a>
   </div>
 
-  <div *dxTemplate="let cell of 'highlightCellTemplate'"
-       [innerHtml]="cell.text | highlight: highlightTerm">
-  </div>
+  <div
+    *dxTemplate="let cell of 'highlightCellTemplate'"
+    [innerHtml]="cell.text | highlight: highlightTerm"
+  ></div>
 
   <div *dxTemplate="let cell of 'dateCellTemplate'">
-    {{cell.text | date: 'dd/MMM/yy'}}
+    {{ cell.text | date: 'dd/MMM/yy' }}
   </div>
 
   <div *dxTemplate="let cell of 'actionCellTemplate'">
-    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
-      <button mat-icon-button
-              (click)="editRow.emit(cell.data)"
-              [matTooltip]="'Edit ' + (section | changeCase:'title')">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="list-action__container"
+    >
+      <button
+        mat-icon-button
+        (click)="editRow.emit(cell.data)"
+        [disabled]="section === 'category' && cell.data.moduleName === 'ALERTS'"
+        [matTooltip]="'Edit ' + (section | changeCase: 'title')"
+      >
         <mat-icon fontIcon="icon-edit"></mat-icon>
       </button>
-      <button mat-icon-button
-              (click)="deleteRow.emit(cell.data)"
-              [matTooltip]="'Delete ' + (section | changeCase:'title')">
+      <button
+        mat-icon-button
+        (click)="deleteRow.emit(cell.data)"
+        [disabled]="section === 'category' && cell.data.moduleName === 'ALERTS'"
+        [matTooltip]="'Delete ' + (section | changeCase: 'title')"
+      >
         <mat-icon fontIcon="icon-trash"></mat-icon>
       </button>
     </div>
   </div>
 
   <div *dxTemplate="let cell of 'groupAssignCellTemplate'">
-    <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container group-select">
-        <mat-form-field class="select-form-field assignments-grid" appearance="outline" style="margin-bottom: 0px;">
-            <mat-select [(ngModel)]="cell.data.groupName" (selectionChange)="assignGrouptoUser($event, cell)">
-              <mat-option *ngIf="securityGroups.length === 0" value="-2">No group available</mat-option>
-              <mat-option *ngFor="let group of securityGroups" [value]="group.securityGroupName">
-                  {{group.securityGroupName}}
-              </mat-option>
-              <mat-option *ngIf="validateClearOption(cell)" style="color:red;" [value]="-1">Clear Group</mat-option>
-            </mat-select>
-          </mat-form-field>
-      <mat-icon *ngIf="groupAssignSuccess === 'checkmark' && cell.data.loginId === userGroupID" fontIcon="icon-checkmark"></mat-icon>
-      <mat-icon *ngIf="groupAssignSuccess === 'close' && cell.data.loginId === userGroupID" fontIcon="icon-close"></mat-icon>
+    <div
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="list-action__container group-select"
+    >
+      <mat-form-field
+        class="select-form-field assignments-grid"
+        appearance="outline"
+        style="margin-bottom: 0px;"
+      >
+        <mat-select
+          [(ngModel)]="cell.data.groupName"
+          (selectionChange)="assignGrouptoUser($event, cell)"
+        >
+          <mat-option *ngIf="securityGroups.length === 0" value="-2"
+            >No group available</mat-option
+          >
+          <mat-option
+            *ngFor="let group of securityGroups"
+            [value]="group.securityGroupName"
+          >
+            {{ group.securityGroupName }}
+          </mat-option>
+          <mat-option
+            *ngIf="validateClearOption(cell)"
+            style="color:red;"
+            [value]="-1"
+            >Clear Group</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+      <mat-icon
+        *ngIf="
+          groupAssignSuccess === 'checkmark' &&
+          cell.data.loginId === userGroupID
+        "
+        fontIcon="icon-checkmark"
+      ></mat-icon>
+      <mat-icon
+        *ngIf="
+          groupAssignSuccess === 'close' && cell.data.loginId === userGroupID
+        "
+        fontIcon="icon-close"
+      ></mat-icon>
     </div>
   </div>
 </dx-data-grid>

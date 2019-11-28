@@ -4,7 +4,11 @@ CMD_DIR=$( cd $(dirname $0); pwd )
 RTPS_HOME=$( cd $CMD_DIR/.. ; pwd )
 ( cd $RTPS_HOME/lib ) || exit
 
-
+MAPR_HOME=/opt/mapr
+isSecure=$(head -1 ${MAPR_HOME}/conf/mapr-clusters.conf | grep -o 'secure=\w*' | cut -d= -f2)
+ if [ "$isSecure" = "true" ] && [ -f "${MAPR_HOME}/conf/mapruserticket" ]; then
+        export MAPR_TICKETFILE_LOCATION="${MAPR_HOME}/conf/mapruserticket"
+ fi
 # Check SPARK executable is in place
 SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
 [[ -x $SPARK_SUBMIT_XPATH ]] || {

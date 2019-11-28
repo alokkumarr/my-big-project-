@@ -50,7 +50,7 @@ semantic:
     host: http://localhost:9200
 security:
   service:
-    host: ${connector}://localhost:${saw-security-port}/saw-security
+    host: ${connector}://localhost:${saw-security-port}/sip-security
 export:
   service:
     host: http://localhost:9400

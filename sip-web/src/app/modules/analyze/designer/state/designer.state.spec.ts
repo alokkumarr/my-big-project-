@@ -3,7 +3,8 @@ import { DesignerService } from '../designer.module';
 import { AnalyzeService } from '../../services/analyze.service';
 import { NgxsModule, Store } from '@ngxs/store';
 import { DesignerState, defaultDesignerState } from './designer.state';
-import { DesignerSetData } from '../actions/designer.actions';
+import { DesignerSetData, DesignerLoadMetric } from '../actions/designer.actions';
+import { tap } from 'rxjs/operators';
 
 describe('Designer State', () => {
   let store: Store;
@@ -43,4 +44,21 @@ describe('Designer State', () => {
         expect(data[0]).toEqual(1);
       });
   });
+
+  it('should check metric name', async(() => {
+    const metric = {
+      metricName: 'sample',
+      artifacts: []
+    };
+
+    store.dispatch(new DesignerLoadMetric(metric));
+    store
+      .selectOnce(DesignerState.metricName)
+      .pipe(
+        tap(metricName => {
+          expect(metricName).toEqual(metric.metricName);
+        })
+      )
+      .subscribe();
+  }));
 });
