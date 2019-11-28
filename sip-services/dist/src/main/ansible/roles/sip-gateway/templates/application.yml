@@ -71,7 +71,7 @@ metadata:
         host: ${connector}://localhost:9500
 security:
     service:
-        host: ${connector}://localhost:9000/saw-security
+        host: ${connector}://localhost:9000/sip-security
 export:
     service:
         host: ${connector}://localhost:9400

@@ -114,7 +114,7 @@ scrape_configs:
 
 {% endif %}
 
-    metrics_path: '/saw-security/actuator/prometheus'
+    metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
 {% for host in groups['saw-security'] %}
