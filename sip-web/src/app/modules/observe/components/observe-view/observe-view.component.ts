@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { HttpHeaders } from '@angular/common/http';
 import * as Bowser from 'bowser';
 
 import { Dashboard } from '../../models/dashboard.interface';
@@ -21,6 +22,7 @@ import {
   ToastService,
   HtmlDownloadService
 } from '../../../../common/services';
+import { CUSTOM_HEADERS } from '../../../../common/consts';
 import { PREFERENCES } from '../../../../common/services/configuration.service';
 
 import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
@@ -319,7 +321,11 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   loadDashboard(): Observable<Dashboard> {
     this.filters.resetLastKPIFilterApplied();
     this.filters.resetLastAnalysisFiltersApplied();
-    return this.observe.getDashboard(this.dashboardId).pipe(
+    const skipToastHeader = {
+      [CUSTOM_HEADERS.SKIP_TOAST]: '1'
+    };
+    const headers = new HttpHeaders(skipToastHeader);
+    return this.observe.getDashboard(this.dashboardId, { headers }).pipe(
       map((data: Dashboard) => {
         this.dashboard = data;
         this.loadPrivileges();
@@ -327,6 +333,21 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
         return data;
       }),
       catchError(error => {
+        if (
+          get(error, 'error.message') ===
+          'While retrieving it has been found that Entity does not exist.'
+        ) {
+          this._toastMessage.error(
+            'Redirecting to first dashboard...',
+            'This dashboard has been deleted.'
+          );
+          setTimeout(() => {
+            this.observe.reloadMenu().subscribe(menu => {
+              this.observe.updateSidebar(menu);
+              this.guard.redirectToFirstDash(null, menu, true);
+            });
+          }, 1000);
+        }
         return of(error);
       })
     );
