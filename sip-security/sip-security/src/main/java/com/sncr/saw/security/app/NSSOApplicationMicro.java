@@ -12,13 +12,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import com.sncr.saw.security.common.util.JwtFilter;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
-import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
@@ -52,7 +50,7 @@ public class NSSOApplicationMicro extends SpringBootServletInitializer {
 	public FilterRegistrationBean jwtFilter() {
 		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
 		registrationBean.setFilter(new JwtFilter(nSSOProperties.getJwtSecretKey(), ticketHelper));
-		registrationBean.addUrlPatterns("/auth/*");
+		registrationBean.addUrlPatterns("/sip-security/auth/*");
 
 		return registrationBean;
 	}
