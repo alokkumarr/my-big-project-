@@ -92,15 +92,17 @@ public class ExternalSecurityController {
 					boolean roleExist = roles.stream().anyMatch(role -> inputRole.getRoleType().equalsIgnoreCase(role.getRoleName()));
 					if (!roleExist) {
 						roleRepository.addNewRoleType(inputRole);
+						roleRepository.createNewRoleDao(customerSysId, inputRole);
+						categoryPrivilege.setMessage("Role has been created successfully.");
+					} else {
+						categoryPrivilege.setMessage("Role already exist in the system.");
 					}
 				}
-				// add new roles details
-				roleRepository.createNewRoleDao(customerSysId, inputRole);
-				categoryPrivilege.setMessage("Role has been created successfully.");
 			} else {
-
+				categoryPrivilege.setMessage("Role already exist in the system.");
 			}
 		}
+
 		return categoryPrivilege;
 	}
 }
