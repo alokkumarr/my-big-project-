@@ -1,18 +1,21 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.ProductModuleRepository;
-import java.sql.Connection;
+
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -20,8 +23,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(ProductModuleRepositoryDaoImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProductModuleRepositoryDaoImpl.class);
+
   private final JdbcTemplate jdbcTemplate;
 
   @Autowired
@@ -38,7 +41,7 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
   @Override
   public boolean checkProductModuleExistance(Long prodModId) {
-    String sql = "select PROD_MOD_SYS_ID from product_modules where PROD_MOD_SYS_ID = "+ prodModId;
+    String sql = "select PROD_MOD_SYS_ID from product_modules where PROD_MOD_SYS_ID = " + prodModId;
     return !jdbcTemplate.queryForList(sql).isEmpty();
   }
 
@@ -66,20 +69,48 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
         "INSERT INTO `PRODUCT_MODULES` (`PRODUCT_SYS_ID`,`MODULE_SYS_ID`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (4,2,1,?,'admin',NULL,'',NULL,'')");
 
     for (Map.Entry m : sqlstatements.entrySet()) {
-      jdbcTemplate.update(new PreparedStatementCreator() {
-                            @Override
-                            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                              PreparedStatement ps = con
-                                  .prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
-                              ps.setDate(1, new java.sql.Date(new Date().getTime()));
-                              return ps;
-                            }
-                          },
-          keyHolder
-      );
+      jdbcTemplate.update(con -> {
+        PreparedStatement ps = con.prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
+        ps.setDate(1, new java.sql.Date(new Date().getTime()));
+        return ps;
+      }, keyHolder);
       results.put((Integer) m.getKey(), keyHolder.getKey().toString());
     }
-
     return results;
+  }
+
+  @Override
+  public boolean validateModuleProductName(String productName, String moduleName, String loginId) {
+
+    boolean validateModuleProductName = false;
+    String sql = "select PR.PRODUCT_NAME, M.MODULE_NAME from PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM, PRODUCTS PR, MODULES M, USERS U, CUSTOMERS C " +
+        "WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND CPM.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID " +
+        "AND PR.PRODUCT_SYS_ID=PM.PRODUCT_SYS_ID AND M.MODULE_SYS_ID=PM.MODULE_SYS_ID AND CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID " +
+        "AND U.USER_ID = ?;";
+    try {
+      Map<String, String> productModeule = jdbcTemplate.query(sql, preparedStatement ->
+              preparedStatement.setString(1, loginId)
+          , new ProductModuleRepositoryDaoImpl.ProductModuleExtractor());
+
+      // check if product and  name exists
+      validateModuleProductName = productModeule != null && !productModeule.isEmpty()
+          ? (productModeule.keySet().contains(productName) || productModeule.values().contains(productName)) : false;
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage());
+    } catch (Exception e) {
+      logger.error("Exception encountered while checking user Id :" + e.getMessage());
+    }
+    return validateModuleProductName;
+  }
+
+  private class ProductModuleExtractor implements ResultSetExtractor<Map<String, String>> {
+    Map<String, String> values = new HashMap<>();
+    @Override
+    public Map<String, String> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+      while (resultSet.next()) {
+        values.put(resultSet.getString("PRODUCT_NAME"), resultSet.getString("MODULE_NAME"));
+      }
+      return values;
+    }
   }
 }

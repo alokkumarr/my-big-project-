@@ -58,4 +58,14 @@ public class RoleRepositoryDaoImpl implements RoleRepository {
     }
     return -1L;
   }
+
+  @Override
+  public boolean validateRoleByIdAndCustomerCode(Long loginId, String customerCode) {
+    try {
+
+    } catch (Exception ex) {
+
+    }
+    return false;
+  }
 }
