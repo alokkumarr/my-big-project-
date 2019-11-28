@@ -1321,7 +1321,9 @@ public class SipDslIT extends BaseIT {
    */
   public ObjectNode testCreateDlAnalysis() throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(testDataForDl.toString());
+    JsonObject data = testData;
+    data.addProperty("category", "5");
+    JsonNode jsonNode = objectMapper.readTree(data.toString());
     Response response =
         given(spec)
             .header("Authorization", "Bearer " + token)
