@@ -163,7 +163,7 @@ public class SipCommonUtils {
    */
   public static Long checkForPrivateCategory(Ticket ticket) {
     final Long[] privateCategory = {null};
-    if (ticket != null && !CollectionUtils.isEmpty(ticket.getProducts()))
+    if (ticket != null && !CollectionUtils.isEmpty(ticket.getProducts())) {
       ticket
           .getProducts()
           .forEach(
@@ -204,6 +204,7 @@ public class SipCommonUtils {
                           });
                 }
               });
+    }
     return privateCategory[0];
   }
 }
