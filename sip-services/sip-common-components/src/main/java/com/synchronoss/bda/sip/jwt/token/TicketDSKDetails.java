@@ -1,9 +1,12 @@
 package com.synchronoss.bda.sip.jwt.token;
 
+import java.io.Serializable;
 import java.util.List;
 
 /** Created by pman0003 on 10/3/2017. */
-public class TicketDSKDetails {
+public class TicketDSKDetails implements Serializable {
+
+  private static final long serialVersionUID = 7546190895561288031L;
 
   private String name;
   private List<String> values;

@@ -1,7 +1,7 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
 import static com.synchronoss.saw.es.QueryBuilderUtil.checkDSKApplicableAnalysis;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
@@ -129,7 +129,7 @@ public class SipKpiController {
         if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
 
             DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-            List<String> artsName = getArtsNames(savedQuery);
+            List<String> artsName = getArtifactsNames(savedQuery);
             List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
                 for (String artifact : artsName) {
                     dataSecurityKeyDef.setName(CUSTOMER_CODE);
