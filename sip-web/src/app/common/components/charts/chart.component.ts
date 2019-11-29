@@ -17,10 +17,8 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as some from 'lodash/some';
-import * as clone from 'lodash/clone';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as isArray from 'lodash/isArray';
-import * as find from 'lodash/find';
 import * as isUndefined from 'lodash/isUndefined';
 
 import {
@@ -70,7 +68,6 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public _options: any;
   public config: any = {};
   public subscription: any;
-  public clonedConfig: any = {};
 
   constructor() {
     this.highcharts.setOptions(cloneDeep(globalChartOptions));
@@ -171,14 +168,15 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   addExportSize(config) {
     setTimeout(() => {
-      set(config, 'exporting.sourceWidth', this.chart.chartWidth);
-      set(config, 'exporting.sourceHeight', this.chart.chartHeight);
+      const { chartWidth, chartHeight } = this.chart;
+      set(config, 'exporting.sourceWidth', chartWidth);
+      set(config, 'exporting.sourceHeight', chartHeight);
 
       this.chart.update(
         {
           exporting: {
-            sourceHeight: this.chart.chartHeight,
-            sourceWidth: this.chart.chartWidth
+            sourceWidth: chartWidth,
+            sourceHeight: chartHeight
           }
         },
         false
@@ -212,48 +210,33 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     const chartSettingsType = this.getChartSettingsType(this.chartType);
     const defaultConfig =
       this.chartSettings[chartSettingsType] || cloneDeep(chartOptions);
-    const requestConfig = defaultsDeep({}, this.config, defaultConfig);
+    const config = defaultsDeep({}, this.config, defaultConfig);
     switch (chartSettingsType) {
       case 'highStock':
-        set(
-          requestConfig,
-          'xAxis.0.title.text',
-          get(requestConfig, 'xAxis.title.text')
-        ); // Highstocks adding a default xAxis settings objects with title & categories.
+        // Highstocks adding a default xAxis settings objects with title & categories.
+        set(config, 'xAxis.0.title.text', get(config, 'xAxis.title.text'));
         // So have to populate them inorder the title to display.
-        set(
-          requestConfig,
-          'xAxis.0.categories',
-          get(requestConfig, 'xAxis.categories')
-        );
+        set(config, 'xAxis.0.categories', get(config, 'xAxis.categories'));
 
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
-        this.clonedConfig = clone(requestConfig);
-        this.addExportConfig(this.clonedConfig);
-        this.chart = this.highstocks.stockChart(
-          this.container.nativeElement,
-          requestConfig
-        );
-        this.config = clone(this.clonedConfig);
-        this.addExportSize(this.config);
-        this.clonedConfig = {};
         break;
       default:
-        this.addExportConfig(requestConfig);
         const shouldSetColumnStackingToPercent = some(
           this.config.series,
           ({ aggregate }) => aggregate === 'percentagebyrow'
         );
         if (shouldSetColumnStackingToPercent) {
-          set(requestConfig, 'plotOptions.column.stacking', 'percent');
+          set(config, 'plotOptions.column.stacking', 'percent');
         }
-        this.chart = this.highcharts.chart(
-          this.container.nativeElement,
-          requestConfig
-        );
-        this.addExportSize(requestConfig);
     }
+
+    this.addExportConfig(config);
+    this.chart = this.highstocks.stockChart(
+      this.container.nativeElement,
+      config
+    );
+    this.addExportSize(config);
 
     // This is causing more problems than it solves. Updating the defaultsDeep
     // call in ngAfterViewInit callback. Hopefully this isn't needed anymore.
