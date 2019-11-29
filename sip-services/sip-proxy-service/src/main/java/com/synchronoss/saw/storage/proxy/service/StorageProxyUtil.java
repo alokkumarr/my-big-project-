@@ -66,7 +66,12 @@ public class StorageProxyUtil {
   public static JsonNode buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter) {
     GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
     JsonNode jsonNode1 = jsonNode.get("global_filter_values");
-    Map<String, Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+    Map<String, Object> result = null;
+    if (jsonNode1 != null) {
+      result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+    } else {
+      result = globalFilterResultParser.jsonNodeParser(jsonNode);
+    }
     result.put("esRepository", globalFilter.getEsRepository());
     ObjectMapper mapper = new ObjectMapper();
     return mapper.valueToTree(result);

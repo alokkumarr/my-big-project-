@@ -2,13 +2,12 @@ package com.synchronoss.saw.es.kpi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-
 import com.synchronoss.saw.model.globalfilter.Filter;
 import com.synchronoss.saw.model.globalfilter.Filter.Order;
+import com.synchronoss.saw.model.globalfilter.Filter.Type;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.model.globalfilter.GlobalFilterExecutionObject;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
-import com.synchronoss.saw.util.BuilderUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,15 +49,26 @@ public class GlobalFilterDataQueryBuilder {
                         "Please add filter[] block.It can be empty but these blocks are important.");
             }
 
-            List<Filter> filters = globalFilter.getFilters();
-
-            final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-            AggregationBuilder aggregationBuilder = AggregationBuilders.global(GLOBAL_FILTER_VALUES);
-            for (Filter item : filters) {
-             List<AggregationBuilder> aggregationBuilders = filterAggregationBuilder(item);
-            for(AggregationBuilder aggregationBuilder1: aggregationBuilders)
-                aggregationBuilder.subAggregation(aggregationBuilder1);
+      List<Filter> filters = globalFilter.getFilters();
+      final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+      AggregationBuilder aggregationBuilder = null;
+      for (Filter item : filters) {
+        List<AggregationBuilder> aggregationBuilders = filterAggregationBuilder(item);
+        for (AggregationBuilder aggregationBuilder1 : aggregationBuilders) {
+          if (item.getType() == Type.STRING) {
+            if (aggregationBuilder == null) {
+              aggregationBuilder = aggregationBuilder1;
+            } else {
+              aggregationBuilder.subAggregation(aggregationBuilder1);
             }
+          } else if (aggregationBuilder == null) {
+            aggregationBuilder = AggregationBuilders.global(GLOBAL_FILTER_VALUES);
+            aggregationBuilder.subAggregation(aggregationBuilder1);
+          } else {
+            aggregationBuilder.subAggregation(aggregationBuilder1);
+          }
+        }
+      }
             searchSourceBuilder.aggregation(aggregationBuilder);
             searchSourceBuilder.query(boolQueryBuilder);
             globalFilterExecutionObject.setEsRepository(globalFilter.getEsRepository());
