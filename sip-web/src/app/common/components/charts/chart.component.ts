@@ -58,11 +58,11 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
    *
    * @memberof ChartComponent
    */
-  chartSettings = [
-    { type: 'default', config: cloneDeep(chartOptions) },
-    { type: 'highStock', config: cloneDeep(stockChartOptions) },
-    { type: 'bullet', config: cloneDeep(bulletChartOptions) }
-  ];
+  chartSettings = {
+    default: cloneDeep(chartOptions),
+    highStock: cloneDeep(stockChartOptions),
+    bullet: cloneDeep(bulletChartOptions)
+  };
 
   public highcharts: any = Highcharts;
   public highstocks: any = Highstock;
@@ -71,7 +71,6 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   public config: any = {};
   public subscription: any;
   public clonedConfig: any = {};
-  public chartSettingsType: string;
 
   constructor() {
     this.highcharts.setOptions(cloneDeep(globalChartOptions));
@@ -121,17 +120,10 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     // set the appropriate config based on chart type
-    this.chartSettingsType = this.getChartSettingsType(this.chartType);
-    this.config = defaultsDeep(
-      {},
-      options,
-      this.config,
-      get(
-        find(this.chartSettings, ['type', this.chartSettingsType]),
-        'config',
-        cloneDeep(chartOptions)
-      )
-    );
+    const chartSettingsType = this.getChartSettingsType(this.chartType);
+    const chartSettings =
+      this.chartSettings[chartSettingsType] || cloneDeep(chartOptions);
+    this.config = defaultsDeep({}, options, this.config, chartSettings);
 
     if (this.enableExport) {
       this.config.exporting = {
@@ -218,40 +210,37 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Not using chart.update due to a bug with navigation
     // update and bar styles.
     const chartSettingsType = this.getChartSettingsType(this.chartType);
+    const defaultConfig =
+      this.chartSettings[chartSettingsType] || cloneDeep(chartOptions);
+    const requestConfig = defaultsDeep({}, this.config, defaultConfig);
     switch (chartSettingsType) {
       case 'highStock':
         set(
-          this.config,
+          requestConfig,
           'xAxis.0.title.text',
-          get(this.config, 'xAxis.title.text')
+          get(requestConfig, 'xAxis.title.text')
         ); // Highstocks adding a default xAxis settings objects with title & categories.
         // So have to populate them inorder the title to display.
         set(
-          this.config,
+          requestConfig,
           'xAxis.0.categories',
-          get(this.config, 'xAxis.categories')
+          get(requestConfig, 'xAxis.categories')
         );
 
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
-        this.clonedConfig = clone(this.config);
-        this.addExportConfig(this.config);
+        this.clonedConfig = clone(requestConfig);
+        this.addExportConfig(this.clonedConfig);
         this.chart = this.highstocks.stockChart(
           this.container.nativeElement,
-          this.config
+          requestConfig
         );
         this.config = clone(this.clonedConfig);
         this.addExportSize(this.config);
         this.clonedConfig = {};
         break;
       default:
-        this.addExportConfig(this.config);
-        const defaultConfig = get(
-          find(this.chartSettings, ['type', chartSettingsType]),
-          'config',
-          cloneDeep(chartOptions)
-        );
-        const requestConfig = defaultsDeep({}, this.config, defaultConfig);
+        this.addExportConfig(requestConfig);
         const shouldSetColumnStackingToPercent = some(
           this.config.series,
           ({ aggregate }) => aggregate === 'percentagebyrow'
