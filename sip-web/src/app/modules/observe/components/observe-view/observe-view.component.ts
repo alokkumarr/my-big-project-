@@ -1,14 +1,13 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef
-} from '@angular/core';
+import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 import * as Bowser from 'bowser';
+import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import * as get from 'lodash/get';
+import * as filter from 'lodash/filter';
+import * as isEmpty from 'lodash/isEmpty';
 
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
@@ -16,20 +15,14 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { FirstDashboardGuard } from '../../guards';
+import { CUSTOM_HEADERS } from '../../../../common/consts';
+import { PREFERENCES } from '../../../../common/services/configuration.service';
 import {
   JwtService,
   ConfigService,
   ToastService,
   HtmlDownloadService
 } from '../../../../common/services';
-import { CUSTOM_HEADERS } from '../../../../common/consts';
-import { PREFERENCES } from '../../../../common/services/configuration.service';
-
-import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import * as get from 'lodash/get';
-import * as filter from 'lodash/filter';
-import * as isEmpty from 'lodash/isEmpty';
 
 const browser = get(
   Bowser.getParser(window.navigator.userAgent).getBrowser(),
@@ -42,7 +35,7 @@ const browser = get(
   templateUrl: './observe-view.component.html',
   providers: [DashboardService, GlobalFilterService]
 })
-export class ObserveViewComponent implements OnInit, OnDestroy {
+export class ObserveViewComponent implements OnDestroy {
   public dashboardId: string;
   public subCategoryId: string;
   public dashboard: Dashboard;
@@ -82,8 +75,6 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
     this.listeners.push(navigationListener);
   }
-
-  ngOnInit() {}
 
   initialise() {
     const snapshot = this._route.snapshot;
@@ -221,10 +212,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       .toPromise()
       .then(() => {
         this.observe.deleteDashboard(this.dashboard).subscribe(() => {
-          this.observe.reloadMenu().subscribe(menu => {
-            this.observe.updateSidebar(menu);
-            this.guard.redirectToFirstDash(null, menu, true);
-          });
+          this.guard.redirectToFirstDash();
         });
       });
   }
@@ -342,10 +330,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
             'This dashboard has been deleted.'
           );
           setTimeout(() => {
-            this.observe.reloadMenu().subscribe(menu => {
-              this.observe.updateSidebar(menu);
-              this.guard.redirectToFirstDash(null, menu, true);
-            });
+            this.guard.redirectToFirstDash();
           }, 1000);
         }
         return of(error);
