@@ -77,14 +77,14 @@ import org.springframework.web.bind.annotation.RestController;
         "The controller provides operations pertaining to polyglot persistence layer of synchronoss analytics platform ")
 @ApiResponses(
     value = {
-      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-      @ApiResponse(code = 400, message = "Bad Request"),
-      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-      @ApiResponse(
-          code = 403,
-          message = "Accessing the resource you were trying to reach is forbidden"),
-      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-      @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(
+            code = 403,
+            message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
     })
 public class StorageProxyController {
 
@@ -96,14 +96,16 @@ public class StorageProxyController {
   @Value("${sip.security.host}")
   private String sipSecurityHost;
 
-  @Autowired private RestUtil restUtil;
-  @Autowired private StorageProxyService proxyService;
+  @Autowired
+  private RestUtil restUtil;
+  @Autowired
+  private StorageProxyService proxyService;
 
   public static final String CUSTOMER_CODE = "customerCode";
 
   /**
-   * This method is used to get the data based on the storage type<br>
-   * perform conversion based on the specification asynchronously
+   * This method is used to get the data based on the storage type<br> perform conversion based on
+   * the specification asynchronously
    *
    * @param requestBody
    * @return
@@ -116,13 +118,13 @@ public class StorageProxyController {
       response = StorageProxy.class)
   @ApiResponses(
       value = {
-        @ApiResponse(code = 200, message = "Success"),
-        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-        @ApiResponse(
-            code = 403,
-            message = "Accessing the resource you were trying to reach is forbidden"),
-        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-        @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
+          @ApiResponse(code = 200, message = "Success"),
+          @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+          @ApiResponse(
+              code = 403,
+              message = "Accessing the resource you were trying to reach is forbidden"),
+          @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+          @ApiResponse(code = 500, message = "Server is down. Contact System administrator")
       })
   @RequestMapping(
       value = "/internal/proxy/storage",
@@ -131,10 +133,10 @@ public class StorageProxyController {
   @ResponseStatus(HttpStatus.OK)
   public StorageProxy retrieveStorageDataSync(
       @ApiParam(
-              value = "Storage object that needs to be added/updated/deleted to the store",
-              required = true)
-          @Valid
-          @RequestBody
+          value = "Storage object that needs to be added/updated/deleted to the store",
+          required = true)
+      @Valid
+      @RequestBody
           StorageProxy requestBody)
       throws JsonProcessingException {
     logger.debug("Request Body:{}", requestBody);
@@ -175,10 +177,10 @@ public class StorageProxyController {
   @ResponseStatus(HttpStatus.OK)
   public List<?> retrieveStorageDataSync(
       @ApiParam(
-              value = "Storage object that needs to be added/updated/deleted to the store",
-              required = true)
-          @Valid
-          @RequestBody
+          value = "Storage object that needs to be added/updated/deleted to the store",
+          required = true)
+      @Valid
+      @RequestBody
           SIPDSL sipdsl,
       @RequestParam(name = "size", required = false) Integer size,
       HttpServletRequest request,
@@ -244,33 +246,33 @@ public class StorageProxyController {
   @ResponseBody
   public ExecuteAnalysisResponse executeAnalysis(
       @ApiParam(
-              value = "Storage object that needs to be added/updated/deleted to the store",
-              required = true)
-          @Valid
-          @RequestBody
+          value = "Storage object that needs to be added/updated/deleted to the store",
+          required = true)
+      @Valid
+      @RequestBody
           Analysis analysis,
       @ApiParam(value = "analysis id", required = false)
-          @RequestParam(name = "id", required = false)
+      @RequestParam(name = "id", required = false)
           String queryId,
       @ApiParam(value = "size of execution", required = false)
-          @RequestParam(name = "size", required = false)
+      @RequestParam(name = "size", required = false)
           Integer size,
       @ApiParam(value = "page number", required = false)
-          @RequestParam(name = "page", required = false)
+      @RequestParam(name = "page", required = false)
           Integer page,
       @ApiParam(value = "page size", required = false)
-          @RequestParam(name = "pageSize", required = false)
+      @RequestParam(name = "pageSize", required = false)
           Integer pageSize,
       @ApiParam(value = "execution type", required = false)
-          @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
+      @RequestParam(name = "executionType", required = false, defaultValue = "onetime")
           ExecutionType executionType,
       @ApiParam(value = "user id", required = false)
-          @RequestParam(name = "userId", required = false)
+      @RequestParam(name = "userId", required = false)
           String userId,
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken)
-      throws JsonProcessingException, IllegalAccessException {
+      throws IOException, IllegalAccessException {
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
       throw new JSONMissingSAWException("Analysis definition is missing in request body");
@@ -279,16 +281,18 @@ public class StorageProxyController {
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
     boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
     boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
-      response.setStatus(401);
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("Invalid authentication token");
-      executeResponse.setData(Collections.singletonList("Invalid authentication token"));
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
 
@@ -301,24 +305,27 @@ public class StorageProxyController {
     if (category == null) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       logger.error("BAD REQUEST : category should not be null!!");
-      executeResponse.setData(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
       return executeResponse;
     }
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the PUBLISH privilege!!");
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     } else if (isScheduledExecution
         && !validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the EXPORT||SCHEDULED privilege!!");
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     } else if (!validatePrivilege(productList, category, PrivilegeNames.EXECUTE)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the EXECUTE privilege!!");
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
 
@@ -451,7 +458,9 @@ public class StorageProxyController {
         executeResponse.setData(
             pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
         // return user id with data in execution results
-        if (userId != null) executeResponse.setUserId(userId);
+        if (userId != null) {
+          executeResponse.setUserId(userId);
+        }
       }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
@@ -527,9 +536,11 @@ public class StorageProxyController {
   public List<?> listExecutions(
       @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id") String queryId,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
     if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return Collections.singletonList(HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
     try {
@@ -554,25 +565,26 @@ public class StorageProxyController {
   @ResponseBody
   public ExecutionResponse executionsData(
       @ApiParam(value = "page number", required = false)
-          @RequestParam(name = "page", required = false)
+      @RequestParam(name = "page", required = false)
           Integer page,
       @ApiParam(value = "page size", required = false)
-          @RequestParam(name = "pageSize", required = false)
+      @RequestParam(name = "pageSize", required = false)
           Integer pageSize,
       @ApiParam(value = "execution type", required = false)
-          @RequestParam(name = "executionType", required = false)
+      @RequestParam(name = "executionType", required = false)
           ExecutionType executionType,
       @ApiParam(value = "analysis type", required = false)
-          @RequestParam(name = "analysisType", required = false)
+      @RequestParam(name = "analysisType", required = false)
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
     if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
     if (analysisType != null && analysisType.equals("report")) {
@@ -601,26 +613,27 @@ public class StorageProxyController {
   @ResponseBody
   public ExecutionResponse lastExecutionsData(
       @ApiParam(value = "page number", required = false)
-          @RequestParam(name = "page", required = false)
+      @RequestParam(name = "page", required = false)
           Integer page,
       @ApiParam(value = "page size", required = false)
-          @RequestParam(name = "pageSize", required = false)
+      @RequestParam(name = "pageSize", required = false)
           Integer pageSize,
       @ApiParam(value = "execution type", required = false)
-          @RequestParam(name = "executionType", required = false)
+      @RequestParam(name = "executionType", required = false)
           ExecutionType executionType,
       @ApiParam(value = "analysis type", required = false)
-          @RequestParam(name = "analysisType", required = false)
+      @RequestParam(name = "analysisType", required = false)
           String analysisType,
-      @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
+      @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id") 
           String analysisId,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
 
     if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
-      executeResponse.setData(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
     if (analysisType != null && analysisType.equals("report")) {

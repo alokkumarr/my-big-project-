@@ -229,7 +229,7 @@ public class AnalysisController {
     }
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    response = validateTicket(authTicket, PrivilegeNames.EDIT, analysis, response);
+    response = validateTicket(authTicket, PrivilegeNames.ACCESS, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
