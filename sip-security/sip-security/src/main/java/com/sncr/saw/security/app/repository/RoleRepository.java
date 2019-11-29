@@ -7,7 +7,5 @@ import com.sncr.saw.security.common.bean.Role;
  */
 public interface RoleRepository {
     long createNewAdminRoleDao(Long custId);
-    boolean validateRoleByIdAndCustomerCode(Long loginId, String customerCode);
-    long createNewRoleDao(Long custId, Role role);
-    long addNewRoleType(Role role);
+    boolean validateRoleByIdAndCustomerCode(Long loginId, Role role);
 }

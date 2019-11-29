@@ -1745,40 +1745,32 @@ public class UserRepositoryImpl implements UserRepository {
 		String sql = "INSERT INTO ROLES (CUSTOMER_SYS_ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ROLE_TYPE, "
 				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
 				+ "VALUES ( ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
-		StringBuffer roleCode = new StringBuffer();
-		roleCode.append(role.getCustomerCode()).append("_").append(role.getRoleName()).append("_")
-				.append(role.getRoleType());
+		final StringBuffer roleCode = new StringBuffer();
+		roleCode.append(role.getCustomerCode()).append("_");
+		if (role.getRoleName() != null && !role.getRoleName().isEmpty()) {
+			roleCode.append(role.getRoleName()).append("_").append(role.getRoleType());
+		} else {
+			roleCode.append(role.getRoleType());
+		}
 		try {
 			// Add the role
-			jdbcTemplate.update(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-
-					preparedStatement.setLong(1, role.getCustSysId());
-					preparedStatement.setString(2, role.getRoleName());
-					preparedStatement.setString(3, roleCode.toString());
-					preparedStatement.setString(4, role.getRoleDesc());
-					preparedStatement.setString(5, role.getRoleType().name());
-
-					preparedStatement.setLong(6, Integer.parseInt(role.getActiveStatusInd()));
-					preparedStatement.setString(7, role.getMasterLoginId());
-				}
+			jdbcTemplate.update(sql, preparedStatement -> {
+				preparedStatement.setLong(1, role.getCustSysId());
+				preparedStatement.setString(2, role.getRoleName());
+				preparedStatement.setString(3, roleCode.toString());
+				preparedStatement.setString(4, role.getRoleDesc());
+				preparedStatement.setString(5, role.getRoleType().name());
+				preparedStatement.setLong(6, Integer.parseInt(role.getActiveStatusInd()));
+				preparedStatement.setString(7, role.getMasterLoginId());
 			});
 
-			if (role.getMyAnalysis()) {
-
+			if (role.getMyAnalysis() != null && role.getMyAnalysis()) {
 				// Get Added Role Sys Id
-
 				String sql1 = "SELECT R.ROLE_SYS_ID FROM ROLES R WHERE R.ROLE_NAME=?";
-
-				roleId = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-					public void setValues(PreparedStatement preparedStatement) throws SQLException {
-						preparedStatement.setString(1, role.getRoleName());
-					}
-				}, new UserRepositoryImpl.roleIdDetailExtractor());
+				roleId = jdbcTemplate.query(sql1, preparedStatement -> preparedStatement.setString(1, role.getRoleName()), new UserRepositoryImpl.roleIdDetailExtractor());
 
 				// Get the CUST, PROD, MOD details
-
-				String sql2 = "SELECT DISTINCT CPM.CUST_PROD_MOD_SYS_ID, CPM.CUST_PROD_SYS_ID FROM CUSTOMER_PRODUCT_MODULES CPM "
+			String sql2 = "SELECT DISTINCT CPM.CUST_PROD_MOD_SYS_ID, CPM.CUST_PROD_SYS_ID FROM CUSTOMER_PRODUCT_MODULES CPM "
 						+ "INNER JOIN PRODUCT_MODULES PM ON (CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID) "
 						+ "INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUST_PROD_SYS_ID=CPM.CUST_PROD_SYS_ID) "
 						+ "INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=CP.CUSTOMER_SYS_ID) "

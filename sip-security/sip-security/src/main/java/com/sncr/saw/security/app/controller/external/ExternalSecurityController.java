@@ -6,11 +6,15 @@ import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.RoleCategoryPrivilege;
+import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
+import com.sncr.saw.security.common.bean.repo.admin.RolesList;
+import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,24 +89,48 @@ public class ExternalSecurityController {
 			if (inputRole.getCustomerCode().isEmpty() || inputRole.getRoleType().isEmpty()) {
 				response.setStatus(HttpStatus.BAD_REQUEST.value());
 				categoryPrivilege.setMessage("Customer Code and Role Name can't be blank or empty.");
-			} else if (inputRole.isAutoCreate()) {
-				List<Role> roles = userRepository.getRoletypesDropDownList();
-				// check if role type not exist then add new role type
-				if (roles != null && !roles.isEmpty()) {
-					boolean roleExist = roles.stream().anyMatch(role -> inputRole.getRoleType().equalsIgnoreCase(role.getRoleName()));
-					if (!roleExist) {
-						roleRepository.addNewRoleType(inputRole);
-						roleRepository.createNewRoleDao(customerSysId, inputRole);
-						categoryPrivilege.setMessage("Role has been created successfully.");
+			} else if (inputRole.isAutoCreate() && !roleRepository.validateRoleByIdAndCustomerCode(customerSysId, inputRole)) {
+				// build role details bean from input
+				RoleDetails role = buildRoleDetails(masterLoginId, customerSysId, inputRole);
+				RolesList roleList = new RolesList();
+				try {
+					if (role != null) {
+						Valid valid = userRepository.addRole(role);
+						if (valid.getValid()) {
+							roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
+							roleList.setValid(true);
+						} else {
+							roleList.setValid(false);
+							roleList.setValidityMessage("Role could not be added. " + valid.getError());
+						}
 					} else {
-						categoryPrivilege.setMessage("Role already exist in the system.");
+						roleList.setValid(false);
+						roleList.setValidityMessage("Mandatory request params are missing");
 					}
+				} catch (Exception e) {
+					roleList.setValid(false);
+					String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+					roleList.setValidityMessage(message + " Please contact server Administrator");
+					roleList.setError(e.getMessage());
+					return roleList;
 				}
+				return roleList;
 			} else {
 				categoryPrivilege.setMessage("Role already exist in the system.");
 			}
 		}
-
 		return categoryPrivilege;
+	}
+
+	private RoleDetails buildRoleDetails(String masterLoginId, Long customerSysId, Role inputRole) {
+		RoleDetails role = new RoleDetails();
+		role.setActiveStatusInd(Boolean.valueOf(inputRole.getActiveStatusInd()) ? "1" : "0");
+		role.setCustomerCode(inputRole.getCustomerCode());
+		role.setMasterLoginId(masterLoginId);
+		role.setRoleName(inputRole.getRoleName());
+		role.setRoleDesc(inputRole.getRoleDesc());
+		role.setRoleType(RoleType.fromValue(inputRole.getRoleType()));
+		role.setCustSysId(customerSysId);
+		return role;
 	}
 }
