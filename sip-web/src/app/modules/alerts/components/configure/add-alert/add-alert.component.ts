@@ -37,7 +37,7 @@ import {
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
+import { validateEntityName } from './../../../../../common/consts';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -80,6 +80,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   showNotificationEmail = false;
   showOtherThresholdValue = false;
   lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
+  validateCheck: any;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -578,6 +579,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
         this.notifyOnAction(data);
       });
     this.subscriptions.push(updateSubscriber);
+  }
+
+  validateSaving(name) {
+    const validateState = validateEntityName(name);
+    this.validateCheck = validateState.validateCheck;
+    return validateState.validationStateFail;
   }
 
   notifyOnAction(data) {

@@ -19,6 +19,16 @@
       </ng-template>
 
       <mat-step [stepControl]="alertDefFormGroup">
+        <!-- Validation error messages for the user to correct the
+        incorrect dashboard name entered. -->
+        <div class="name-validation" *ngIf="validateSaving(alertDefFormGroup.value.alertRuleName)" fxLayout="column">
+          <span *ngIf="validateCheck.validateLength">
+            * Alert Rule cannot be empty or exceed 30 characters.
+          </span>
+          <span *ngIf="validateCheck.validateCharacters">
+            * Alert Rule cannot contain special characters.
+          </span>
+        </div>
         <form [formGroup]="alertDefFormGroup">
           <ng-template matStepLabel>Name your alert</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
@@ -534,6 +544,7 @@
             color="primary"
             mat-stroked-button
             e2e="add-alert"
+            [disabled]="validateSaving(alertDefFormGroup.value.alertRuleName)"
           >
             Add
           </button>
@@ -543,6 +554,7 @@
             color="primary"
             mat-stroked-button
             e2e="update-alert"
+            [disabled]="validateSaving(alertDefFormGroup.value.alertRuleName)"
           >
             Update
           </button>

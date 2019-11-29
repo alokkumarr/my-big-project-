@@ -509,3 +509,16 @@ export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(NUMBER_FILTER_OPERATORS);
+
+export const validateEntityName = (name) => {
+  const analysisNameLength = name.length;
+  // Due to an error in generating an excel file during dispatch opearation,
+  // we need to apply the following length and special character rules.
+  const validateCheck = {
+    validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
+    validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(name)
+  };
+  const { validateLength, validateCharacters } = validateCheck;
+  const validationStateFail = validateLength || validateCharacters;
+  return {validationStateFail, validateCheck};
+};

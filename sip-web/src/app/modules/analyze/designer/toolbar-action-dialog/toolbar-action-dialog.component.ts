@@ -6,6 +6,7 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
+import { validateEntityName } from './../../../../common/consts';
 
 @Component({
   selector: 'toolbar-action-dialog',
@@ -42,16 +43,9 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   }
 
   validateSaving(analysisName) {
-    const analysisNameLength = analysisName.length;
-    // Due to an error in generating an excel file during dispatch opearation,
-    // we need to apply the following length and special character rules.
-    this.validateCheck = {
-      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
-      validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
-    };
-    const { validateLength, validateCharacters } = this.validateCheck;
-    const validationStateFail = validateLength || validateCharacters;
-    return validationStateFail;
+    const validateState = validateEntityName(analysisName);
+    this.validateCheck = validateState.validateCheck;
+    return validateState.validationStateFail;
   }
 
   onBack() {
