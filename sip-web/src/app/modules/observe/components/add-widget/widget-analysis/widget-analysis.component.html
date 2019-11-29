@@ -19,7 +19,7 @@
 <div [hidden]="showProgress">
   <div
     class="choose-analysis"
-    *ngFor="let analysis of (analyses | filter: 'name':searchTerm)"
+    *ngFor="let analysis of analyses | filter: 'name':searchTerm"
   >
     <mat-icon
       [fontIcon]="
@@ -31,7 +31,7 @@
       "
     ></mat-icon>
     <div>
-      <strong [textContent]="analysis.name"></strong>
+      <strong class="analysis-name" [textContent]="analysis.name"></strong>
       <p class="analysis-description" [textContent]="analysis.description"></p>
       <div class="card-base">
         <small

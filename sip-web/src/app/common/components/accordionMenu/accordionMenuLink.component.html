@@ -1,5 +1,9 @@
 <mat-accordion>
-  <mat-expansion-panel *ngIf="!hasChildren()" class="menu-panel-header sidenav-mainmenu" [expanded]="expanded">
+  <mat-expansion-panel
+    *ngIf="!hasChildren()"
+    class="menu-panel-header sidenav-mainmenu"
+    [expanded]="expanded"
+  >
     <mat-expansion-panel-header class="sidenav-mainmenu" *ngIf="!hasChildren()">
       <mat-panel-title class="sidenav-mainmenu">
         <span [innerHtml]="metadata.name"></span>
@@ -7,15 +11,41 @@
     </mat-expansion-panel-header>
     <div *ngIf="!hasChildren()">
       <div *ngFor="let child of metadata.children">
-        <accordion-menu-link [metadata]="child" class="accordion-root"></accordion-menu-link>
+        <accordion-menu-link
+          [metadata]="child"
+          class="accordion-root"
+        ></accordion-menu-link>
       </div>
     </div>
   </mat-expansion-panel>
-  <div class="no-children" [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)" fxLayout="row" fxLayoutAlign="end center" *ngIf="hasChildren()">
-    <a fxFlex class="child-item" [routerLink]="metadata.url" [queryParams]="metadata.queryParams" (click)="closeSideNav()" [class.active]="active">
-      {{metadata.name}}
-      <mat-icon fontIcon="icon-star-solid" *ngIf="checkDefault(metadata)" [style.margin]="0"></mat-icon>
+  <div
+    class="no-children"
+    [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    *ngIf="hasChildren()"
+  >
+    <a
+      fxFlex
+      class="child-item"
+      [matTooltip]="metadata.name"
+      [routerLink]="metadata.url"
+      [queryParams]="metadata.queryParams"
+      (click)="closeSideNav()"
+      [class.active]="active"
+    >
+      {{ metadata.name }}
+      <mat-icon
+        fontIcon="icon-star-solid"
+        *ngIf="checkDefault(metadata)"
+        [style.margin]="0"
+      ></mat-icon>
     </a>
-    <mat-icon fxFlex="1 1 25px" *ngIf="checkActiveMenu(metadata.url, metadata.queryParams)" [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)" fontIcon="icon-caret-left"></mat-icon>
+    <mat-icon
+      fxFlex="1 1 25px"
+      *ngIf="checkActiveMenu(metadata.url, metadata.queryParams)"
+      [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)"
+      fontIcon="icon-caret-left"
+    ></mat-icon>
   </div>
 </mat-accordion>
