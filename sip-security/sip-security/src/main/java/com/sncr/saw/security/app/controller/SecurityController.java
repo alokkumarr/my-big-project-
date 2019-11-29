@@ -96,6 +96,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
+@RequestMapping("/sip-security")
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
@@ -1768,29 +1769,6 @@ public class SecurityController {
 			return catList;
 		}
 		return catList;
-	}
-
-	/**
-	 * Return response indicating the status of the health of the
-	 * service.  Used by load balancer to route requests to healthy
-	 * instances of the service to provide high availability.
-	 */
-	@RequestMapping("/saw-security/actuator/health")
-	public ResponseEntity<ObjectNode> health() {
-		String status = "UP";
-		HttpStatus httpStatus = HttpStatus.OK;
-		try {
-			/* Execute sample read-only query to determine if database
-			 * is reachable */
-			userRepository.getRoletypesDropDownList();
-		} catch (Exception e) {
-			logger.error("Database health check failed", e);
-			status = "DOWN";
-			httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
-		}
-		ObjectNode root = mapper.createObjectNode();
-		root.put("status", status);
-		return new ResponseEntity<>(root, httpStatus);
 	}
 
     /**

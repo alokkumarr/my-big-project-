@@ -27,4 +27,5 @@ export interface Schedule {
   jobScheduleTime?: string;
   categoryID?: any;
   jobGroup?: string;
+  userId: string;
 }

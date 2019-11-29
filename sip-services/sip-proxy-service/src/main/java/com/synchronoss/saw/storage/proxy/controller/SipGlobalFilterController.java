@@ -1,8 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,7 +11,6 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
-import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
@@ -74,7 +71,7 @@ public class SipGlobalFilterController {
       return Collections.singletonList("Invalid authentication token");
     }
     List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
-    Object responseObject = null;
+    Object responseObject;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);

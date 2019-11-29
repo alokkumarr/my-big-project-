@@ -54,11 +54,11 @@ integration tests can run.
 
 To build and run the full SAW system locally in development mode,
 execute the following commands to start SAW in Docker containers:
-Note: `-Dsip-cloud-secure=False or -Dsip-cloud-secure=True`. This is necessary to activate & deactivate http/https
-
+Note: `-Dsip.cloud.secure=True`. To start the docker in secure mode, Default command
+without flag will have the start docker in http mode (non-secure). 
         $ cd sip
-        $ mvn package -Dsip-cloud-secure=False
-        $ mvn -Ddocker-start=local
+        $ mvn package -Dsip.cloud.secure=True
+        $ mvn -Ddocker-start=cloud -Dsip.cloud.secure=True
 
 SAW also Support data-lake report execution with YARN.
 To run SAW system locally with YARN execute the following commands:
