@@ -91,6 +91,7 @@ public class SipGlobalFilterController {
       logger.trace(
           "Storage Proxy sync request object : {} ",
           objectMapper.writeValueAsString(globalFilters));
+
       responseObject = proxyService.fetchGlobalFilter(globalFilters, dataSecurityKey);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

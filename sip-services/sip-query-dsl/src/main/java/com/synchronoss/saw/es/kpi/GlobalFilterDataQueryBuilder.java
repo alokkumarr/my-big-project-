@@ -1,17 +1,25 @@
 package com.synchronoss.saw.es.kpi;
 
+import static com.synchronoss.saw.es.ElasticSearchQueryBuilder.buildBooleanQuery;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.globalfilter.Filter;
 import com.synchronoss.saw.model.globalfilter.Filter.Order;
 import com.synchronoss.saw.model.globalfilter.Filter.Type;
 import com.synchronoss.saw.model.globalfilter.GlobalFilter;
 import com.synchronoss.saw.model.globalfilter.GlobalFilterExecutionObject;
 import com.synchronoss.saw.model.globalfilter.GlobalFilters;
+import com.synchronoss.saw.util.BuilderUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -34,7 +42,8 @@ public class GlobalFilterDataQueryBuilder {
      * @throws JsonProcessingException
      * @throws ProcessingException
      */
-    public List<GlobalFilterExecutionObject> buildQuery(GlobalFilters globalFilters) throws IOException, ProcessingException {
+    public List<GlobalFilterExecutionObject> buildQuery(GlobalFilters globalFilters,
+        DataSecurityKey dataSecurityKey) throws IOException, ProcessingException {
 
         List<GlobalFilterExecutionObject> executionObjectList = new ArrayList<>();
         int size = 0;
@@ -52,6 +61,18 @@ public class GlobalFilterDataQueryBuilder {
       List<Filter> filters = globalFilter.getFilters();
       final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
       AggregationBuilder aggregationBuilder = null;
+            List<QueryBuilder> dskBuilder = new ArrayList<>();
+            BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
+            if (dataSecurityKey != null && dataSecurityKey.getDataSecuritykey() != null) {
+                for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
+                    TermsQueryBuilder dataSecurityBuilder =
+                        new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
+                    dskBuilder.add(dataSecurityBuilder);
+                }
+                buildBooleanQuery(BooleanCriteria.AND, dskBuilder, boolQueryBuilderDsk);
+            }
+            boolQueryBuilder.must(boolQueryBuilderDsk);
+
       for (Filter item : filters) {
         List<AggregationBuilder> aggregationBuilders = filterAggregationBuilder(item);
         for (AggregationBuilder aggregationBuilder1 : aggregationBuilders) {
