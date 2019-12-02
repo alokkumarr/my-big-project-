@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @Api(value = "The controller provides operations related Module privileges "
     + "synchronoss analytics platform ")
-@RequestMapping("/auth/admin/modules")
+@RequestMapping("/sip-security/auth/admin/modules")
 public class SecurityModuleController {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityModuleController.class);
