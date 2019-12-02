@@ -86,69 +86,6 @@ public class StorageProxyController {
 
   /**
    * This method is used to get the data based on the storage type<br>
-   * perform conversion based on the specification asynchronously.
-   *
-   * @param requestBody
-   * @return
-   */
-  // @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  // @RequestMapping(value = "/internal/proxy/storage/async", method = RequestMethod.POST, produces=
-  // MediaType.APPLICATION_JSON_UTF8_VALUE)
-  // @ResponseStatus(HttpStatus.ACCEPTED)
-  public CompletableFuture<StorageProxy> retrieveStorageDataAsync(
-      @RequestBody StorageProxy requestBody) {
-    logger.debug("Request Body:{}", requestBody);
-    if (requestBody == null) {
-      throw new JSONMissingSAWException("json body is missing in request body");
-    }
-    CompletableFuture<StorageProxy> responseObjectFuture = null;
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      logger.trace(
-          "Storage Proxy async request object : {} ", objectMapper.writeValueAsString(requestBody));
-      responseObjectFuture =
-          CompletableFuture.supplyAsync(
-                  () -> {
-                    StorageProxy proxyResponseData = null;
-                    try {
-                      proxyResponseData = proxyService.execute(requestBody);
-                    } catch (IOException e) {
-                      logger.error("While retrieving data there is an exception.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    } catch (ProcessingException e) {
-                      logger.error(
-                          "Exception generated while validating incoming json against schema.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    } catch (Exception e) {
-                      logger.error("Exception generated while processing incoming json.", e);
-                      proxyResponseData =
-                          StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
-                    }
-                    return proxyResponseData;
-                  })
-              .handle(
-                  (res, ex) -> {
-                    if (ex != null) {
-                      logger.error("While retrieving data there is an exception.", ex);
-                      res.setStatusMessage(ex.getCause().toString());
-                      return res;
-                    }
-                    return res;
-                  });
-    } catch (IOException e) {
-      throw new JSONProcessingSAWException("expected missing on the request body");
-    } catch (ReadEntitySAWException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
-    }
-    return responseObjectFuture;
-  }
-
-  /**
-   * This method is used to get the data based on the storage type<br>
    * perform conversion based on the specification asynchronously
    *
    * @param requestBody
@@ -537,11 +474,11 @@ public class StorageProxyController {
       logger.info("Storage Proxy request to fetch list of executions");
 
       logger.trace("Extracting auth ticket details");
-      Ticket authTicket = request != null ? getTicket(request) : null;
+      Ticket authTicket = (request == null) ? null : getTicket(request);
 
       List<TicketDSKDetails> dskList =
-          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-      logger.debug("DSK List size = " + dskList);
+          authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+      logger.trace("DSK List size = " + dskList);
 
       if (dskList == null || dskList.size() == 0) {
         return proxyService.fetchDslExecutionsList(queryId);
@@ -583,11 +520,11 @@ public class StorageProxyController {
           String executionId,
       HttpServletRequest request) {
 
-    Ticket authTicket = request != null ? getTicket(request) : null;
+    Ticket authTicket = (request == null) ? null : getTicket(request);
 
     List<TicketDSKDetails> dskList =
-        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    logger.debug("DSK List = " + dskList);
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
 
     // If user is associated with any datasecurity key, return empty data
     if (dskList != null && dskList.size() != 0) {
@@ -635,11 +572,11 @@ public class StorageProxyController {
           String analysisId,
       HttpServletRequest request) {
 
-    Ticket authTicket = request != null ? getTicket(request) : null;
+    Ticket authTicket = (request == null) ? null : getTicket(request);
 
     List<TicketDSKDetails> dskList =
-        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
-    logger.debug("DSK List = " + dskList);
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
 
     if (dskList != null && dskList.size() != 0) {
       return new ExecutionResponse();
