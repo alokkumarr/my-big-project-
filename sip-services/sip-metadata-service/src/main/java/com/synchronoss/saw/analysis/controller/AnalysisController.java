@@ -15,6 +15,7 @@ import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -75,8 +76,8 @@ public class AnalysisController {
       HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis,
       @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (analysis == null) {
-      analysisResponse.setMessage("Analysis definition can't be null for create request");
+    if (analysis == null || analysis.getCategory() == null) {
+      analysisResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       return analysisResponse;
     }
@@ -280,7 +281,10 @@ public class AnalysisController {
       }
       return analysisService.getAnalysisByCategory(categoryId, authTicket);
     } else {
-      throw new SipAuthorizationException("You are not authorized to view this Category");
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.sendError(HttpStatus.UNAUTHORIZED.value(),
+          "You are not authorized to view this Category");
+      return new ArrayList<>();
     }
   }
 }

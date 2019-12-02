@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.synchronoss.bda.sip.jwt.TokenParser;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,29 +42,29 @@ public class JobController extends BaseJobController{
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
 	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail,
-        @RequestHeader("Authorization") String authToken) throws IllegalAccessException, IOException {
+        @RequestHeader("Authorization") String authToken) throws IOException {
 		logger.info("JobController schedule() start here.");
 		String auth = authToken;
 		logger.debug("Auth = "+auth);
 		jobDetail.setAuth(auth);
 		String token = null;
 
-        if (auth == null || !auth.startsWith("Bearer ")) {
-            logger.error("Invalid authentication token");
-            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
-        }
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
-        Ticket authTicket = TokenParser.retrieveTicket(auth.substring(7));
-        if (authTicket == null) {
-            logger.error("Invalid authentication token");
-            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
-        }
-        ArrayList<Products> productList = authTicket.getProducts();
-        Long category = Long.parseLong(jobDetail.getCategoryID());
-        if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
-            logger.error("Invalid authentication token, Unauthorized access!!");
-            return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
-        }
+		Ticket authTicket = TokenParser.retrieveTicket(auth.substring(7));
+		if (authTicket == null) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(jobDetail.getCategoryID());
+		if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
@@ -110,14 +112,39 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="unschedule",method = RequestMethod.POST)
-	public void unschedule(@RequestBody ScheduleKeys schedule) {
+	public void unschedule(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+		}
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+		}
 		logger.info("JobController unschedule() method");
 		jobService.unScheduleJob(schedule);
 	}
 
 	@RequestMapping(value ="delete",method = RequestMethod.POST)
-	public SchedulerResponse delete(@RequestBody ScheduleKeys schedule ) {
+	public SchedulerResponse delete(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
         logger.info("JobController delete() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		if(jobService.isJobWithNamePresent(schedule)){
 			boolean isJobRunning = jobService.isJobRunning(schedule);
@@ -139,8 +166,22 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="pause",method = RequestMethod.POST)
-	public SchedulerResponse pause(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse pause(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
 		logger.info( "JobController pause() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		if(jobService.isJobWithNamePresent(schedule)){
 
@@ -164,8 +205,22 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="resume",method = RequestMethod.POST)
-	public SchedulerResponse resume(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse resume(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
         logger.info("JobController resume() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		if(jobService.isJobWithNamePresent(schedule)){
 			String jobState = jobService.getJobState(schedule);
@@ -192,10 +247,24 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="update",method = RequestMethod.POST)
-	public SchedulerResponse updateJob(@RequestBody SchedulerJobDetail jobDetail){
+	public SchedulerResponse updateJob(@RequestBody SchedulerJobDetail jobDetail,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
 		logger.info("JobController updateJob() method ");
 
 		logger.debug("Job details  = " + jobDetail);
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(jobDetail.getCategoryID());
+		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
@@ -236,8 +305,22 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="jobs",method = RequestMethod.POST)
-	public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule){
+	public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
         logger.info("JobController getAllJobs() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		List<Map<String, Object>> list = jobService.getAllJobs(schedule.getGroupkey()
                 ,schedule.getCategoryId());
@@ -245,8 +328,23 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="fetchJob",method = RequestMethod.POST)
-	public SchedulerResponse getJobDetails(@RequestBody ScheduleKeys schedule){
+	public SchedulerResponse getJobDetails(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
 		logger.info("JobController getJobDetails() method");
+
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		//Job Name is mandatory
 		if(schedule.getJobName() == null || schedule.getJobName().trim().equals("")){
@@ -258,24 +356,66 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="isJobRunning",method = RequestMethod.POST)
-	public SchedulerResponse isJobRunning(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse isJobRunning(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
 		logger.info("JobController isJobRunning() method");
 
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 		boolean status = jobService.isJobRunning(schedule);
 		return getServerResponse(ServerResponseCode.SUCCESS, status);
 	}
 
 	@RequestMapping(value ="jobState",method = RequestMethod.POST)
-	public SchedulerResponse getJobState(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse getJobState(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
         logger.info("JobController getJobState() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		String jobState = jobService.getJobState(schedule);
 		return getServerResponse(ServerResponseCode.SUCCESS, jobState);
 	}
 
 	@RequestMapping(value ="stop",method = RequestMethod.POST)
-	public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
         logger.info("JobController stopJob() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		if(jobService.isJobWithNamePresent(schedule)){
 
@@ -300,8 +440,22 @@ public class JobController extends BaseJobController{
 	}
 
 	@RequestMapping(value ="start",method = RequestMethod.POST)
-	public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule) {
+	public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule,
+			@RequestHeader("Authorization") String authToken)
+			throws IOException {
 		logger.info("JobController startJobNow() method");
+		if (!authValidation(authToken)) {
+			logger.error("Invalid authentication token");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
+
+		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(7));
+		ArrayList<Products> productList = authTicket.getProducts();
+		Long category = Long.parseLong(schedule.getCategoryId());
+		if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
+			logger.error("Invalid authentication token, Unauthorized access!!");
+			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
+		}
 
 		if(jobService.isJobWithNamePresent(schedule)){
 
