@@ -413,14 +413,9 @@ public class StorageProxyController {
     }
     logger.trace(
         "response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
-    /** As part of SIP-9028 changes,
-    we need to remove the data part which is being sent back to scheduler.
-    Sip scheduler holding the data while processing the request,
-    which can be minimized to improve memory performance. **/
+    /** SIP-9028 : memory-optimization-for-the-sip-scheduler-with-large-number-of-data. **/
     if (isScheduledExecution) {
       executeResponse.setData(null);
-      logger.trace("Response returned back to scheduler {}",
-          objectMapper.writeValueAsString(executeResponse));
     }
     return executeResponse;
   }
