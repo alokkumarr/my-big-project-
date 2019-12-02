@@ -8,7 +8,10 @@ import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
+import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
@@ -24,8 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author alok.kumarr
@@ -51,6 +52,8 @@ public class ExternalSecurityController {
 																						@RequestBody RoleCategoryPrivilege roleCategoryPrivilege) {
 
 		RoleCategoryPrivilege categoryPrivilege = new RoleCategoryPrivilege();
+		categoryPrivilege.setModuleName(roleCategoryPrivilege.getModuleName());
+		categoryPrivilege.setProductName(roleCategoryPrivilege.getProductName());
 		if (roleCategoryPrivilege == null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			categoryPrivilege.setMessage("Body is missing.");
@@ -66,22 +69,11 @@ public class ExternalSecurityController {
 			categoryPrivilege.setMessage("You are not authorized to perform this operation.");
 		}
 
-		String moduleName = roleCategoryPrivilege.getModuleName();
-		String productName = roleCategoryPrivilege.getProductName();
-		categoryPrivilege.setModuleName(moduleName);
-		categoryPrivilege.setProductName(productName);
-
-		List<ProductModuleDetails> moduleNameList = productModuleRepository.getModuleProductName(masterLoginId);
-		Long customerSysId = null;
-		if (moduleNameList != null && !moduleNameList.isEmpty()) {
-			customerSysId = moduleNameList.stream().findFirst().get().getCustomerSysId();
-			Set<String> moduleNames = moduleNameList.stream().map(pmd -> pmd.getModuleName()).collect(Collectors.toSet());
-			Set<String> productNames = moduleNameList.stream().map(pmd -> pmd.getProductName()).collect(Collectors.toSet());
-			boolean hasValidNames = productNames.contains(productName) && moduleNames.contains(moduleName);
-			if (!hasValidNames) {
-				response.setStatus(HttpStatus.UNAUTHORIZED.value());
-				categoryPrivilege.setMessage("Product and Module does not exist for this user.");
-			}
+		ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId, roleCategoryPrivilege.getProductName(), roleCategoryPrivilege.getModuleName());
+		final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
+		if (customerSysId == null || customerSysId == 0) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			categoryPrivilege.setMessage("Product and Module does not exist for this user.");
 		}
 
 		Role inputRole = roleCategoryPrivilege.getRole();
@@ -118,8 +110,94 @@ public class ExternalSecurityController {
 			} else {
 				categoryPrivilege.setMessage("Role already exist in the system.");
 			}
+			CategoryList catList = new CategoryList();
+			List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategoryDetails();
+			if (categoryPrivilegeLis != null && !categoryPrivilegeLis.isEmpty()) {
+				categoryPrivilegeLis.forEach(category -> {
+					if (category.isAutoCreate()) {
+						CategoryDetails categoryDetails = buildCategoryBean(customerSysId, category, null);
+						categoryDetails.setProductId(moduleDetails.getProductId());
+						categoryDetails.setProductId(moduleDetails.getModuleId());
+						// add category
+						addCategory(catList, categoryDetails);
+
+						// subcategories
+						List<SubCategoryDetails> subCategories = category.getSubCategories();
+						if (subCategories != null && !subCategories.isEmpty()) {
+							for (SubCategoryDetails subCategoryDetails :  subCategories){
+								if(subCategoryDetails.isAutoCreate()) {
+									CategoryDetails details = buildCategoryBean(customerSysId, null , subCategoryDetails);
+									details.setProductId(moduleDetails.getProductId());
+									details.setProductId(moduleDetails.getModuleId());
+									details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
+									// add sub categories
+									addCategory(catList, categoryDetails);
+								} else {
+									catList.setValid(false);
+									catList.setValidityMessage("Sub categories can't be add for flag false.");
+								}
+							}
+						}
+					} else {
+						catList.setValid(false);
+						catList.setValidityMessage("categories can't be add for flag false.");
+					}
+				});
+				return catList;
+			}
 		}
 		return categoryPrivilege;
+	}
+
+	private void addCategory(CategoryList catList, CategoryDetails categoryDetails) {
+		Valid valid;
+		try {
+			if (categoryDetails != null) {
+				if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
+					if (!userRepository.checkCatExists(categoryDetails)) {
+						valid = userRepository.addCategory(categoryDetails);
+						if (valid.getValid()) {
+							catList.setCategories(userRepository.getCategories(categoryDetails.getCustomerId()));
+							catList.setValid(true);
+						} else {
+							catList.setValid(false);
+							catList.setValidityMessage("Category could not be added. " + valid.getError());
+						}
+					} else {
+						catList.setValid(false);
+						catList.setValidityMessage("Category Name already exists for this Customer Product Module Combination. ");
+					}
+				} else {
+					catList.setValid(false);
+					catList.setValidityMessage("Adding Categories and Sub Categories for Alert Module is not allowed. ");
+				}
+			} else {
+				catList.setValid(false);
+				catList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+		}
+	}
+
+	private CategoryDetails buildCategoryBean(Long customerSysId, CategoryDetails category, SubCategoryDetails subCategoryDetails) {
+		CategoryDetails categoryDetails = new CategoryDetails();
+		categoryDetails.setCustomerId(customerSysId);
+		if (subCategoryDetails != null) {
+			categoryDetails.setCategoryName(subCategoryDetails.getSubCategoryName());
+		} else {
+			categoryDetails.setCategoryName(category.getCategoryName());
+		}
+		if (subCategoryDetails.getSubCategoryDesc() != null){
+			categoryDetails.setCategoryDesc(subCategoryDetails.getSubCategoryDesc());
+		} else {
+			categoryDetails.setCategoryDesc(category.getCategoryDesc());
+		}
+		categoryDetails.setActiveStatusInd(1L);
+		return categoryDetails;
 	}
 
 	private RoleDetails buildRoleDetails(String masterLoginId, Long customerSysId, Role inputRole) {

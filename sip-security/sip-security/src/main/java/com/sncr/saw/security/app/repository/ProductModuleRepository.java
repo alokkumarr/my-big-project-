@@ -9,5 +9,5 @@ public interface ProductModuleRepository {
   Map<Integer, String> createProductModuleLinkageForOnboarding();
   List getProductModules();
   boolean checkProductModuleExistance(Long prodModId);
-  List<ProductModuleDetails> getModuleProductName(String masterLoginId);
+  ProductModuleDetails fetchModuleProductDetail(String masterLoginId, String productName, String moduleName);
 }

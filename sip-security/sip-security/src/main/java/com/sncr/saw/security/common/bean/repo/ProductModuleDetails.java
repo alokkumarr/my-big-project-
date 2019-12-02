@@ -9,24 +9,24 @@ public class ProductModuleDetails {
 
 	private static final long serialVersionUID = 6710950219766990634L;
 
-	String moduleName;
-	String productName;
+	Long moduleId;
+	Long productId;
 	Long customerSysId;
 
-	public String getModuleName() {
-		return moduleName;
+	public Long getModuleId() {
+		return moduleId;
 	}
 
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
+	public void setModuleId(Long moduleId) {
+		this.moduleId = moduleId;
 	}
 
-	public String getProductName() {
-		return productName;
+	public Long getProductId() {
+		return productId;
 	}
 
-	public void setProductName(String productName) {
-		this.productName = productName;
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
 	public Long getCustomerSysId() {

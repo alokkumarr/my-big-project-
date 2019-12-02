@@ -78,16 +78,18 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 	}
 
 	@Override
-	public List<ProductModuleDetails> getModuleProductName(String loginId) {
+	public ProductModuleDetails fetchModuleProductDetail(String loginId, String productName, String moduleName) {
 
-		String sql = "select C.CUSTOMER_SYS_ID, PR.PRODUCT_NAME, M.MODULE_NAME from PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM, PRODUCTS PR, MODULES M, USERS U, CUSTOMERS C " +
+		String sql = "select C.PRODUCT_SYS_ID, PR.PRODUCT_NAME, M.MODULE_SYS_ID from PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM, PRODUCTS PR, MODULES M, USERS U, CUSTOMERS C " +
 				"WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND CPM.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND PR.PRODUCT_SYS_ID=PM.PRODUCT_SYS_ID " +
 				"AND M.MODULE_SYS_ID=PM.MODULE_SYS_ID AND CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID " +
-				"AND U.USER_ID = ?;";
+				"AND PR.PRODUCT_NAME = ? AND M.MODULE_NAME = ? AND U.USER_ID = ?;";
 		try {
-			return jdbcTemplate.query(sql, preparedStatement ->
-							preparedStatement.setString(1, loginId)
-					, new ProductModuleRepositoryDaoImpl.ProductModuleExtractor());
+			return jdbcTemplate.query(sql, preparedStatement -> {
+				preparedStatement.setString(1, productName);
+				preparedStatement.setString(2, moduleName);
+				preparedStatement.setString(3, loginId);
+			}, new ProductModuleRepositoryDaoImpl.ProductModuleExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage());
 		} catch (Exception e) {
@@ -96,19 +98,16 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 		return null;
 	}
 
-	private class ProductModuleExtractor implements ResultSetExtractor<List<ProductModuleDetails>> {
-		List<ProductModuleDetails> moduleDetailsList = new ArrayList<>();
-
+	private class ProductModuleExtractor implements ResultSetExtractor<ProductModuleDetails> {
+		ProductModuleDetails moduleDetails = new ProductModuleDetails();
 		@Override
-		public List<ProductModuleDetails> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+		public ProductModuleDetails extractData(ResultSet resultSet) throws SQLException, DataAccessException {
 			while (resultSet.next()) {
-				ProductModuleDetails moduleDetails = new ProductModuleDetails();
 				moduleDetails.setCustomerSysId(resultSet.getLong("CUSTOMER_SYS_ID"));
-				moduleDetails.setProductName(resultSet.getString("PRODUCT_NAME"));
-				moduleDetails.setModuleName(resultSet.getString("MODULE_NAME"));
-				moduleDetailsList.add(moduleDetails);
+				moduleDetails.setProductId(resultSet.getLong("PRODUCT_SYS_ID"));
+				moduleDetails.setModuleId(resultSet.getLong("MODULE_SYS_ID"));
 			}
-			return moduleDetailsList;
+			return moduleDetails;
 		}
 	}
 }

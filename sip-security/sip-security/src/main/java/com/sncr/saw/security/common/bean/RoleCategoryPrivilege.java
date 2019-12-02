@@ -1,5 +1,7 @@
 package com.sncr.saw.security.common.bean;
 
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +19,7 @@ public class RoleCategoryPrivilege implements Serializable {
 	private String message;
 	private String moduleName;
 	private String productName;
-	private List<Category> category = null;
+	private List<CategoryDetails> categoryDetails = null;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	public Role getRole() {
@@ -52,12 +54,12 @@ public class RoleCategoryPrivilege implements Serializable {
 		this.productName = productName;
 	}
 
-	public List<Category> getCategory() {
-		return category;
+	public List<CategoryDetails> getCategoryDetails() {
+		return categoryDetails;
 	}
 
-	public void setCategory(List<Category> category) {
-		this.category = category;
+	public void setCategoryDetails(List<CategoryDetails> categoryDetails) {
+		this.categoryDetails = categoryDetails;
 	}
 
 	public Map<String, Object> getAdditionalProperties() {
