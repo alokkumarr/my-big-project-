@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author alok.kumarr
@@ -121,7 +122,7 @@ public class ExternalSecurityController {
 						categoryDetails.setModuleId(moduleDetails.getModuleId());
 						categoryDetails.setMasterLoginId(masterLoginId);
 						// add category
-						addCategory(catList, categoryDetails);
+						addCategory(catList, categoryDetails, roleCategoryPrivilege);
 
 						if (catList.getValid()) {
 							List<SubCategoryDetails> subCategories = category.getSubCategory();
@@ -141,7 +142,7 @@ public class ExternalSecurityController {
 										boolean checkSubCategory = userRepository.checkSubCatExists(details);
 										if (!checkSubCategory) {
 											details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
-											addCategory(catList, details);
+											addCategory(catList, details, roleCategoryPrivilege);
 										} else {
 											catList.setValid(false);
 											catList.setValidityMessage("Sub Category Name already exists for this Customer Product Module Combination. ");
@@ -164,21 +165,22 @@ public class ExternalSecurityController {
 		return null;
 	}
 
-	private void addCategory(CategoryList catList, CategoryDetails categoryDetails) {
+	private void addCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege roleCategoryPrivilege) {
 		Valid valid;
 		try {
 			if (categoryDetails != null) {
 				if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
 					boolean checkCatExist = !categoryDetails.isSubCategoryInd() ? !userRepository.checkCatExists(categoryDetails) : false;
-					boolean checkSubCatExist = categoryDetails.isSubCategoryInd() ? userRepository.checkSubCatExists(categoryDetails) : true;
+					boolean checkSubCatExist = categoryDetails.isSubCategoryInd() ? userRepository.checkSubCatExists(categoryDetails) : false;
 					if (checkCatExist || !checkSubCatExist) {
 						valid = userRepository.addCategory(categoryDetails);
 						if (valid.getValid()) {
-							catList.setCategories(userRepository.getCategories(categoryDetails.getCustomerId()));
+							List<CategoryDetails> finalCategory = getResponseCategoryDetails(categoryDetails.getCustomerId(), roleCategoryPrivilege);
+							catList.setCategories(finalCategory);
 							catList.setValid(true);
 						} else {
 							catList.setValid(false);
-							catList.setValidityMessage("Category could not be added. " + valid.getError());
+							catList.setValidityMessage("Category/SubCategory could not be added. " + valid.getError());
 						}
 					} else if (checkCatExist) {
 						catList.setValid(false);
@@ -202,6 +204,30 @@ public class ExternalSecurityController {
 			catList.setError(e.getMessage());
 		}
 	}
+
+	private List<CategoryDetails> getResponseCategoryDetails(Long customerId, RoleCategoryPrivilege roleCategoryPrivilege) {
+		List<CategoryDetails> finalCategory = new ArrayList<>();
+		List<CategoryDetails> customerCatList = userRepository.getCategories(customerId);
+		if (customerCatList != null) {
+			List<CategoryDetails> filterCategory = customerCatList.stream().filter(cd -> cd.getModuleName().equalsIgnoreCase(roleCategoryPrivilege.getModuleName())
+					&& cd.getProductName().equalsIgnoreCase(roleCategoryPrivilege.getProductName())).collect(Collectors.toList());
+
+			if (roleCategoryPrivilege.getCategory() != null && !roleCategoryPrivilege.getCategory().isEmpty()) {
+				for (CategoryDetails details : roleCategoryPrivilege.getCategory()){
+					filterCategory.forEach(filterCat -> {
+						String catName = details.getCategoryName();
+						if (filterCat.getCategoryName().equalsIgnoreCase(catName)){
+							filterCat.setAutoCreate(true);
+							finalCategory.add(filterCat);
+						}
+					});
+				}
+			}
+		}
+		return finalCategory;
+	}
+
+
 
 	private CategoryDetails buildCategoryBean(Long customerSysId, CategoryDetails category, SubCategoryDetails subCategoryDetails) {
 		CategoryDetails categoryDetails = new CategoryDetails();

@@ -2702,6 +2702,27 @@ public class UserRepositoryImpl implements UserRepository {
 		featureCode.append(category.getCustomerId());
 		featureCode.append(category.getProductId());
 
+		if (category.isSubCategoryInd()) {
+			String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES WHERE FEATURE_NAME = ? AND FEATURE_CODE = ?";
+			Boolean isFeatureCodeExist;
+			try {
+				isFeatureCodeExist = jdbcTemplate.query(sql1, preparedStatement -> {
+					preparedStatement.setString(1, category.getCategoryName());
+					preparedStatement.setString(2, featureCode.toString());
+				}, new UserRepositoryImpl.SubCatExistsExtractor());
+				if (isFeatureCodeExist) {
+					valid.setValid(false);
+					valid.setError("Subcategory Name already exit.");
+					return valid;
+				}
+			} catch (Exception e) {
+				logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
+				valid.setValid(false);
+				valid.setError("Something went wrong while checking the subcategory!");
+				return valid;
+			}
+		}
+
 		StringBuffer featureType = new StringBuffer();
 		if (category.isSubCategoryInd()) {
 			featureType.append("CHILD_" + category.getCategoryCode());
