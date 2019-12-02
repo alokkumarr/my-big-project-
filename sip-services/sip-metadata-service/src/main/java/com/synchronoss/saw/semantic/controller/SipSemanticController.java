@@ -103,7 +103,7 @@ public class SipSemanticController {
 
   /** This method is used to update a semantic entity in mapr store with id. */
   @RequestMapping(
-      value = "/{projectId}/{id}",
+      value = "/{projectId}/{Id}",
       method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
