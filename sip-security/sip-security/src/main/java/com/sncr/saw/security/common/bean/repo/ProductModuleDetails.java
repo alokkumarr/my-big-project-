@@ -12,6 +12,7 @@ public class ProductModuleDetails {
 	Long moduleId;
 	Long productId;
 	Long customerSysId;
+	Long customerProdModSysId;
 
 	public Long getModuleId() {
 		return moduleId;
@@ -35,5 +36,13 @@ public class ProductModuleDetails {
 
 	public void setCustomerSysId(Long customerSysId) {
 		this.customerSysId = customerSysId;
+	}
+
+	public Long getCustomerProdModSysId() {
+		return customerProdModSysId;
+	}
+
+	public void setCustomerProdModSysId(Long customerProdModSysId) {
+		this.customerProdModSysId = customerProdModSysId;
 	}
 }

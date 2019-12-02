@@ -20,7 +20,7 @@ public class CategoryDetails {
 	private Long activeStatusInd;
 	private String masterLoginId;
 	private boolean subCategoryInd;	
-	private List<SubCategoryDetails> subCategories;
+	private List<SubCategoryDetails> subCategory;
 
 	public boolean isAutoCreate() {
 		return autoCreate;
@@ -64,11 +64,13 @@ public class CategoryDetails {
 	public void setCategoryDesc(String categoryDesc) {
 		this.categoryDesc = categoryDesc;
 	}
-	public List<SubCategoryDetails> getSubCategories() {
-		return subCategories;
+
+	public List<SubCategoryDetails> getSubCategory() {
+		return subCategory;
 	}
-	public void setSubCategories(List<SubCategoryDetails> subCategories) {
-		this.subCategories = subCategories;
+
+	public void setSubCategory(List<SubCategoryDetails> subCategory) {
+		this.subCategory = subCategory;
 	}
 	public String getCategoryCode() {
 		return categoryCode;
@@ -82,7 +84,7 @@ public class CategoryDetails {
 	public void setCategoryType(String categoryType) {
 		this.categoryType = categoryType;
 	}
-	
+
 	public long getCustomerId() {
 		return customerId;
 	}

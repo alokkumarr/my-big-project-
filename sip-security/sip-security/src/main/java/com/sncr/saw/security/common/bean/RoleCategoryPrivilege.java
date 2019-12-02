@@ -19,7 +19,7 @@ public class RoleCategoryPrivilege implements Serializable {
 	private String message;
 	private String moduleName;
 	private String productName;
-	private List<CategoryDetails> categoryDetails = null;
+	private List<CategoryDetails> category;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	public Role getRole() {
@@ -54,12 +54,12 @@ public class RoleCategoryPrivilege implements Serializable {
 		this.productName = productName;
 	}
 
-	public List<CategoryDetails> getCategoryDetails() {
-		return categoryDetails;
+	public List<CategoryDetails> getCategory() {
+		return category;
 	}
 
-	public void setCategoryDetails(List<CategoryDetails> categoryDetails) {
-		this.categoryDetails = categoryDetails;
+	public void setCategory(List<CategoryDetails> category) {
+		this.category = category;
 	}
 
 	public Map<String, Object> getAdditionalProperties() {

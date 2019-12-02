@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,42 +112,56 @@ public class ExternalSecurityController {
 				categoryPrivilege.setMessage("Role already exist in the system.");
 			}
 			CategoryList catList = new CategoryList();
-			List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategoryDetails();
+			List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategory();
 			if (categoryPrivilegeLis != null && !categoryPrivilegeLis.isEmpty()) {
-				categoryPrivilegeLis.forEach(category -> {
+				for (CategoryDetails category : categoryPrivilegeLis) {
 					if (category.isAutoCreate()) {
 						CategoryDetails categoryDetails = buildCategoryBean(customerSysId, category, null);
 						categoryDetails.setProductId(moduleDetails.getProductId());
-						categoryDetails.setProductId(moduleDetails.getModuleId());
+						categoryDetails.setModuleId(moduleDetails.getModuleId());
+						categoryDetails.setMasterLoginId(masterLoginId);
 						// add category
 						addCategory(catList, categoryDetails);
 
-						// subcategories
-						List<SubCategoryDetails> subCategories = category.getSubCategories();
-						if (subCategories != null && !subCategories.isEmpty()) {
-							for (SubCategoryDetails subCategoryDetails :  subCategories){
-								if(subCategoryDetails.isAutoCreate()) {
-									CategoryDetails details = buildCategoryBean(customerSysId, null , subCategoryDetails);
-									details.setProductId(moduleDetails.getProductId());
-									details.setProductId(moduleDetails.getModuleId());
-									details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
-									// add sub categories
-									addCategory(catList, categoryDetails);
-								} else {
-									catList.setValid(false);
-									catList.setValidityMessage("Sub categories can't be add for flag false.");
+						if (catList.getValid()) {
+							List<SubCategoryDetails> subCategories = category.getSubCategory();
+							if (subCategories != null && !subCategories.isEmpty()) {
+								for (SubCategoryDetails subCategoryDetails : subCategories) {
+									if (subCategoryDetails.isAutoCreate()) {
+										CategoryDetails details = buildCategoryBean(customerSysId, null, subCategoryDetails);
+										details.setProductId(moduleDetails.getProductId());
+										details.setModuleId(moduleDetails.getModuleId());
+										details.setMasterLoginId(masterLoginId);
+										List<CategoryDetails> categoryList = catList.getCategories() != null ? catList.getCategories() : new ArrayList<>();
+										String categoryCode = categoryList.stream().filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
+												.findAny().get().getCategoryCode();
+										details.setCategoryCode(categoryCode);
+
+										// add sub categories
+										boolean checkSubCategory = userRepository.checkSubCatExists(details);
+										if (!checkSubCategory) {
+											details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
+											addCategory(catList, details);
+										} else {
+											catList.setValid(false);
+											catList.setValidityMessage("Sub Category Name already exists for this Customer Product Module Combination. ");
+										}
+									} else {
+										catList.setValid(false);
+										catList.setValidityMessage("Sub categories can't be add for flag false.");
+									}
 								}
 							}
 						}
 					} else {
 						catList.setValid(false);
-						catList.setValidityMessage("categories can't be add for flag false.");
+						catList.setValidityMessage("Categories can't be add for flag false.");
 					}
-				});
+				}
 				return catList;
 			}
 		}
-		return categoryPrivilege;
+		return null;
 	}
 
 	private void addCategory(CategoryList catList, CategoryDetails categoryDetails) {
@@ -154,7 +169,9 @@ public class ExternalSecurityController {
 		try {
 			if (categoryDetails != null) {
 				if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
-					if (!userRepository.checkCatExists(categoryDetails)) {
+					boolean checkCatExist = !categoryDetails.isSubCategoryInd() ? !userRepository.checkCatExists(categoryDetails) : false;
+					boolean checkSubCatExist = categoryDetails.isSubCategoryInd() ? userRepository.checkSubCatExists(categoryDetails) : true;
+					if (checkCatExist || !checkSubCatExist) {
 						valid = userRepository.addCategory(categoryDetails);
 						if (valid.getValid()) {
 							catList.setCategories(userRepository.getCategories(categoryDetails.getCustomerId()));
@@ -163,9 +180,12 @@ public class ExternalSecurityController {
 							catList.setValid(false);
 							catList.setValidityMessage("Category could not be added. " + valid.getError());
 						}
-					} else {
+					} else if (checkCatExist) {
 						catList.setValid(false);
 						catList.setValidityMessage("Category Name already exists for this Customer Product Module Combination. ");
+					} else if (checkSubCatExist) {
+						catList.setValid(false);
+						catList.setValidityMessage("Sub Category Name already exists for this Customer Product Module Combination. ");
 					}
 				} else {
 					catList.setValid(false);
@@ -186,12 +206,12 @@ public class ExternalSecurityController {
 	private CategoryDetails buildCategoryBean(Long customerSysId, CategoryDetails category, SubCategoryDetails subCategoryDetails) {
 		CategoryDetails categoryDetails = new CategoryDetails();
 		categoryDetails.setCustomerId(customerSysId);
-		if (subCategoryDetails != null) {
+		if (subCategoryDetails != null && subCategoryDetails.getSubCategoryName() != null) {
 			categoryDetails.setCategoryName(subCategoryDetails.getSubCategoryName());
 		} else {
 			categoryDetails.setCategoryName(category.getCategoryName());
 		}
-		if (subCategoryDetails.getSubCategoryDesc() != null){
+		if (subCategoryDetails != null && subCategoryDetails.getSubCategoryDesc() != null) {
 			categoryDetails.setCategoryDesc(subCategoryDetails.getSubCategoryDesc());
 		} else {
 			categoryDetails.setCategoryDesc(category.getCategoryDesc());
