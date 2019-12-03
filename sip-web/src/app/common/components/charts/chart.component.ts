@@ -220,6 +220,12 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
+
+        this.addExportConfig(config);
+        this.chart = this.highstocks.stockChart(
+          this.container.nativeElement,
+          config
+        );
         break;
       default:
         const shouldSetColumnStackingToPercent = some(
@@ -229,13 +235,13 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
         if (shouldSetColumnStackingToPercent) {
           set(config, 'plotOptions.column.stacking', 'percent');
         }
+        this.addExportConfig(config);
+        this.chart = this.highcharts.chart(
+          this.container.nativeElement,
+          config
+        );
     }
 
-    this.addExportConfig(config);
-    this.chart = this.highstocks.stockChart(
-      this.container.nativeElement,
-      config
-    );
     this.addExportSize(config);
 
     // This is causing more problems than it solves. Updating the defaultsDeep
