@@ -6,7 +6,9 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
-import { validateEntityName } from './../../../../common/consts';
+import { validateEntityName,
+  entityNameErrorMessage
+} from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
   selector: 'toolbar-action-dialog',
@@ -17,7 +19,6 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;
   progressSub;
   filterValid = true;
-  validateCheck: any;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -42,10 +43,12 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.progressSub.unsubscribe();
   }
 
-  validateSaving(analysisName) {
-    const validateState = validateEntityName(analysisName);
-    this.validateCheck = validateState.validateCheck;
-    return validateState.validationStateFail;
+  validateNameField(name) {
+    return validateEntityName(name);
+  }
+
+  validationErrorMessage(state) {
+    return entityNameErrorMessage(state);
   }
 
   onBack() {

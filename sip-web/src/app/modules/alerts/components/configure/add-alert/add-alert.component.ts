@@ -37,7 +37,9 @@ import {
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { validateEntityName } from './../../../../../common/consts';
+import { validateEntityName,
+  entityNameErrorMessage
+} from './../../../../../common/validators/field-name-rule.validator';
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -581,10 +583,12 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     this.subscriptions.push(updateSubscriber);
   }
 
-  validateSaving(name) {
-    const validateState = validateEntityName(name);
-    this.validateCheck = validateState.validateCheck;
-    return validateState.validationStateFail;
+  validateNameField(name) {
+    return validateEntityName(name);
+  }
+
+  validationErrorMessage(state) {
+    return entityNameErrorMessage(state);
   }
 
   notifyOnAction(data) {

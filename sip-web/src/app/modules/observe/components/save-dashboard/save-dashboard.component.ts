@@ -17,7 +17,9 @@ import {
   JwtService
 } from '../../../../common/services';
 import { requireIf } from '../../../../common/validators/index';
-import { validateEntityName } from './../../../../common/consts';
+import { validateEntityName,
+  entityNameErrorMessage
+} from './../../../../common/validators/field-name-rule.validator';
 
 export const REFRESH_INTERVALS = [
   {
@@ -75,7 +77,6 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   public showProgress = false;
   public listeners: Array<Subscription> = [];
   progressSub;
-  validateCheck: any;
 
   constructor(
     public dialogRef: MatDialogRef<SaveDashboardComponent>,
@@ -183,10 +184,12 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     this.dialogRef.close(data);
   }
 
-  validateSaving(analysisName) {
-    const validateState = validateEntityName(analysisName);
-    this.validateCheck = validateState.validateCheck;
-    return validateState.validationStateFail;
+  validateNameField(name) {
+    return validateEntityName(name);
+  }
+
+  validationErrorMessage(state) {
+    return entityNameErrorMessage(state);
   }
 
   saveDashboard() {
