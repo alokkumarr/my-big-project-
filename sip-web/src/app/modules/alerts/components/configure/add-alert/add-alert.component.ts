@@ -80,7 +80,6 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   showNotificationEmail = false;
   showOtherThresholdValue = false;
   lookbackPeriodTypes = ['minute', 'hour', 'day', 'week', 'month'];
-  validateCheck: any;
 
   constructor(
     private _formBuilder: FormBuilder,
