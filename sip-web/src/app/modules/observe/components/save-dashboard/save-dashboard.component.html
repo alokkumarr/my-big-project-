@@ -7,12 +7,12 @@
 <div mat-dialog-content class="dialog__content">
    <!-- Validation error messages for the user to correct the
   incorrect dashboard name entered. -->
-  <div class="name-validation" *ngIf="validateNameField(dashboardForm.value.name).check" fxLayout="column">
-    <span *ngIf="validateNameField(dashboardForm.value.name).check.validateLength">
-      {{validationErrorMessage('nameLength')}}
+  <div class="name-validation" *ngIf="!dashboardForm.valid" fxLayout="column">
+    <span *ngIf="dashboardForm.hasError('required', ['name']) || dashboardForm.value.name.length > 30">
+      * Dashboard Name cannot be empty or exceed 30 characters.
     </span>
-    <span *ngIf="validateNameField(dashboardForm.value.name).check.validateCharacters">
-      {{validationErrorMessage('specialChars')}}
+    <span *ngIf="dashboardForm.hasError('pattern', ['name'])">
+      * Dashboard Name cannot contain special characters.
     </span>
   </div>
   <form [formGroup]="dashboardForm" class="save-dashboard-form">
@@ -72,7 +72,7 @@
 <div mat-dialog-actions class="dialog__actions">
   <button mat-raised-button color="primary" (click)="saveDashboard()"
     e2e="dashboard-save-save-button"
-    [disabled]="validateNameField(dashboardForm.value.name).state">
+    [disabled]="dashboardForm.invalid">
     Save
   </button>
   <button mat-button color="primary" (click)="closeDashboard(null)"

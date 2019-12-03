@@ -21,12 +21,12 @@
       <mat-step [stepControl]="alertDefFormGroup">
         <!-- Validation error messages for the user to correct the
         incorrect dashboard name entered. -->
-        <div class="name-validation" *ngIf="validateNameField(dashboardForm.value.name).check" fxLayout="column">
-          <span *ngIf="validateNameField(dashboardForm.value.name).check.validateLength">
-            {{validationErrorMessage('nameLength')}}
+        <div class="name-validation" *ngIf="!alertDefFormGroup.valid" fxLayout="column">
+          <span *ngIf="alertDefFormGroup.hasError('required', ['alertRuleName']) || alertDefFormGroup.value.alertRuleName.length > 30">
+            * Dashboard Name cannot be empty or exceed 30 characters.
           </span>
-          <span *ngIf="validateNameField(dashboardForm.value.name).check.validateCharacters">
-            {{validationErrorMessage('specialChars')}}
+          <span *ngIf="alertDefFormGroup.hasError('pattern', ['name'])">
+            * Dashboard Name cannot contain special characters.
           </span>
         </div>
         <form [formGroup]="alertDefFormGroup">
@@ -544,7 +544,7 @@
             color="primary"
             mat-stroked-button
             e2e="add-alert"
-            [disabled]="validateNameField(alertDefFormGroup.value.alertRuleName).state"
+            [disabled]="alertDefFormGroup.invalid"
           >
             Add
           </button>
@@ -554,7 +554,7 @@
             color="primary"
             mat-stroked-button
             e2e="update-alert"
-            [disabled]="validateNameField(alertDefFormGroup.value.alertRuleName).state"
+            [disabled]="alertDefFormGroup.invalid"
           >
             Update
           </button>

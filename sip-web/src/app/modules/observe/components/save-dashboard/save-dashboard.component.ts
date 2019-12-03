@@ -17,9 +17,6 @@ import {
   JwtService
 } from '../../../../common/services';
 import { requireIf } from '../../../../common/validators/index';
-import { validateEntityName,
-  entityNameErrorMessage
-} from './../../../../common/validators/field-name-rule.validator';
 
 export const REFRESH_INTERVALS = [
   {
@@ -95,7 +92,9 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.dashboardForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required,
+        Validators.maxLength(30),
+        Validators.pattern(/^[a-zA-Z0-9-_ ]+$/)]],
       description: [''],
       categoryId: ['', Validators.required],
       autoRefreshEnabled: [false, Validators.required],
@@ -182,14 +181,6 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
 
   closeDashboard(data) {
     this.dialogRef.close(data);
-  }
-
-  validateNameField(name) {
-    return validateEntityName(name);
-  }
-
-  validationErrorMessage(state) {
-    return entityNameErrorMessage(state);
   }
 
   saveDashboard() {
