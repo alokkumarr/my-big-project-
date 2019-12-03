@@ -79,6 +79,8 @@ public class AnalysisController {
     if (analysis == null || analysis.getCategory() == null) {
       analysisResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
+      logger.error(
+          String.format("Analysis body and category can't be null or empty : %s ", analysis));
       return analysisResponse;
     }
     String id = UUID.randomUUID().toString();
@@ -131,9 +133,11 @@ public class AnalysisController {
       @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
 
-    if (analysis == null) {
-      analysisResponse.setMessage("Analysis definition can't be null for update request");
+    if (analysis == null || analysis.getCategory() == null) {
+      analysisResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
       response.setStatus(HttpStatus.BAD_REQUEST.value());
+      logger.error(
+          String.format("Analysis body and category can't be null or empty : %s ", analysis));
       return analysisResponse;
     }
     analysis.setId(id);

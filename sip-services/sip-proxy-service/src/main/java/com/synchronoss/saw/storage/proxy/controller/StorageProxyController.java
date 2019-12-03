@@ -329,6 +329,11 @@ public class StorageProxyController {
       return executeResponse;
     }
 
+    // For published analysis, update analysis metadata table with the category information.
+    if (isPublishedExecution == true) {
+      proxyService.updateAnalysis(analysis);
+    }
+
     List<TicketDSKDetails> dskList = new ArrayList<>();
     DataSecurityKeys dataSecurityKeys = null;
     // fetch DSK details for scheduled

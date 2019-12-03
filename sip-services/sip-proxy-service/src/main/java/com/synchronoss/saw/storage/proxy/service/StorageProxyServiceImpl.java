@@ -71,6 +71,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   private final String tempResultTable = "onetime";
   private final String executionResultTable = "executionResult";
+  private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
 
   @Value("${schema.file}")
@@ -990,6 +991,24 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       return dataObj.subList(startIndex, endIndex);
     }
     return null;
+  }
+
+  @Override
+  public Boolean updateAnalysis(Analysis analysis) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      ExecutionResultStore executionResultStore =
+          new ExecutionResultStore(analysisMetadataTable, basePath);
+      executionResultStore.update(
+          analysis.getId(), objectMapper.writeValueAsString(analysis));
+      logger.info(
+          String.format("Updated Analysis id : %s with body : %s ", analysis.getId(), analysis));
+      return true;
+    } catch (Exception e) {
+      logger.error("Error occurred while updating the analysis");
+      logger.error(e.getMessage());
+    }
+    return false;
   }
 
   @Override
