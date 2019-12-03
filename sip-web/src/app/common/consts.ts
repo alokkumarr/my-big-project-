@@ -296,20 +296,20 @@ export const AGGREGATE_TYPES = [
     value: 'percentage',
     icon: 'icon-Percentage',
     type: 'float',
-    valid: ['pivot', 'report', 'esReport']
-  },
-  {
-    label: 'Percentage By Row',
-    designerLabel: 'PCTR',
-    value: 'percentagebyrow',
-    icon: 'icon-Percentage',
-    type: 'float',
-    valid: ['chart']
+    valid: ['pivot', 'map', 'report', 'esReport']
   },
   {
     label: 'Percentage by Column',
     designerLabel: 'PCTC',
     value: 'percentage',
+    icon: 'icon-Percentage',
+    type: 'float',
+    valid: ['chart']
+  },
+  {
+    label: 'Percentage By Row',
+    designerLabel: 'PCTR',
+    value: 'percentagebyrow',
     icon: 'icon-Percentage',
     type: 'float',
     valid: ['chart']

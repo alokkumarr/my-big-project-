@@ -114,15 +114,16 @@ describe('DesignerPageComponent', () => {
       expect(analysis.parentAnalysisId).toBeUndefined();
     });
 
-    it('should fork if mode is edit and analysis is not in users private category', () => {
+    it('should fork if mode is edit and analysis is in a public category', () => {
       component.designerMode = 'edit';
+      const category = new JwtServiceStub().userAnalysisCategoryId + '1';
       const analysis = component.forkIfNecessary({
         type: 'report',
-        category: new JwtServiceStub().userAnalysisCategoryId + '1',
+        category,
         id: '2',
         sipQuery: {}
       } as AnalysisDSL);
-      expect(analysis.parentAnalysisId).not.toBeUndefined();
+      expect(analysis.parentAnalysisId).toEqual('2');
     });
 
     it('should add derived metrics to metric artifacts', () => {
