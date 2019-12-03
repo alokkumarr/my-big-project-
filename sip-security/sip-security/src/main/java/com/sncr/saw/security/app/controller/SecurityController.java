@@ -7,8 +7,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.DskGroup;
+import com.sncr.saw.security.app.model.DskValues;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -67,6 +68,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -865,6 +867,51 @@ public class SecurityController {
             // Here we are sending two different Objects, one in case of Success and another object is returned in case of
             // Error. This change has to be retained else all other REST API has to unified since we are following this convention.
         }
+    }
+
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
+    public Object addDskGroup(HttpServletRequest request, HttpServletResponse response,
+        @RequestBody DskGroup dskGroup) {
+      String jwtToken = JWTUtils.getToken(request);
+      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+
+      Long custId = Long.valueOf(extractValuesFromToken[1]);
+      String createdBy = extractValuesFromToken[2];
+
+
+      String securityGroupName = dskGroup.getGroupName();
+      String securityGroupDescription = dskGroup.getGroupDescription();
+
+      SecurityGroups securityGroup = new SecurityGroups();
+      securityGroup.setSecurityGroupName(securityGroupName);
+      securityGroup.setDescription(securityGroupDescription);
+
+      DskValidity dskValidity =
+          dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,custId);
+
+      Long groupSysId = dskValidity.getGroupId();
+
+      if (groupSysId == null) {
+        logger.error("Error occurred: " + dskValidity.getError());
+        return dskValidity;
+      }
+      List<DskValues> dsk = dskGroup.getDataSecurity();
+
+      for(DskValues dskValues: dsk) {
+        Set<String> values = dskValues.getValues();
+
+        for(String value: values) {
+          AttributeValues attributeValues = new AttributeValues();
+          attributeValues.setAttributeName(dskValues.getName());
+          attributeValues.setValue(value);
+
+          dataSecurityKeyRepository
+               .addSecurityGroupDskAttributeValues(groupSysId,attributeValues);
+        }
+      }
+
+      return dskValidity;
     }
 
     /**
