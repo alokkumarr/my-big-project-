@@ -24,8 +24,8 @@ export const validateEntityName = (analysisName)  => {
 export const entityNameErrorMessage = (failState) => {
   switch (failState) {
     case 'nameLength':
-      return `* Dashboard Name cannot be empty or exceed ${minimumNameLength} characters.`;
+      return `* Name cannot be empty or exceed ${minimumNameLength} characters.`;
     case 'specialChars':
-      return `* Dashboard Name cannot contain special characters.`;
+      return `* Name cannot contain special characters.`;
   }
 };

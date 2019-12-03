@@ -28,6 +28,7 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
+import { entityNameErrorMessage } from './../../../../../common/validators/field-name-rule.validator';
 
 import {
   AlertConfig,
@@ -187,11 +188,15 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return notifications;
   }
 
+  displayErrorMessage(state) {
+    return entityNameErrorMessage(state);
+  }
+
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
       alertRuleName: ['', [Validators.required,
         Validators.maxLength(30),
-        Validators.pattern(/^[a-zA-Z0-9-_ ]+$/)]],
+        Validators.pattern(/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g)]],
       alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
