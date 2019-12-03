@@ -12,7 +12,7 @@ import { ConfirmDialogComponent } from '../../../../common/components/confirm-di
 import { ConfirmDialogData } from '../../../../common/types';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { ExecuteService } from '../../services/execute.service';
-import { Analysis, AnalysisDSL } from '../types';
+import { AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
@@ -246,28 +246,23 @@ export class DesignerPageComponent implements OnInit {
    * @returns
    * @memberof DesignerPageComponent
    */
-  forkIfNecessary(analysis: Analysis | AnalysisDSL) {
+  forkIfNecessary(analysis: AnalysisDSL) {
     const userAnalysisCategoryId = this.jwtService.userAnalysisCategoryId.toString();
-    const analysisCategoryId =
-      (isDSLAnalysis(analysis) ? analysis.category : analysis.categoryId) || '';
-    if (
-      userAnalysisCategoryId === analysisCategoryId.toString() ||
-      this.designerMode !== 'edit'
-    ) {
-      /* Analysis is from user's private folder or action is not edit.
-         No special steps needed. for this.
-      */
-      return analysis;
-    } else {
+    const analysisCategoryId = analysis.category.toString() || '';
+    const isFromPublicCategory = userAnalysisCategoryId !== analysisCategoryId;
+    const isInEditMode = this.designerMode === 'edit';
+    if (isInEditMode && isFromPublicCategory) {
       this.designerMode = 'fork';
       return {
         ...analysis,
-        ...(isDSLAnalysis(analysis)
-          ? { category: userAnalysisCategoryId }
-          : { categoryId: userAnalysisCategoryId }),
+        category: userAnalysisCategoryId,
         parentAnalysisId: analysis.id,
         parentCategoryId: analysisCategoryId
       };
     }
+    /* Analysis is from user's private folder or action is not edit.
+        No special steps needed. for this.
+    */
+    return analysis;
   }
 }
