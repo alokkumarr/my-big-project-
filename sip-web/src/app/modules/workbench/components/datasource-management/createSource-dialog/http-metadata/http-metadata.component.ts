@@ -1,12 +1,22 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { HTTP_METHODS } from 'src/app/modules/workbench/models/workbench.interface';
-import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
+import {
+  HTTP_METHODS,
+  AUTHORIZATION_TYPES
+} from 'src/app/modules/workbench/models/workbench.interface';
+import {
+  FormGroup,
+  FormArray,
+  FormBuilder,
+  Validators,
+  FormControl
+} from '@angular/forms';
 import {
   CONTENT_TYPE_VALUES,
   STANDARD_HEADERS
 } from 'src/app/common/http-headers';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { requireIf } from 'src/app/common/validators';
 
 @Component({
   selector: 'http-metadata',
@@ -22,19 +32,45 @@ export class HttpMetadataComponent implements OnInit {
     // HTTP_METHODS.DELETE
   ];
 
+  authorizationTypes = AUTHORIZATION_TYPES;
+  authorizationTypeValues = Object.values(AUTHORIZATION_TYPES);
+  authorizationForm: FormGroup;
+
   filteredHeaderFields: Observable<string[]>[] = [];
   filteredHeaderValues: Observable<string[]>[] = [];
 
   @Input() requiredFields: Array<string>;
   @Input() parentForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {
+    this.createAuthForm();
+  }
 
   ngOnInit() {
-    (this.parentForm.get('headerParameters') as FormArray).controls.forEach(
-      headerControl =>
-        this.generateHeaderAutoCompleteFilter(headerControl as FormGroup)
+    (this.parentForm.get(
+      'headerParameters'
+    ) as FormArray).controls.forEach(headerControl =>
+      this.generateHeaderAutoCompleteFilter(headerControl as FormGroup)
     );
+  }
+
+  createAuthForm() {
+    this.authorizationForm = this.formBuilder.group({
+      type: [AUTHORIZATION_TYPES[Object.keys(AUTHORIZATION_TYPES)[0]]],
+      userName: [
+        '',
+        [requireIf('type', val => val === AUTHORIZATION_TYPES.USER)]
+      ],
+      password: [
+        '',
+        [requireIf('type', val => val === AUTHORIZATION_TYPES.USER)]
+      ]
+    });
+
+    this.authorizationForm.get('type').valueChanges.subscribe(() => {
+      this.authUsername.updateValueAndValidity();
+      this.authPassword.updateValueAndValidity();
+    });
   }
 
   /**
@@ -89,6 +125,18 @@ export class HttpMetadataComponent implements OnInit {
 
   get canAddQueryParam() {
     return this.queryParams.valid;
+  }
+
+  get authUsername(): FormControl {
+    return this.authorizationForm.get('userName') as FormControl;
+  }
+
+  get authPassword(): FormControl {
+    return this.authorizationForm.get('password') as FormControl;
+  }
+
+  get authType(): FormControl {
+    return this.authorizationForm.get('type') as FormControl;
   }
 
   /**

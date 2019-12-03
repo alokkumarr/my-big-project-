@@ -258,4 +258,82 @@
       </div>
     </div>
   </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        [ngClass]="{ 'tab-error': !headerParams.valid }"
+      >
+        Authorization &nbsp;
+        <ng-container>
+          <span class="dot"></span>
+        </ng-container>
+      </div>
+    </ng-template>
+    <!-- Query Parameters form -->
+    <form
+      fxFlex
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      class="parameters authorization"
+      novalidate
+      [formGroup]="authorizationForm"
+      autocomplete="false"
+    >
+      <mat-form-field appearance="outline" fxFlex="20">
+        <mat-label>Authorization Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option
+            *ngFor="let type of authorizationTypeValues"
+            [value]="type"
+          >
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-divider [vertical]="true"></mat-divider>
+      <div
+        fxFlex
+        fxLayout="column"
+        fxLayoutAlign="center start"
+        [style.display]="
+          authType.value === authorizationTypes.USER ? 'flex' : 'none'
+        "
+      >
+        <mat-form-field fxFlexappearance="outline">
+          <mat-label i18n>Username</mat-label>
+          <input
+            matInput
+            name="auth-username"
+            e2e="auth-username"
+            formControlName="userName"
+            [required]="authType.value === authorizationTypes.USER"
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!authUsername.hasError('required')" i18n>
+            Username is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxFlexappearance="outline">
+          <mat-label i18n>Password</mat-label>
+          <input
+            matInput
+            name="auth-password"
+            e2e="auth-password"
+            formControlName="password"
+            [required]="authType.value === authorizationTypes.USER"
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!authPassword.hasError('required')" i18n>
+            Password is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-tab>
 </mat-tab-group>
