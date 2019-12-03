@@ -137,9 +137,14 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     }
 
     private void processFieldNames(Object[] names){
+        int fieldNo = 1;
         for(Object o : names){
             if(o!=null) {
-                fieldNames.add(sanitizeFieldName(o.toString()));}
+                fieldNames.add(sanitizeFieldName(o.toString()));
+            }else{
+                fieldNames.add("FIELD_" + fieldNo);
+            }
+            fieldNo++;
         }
     }
 
