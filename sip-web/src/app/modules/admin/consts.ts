@@ -237,19 +237,19 @@ export const CategoriesTableHeader = [
   },
   {
     caption: 'SUB CATEGORIES',
-    dataField: 'subCategories',
+    dataField: 'subCategory',
     allowSorting: true,
     alignment: 'left',
     width: '52%',
     cellTemplate: 'highlightCellTemplate',
     calculateDisplayValue: data => {
-      const { subCategories } = data;
+      const { subCategory } = data;
 
-      if (subCategories) {
+      if (subCategory) {
         return fpPipe(
           fpMap(({ subCategoryName }) => subCategoryName),
           fpJoin(', ')
-        )(subCategories);
+        )(subCategory);
       }
       return '';
     }
