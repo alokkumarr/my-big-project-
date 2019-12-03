@@ -84,7 +84,7 @@
     "tslib": "1.10.0",
     "tz-lookup": "6.1.18",
     "weather-icons": "github:akil3/weather-icons",
-    "zone.js": "~0.9.1"
+    "zone.js": "0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.19",
