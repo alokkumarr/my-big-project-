@@ -36,4 +36,17 @@ public enum RoleType {
       return constant;
     }
   }
+	/**
+	 * Validate Role type from string.
+	 *
+	 * @param type Role type Value.
+	 * @return true if matches else false
+	 */
+	public static boolean validRoleType(String type) {
+		RoleType[] roleTypes = RoleType.values();
+		for (RoleType roleType : roleTypes)
+			if (roleType.name().equalsIgnoreCase(type))
+				return true;
+		return false;
+	}
 }

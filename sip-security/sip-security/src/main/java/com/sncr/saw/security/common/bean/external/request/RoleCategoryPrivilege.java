@@ -1,5 +1,6 @@
-package com.sncr.saw.security.common.bean;
+package com.sncr.saw.security.common.bean.external.request;
 
+import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 
 import java.io.Serializable;
