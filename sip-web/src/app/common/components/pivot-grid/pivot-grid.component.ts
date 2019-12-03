@@ -21,6 +21,7 @@ import * as filter from 'lodash/filter';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
+import * as reduce from 'lodash/reduce';
 import { Subject } from 'rxjs';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -61,16 +62,7 @@ export class PivotGridComponent implements OnDestroy {
   @Input() mode: string | 'designer';
   @Input() showFieldDetails;
   @Input() name;
-
-  @Input('sorts')
-  set setSorts(sorts: Sort[]) {
-    if (sorts) {
-      this.delayIfNeeded(() => {
-        this.updateSorts(sorts, null);
-      });
-      this._sorts = sorts;
-    }
-  }
+  @Input() sorts: Sort[];
 
   @Input('artifactColumns')
   set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
@@ -155,7 +147,6 @@ export class PivotGridComponent implements OnDestroy {
         fields: this.pivotFields || []
       });
       /* Try to apply existing sorts (if any) to the new data source */
-      this.updateSorts(this._sorts, dataSource);
       this.updateDataSource(dataSource);
     }
   }
@@ -163,7 +154,6 @@ export class PivotGridComponent implements OnDestroy {
   update(update: IPivotGridUpdate) {
     /* eslint-disable no-unused-expressions */
     update.dataSource && this.updateDataSource(update.dataSource);
-    update.sorts && this.updateSorts(update.sorts, null);
     update.export && this.exportToExcel();
     update.rePaint && this.rePaintGrid();
     /* eslint-disable no-unused-expressions */
@@ -185,40 +175,6 @@ export class PivotGridComponent implements OnDestroy {
 
   rePaintGrid() {
     this._gridInstance.repaint();
-  }
-
-  updateSorts(sorts: Sort[], source) {
-    if (isEmpty(sorts)) {
-      return;
-    }
-
-    const dataSource = source || this._gridInstance.getDataSource();
-    const load = !source;
-
-    // reset other sorts
-    forEach(dataSource.fields(), field => {
-      if (field.sortOrder) {
-        dataSource.field(field.dataField, {
-          sortOrder: null
-        });
-      }
-    });
-
-    forEach(sorts, (sort: Sort) => {
-      // remove the suffix from the sort fields name, that is added by elastic search
-      // there is a bug that breaks pivotgrid when the name conains a .
-      const dataField =
-        sort.type === 'string'
-          ? sort.columnName.split('.')[0]
-          : sort.columnName;
-      dataSource.field(dataField, {
-        sortOrder: sort.order
-      });
-    });
-
-    if (load) {
-      dataSource.load();
-    }
   }
 
   delayIfNeeded(fn) {
@@ -308,13 +264,16 @@ export class PivotGridComponent implements OnDestroy {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({ columnName, groupInterval, manualFormat }) => {
-        clonedDataPoint[columnName] = this.getFormattedDataValue(
-          clonedDataPoint[columnName],
-          groupInterval,
-          manualFormat
-        );
-      });
+      forEach(
+        columnsToFormat,
+        ({ columnName, groupInterval, manualFormat }) => {
+          clonedDataPoint[columnName] = this.getFormattedDataValue(
+            clonedDataPoint[columnName],
+            groupInterval,
+            manualFormat
+          );
+        }
+      );
       return clonedDataPoint;
     });
     return formattedData;
@@ -351,6 +310,17 @@ export class PivotGridComponent implements OnDestroy {
   }
 
   artifactColumn2PivotField(): any {
+    const sortsMap = reduce(
+      this._sorts,
+      (acc, sort) => {
+        const { columnName, type, order } = sort;
+        const dataField =
+          type === 'string' ? columnName.split('.')[0] : columnName;
+        acc[dataField] = order;
+        return acc;
+      },
+      {}
+    );
     return fpPipe(
       fpMap(artifactColumn => {
         const cloned = clone(artifactColumn);
@@ -400,12 +370,6 @@ export class PivotGridComponent implements OnDestroy {
             ? cloned.dataField
             : cloned.columnName;
 
-        if (DATE_TYPES.includes(cloned.type)) {
-          // disable sorting for the fields that have a type string because of manual formatting
-          // so it doesn't sort the fields accordinbg to the display string
-          cloned.sortBy = 'value';
-        }
-
         if (!isUndefined(cloned.alias) && cloned.alias !== '') {
           cloned.displayName = cloned.alias;
         }
@@ -420,7 +384,11 @@ export class PivotGridComponent implements OnDestroy {
           const newKey = ARTIFACT_COLUMN_2_PIVOT_FIELD[key];
           return newKey || key;
         })
-      )
+      ),
+      fpMap(col => {
+        col.sortOrder = sortsMap[col.dataField];
+        return col;
+      })
     );
   }
 }
