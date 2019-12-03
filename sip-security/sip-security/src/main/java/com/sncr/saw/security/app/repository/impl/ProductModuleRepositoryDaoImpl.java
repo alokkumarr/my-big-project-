@@ -1,11 +1,13 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.ProductModuleRepository;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import org.slf4j.Logger;
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Repository;
 public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProductModuleRepositoryDaoImpl.class);
-
 	private final JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -39,7 +40,7 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
 	@Override
 	public boolean checkProductModuleExistance(Long prodModId) {
-		String sql = "select PROD_MOD_SYS_ID from product_modules where PROD_MOD_SYS_ID = " + prodModId;
+		String sql = "select PROD_MOD_SYS_ID from product_modules where PROD_MOD_SYS_ID = "+ prodModId;
 		return !jdbcTemplate.queryForList(sql).isEmpty();
 	}
 
@@ -68,10 +69,13 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
 		for (Map.Entry m : sqlstatements.entrySet()) {
 			jdbcTemplate.update(con -> {
-				PreparedStatement ps = con.prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
+				PreparedStatement ps = con
+						.prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
 				ps.setDate(1, new java.sql.Date(new Date().getTime()));
 				return ps;
-			}, keyHolder);
+			},
+					keyHolder
+			);
 			results.put((Integer) m.getKey(), keyHolder.getKey().toString());
 		}
 		return results;
