@@ -452,7 +452,8 @@ export class ChartService {
         forEach(dateFields, ({ columnName, dateFormat }) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
           dataPoint[removeKeyword(columnName)] =
-            moment(dataPoint[removeKeyword(columnName)], momentDateFormat).utc()
+            moment(dataPoint[removeKeyword(columnName)], momentDateFormat)
+              .utc()
               .unix() * 1000;
         });
       });
@@ -1056,6 +1057,18 @@ export class ChartService {
       { path: 'series', data: [{ data: data }] },
       { path: 'plotOptions.packedbubble', data: packedBubble }
     ];
+  }
+
+  addTooltipsAndLegendAsObject(fields, chartType) {
+    const updates = this.addTooltipsAndLegend(fields, chartType);
+    return reduce(
+      updates,
+      (acc, { path, data }) => {
+        acc[path] = data;
+        return acc;
+      },
+      {}
+    );
   }
 
   addTooltipsAndLegend(fields, chartType) {
