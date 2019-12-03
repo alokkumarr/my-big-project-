@@ -25,7 +25,7 @@ describe('entity name validation', () => {
     // should fail for length validation
     // disabled state is set to true.
     expect(checkAnalysisNameChar).toEqual(
-      '* Dashboard Name cannot be empty or exceed 30 characters.'
+      '* Name cannot be empty or exceed 30 characters.'
     );
   });
 
@@ -36,7 +36,7 @@ describe('entity name validation', () => {
     // should fail for length validation
     // disabled state is set to true.
     expect(checkAnalysisNameChar).toEqual(
-      '* Dashboard Name cannot contain special characters.'
+      '* Name cannot contain special characters.'
     );
   });
 });
