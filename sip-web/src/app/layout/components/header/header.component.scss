@@ -32,7 +32,7 @@ mat-toolbar {
   }
 
   .alert-bell-icon {
-    background-image: url('/assets/img/alert-bell.png');
+    background-image: url('src/assets/img/alert-bell.png');
     background-size: 85% 85%;
     background-repeat: no-repeat;
     height: 21px;
@@ -50,7 +50,7 @@ mat-toolbar {
       height: 20px;
       margin: 3px 16px 0;
       cursor: pointer;
-      background-image: url('/assets/img/module-icons/launcher.svg');
+      background-image: url('src/assets/img/module-icons/launcher.svg');
       background-size: cover;
       background-repeat: no-repeat;
     }
@@ -91,35 +91,35 @@ mat-toolbar {
         background-size: cover;
         background-repeat: no-repeat;
         margin-bottom: 5px;
-        background-image: url('/assets/img/module-icons/campaign-insights.svg');
+        background-image: url('src/assets/img/module-icons/campaign-insights.svg');
       }
 
       &.module-analyze > .option-image {
-        background-image: url('/assets/img/module-icons/analyze.svg');
+        background-image: url('src/assets/img/module-icons/analyze.svg');
       }
 
       &.module-observe > .option-image {
-        background-image: url('/assets/img/module-icons/observe.svg');
+        background-image: url('src/assets/img/module-icons/observe.svg');
       }
 
       &.module-workbench > .option-image {
-        background-image: url('/assets/img/module-icons/workbench.svg');
+        background-image: url('src/assets/img/module-icons/workbench.svg');
       }
 
       &.module-admin > .option-image {
-        background-image: url('/assets/img/module-icons/admin.svg');
+        background-image: url('src/assets/img/module-icons/admin.svg');
       }
 
       &.module-alerts > .option-image {
-        background-image: url('/assets/img/module-icons/alerts.svg');
+        background-image: url('src/assets/img/module-icons/alerts.svg');
       }
 
       &.module-insights > .option-image {
-        background-image: url('/assets/img/module-icons/insights.svg');
+        background-image: url('src/assets/img/module-icons/insights.svg');
       }
 
       &.module-ratings > .option-image {
-        background-image: url('/assets/img/module-icons/ratings.svg');
+        background-image: url('src/assets/img/module-icons/ratings.svg');
       }
     }
   }
