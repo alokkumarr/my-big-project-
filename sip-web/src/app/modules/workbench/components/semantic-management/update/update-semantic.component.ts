@@ -14,6 +14,7 @@ import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
+import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'update-semantic',
@@ -108,7 +109,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: true,
+        filterEligible: false,
         joinEligible: false,
         kpiEligible: false,
         include: false,
@@ -131,7 +132,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
     forIn(this.selectedDPData, ds => {
       this.selectedDPDetails.artifacts.push({
         artifactName: ds.artifactName,
-        columns: ds.columns // filter(ds.columns, 'include')
+        columns: filter(ds.columns, 'include')
       });
     });
     this.workBench
