@@ -115,7 +115,7 @@ RUN curl -O $path/$rpm \
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64/
 
 # COPY java.security into the directory
-COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
+COPY java.security /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64/jre/lib/security/
 
 # Add SIP container health check command
 COPY sip-health-check /root/

@@ -139,19 +139,8 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     private void processFieldNames(Object[] names){
         for(Object o : names){
             if(o!=null) {
-            fieldNames.add(sanitizeFieldName(o.toString()));}
+            fieldNames.add(o.toString());}
         }
-    }
-
-    private String sanitizeFieldName(String fieldName) {
-        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
-        String invalidCharRegex = "[^a-zA-Z0-9_ ]";
-        if(fieldName != null && !fieldName.trim().isEmpty()){
-            fieldName = fieldName.trim().replaceAll(invalidCharRegex, "")
-                .replaceAll("\\s+", "_").toUpperCase();
-            logger.debug("Converted to :"+fieldName);
-        }
-        return fieldName;
     }
 
     private void processDataRow(Object[] fields){

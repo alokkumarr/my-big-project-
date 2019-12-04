@@ -27,9 +27,10 @@
   </mat-card-content>
   <mat-divider></mat-divider>
   <mat-card-footer fxLayout="row" fxLayoutAlign="space-between start">
-    <div>
+    <div style="width: 80%;">
       <mat-card-title>
         <a
+          [matTooltip]="analysis.name"
           [innerHtml]="analysis.name | highlight: highlightTerm"
           routerLink="../analysis/{{ analysis.id }}/executed"
           [queryParams]="{ isDSL: !!analysis.sipQuery }"
