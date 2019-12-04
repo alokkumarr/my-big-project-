@@ -277,16 +277,17 @@ public class StorageProxyController {
     if (analysis == null) {
       throw new JSONMissingSAWException("Analysis definition is missing in request body");
     }
+    boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
+    boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
-    if (!authValidation(authToken)) {
+    if (!isScheduledExecution && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
-    boolean isScheduledExecution = executionType.equals(ExecutionType.scheduled);
-    boolean isPublishedExecution = executionType.equals(ExecutionType.publish);
+
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -311,13 +312,6 @@ public class StorageProxyController {
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the PUBLISH privilege!!");
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
-      return executeResponse;
-    } else if (isScheduledExecution
-        && !validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      logger.error("UNAUTHORIZED ACCESS : User don't have the EXPORT||SCHEDULED privilege!!");
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;

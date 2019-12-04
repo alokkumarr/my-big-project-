@@ -13,6 +13,7 @@ import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
@@ -34,25 +35,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Analysis entity controller. */
+/**
+ * Analysis entity controller.
+ */
 @RestController
 @RequestMapping("/dslanalysis")
 @ApiResponses(
     value = {
-      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-      @ApiResponse(code = 400, message = "Bad Request"),
-      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-      @ApiResponse(
-          code = 403,
-          message = "Accessing the resource you were trying to reach is forbidden"),
-      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-      @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(
+            code = 403,
+            message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
     })
 public class AnalysisController {
 
   private static final Logger logger = LoggerFactory.getLogger(AnalysisController.class);
 
-  @Autowired AnalysisService analysisService;
+  @Autowired
+  AnalysisService analysisService;
 
   /**
    * create Analysis API.
@@ -225,22 +229,26 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
+      @ApiParam(value = "internalCall", required = false)
+      @RequestParam(name = "internalCall", required = false)
+          boolean internal,
       @RequestHeader("Authorization") String authToken) {
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (!authValidation(authToken)) {
+    if (!internal && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
-    Ticket authTicket = getTicket(request);
+    Ticket authTicket = internal == true ? null : getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    response = validateTicket(authTicket, PrivilegeNames.ACCESS, analysis, response);
+    response = internal == true ? null
+        : validateTicket(authTicket, PrivilegeNames.ACCESS, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
 
-    analysisResponse.setAnalysis(analysisService.getAnalysis(id, authTicket));
+    analysisResponse.setAnalysis(analysis);
     analysisResponse.setMessage("Analysis retrieved successfully");
     analysisResponse.setAnalysisId(id);
     return analysisResponse;
@@ -266,7 +274,7 @@ public class AnalysisController {
   public List<Analysis> getAnalysisByCategory(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "category") String categoryId) throws  Exception {
+      @RequestParam(name = "category") String categoryId) throws Exception {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {

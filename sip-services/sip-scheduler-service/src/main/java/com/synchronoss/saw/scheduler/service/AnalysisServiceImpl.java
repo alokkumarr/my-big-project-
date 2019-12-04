@@ -183,7 +183,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
   @Override
   public void executeDslAnalysis(String analysisId, String userId) {
-    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
+    String dslUrl = metadataAnalysisUrl + "/" + analysisId +"&internalCall=true";
     logger.trace("URL for request body : ", dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
