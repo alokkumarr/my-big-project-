@@ -114,9 +114,10 @@ public class PrivilegeUtils {
         int value = privilegeCodes.get(PrivilegeNames.fromValue(accessName));
         privilege[value] = 1;
       }
-      for (Integer n : privilege) {
-        builder.append(n);
-      }
+
+      // build integer to string
+      for (Integer n : privilege) builder.append(n);
+
       privilegeCode = Long.parseLong(builder.toString(), 2);
     } catch (Exception ex) {
       logger.error("Error while getting decimal value for privileges.");
