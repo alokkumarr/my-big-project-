@@ -370,6 +370,12 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         result.add("fields", fields);
         result.add("info", info);
         result.add("samplesParsed", samplesParsed);
+        result.addProperty("lineSeparator", new String(settings.getFormat().getLineSeparator()));
+        result.addProperty("delimiter", String.valueOf(settings.getFormat().getDelimiter()));
+        result.addProperty("quoteChar", String.valueOf(settings.getFormat().getQuote()));
+        result.addProperty("quoteEscapeChar", String.valueOf(settings.getFormat().getQuoteEscape()));
+        result.addProperty("headerSize", headerSize);
+        result.addProperty("fieldNamesLine", fieldDefRowNumber);
         return result;
     }
 
