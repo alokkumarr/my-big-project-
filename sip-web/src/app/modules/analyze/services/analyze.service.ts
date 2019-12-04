@@ -163,9 +163,11 @@ export class AnalyzeService {
     ).pipe(
       // Sort all the analyses based on their create time in descending order (newest first).
       // Uses correct time field based on if analysis is new dsl type or not
-      map(<FPSort<AnalysisDSL>>(
-        fpSortBy([analysis => -(analysis.createdTime || 0)])
-      ))
+      map(
+        <FPSort<AnalysisDSL>>(
+          fpSortBy([analysis => -(analysis.createdTime || 0)])
+        )
+      )
     );
   }
 
@@ -345,8 +347,7 @@ export class AnalyzeService {
     return promise;
   }
 
-  changeSchedule(analysis) {
-    const schedule = analysis.schedule;
+  changeSchedule(schedule) {
     const scheduleState = schedule.scheduleState;
     switch (scheduleState) {
       case 'new':
