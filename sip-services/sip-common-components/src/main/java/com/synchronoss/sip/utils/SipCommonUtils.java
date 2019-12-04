@@ -3,6 +3,7 @@ package com.synchronoss.sip.utils;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.io.IOException;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,5 +71,21 @@ public class SipCommonUtils {
                   + "less than or equal to 30",
               name));
     }
+  }
+
+  /**
+   * Convert decimal to binary.
+   *
+   * @param value to be converted
+   * @return binary array of value
+   */
+  public static int[] decToBinary(Long value) {
+    String binString = Long.toBinaryString(value);
+    binString = binString.length() < 16 ? "00000000".concat(binString) : binString;
+
+    binString.toCharArray();
+    final int[] privCode = Stream.of(binString.split("")).mapToInt(Integer::parseInt).toArray();
+
+    return privCode;
   }
 }

@@ -3,9 +3,14 @@ package com.sncr.saw.security.common.util;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.external.response.CategoryDetails;
 import com.sncr.saw.security.common.bean.external.response.CategoryList;
+import com.sncr.saw.security.common.bean.external.response.Role;
+import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
+import com.synchronoss.sip.utils.PrivilegeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,5 +114,74 @@ public class SecurityUtils {
 		catList.setCategories(null);
 		catList.setValid(false);
 		catList.setMessage(message);
+	}
+
+	/**
+	 * Build the privilege bean from role/category/privileges bean
+	 *
+	 * @param masterLoginId
+	 * @param moduleDetails
+	 * @param responseRole
+	 * @param category
+	 * @param privileges
+	 * @return AddPrivilegeDetails bean
+	 */
+	public static AddPrivilegeDetails buildPrivilegeBean(String masterLoginId, ProductModuleDetails moduleDetails, Role responseRole,
+																											 com.sncr.saw.security.common.bean.external.response.CategoryDetails category,
+																											 List<String> privileges) {
+		Long subCategoryId = category.getSubCategory().get(0).getSubCategoryId();
+		AddPrivilegeDetails privilegeDetails = new AddPrivilegeDetails();
+		privilegeDetails.setCategoryCode(category.getCategoryCode());
+		privilegeDetails.setCategoryId(category.getCategoryId());
+		privilegeDetails.setCategoryType(category.getCategoryType());
+		privilegeDetails.setCustomerId(category.getCustomerId());
+		privilegeDetails.setProductId(moduleDetails.getProductId());
+		privilegeDetails.setModuleId(moduleDetails.getModuleId());
+		privilegeDetails.setMasterLoginId(masterLoginId);
+		privilegeDetails.setRoleId(responseRole.getRoleSysId());
+
+		List<SubCategoriesPrivilege> subCategoriesPrivilegeList = new ArrayList<>();
+		SubCategoriesPrivilege subCategoriesPrivilege = new SubCategoriesPrivilege();
+		Long privilegesCode = PrivilegeUtils.getPrivilegeCode(privileges);
+		subCategoriesPrivilege.setPrivilegeCode(privilegesCode);
+		subCategoriesPrivilege.setSubCategoryId(subCategoryId);
+		subCategoriesPrivilege.setPrivilegeDesc(String.join(",", privileges));
+		subCategoriesPrivilege.setPrivilegeId(0l);
+		subCategoriesPrivilegeList.add(subCategoriesPrivilege);
+		privilegeDetails.setSubCategoriesPrivilege(subCategoriesPrivilegeList);
+		return privilegeDetails;
+	}
+
+	/**
+	 * Fetch the category details bases upon the product / module Id
+	 *
+	 * @param categoryPrivilege
+	 * @param customerCatList
+	 * @return list of category details
+	 */
+	public static List<CategoryDetails> fetchResponseCategoryDetails(RoleCategoryPrivilege categoryPrivilege,
+																																	 List<com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails> customerCatList) {
+
+		List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> finalCategory = new ArrayList<>();
+		if (customerCatList != null) {
+			List<com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails> filterCategory = customerCatList.stream()
+					.filter(cd -> cd.getModuleName().equalsIgnoreCase(categoryPrivilege.getModuleName())
+							&& cd.getProductName().equalsIgnoreCase(categoryPrivilege.getProductName()))
+					.collect(Collectors.toList());
+
+			filterCategory.forEach(filterCat -> {
+				com.sncr.saw.security.common.bean.external.response.CategoryDetails catDetails = new com.sncr.saw.security.common.bean.external.response.CategoryDetails();
+				catDetails.setActiveStatusInd(filterCat.getActiveStatusInd() != null ? filterCat.getActiveStatusInd() : 0l);
+				catDetails.setCategoryCode(filterCat.getCategoryCode());
+				catDetails.setCategoryName(filterCat.getCategoryName());
+				catDetails.setCategoryType(filterCat.getCategoryType());
+				catDetails.setCategoryDesc(filterCat.getCategoryDesc());
+				catDetails.setCustomerId(filterCat.getCustomerId());
+				catDetails.setCategoryId(filterCat.getCategoryId());
+				catDetails.setSubCategory(filterCat.getSubCategory() != null ? filterCat.getSubCategory() : null);
+				finalCategory.add(catDetails);
+			});
+		}
+		return finalCategory;
 	}
 }

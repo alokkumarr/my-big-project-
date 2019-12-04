@@ -12,10 +12,13 @@ import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.SecurityUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
+import com.synchronoss.sip.utils.PrivilegeUtils;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -35,7 +38,7 @@ import java.util.stream.Collectors;
  * @author alok.kumarr
  * @since 3.5.0
  */
-@Api(value = "The controller provides to perform admin security operation in synchronoss analytics platform ")
+@Api(value = "The controller provides to perform external admin security operation in synchronoss analytics platform ")
 @RestController
 @RequestMapping("/sip-security/external")
 public class ExternalSecurityController {
@@ -90,8 +93,8 @@ public class ExternalSecurityController {
 		response.setModuleName(roleCategoryPrivilege.getModuleName());
 
 		com.sncr.saw.security.common.bean.Role inputRole = roleCategoryPrivilege.getRole();
+		Role responseRole = new Role();
 		if (inputRole != null) {
-			Role responseRole = new Role();
 			if (inputRole.getCustomerCode() == null || inputRole.getCustomerCode().isEmpty()) {
 				httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 				responseRole.setMessage("Customer Code can't be blank or empty.");
@@ -183,7 +186,17 @@ public class ExternalSecurityController {
 										addCategory(catList, details, roleCategoryPrivilege);
 
 										// add privilege for the subcategory
+										if (subCategoryDetails.getPrivilege() != null && !subCategoryDetails.getPrivilege().isEmpty()) {
+											com.sncr.saw.security.common.bean.external.response.CategoryDetails detailsCategory = catList.getCategories().stream()
+													.filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
+													.findAny().get();
 
+											AddPrivilegeDetails privilegeDetails = SecurityUtils.buildPrivilegeBean(masterLoginId, moduleDetails, responseRole, detailsCategory, subCategoryDetails.getPrivilege());
+											/*Valid valid = userRepository.upsertPrivilege(privilegeDetails);
+											if (valid.getValid()) {
+												response.setMessage(response.getMessage().concat("Privileges added : " + String.join(",", subCategoryDetails.getPrivilege())));
+											}*/
+										}
 									} else {
 										SecurityUtils.buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.");
 									}
@@ -287,10 +300,18 @@ public class ExternalSecurityController {
 					responseRole.setRoleName(fetchedRole.getRoleName());
 					responseRole.setRoleDesc(fetchedRole.getRoleDesc());
 					responseRole.setRoleType(fetchedRole.getRoleType());
+					responseRole.setMessage("Role fetched for Customer Product Module Combination.");
+
+					// fetch category for this role
+					CategoryList categoryList = new CategoryList();
+					List<com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails> customerCatList =
+							userRepository.getCategories(customerSysId);
+					categoryList.setCategories(SecurityUtils.fetchResponseCategoryDetails(request, customerCatList));
+					categoryList.setMessage("Category/Subcategory fetched for Customer Product Module Combination.");
 
 					response.setValid(true);
-					responseRole.setMessage("Role fetched for Customer Product Module Combination.");
 					response.setRole(responseRole);
+					response.setCategoryList(categoryList);
 				}
 			});
 		}
