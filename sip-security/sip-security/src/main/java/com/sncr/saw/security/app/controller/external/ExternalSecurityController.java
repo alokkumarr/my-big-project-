@@ -54,8 +54,6 @@ public class ExternalSecurityController {
 																						HttpServletResponse httpResponse,
 																						@RequestBody RoleCategoryPrivilege roleCategoryPrivilege) {
 		RoleCatPrivilegeResponse response = new RoleCatPrivilegeResponse();
-		response.setProductName(roleCategoryPrivilege.getProductName());
-		response.setModuleName(roleCategoryPrivilege.getModuleName());
 		if (roleCategoryPrivilege == null) {
 			httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			response.setValid(false);
@@ -88,6 +86,8 @@ public class ExternalSecurityController {
 		// add the product/module id
 		response.setProductId(moduleDetails.getProductId());
 		response.setModuleId(moduleDetails.getModuleId());
+		response.setProductName(roleCategoryPrivilege.getProductName());
+		response.setModuleName(roleCategoryPrivilege.getModuleName());
 
 		com.sncr.saw.security.common.bean.Role inputRole = roleCategoryPrivilege.getRole();
 		if (inputRole != null) {
@@ -236,5 +236,71 @@ public class ExternalSecurityController {
 					: "Error. Please contact server Administrator";
 			SecurityUtils.buildMessage(catList, message);
 		}
+	}
+
+	@RequestMapping(value = "/fetchRoleCategoryPrivilege", method = RequestMethod.POST)
+	public Object fetchRoleCategoryPrivilege(HttpServletRequest httpRequest,
+																					 HttpServletResponse httpResponse,
+																					 @RequestBody RoleCategoryPrivilege request) {
+		RoleCatPrivilegeResponse response = new RoleCatPrivilegeResponse();
+
+		String jwtToken = JWTUtils.getToken(httpRequest);
+		String[] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
+		String roleType = extractValuesFromToken[3];
+		String masterLoginId = extractValuesFromToken[4];
+		if (masterLoginId != null && !userRepository.validateUser(masterLoginId) && !RoleType.ADMIN.equals(roleType.toUpperCase())) {
+			httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+			response.setValid(false);
+			response.setMessage("You are not authorized to perform this operation.");
+			return response;
+		}
+
+		String productName = request.getProductName();
+		String moduleName = request.getModuleName();
+		ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId, productName, moduleName);
+		final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
+		if (customerSysId == null || customerSysId == 0) {
+			httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+			response.setValid(false);
+			response.setMessage("Product and Module does not exist for this user.");
+			response.setProductName(productName);
+			response.setModuleName(moduleName);
+			return response;
+		}
+
+		if (request.getRole() == null || request.getRole().getRoleName() == null || request.getRole().getRoleName().isEmpty()) {
+			httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			response.setMessage("Role Name can't be blank or empty.");
+			response.setProductName(productName);
+			response.setModuleName(moduleName);
+			return response;
+		}
+
+		Role responseRole = new Role();
+		if (request.getRole().getRoleName() != null && !request.getRole().getRoleName().isEmpty()) {
+			userRepository.getRoles(customerSysId).stream().forEach(fetchedRole -> {
+				if (request.getRole().getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
+					responseRole.setCustomerCode(fetchedRole.getCustomerCode());
+					responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
+					responseRole.setRoleSysId(fetchedRole.getRoleSysId());
+					responseRole.setCustomerSysId(fetchedRole.getCustSysId());
+					responseRole.setRoleName(fetchedRole.getRoleName());
+					responseRole.setRoleDesc(fetchedRole.getRoleDesc());
+					responseRole.setRoleType(fetchedRole.getRoleType());
+
+					response.setValid(true);
+					responseRole.setMessage("Role fetched for Customer Product Module Combination.");
+					response.setRole(responseRole);
+				}
+			});
+		}
+
+		// add the product/module id
+		response.setProductName(productName);
+		response.setModuleName(moduleName);
+		response.setProductId(moduleDetails.getProductId());
+		response.setModuleId(moduleDetails.getModuleId());
+
+		return response;
 	}
 }
