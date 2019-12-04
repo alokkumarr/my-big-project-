@@ -1,7 +1,5 @@
 package com.sncr.saw.security.common.bean.external.response;
 
-import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
-
 import java.io.Serializable;
 import java.util.List;
 
