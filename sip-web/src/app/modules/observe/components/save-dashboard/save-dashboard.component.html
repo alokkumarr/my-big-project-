@@ -11,7 +11,7 @@
     <span *ngIf="dashboardForm.hasError('required', ['name']) || dashboardForm.value.name.length > 30">
       {{displayErrorMessage('nameLength')}}
     </span>
-    <span *ngIf="dashboardForm.hasError('pattern', ['name'])">
+    <span *ngIf="dashboardForm.hasError('nameIsInValid', ['name'])">
       {{displayErrorMessage('specialChars')}}
     </span>
   </div>

@@ -25,7 +25,7 @@
           <span *ngIf="alertDefFormGroup.hasError('required', ['alertRuleName']) || alertDefFormGroup.value.alertRuleName.length > 30">
             {{displayErrorMessage('nameLength')}}
           </span>
-          <span *ngIf="alertDefFormGroup.hasError('pattern', ['name'])">
+          <span *ngIf="alertDefFormGroup.hasError('nameIsInValid', ['name'])">
             {{displayErrorMessage('specialChars')}}
           </span>
         </div>

@@ -94,8 +94,9 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   createForm() {
     this.dashboardForm = this.fb.group({
       name: ['', [Validators.required,
-        Validators.maxLength(30),
-        Validators.pattern(/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g)]],
+        Validators.maxLength(30)],
+        this.validatePattern
+      ],
       description: [''],
       categoryId: ['', Validators.required],
       autoRefreshEnabled: [false, Validators.required],
@@ -106,6 +107,16 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.disableIntervalConditionally();
+  }
+
+  validatePattern(control) {
+    return new Promise((resolve, reject) => {
+      if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
+          resolve({ nameIsInValid: true });
+      } else {
+        resolve(null);
+      }
+    });
   }
 
   disableIntervalConditionally() {

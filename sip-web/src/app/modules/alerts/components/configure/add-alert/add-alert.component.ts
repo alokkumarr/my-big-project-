@@ -191,11 +191,21 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return entityNameErrorMessage(state);
   }
 
+  validatePattern(control) {
+    return new Promise((resolve, reject) => {
+      if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
+          resolve({ nameIsInValid: true });
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
       alertRuleName: ['', [Validators.required,
-        Validators.maxLength(30),
-        Validators.pattern(/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g)]],
+        Validators.maxLength(30)],
+        this.validatePattern],
       alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
