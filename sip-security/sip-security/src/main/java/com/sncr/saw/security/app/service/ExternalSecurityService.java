@@ -124,7 +124,7 @@ public class ExternalSecurityService {
 
     // add category
     CategoryList catList = new CategoryList();
-    List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategory();
+    List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategories();
     if (categoryPrivilegeLis != null && !categoryPrivilegeLis.isEmpty()) {
       for (CategoryDetails category : categoryPrivilegeLis) {
         if (category.isAutoCreate()) {
@@ -137,7 +137,7 @@ public class ExternalSecurityService {
           response.setCategoryList(catList);
 
           if (catList.getValid()) {
-            List<SubCategoryDetails> subCategories = category.getSubCategory();
+            List<SubCategoryDetails> subCategories = category.getSubCategories();
             if (subCategories != null && !subCategories.isEmpty()) {
               for (SubCategoryDetails subCategoryDetails : subCategories) {
                 if (subCategoryDetails.isAutoCreate()) {
@@ -315,8 +315,8 @@ public class ExternalSecurityService {
           .filter(cd -> cd.getModuleName().equalsIgnoreCase(roleCategoryPrivilege.getModuleName())
               && cd.getProductName().equalsIgnoreCase(roleCategoryPrivilege.getProductName())).collect(Collectors.toList());
 
-      if (roleCategoryPrivilege.getCategory() != null && !roleCategoryPrivilege.getCategory().isEmpty()) {
-        for (com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails details : roleCategoryPrivilege.getCategory()) {
+      if (roleCategoryPrivilege.getCategories() != null && !roleCategoryPrivilege.getCategories().isEmpty()) {
+        for (com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails details : roleCategoryPrivilege.getCategories()) {
           filterCategory.forEach(filterCat -> {
             String catName = details.getCategoryName();
             if (filterCat.getCategoryName().equalsIgnoreCase(catName)) {
@@ -350,8 +350,8 @@ public class ExternalSecurityService {
   private static List<com.sncr.saw.security.common.bean.external.response.SubCategoryDetails> buildSubCategoryDetails(
       com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails filterCat) {
     List<com.sncr.saw.security.common.bean.external.response.SubCategoryDetails> subCategoryList = new ArrayList<>();
-    if (filterCat.getSubCategory() != null && !filterCat.getSubCategory().isEmpty()) {
-      filterCat.getSubCategory().forEach(subDetails -> {
+    if (filterCat.getSubCategories() != null && !filterCat.getSubCategories().isEmpty()) {
+      filterCat.getSubCategories().forEach(subDetails -> {
         com.sncr.saw.security.common.bean.external.response.SubCategoryDetails subCategoryDetails =
             new com.sncr.saw.security.common.bean.external.response.SubCategoryDetails();
         subCategoryDetails.setActiveStatusInd(subDetails.getActivestatusInd());

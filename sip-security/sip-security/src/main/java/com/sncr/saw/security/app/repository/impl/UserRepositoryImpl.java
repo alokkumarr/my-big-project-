@@ -2590,7 +2590,7 @@ public class UserRepositoryImpl implements UserRepository {
           }
 
         }
-        catPDetails.setSubCategory(subCategory);
+        catPDetails.setSubCategories(subCategory);
         catList.add(catPDetails);
       }
 
@@ -2765,8 +2765,8 @@ public class UserRepositoryImpl implements UserRepository {
         + " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND FEATURE_TYPE = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?";
     try {
       catExists = jdbcTemplate.query(sql1, preparedStatement -> {
-        String subCategoryName = category.getSubCategory() != null ? category.getSubCategory().get(0).getSubCategoryName() : category.getCategoryName();
-        Long subCategoryId = category.getSubCategory() != null ? category.getSubCategory().get(0).getSubCategoryId() : 0l;
+        String subCategoryName = category.getSubCategories() != null ? category.getSubCategories().get(0).getSubCategoryName() : category.getCategoryName();
+        Long subCategoryId = category.getSubCategories() != null ? category.getSubCategories().get(0).getSubCategoryId() : 0l;
 
         preparedStatement.setLong(1, category.getProductId());
         preparedStatement.setString(2, subCategoryName);
@@ -2938,13 +2938,13 @@ public class UserRepositoryImpl implements UserRepository {
           preparedStatement.setLong(7, category.getCategoryId());
         }
       });
-      Boolean subCatExists = category.getSubCategory().size() > 0 ? true : false;
+      Boolean subCatExists = category.getSubCategories().size() > 0 ? true : false;
       if (subCatExists) {
         //Update Child Category
         String sql1 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_NAME=?,FEATURE_DESC=?,"
             + "FEATURE_CODE=?,FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
             + " WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";
-        String[] subCategoryCode = category.getSubCategory().get(0).getSubCategoryName().toUpperCase().split(" ");
+        String[] subCategoryCode = category.getSubCategories().get(0).getSubCategoryName().toUpperCase().split(" ");
         StringBuffer subFeatureCode = new StringBuffer();
         StringBuffer subFeatureType = new StringBuffer();
 
@@ -2952,18 +2952,18 @@ public class UserRepositoryImpl implements UserRepository {
         for (int i = 0; i < subCategoryCode.length; i++) {
           subFeatureCode.append(subCategoryCode[i]);
         }
-        subFeatureCode.append(category.getSubCategory().get(0).getSubCategoryId());
+        subFeatureCode.append(category.getSubCategories().get(0).getSubCategoryId());
         subFeatureType.append("CHILD_" + featureCode);
 
         jdbcTemplate.update(sql1, new PreparedStatementSetter() {
           public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, category.getSubCategory().get(0).getSubCategoryName());
-            preparedStatement.setString(2, category.getSubCategory().get(0).getSubCategoryDesc());
+            preparedStatement.setString(1, category.getSubCategories().get(0).getSubCategoryName());
+            preparedStatement.setString(2, category.getSubCategories().get(0).getSubCategoryDesc());
             preparedStatement.setString(3, subFeatureCode.toString());
             preparedStatement.setString(4, subFeatureType.toString());
-            preparedStatement.setLong(5, category.getSubCategory().get(0).getActivestatusInd());
+            preparedStatement.setLong(5, category.getSubCategories().get(0).getActivestatusInd());
             preparedStatement.setString(6, category.getMasterLoginId());
-            preparedStatement.setLong(7, category.getSubCategory().get(0).getSubCategoryId());
+            preparedStatement.setLong(7, category.getSubCategories().get(0).getSubCategoryId());
           }
         });
 
