@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 :host {
   width: 100%;
@@ -25,7 +25,8 @@
 }
 
 .whiteFrame {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12);
   background-color: white;
 }
 
@@ -85,7 +86,8 @@
   border: $primary-blue-b2 0.5px dotted;
 
   &:hover {
-    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+      0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
     cursor: pointer;
   }
 }
@@ -93,4 +95,9 @@
 .preview-icon {
   font-size: 18px;
   color: $primary-blue-b2;
+}
+
+// If form fields are positioned one over another then mat-hint and mat-error are overlapped, to solve that issue this style is added.
+.section-input-margin {
+  margin-top: 0.6em !important;
 }
