@@ -2,7 +2,7 @@
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
 const Header = require('../../pages/components/Header');
-
+const logger = require('../../conf/logger')(__filename);
 class DataSourcesPage extends DeleteModel {
   constructor() {
     super();
@@ -256,6 +256,7 @@ class DataSourcesPage extends DeleteModel {
   clickOnBackButton() {
     commonFunctions.clickOnElement(this._backBtn);
   }
+
   verifyRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
     let attempts = 15;
@@ -274,7 +275,7 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              console.log('Element found...');
+              logger.info('Element found...');
               _self.clickOnJobIdByRouteName(routeInfo.routeName);
               _self.scheduleVerification(routeInfo);
               // go to channel management
@@ -283,8 +284,8 @@ class DataSourcesPage extends DeleteModel {
             } else {
               // go to channel management
               _self.clickOnBackButton();
-              console.log(`Element not present Attempt:${index} done`);
-              console.log(`waiting for 20 seconds and check again`);
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
               process(index + 1);
             }
@@ -299,6 +300,7 @@ class DataSourcesPage extends DeleteModel {
     header.selectCategory(cat);
     header.selectSubCategory(subCat);
   }
+
   scheduleVerification(routeInfo) {
     expect(
       this._jobLogFilePattern(routeInfo.filePattern).isDisplayed()
@@ -346,6 +348,52 @@ class DataSourcesPage extends DeleteModel {
 
   clickOnEditRoute() {
     commonFunctions.clickOnElement(this._editRoute);
+  }
+
+  verifyApiRouteScheduleInformation(channelName, routeInfo) {
+    let _self = this;
+    let attempts = 15;
+    (function process(index) {
+      if (index >= attempts) {
+        return;
+      }
+      _self.clickOnCreatedChannelName(channelName);
+      _self.clickOnRouteAction(routeInfo.routeName);
+      _self.clickOnViewRouteLogs();
+      browser.sleep(2000);
+
+      element(
+        _self
+          ._jobRouteName(routeInfo.routeName)
+          .isPresent()
+          .then(present => {
+            if (present) {
+              logger.info('Element found...');
+              _self.clickOnJobIdByRouteName(routeInfo.routeName);
+              _self.scheduleAPiLogVerification(routeInfo);
+              // go to channel management
+              _self.clickOnBackButton();
+              _self.clickOnBackButton();
+            } else {
+              // go to channel management
+              _self.clickOnBackButton();
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
+              browser.sleep(20000);
+              process(index + 1);
+            }
+          })
+      );
+    })(1);
+  }
+
+  scheduleAPiLogVerification(routeInfo) {
+    const recFileName = routeInfo.routeName.replace(/ /g, '_').toLowerCase();
+    expect(this._recFileName(recFileName).isDisplayed()).toBeTruthy();
+    expect(this._jobLogFileStatus(`SUCCESS`).isDisplayed()).toBeTruthy();
+    expect(
+      this._jobLogProcessState(`DATA_RECEIVED`).isDisplayed()
+    ).toBeTruthy();
   }
 }
 
