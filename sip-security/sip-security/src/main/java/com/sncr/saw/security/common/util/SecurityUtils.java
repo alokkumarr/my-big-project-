@@ -3,7 +3,6 @@ package com.sncr.saw.security.common.util;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.external.response.CategoryDetails;
 import com.sncr.saw.security.common.bean.external.response.CategoryList;
-import com.sncr.saw.security.common.bean.external.response.Role;
 import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -137,12 +136,12 @@ public class SecurityUtils {
    *
    * @param masterLoginId
    * @param response
-   * @param responseRole
+   * @param roleId
    * @param category
    * @param privileges
    * @return AddPrivilegeDetails bean
    */
-  public static AddPrivilegeDetails buildPrivilegeBean(String masterLoginId, RoleCatPrivilegeResponse response, Role responseRole,
+  public static AddPrivilegeDetails buildPrivilegeBean(String masterLoginId, RoleCatPrivilegeResponse response, Long roleId,
                                                        com.sncr.saw.security.common.bean.external.response.CategoryDetails category,
                                                        List<String> privileges) {
     Long subCategoryId = category.getSubCategory().get(0).getSubCategoryId();
@@ -154,7 +153,7 @@ public class SecurityUtils {
     privilegeDetails.setProductId(response.getProductId());
     privilegeDetails.setModuleId(response.getModuleId());
     privilegeDetails.setMasterLoginId(masterLoginId);
-    privilegeDetails.setRoleId(responseRole.getRoleSysId());
+    privilegeDetails.setRoleId(roleId);
 
     List<SubCategoriesPrivilege> subCategoriesPrivilegeList = new ArrayList<>();
     SubCategoriesPrivilege subCategoriesPrivilege = new SubCategoriesPrivilege();

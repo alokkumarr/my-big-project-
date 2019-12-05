@@ -203,24 +203,33 @@ public class ExternalSecurityController {
                           .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
                           .findAny().get();
 
-                      AddPrivilegeDetails privilegeDetails = SecurityUtils.buildPrivilegeBean(masterLoginId, response, responseRole, detailsCategory, subCategoryDetails.getPrivilege());
-                      Valid valid = userRepository.upsertPrivilege(privilegeDetails);
-                      if (valid.getValid()) {
-                        String pMessage = "Category,Subcategory,Privileges added : " + String.join(",", subCategoryDetails.getPrivilege());
-                        response.setMessage(pMessage);
+                      if (responseRole.getRoleSysId() > 0) {
+                        AddPrivilegeDetails privilegeDetails = SecurityUtils.buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, subCategoryDetails.getPrivilege());
+                        Valid valid = userRepository.upsertPrivilege(privilegeDetails);
+                        if (valid.getValid()) {
+                          String pMessage = "Category,Subcategory,Privileges added : " + String.join(",", subCategoryDetails.getPrivilege());
+                          detailsCategory.getSubCategory().forEach(subCat -> subCat.setPrivilege(subCategoryDetails.getPrivilege()));
+                          response.setMessage(pMessage);
+                        }
+                      } else {
+                        response.getCategoryList().setValid(false);
+                        response.getCategoryList().setMessage("Privileges can't be added without role Id.");
                       }
                     }
                   } else {
                     SecurityUtils.buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false);
+                    response.setCategoryList(catList);
                   }
                 } else {
                   SecurityUtils.buildMessage(catList, "Sub categories can't be add for flag false.", false);
+                  response.setCategoryList(catList);
                 }
               }
             }
           }
         } else {
           SecurityUtils.buildMessage(catList, "Categories can't be add for flag false.", false);
+          response.setCategoryList(catList);
         }
       }
     }
