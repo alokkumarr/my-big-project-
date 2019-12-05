@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sncr.saw.security.common.bean.Role;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,4 +25,12 @@ public class RoleRepositoryDaoImplTest {
     assertEquals(100L, roleRepoDao.createNewAdminRoleDao(custId));
   }
 
+  @Test
+  public void validateRoleByIdAndCustomerCode() throws Exception {
+    Long custId = 10L;
+    Role role = new Role();
+    role.setRoleCode("TESTCODE01");
+    role.setRoleType("ADMIN");
+    when(roleRepoDao.validateRoleByIdAndCustomerCode(custId, role)).thenReturn(true);
+  }
 }
