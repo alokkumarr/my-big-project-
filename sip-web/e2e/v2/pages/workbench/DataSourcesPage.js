@@ -2,7 +2,7 @@
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
 const Header = require('../../pages/components/Header');
-
+const logger = require('../../conf/logger')(__filename);
 class DataSourcesPage extends DeleteModel {
   constructor() {
     super();
@@ -277,7 +277,7 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              console.log('Element found...');
+              logger.info('Element found...');
               _self.clickOnJobIdByRouteName(routeInfo.routeName);
               _self.scheduleVerification(routeInfo);
               // go to channel management
@@ -286,8 +286,8 @@ class DataSourcesPage extends DeleteModel {
             } else {
               // go to channel management
               _self.clickOnBackButton();
-              console.log(`Element not present Attempt:${index} done`);
-              console.log(`waiting for 20 seconds and check again`);
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
               process(index + 1);
             }
@@ -370,7 +370,7 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              console.log('Element found...');
+              logger.info('Element found...');
               _self.clickOnJobIdByRouteName(routeInfo.routeName);
               _self.scheduleAPiLogVerification(routeInfo);
               // go to channel management
@@ -379,8 +379,8 @@ class DataSourcesPage extends DeleteModel {
             } else {
               // go to channel management
               _self.clickOnBackButton();
-              console.log(`Element not present Attempt:${index} done`);
-              console.log(`waiting for 20 seconds and check again`);
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
               process(index + 1);
             }
