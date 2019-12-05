@@ -93,6 +93,7 @@ public class UserRepositoryImplTest {
 	private static Category category11;
 	private static Category category12;
 	private static List<Category> categoryList = new ArrayList<Category>();
+  private static String createdBy="sawadmin@synchronoss.com";
 
 	@BeforeClass
 	public static void setUp() {
@@ -531,9 +532,9 @@ public class UserRepositoryImplTest {
 	public void testAddUser() {
 		Valid validUser1 = new Valid();
 		validUser1.setValid(true);
-		when(userRepositoryDAO.addUser(user1)).thenReturn(validUser1); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.addUser(user1,createdBy)).thenReturn(validUser1); // Stubbing the methods of mocked userRepo with mocked data.
 
-		Valid isbn = userRepositoryDAO.addUser(user1);
+		Valid isbn = userRepositoryDAO.addUser(user1,createdBy);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
 		if (isbn.getValid()) {
@@ -546,8 +547,8 @@ public class UserRepositoryImplTest {
 
 		Valid validUser2 = new Valid();
 		validUser2.setValid(true);
-		when(userRepositoryDAO.addUser(user2)).thenReturn(validUser2); // Stubbing the methods of mocked userRepo with mocked data.
-		isbn = userRepositoryDAO.addUser(user2);
+		when(userRepositoryDAO.addUser(user2,createdBy)).thenReturn(validUser2); // Stubbing the methods of mocked userRepo with mocked data.
+		isbn = userRepositoryDAO.addUser(user2,createdBy);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
 		if (isbn.getValid()) {

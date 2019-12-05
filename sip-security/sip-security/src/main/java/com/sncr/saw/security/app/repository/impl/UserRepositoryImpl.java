@@ -3301,8 +3301,10 @@ public class UserRepositoryImpl implements UserRepository {
   public UserDetails getUser(String masterLoginId, Long customerSysId) {
     UserDetails userDetails = null;
     String sql =
-        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,\n"
-            + " U.ACTIVE_STATUS_IND,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? AND U.CUSTOMER_SYS_ID=?";
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
+            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
+            + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
+            + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? AND U.CUSTOMER_SYS_ID=?";
     try {
       userDetails =
           jdbcTemplate.query(
