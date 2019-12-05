@@ -47,13 +47,13 @@ public class ExternalSecurityService {
    *
    * @param httpResponse
    * @param roleCategoryPrivilege
-   * @param response
    * @param masterLoginId
    * @param moduleDetails
    * @param customerSysId
    */
-  public void createRoleCategoryPrivilege(HttpServletResponse httpResponse, @RequestBody RoleCategoryPrivilege roleCategoryPrivilege,
-                                          RoleCatPrivilegeResponse response, String masterLoginId, ProductModuleDetails moduleDetails, Long customerSysId) {
+  public RoleCatPrivilegeResponse createRoleCategoryPrivilege(HttpServletResponse httpResponse, RoleCategoryPrivilege roleCategoryPrivilege,
+                                                              String masterLoginId, ProductModuleDetails moduleDetails, Long customerSysId) {
+    RoleCatPrivilegeResponse response = new RoleCatPrivilegeResponse();
     // add the product/module id
     response.setProductId(moduleDetails.getProductId());
     response.setModuleId(moduleDetails.getModuleId());
@@ -192,6 +192,8 @@ public class ExternalSecurityService {
         }
       }
     }
+    logger.trace("Role , category, privilege Response : {}", response.toString());
+    return response;
   }
 
   /**

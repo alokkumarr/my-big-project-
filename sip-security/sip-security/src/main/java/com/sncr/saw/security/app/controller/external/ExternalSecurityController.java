@@ -83,8 +83,7 @@ public class ExternalSecurityController {
       response.setMessage("Product and Module does not exist for this user.");
       return response;
     }
-    securityService.createRoleCategoryPrivilege(httpResponse, roleCategoryPrivilege, response, masterLoginId, moduleDetails, customerSysId);
-
+    response = securityService.createRoleCategoryPrivilege(httpResponse, roleCategoryPrivilege, masterLoginId, moduleDetails, customerSysId);
     return response;
   }
 
