@@ -56,6 +56,7 @@ import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
+import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
@@ -79,6 +80,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,12 +130,6 @@ public class SecurityController {
     private final String AdminRole = "ADMIN";
 
     private final String ALERTS = "ALERTS";
-
-  private final String errorMessage = "%s can't be null or empty";
-
-  private final String nullErrorMessage = "%s can't be null";
-
-  private final String notExistErrorMessage = "%s does not exists";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -1830,29 +1826,38 @@ public class SecurityController {
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
 
-
+  /**
+   * Create user with dsk.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param userDetails UserDetails
+   * @return Returns UserDetailsResponse
+   */
   @RequestMapping(
       value = "/auth/admin/cust/manage/external/users/create",
       method = RequestMethod.POST)
   @ResponseBody
   public UserDetailsResponse createUser(
-      @RequestHeader("Authorization") String authToken,
-      @RequestBody  UserDetails userDetails,
-      HttpServletResponse response) {
-    String[] valuesFromToken =
-        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody UserDetails userDetails) {
+    String jwtToken = JWTUtils.getToken(request);
+    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
     validateUserDetails(userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       userDetailsResponse.setValid(false);
+      logger.error("user is not admin");
       userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
       return userDetailsResponse;
     }
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
     if (customerSysId == null) {
       userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(String.format(notExistErrorMessage, "customerCode"));
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
       return userDetailsResponse;
     }
     String securityGroupName = userDetails.getSecurityGroupName();
@@ -1862,17 +1867,21 @@ public class SecurityController {
       if (groupSysId == null) {
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage(
-            String.format(notExistErrorMessage, "securityGroupName"));
+            String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
         return userDetailsResponse;
       }
     }
     Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName());
     if (roleSysId == null) {
       userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(String.format(notExistErrorMessage, "roleName"));
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.notExistErrorMessage, "roleName"));
       return userDetailsResponse;
     }
     String masterLoginId = valuesFromToken[4];
+    if (StringUtils.isBlank(userDetails.getPassword())) {
+      userDetails.setPassword(generateRandomPassowrd());
+    }
     Valid valid = null;
 
     try {
@@ -1906,39 +1915,56 @@ public class SecurityController {
   }
 
   private void validateUserDetails(UserDetails userDetails) {
-    Preconditions.checkNotNull(userDetails, String.format(nullErrorMessage, "Request Body"));
+    Preconditions.checkNotNull(
+        userDetails, String.format(ErrorMessages.nullErrorMessage, "Request Body"));
     Preconditions.checkState(
         StringUtils.isNotBlank(userDetails.getCustomerCode()),
-        String.format(errorMessage, "customercode"));
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "customercode"));
     Preconditions.checkState(
         StringUtils.isNotBlank(userDetails.getMasterLoginId()),
-        String.format(errorMessage, "masterLoginId"));
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
     Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getPassword()), String.format(errorMessage, "password"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getEmail()), String.format(errorMessage, "email"));
+        StringUtils.isNotBlank(userDetails.getEmail()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
     Preconditions.checkState(
         StringUtils.isNotBlank(userDetails.getFirstName()),
-        String.format(errorMessage, "firstName"));
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
     Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getLastName()), String.format(errorMessage, "lastName"));
+        StringUtils.isNotBlank(userDetails.getLastName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
     Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getRoleName()), String.format(errorMessage, "roleName"));
+        StringUtils.isNotBlank(userDetails.getRoleName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleName"));
     Preconditions.checkNotNull(
-        userDetails.getActiveStatusInd(), String.format(nullErrorMessage, "activeStatusInd"));
+        userDetails.getActiveStatusInd(),
+        String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
   }
 
-  /** @return */
+  /**
+   * gets all users.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @return Returns UsersDetailsList
+   */
   @RequestMapping(
       value = "/auth/admin/cust/manage/external/users/fetch",
       method = RequestMethod.GET)
-  public UsersDetailsList getUserList(@RequestHeader("Authorization") String authToken) {
-    String[] valuesFromToken =
-        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
+  public UsersDetailsList getUserList(
+      HttpServletRequest request, HttpServletResponse response) {
+    String jwtToken = JWTUtils.getToken(request);
+    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
     UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
-    Long customerId1 = Long.valueOf(valuesFromToken[1]);
+    if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      usersDetailsListResponse.setValid(false);
+      usersDetailsListResponse.setValidityMessage(
+          "You are not authorized to perform this operation");
+      return usersDetailsListResponse;
+    }
+    Long customerId = Long.valueOf(valuesFromToken[1]);
     try {
-      List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId1);
+      List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId);
       usersDetailsListResponse.setUsers(userDetailsList);
       usersDetailsListResponse.setRecordCount(userDetailsList.size());
       usersDetailsListResponse.setValid(true);
@@ -1950,5 +1976,19 @@ public class SecurityController {
       return usersDetailsListResponse;
     }
     return usersDetailsListResponse;
+  }
+
+  private String generateRandomPassowrd() {
+    String upperCaseLetters = RandomStringUtils.random(2, 65, 90, true, true);
+    String lowerCaseLetters = RandomStringUtils.random(2, 97, 122, true, true);
+    String numbers = RandomStringUtils.randomNumeric(2);
+    String specialChar = RandomStringUtils.random(2, 33, 47, false, false);
+    String totalChars = RandomStringUtils.randomAlphanumeric(2);
+    return new StringBuilder(upperCaseLetters)
+        .append(lowerCaseLetters)
+        .append(numbers)
+        .append(specialChar)
+        .append(totalChars)
+        .toString();
   }
 }
