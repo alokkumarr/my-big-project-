@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
@@ -27,6 +28,7 @@ import com.sncr.saw.security.common.bean.ResetPwdDtls;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserPreferences;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
@@ -40,6 +42,8 @@ import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
+import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
+import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -75,6 +79,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +94,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -122,6 +128,12 @@ public class SecurityController {
     private final String AdminRole = "ADMIN";
 
     private final String ALERTS = "ALERTS";
+
+  private final String errorMessage = "%s can't be null or empty";
+
+  private final String nullErrorMessage = "%s can't be null";
+
+  private final String notExistErrorMessage = "%s does not exists";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -1077,26 +1089,27 @@ public class SecurityController {
 	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
 
+  /**
+   * @param user
+   * @return
+   */
+  @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
+  public UsersList addUser(
+      @RequestHeader("Authorization") String authToken, @RequestBody User user) {
+    String[] valuesFromToken =
+        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
 
-
-    /**
-	 *
-	 * @param user
-	 * @return
-	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
-	public UsersList addUser(@RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
-
-		try {
-			if (user != null) {
-			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
-                userList.setValid(validity.getValid());
-                userList.setValidityMessage(validity.getValidityMessage());
+    String masterLoginId = valuesFromToken[4];
+    UsersList userList = new UsersList();
+    Valid valid = null;
+    try {
+      if (user != null) {
+        Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
+        userList.setValid(validity.getValid());
+        userList.setValidityMessage(validity.getValidityMessage());
 
 				if (userList.getValid()) {
-					valid = userRepository.addUser(user);
+					valid = userRepository.addUser(user,masterLoginId);
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
@@ -1444,11 +1457,11 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param cpm
 	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/list", method = RequestMethod.POST)
 	public CategoryList getcategoriesList(@RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
@@ -1464,13 +1477,13 @@ public class SecurityController {
 		}
 		return categories;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param cpsm
 	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/auth/admin/cust/manage/subCategoriesWithPrivilege/list", method = RequestMethod.POST)
 	public SubCategoryWithPrivilegeList getSubCategoriesList(@RequestBody CustomerProductSubModule cpsm) {
 		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
@@ -1486,9 +1499,9 @@ public class SecurityController {
 		}
 		return subcategories;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param addPrivilegeDetails
 	 * @return
 	 */
@@ -1519,9 +1532,9 @@ public class SecurityController {
 		}
 		return privList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param privilege
 	 * @return
 	 */
@@ -1554,7 +1567,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param privilege
 	 * @return
 	 */
@@ -1583,9 +1596,9 @@ public class SecurityController {
 		}
 		return privList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param customerId
 	 * @return
 	 */
@@ -1610,9 +1623,9 @@ public class SecurityController {
 
 		return catList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
@@ -1654,13 +1667,13 @@ public class SecurityController {
 		}
 		return catList;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param cpm
 	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/parent/list", method = RequestMethod.POST)
 	public CategoryList getcategoriesOnlyList(@RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
@@ -1676,9 +1689,9 @@ public class SecurityController {
 		}
 		return categories;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
@@ -1706,7 +1719,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
@@ -1733,7 +1746,7 @@ public class SecurityController {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param category
 	 * @return
 	 */
@@ -1816,4 +1829,126 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+
+  @RequestMapping(
+      value = "/auth/admin/cust/manage/external/users/create",
+      method = RequestMethod.POST)
+  @ResponseBody
+  public UserDetailsResponse createUser(
+      @RequestHeader("Authorization") String authToken,
+      @RequestBody  UserDetails userDetails,
+      HttpServletResponse response) {
+    String[] valuesFromToken =
+        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
+    validateUserDetails(userDetails);
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+    if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+      return userDetailsResponse;
+    }
+    Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
+    if (customerSysId == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(String.format(notExistErrorMessage, "customerCode"));
+      return userDetailsResponse;
+    }
+    String securityGroupName = userDetails.getSecurityGroupName();
+    Long groupSysId = null;
+    if (securityGroupName != null) {
+      groupSysId = userRepository.getSecurityGroupSysid(securityGroupName);
+      if (groupSysId == null) {
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage(
+            String.format(notExistErrorMessage, "securityGroupName"));
+        return userDetailsResponse;
+      }
+    }
+    Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName());
+    if (roleSysId == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(String.format(notExistErrorMessage, "roleName"));
+      return userDetailsResponse;
+    }
+    String masterLoginId = valuesFromToken[4];
+    Valid valid = null;
+
+    try {
+      Valid validity =
+          PasswordValidation.validatePassword(
+              userDetails.getPassword(), userDetails.getMasterLoginId());
+      userDetailsResponse.setValid(validity.getValid());
+      userDetailsResponse.setValidityMessage(validity.getValidityMessage());
+      userDetails.setCustomerId(customerSysId);
+      userDetails.setRoleId(roleSysId);
+      userDetails.setSecGroupSysId(groupSysId);
+      if (userDetailsResponse.getValid()) {
+        valid = userRepository.addUserDetails(userDetails, masterLoginId);
+        if (valid.getValid()) {
+          userDetailsResponse.setUser(
+              userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
+          userDetailsResponse.setValid(true);
+        } else {
+          userDetailsResponse.setValid(false);
+          userDetailsResponse.setValidityMessage(valid.getError());
+        }
+      }
+    } catch (Exception e) {
+      userDetailsResponse.setValid(false);
+      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+      userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
+      userDetailsResponse.setError(e.getMessage());
+      return userDetailsResponse;
+    }
+    return userDetailsResponse;
+  }
+
+  private void validateUserDetails(UserDetails userDetails) {
+    Preconditions.checkNotNull(userDetails, String.format(nullErrorMessage, "Request Body"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getCustomerCode()),
+        String.format(errorMessage, "customercode"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getMasterLoginId()),
+        String.format(errorMessage, "masterLoginId"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getPassword()), String.format(errorMessage, "password"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getEmail()), String.format(errorMessage, "email"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getFirstName()),
+        String.format(errorMessage, "firstName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getLastName()), String.format(errorMessage, "lastName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getRoleName()), String.format(errorMessage, "roleName"));
+    Preconditions.checkNotNull(
+        userDetails.getActiveStatusInd(), String.format(nullErrorMessage, "activeStatusInd"));
+  }
+
+  /** @return */
+  @RequestMapping(
+      value = "/auth/admin/cust/manage/external/users/fetch",
+      method = RequestMethod.GET)
+  public UsersDetailsList getUserList(@RequestHeader("Authorization") String authToken) {
+    String[] valuesFromToken =
+        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
+    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+    Long customerId1 = Long.valueOf(valuesFromToken[1]);
+    try {
+      List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId1);
+      usersDetailsListResponse.setUsers(userDetailsList);
+      usersDetailsListResponse.setRecordCount(userDetailsList.size());
+      usersDetailsListResponse.setValid(true);
+    } catch (Exception e) {
+      usersDetailsListResponse.setValid(false);
+      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+      usersDetailsListResponse.setValidityMessage(message + " Please contact server Administrator");
+      usersDetailsListResponse.setError(e.getMessage());
+      return usersDetailsListResponse;
+    }
+    return usersDetailsListResponse;
+  }
 }

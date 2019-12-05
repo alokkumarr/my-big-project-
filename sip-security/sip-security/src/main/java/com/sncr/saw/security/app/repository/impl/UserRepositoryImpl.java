@@ -11,6 +11,7 @@ import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.CustomerProductModuleFeature;
 import com.sncr.saw.security.common.bean.repo.PasswordDetails;
@@ -1386,7 +1387,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public Valid addUser(User user) {
+	public Valid addUser(User user,String createdBy) {
 		Valid valid = new Valid();
 		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
 				+ "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
@@ -1403,7 +1404,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(7, user.getMiddleName());
 					preparedStatement.setString(8, user.getLastName());
 					preparedStatement.setString(9, user.getActiveStatusInd());
-					preparedStatement.setString(10, user.getMasterLoginId());
+					preparedStatement.setString(10, createdBy);
 				}
 			});
 		} catch (DuplicateKeyException e) {
@@ -3176,5 +3177,250 @@ public class UserRepositoryImpl implements UserRepository {
       logger.error("Exception encountered while ", e);
     }
     return false;
+  }
+
+  @Override
+  public Long getCustomerSysid(String customerCode) {
+    String sql = "select C.CUSTOMER_SYS_ID from CUSTOMERS C where C.CUSTOMER_CODE =?";
+    Long customerSysId = null;
+    try {
+      customerSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> preparedStatement.setString(1, customerCode),
+              new UserRepositoryImpl.LongExtractor("CUSTOMER_SYS_ID"));
+    } catch (Exception e) {
+      logger.error("Exception encountered while ", e);
+    }
+    return customerSysId;
+  }
+
+
+  @Override
+  public Long getSecurityGroupSysid(String dskGroup) {
+      String sql = "select S.SEC_GROUP_SYS_ID  from SEC_GROUP S where S.SEC_GROUP_NAME =?";
+      Long secGroupSysId = null;
+      try {
+          secGroupSysId =
+              jdbcTemplate.query(
+                  sql,
+                  preparedStatement -> preparedStatement.setString(1, dskGroup),
+                  new UserRepositoryImpl.LongExtractor("SEC_GROUP_SYS_ID"));
+      } catch (Exception e) {
+          logger.error("Exception encountered while ", e);
+      }
+      return secGroupSysId;
+  }
+
+
+    public class LongExtractor implements ResultSetExtractor<Long> {
+        private String fieldName;
+        public LongExtractor(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        @Override
+        public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Long result = null;
+            if (rs.next()) {
+                result = rs.getLong(fieldName);
+            }
+            return result;
+        }
+    }
+  @Override
+  public Long getRoleSysId(String roleName) {
+      String sql = "select R.ROLE_SYS_ID from ROLES R where R.ROLE_NAME =?";
+      Long roleSysId = null;
+      try {
+          roleSysId =
+              jdbcTemplate.query(
+                  sql,
+                  preparedStatement -> preparedStatement.setString(1, roleName),
+                  new UserRepositoryImpl.LongExtractor("ROLE_SYS_ID"));
+      } catch (Exception e) {
+          logger.error("Exception encountered while ", e);
+      }
+      return roleSysId;
+  }
+
+  @Override
+  public Valid addUserDetails(UserDetails userDetails, String createdBy) {
+    Valid valid = new Valid();
+    String sql =
+        "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
+            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
+            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?, SYSDATE(), ? ); ";
+    try {
+      jdbcTemplate.update(
+          sql,
+          new PreparedStatementSetter() {
+            public void setValues(PreparedStatement preparedStatement) throws SQLException {
+              preparedStatement.setString(1, userDetails.getMasterLoginId());
+              preparedStatement.setString(2, userDetails.getEmail());
+              preparedStatement.setLong(3, userDetails.getRoleId());
+              preparedStatement.setLong(4, userDetails.getCustomerId());
+              if (userDetails.getSecGroupSysId() != null) {
+                preparedStatement.setLong(5, userDetails.getSecGroupSysId());
+              } else {
+                preparedStatement.setNull(5, Types.BIGINT);
+              }
+              preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
+              preparedStatement.setString(7, userDetails.getFirstName());
+              preparedStatement.setString(8, userDetails.getMiddleName());
+              preparedStatement.setString(9, userDetails.getLastName());
+              preparedStatement.setString(10, getActiveStatusInd(userDetails.getActiveStatusInd()));
+              preparedStatement.setString(11, createdBy);
+            }
+          });
+    } catch (DuplicateKeyException e) {
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+      valid.setValid(false);
+      valid.setError("User cannot be added. Login ID already Exists!");
+      return valid;
+    } catch (DataIntegrityViolationException de) {
+      logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+      valid.setValid(false);
+      valid.setError("Please enter valid input in the field(s)");
+      return valid;
+    } catch (Exception e) {
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+      valid.setValid(false);
+      valid.setError(e.getMessage());
+      return valid;
+    }
+    valid.setValid(true);
+    return valid;
+  }
+
+  private String getActiveStatusInd(Boolean activeStatusInd) {
+    return activeStatusInd ? "1" : "0";
+  }
+
+  @Override
+  public UserDetails getUser(String masterLoginId, Long customerSysId) {
+    UserDetails userDetails = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,\n"
+            + " U.ACTIVE_STATUS_IND,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? AND U.CUSTOMER_SYS_ID=?";
+    try {
+      userDetails =
+          jdbcTemplate.query(
+              sql,
+              new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                  preparedStatement.setString(1, masterLoginId);
+                  preparedStatement.setLong(2, customerSysId);
+                }
+              },
+              new UserRepositoryImpl.UserDetailsExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+
+    return userDetails;
+  }
+
+  public class UserDetailsExtractor implements ResultSetExtractor<UserDetails> {
+
+    @Override
+    public UserDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+      UserDetails userDetails = null;
+      if (rs.next()) {
+        userDetails = new UserDetails();
+        userDetails.setMasterLoginId(rs.getString("USER_ID"));
+        userDetails.setUserId(rs.getLong("USER_SYS_ID"));
+        userDetails.setEmail(rs.getString("EMAIL"));
+        userDetails.setRoleName(rs.getString("ROLE_NAME"));
+        userDetails.setRoleId(rs.getLong("ROLE_SYS_ID"));
+        userDetails.setFirstName(rs.getString("FIRST_NAME"));
+        userDetails.setLastName(rs.getString("LAST_NAME"));
+        userDetails.setMiddleName(rs.getString("MIDDLE_NAME"));
+        userDetails.setCustomerCode(rs.getString("CUSTOMER_CODE"));
+        userDetails.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
+        Long secGroupSysId = rs.getLong("SEC_GROUP_SYS_ID");
+        secGroupSysId = (secGroupSysId < 1) ? null : secGroupSysId;
+        userDetails.setSecGroupSysId(secGroupSysId);
+        userDetails.setSecurityGroupName(rs.getString("SEC_GROUP_NAME"));
+
+        if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
+          userDetails.setActiveStatusInd(true);
+        } else {
+          userDetails.setActiveStatusInd(false);
+        }
+      }
+      return userDetails;
+    }
+  }
+
+  @Override
+  public ArrayList<UserDetails> getUsersDetailList(Long customerId) {
+    ArrayList<UserDetails> userDetailsList = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME,"
+            + " U.LAST_NAME, U.ACTIVE_STATUS_IND ,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME,C.CUSTOMER_CODE FROM USERS U  left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID "
+            + "inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID WHERE U.CUSTOMER_SYS_ID=?";
+    try {
+      userDetailsList =
+          jdbcTemplate.query(
+              sql,
+              new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                  preparedStatement.setLong(1, customerId);
+                }
+              },
+              new UserRepositoryImpl.UserDetailsListExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+
+    return userDetailsList;
+  }
+
+  public class UserDetailsListExtractor implements ResultSetExtractor<ArrayList<UserDetails>> {
+
+    @Override
+    public ArrayList<UserDetails> extractData(ResultSet rs)
+        throws SQLException, DataAccessException {
+      UserDetails userDetails = null;
+      ArrayList<UserDetails> userDetailsList = new ArrayList<UserDetails>();
+      while (rs.next()) {
+        userDetails = new UserDetails();
+        userDetails.setMasterLoginId(rs.getString("USER_ID"));
+        userDetails.setUserId(rs.getLong("USER_SYS_ID"));
+        userDetails.setEmail(rs.getString("EMAIL"));
+        userDetails.setRoleName(rs.getString("ROLE_NAME"));
+        userDetails.setRoleId(rs.getLong("ROLE_SYS_ID"));
+        userDetails.setFirstName(rs.getString("FIRST_NAME"));
+        userDetails.setLastName(rs.getString("LAST_NAME"));
+        userDetails.setMiddleName(rs.getString("MIDDLE_NAME"));
+        userDetails.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
+        userDetails.setCustomerCode(rs.getString("CUSTOMER_CODE"));
+        userDetails.setSecurityGroupName(rs.getString("SEC_GROUP_NAME"));
+        Long secGroupSysId = rs.getLong("SEC_GROUP_SYS_ID");
+        secGroupSysId = (secGroupSysId < 1) ? null : secGroupSysId;
+        userDetails.setSecGroupSysId(secGroupSysId);
+        if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
+          userDetails.setActiveStatusInd(true);
+        } else {
+          userDetails.setActiveStatusInd(false);
+        }
+
+        userDetailsList.add(userDetails);
+      }
+      return userDetailsList;
+    }
   }
 }
