@@ -19,16 +19,6 @@
       </ng-template>
 
       <mat-step [stepControl]="alertDefFormGroup">
-        <!-- Validation error messages for the user to correct the
-        incorrect dashboard name entered. -->
-        <div class="name-validation" *ngIf="!alertDefFormGroup.valid" fxLayout="column">
-          <span *ngIf="alertDefFormGroup.hasError('required', ['alertRuleName']) || alertDefFormGroup.value.alertRuleName.length > 30">
-            {{displayErrorMessage('nameLength')}}
-          </span>
-          <span *ngIf="alertDefFormGroup.hasError('nameIsInValid', ['name'])">
-            {{displayErrorMessage('specialChars')}}
-          </span>
-        </div>
         <form [formGroup]="alertDefFormGroup">
           <ng-template matStepLabel>Name your alert</ng-template>
           <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
@@ -47,6 +37,14 @@
                 "
                 >This field is required</mat-error
               >
+              <mat-error *ngIf="alertDefFormGroup.value.alertRuleName.length > 30" i18n>
+                <strong> {{displayErrorMessage('nameLength')}}
+                </strong>
+              </mat-error>
+              <mat-error *ngIf="alertDefFormGroup.hasError('nameIsInValid', ['name'])" i18n>
+                <strong> {{displayErrorMessage('specialChars')}}
+                </strong>
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">

@@ -5,16 +5,6 @@
   <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 </div>
 <div mat-dialog-content class="dialog__content">
-   <!-- Validation error messages for the user to correct the
-  incorrect dashboard name entered. -->
-  <div class="name-validation" *ngIf="!dashboardForm.valid" fxLayout="column">
-    <span *ngIf="dashboardForm.hasError('required', ['name']) || dashboardForm.value.name.length > 30">
-      {{displayErrorMessage('nameLength')}}
-    </span>
-    <span *ngIf="dashboardForm.hasError('nameIsInValid', ['name'])">
-      {{displayErrorMessage('specialChars')}}
-    </span>
-  </div>
   <form [formGroup]="dashboardForm" class="save-dashboard-form">
     <mat-form-field class="full-form-field">
       <input matInput name="dashboardName"
@@ -22,6 +12,18 @@
                       e2e="dashboard-save-name-input"
                       placeholder="Dashboard Name"
                       formControlName="name" />
+      <mat-error
+        *ngIf="dashboardForm.hasError('required', ['name'])"
+        >This field is required
+      </mat-error>
+      <mat-error *ngIf="dashboardForm.value.name.length > 30" i18n>
+        <strong> {{displayErrorMessage('nameLength')}}
+        </strong>
+      </mat-error>
+      <mat-error *ngIf="dashboardForm.hasError('nameIsInValid', ['name'])" i18n>
+        <strong> {{displayErrorMessage('specialChars')}}
+        </strong>
+      </mat-error>
     </mat-form-field>
     <mat-form-field class="full-form-field">
       <textarea matInput matTextareaAutosize
