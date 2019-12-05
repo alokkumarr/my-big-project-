@@ -17,7 +17,7 @@ public class DateTemporalExtractor {
 
   /**
    * Provides the {@link List} of {@link TemporalDateStructure} as output
-   * 
+   *
    * @param text
    *            source text
    * @return
@@ -78,27 +78,27 @@ public class DateTemporalExtractor {
           int year;
 
           // scenario detemisnistic where t1>31 & t1< 9999
-          // YYYY MM DD
-          // YYYY DD MM
-          // YY DD MM
-          // YY MM DD
-          // in case of YY (MM/DD) if YY<32, date can not be detrmined
+          // yyyy MM dd
+          // yyyy dd MM
+          // yy dd MM
+          // yy MM dd
+          // in case of yy (MM/dd) if yy<32, date can not be detrmined
           if (ExtractHelper.isDigit(t1)) {
               year = Integer.parseInt(t1);
               if (year > 31) {
                   /*determine the format of year to find out present date format*/
                   if(year < 99) {
-                      presentDateFormat ="YY$";
+                      presentDateFormat ="yy$";
                   }
                   else if(year > 999 && year < 10000) {
-                      presentDateFormat ="YYYY$";
+                      presentDateFormat ="yyyy$";
                   }
                   if (ExtractHelper.isDigit(t2)) {
-                      presentDateFormat = presentDateFormat +"DD&MMM";
+                      presentDateFormat = presentDateFormat +"dd&MMM";
                       day = Integer.parseInt(t2);
                       month = monthToDigit(t3);
                   } else {
-                      presentDateFormat = presentDateFormat +"MMM&DD";
+                      presentDateFormat = presentDateFormat +"MMM&dd";
                       month = monthToDigit(t2);
                       day = Integer.parseInt(t3);
                   }
@@ -114,27 +114,27 @@ public class DateTemporalExtractor {
           }
 
           // scenario detemisnistic where t1>31 & t1< 9999
-          // DD MM YYYY
-          // DD MM YY
-          // MM DD YYYY
-          // MM DD YY
-          // in case of (MM/DD) YY if YY<32, date can not be detrmined
+          // dd MM yyyy
+          // dd MM yy
+          // MM dd yyyy
+          // MM dd yy
+          // in case of (MM/dd) yy if yy<32, date can not be detrmined
           if (ExtractHelper.isDigit(t3)) {
               year = Integer.parseInt(t3);
               if (year > 31) {
                   /*determine the format of year to find out present date format*/
                   if(year < 99) {
-                      presentDateFormat ="YY";
+                      presentDateFormat ="yy";
                   }
                   else if(year > 999 && year < 10000) {
-                      presentDateFormat ="YYYY";
+                      presentDateFormat ="yyyy";
                   }
                   if (ExtractHelper.isDigit(t1)) {
-                      presentDateFormat = "DD$MMM&" + presentDateFormat;
+                      presentDateFormat = "dd$MMM&" + presentDateFormat;
                       day = Integer.parseInt(t1);
                       month = monthToDigit(t2);
                   } else {
-                      presentDateFormat = "MMM$DD&" + presentDateFormat;
+                      presentDateFormat = "MMM$dd&" + presentDateFormat;
                       month = monthToDigit(t1);
                       day = Integer.parseInt(t2);
                   }
@@ -155,14 +155,14 @@ public class DateTemporalExtractor {
           int d2 = Integer.parseInt(tokenizer.nextToken());
           int d3 = Integer.parseInt(tokenizer.nextToken());
           // supported formats
-          // YYYY MM DD
-          // YY MM DD
-          // DD MM YYYY
-          // DD MM YY
-          // MM DD YYYY
-          // MM DD YY
+          // yyyy MM dd
+          // yy MM dd
+          // dd MM yyyy
+          // dd MM yy
+          // MM dd yyyy
+          // MM dd yy
           // if d1 = year then d2 = month & d3 = day given d1>999 or 4 digit,
-          // detrmining YYYY MM DD
+          // detrmining yyyy MM dd
           if (d1 > 999) {
               TemporalDateStructure localDate = getYyyyMmDdProbable(d1, d2, d3);
               if (localDate != null) {
@@ -175,7 +175,7 @@ public class DateTemporalExtractor {
               }
           }
           // determined that 2 digit date is not a month or day as its between
-          // 31 & 99 , deteremining YY MM DD
+          // 31 & 99 , deteremining yy MM dd
           if (notFound && d1 > 31 && d1 < 100) {
               TemporalDateStructure localDate = getYyMmDdProbable(d1, d2, d3);
               if (localDate != null) {
@@ -187,7 +187,7 @@ public class DateTemporalExtractor {
                   return localDate;
               }
           }
-          // if d3= year in YYYY format, then date and month not determinstic
+          // if d3= year in yyyy format, then date and month not determinstic
           // if d1 & d2 <= 12
           // determine in case one position is dterministic
           //TODO
@@ -202,7 +202,7 @@ public class DateTemporalExtractor {
                   return localDate;
               }
           }
-          // if d3=year in YY format i.e. d3>31 & d3< 100, possible date with
+          // if d3=year in yy format i.e. d3>31 & d3< 100, possible date with
           // month and day not determinsitic
           //TODO
           if ((d3 > 31 && d3 < 100) && ((d1 > 0 && d1 < 32) || (d2 > 0 && d2 < 32))) {
@@ -240,10 +240,10 @@ public class DateTemporalExtractor {
           mils = Integer.parseInt(tokenizer.nextToken());
           //format = format + ".SSS";
           if(s.contains(".")) {
-              probableTimeFormat = format + ".SSS";   
+              probableTimeFormat = format + ".SSS";
           }
           if(s.contains(",")) {
-              probableTimeFormat = format + ",SSS";   
+              probableTimeFormat = format + ",SSS";
           }
       } else {
           tokenizer = new StringTokenizer(s, ": ");
@@ -278,8 +278,8 @@ public class DateTemporalExtractor {
       TemporalDateStructure localDate = getDetemintaionForYyyyPrefix(d1, d2, pYear);
       if (localDate != null) {
           /*
-           * String format = localDate.getConDateFormat().replace("YYYY",
-           * "YY"); localDate.setConDateFormat(format);
+           * String format = localDate.getConDateFormat().replace("yyyy",
+           * "yy"); localDate.setConDateFormat(format);
            */
       }
       return localDate;
@@ -293,12 +293,12 @@ public class DateTemporalExtractor {
           int pMonth = d2;
           TemporalDateStructure localDate = getYyyyMmDdProbable(pYear, pMonth, pDate);
           if (localDate != null) {
-              // localDate.setConDateFormat("DD-MM-YYYY");
+              // localDate.setConDateFormat("dd-MM-yyyy");
               if(pYear > 9 & pYear < 100) {
-                  localDate.setIdentifiedDateFormat("DD$MM&YY");
+                  localDate.setIdentifiedDateFormat("dd$MM&yy");
               }
               if(pYear > 99 & pYear < 10000) {
-                  localDate.setIdentifiedDateFormat("DD$MM&YYYY");
+                  localDate.setIdentifiedDateFormat("dd$MM&yyyy");
               }
               return localDate;
           }
@@ -308,28 +308,28 @@ public class DateTemporalExtractor {
           int pMonth = d1;
           TemporalDateStructure localDate = getYyyyMmDdProbable(pYear, pMonth, pDate);
           if (localDate != null) {
-              // localDate.setConDateFormat("MM-DD-YYYY");
+              // localDate.setConDateFormat("MM-dd-yyyy");
               if(pYear > 9 & pYear < 100) {
-                  localDate.setIdentifiedDateFormat("MM$DD&YY");
+                  localDate.setIdentifiedDateFormat("MM$dd&yy");
               }
               if(pYear > 99 & pYear < 10000) {
-                  localDate.setIdentifiedDateFormat("MM$DD&YYYY");
+                  localDate.setIdentifiedDateFormat("MM$dd&yyyy");
               }
               return localDate;
           }
       }
       if(d1 <= 12 && d2 <= 12) {
-          // Assumption is MM DD, i.e. Month will always be d2 and date will be d3
+          // Assumption is MM dd, i.e. Month will always be d2 and date will be d3
           int pMonth=d1;
           int pDate=d2;
           TemporalDateStructure localDate = getYyyyMmDdProbable(pYear, pMonth, pDate);
           if (localDate != null) {
-              // localDate.setConDateFormat("MM-DD-YYYY");
+              // localDate.setConDateFormat("MM-dd-yyyy");
               if(pYear > 9 & pYear < 100) {
-                  localDate.setIdentifiedDateFormat("MM$DD&YY");
+                  localDate.setIdentifiedDateFormat("MM$dd&yy");
               }
               if(pYear > 99 & pYear < 10000) {
-                  localDate.setIdentifiedDateFormat("MM$DD&YYYY");
+                  localDate.setIdentifiedDateFormat("MM$dd&yyyy");
               }
               return localDate;
           }
@@ -340,7 +340,7 @@ public class DateTemporalExtractor {
   private TemporalDateStructure getYyMmDdProbable(int pYear, int pMonth, int pDay) {
       TemporalDateStructure localDate = getYyyyMmDdProbable(pYear, pMonth, pDay);
       if (localDate != null) {
-          // localDate.setConDateFormat("YY-MM-DD");
+          // localDate.setConDateFormat("yy-MM-dd");
       }
       return localDate;
   }
@@ -356,11 +356,11 @@ public class DateTemporalExtractor {
       // month should be between 1 & 12, else its not a date
       if (pMonth > 0 && pMonth < 13) {
           month = pMonth;
-          formatProbable = "MM&DD";
+          formatProbable = "MM&dd";
       }else if(pMonth > 12 && pDay < 13) {
           month=pDay;
           pDay = pMonth;
-          formatProbable = "DD&MM";
+          formatProbable = "dd&MM";
       }else {
           return null;
       }
@@ -397,10 +397,10 @@ public class DateTemporalExtractor {
           localdate.setDateTimeString(String.format("%04d", year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day));
           localdate.setConDateFormat("yyyy-MM-dd");
           if(year > 9 & year < 100 ) {
-              formatProbable = "YY$" + formatProbable;
+              formatProbable = "yy$" + formatProbable;
           }
           if(year > 999 & year < 10000){
-              formatProbable = "YYYY$" + formatProbable;
+              formatProbable = "yyyy$" + formatProbable;
           }
           localdate.setIdentifiedDateFormat(formatProbable);
           return localdate;
@@ -410,7 +410,7 @@ public class DateTemporalExtractor {
 
   /**
    * Parses source text to find date patterns
-   * 
+   *
    * @param text
    *            source text
    * @return
@@ -439,11 +439,11 @@ public class DateTemporalExtractor {
       for (int count = 0; count < textLength; count++) {
 
           char c = text.charAt(count);
-          
+
           if (i == 0) {
               tree = TrieTree.patternPredictionTree;
           }
-          
+
           // check for whitespace series
           if ((i > 1 && possibleDate[i - 1] == 32 && c == 32)) {
               whitespaceCount++;
@@ -675,10 +675,10 @@ public class DateTemporalExtractor {
       }
       return dateGroups;
   }
-  
+
   /**
    * add the date fragment to dategroup with other details
-   * 
+   *
    * @param dateGroups
    * @param possibleDate
    * @param count
@@ -697,7 +697,7 @@ public class DateTemporalExtractor {
   }
 
      /**
-      * 
+      *
       * @param possibleTime
       * @return
       */
@@ -714,7 +714,7 @@ public class DateTemporalExtractor {
       }
 
   /**
-   * 
+   *
    * @param dateGroups
    * @param possibleDate
    * @param possibleTime
