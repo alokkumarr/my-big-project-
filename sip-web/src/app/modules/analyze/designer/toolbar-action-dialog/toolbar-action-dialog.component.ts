@@ -6,8 +6,7 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
-import { validateEntityName,
-  entityNameErrorMessage
+import { validateEntityName
 } from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
@@ -45,10 +44,6 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
 
   validateNameField(name) {
     return validateEntityName(name);
-  }
-
-  validationErrorMessage(state) {
-    return entityNameErrorMessage(state);
   }
 
   onBack() {
@@ -90,6 +85,9 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   }
 
   save(action) {
+    if (this.validateNameField(this.data.analysis.name).state) {
+      return;
+    }
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then((response: any) => {

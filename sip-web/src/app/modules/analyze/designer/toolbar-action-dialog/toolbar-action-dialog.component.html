@@ -17,16 +17,6 @@
                         (descriptionChange)="onDescriptionChange($event)"
                         [description]="data.description">
   </designer-description>
- <!-- Validation error messages for the user to correct the
-  incorrect analysis name entered. -->
-  <div class="name-validation" *ngIf="data.action === 'save' && validateNameField(data.analysis.name).check" fxLayout="column">
-    <span *ngIf="validateNameField(data.analysis.name).check.validateLength">
-      {{validationErrorMessage('nameLength')}}
-    </span>
-    <span *ngIf="validateNameField(data.analysis.name).check.validateCharacters">
-      {{validationErrorMessage('specialChars')}}
-    </span>
-  </div>
   <designer-save *ngSwitchCase="'save'"
                  (nameChange)="onNameChange($event)"
                  [designerMode]="data.designerMode"
@@ -54,14 +44,12 @@
         <button *ngSwitchCase="'save'"
                 (click)="save('saveAndClose')"
                 e2e="save-dialog-save-analysis"
-                [disabled]="validateNameField(data.analysis.name).state"
                 mat-raised-button color="primary" i18n>
           Save & Close
         </button>
         <button *ngSwitchCase="'save'"
                 (click)="save('save')"
                 e2e="dialog-save-analysis"
-                [disabled]="validateNameField(data.analysis.name).state"
                 mat-button i18n>
           Save
         </button>

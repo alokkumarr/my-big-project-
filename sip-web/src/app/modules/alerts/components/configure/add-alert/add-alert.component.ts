@@ -576,6 +576,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   createAlert() {
+    if (this.alertDefFormGroup.invalid) {
+      return;
+    }
+
     const payload = this.constructPayload();
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
@@ -586,6 +590,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   updateAlert() {
+    if (this.alertDefFormGroup.invalid) {
+      return;
+    }
     const payload = this.constructPayload();
     const alertID = this.alertDefinition.alertConfig.alertRulesSysId;
     const updateSubscriber = this._configureAlertService

@@ -10,6 +10,14 @@
       required
     />
   </mat-form-field>
+  <mat-error *ngIf="validateNameField(analysis.name).check.validateLength" i18n>
+    <strong> {{validationErrorMessage('nameLength')}}
+    </strong>
+  </mat-error>
+  <mat-error *ngIf="validateNameField(analysis.name).check.validateCharacters" i18n>
+    <strong> {{validationErrorMessage('specialChars')}}
+    </strong>
+  </mat-error>
   <mat-form-field>
     <textarea
       matInput

@@ -5,6 +5,9 @@ import {
   USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../../../../common/consts';
 import { JwtService } from '../../../../common/services';
+import { validateEntityName,
+  entityNameErrorMessage
+} from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
   selector: 'designer-save',
@@ -32,6 +35,14 @@ export class DesignerSaveComponent implements OnInit {
 
   onNameChange(description) {
     this.nameChange.emit(description);
+  }
+
+  validateNameField(name) {
+    return validateEntityName(name);
+  }
+
+  validationErrorMessage(state) {
+    return entityNameErrorMessage(state);
   }
 
   onDescriptionChange(description) {
