@@ -41,12 +41,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -60,8 +55,8 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const now = moment().format();
-        const chartName = `e2e chart ${now}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
         const chartDescription = `e2e chart description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
@@ -115,11 +110,7 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
         executePage.clickOnEditLink();
 
         // Verify the selected aggregate.
-        chartDesignerPage.validateSelectedAggregate(
-          metrics,
-          data.aggregate.designerLabel,
-          data.aggregate.value
-        );
+        chartDesignerPage.validateSelectedAggregate(metrics, data.aggregate.designerLabel, data.aggregate.value);
         chartDesignerPage.clickOnSave();
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
         // Delete the analysis

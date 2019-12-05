@@ -12,6 +12,10 @@ $header-font-size: 18px;
     font-size: $header-font-size;
     margin-left: 16%;
     width: 55%;
+    white-space: nowrap;
+    overflow-x: hidden;
+    display: block;
+    text-overflow: ellipsis;
   }
 
   .toggle-icons {

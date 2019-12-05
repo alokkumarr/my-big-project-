@@ -52,13 +52,7 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
       }
       analyses.forEach(id => {
         logger.warn('deleting analysis with id: ' + id);
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          id,
-          Constants.CHART
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.CHART);
       });
 
       commonFunctions.clearLocalStorage();
@@ -73,8 +67,9 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
         const type = data.chartType.split(':')[1];
         if (!token) {
           logger.error('token cannot be null');

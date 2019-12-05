@@ -41,12 +41,7 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
+        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -60,8 +55,8 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const now = moment().format();
-        const pivotName = `e2e pivot ${now}`;
+        const now = new Date().getTime();
+        const pivotName = `e2e ${now}`;
         const pivotDescription = `e2e pivot description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);

@@ -94,7 +94,7 @@ function getFieldLabelWithAggregateFun(field) {
 function getYValueBasedOnAggregate(field, point) {
   switch (field.aggregate) {
     case 'percentage':
-      return Math.round(point.y * 100) / 100 + '%';
+      return Math.round((point.y || point.value) * 100) / 100 + '%';
     case 'percentagebyrow':
       return round(point.percentage, 2) + '%';
     default:
