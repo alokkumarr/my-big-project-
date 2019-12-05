@@ -44,7 +44,7 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   channelEditable = false;
   columns: Array<any> = [];
 
-  @ViewChild('channelsGrid')
+  @ViewChild('channelsGrid', { static: true })
   channelsGrid: DxDataGridComponent;
 
   constructor(

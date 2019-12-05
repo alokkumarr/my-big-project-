@@ -48,7 +48,7 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() chartType: string;
   @Input()
   enableExport: boolean;
-  @ViewChild('container')
+  @ViewChild('container', { static: true })
   container: ElementRef;
 
   /**

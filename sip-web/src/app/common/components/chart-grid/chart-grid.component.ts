@@ -80,7 +80,7 @@ export class ChartGridComponent implements OnInit {
       this._headerProgress.hide();
     });
   }
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
 
   public analysis: AnalysisDSL;
   public chartOptions: Object;
