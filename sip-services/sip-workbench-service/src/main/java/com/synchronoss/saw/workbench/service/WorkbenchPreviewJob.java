@@ -45,7 +45,6 @@ public class WorkbenchPreviewJob implements Job<Integer> {
     SparkSession session = jobContext.sparkSession();
     Dataset<Row> dataset = getDataset(session, location);
     if (dataset != null) {
-      log.info("dataset.schema() : " +  dataset.schema().toString());
       StructField[] fields = dataset.schema().fields();
       Iterator<Row> rows = dataset.limit(limit).toLocalIterator();
       rows.forEachRemaining(
@@ -84,7 +83,6 @@ public class WorkbenchPreviewJob implements Job<Integer> {
   private Dataset<Row> getDataset(SparkSession session, String location) {
     Logger log = LoggerFactory.getLogger(getClass().getName());
     try {
-      log.info("dataset file location : " +  location);
       return session.read().load(location);
     } catch (Exception e) {
       /*
