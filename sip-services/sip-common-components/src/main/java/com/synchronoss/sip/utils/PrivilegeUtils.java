@@ -1,6 +1,5 @@
 package com.synchronoss.sip.utils;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -47,10 +46,10 @@ public class PrivilegeUtils {
     }
 
     /**
-     * Get Role type from string.
+     * Get Privilege Names from string.
      *
-     * @param value Role type Value.
-     * @return RoleType
+     * @param value Privilege Names Value.
+     * @return Privilege Names
      */
     public static PrivilegeNames fromValue(String value) {
       PrivilegeNames constant = CONSTANTS.get(value.toUpperCase());
@@ -115,7 +114,7 @@ public class PrivilegeUtils {
         privilege[value] = 1;
       }
 
-      // build integer to string
+      // build integer array to string for decimal conversion
       for (Integer n : privilege) builder.append(n);
 
       privilegeCode = Long.parseLong(builder.toString(), 2);
