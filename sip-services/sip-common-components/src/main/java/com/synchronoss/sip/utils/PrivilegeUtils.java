@@ -115,7 +115,9 @@ public class PrivilegeUtils {
       }
 
       // build integer array to string for decimal conversion
-      for (Integer n : privilege) builder.append(n);
+      for (Integer n : privilege) {
+        builder.append(n);
+      }
 
       privilegeCode = Long.parseLong(builder.toString(), 2);
     } catch (Exception ex) {

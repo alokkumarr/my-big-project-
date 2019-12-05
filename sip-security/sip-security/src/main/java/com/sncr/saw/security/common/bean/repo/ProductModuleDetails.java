@@ -1,11 +1,13 @@
 package com.sncr.saw.security.common.bean.repo;
 
 
+import java.io.Serializable;
+
 /**
  * @author alok.kumarr
  * @since 3.5.0
  */
-public class ProductModuleDetails {
+public class ProductModuleDetails implements Serializable {
 
 	private static final long serialVersionUID = 6710950219766990634L;
 
