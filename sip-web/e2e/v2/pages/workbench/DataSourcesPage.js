@@ -370,7 +370,7 @@ class DataSourcesPage extends DeleteModel {
 
   verifyApiRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
-    let attempts = 15;
+    let attempts = 16;
     let skip = true;
     (function process(index) {
       if (index >= attempts) {
