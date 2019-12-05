@@ -112,6 +112,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         filterEligible: false,
         joinEligible: false,
         kpiEligible: false,
+        dskEligible: false,
         include: false,
         name: value.name,
         table: artifactName,
@@ -135,6 +136,8 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         columns: filter(ds.columns, 'include')
       });
     });
+    console.log('selectedDPDetails : ', this.selectedDPDetails);
+
     this.workBench
       .updateSemanticDetails(this.selectedDPDetails)
       .subscribe((data: any[]) => {
