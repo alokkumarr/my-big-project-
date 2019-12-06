@@ -1,6 +1,7 @@
 'use strict';
 const commonFunctions = require('../utils/commonFunctions');
 const RouteModel = require('./components/RouteModel');
+const ChannelActions = require('../../pages/workbench/ChannelActions');
 
 class RouteActions extends RouteModel {
   constructor() {
@@ -21,12 +22,35 @@ class RouteActions extends RouteModel {
 
     if (testConnectivity) {
       this.clickOnTestConnectivity();
-      this.verifyTestConnectivityLogs(data.testConnectivityMessage);
+      this.verifyTestConnectivityLogs(testConnectivityMessage);
       this.closeTestConnectivity();
     }
 
     this.setScheduleStartDate();
     this.clickOnCreateRouteBtn();
+  }
+
+  fillRouteInfo(routeInfo, update = false) {
+    this.fillApiRouteName(routeInfo.routeName);
+    this.fillApiRouteDestination(routeInfo.destination);
+    const channelActions = new ChannelActions();
+    channelActions.selectMethodType(routeInfo.method);
+    channelActions.fillEndPoint(routeInfo.endPoint);
+    if (routeInfo.method === 'POST')
+      channelActions.fillRequestBody(JSON.stringify(routeInfo.body));
+    if (routeInfo.headers) {
+      if (update) channelActions.clearHeader();
+      channelActions.addHeaders(routeInfo.headers);
+    }
+    if (routeInfo.queryParams) {
+      if (update) channelActions.clearQueryParams();
+      channelActions.addQueryParams(routeInfo.queryParams);
+    }
+    this.fillRouteDescription(routeInfo.desc);
+    this.clickOnRouteNextBtn();
+    this.clickOnScheduleTab('Hourly');
+    this.clickOnFrequency('Hour', 0);
+    this.clickOnFrequency('Minute', 2);
   }
 }
 
