@@ -3,7 +3,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 export const CUSTOM_DATE_PRESET_VALUE = 'NA';
-
+export { CUSTOM_HEADERS } from '../../common/consts';
 export const DATE_PRESETS = [
   {
     value: 'Yesterday',

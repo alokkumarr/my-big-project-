@@ -34,7 +34,19 @@ const baseChartOptions = {
     }
   },
   exporting: {
-    enabled: false
+    enabled: false,
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'printChart',
+          'separator',
+          'downloadPNG',
+          'downloadJPEG',
+          'downloadPDF',
+          'downloadSVG'
+        ]
+      }
+    }
   },
   credits: false
 };
