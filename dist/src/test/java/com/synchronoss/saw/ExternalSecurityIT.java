@@ -1,5 +1,7 @@
 package com.synchronoss.saw;
 
+import static io.restassured.RestAssured.given;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -7,8 +9,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static io.restassured.RestAssured.given;
 
 /**
  * Integration test for external security CRUD APIs.
@@ -76,14 +76,12 @@ public class ExternalSecurityIT extends BaseIT {
     roleDetails.put("roleType", "ADMIN");
     objectNode.set("role", roleDetails);
 
-    ArrayNode category = objectNode.putArray("category");
     ObjectNode categoryDetail = mapper.createObjectNode();
     categoryDetail.put("autoCreate", true);
     categoryDetail.put("categoryDesc", "Category Description");
     categoryDetail.put("categoryName", "New Category 01");
     categoryDetail.put("categoryType", "000121");
 
-    ArrayNode subCategory = categoryDetail.putArray("subCategory");
     ObjectNode subCategoryDetail = mapper.createObjectNode();
     subCategoryDetail.put("autoCreate", true);
 
@@ -95,7 +93,10 @@ public class ExternalSecurityIT extends BaseIT {
     subCategoryDetail.put("subCategoryDesc", "Sub Category Description");
     subCategoryDetail.put("subCategoryName", "New Sub Category 01");
 
+    ArrayNode subCategory = categoryDetail.putArray("subCategory");
     subCategory.add(subCategoryDetail);
+
+    ArrayNode category = objectNode.putArray("category");
     category.add(categoryDetail);
     return objectNode;
   }
