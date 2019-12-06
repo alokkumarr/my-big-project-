@@ -15,6 +15,7 @@
           mat-raised-button
           color="primary"
           e2e="add-new-channel-btn"
+          [disabled]="isRequestInProgress"
           (click)="createSource(undefined)"
         >
           <span i18n>+ Channel</span>
@@ -139,7 +140,7 @@
             e2e="channel-test-connect-btn-detail"
             class="mat-elevation-z2"
             color="primary"
-            [disabled]="!channelEditable"
+            [disabled]="!channelEditable || isRequestInProgress"
             (click)="testChannel(selectedSourceData?.bisChannelSysId)"
             i18n-matTooltip
             matTooltip="Test Channel Connectivity"
@@ -151,7 +152,7 @@
             e2e="edit-channel"
             class="mat-elevation-z2"
             color="primary"
-            [disabled]="!channelEditable"
+            [disabled]="!channelEditable || isRequestInProgress"
             (click)="createSource(selectedSourceData)"
             matTooltip="Edit Channel"
             i18n-matTooltip
@@ -163,7 +164,7 @@
             e2e="delete-channel"
             class="mat-elevation-z3"
             color="warn"
-            [disabled]="!channelEditable"
+            [disabled]="!channelEditable || isRequestInProgress"
             (click)="deleteChannel(selectedSourceData?.bisChannelSysId)"
             matTooltip="Delete Channel"
             i18n-matTooltip
@@ -174,7 +175,7 @@
             mat-raised-button
             e2e="add-route"
             color="primary"
-            [disabled]="!channelEditable"
+            [disabled]="!channelEditable || isRequestInProgress"
             (click)="createRoute(selectedSourceData?.bisChannelSysId)"
           >
             <span i18n>+ Route</span>
