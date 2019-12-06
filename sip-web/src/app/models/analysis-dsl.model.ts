@@ -84,7 +84,7 @@ export interface AnalysisBaseDSL {
   scheduleHuman?: string; // todo
   semanticId: string;
   type: AnalysisType;
-
+  userId?: number;
   sipQuery: QueryDSL;
 }
 

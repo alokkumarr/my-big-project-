@@ -663,6 +663,7 @@ export class AnalyzeService {
       name: 'Untitled Analysis',
       description: '',
       createdBy: this._jwtService.getLoginId(),
+      userId: this._jwtService.getUserId(),
       customerCode: this._jwtService.customerCode,
       projectCode: PROJECT_CODE,
       module: ANALYZE_MODULE_NAME,
@@ -683,9 +684,7 @@ export class AnalyzeService {
       model = { ...model, ...this.newAnalysisChartModel(model) };
     }
 
-    return (<Observable<Analysis | AnalysisDSL>>this.getSemanticObject(
-      semanticId
-    ).pipe(
+    return (<Observable<AnalysisDSL>>this.getSemanticObject(semanticId).pipe(
       map(semanticData => {
         const repo = semanticData.esRepository;
         if (repo) {
