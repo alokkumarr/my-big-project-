@@ -66,8 +66,8 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const time = new Date().getTime();
         const content = `This is content for file ${time} and ${num}`;
         const fileName = `file${time}.txt${num}`;
-        const source = `source${time}`;
-        const destination = `/dest${time}`;
+        const source = `source${time}${num}`;
+        const destination = `/dest${time}${num}`;
         const host = APICommonHelpers.getHost(browser.baseUrl);
 
         new SshUtility(host, 8022, 'root', 'root').createDirectoryAndDummyFile(
