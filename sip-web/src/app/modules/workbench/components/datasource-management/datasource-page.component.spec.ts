@@ -10,15 +10,21 @@ import { DatasourceService } from '../../services/datasource.service';
 import { DatasourceComponent } from './datasource-page.component';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { Observable } from 'rxjs';
+import { HeaderProgressService } from 'src/app/common/services';
 
 const DatasourceServiceStub = {
   getSourceList: () => {
     return new Observable();
-  }
+  },
+  testChannel: () => {}
 };
 const ToastServiceStub: Partial<ToastService> = {};
 
 class RouterServiceStub {}
+
+class HeaderProgressServiceStub {
+  subscribe() {}
+}
 
 describe('DatasourcePageComponent', () => {
   let component: DatasourceComponent;
@@ -35,6 +41,10 @@ describe('DatasourcePageComponent', () => {
       ],
       declarations: [DatasourceComponent],
       providers: [
+        {
+          provide: HeaderProgressService,
+          useValue: new HeaderProgressServiceStub()
+        },
         { provide: DatasourceService, useValue: DatasourceServiceStub },
         { provide: ToastService, useValue: ToastServiceStub },
         { provide: Router, useClass: RouterServiceStub }
@@ -70,6 +80,17 @@ describe('DatasourcePageComponent', () => {
     it('should select channel based on id', () => {
       component.selectChannel({ bisChannelSysId: 1 });
       expect(component.selectedSourceData.channelName).toEqual('abc');
+    });
+  });
+
+  describe('test connectivity', () => {
+    it('should call service for channel', () => {
+      const spy = spyOn(
+        TestBed.get(DatasourceService),
+        'testChannel'
+      ).and.returnValue({ subscribe: () => {} });
+      component.testChannel(1);
+      expect(spy).toHaveBeenCalled();
     });
   });
 });
