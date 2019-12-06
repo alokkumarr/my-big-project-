@@ -9,12 +9,7 @@ const SANITY = [...SMOKE, 'ForgotPassword/preResetPwd.test.js'];
 const CRITICAL = [
   ...SANITY,
   'analyze/analyze.test.js',
-  'bis/activateAndDeActivateRoute.test.js',
-  'bis/activateDeActivateChannel.test.js',
-  'bis/createAndDeleteChannel.test.js',
-  'bis/createAndDeleteRoute.test.js',
   'bis/scheduleRoute.test.js',
-  'bis/updateAndDeleteChannel.test.js',
   'change-password/changepassword.test.js',
   'charts/createAndDelete.test.js',
   'charts/editAndDelete.test.js',
@@ -23,6 +18,11 @@ const CRITICAL = [
   'create-delete-dashboards/actualVsTargetKPI.test.js',
   'create-delete-dashboards/charts.test.js',
   'create-delete-dashboards/chartsGlobalFilter.test.js',
+  'bis/activateAndDeActivateRoute.test.js',
+  'bis/activateDeActivateChannel.test.js',
+  'bis/createAndDeleteChannel.test.js',
+  'bis/createAndDeleteRoute.test.js',
+  'bis/updateAndDeleteChannel.test.js',
   'create-delete-dashboards/esReport.test.js',
   'create-delete-dashboards/esReportGlobalFilter.test.js',
   'create-delete-dashboards/pivot.test.js',
@@ -39,6 +39,7 @@ const CRITICAL = [
   'charts/topNForCharts.test.js',
   'charts/bottomNForCharts.test.js',
   'charts/SortingWithCharts.test.js',
+  'bis/APIPullRouteSchedule.test.js',
   'charts/AggregateWithCharts.test.js',
   'pivots/PivotsWithAggregate.test.js',
   'reports/AggregateWithESReport.test.js',
@@ -56,8 +57,7 @@ const CRITICAL = [
   'bis/APIPullChannelUpdateDelete.test.js',
   'bis/APIPullChannelActivateDeActivate.test.js',
   'bis/APIPullRouteCreateDelete.test.js',
-  'bis/APIPullRouteUpdateDelete.test.js',
-  'bis/APIPullRouteSchedule.test.js'
+  'bis/APIPullRouteUpdateDelete.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

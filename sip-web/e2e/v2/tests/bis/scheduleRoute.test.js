@@ -44,9 +44,7 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const uId = Utils.randomId();
 
         const channelName = `${data.channelName}${uId}`;
-        const channelDescription = `${
-          data.channelName
-        } description created at ${uId}`;
+        const channelDescription = `${data.channelName} description created at ${uId}`;
 
         const routeName = `${data.routeName}${uId}`;
         const desc = `${data.routeName} description created at ${uId}`;
@@ -68,8 +66,8 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const time = new Date().getTime();
         const content = `This is content for file ${time} and ${num}`;
         const fileName = `file${time}.txt${num}`;
-        const source = `source${time}`;
-        const destination = `/dest${time}`;
+        const source = `source${time}${num}`;
+        const destination = `/dest${time}${num}`;
         const host = APICommonHelpers.getHost(browser.baseUrl);
 
         new SshUtility(host, 8022, 'root', 'root').createDirectoryAndDummyFile(
@@ -102,6 +100,7 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const channelActions = new ChannelActions();
         // Create new channel
         channelActions.createNewChannel(channelInfo);
+        dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
         dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
         // Add route
         dataSourcesPage.clickOnAddRoute();
