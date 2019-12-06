@@ -113,6 +113,7 @@ describe('BIS tests: scheduleRoute.test.js', () => {
           channelInfo.channelName,
           routeInfo
         );
+        dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
         dataSourcesPage.clickOnRouteAction(routeInfo.routeName);
         dataSourcesPage.clickOnDeleteRoute();
         dataSourcesPage.clickOnConfirmYesButton();
