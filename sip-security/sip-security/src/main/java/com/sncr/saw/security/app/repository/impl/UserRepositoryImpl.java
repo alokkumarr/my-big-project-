@@ -3,6 +3,9 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.repository.result.extract.LongExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserDetailsExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserDetailsListExtractor;
 import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
@@ -3188,7 +3191,7 @@ public class UserRepositoryImpl implements UserRepository {
           jdbcTemplate.query(
               sql,
               preparedStatement -> preparedStatement.setString(1, customerCode),
-              new UserRepositoryImpl.LongExtractor("CUSTOMER_SYS_ID"));
+              new LongExtractor("CUSTOMER_SYS_ID"));
     } catch (Exception e) {
       logger.error("Exception encountered while ", e);
     }
@@ -3205,7 +3208,7 @@ public class UserRepositoryImpl implements UserRepository {
               jdbcTemplate.query(
                   sql,
                   preparedStatement -> preparedStatement.setString(1, dskGroup),
-                  new UserRepositoryImpl.LongExtractor("SEC_GROUP_SYS_ID"));
+                  new LongExtractor("SEC_GROUP_SYS_ID"));
       } catch (Exception e) {
           logger.error("Exception encountered while ", e);
       }
@@ -3213,21 +3216,6 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
 
-    public class LongExtractor implements ResultSetExtractor<Long> {
-        private String fieldName;
-        public LongExtractor(String fieldName) {
-            this.fieldName = fieldName;
-        }
-
-        @Override
-        public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Long result = null;
-            if (rs.next()) {
-                result = rs.getLong(fieldName);
-            }
-            return result;
-        }
-    }
   @Override
   public Long getRoleSysId(String roleName) {
       String sql = "select R.ROLE_SYS_ID from ROLES R where R.ROLE_NAME =?";
@@ -3237,7 +3225,7 @@ public class UserRepositoryImpl implements UserRepository {
               jdbcTemplate.query(
                   sql,
                   preparedStatement -> preparedStatement.setString(1, roleName),
-                  new UserRepositoryImpl.LongExtractor("ROLE_SYS_ID"));
+                  new LongExtractor("ROLE_SYS_ID"));
       } catch (Exception e) {
           logger.error("Exception encountered while ", e);
       }
@@ -3254,24 +3242,22 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       jdbcTemplate.update(
           sql,
-          new PreparedStatementSetter() {
-            public void setValues(PreparedStatement preparedStatement) throws SQLException {
-              preparedStatement.setString(1, userDetails.getMasterLoginId());
-              preparedStatement.setString(2, userDetails.getEmail());
-              preparedStatement.setLong(3, userDetails.getRoleId());
-              preparedStatement.setLong(4, userDetails.getCustomerId());
-              if (userDetails.getSecGroupSysId() != null) {
-                preparedStatement.setLong(5, userDetails.getSecGroupSysId());
-              } else {
-                preparedStatement.setNull(5, Types.BIGINT);
-              }
-              preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
-              preparedStatement.setString(7, userDetails.getFirstName());
-              preparedStatement.setString(8, userDetails.getMiddleName());
-              preparedStatement.setString(9, userDetails.getLastName());
-              preparedStatement.setString(10, getActiveStatusInd(userDetails.getActiveStatusInd()));
-              preparedStatement.setString(11, createdBy);
+          preparedStatement -> {
+            preparedStatement.setString(1, userDetails.getMasterLoginId());
+            preparedStatement.setString(2, userDetails.getEmail());
+            preparedStatement.setLong(3, userDetails.getRoleId());
+            preparedStatement.setLong(4, userDetails.getCustomerId());
+            if (userDetails.getSecGroupSysId() != null) {
+              preparedStatement.setLong(5, userDetails.getSecGroupSysId());
+            } else {
+              preparedStatement.setNull(5, Types.BIGINT);
             }
+            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
+            preparedStatement.setString(7, userDetails.getFirstName());
+            preparedStatement.setString(8, userDetails.getMiddleName());
+            preparedStatement.setString(9, userDetails.getLastName());
+            preparedStatement.setString(10, getActiveStatusInd(userDetails.getActiveStatusInd()));
+            preparedStatement.setString(11, createdBy);
           });
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
@@ -3309,13 +3295,11 @@ public class UserRepositoryImpl implements UserRepository {
       userDetails =
           jdbcTemplate.query(
               sql,
-              new PreparedStatementSetter() {
-                public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                  preparedStatement.setString(1, masterLoginId);
-                  preparedStatement.setLong(2, customerSysId);
-                }
+              preparedStatement -> {
+                preparedStatement.setString(1, masterLoginId);
+                preparedStatement.setLong(2, customerSysId);
               },
-              new UserRepositoryImpl.UserDetailsExtractor());
+              new UserDetailsExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -3327,38 +3311,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     return userDetails;
-  }
-
-  public class UserDetailsExtractor implements ResultSetExtractor<UserDetails> {
-
-    @Override
-    public UserDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
-      UserDetails userDetails = null;
-      if (rs.next()) {
-        userDetails = new UserDetails();
-        userDetails.setMasterLoginId(rs.getString("USER_ID"));
-        userDetails.setUserId(rs.getLong("USER_SYS_ID"));
-        userDetails.setEmail(rs.getString("EMAIL"));
-        userDetails.setRoleName(rs.getString("ROLE_NAME"));
-        userDetails.setRoleId(rs.getLong("ROLE_SYS_ID"));
-        userDetails.setFirstName(rs.getString("FIRST_NAME"));
-        userDetails.setLastName(rs.getString("LAST_NAME"));
-        userDetails.setMiddleName(rs.getString("MIDDLE_NAME"));
-        userDetails.setCustomerCode(rs.getString("CUSTOMER_CODE"));
-        userDetails.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
-        Long secGroupSysId = rs.getLong("SEC_GROUP_SYS_ID");
-        secGroupSysId = (secGroupSysId < 1) ? null : secGroupSysId;
-        userDetails.setSecGroupSysId(secGroupSysId);
-        userDetails.setSecurityGroupName(rs.getString("SEC_GROUP_NAME"));
-
-        if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
-          userDetails.setActiveStatusInd(true);
-        } else {
-          userDetails.setActiveStatusInd(false);
-        }
-      }
-      return userDetails;
-    }
   }
 
   @Override
@@ -3377,7 +3329,7 @@ public class UserRepositoryImpl implements UserRepository {
                   preparedStatement.setLong(1, customerId);
                 }
               },
-              new UserRepositoryImpl.UserDetailsListExtractor());
+              new UserDetailsListExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -3391,38 +3343,5 @@ public class UserRepositoryImpl implements UserRepository {
     return userDetailsList;
   }
 
-  public class UserDetailsListExtractor implements ResultSetExtractor<ArrayList<UserDetails>> {
 
-    @Override
-    public ArrayList<UserDetails> extractData(ResultSet rs)
-        throws SQLException, DataAccessException {
-      UserDetails userDetails = null;
-      ArrayList<UserDetails> userDetailsList = new ArrayList<UserDetails>();
-      while (rs.next()) {
-        userDetails = new UserDetails();
-        userDetails.setMasterLoginId(rs.getString("USER_ID"));
-        userDetails.setUserId(rs.getLong("USER_SYS_ID"));
-        userDetails.setEmail(rs.getString("EMAIL"));
-        userDetails.setRoleName(rs.getString("ROLE_NAME"));
-        userDetails.setRoleId(rs.getLong("ROLE_SYS_ID"));
-        userDetails.setFirstName(rs.getString("FIRST_NAME"));
-        userDetails.setLastName(rs.getString("LAST_NAME"));
-        userDetails.setMiddleName(rs.getString("MIDDLE_NAME"));
-        userDetails.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
-        userDetails.setCustomerCode(rs.getString("CUSTOMER_CODE"));
-        userDetails.setSecurityGroupName(rs.getString("SEC_GROUP_NAME"));
-        Long secGroupSysId = rs.getLong("SEC_GROUP_SYS_ID");
-        secGroupSysId = (secGroupSysId < 1) ? null : secGroupSysId;
-        userDetails.setSecGroupSysId(secGroupSysId);
-        if (rs.getInt("ACTIVE_STATUS_IND") == 1) {
-          userDetails.setActiveStatusInd(true);
-        } else {
-          userDetails.setActiveStatusInd(false);
-        }
-
-        userDetailsList.add(userDetails);
-      }
-      return userDetailsList;
-    }
-  }
 }

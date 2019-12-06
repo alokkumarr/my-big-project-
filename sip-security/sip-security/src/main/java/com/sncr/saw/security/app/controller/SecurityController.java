@@ -7,13 +7,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.SecurityService;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
@@ -56,7 +55,6 @@ import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
-import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
@@ -64,6 +62,8 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -80,8 +80,6 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +122,8 @@ public class SecurityController {
 
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
+
+    @Autowired SecurityService securityService;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -1834,6 +1834,11 @@ public class SecurityController {
    * @param userDetails UserDetails
    * @return Returns UserDetailsResponse
    */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUserWithDsk",
+      notes = "Admin can only use this API to create the user",
+      response = UserDetailsResponse.class)
   @RequestMapping(
       value = "/auth/admin/cust/manage/external/users/create",
       method = RequestMethod.POST)
@@ -1841,10 +1846,10 @@ public class SecurityController {
   public UserDetailsResponse createUser(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestBody UserDetails userDetails) {
+      @ApiParam(value = "User details to store", required = true) @RequestBody
+          UserDetails userDetails) {
     String jwtToken = JWTUtils.getToken(request);
     String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-    validateUserDetails(userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -1853,91 +1858,8 @@ public class SecurityController {
       userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
       return userDetailsResponse;
     }
-    Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
-    if (customerSysId == null) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
-      return userDetailsResponse;
-    }
-    String securityGroupName = userDetails.getSecurityGroupName();
-    Long groupSysId = null;
-    if (securityGroupName != null) {
-      groupSysId = userRepository.getSecurityGroupSysid(securityGroupName);
-      if (groupSysId == null) {
-        userDetailsResponse.setValid(false);
-        userDetailsResponse.setValidityMessage(
-            String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
-        return userDetailsResponse;
-      }
-    }
-    Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName());
-    if (roleSysId == null) {
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(
-          String.format(ErrorMessages.notExistErrorMessage, "roleName"));
-      return userDetailsResponse;
-    }
     String masterLoginId = valuesFromToken[4];
-    if (StringUtils.isBlank(userDetails.getPassword())) {
-      userDetails.setPassword(generateRandomPassowrd());
-    }
-    Valid valid = null;
-
-    try {
-      Valid validity =
-          PasswordValidation.validatePassword(
-              userDetails.getPassword(), userDetails.getMasterLoginId());
-      userDetailsResponse.setValid(validity.getValid());
-      userDetailsResponse.setValidityMessage(validity.getValidityMessage());
-      userDetails.setCustomerId(customerSysId);
-      userDetails.setRoleId(roleSysId);
-      userDetails.setSecGroupSysId(groupSysId);
-      if (userDetailsResponse.getValid()) {
-        valid = userRepository.addUserDetails(userDetails, masterLoginId);
-        if (valid.getValid()) {
-          userDetailsResponse.setUser(
-              userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
-          userDetailsResponse.setValid(true);
-        } else {
-          userDetailsResponse.setValid(false);
-          userDetailsResponse.setValidityMessage(valid.getError());
-        }
-      }
-    } catch (Exception e) {
-      userDetailsResponse.setValid(false);
-      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
-      userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
-      userDetailsResponse.setError(e.getMessage());
-      return userDetailsResponse;
-    }
-    return userDetailsResponse;
-  }
-
-  private void validateUserDetails(UserDetails userDetails) {
-    Preconditions.checkNotNull(
-        userDetails, String.format(ErrorMessages.nullErrorMessage, "Request Body"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getCustomerCode()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "customercode"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getMasterLoginId()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getEmail()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getFirstName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getLastName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
-    Preconditions.checkState(
-        StringUtils.isNotBlank(userDetails.getRoleName()),
-        String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleName"));
-    Preconditions.checkNotNull(
-        userDetails.getActiveStatusInd(),
-        String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
+    return securityService.addUserDetails(userDetails, masterLoginId);
   }
 
   /**
@@ -1947,48 +1869,26 @@ public class SecurityController {
    * @param response HttpServletResponse
    * @return Returns UsersDetailsList
    */
+  @ApiOperation(
+      value = " Fetch Users API ",
+      nickname = "FetchUsers",
+      notes = "Admin can only use this API to fetch the users",
+      response = UsersDetailsList.class)
   @RequestMapping(
       value = "/auth/admin/cust/manage/external/users/fetch",
       method = RequestMethod.GET)
-  public UsersDetailsList getUserList(
-      HttpServletRequest request, HttpServletResponse response) {
+  public UsersDetailsList getUserList(HttpServletRequest request, HttpServletResponse response) {
     String jwtToken = JWTUtils.getToken(request);
     String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
     UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
     if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       usersDetailsListResponse.setValid(false);
       usersDetailsListResponse.setValidityMessage(
           "You are not authorized to perform this operation");
       return usersDetailsListResponse;
     }
     Long customerId = Long.valueOf(valuesFromToken[1]);
-    try {
-      List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId);
-      usersDetailsListResponse.setUsers(userDetailsList);
-      usersDetailsListResponse.setRecordCount(userDetailsList.size());
-      usersDetailsListResponse.setValid(true);
-    } catch (Exception e) {
-      usersDetailsListResponse.setValid(false);
-      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
-      usersDetailsListResponse.setValidityMessage(message + " Please contact server Administrator");
-      usersDetailsListResponse.setError(e.getMessage());
-      return usersDetailsListResponse;
-    }
-    return usersDetailsListResponse;
-  }
-
-  private String generateRandomPassowrd() {
-    String upperCaseLetters = RandomStringUtils.random(2, 65, 90, true, true);
-    String lowerCaseLetters = RandomStringUtils.random(2, 97, 122, true, true);
-    String numbers = RandomStringUtils.randomNumeric(2);
-    String specialChar = RandomStringUtils.random(2, 33, 47, false, false);
-    String totalChars = RandomStringUtils.randomAlphanumeric(2);
-    return new StringBuilder(upperCaseLetters)
-        .append(lowerCaseLetters)
-        .append(numbers)
-        .append(specialChar)
-        .append(totalChars)
-        .toString();
+    return securityService.getUsersDetailList(customerId);
   }
 }
