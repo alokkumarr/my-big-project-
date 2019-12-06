@@ -88,6 +88,7 @@ mat-dialog-content {
   align-content: center;
   align-items: center;
   height: 9vh;
+  margin-top: 0.8em !important; // Added as part of SIP-9315: If form fields are positioned one over another then mat-hint and mat-error are overlapped.
 }
 
 .headerGradient {
@@ -135,9 +136,4 @@ mat-dialog-content {
 
 .mat-horizontal-stepper-header {
   height: 55px;
-}
-
-// SIP-9315: If form fields are positioned one over another then mat-hint and mat-error are overlapped, to solve that issue this style is added.
-.section-input-margin {
-  margin-top: 0.65em !important;
 }

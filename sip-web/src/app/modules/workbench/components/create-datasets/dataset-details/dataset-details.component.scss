@@ -96,8 +96,3 @@
   font-size: 18px;
   color: $primary-blue-b2;
 }
-
-// If form fields are positioned one over another then mat-hint and mat-error are overlapped, to solve that issue this style is added.
-.section-input-margin {
-  margin-top: 0.6em !important;
-}
