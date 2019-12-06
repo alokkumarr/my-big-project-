@@ -1089,9 +1089,15 @@ public class SecurityController {
    * @param user
    * @return
    */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUser",
+      notes = "",
+      response = UsersList.class)
   @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
   public UsersList addUser(
-      @RequestHeader("Authorization") String authToken, @RequestBody User user) {
+      @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
+      @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
     String[] valuesFromToken =
         JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
 
