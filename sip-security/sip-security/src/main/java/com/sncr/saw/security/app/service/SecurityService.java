@@ -11,12 +11,17 @@ import com.sncr.saw.security.common.util.PasswordValidation;
 import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityService {
+
+  private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
+
   @Autowired private UserRepository userRepository;
 
   /**
@@ -27,6 +32,7 @@ public class SecurityService {
    * @return Returns UserDetailsResponse
    */
   public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId) {
+    logger.trace("User details body :{}", userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     validateUserDetails(userDetails);
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
@@ -34,6 +40,7 @@ public class SecurityService {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
+      logger.debug(String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
       return userDetailsResponse;
     }
     String securityGroupName = userDetails.getSecurityGroupName();
@@ -44,6 +51,7 @@ public class SecurityService {
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage(
             String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
+        logger.debug(String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
         return userDetailsResponse;
       }
     }
@@ -52,9 +60,11 @@ public class SecurityService {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.notExistErrorMessage, "roleName"));
+      logger.debug(String.format(ErrorMessages.notExistErrorMessage, "roleName"));
       return userDetailsResponse;
     }
     if (StringUtils.isBlank(userDetails.getPassword())) {
+      logger.debug("setting random password");
       userDetails.setPassword(generateRandomPassowrd());
     }
     Valid valid = null;
@@ -75,12 +85,14 @@ public class SecurityService {
               userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
           userDetailsResponse.setValid(true);
         } else {
+          logger.debug("Error occurred while getting user details:{}", valid.getError());
           userDetailsResponse.setValid(false);
           userDetailsResponse.setValidityMessage(valid.getError());
         }
       }
     } catch (Exception e) {
       userDetailsResponse.setValid(false);
+      logger.debug("Error occurred while adding user details:{}", e);
       String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
       userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
       userDetailsResponse.setError(e.getMessage());
@@ -97,6 +109,7 @@ public class SecurityService {
    */
   public UsersDetailsList getUsersDetailList(Long customerId) {
     UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+    logger.trace("Getting users for customer id :{}", customerId);
     try {
       List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId);
       usersDetailsListResponse.setUsers(userDetailsList);
@@ -104,6 +117,7 @@ public class SecurityService {
       usersDetailsListResponse.setValid(true);
     } catch (Exception e) {
       usersDetailsListResponse.setValid(false);
+      logger.debug("Error occurred while getting user details:{}", e);
       String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
       usersDetailsListResponse.setValidityMessage(message + " Please contact server Administrator");
       usersDetailsListResponse.setError(e.getMessage());
