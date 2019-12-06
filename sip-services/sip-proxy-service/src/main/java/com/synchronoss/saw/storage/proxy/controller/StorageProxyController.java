@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -82,7 +83,6 @@ public class StorageProxyController {
   @Autowired private StorageProxyService proxyService;
 
   public static final String CUSTOMER_CODE = "customerCode";
-
 
   /**
    * This method is used to get the data based on the storage type<br>
@@ -178,8 +178,8 @@ public class StorageProxyController {
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-      List<TicketDSKDetails> dskList =
-          authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
+    List<TicketDSKDetails> dskList =
+        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -252,7 +252,7 @@ public class StorageProxyController {
           String userId,
       HttpServletRequest request,
       HttpServletResponse response)
-      throws JsonProcessingException ,IllegalAccessException{
+      throws JsonProcessingException, IllegalAccessException {
     logger.debug("Request Body:{}", analysis);
     if (analysis == null) {
       throw new JSONMissingSAWException("Analysis definition is missing in request body");
@@ -278,7 +278,8 @@ public class StorageProxyController {
     }
 
     SipQuery savedQuery =
-        getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
+        getSipQuery(
+            analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -286,7 +287,7 @@ public class StorageProxyController {
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     List<String> sipQueryArts = getArtifactsNames(analysis.getSipQuery());
     DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey,sipQueryArts);
+        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
@@ -362,6 +363,7 @@ public class StorageProxyController {
                 startTime,
                 authTicket,
                 executionType,
+                dataSecurityKeyNode,
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
       }
@@ -376,6 +378,7 @@ public class StorageProxyController {
                   startTime,
                   authTicket,
                   executionType,
+                  dataSecurityKeyNode,
                   (List<Object>) executeResponse.getData());
           proxyService.saveTtlExecutionResult(executionResult);
         }
@@ -435,6 +438,7 @@ public class StorageProxyController {
       Long startTime,
       Ticket authTicket,
       ExecutionType executionType,
+      DataSecurityKey dataSecurityKeyNode,
       List<Object> data) {
     ExecutionResult executionResult = new ExecutionResult();
     String type = analysis.getType();
@@ -447,6 +451,7 @@ public class StorageProxyController {
     executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
     executionResult.setStatus("success");
     executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    executionResult.setDataSecurityKey(dataSecurityKeyNode.getDataSecuritykey());
     executionResult.setRecordCount(data.size());
     return executionResult;
   }
@@ -463,11 +468,24 @@ public class StorageProxyController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public List<?> listExecutions(
-      @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id")
-          String queryId) {
+      @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id") String queryId,
+      HttpServletRequest request) {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchDslExecutionsList(queryId);
+
+      logger.trace("Extracting auth ticket details");
+      Ticket authTicket = (request == null) ? null : getTicket(request);
+
+      List<TicketDSKDetails> dskList =
+          authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+      logger.trace("DSK List size = " + dskList);
+
+      if (dskList == null || dskList.size() == 0) {
+        return proxyService.fetchDslExecutionsList(queryId);
+      } else {
+        return new ArrayList<>();
+      }
+
     } catch (Exception e) {
       logger.error("error occurred while fetching list of executions ", e);
     }
@@ -499,7 +517,20 @@ public class StorageProxyController {
           @RequestParam(name = "analysisType", required = false)
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
-          String executionId) {
+          String executionId,
+      HttpServletRequest request) {
+
+    Ticket authTicket = (request == null) ? null : getTicket(request);
+
+    List<TicketDSKDetails> dskList =
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
+
+    // If user is associated with any datasecurity key, return empty data
+    if (dskList != null && dskList.size() != 0) {
+      return new ExecutionResponse();
+    }
+
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
     }
@@ -538,8 +569,18 @@ public class StorageProxyController {
           @RequestParam(name = "analysisType", required = false)
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
-          String analysisId) {
+          String analysisId,
+      HttpServletRequest request) {
 
+    Ticket authTicket = (request == null) ? null : getTicket(request);
+
+    List<TicketDSKDetails> dskList =
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
+
+    if (dskList != null && dskList.size() != 0) {
+      return new ExecutionResponse();
+    }
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);
     }

@@ -3,16 +3,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map as mapObservable } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Analysis, AnalysisDSL } from '../../analyze/types';
-import { AnalysisMapDSL } from '../../analyze/models';
-import { CUSTOM_HEADERS } from '../consts';
-
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as add from 'lodash/add';
 
+import { CUSTOM_HEADERS } from '../consts';
+import { Analysis, AnalysisDSL } from '../../analyze/types';
+import { AnalysisMapDSL } from '../../analyze/models';
 import {
   JwtService,
   MenuService,

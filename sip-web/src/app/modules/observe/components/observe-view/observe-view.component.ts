@@ -327,7 +327,7 @@ export class ObserveViewComponent implements OnDestroy {
         ) {
           this._toastMessage.error(
             'Redirecting to first dashboard...',
-            'This dashboard has been deleted.'
+            'Dashboard doas not exist.'
           );
           setTimeout(() => {
             this.guard.redirectToFirstDash();
