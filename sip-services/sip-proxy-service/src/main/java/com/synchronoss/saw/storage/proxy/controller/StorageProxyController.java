@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -430,6 +431,7 @@ public class StorageProxyController {
                 startTime,
                 authTicket,
                 executionType,
+                dataSecurityKeyNode,
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
       }
@@ -444,6 +446,7 @@ public class StorageProxyController {
                   startTime,
                   authTicket,
                   executionType,
+                  dataSecurityKeyNode,
                   (List<Object>) executeResponse.getData());
           proxyService.saveTtlExecutionResult(executionResult);
         }
@@ -505,6 +508,7 @@ public class StorageProxyController {
       Long startTime,
       Ticket authTicket,
       ExecutionType executionType,
+      DataSecurityKey dataSecurityKeyNode,
       List<Object> data) {
     ExecutionResult executionResult = new ExecutionResult();
     String type = analysis.getType();
@@ -517,6 +521,7 @@ public class StorageProxyController {
     executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
     executionResult.setStatus("success");
     executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    executionResult.setDataSecurityKey(dataSecurityKeyNode.getDataSecuritykey());
     executionResult.setRecordCount(data.size());
     return executionResult;
   }
@@ -534,6 +539,7 @@ public class StorageProxyController {
   @ResponseBody
   public List<?> listExecutions(
       @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id") String queryId,
+      HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken) throws IOException {
     if (!authValidation(authToken)) {
@@ -544,7 +550,20 @@ public class StorageProxyController {
     }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchDslExecutionsList(queryId);
+
+      logger.trace("Extracting auth ticket details");
+      Ticket authTicket = (request == null) ? null : getTicket(request);
+
+      List<TicketDSKDetails> dskList =
+          authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+      logger.trace("DSK List size = " + dskList);
+
+      if (dskList == null || dskList.size() == 0) {
+        return proxyService.fetchDslExecutionsList(queryId);
+      } else {
+        return new ArrayList<>();
+      }
+
     } catch (Exception e) {
       logger.error("error occurred while fetching list of executions ", e);
     }
@@ -577,8 +596,10 @@ public class StorageProxyController {
           String analysisType,
       @ApiParam(value = "List of executions", required = true) @PathVariable(name = "executionId")
           String executionId,
+      HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken) throws IOException {
+
     if (!authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
@@ -586,6 +607,18 @@ public class StorageProxyController {
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
     }
+
+    Ticket authTicket = (request == null) ? null : getTicket(request);
+
+    List<TicketDSKDetails> dskList =
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
+
+    // If user is associated with any datasecurity key, return empty data
+    if (dskList != null && dskList.size() != 0) {
+      return new ExecutionResponse();
+    }
+
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
     }
@@ -623,8 +656,9 @@ public class StorageProxyController {
       @ApiParam(value = "analysis type", required = false)
       @RequestParam(name = "analysisType", required = false)
           String analysisType,
-      @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id") 
+      @ApiParam(value = "List of executions", required = true) @PathVariable(name = "id")
           String analysisId,
+      HttpServletRequest request,
       HttpServletResponse response,
       @RequestHeader("Authorization") String authToken) throws IOException {
 
@@ -634,6 +668,16 @@ public class StorageProxyController {
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
+    }
+
+    Ticket authTicket = (request == null) ? null : getTicket(request);
+
+    List<TicketDSKDetails> dskList =
+        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
+    logger.trace("DSK List = " + dskList);
+
+    if (dskList != null && dskList.size() != 0) {
+      return new ExecutionResponse();
     }
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);

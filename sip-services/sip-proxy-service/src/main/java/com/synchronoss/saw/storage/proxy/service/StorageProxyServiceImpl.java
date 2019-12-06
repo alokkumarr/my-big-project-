@@ -897,7 +897,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       throws Exception {
     GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
     List<GlobalFilterExecutionObject> executionList =
-        globalFilterDataQueryBuilder.buildQuery(globalFilters);
+        globalFilterDataQueryBuilder.buildQuery(globalFilters,dataSecurityKey);
     JsonNode result = null;
     for (GlobalFilterExecutionObject globalFilterExecutionObject : executionList) {
       globalFilterExecutionObject.getEsRepository();
