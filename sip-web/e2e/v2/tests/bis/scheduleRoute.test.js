@@ -44,9 +44,7 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const uId = Utils.randomId();
 
         const channelName = `${data.channelName}${uId}`;
-        const channelDescription = `${
-          data.channelName
-        } description created at ${uId}`;
+        const channelDescription = `${data.channelName} description created at ${uId}`;
 
         const routeName = `${data.routeName}${uId}`;
         const desc = `${data.routeName} description created at ${uId}`;
@@ -102,6 +100,7 @@ describe('BIS tests: scheduleRoute.test.js', () => {
         const channelActions = new ChannelActions();
         // Create new channel
         channelActions.createNewChannel(channelInfo);
+        dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
         dataSourcesPage.clickOnCreatedChannelName(channelInfo.channelName);
         // Add route
         dataSourcesPage.clickOnAddRoute();

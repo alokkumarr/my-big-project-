@@ -198,6 +198,7 @@ class DataSourcesPage extends DeleteModel {
   }
 
   clickOnAddRoute() {
+    browser.sleep(2000); // to test if this solves intermittent failures
     commonFunctions.clickOnElement(this._addRouteBtn);
   }
 
