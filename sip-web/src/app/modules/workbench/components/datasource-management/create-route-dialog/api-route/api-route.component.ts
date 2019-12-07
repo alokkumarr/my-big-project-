@@ -11,6 +11,7 @@ import { isUnique } from 'src/app/common/validators';
 
 import * as isUndefined from 'lodash/isUndefined';
 import * as trim from 'lodash/trim';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
@@ -94,7 +95,8 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       }),
       headerParameters: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),
-      urlParameters: this.formBuilder.array([])
+      urlParameters: this.formBuilder.array([]),
+      provisionalHeaders: this.formBuilder.array([])
     });
 
     this.detailsFormGroup.get('destinationLocation').valueChanges.pipe(
@@ -122,7 +124,12 @@ export class ApiRouteComponent implements OnInit, DetailForm {
   }
 
   get value(): APIRouteMetadata {
-    return this.detailsFormGroup.value;
+    const formValue = cloneDeep(this.detailsFormGroup.value);
+    formValue.headerParameters = formValue.headerParameters.concat(
+      cloneDeep(formValue.provisionalHeaders)
+    );
+    delete formValue.provisionalHeaders;
+    return formValue;
   }
 
   get valid(): boolean {

@@ -117,42 +117,49 @@
           </mat-expansion-panel-header>
 
           <div
-            fxLayout="row"
-            fxLayoutAlign="start center"
-            fxLayoutGap="10px"
-            *ngFor="let item of provisionalHeaders"
+            formArrayName="provisionalHeaders"
+            *ngFor="let item of provisionalHeaderParams.controls; let i = index"
           >
-            <!-- Header Key -->
-            <mat-form-field
-              fxFlex="1 1 auto"
-              appearance="outline"
+            <div
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              [formGroupName]="i"
               fxLayoutGap="10px"
-              matTooltip="Use Authorization tab to update"
             >
-              <mat-label i18n>Header Name</mat-label>
-              <input
-                matInput
-                name="name-of-header"
-                [value]="item.key"
-                readonly
-                disabled
-              />
-            </mat-form-field>
+              <!-- Header Key -->
+              <mat-form-field
+                fxFlex="1 1 auto"
+                appearance="outline"
+                fxLayoutGap="10px"
+                matTooltip="Use Authorization tab to update"
+              >
+                <mat-label i18n>Header Name</mat-label>
+                <input
+                  matInput
+                  name="name-of-header"
+                  [e2e]="'provisional-header-name-' + i"
+                  [attr.disabled]="true"
+                  formControlName="key"
+                  readonly
+                />
+              </mat-form-field>
 
-            <mat-form-field
-              fxFlex="5 1 auto"
-              appearance="outline"
-              matTooltip="Use Authorization tab to update"
-            >
-              <mat-label i18n>Header Value</mat-label>
-              <input
-                matInput
-                name="value-of-header"
-                [value]="item.value"
-                readonly
-                disabled
-              />
-            </mat-form-field>
+              <mat-form-field
+                fxFlex="5 1 auto"
+                appearance="outline"
+                matTooltip="Use Authorization tab to update"
+              >
+                <mat-label i18n>Header Value</mat-label>
+                <input
+                  matInput
+                  name="value-of-header"
+                  [e2e]="'provisional-header-value-' + i"
+                  [attr.disabled]="true"
+                  formControlName="value"
+                  readonly
+                />
+              </mat-form-field>
+            </div>
           </div>
         </mat-expansion-panel>
       </mat-accordion>

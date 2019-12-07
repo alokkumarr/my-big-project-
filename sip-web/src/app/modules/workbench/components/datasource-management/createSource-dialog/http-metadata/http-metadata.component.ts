@@ -15,7 +15,7 @@ import {
   STANDARD_HEADERS
 } from 'src/app/common/http-headers';
 import { Observable, Subscription } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, debounceTime } from 'rxjs/operators';
 import { requireIf } from 'src/app/common/validators';
 
 const AUTHORIZATION_HEADER_KEY = 'Authorization';
@@ -91,9 +91,11 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.push(
-      this.authorizationForm.valueChanges.subscribe(() => {
-        this.updateProvisionalHeaders();
-      })
+      this.authorizationForm.valueChanges
+        .pipe(debounceTime(500))
+        .subscribe(() => {
+          this.updateProvisionalHeaders();
+        })
     );
   }
 
@@ -139,6 +141,7 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
       },
       ...this.provisionalHeaders
     ];
+    this.updateFormArray();
   }
 
   /**
@@ -150,6 +153,19 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
     this.provisionalHeaders = this.provisionalHeaders.filter(
       header => header.key !== AUTHORIZATION_HEADER_KEY
     );
+    this.updateFormArray();
+  }
+
+  updateFormArray() {
+    const array = this.formBuilder.array(
+      this.provisionalHeaders.map(({ key, value }) =>
+        this.formBuilder.group({
+          key: [key],
+          value: [value]
+        })
+      )
+    );
+    this.parentForm.setControl('provisionalHeaders', array);
   }
 
   /**
@@ -182,6 +198,10 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
 
   isRequired(fieldName: string): boolean {
     return (this.requiredFields || []).includes(fieldName);
+  }
+
+  get provisionalHeaderParams() {
+    return this.parentForm.get('provisionalHeaders') as FormArray;
   }
 
   get headerParams() {
