@@ -40,11 +40,47 @@ export class ApiRouteComponent implements OnInit, DetailForm {
     if (isUndefined(this.routeData.routeMetadata.length)) {
       const routeMetadata = <APIRouteMetadata>this.routeData.routeMetadata;
 
+      const { provisionalHeaders, headers } = this.getInitialProvisionalHeaders(
+        routeMetadata.headerParameters
+      );
+      routeMetadata.headerParameters = headers;
       this.patchFormArray(routeMetadata.headerParameters, 'headerParameters');
       this.patchFormArray(routeMetadata.queryParameters, 'queryParameters');
+      this.patchFormArray(provisionalHeaders, 'provisionalHeaders');
 
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
     }
+  }
+
+  getInitialProvisionalHeaders(
+    headerParams: APIRouteMetadata['headerParameters']
+  ): {
+    provisionalHeaders: APIRouteMetadata['headerParameters'];
+    headers: APIRouteMetadata['headerParameters'];
+  } {
+    const headers = [];
+    const provisionalHeaders = [];
+    headerParams.forEach(param => {
+      if (param.key !== 'Authorization') {
+        headers.push(param);
+        return;
+      }
+
+      const userAuth = param.value.match(/^Basic (.*)/);
+      if (!userAuth) {
+        headers.push(param);
+        return;
+      }
+
+      const [userName, password] = atob(userAuth[1]).split(':');
+      if (!userName || !password) {
+        headers.push(param);
+        return;
+      }
+
+      provisionalHeaders.push(param);
+    });
+    return { provisionalHeaders, headers };
   }
 
   /**

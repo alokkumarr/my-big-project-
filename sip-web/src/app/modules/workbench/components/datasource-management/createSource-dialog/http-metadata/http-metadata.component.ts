@@ -17,6 +17,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
 import { requireIf } from 'src/app/common/validators';
+import * as find from 'lodash/find';
 
 const AUTHORIZATION_HEADER_KEY = 'Authorization';
 
@@ -62,6 +63,30 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
     ) as FormArray).controls.forEach(headerControl =>
       this.generateHeaderAutoCompleteFilter(headerControl as FormGroup)
     );
+
+    this.initializeProvisionalHeaders();
+  }
+
+  initializeProvisionalHeaders() {
+    const headers = this.parentForm.get('provisionalHeaders').value;
+
+    const userAuth = find(
+      headers,
+      header =>
+        header.key === AUTHORIZATION_HEADER_KEY && /^Basic/.test(header.value)
+    );
+
+    if (!userAuth) {
+      return;
+    }
+
+    this.provisionalHeaders = [userAuth];
+    const [userName, password] = atob(userAuth.value.split(' ')[1]).split(':');
+    this.authorizationForm.patchValue({
+      type: AUTHORIZATION_TYPES.USER,
+      userName,
+      password
+    });
   }
 
   /**
