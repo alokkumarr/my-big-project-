@@ -96,11 +96,67 @@
         [ngClass]="{ 'tab-error': !headerParams.valid }"
       >
         Headers &nbsp;
-        <ng-container *ngIf="headerParams.controls.length">
+        <ng-container
+          *ngIf="headerParams.controls.length + provisionalHeaders.length"
+        >
           <span class="dot"></span>
         </ng-container>
       </div>
     </ng-template>
+
+    <div
+      class="parameters headers"
+      [style.display]="provisionalHeaders.length ? 'block' : 'none'"
+    >
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Provisional Headers
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div
+            fxLayout="row"
+            fxLayoutAlign="start center"
+            fxLayoutGap="10px"
+            *ngFor="let item of provisionalHeaders"
+          >
+            <!-- Header Key -->
+            <mat-form-field
+              fxFlex="1 1 auto"
+              appearance="outline"
+              fxLayoutGap="10px"
+              matTooltip="Use Authorization tab to update"
+            >
+              <mat-label i18n>Header Name</mat-label>
+              <input
+                matInput
+                name="name-of-header"
+                [value]="item.key"
+                readonly
+                disabled
+              />
+            </mat-form-field>
+
+            <mat-form-field
+              fxFlex="5 1 auto"
+              appearance="outline"
+              matTooltip="Use Authorization tab to update"
+            >
+              <mat-label i18n>Header Value</mat-label>
+              <input
+                matInput
+                name="value-of-header"
+                [value]="item.value"
+                readonly
+                disabled
+              />
+            </mat-form-field>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
     <!-- Header Parameters form -->
     <div class="parameters headers" fxLayout="row" fxLayoutAlign="end center">
       <button
@@ -261,13 +317,9 @@
 
   <mat-tab>
     <ng-template mat-tab-label>
-      <div
-        fxLayout="row"
-        fxLayoutAlign="center center"
-        [ngClass]="{ 'tab-error': !headerParams.valid }"
-      >
+      <div fxLayout="row" fxLayoutAlign="center center">
         Authorization &nbsp;
-        <ng-container>
+        <ng-container *ngIf="provisionalHeaders.length">
           <span class="dot"></span>
         </ng-container>
       </div>

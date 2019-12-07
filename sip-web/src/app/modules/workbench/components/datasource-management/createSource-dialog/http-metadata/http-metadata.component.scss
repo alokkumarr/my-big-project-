@@ -51,6 +51,11 @@ mat-form-field {
   }
 }
 
+mat-expansion-panel {
+  box-shadow: none !important;
+  border: 1px solid $material-grey-border;
+}
+
 ::ng-deep .mat-tab-labels .mat-tab-label.mat-tab-label-active {
   opacity: 1;
 }

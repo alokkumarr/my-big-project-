@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import {
   HTTP_METHODS,
   AUTHORIZATION_TYPES
@@ -14,16 +14,18 @@ import {
   CONTENT_TYPE_VALUES,
   STANDARD_HEADERS
 } from 'src/app/common/http-headers';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { requireIf } from 'src/app/common/validators';
+
+const AUTHORIZATION_HEADER_KEY = 'Authorization';
 
 @Component({
   selector: 'http-metadata',
   templateUrl: './http-metadata.component.html',
   styleUrls: ['./http-metadata.component.scss']
 })
-export class HttpMetadataComponent implements OnInit {
+export class HttpMetadataComponent implements OnInit, OnDestroy {
   httpMethods: HTTP_METHODS[] = [
     HTTP_METHODS.GET,
     HTTP_METHODS.POST
@@ -39,11 +41,19 @@ export class HttpMetadataComponent implements OnInit {
   filteredHeaderFields: Observable<string[]>[] = [];
   filteredHeaderValues: Observable<string[]>[] = [];
 
+  provisionalHeaders: { key: String; value: String }[] = [];
+
+  subscriptions: Subscription[] = [];
+
   @Input() requiredFields: Array<string>;
   @Input() parentForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {
     this.createAuthForm();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   ngOnInit() {
@@ -54,6 +64,12 @@ export class HttpMetadataComponent implements OnInit {
     );
   }
 
+  /**
+   * Creates form for authorization options. This is a convinience layer
+   * over what's achievable with normal headers.
+   *
+   * @memberof HttpMetadataComponent
+   */
   createAuthForm() {
     this.authorizationForm = this.formBuilder.group({
       type: [AUTHORIZATION_TYPES[Object.keys(AUTHORIZATION_TYPES)[0]]],
@@ -67,10 +83,73 @@ export class HttpMetadataComponent implements OnInit {
       ]
     });
 
-    this.authorizationForm.get('type').valueChanges.subscribe(() => {
-      this.authUsername.updateValueAndValidity();
-      this.authPassword.updateValueAndValidity();
-    });
+    this.subscriptions.push(
+      this.authorizationForm.get('type').valueChanges.subscribe(() => {
+        this.authUsername.updateValueAndValidity();
+        this.authPassword.updateValueAndValidity();
+      })
+    );
+
+    this.subscriptions.push(
+      this.authorizationForm.valueChanges.subscribe(() => {
+        this.updateProvisionalHeaders();
+      })
+    );
+  }
+
+  /**
+   * Update the provisional headers based on authorization form value
+   *
+   * @memberof HttpMetadataComponent
+   */
+  updateProvisionalHeaders() {
+    const { type, userName, password } = this.authorizationForm.value;
+
+    switch (type) {
+      case AUTHORIZATION_TYPES.USER:
+        this.addUserAuthHeader(userName, password);
+        break;
+      case AUTHORIZATION_TYPES.NONE:
+      default:
+        this.removeAuthHeader();
+        break;
+    }
+  }
+
+  /**
+   * If username and password are valid, adds a new
+   * authorization header. Replaces previous authorization
+   * header if it was set.
+   *
+   * @param {string} userName
+   * @param {string} password
+   * @returns
+   * @memberof HttpMetadataComponent
+   */
+  addUserAuthHeader(userName: string, password: string) {
+    this.removeAuthHeader();
+    if (!userName || !password) {
+      return;
+    }
+
+    this.provisionalHeaders = [
+      {
+        key: AUTHORIZATION_HEADER_KEY,
+        value: `Basic ${btoa(userName + ':' + password)}`
+      },
+      ...this.provisionalHeaders
+    ];
+  }
+
+  /**
+   * Removes the provisional authorization header
+   *
+   * @memberof HttpMetadataComponent
+   */
+  removeAuthHeader() {
+    this.provisionalHeaders = this.provisionalHeaders.filter(
+      header => header.key !== AUTHORIZATION_HEADER_KEY
+    );
   }
 
   /**
