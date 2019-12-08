@@ -371,6 +371,11 @@ public class SecurityIT extends BaseIT {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
   }
 
+  /**
+   * Build node of role, category, privileges.
+   *
+   * @return object Node
+   */
   private ObjectNode roleCategoryPrivilege() {
     ObjectNode objectNode = mapper.createObjectNode();
     objectNode.put("moduleName", "OBSERVE");
