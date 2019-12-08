@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author alok.kumarr
  * @since 3.5.0
  */
-@Api(value = "The controller provides to perform external admin security operation in synchronoss analytics platform ")
+@Api(value = "The controller provides to perform external admin security operation in synchronoss insight platform ")
 @RestController
 @RequestMapping("/sip-security/external")
 public class ExternalSecurityController {
