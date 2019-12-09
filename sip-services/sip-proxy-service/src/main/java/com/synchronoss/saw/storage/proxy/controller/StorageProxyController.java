@@ -326,6 +326,8 @@ public class StorageProxyController {
 
     // For published analysis, update analysis metadata table with the category information.
     if (isPublishedExecution == true) {
+      Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
+      analysis.setUserId(uid);
       proxyService.updateAnalysis(analysis);
     }
 
