@@ -657,13 +657,14 @@ export class AnalyzeService {
     semanticId: string,
     type: AnalysisType
   ): Promise<Partial<AnalysisDSL>> {
+    const userId = parseInt(this._jwtService.getUserId(), 10);
     let model: Partial<AnalysisDSL> = {
       type,
       semanticId,
       name: 'Untitled Analysis',
       description: '',
       createdBy: this._jwtService.getLoginId(),
-      userId: this._jwtService.getUserId(),
+      userId,
       customerCode: this._jwtService.customerCode,
       projectCode: PROJECT_CODE,
       module: ANALYZE_MODULE_NAME,
