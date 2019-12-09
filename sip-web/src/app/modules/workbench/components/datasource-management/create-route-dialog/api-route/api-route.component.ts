@@ -17,6 +17,7 @@ import { DatasourceService } from 'src/app/modules/workbench/services/datasource
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
 import { SourceFolderDialogComponent } from '../../select-folder-dialog';
 import { MatDialog } from '@angular/material';
+import { HttpMetadataComponent } from '../../createSource-dialog/http-metadata/http-metadata.component';
 
 @Component({
   selector: 'api-route',
@@ -40,7 +41,11 @@ export class ApiRouteComponent implements OnInit, DetailForm {
     if (isUndefined(this.routeData.routeMetadata.length)) {
       const routeMetadata = <APIRouteMetadata>this.routeData.routeMetadata;
 
-      const { provisionalHeaders, headers } = this.getInitialProvisionalHeaders(
+      /* Extracts priovisional auth headers from normal headers array */
+      const {
+        provisionalHeaders,
+        headers
+      } = HttpMetadataComponent.getInitialProvisionalHeaders(
         routeMetadata.headerParameters
       );
       routeMetadata.headerParameters = headers;
@@ -50,37 +55,6 @@ export class ApiRouteComponent implements OnInit, DetailForm {
 
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
     }
-  }
-
-  getInitialProvisionalHeaders(
-    headerParams: APIRouteMetadata['headerParameters']
-  ): {
-    provisionalHeaders: APIRouteMetadata['headerParameters'];
-    headers: APIRouteMetadata['headerParameters'];
-  } {
-    const headers = [];
-    const provisionalHeaders = [];
-    headerParams.forEach(param => {
-      if (param.key !== 'Authorization') {
-        headers.push(param);
-        return;
-      }
-
-      const userAuth = param.value.match(/^Basic (.*)/);
-      if (!userAuth) {
-        headers.push(param);
-        return;
-      }
-
-      const [userName, password] = atob(userAuth[1]).split(':');
-      if (!userName || !password) {
-        headers.push(param);
-        return;
-      }
-
-      provisionalHeaders.push(param);
-    });
-    return { provisionalHeaders, headers };
   }
 
   /**

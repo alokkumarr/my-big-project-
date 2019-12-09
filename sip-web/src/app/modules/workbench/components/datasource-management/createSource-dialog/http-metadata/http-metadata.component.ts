@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import {
   HTTP_METHODS,
-  AUTHORIZATION_TYPES
+  AUTHORIZATION_TYPES,
+  APIRouteMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
 import {
   FormGroup,
@@ -48,6 +49,37 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
 
   @Input() requiredFields: Array<string>;
   @Input() parentForm: FormGroup;
+
+  static getInitialProvisionalHeaders(
+    headerParams: APIRouteMetadata['headerParameters']
+  ): {
+    provisionalHeaders: APIRouteMetadata['headerParameters'];
+    headers: APIRouteMetadata['headerParameters'];
+  } {
+    const headers = [];
+    const provisionalHeaders = [];
+    headerParams.forEach(param => {
+      if (param.key !== 'Authorization') {
+        headers.push(param);
+        return;
+      }
+
+      const userAuth = param.value.match(/^Basic (.*)/);
+      if (!userAuth) {
+        headers.push(param);
+        return;
+      }
+
+      const [userName, password] = atob(userAuth[1]).split(':');
+      if (!userName || !password) {
+        headers.push(param);
+        return;
+      }
+
+      provisionalHeaders.push(param);
+    });
+    return { provisionalHeaders, headers };
+  }
 
   constructor(private formBuilder: FormBuilder) {
     this.createAuthForm();
