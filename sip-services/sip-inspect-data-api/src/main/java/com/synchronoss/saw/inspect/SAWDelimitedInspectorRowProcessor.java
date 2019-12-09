@@ -137,10 +137,29 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     }
 
     private void processFieldNames(Object[] names){
-        for(Object o : names){
+        int fieldNo = 1;
+        for(Object o : names) {
+            String fieldName = null;
             if(o!=null) {
-            fieldNames.add(o.toString());}
+                fieldName = sanitizeFieldName(o.toString());
+            }
+            if(fieldName == null || fieldName.isEmpty()) {
+                fieldName="FIELD_" + fieldNo;
+            }
+            fieldNames.add(fieldName);
+            fieldNo++;
         }
+    }
+
+    private String sanitizeFieldName(String fieldName) {
+        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
+        String invalidCharRegex = "[^a-zA-Z0-9_ ]";
+        if(fieldName != null && !fieldName.trim().isEmpty()){
+            fieldName = fieldName.replaceAll(invalidCharRegex, "").trim()
+                .replaceAll("\\s+", "_").toUpperCase();
+            logger.debug("Converted to :"+fieldName);
+        }
+        return fieldName;
     }
 
     private void processDataRow(Object[] fields){
@@ -351,6 +370,12 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         result.add("fields", fields);
         result.add("info", info);
         result.add("samplesParsed", samplesParsed);
+        result.addProperty("lineSeparator", new String(settings.getFormat().getLineSeparator()));
+        result.addProperty("delimiter", String.valueOf(settings.getFormat().getDelimiter()));
+        result.addProperty("quoteChar", String.valueOf(settings.getFormat().getQuote()));
+        result.addProperty("quoteEscapeChar", String.valueOf(settings.getFormat().getQuoteEscape()));
+        result.addProperty("headerSize", headerSize);
+        result.addProperty("fieldNamesLine", fieldDefRowNumber);
         return result;
     }
 
