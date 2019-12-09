@@ -69,12 +69,10 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
 		for (Map.Entry m : sqlstatements.entrySet()) {
 			jdbcTemplate.update(con -> {
-				PreparedStatement ps = con
-						.prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
-				ps.setDate(1, new java.sql.Date(new Date().getTime()));
-				return ps;
-			},
-					keyHolder
+						PreparedStatement ps = con.prepareStatement(m.getValue().toString(), new String[]{"PROD_MOD_SYS_ID"});
+						ps.setDate(1, new java.sql.Date(new Date().getTime()));
+						return ps;
+					}, keyHolder
 			);
 			results.put((Integer) m.getKey(), keyHolder.getKey().toString());
 		}

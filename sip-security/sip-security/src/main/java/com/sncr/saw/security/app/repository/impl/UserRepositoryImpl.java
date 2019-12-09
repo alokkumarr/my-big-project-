@@ -271,32 +271,23 @@ public class UserRepositoryImpl implements UserRepository {
       }
       sql = "select PH.* from PASSWORD_HISTORY PH where PH.user_sys_id=? order by PH.DATE_OF_CHANGE desc ";
 
-      message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, userSysId);
-        }
-      }, new UserRepositoryImpl.PasswordValidator(encNewPass));
+      message = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, userSysId), new UserRepositoryImpl.PasswordValidator(encNewPass));
       if (message != null && message.equals("valid")) {
         String sysId = System.currentTimeMillis() + "";
 
         sql = "insert into PASSWORD_HISTORY (PASSWORD_HISTORY_SYS_ID,USER_SYS_ID,PASSWORD,DATE_OF_CHANGE)"
             + " values(?,?,?,sysdate())";
 
-        jdbcTemplate.update(sql, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, sysId);
-            preparedStatement.setString(2, userSysId);
-            preparedStatement.setString(3, encNewPass);
-          }
+        jdbcTemplate.update(sql, preparedStatement -> {
+          preparedStatement.setString(1, sysId);
+          preparedStatement.setString(2, userSysId);
+          preparedStatement.setString(3, encNewPass);
         });
 
-        sql = "update USERS U  set U.ENCRYPTED_PASSWORD=?"
-            + " ,  U.PWD_MODIFIED_DATE=sysdate(),U.MODIFIED_BY ='change_password' where U.USER_SYS_ID=?";
-        int i = jdbcTemplate.update(sql, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, encNewPass);
-            preparedStatement.setString(2, userSysId);
-          }
+        sql = "update USERS U  set U.ENCRYPTED_PASSWORD=?,  U.PWD_MODIFIED_DATE=sysdate(), U.MODIFIED_BY ='change_password' where U.USER_SYS_ID=?";
+        int i = jdbcTemplate.update(sql, preparedStatement -> {
+          preparedStatement.setString(1, encNewPass);
+          preparedStatement.setString(2, userSysId);
         });
         if (i == 1) {
           message = "Password Successfully Changed.";
@@ -306,8 +297,7 @@ public class UserRepositoryImpl implements UserRepository {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
     } catch (Exception e) {
-      logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null,
-          e);
+      logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null, e);
       message = "Error encountered while changing password.";
     }
 
@@ -349,21 +339,12 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       String insertSql = "insert into RESET_PWD_DTLS(RESET_PWD_DTLS_SYS_ID, USER_ID, RANDOM_HASHCODE,VALID, CREATED_TIME,VALID_UPTO,CREATED_DATE,INACTIVATED_DATE) "
           + "values (?,?,?,?,?,?,sysdate(),?)";
-      Object[] params = new Object[]{System.currentTimeMillis() + "", userId, randomHash, 1, createdTime,
-          validUpto, null};
-      int[] types = new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.BIGINT,
-          Types.BIGINT, Types.DATE};
+      Object[] params = new Object[]{System.currentTimeMillis() + "", userId, randomHash, 1, createdTime, validUpto, null};
+      int[] types = new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.BIGINT, Types.BIGINT, Types.DATE};
 
-      String sql = "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
-          + " AND RS.VALID=1";
-      jdbcTemplate.update(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, userId);
-        }
-      });
-
+      String sql = "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=?  AND RS.VALID=1";
+      jdbcTemplate.update(sql, preparedStatement -> preparedStatement.setString(1, userId));
       jdbcTemplate.update(insertSql, params, types);
-
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -377,18 +358,13 @@ public class UserRepositoryImpl implements UserRepository {
   public ResetValid validateResetPasswordDtls(String randomHash) {
     try {
       String sql = "SELECT VALID_UPTO, USER_ID FROM RESET_PWD_DTLS  WHERE RANDOM_HASHCODE=? AND VALID=1";
-      return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, randomHash);
-        }
-      }, new UserRepositoryImpl.ResetValidityExtractor());
+      return jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, randomHash), new UserRepositoryImpl.ResetValidityExtractor());
       // logger.info("secret code details inserted for user Id "+ userId);
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
     } catch (Exception e) {
-      logger.error("Exception encountered while validating the reset password link for random key" + randomHash
-          + " : " + e.getMessage(), null, e);
+      logger.error("Exception encountered while validating the reset password link for random key" + randomHash + " : " + e.getMessage(), null, e);
       throw e;
     }
   }
@@ -418,11 +394,9 @@ public class UserRepositoryImpl implements UserRepository {
   public void invalidateTicket(String ticketId, String validityMessage) {
     try {
       String updateSql = "update TICKET set valid_indicator=0,inactivated_Date=sysdate(),DESCRIPTION=? where ticket_id=?";
-      jdbcTemplate.update(updateSql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, validityMessage);
-          preparedStatement.setString(2, ticketId);
-        }
+      jdbcTemplate.update(updateSql, preparedStatement -> {
+        preparedStatement.setString(1, validityMessage);
+        preparedStatement.setString(2, ticketId);
       });
       // logger.info("Ticket got invalidated for ticketId: " + ticketId);
     } catch (DataAccessException de) {
@@ -457,19 +431,13 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public void prepareTicketDetails(User user, Boolean onlyDef) {
     String masterLoginId = user.getMasterLoginId();
-
     // TO DO: Modify the below queries to form a single Query
-
     // Generic User Details
     try {
       String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,C.IS_JV_CUSTOMER,R.ROLE_CODE,R.ROLE_TYPE "
           + "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
           + "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
-      TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, masterLoginId);
-        }
-      }, new UserRepositoryImpl.PrepareTicketExtractor());
+      TicketDetails ticketDetails = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.PrepareTicketExtractor());
 
       String configValSql = "SELECT CV.FILTER_BY_CUSTOMER_CODE FROM CONFIG_VAL CV, CUSTOMERS C WHERE CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE AND CV.CONFIG_VAL_OBJ_GROUP=? ";
       Integer filterByCustCode =
@@ -494,11 +462,9 @@ public class UserRepositoryImpl implements UserRepository {
           + " JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND "
           + " PV.ACTIVE_STATUS_IND=1 AND PV.CUST_PROD_MOD_SYS_ID=0 AND R.ACTIVE_STATUS_IND = 1 AND CP.CUSTOMER_SYS_ID=? AND R.ROLE_CODE=?";
 
-      ticketDetails.setProducts(jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, ticketDetails.getCustID());
-          preparedStatement.setString(2, ticketDetails.getRoleCode());
-        }
+      ticketDetails.setProducts(jdbcTemplate.query(sql3, preparedStatement -> {
+        preparedStatement.setString(1, ticketDetails.getCustID());
+        preparedStatement.setString(2, ticketDetails.getRoleCode());
       }, new UserRepositoryImpl.PrepareProductExtractor()));
 
       // Cust - Prod - Modules
@@ -523,11 +489,9 @@ public class UserRepositoryImpl implements UserRepository {
        * if(onlyDef){ sql4 = sql4 + " AND CPM.DEFAULT = 1"; }
        **/
 
-      ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, masterLoginId);
-          preparedStatement.setString(2, ticketDetails.getRoleCode());
-        }
+      ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4, preparedStatement -> {
+        preparedStatement.setString(1, masterLoginId);
+        preparedStatement.setString(2, ticketDetails.getRoleCode());
       }, new UserRepositoryImpl.PrepareProdModExtractor());
       if (prodMods != null) {
         // ticketDetails.setProductModules(prodMods);
@@ -559,11 +523,9 @@ public class UserRepositoryImpl implements UserRepository {
          * if(onlyDef){ sql5 = sql5 + " AND CPM.DEFAULT = 1 AND
          * CPMF.DEFAULT = 1"; }
          **/
-        ArrayList<ProductModuleFeature> prodModFeatrParents = jdbcTemplate.query(sql5, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, masterLoginId);
-            preparedStatement.setString(2, ticketDetails.getRoleCode());
-          }
+        ArrayList<ProductModuleFeature> prodModFeatrParents = jdbcTemplate.query(sql5, preparedStatement -> {
+          preparedStatement.setString(1, masterLoginId);
+          preparedStatement.setString(2, ticketDetails.getRoleCode());
         }, new UserRepositoryImpl.PrepareProdModFeatureExtractor());
         String sql6 = "SELECT DISTINCT"
             + "   U.USER_SYS_ID, "
@@ -621,15 +583,9 @@ public class UserRepositoryImpl implements UserRepository {
             + "   AND R.ACTIVE_STATUS_IND = 1  "
             + "   AND CPMF.FEATURE_TYPE LIKE 'CHILD_%'";
 
-        /**
-         * if(onlyDef){ sql5 = sql5 + " AND CPM.DEFAULT = 1 AND
-         * CPMF.DEFAULT = 1"; }
-         **/
-        ArrayList<ProductModuleFeature> prodModFeatrChildren = jdbcTemplate.query(sql6, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, masterLoginId);
-            preparedStatement.setString(2, ticketDetails.getRoleCode());
-          }
+        ArrayList<ProductModuleFeature> prodModFeatrChildren = jdbcTemplate.query(sql6, preparedStatement -> {
+          preparedStatement.setString(1, masterLoginId);
+          preparedStatement.setString(2, ticketDetails.getRoleCode());
         }, new UserRepositoryImpl.PrepareProdModFeatureChildExtractor());
 
         String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
@@ -638,12 +594,7 @@ public class UserRepositoryImpl implements UserRepository {
             + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
             + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
             + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-        Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
-          @Override
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, masterLoginId);
-          }
-        }, new UserRepositoryImpl.DSKValuesExtractor());
+        Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.DSKValuesExtractor());
         // DSK values should be array in JSON object hence converting into list.
         List<TicketDSKDetails> dskList = new ArrayList<>();
         for (String key : dskValueMapping.keySet()) {
@@ -736,11 +687,7 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "SELECT CONFIG_VAL_CODE  FROM CONFIG_VAL CV , CUSTOMERs C WHERE " +
         "CV.CONFIG_VAL_OBJ_GROUP = ? AND CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE AND " +
         "CV.ACTIVE_STATUS_IND=1 AND UPPER(CV.CONFIG_VAL_OBJ_TYPE) = 'CUSTOMER'";
-    List<String> customConfig = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, customerCode);
-      }
-    }, resultSet -> {
+    List<String> customConfig = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, customerCode), resultSet -> {
       List<String> config = new ArrayList<>();
       while (resultSet.next())
         config.add(resultSet.getString("CONFIG_VAL_CODE"));
@@ -776,12 +723,7 @@ public class UserRepositoryImpl implements UserRepository {
         + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
         + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
         + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-    Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
-      @Override
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, userId);
-      }
-    }, new UserRepositoryImpl.DSKValuesExtractor());
+    Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.DSKValuesExtractor());
     // DSK values should be array in JSON object hence converting into list.
     List<TicketDSKDetails> dskList = new ArrayList<>();
     for (String key : dskValueMapping.keySet()) {
@@ -794,12 +736,7 @@ public class UserRepositoryImpl implements UserRepository {
     String fetchJVDetails = "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST," +
         "USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID " +
         "AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
-    Map<String, String> jvDetails = jdbcTemplate.query(fetchJVDetails, new PreparedStatementSetter() {
-      @Override
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, userId);
-      }
-    }, new UserRepositoryImpl.JVDetailExtractor());
+    Map<String, String> jvDetails = jdbcTemplate.query(fetchJVDetails, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.JVDetailExtractor());
 
 
     DataSecurityKeys securityKeys = new DataSecurityKeys();
@@ -815,11 +752,7 @@ public class UserRepositoryImpl implements UserRepository {
     Ticket ticket = null;
     String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
     try {
-      ticket = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, ticketId);
-        }
-      }, new UserRepositoryImpl.TicketDetailExtractor());
+      ticket = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, ticketId), new UserRepositoryImpl.TicketDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -847,7 +780,6 @@ public class UserRepositoryImpl implements UserRepository {
 
 
   private class customerCodeFilterExtractor implements ResultSetExtractor<Integer> {
-
     @Override
     public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
       Integer customerCodeFilter = null;
@@ -1194,11 +1126,6 @@ public class UserRepositoryImpl implements UserRepository {
     List<AnalysisSummary> listOfAnalysisSummery = new ArrayList<AnalysisSummary>();
     try {
       String sql = "select * from ANALYSIS A " + "where A.CUST_PROD_MOD_FEATURE_SYS_ID = " + featureId
-          /*
-           * +
-           * " (select CUST_PROD_MOD_FEATURE_SYS_ID  from customer_product_module_features cpmf "
-           * + "where cpmf.FEATURE_CODE='" + featureId+"' ) "
-           */
           + " AND A.ACTIVE_STATUS_IND = 1 ";
       List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 
@@ -1248,13 +1175,11 @@ public class UserRepositoryImpl implements UserRepository {
     sql.append(" WHERE ANALYSIS_ID = ? ");
 
     try {
-      jdbcTemplate.update(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, analysis.getAnalysisName());
-          preparedStatement.setLong(2, analysis.getFeatureId());
-          preparedStatement.setString(3, analysis.getUserId());
-          preparedStatement.setLong(4, analysis.getAnalysisId());
-        }
+      jdbcTemplate.update(sql.toString(), preparedStatement -> {
+        preparedStatement.setString(1, analysis.getAnalysisName());
+        preparedStatement.setLong(2, analysis.getFeatureId());
+        preparedStatement.setString(3, analysis.getUserId());
+        preparedStatement.setLong(4, analysis.getAnalysisId());
       });
 
     } catch (Exception e) {
@@ -1268,11 +1193,9 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "UPDATE ANALYSIS SET ACTIVE_STATUS_IND = 0 ,INACTIVATED_DATE=SYSDATE(), INACTIVATED_BY=? "
         + " WHERE ANALYSIS_ID = ? ";
     try {
-      jdbcTemplate.update(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, analysis.getUserId());
-          preparedStatement.setLong(2, analysis.getAnalysisId());
-        }
+      jdbcTemplate.update(sql, preparedStatement -> {
+        preparedStatement.setString(1, analysis.getUserId());
+        preparedStatement.setLong(2, analysis.getAnalysisId());
       });
       return true;
     } catch (Exception e) {
@@ -1287,11 +1210,7 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,"
         + " U.ACTIVE_STATUS_IND FROM USERS U, ROLES R WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.ROLE_SYS_ID = R.ROLE_SYS_ID AND U.CUSTOMER_SYS_ID=?";
     try {
-      userList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.UserDetailExtractor());
+      userList = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.UserDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -1338,19 +1257,17 @@ public class UserRepositoryImpl implements UserRepository {
         + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
         + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
     try {
-      jdbcTemplate.update(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, user.getMasterLoginId());
-          preparedStatement.setString(2, user.getEmail());
-          preparedStatement.setLong(3, user.getRoleId());
-          preparedStatement.setLong(4, user.getCustomerId());
-          preparedStatement.setString(5, Ccode.cencode(user.getPassword()).trim());
-          preparedStatement.setString(6, user.getFirstName());
-          preparedStatement.setString(7, user.getMiddleName());
-          preparedStatement.setString(8, user.getLastName());
-          preparedStatement.setString(9, user.getActiveStatusInd());
-          preparedStatement.setString(10, user.getMasterLoginId());
-        }
+      jdbcTemplate.update(sql, preparedStatement -> {
+        preparedStatement.setString(1, user.getMasterLoginId());
+        preparedStatement.setString(2, user.getEmail());
+        preparedStatement.setLong(3, user.getRoleId());
+        preparedStatement.setLong(4, user.getCustomerId());
+        preparedStatement.setString(5, Ccode.cencode(user.getPassword()).trim());
+        preparedStatement.setString(6, user.getFirstName());
+        preparedStatement.setString(7, user.getMiddleName());
+        preparedStatement.setString(8, user.getLastName());
+        preparedStatement.setString(9, user.getActiveStatusInd());
+        preparedStatement.setString(10, user.getMasterLoginId());
       });
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
@@ -1380,27 +1297,21 @@ public class UserRepositoryImpl implements UserRepository {
         + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
-
     try {
-
-      jdbcTemplate.update(new PreparedStatementCreator() {
-                            @Override
-                            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                              PreparedStatement ps = con.prepareStatement(sql, new String[]{"USER_SYS_ID"});
-                              ps.setString(1, user.getMasterLoginId());
-                              ps.setString(2, user.getEmail());
-                              ps.setLong(3, user.getRoleId());
-                              ps.setLong(4, user.getCustomerId());
-                              ps.setString(5, Ccode.cencode(user.getPassword()).trim());
-                              ps.setString(6, user.getFirstName());
-                              ps.setString(7, user.getMiddleName());
-                              ps.setString(8, user.getLastName());
-                              ps.setString(9, user.getActiveStatusInd());
-                              ps.setString(10, user.getMasterLoginId());
-                              return ps;
-                            }
-                          },
-          keyHolder);
+      jdbcTemplate.update(con -> {
+        PreparedStatement ps = con.prepareStatement(sql, new String[]{"USER_SYS_ID"});
+        ps.setString(1, user.getMasterLoginId());
+        ps.setString(2, user.getEmail());
+        ps.setLong(3, user.getRoleId());
+        ps.setLong(4, user.getCustomerId());
+        ps.setString(5, Ccode.cencode(user.getPassword()).trim());
+        ps.setString(6, user.getFirstName());
+        ps.setString(7, user.getMiddleName());
+        ps.setString(8, user.getLastName());
+        ps.setString(9, user.getActiveStatusInd());
+        ps.setString(10, user.getMasterLoginId());
+        return ps;
+      }, keyHolder);
       return (Long) keyHolder.getKey();
     } catch (Exception e) {
       return -1L;
@@ -1421,17 +1332,15 @@ public class UserRepositoryImpl implements UserRepository {
         + " MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
 
     try {
-      jdbcTemplate.update(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, user.getEmail());
-          preparedStatement.setLong(2, user.getRoleId());
-          preparedStatement.setString(3, user.getFirstName());
-          preparedStatement.setString(4, user.getMiddleName());
-          preparedStatement.setString(5, user.getLastName());
-          preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
-          preparedStatement.setString(7, user.getMasterLoginId());
-          preparedStatement.setLong(8, user.getUserId());
-        }
+      jdbcTemplate.update(sql.toString(), preparedStatement -> {
+        preparedStatement.setString(1, user.getEmail());
+        preparedStatement.setLong(2, user.getRoleId());
+        preparedStatement.setString(3, user.getFirstName());
+        preparedStatement.setString(4, user.getMiddleName());
+        preparedStatement.setString(5, user.getLastName());
+        preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
+        preparedStatement.setString(7, user.getMasterLoginId());
+        preparedStatement.setLong(8, user.getUserId());
       });
     } catch (DataIntegrityViolationException de) {
       logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
@@ -1452,11 +1361,7 @@ public class UserRepositoryImpl implements UserRepository {
   public boolean deleteUser(Long userId, String masterLoginId) {
     String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ?";
     try {
-      jdbcTemplate.update(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, userId);
-        }
-      });
+      jdbcTemplate.update(sql, preparedStatement -> preparedStatement.setLong(1, userId));
     } catch (Exception e) {
       logger.error("Exception encountered while deleting user " + e.getMessage(), null, e);
       return false;
@@ -1470,11 +1375,7 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "SELECT R.ROLE_SYS_ID, R.ROLE_NAME FROM ROLES R "
         + " WHERE R.CUSTOMER_SYS_ID = ? AND R.ACTIVE_STATUS_IND=1;";
     try {
-      rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.rolesDDDetailExtractor());
+      rolesList = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.rolesDDDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -1508,11 +1409,7 @@ public class UserRepositoryImpl implements UserRepository {
     String sql = "SELECT R.ROLE_SYS_ID, R.CUSTOMER_SYS_ID, R.ROLE_NAME, R.ROLE_DESC,  R.ROLE_TYPE, R.ACTIVE_STATUS_IND"
         + "  FROM ROLES R WHERE R.CUSTOMER_SYS_ID=?";
     try {
-      roleList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.roleDetailExtractor());
+      roleList = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.roleDetailExtractor());
 
       List<Long> featureSysIdList;
       ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
@@ -1529,12 +1426,7 @@ public class UserRepositoryImpl implements UserRepository {
           + "CP.ACTIVE_STATUS_IND = 1 "
           + "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1";
 
-      cpmf = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-
-        }
-      }, new UserRepositoryImpl.CPMFDetailExtractor());
+      cpmf = jdbcTemplate.query(sql2, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.CPMFDetailExtractor());
 
       String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
           + "FROM "
@@ -1553,13 +1445,10 @@ public class UserRepositoryImpl implements UserRepository {
           String sql4 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
               + " AND	 CUST_PROD_MOD_FEATURE_SYS_ID != 0 ANd ROLE_SYS_ID=?";
 
-          Boolean privExists = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
-            public void setValues(PreparedStatement preparedStatement) throws SQLException {
-              preparedStatement.setLong(1, custProd);
-              preparedStatement.setLong(2, custProdMod);
-              preparedStatement.setLong(3, roleSysId);
-            }
-
+          Boolean privExists = jdbcTemplate.query(sql4, preparedStatement -> {
+            preparedStatement.setLong(1, custProd);
+            preparedStatement.setLong(2, custProdMod);
+            preparedStatement.setLong(3, roleSysId);
           }, new UserRepositoryImpl.PrivDetailExtractor());
           if (privExists) {
             roleList.get(y).setPrivExists(true);
@@ -1571,40 +1460,30 @@ public class UserRepositoryImpl implements UserRepository {
             String sql5 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
                 + " AND	 CUST_PROD_MOD_FEATURE_SYS_ID=? ANd ROLE_SYS_ID=?";
 
-            Boolean myAPrivExists = jdbcTemplate.query(sql5, new PreparedStatementSetter() {
-              public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                preparedStatement.setLong(1, custProd);
-                preparedStatement.setLong(2, custProdMod);
-                preparedStatement.setLong(3, custProdModFeatr);
-                preparedStatement.setLong(4, roleSysId);
-              }
-
+            Boolean myAPrivExists = jdbcTemplate.query(sql5, preparedStatement -> {
+              preparedStatement.setLong(1, custProd);
+              preparedStatement.setLong(2, custProdMod);
+              preparedStatement.setLong(3, custProdModFeatr);
+              preparedStatement.setLong(4, roleSysId);
             }, new UserRepositoryImpl.PrivDetailExtractor());
-
             if (myAPrivExists) {
               roleList.get(y).setMyAnalysis(true);
             } else {
               roleList.get(y).setMyAnalysis(false);
             }
-
           }
-
         }
-
       }
-
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
     } catch (Exception e) {
       logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
     }
-
     return roleList;
   }
 
   public class PrivDetailExtractor implements ResultSetExtractor<Boolean> {
-
     @Override
     public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
       Boolean featureSysId = false;
@@ -1616,10 +1495,8 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   public class roleDetailExtractor implements ResultSetExtractor<ArrayList<RoleDetails>> {
-
     @Override
     public ArrayList<RoleDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
       RoleDetails role = null;
       ArrayList<RoleDetails> roleList = new ArrayList<RoleDetails>();
       while (rs.next()) {
@@ -1630,8 +1507,6 @@ public class UserRepositoryImpl implements UserRepository {
           role.setActiveStatusInd("Inactive");
         }
         role.setCustSysId(rs.getLong("CUSTOMER_SYS_ID"));
-
-
         role.setRoleDesc(rs.getString("ROLE_DESC"));
         role.setRoleName(rs.getString("ROLE_NAME"));
         role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
@@ -1642,7 +1517,6 @@ public class UserRepositoryImpl implements UserRepository {
         } else {
           role.setActiveStatusInd("Inactive");
         }
-
         roleList.add(role);
       }
       return roleList;
@@ -1653,11 +1527,8 @@ public class UserRepositoryImpl implements UserRepository {
   public List<Role> getRoletypesDropDownList() {
     ArrayList<Role> rolesList = null;
     String sql = "SELECT R.ROLES_TYPE_SYS_ID, R.ROLES_TYPE_NAME FROM ROLES_TYPE R WHERE R.ACTIVE_STATUS_IND = 1";
-
     try {
-      rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        }
+      rolesList = jdbcTemplate.query(sql, preparedStatement -> {
       }, new UserRepositoryImpl.roleTypeDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
@@ -1665,12 +1536,10 @@ public class UserRepositoryImpl implements UserRepository {
     } catch (Exception e) {
       logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
     }
-
     return rolesList;
   }
 
   public class roleTypeDetailExtractor implements ResultSetExtractor<ArrayList<Role>> {
-
     @Override
     public ArrayList<Role> extractData(ResultSet rs) throws SQLException, DataAccessException {
       Role role = null;
@@ -1729,12 +1598,7 @@ public class UserRepositoryImpl implements UserRepository {
             + "CP.ACTIVE_STATUS_IND = 1 "
             + "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1";
 
-        cpmf = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setLong(1, role.getCustSysId());
-
-          }
-        }, new UserRepositoryImpl.CPMFDetailExtractor());
+        cpmf = jdbcTemplate.query(sql2, preparedStatement -> preparedStatement.setLong(1, role.getCustSysId()), new UserRepositoryImpl.CPMFDetailExtractor());
 
         // use above id's to check if feature exists,
         // if no create feature, get the feature sys id and create
@@ -1752,7 +1616,6 @@ public class UserRepositoryImpl implements UserRepository {
           Long custProdMod = cpmf.get(i).getCustProdModSysId();
           Long custProd = cpmf.get(i).getCustProdSysId();
           featureSysIdList = getFeatureSysId(sql3, custProdMod);
-
           for (Long featureSysId : featureSysIdList) {
             if (featureSysId != 0) {
               Long custProdModFeatr = featureSysId;
@@ -1762,7 +1625,6 @@ public class UserRepositoryImpl implements UserRepository {
           }
         }
       }
-
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
       valid.setValid(false);
@@ -1791,25 +1653,18 @@ public class UserRepositoryImpl implements UserRepository {
         + "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
         + "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, '0', '128', 'All', '1', sysdate(), ?) ";
 
-    jdbcTemplate.update(sql4, new PreparedStatementSetter() {
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, custProd);
-        preparedStatement.setLong(2, custProdMod);
-        preparedStatement.setLong(3, custProdModFeatr);
-        preparedStatement.setLong(4, roleId);
-        preparedStatement.setString(5, role.getMasterLoginId());
-      }
+    jdbcTemplate.update(sql4, preparedStatement -> {
+      preparedStatement.setLong(1, custProd);
+      preparedStatement.setLong(2, custProdMod);
+      preparedStatement.setLong(3, custProdModFeatr);
+      preparedStatement.setLong(4, roleId);
+      preparedStatement.setString(5, role.getMasterLoginId());
     });
   }
 
   private void insertPMFAccessPrivilege(String masterLoginId, Long roleId, Long custProdMod, Long custProd) {
     String sql3 = "select PRIVILEGE_SYS_ID from privileges where ROLE_SYS_ID=?";
-    Boolean privExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, roleId);
-      }
-
-    }, new UserRepositoryImpl.PrivDetailExtractor());
+    Boolean privExists = jdbcTemplate.query(sql3, preparedStatement -> preparedStatement.setLong(1, roleId), new UserRepositoryImpl.PrivDetailExtractor());
 
     if (privExists == null || !privExists) {
 
@@ -1818,13 +1673,11 @@ public class UserRepositoryImpl implements UserRepository {
           + "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
           + " VALUES (?, ?, '0', ?, '0', '128', 'All', '1', sysdate(), ?) ";
 
-      jdbcTemplate.update(sql5, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, custProd);
-          preparedStatement.setLong(2, custProdMod);
-          preparedStatement.setLong(3, roleId);
-          preparedStatement.setString(4, masterLoginId);
-        }
+      jdbcTemplate.update(sql5, preparedStatement -> {
+        preparedStatement.setLong(1, custProd);
+        preparedStatement.setLong(2, custProdMod);
+        preparedStatement.setLong(3, roleId);
+        preparedStatement.setString(4, masterLoginId);
       });
 
       String sql6 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
@@ -1832,28 +1685,19 @@ public class UserRepositoryImpl implements UserRepository {
           + "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
           + "VALUES (?, '0', '0', ?, '0', '128', 'All', '1', sysdate(), ?)";
 
-      jdbcTemplate.update(sql6, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, custProd);
-          preparedStatement.setLong(2, roleId);
-          preparedStatement.setString(3, masterLoginId);
-        }
-
+      jdbcTemplate.update(sql6, preparedStatement -> {
+        preparedStatement.setLong(1, custProd);
+        preparedStatement.setLong(2, roleId);
+        preparedStatement.setString(3, masterLoginId);
       });
     }
   }
 
   private List<Long> getFeatureSysId(String sql3, Long custProdMod) {
-    return jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, custProdMod);
-
-      }
-    }, new UserRepositoryImpl.MyAnalysisDetailExtractor());
+    return jdbcTemplate.query(sql3, preparedStatement -> preparedStatement.setLong(1, custProdMod), new UserRepositoryImpl.MyAnalysisDetailExtractor());
   }
 
   public class roleIdDetailExtractor implements ResultSetExtractor<Long> {
-
     @Override
     public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
       Long role = null;
@@ -1865,7 +1709,6 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   public class CPMFDetailExtractor implements ResultSetExtractor<ArrayList<CustomerProductModuleFeature>> {
-
     @Override
     public ArrayList<CustomerProductModuleFeature> extractData(ResultSet rs)
         throws SQLException, DataAccessException {
@@ -1898,12 +1741,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     String sql2 = "DELETE FROM ROLES " + " WHERE ROLE_SYS_ID = ?";
     try {
-      jdbcTemplate.update(sql2, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, roleId);
-
-        }
-      });
+      jdbcTemplate.update(sql2, preparedStatement -> preparedStatement.setLong(1, roleId));
     } catch (Exception e) {
       logger.error("Exception encountered while deleting role " + e.getMessage(), null, e);
       return false;
@@ -1921,19 +1759,16 @@ public class UserRepositoryImpl implements UserRepository {
     roleCode.append(role.getCustomerCode()).append("_").append(role.getRoleName()).append("_")
         .append(role.getRoleType());
     try {
-      jdbcTemplate.update(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, role.getCustSysId());
-          preparedStatement.setString(2, role.getRoleName());
-          preparedStatement.setString(3, roleCode.toString());
-          preparedStatement.setString(4, role.getRoleDesc());
-          preparedStatement.setString(5, role.getRoleType().name());
-          preparedStatement.setInt(6, Integer.parseInt(role.getActiveStatusInd()));
-          preparedStatement.setString(7, role.getMasterLoginId());
-          preparedStatement.setLong(8, role.getRoleSysId());
-        }
+      jdbcTemplate.update(sql.toString(), preparedStatement -> {
+        preparedStatement.setLong(1, role.getCustSysId());
+        preparedStatement.setString(2, role.getRoleName());
+        preparedStatement.setString(3, roleCode.toString());
+        preparedStatement.setString(4, role.getRoleDesc());
+        preparedStatement.setString(5, role.getRoleType().name());
+        preparedStatement.setInt(6, Integer.parseInt(role.getActiveStatusInd()));
+        preparedStatement.setString(7, role.getMasterLoginId());
+        preparedStatement.setLong(8, role.getRoleSysId());
       });
-
     } catch (DuplicateKeyException e) {
       logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
       valid.setValid(false);
@@ -1955,11 +1790,7 @@ public class UserRepositoryImpl implements UserRepository {
     Boolean userExists;
     String sql1 = "SELECT * FROM USERS " + " WHERE ROLE_SYS_ID = ?";
     try {
-      userExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, roleId);
-        }
-      }, new UserRepositoryImpl.UserExistsExtractor());
+      userExists = jdbcTemplate.query(sql1, preparedStatement -> preparedStatement.setLong(1, roleId), new UserRepositoryImpl.UserExistsExtractor());
     } catch (Exception e) {
       logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
       return false;
@@ -1968,7 +1799,6 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   public class UserExistsExtractor implements ResultSetExtractor<Boolean> {
-
     @Override
     public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
       Boolean userExists = false;
@@ -1984,11 +1814,7 @@ public class UserRepositoryImpl implements UserRepository {
     Boolean privExists;
     String sql1 = "SELECT * FROM PRIVILEGES " + " WHERE ROLE_SYS_ID = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != 0";
     try {
-      privExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, roleId);
-        }
-      }, new UserRepositoryImpl.PrivExistsExtractor());
+      privExists = jdbcTemplate.query(sql1, preparedStatement -> preparedStatement.setLong(1, roleId), new UserRepositoryImpl.PrivExistsExtractor());
     } catch (Exception e) {
       logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
       return false;
@@ -2000,11 +1826,9 @@ public class UserRepositoryImpl implements UserRepository {
     PrivilegeDetails priv = null;
     String sql1 = "SELECT PRIVILEGE_CODE, PRIVILEGE_DESC FROM PRIVILEGES " + " WHERE ROLE_SYS_ID = ? AND CUST_PROD_MOD_FEATURE_SYS_ID =?";
     try {
-      priv = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, roleId);
-          preparedStatement.setLong(2, custProdModFeatureId);
-        }
+      priv = jdbcTemplate.query(sql1, preparedStatement -> {
+        preparedStatement.setLong(1, roleId);
+        preparedStatement.setLong(2, custProdModFeatureId);
       }, new UserRepositoryImpl.PrivilegeExtractor());
     } catch (Exception e) {
       logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
@@ -2013,10 +1837,8 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   public class PrivilegeExtractor implements ResultSetExtractor<PrivilegeDetails> {
-
     @Override
     public PrivilegeDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
-
       PrivilegeDetails privilege = null;
       while (rs.next()) {
         privilege = new PrivilegeDetails();
@@ -2028,7 +1850,6 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   public class PrivExistsExtractor implements ResultSetExtractor<Boolean> {
-
     @Override
     public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
       Boolean privExists = false;
@@ -2098,18 +1919,13 @@ public class UserRepositoryImpl implements UserRepository {
         + " AND R.ACTIVE_STATUS_IND = 1  "
         + " AND C.CUSTOMER_SYS_ID = ?";
     try {
-      privList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.privilegeDetailExtractor());
+      privList = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.privilegeDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
     } catch (Exception e) {
       logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
     }
-
     return privList;
 
   }
@@ -2118,12 +1934,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public ArrayList<PrivilegeDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
       PrivilegeDetails privilege = null;
       ArrayList<PrivilegeDetails> privList = new ArrayList<PrivilegeDetails>();
       while (rs.next()) {
         privilege = new PrivilegeDetails();
-
         privilege.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
         privilege.setProductName(rs.getString("PRODUCT_NAME"));
         privilege.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
@@ -2153,11 +1967,7 @@ public class UserRepositoryImpl implements UserRepository {
         + " AND CP.CUSTOMER_SYS_ID=? ";
 
     try {
-      productsList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.productsDetailExtractor());
+      productsList = jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.productsDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -2196,11 +2006,9 @@ public class UserRepositoryImpl implements UserRepository {
         + " AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND  CPM.ACTIVE_STATUS_IND=1 AND CP.CUST_PROD_SYS_ID = ?";
 
     try {
-      modulesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-          preparedStatement.setLong(2, productId);
-        }
+      modulesList = jdbcTemplate.query(sql, preparedStatement -> {
+        preparedStatement.setLong(1, customerId);
+        preparedStatement.setLong(2, productId);
       }, new UserRepositoryImpl.modulesDetailExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
@@ -2248,11 +2056,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     try {
-      categoriesList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-          preparedStatement.setLong(2, moduleId);
-        }
+      categoriesList = jdbcTemplate.query(sql.toString(), preparedStatement -> {
+        preparedStatement.setLong(1, customerId);
+        preparedStatement.setLong(2, moduleId);
       }, new UserRepositoryImpl.categoryListDetailExtractor());
 
     } catch (DataAccessException de) {
@@ -2310,13 +2116,11 @@ public class UserRepositoryImpl implements UserRepository {
         + "   AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND";
 
     try {
-      subCategoryWithPrivelegeList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, cpsm.getRoleId());
-          preparedStatement.setLong(2, cpsm.getCustomerId());
-          preparedStatement.setLong(3, cpsm.getModuleId());
-          preparedStatement.setString(4, "CHILD_" + cpsm.getCategoryCode());
-        }
+      subCategoryWithPrivelegeList = jdbcTemplate.query(sql, preparedStatement -> {
+        preparedStatement.setLong(1, cpsm.getRoleId());
+        preparedStatement.setLong(2, cpsm.getCustomerId());
+        preparedStatement.setLong(3, cpsm.getModuleId());
+        preparedStatement.setString(4, "CHILD_" + cpsm.getCategoryCode());
       }, new UserRepositoryImpl.SubCategoryDetailWithPrivelegeExtractor());
 
     } catch (DataAccessException de) {
@@ -2325,7 +2129,6 @@ public class UserRepositoryImpl implements UserRepository {
     } catch (Exception e) {
       logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
     }
-
     return subCategoryWithPrivelegeList;
   }
 
@@ -2333,8 +2136,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public ArrayList<SubCategoryWithPrivilegeDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
-
       SubCategoryWithPrivilegeDetails subCategory = null;
       ArrayList<SubCategoryWithPrivilegeDetails> subCatList = new ArrayList<SubCategoryWithPrivilegeDetails>();
       while (rs.next()) {
@@ -2454,13 +2255,11 @@ public class UserRepositoryImpl implements UserRepository {
     Long privExists = null;
     Valid valid = new Valid();
     try {
-      privExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, privilege.getProductId());
-          preparedStatement.setLong(2, privilege.getModuleId());
-          preparedStatement.setLong(3, privilege.getCategoryId());
-          preparedStatement.setLong(4, privilege.getRoleId());
-        }
+      privExists = jdbcTemplate.query(sql1, preparedStatement -> {
+        preparedStatement.setLong(1, privilege.getProductId());
+        preparedStatement.setLong(2, privilege.getModuleId());
+        preparedStatement.setLong(3, privilege.getCategoryId());
+        preparedStatement.setLong(4, privilege.getRoleId());
       }, new UserRepositoryImpl.GetPrivExtractor());
 
       if (privExists == null || privilege.getPrivilegeId() == privExists) {
@@ -2468,18 +2267,16 @@ public class UserRepositoryImpl implements UserRepository {
         String sql4 = "UPDATE PRIVILEGES SET CUST_PROD_SYS_ID=?, CUST_PROD_MOD_SYS_ID=?, "
             + "CUST_PROD_MOD_FEATURE_SYS_ID=?, ROLE_SYS_ID=?, ANALYSIS_SYS_ID=?, PRIVILEGE_CODE=?, PRIVILEGE_DESC=?, "
             + "MODIFIED_DATE=sysdate(), MODIFIED_BY=? WHERE PRIVILEGE_SYS_ID=?";
-        jdbcTemplate.update(sql4, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setLong(1, privilege.getProductId());
-            preparedStatement.setLong(2, privilege.getModuleId());
-            preparedStatement.setLong(3, privilege.getCategoryId());
-            preparedStatement.setLong(4, privilege.getRoleId());
-            preparedStatement.setLong(5, 0);
-            preparedStatement.setLong(6, privilege.getPrivilegeCode());
-            preparedStatement.setString(7, privilege.getPrivilegeDesc());
-            preparedStatement.setString(8, privilege.getMasterLoginId());
-            preparedStatement.setLong(9, privilege.getPrivilegeId());
-          }
+        jdbcTemplate.update(sql4, preparedStatement -> {
+          preparedStatement.setLong(1, privilege.getProductId());
+          preparedStatement.setLong(2, privilege.getModuleId());
+          preparedStatement.setLong(3, privilege.getCategoryId());
+          preparedStatement.setLong(4, privilege.getRoleId());
+          preparedStatement.setLong(5, 0);
+          preparedStatement.setLong(6, privilege.getPrivilegeCode());
+          preparedStatement.setString(7, privilege.getPrivilegeDesc());
+          preparedStatement.setString(8, privilege.getMasterLoginId());
+          preparedStatement.setLong(9, privilege.getPrivilegeId());
         });
         valid.setValid(true);
       } else {
@@ -2525,12 +2322,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     String sql2 = "DELETE FROM PRIVILEGES " + " WHERE PRIVILEGE_SYS_ID = ?";
     try {
-      jdbcTemplate.update(sql2, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, privId);
-
-        }
-      });
+      jdbcTemplate.update(sql2, preparedStatement -> preparedStatement.setLong(1, privId));
     } catch (Exception e) {
       logger.error("Exception encountered while deleting privilege " + e.getMessage(), null, e);
       return false;
@@ -2558,11 +2350,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     try {
-      categoryList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-        }
-      }, new UserRepositoryImpl.CategoryDetailExtractor());
+      categoryList = jdbcTemplate.query(sql.toString(), preparedStatement -> preparedStatement.setLong(1, customerId), new UserRepositoryImpl.CategoryDetailExtractor());
 
       ArrayList<CategoryDetails> categoryParentSorted = new ArrayList<CategoryDetails>();
       ArrayList<CategoryDetails> categoryChildSorted = new ArrayList<CategoryDetails>();
