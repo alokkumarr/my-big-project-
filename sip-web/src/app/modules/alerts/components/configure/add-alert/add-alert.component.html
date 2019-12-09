@@ -31,6 +31,7 @@
                 formControlName="alertRuleName"
                 e2e="alertRuleName"
               />
+
               <mat-error
                 *ngIf="
                   alertDefFormGroup.controls.alertRuleName.hasError('required')
@@ -41,7 +42,7 @@
                 <strong> {{displayErrorMessage('nameLength')}}
                 </strong>
               </mat-error>
-              <mat-error *ngIf="alertDefFormGroup.hasError('nameIsInValid', ['name'])" i18n>
+              <mat-error *ngIf="alertDefFormGroup.controls.alertRuleName.hasError('nameIsInValid')" i18n>
                 <strong> {{displayErrorMessage('specialChars')}}
                 </strong>
               </mat-error>
