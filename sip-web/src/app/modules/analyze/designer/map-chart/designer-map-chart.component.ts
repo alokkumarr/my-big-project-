@@ -9,7 +9,6 @@ import * as isArray from 'lodash/isArray';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpMapValues from 'lodash/fp/mapValues';
 import { Subject, Observable, isObservable } from 'rxjs';
 
 import { ChartService } from '../../../../common/services/chart.service';
@@ -45,7 +44,7 @@ export class DesignerMapChartComponent implements OnInit {
     this._fields = fpPipe(
       fpFlatMap(artifact => artifact.fields),
       fpGroupBy('area'),
-      fpMapValues(([field]) => field)
+      ({ x, y }) => ({ y, x: x[0] })
     )(sipQuery.artifacts);
 
     const xField = this._fields.x;
@@ -109,6 +108,11 @@ export class DesignerMapChartComponent implements OnInit {
     const rawSeries = this._rawSeries;
     const fields = this._fields;
 
+    const tooltipsAndLegend = this._chartService.addTooltipsAndLegendAsObject(
+      fields,
+      'chart_scale'
+    );
+
     if (
       isObservable(this._mapData) &&
       isArray(rawSeries) &&
@@ -121,6 +125,7 @@ export class DesignerMapChartComponent implements OnInit {
       mapData$.subscribe(mapData => {
         rawSeries[0].mapData = mapData;
         const updateObj = {
+          ...tooltipsAndLegend,
           series: rawSeries
         };
         this.chartUpdater.next(updateObj);

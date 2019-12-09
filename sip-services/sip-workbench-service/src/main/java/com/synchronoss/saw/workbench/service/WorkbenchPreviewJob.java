@@ -45,7 +45,6 @@ public class WorkbenchPreviewJob implements Job<Integer> {
     SparkSession session = jobContext.sparkSession();
     Dataset<Row> dataset = getDataset(session, location);
     if (dataset != null) {
-      log.info("dataset.schema() : " +  dataset.schema().toString());
       StructField[] fields = dataset.schema().fields();
       Iterator<Row> rows = dataset.limit(limit).toLocalIterator();
       rows.forEachRemaining(
@@ -67,6 +66,8 @@ public class WorkbenchPreviewJob implements Job<Integer> {
                 document.put(name, row.getFloat(i));
               } else if (dataType.equals(DataTypes.DoubleType)) {
                 document.put(name, row.getDouble(i));
+              } else if (dataType.equals(DataTypes.TimestampType)) {
+                document.put(name, row.getTimestamp(i).toString());
               } else {
                 log.warn("Unhandled Spark data type: {}", dataType);
                 document.put(name, row.get(i).toString());
@@ -84,7 +85,6 @@ public class WorkbenchPreviewJob implements Job<Integer> {
   private Dataset<Row> getDataset(SparkSession session, String location) {
     Logger log = LoggerFactory.getLogger(getClass().getName());
     try {
-      log.info("dataset file location : " +  location);
       return session.read().load(location);
     } catch (Exception e) {
       /*

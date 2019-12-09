@@ -2,7 +2,7 @@
 const commonFunctions = require('../utils/commonFunctions');
 const DeleteModel = require('../workbench/components/DeleteModel');
 const Header = require('../../pages/components/Header');
-
+const logger = require('../../conf/logger')(__filename);
 class DataSourcesPage extends DeleteModel {
   constructor() {
     super();
@@ -64,6 +64,16 @@ class DataSourcesPage extends DeleteModel {
       element(by.css(`[e2e='route-destinationLocation-${value}']`));
     this._description = value =>
       element(by.css(`[e2e='route-description-${value}']`));
+    this._createdBy = element(
+      by.xpath(`//*[contains(@e2e,'route-createdBy')]`)
+    );
+    this._scheduleInfo = element(
+      by.xpath(`//*[contains(@e2e,'route-schedulerExpression-')]`)
+    );
+    this._nextFireTime = element(
+      by.xpath(`//*[contains(@e2e,'route-nextFireTime-')]`)
+    );
+    this._editRoute = element(by.css(`[e2e='edit-route-btn']`));
 
     //Jobs page
     this._channelName = value =>
@@ -90,6 +100,8 @@ class DataSourcesPage extends DeleteModel {
       element(by.css(`[e2e='job-log-mflFileStatus-${value}']`));
 
     this._backBtn = element(by.css(`[class='mat-icon-button']`));
+    this._recFileName = name =>
+      element(by.xpath(`//*[contains(@e2e,'job-log-recdFileName-${name}')]`));
   }
 
   clickOnJobIdByRouteName(name) {
@@ -178,6 +190,13 @@ class DataSourcesPage extends DeleteModel {
     );
   }
 
+  activateChannel(name) {
+    commonFunctions.clickOnElement(this._channelActivateDeactivate(name, 0));
+    commonFunctions.waitFor.elementToBeVisible(
+      this._channelActivateDeactivate(name, 1)
+    );
+  }
+
   clickOnAddRoute() {
     commonFunctions.clickOnElement(this._addRouteBtn);
   }
@@ -201,16 +220,21 @@ class DataSourcesPage extends DeleteModel {
     commonFunctions.clickOnElement(this._closeRouteLogsModel);
   }
 
-  verifyRouteDetails(routeInfo) {
+  verifyRouteDetails(routeInfo, apipull = false) {
     commonFunctions.waitFor.elementToBeVisible(
       this._routeName(routeInfo.routeName)
     );
-    commonFunctions.waitFor.elementToBeVisible(
-      this._sourceLocation(routeInfo.source)
-    );
-    commonFunctions.waitFor.elementToBeVisible(
-      this._filePattern(routeInfo.filePattern)
-    );
+    if (!apipull) {
+      commonFunctions.waitFor.elementToBeVisible(
+        this._sourceLocation(routeInfo.source)
+      );
+      commonFunctions.waitFor.elementToBeVisible(
+        this._filePattern(routeInfo.filePattern)
+      );
+    }
+    commonFunctions.validateHasText(this._createdBy);
+    commonFunctions.validateHasText(this._scheduleInfo);
+    commonFunctions.validateHasText(this._nextFireTime);
     commonFunctions.waitFor.elementToBeVisible(
       this._destLocation(routeInfo.destination)
     );
@@ -234,6 +258,7 @@ class DataSourcesPage extends DeleteModel {
   clickOnBackButton() {
     commonFunctions.clickOnElement(this._backBtn);
   }
+
   verifyRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
     let attempts = 15;
@@ -252,7 +277,7 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              console.log('Element found...');
+              logger.info('Element found...');
               _self.clickOnJobIdByRouteName(routeInfo.routeName);
               _self.scheduleVerification(routeInfo);
               // go to channel management
@@ -261,8 +286,8 @@ class DataSourcesPage extends DeleteModel {
             } else {
               // go to channel management
               _self.clickOnBackButton();
-              console.log(`Element not present Attempt:${index} done`);
-              console.log(`waiting for 20 seconds and check again`);
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
               browser.sleep(20000);
               process(index + 1);
             }
@@ -277,6 +302,7 @@ class DataSourcesPage extends DeleteModel {
     header.selectCategory(cat);
     header.selectSubCategory(subCat);
   }
+
   scheduleVerification(routeInfo) {
     expect(
       this._jobLogFilePattern(routeInfo.filePattern).isDisplayed()
@@ -286,6 +312,86 @@ class DataSourcesPage extends DeleteModel {
         `${routeInfo.source}/${routeInfo.fileName}`
       ).isDisplayed()
     ).toBeTruthy();
+    expect(this._jobLogFileStatus(`SUCCESS`).isDisplayed()).toBeTruthy();
+    expect(
+      this._jobLogProcessState(`DATA_RECEIVED`).isDisplayed()
+    ).toBeTruthy();
+  }
+
+  /**
+   *
+   * @param {Object} channelInfo
+   * contains all the property which are displayed in current displayed channel
+   */
+  verifyCurrentDisplayedApiChannel(channelInfo) {
+    commonFunctions.waitFor.elementToBeVisible(this._channelNameDetail);
+    commonFunctions.validateText(
+      this._channelNameDetail,
+      channelInfo.channelName
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('host-name'),
+      channelInfo.hostName
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('port-number'),
+      channelInfo.port
+    );
+    commonFunctions.validateText(
+      this._channelAttributes('created-by'),
+      channelInfo.created
+    );
+
+    commonFunctions.validateText(
+      this._channelAttributes('description'),
+      channelInfo.desc
+    );
+  }
+
+  clickOnEditRoute() {
+    commonFunctions.clickOnElement(this._editRoute);
+  }
+
+  verifyApiRouteScheduleInformation(channelName, routeInfo) {
+    let _self = this;
+    let attempts = 15;
+    (function process(index) {
+      if (index >= attempts) {
+        return;
+      }
+      _self.clickOnCreatedChannelName(channelName);
+      _self.clickOnRouteAction(routeInfo.routeName);
+      _self.clickOnViewRouteLogs();
+      browser.sleep(2000);
+
+      element(
+        _self
+          ._jobRouteName(routeInfo.routeName)
+          .isPresent()
+          .then(present => {
+            if (present) {
+              logger.info('Element found...');
+              _self.clickOnJobIdByRouteName(routeInfo.routeName);
+              _self.scheduleAPiLogVerification(routeInfo);
+              // go to channel management
+              _self.clickOnBackButton();
+              _self.clickOnBackButton();
+            } else {
+              // go to channel management
+              _self.clickOnBackButton();
+              logger.info(`Element not present Attempt:${index} done`);
+              logger.info(`waiting for 20 seconds and check again`);
+              browser.sleep(20000);
+              process(index + 1);
+            }
+          })
+      );
+    })(1);
+  }
+
+  scheduleAPiLogVerification(routeInfo) {
+    const recFileName = routeInfo.routeName.replace(/ /g, '_').toLowerCase();
+    expect(this._recFileName(recFileName).isDisplayed()).toBeTruthy();
     expect(this._jobLogFileStatus(`SUCCESS`).isDisplayed()).toBeTruthy();
     expect(
       this._jobLogProcessState(`DATA_RECEIVED`).isDisplayed()
