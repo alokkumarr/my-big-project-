@@ -135,6 +135,7 @@ describe('AddAlertComponent', () => {
     ).toEqual('');
   });
 
+
   it('should create alert payload', () => {
     component.selectedDatapod = {
       artifacts: [{ artifactName: 'sample', fields: [] }],
@@ -152,6 +153,20 @@ describe('AddAlertComponent', () => {
     };
     component.constructPayload();
     expect(component.endPayload).toEqual(payload);
+  });
+
+  it('should create alert', () => {
+    const payloadSpy = spyOn(component, 'constructPayload');
+    component.createAlert();
+    expect(payloadSpy).toHaveBeenCalled();
+    expect(component.subscriptions).not.toBeNull();
+  });
+
+  it('should update alert', () => {
+    const payloadSpy = spyOn(component, 'constructPayload');
+    component.updateAlert();
+    expect(payloadSpy).toHaveBeenCalled();
+    expect(component.subscriptions).not.toBeNull();
   });
 
   it('should notifyOnAction', () => {
