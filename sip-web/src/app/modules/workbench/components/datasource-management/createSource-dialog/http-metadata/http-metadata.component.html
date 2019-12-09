@@ -138,7 +138,6 @@
                   matInput
                   name="name-of-header"
                   [e2e]="'provisional-header-name-' + i"
-                  [attr.disabled]="true"
                   formControlName="key"
                   readonly
                 />
@@ -154,7 +153,6 @@
                   matInput
                   name="value-of-header"
                   [e2e]="'provisional-header-value-' + i"
-                  [attr.disabled]="true"
                   formControlName="value"
                   readonly
                 />
@@ -335,33 +333,45 @@
     <form
       fxFlex
       fxLayout="row"
-      fxLayoutAlign="center center"
+      fxLayoutAlign="start center"
+      fxLayoutGap="5px"
       class="parameters authorization"
       novalidate
       [formGroup]="authorizationForm"
       autocomplete="false"
     >
-      <mat-form-field appearance="outline" fxFlex="20">
-        <mat-label>Authorization Type</mat-label>
-        <mat-select formControlName="type">
-          <mat-option
-            *ngFor="let type of authorizationTypeValues"
-            [value]="type"
-          >
-            {{ type }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div fxFlex="50" fxLayout="row" fxLayoutAlign="end center">
+        <mat-form-field appearance="outline" fxFlex="35">
+          <mat-label>Authorization Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option
+              *ngFor="let type of authorizationTypeValues"
+              [value]="type"
+            >
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
       <mat-divider [vertical]="true"></mat-divider>
       <div
-        fxFlex
+        fxFlex="25"
+        [style.display]="
+          authType.value === authorizationTypes.NONE ? 'block' : 'none'
+        "
+      >
+        Please choose an Authorization scheme. The headers will be automatically
+        calculated and appended to the request.
+      </div>
+      <div
+        fxFlex="50"
         fxLayout="column"
         fxLayoutAlign="center start"
         [style.display]="
           authType.value === authorizationTypes.USER ? 'flex' : 'none'
         "
       >
-        <mat-form-field fxFlexappearance="outline">
+        <mat-form-field fxFlex appearance="outline">
           <mat-label i18n>Username</mat-label>
           <input
             matInput
@@ -377,7 +387,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field fxFlexappearance="outline">
+        <mat-form-field fxFlex appearance="outline">
           <mat-label i18n>Password</mat-label>
           <input
             matInput

@@ -29,6 +29,10 @@ mat-form-field {
 
 .parameters {
   margin-bottom: 10px;
+
+  &.authorization {
+    min-height: 180px;
+  }
 }
 
 ::ng-deep mat-tab-body {
