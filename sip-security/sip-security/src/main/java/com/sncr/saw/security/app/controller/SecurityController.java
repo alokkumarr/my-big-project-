@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.sncr.saw.security.app.model.DskGroup;
-import com.sncr.saw.security.app.model.DskValues;
+import com.sncr.saw.security.app.model.DskGroupReq;
+import com.sncr.saw.security.app.model.DskAttribute;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -81,8 +81,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -872,7 +870,7 @@ public class SecurityController {
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
     public Object addDskGroup(HttpServletRequest request, HttpServletResponse response,
-        @RequestBody DskGroup dskGroup) {
+        @RequestBody DskGroupReq dskGroupReq) {
       String jwtToken = JWTUtils.getToken(request);
       String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
 
@@ -880,8 +878,8 @@ public class SecurityController {
       String createdBy = extractValuesFromToken[2];
 
 
-      String securityGroupName = dskGroup.getGroupName();
-      String securityGroupDescription = dskGroup.getGroupDescription();
+      String securityGroupName = dskGroupReq.getGroupName();
+      String securityGroupDescription = dskGroupReq.getGroupDescription();
 
       SecurityGroups securityGroup = new SecurityGroups();
       securityGroup.setSecurityGroupName(securityGroupName);
@@ -896,14 +894,15 @@ public class SecurityController {
         logger.error("Error occurred: " + dskValidity.getError());
         return dskValidity;
       }
-      List<DskValues> dsk = dskGroup.getDataSecurity();
 
-      for(DskValues dskValues: dsk) {
-        Set<String> values = dskValues.getValues();
+      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+
+      for(DskAttribute dskAttribute : dsk) {
+        Set<String> values = dskAttribute.getValues();
 
         for(String value: values) {
           AttributeValues attributeValues = new AttributeValues();
-          attributeValues.setAttributeName(dskValues.getName());
+          attributeValues.setAttributeName(dskAttribute.getName());
           attributeValues.setValue(value);
 
           dataSecurityKeyRepository
@@ -911,7 +910,46 @@ public class SecurityController {
         }
       }
 
-      return dskValidity;
+      List<DskDetails> details = dataSecurityKeyRepository.fetchDskAllAttributeValues(groupSysId);
+
+      return details;
+    }
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
+    public Object updateDatasecurityGroup(HttpServletRequest request, HttpServletResponse response,
+        @PathVariable(name = "securityGroupId", required = true) Long securityGroupId,
+        @RequestBody DskGroupReq dskGroupReq) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+
+        Long custId = Long.valueOf(extractValuesFromToken[1]);
+        String createdBy = extractValuesFromToken[2];
+
+        List<String> securityGroupAttributes = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupId);
+        securityGroupAttributes.add(0, String.valueOf(securityGroupId));
+
+        if (securityGroupAttributes != null && securityGroupAttributes.size() != 0)
+          dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
+
+
+        List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+
+        for(DskAttribute dskAttributes : dsk) {
+            Set<String> values = dskAttributes.getValues();
+
+            for(String value: values) {
+                AttributeValues attributeValues = new AttributeValues();
+                attributeValues.setAttributeName(dskAttributes.getName());
+                attributeValues.setValue(value);
+
+                dataSecurityKeyRepository
+                    .addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
+            }
+        }
+        List<DskDetails> details =
+            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
+
+        return details;
     }
 
     /**

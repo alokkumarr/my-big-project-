@@ -2,7 +2,7 @@ package com.sncr.saw.security.app.model;
 
 import java.util.Set;
 
-public class DskValues {
+public class DskAttribute {
   private String name;
   private Set<String> values;
 
