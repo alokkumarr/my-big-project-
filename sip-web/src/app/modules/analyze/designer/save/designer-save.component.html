@@ -1,40 +1,48 @@
-<div fxLayout="column" style="width: 400px;">
-  <mat-form-field>
-    <input
-      matInput
-      (input)="onNameChange($event.target.value)"
-      [value]="analysis.name"
-      e2e="save-dialog-name"
-      autocomplete="off"
-      placeholder="Name"
-      required
-    />
-  </mat-form-field>
-  <mat-error *ngIf="validateNameField(analysis.name).check.validateLength" i18n>
-    <strong> {{validationErrorMessage('nameLength')}}
-    </strong>
-  </mat-error>
-  <mat-error *ngIf="validateNameField(analysis.name).check.validateCharacters" i18n>
-    <strong> {{validationErrorMessage('specialChars')}}
-    </strong>
-  </mat-error>
-  <mat-form-field>
-    <textarea
-      matInput
-      (input)="onDescriptionChange($event.target.value)"
-      [value]="analysis.description"
-      placeholder="Description"
-      e2e="save-dialog-description"
-      autocomplete="off"
-      matTextareaAutosize
-      matAutosizeMinRows="2"
-      matAutosizeMaxRows="10"
-    >
-    </textarea>
-  </mat-form-field>
+<form [formGroup]="saveForm">
+  <div fxLayout="column" style="width: 400px;">
+    <mat-form-field>
+      <input
+        matInput
+        (input)="onNameChange($event.target.value)"
+        [value]="analysis.name"
+        e2e="save-dialog-name"
+        autocomplete="off"
+        placeholder="Name"
+        formControlName="name"
+        required
+      />
+      <mat-error
+        *ngIf="saveForm.hasError('required', ['name'])"
+        >This field is required
+      </mat-error>
+      <mat-error *ngIf="saveForm.value.name.length > 30" i18n>
+        <strong> {{displayErrorMessage('nameLength')}}
+        </strong>
+      </mat-error>
+      <mat-error *ngIf="saveForm.hasError('nameIsInValid', ['name'])" i18n>
+        <strong> {{displayErrorMessage('specialChars')}}
+        </strong>
+      </mat-error>
+    </mat-form-field>
 
-  <span>
-    This analysis will be saved to
-    <strong>{{ userCategoryName }} > {{ userSubCategoryName }}.</strong>
-  </span>
-</div>
+    <mat-form-field>
+      <textarea
+        matInput
+        (input)="onDescriptionChange($event.target.value)"
+        [value]="analysis.description"
+        placeholder="Description"
+        e2e="save-dialog-description"
+        autocomplete="off"
+        matTextareaAutosize
+        matAutosizeMinRows="2"
+        matAutosizeMaxRows="10"
+      >
+      </textarea>
+    </mat-form-field>
+
+    <span>
+      This analysis will be saved to
+      <strong>{{ userCategoryName }} > {{ userSubCategoryName }}.</strong>
+    </span>
+  </div>
+</form>
