@@ -66,6 +66,8 @@ public class WorkbenchPreviewJob implements Job<Integer> {
                 document.put(name, row.getFloat(i));
               } else if (dataType.equals(DataTypes.DoubleType)) {
                 document.put(name, row.getDouble(i));
+              } else if (dataType.equals(DataTypes.TimestampType)) {
+                document.put(name, row.getTimestamp(i).toString());
               } else {
                 log.warn("Unhandled Spark data type: {}", dataType);
                 document.put(name, row.get(i).toString());
