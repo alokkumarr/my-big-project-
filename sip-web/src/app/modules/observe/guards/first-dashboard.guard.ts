@@ -45,8 +45,6 @@ export class FirstDashboardGuard implements CanActivate {
     const favouriteDashboardCategory = this.configService.getPreference(
       PREFERENCES.DEFAULT_DASHBOARD_CAT
     );
-    console.log('favouriteDashboardCategory', favouriteDashboardCategory);
-    console.log('favouriteDashboardId', favouriteDashboardId);
     if (!favouriteDashboardId) {
       this.redirectToFirstDash();
     } else {
@@ -69,45 +67,42 @@ export class FirstDashboardGuard implements CanActivate {
   }
 
   redirectToFirstDash(): void {
-    this.observe
-      .reloadMenu()
-      .toPromise()
-      .then(menu => {
-        const categoryWithDashboard = find(menu, cat => {
-          const subCategory = find(cat.children, subCat => {
-            return subCat.children.length > 0;
-          });
-
-          return Boolean(subCategory);
+    this.observe.reloadMenu().toPromise().then(menu => {
+      const categoryWithDashboard = find(menu, cat => {
+        const subCategory = find(cat.children, subCat => {
+          return subCat.children.length > 0;
         });
 
-        const categoryWithSubCategory = find(
-          menu,
-          cat => cat.children.length > 0
-        );
-
-        if (categoryWithDashboard) {
-          /* If a dashboard has been found in some category/subcategory, redirect to that */
-          const subCategory = find(categoryWithDashboard.children, subCat => {
-            return subCat.children.length > 0;
-          });
-
-          this.router.navigate(['observe', subCategory.id], {
-            queryParams: {
-              dashboard: subCategory.children[0].id
-            }
-          });
-        } else if (categoryWithSubCategory) {
-          /* Otherwise, redirect to the first empty subcategory available. */
-          this.router.navigate(
-            ['observe', categoryWithSubCategory.children[0].id],
-            {
-              queryParams: {
-                dashboard: ''
-              }
-            }
-          );
-        }
+        return Boolean(subCategory);
       });
+
+      const categoryWithSubCategory = find(
+        menu,
+        cat => cat.children.length > 0
+      );
+
+      if (categoryWithDashboard) {
+        /* If a dashboard has been found in some category/subcategory, redirect to that */
+        const subCategory = find(categoryWithDashboard.children, subCat => {
+          return subCat.children.length > 0;
+        });
+
+        this.router.navigate(['observe', subCategory.id], {
+          queryParams: {
+            dashboard: subCategory.children[0].id
+          }
+        });
+      } else if (categoryWithSubCategory) {
+        /* Otherwise, redirect to the first empty subcategory available. */
+        this.router.navigate(
+          ['observe', categoryWithSubCategory.children[0].id],
+          {
+            queryParams: {
+              dashboard: ''
+            }
+          }
+        );
+      }
+    });
   }
 }
