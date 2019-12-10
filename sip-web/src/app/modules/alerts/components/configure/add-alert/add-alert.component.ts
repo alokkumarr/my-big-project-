@@ -28,7 +28,7 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
-import { entityNameErrorMessage } from './../../../../../common/validators/field-name-rule.validator';
+import { entityNameErrorMessage, minimumNameLength } from './../../../../../common/validators/field-name-rule.validator';
 
 import {
   AlertConfig,
@@ -75,6 +75,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
+  nameLengthLimit;
   endActionText = 'Add';
   endPayload: AlertConfig;
   showNotificationEmail = false;
@@ -136,6 +137,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     );
     this.operators$ = this._configureAlertService.getOperators();
     this.notifications$ = of(notificationsOptions);
+    this.nameLengthLimit = minimumNameLength;
   }
 
   ngOnDestroy() {
@@ -576,11 +578,11 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   createAlert() {
+    const payload = this.constructPayload();
     if (this.alertDefFormGroup.invalid) {
       return;
     }
 
-    const payload = this.constructPayload();
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
@@ -590,10 +592,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   }
 
   updateAlert() {
+    const payload = this.constructPayload();
     if (this.alertDefFormGroup.invalid) {
       return;
     }
-    const payload = this.constructPayload();
     const alertID = this.alertDefinition.alertConfig.alertRulesSysId;
     const updateSubscriber = this._configureAlertService
       .updateAlert(alertID, payload)

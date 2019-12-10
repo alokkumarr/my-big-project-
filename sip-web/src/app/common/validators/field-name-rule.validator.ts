@@ -1,4 +1,4 @@
-const minimumNameLength = 30;
+export const minimumNameLength = 30;
 
 const checkEntityName = (name) => {
   const analysisNameLength = name.length;

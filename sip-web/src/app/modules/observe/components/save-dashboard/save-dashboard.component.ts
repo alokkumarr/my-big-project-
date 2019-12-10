@@ -17,7 +17,7 @@ import {
   JwtService
 } from '../../../../common/services';
 import { requireIf } from '../../../../common/validators/index';
-import { entityNameErrorMessage } from './../../../../common/validators/field-name-rule.validator';
+import { entityNameErrorMessage, minimumNameLength } from './../../../../common/validators/field-name-rule.validator';
 
 export const REFRESH_INTERVALS = [
   {
@@ -75,7 +75,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   public showProgress = false;
   public listeners: Array<Subscription> = [];
   progressSub;
-
+  nameLengthLimit;
   constructor(
     public dialogRef: MatDialogRef<SaveDashboardComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -107,6 +107,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.disableIntervalConditionally();
+    this.nameLengthLimit = minimumNameLength;
   }
 
   validatePattern(control) {

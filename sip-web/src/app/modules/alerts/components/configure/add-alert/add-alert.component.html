@@ -38,7 +38,7 @@
                 "
                 >This field is required</mat-error
               >
-              <mat-error *ngIf="alertDefFormGroup.value.alertRuleName.length > 30" i18n>
+              <mat-error *ngIf="alertDefFormGroup.value.alertRuleName.length > nameLengthLimit" i18n>
                 <strong> {{displayErrorMessage('nameLength')}}
                 </strong>
               </mat-error>

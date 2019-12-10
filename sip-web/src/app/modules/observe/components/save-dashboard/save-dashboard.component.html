@@ -16,7 +16,7 @@
         *ngIf="dashboardForm.hasError('required', ['name'])"
         >This field is required
       </mat-error>
-      <mat-error *ngIf="dashboardForm.value.name.length > 30" i18n>
+      <mat-error *ngIf="dashboardForm.value.name.length > nameLengthLimit" i18n>
         <strong> {{displayErrorMessage('nameLength')}}
         </strong>
       </mat-error>
