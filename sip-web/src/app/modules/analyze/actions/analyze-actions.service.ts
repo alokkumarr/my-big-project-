@@ -253,7 +253,7 @@ export class AnalyzeActionsService {
         scheduleState: 'delete',
         jobName: analysis.id,
         groupName: analysis.customerCode,
-        categoryId: analysis.categoryId
+        categoryId: analysis.category
       };
       this._analyzeService.changeSchedule(deleteScheduleBody);
     }
