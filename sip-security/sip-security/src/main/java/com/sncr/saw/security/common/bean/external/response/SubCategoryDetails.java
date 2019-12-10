@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class SubCategoryDetails implements Serializable {
 
-  private static final long serialVersionUID = -6682525829922872306L;
+  private static final long serialVersionUID = -8947328678090366905L;
 
   private long subCategoryId;
   private String subCategoryName;
