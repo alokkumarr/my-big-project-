@@ -7,8 +7,9 @@ import com.sncr.saw.security.app.service.ExternalSecurityService;
 import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
-import com.sncr.saw.security.common.util.JWTUtils;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -62,11 +63,10 @@ public class ExternalSecurityController {
       return response;
     }
 
-    String jwtToken = JWTUtils.getToken(request);
-    String[] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-    String roleType = extractValuesFromToken[3];
-    String masterLoginId = extractValuesFromToken[4];
-    if (masterLoginId != null && !userRepository.validateUser(masterLoginId) && !RoleType.ADMIN.equals(roleType)) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    RoleType roleType = ticket.getRoleType();
+    String masterLoginId = ticket.getMasterLoginId();
+    if ((masterLoginId != null && !userRepository.validateUser(masterLoginId)) || !RoleType.ADMIN.equals(roleType)) {
       httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.setValid(false);
       response.setMessage("You are not authorized to perform this operation.");
@@ -110,11 +110,10 @@ public class ExternalSecurityController {
       return response;
     }
 
-    String jwtToken = JWTUtils.getToken(httpRequest);
-    String[] extractValuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
-    String roleType = extractValuesFromToken[3];
-    String masterLoginId = extractValuesFromToken[4];
-    if (masterLoginId != null && !userRepository.validateUser(masterLoginId) && !RoleType.ADMIN.equals(roleType.toUpperCase())) {
+    Ticket ticket = SipCommonUtils.getTicket(httpRequest);
+    RoleType roleType = ticket.getRoleType();
+    String masterLoginId = ticket.getMasterLoginId();
+    if ((masterLoginId != null && !userRepository.validateUser(masterLoginId)) || !RoleType.ADMIN.equals(roleType)) {
       httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.setValid(false);
       response.setMessage("You are not authorized to perform this operation.");
