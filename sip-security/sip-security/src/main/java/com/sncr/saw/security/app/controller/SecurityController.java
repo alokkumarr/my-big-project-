@@ -1356,11 +1356,12 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/edit", method = RequestMethod.POST)
-	public RolesList editRole(@RequestBody RoleDetails role) {
+	public RolesList editRole(HttpServletRequest request, @RequestBody RoleDetails role) {
 		RolesList roleList = new RolesList();
 		Valid valid = null;
 		try {
-			if (role != null) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+			if (role != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(role.getCustSysId())) {
 				valid = userRepository.updateRole(role);
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
@@ -1500,11 +1501,17 @@ public class SecurityController {
 	 */
 
 	@RequestMapping(value = "/auth/admin/cust/manage/subCategoriesWithPrivilege/list", method = RequestMethod.POST)
-	public SubCategoryWithPrivilegeList getSubCategoriesList(@RequestBody CustomerProductSubModule cpsm) {
+	public SubCategoryWithPrivilegeList getSubCategoriesList(HttpServletRequest request, @RequestBody CustomerProductSubModule cpsm) {
 		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
 		try {
-			subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
-			subcategories.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpsm.getCustomerId())){
+        subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
+        subcategories.setValid(true);
+      } else {
+        subcategories.setError("Customer Id not matched, please correct customer id.");
+        subcategories.setValid(false);
+      }
 		} catch (Exception e) {
 			subcategories.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1695,11 +1702,17 @@ public class SecurityController {
 	 */
 
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/parent/list", method = RequestMethod.POST)
-	public CategoryList getcategoriesOnlyList(@RequestBody  CustProdModule cpm) {
+	public CategoryList getcategoriesOnlyList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
 		try {
-			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
-			categories.setValid(true);
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpm.getCustomerId())) {
+        categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
+        categories.setValid(true);
+      } else {
+		    categories.setError("Customer Id not matched, please correct customer id.");
+        categories.setValid(false);
+      }
 		} catch (Exception e) {
 			categories.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1716,18 +1729,22 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/delete", method = RequestMethod.POST)
-	public CategoryList deleteCategories(@RequestBody DeleteCategory category) {
+	public CategoryList deleteCategories(HttpServletRequest request, @RequestBody DeleteCategory category) {
 		CategoryList catList = new CategoryList();
 		try {
-
-			if (userRepository.deleteCategory(category.getCategoryId())) {
-				catList.setCategories(userRepository.getCategories(category.getCustomerId()));
-				catList.setValid(true);
-			} else {
-				catList.setValid(false);
-				catList.setValidityMessage("Category could not be deleted. ");
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+        if (userRepository.deleteCategory(category.getCategoryId())) {
+          catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+          catList.setValid(true);
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Category could not be deleted. ");
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1744,17 +1761,22 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/subcategories/delete", method = RequestMethod.POST)
-	public CategoryList deleteSubCategories(@RequestBody DeleteCategory category) {
+	public CategoryList deleteSubCategories(HttpServletRequest request, @RequestBody DeleteCategory category) {
 		CategoryList catList = new CategoryList();
 		try {
-			if (userRepository.deleteCategory(category.getCategoryId())) {
-				catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
-				catList.setValid(true);
-			} else {
-				catList.setValid(false);
-				catList.setValidityMessage("Category could not be deleted. ");
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+        if (userRepository.deleteCategory(category.getCategoryId())) {
+          catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
+          catList.setValid(true);
+        } else {
+          catList.setValid(false);
+          catList.setValidityMessage("Category could not be deleted. ");
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
@@ -1771,29 +1793,34 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/edit", method = RequestMethod.POST)
-	public CategoryList updateCategories(@RequestBody CategoryDetails category) {
+	public CategoryList updateCategories(HttpServletRequest request, @RequestBody CategoryDetails category) {
 		CategoryList catList = new CategoryList();
 		Valid valid = new Valid();
 		try {
-			if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
-				catList.setValid(false);
-				catList.setValidityMessage(
-						"Category Name already exists for this Customer Product Module Combination. ");
-			} else if (userRepository.checkSubCatExists(category)) {
-				catList.setValid(false);
-				catList.setValidityMessage(
-						"Sub Category Name already exists for this Customer Product Module Category Combination. ");
-			} else {
-				valid = userRepository.updateCategory(category);
-				if (valid.getValid()) {
-					catList.setCategories(userRepository.getCategories(category.getCustomerId()));
-					catList.setValid(true);
-				} else {
-					catList.setValid(false);
-					catList.setValidityMessage("Category could not be edited. ");
-				}
-			}
-
+      Ticket ticket = SipCommonUtils.getTicket(request);
+      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+        if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
+          catList.setValid(false);
+          catList.setValidityMessage(
+              "Category Name already exists for this Customer Product Module Combination. ");
+        } else if (userRepository.checkSubCatExists(category)) {
+          catList.setValid(false);
+          catList.setValidityMessage(
+              "Sub Category Name already exists for this Customer Product Module Category Combination. ");
+        } else {
+          valid = userRepository.updateCategory(category);
+          if (valid.getValid()) {
+            catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+            catList.setValid(true);
+          } else {
+            catList.setValid(false);
+            catList.setValidityMessage("Category could not be edited. ");
+          }
+        }
+      } else {
+        catList.setValid(false);
+        catList.setValidityMessage("Customer Id not matched, please correct customer id.");
+      }
 		} catch (Exception e) {
 			catList.setValid(false);
 			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
