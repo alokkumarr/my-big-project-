@@ -3,6 +3,8 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.repository.impl.extract.SubCategoryDetailExtractor;
+import com.sncr.saw.security.app.repository.impl.extract.TicketValidExtractor;
 import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
@@ -2651,12 +2653,10 @@ public class UserRepositoryImpl implements UserRepository {
     sql.append(" AND CPMF.FEATURE_TYPE LIKE ?");
 
     try {
-      categoryList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setLong(1, customerId);
-          preparedStatement.setString(2, "CHILD_" + featureCode);
-        }
-      }, new UserRepositoryImpl.SubCategoryDetailExtractor());
+      categoryList = jdbcTemplate.query(sql.toString(), preparedStatement -> {
+        preparedStatement.setLong(1, customerId);
+        preparedStatement.setString(2, "CHILD_" + featureCode);
+      }, new SubCategoryDetailExtractor());
 
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
@@ -2668,27 +2668,6 @@ public class UserRepositoryImpl implements UserRepository {
     return categoryList;
 
   }
-
-  public class SubCategoryDetailExtractor implements ResultSetExtractor<ArrayList<SubCategoryDetails>> {
-
-    @Override
-    public ArrayList<SubCategoryDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
-
-      SubCategoryDetails subCategory = null;
-      ArrayList<SubCategoryDetails> subCatList = new ArrayList<SubCategoryDetails>();
-      while (rs.next()) {
-        subCategory = new SubCategoryDetails();
-        subCategory.setSubCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
-        subCategory.setSubCategoryName(rs.getString("FEATURE_NAME"));
-        subCategory.setSubCategoryDesc(rs.getString("FEATURE_DESC"));
-        subCategory.setActivestatusInd(rs.getLong("ACTIVE_STATUS_IND"));
-        subCatList.add(subCategory);
-      }
-      return subCatList;
-    }
-  }
-
 
   @Override
   public Valid updateCategory(CategoryDetails category) {
@@ -2715,16 +2694,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     try {
 
-      jdbcTemplate.update(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, category.getCategoryName());
-          preparedStatement.setString(2, category.getCategoryDesc());
-          preparedStatement.setString(3, featureCode.toString());
-          preparedStatement.setString(4, featureType.toString());
-          preparedStatement.setLong(5, category.getActiveStatusInd());
-          preparedStatement.setString(6, category.getMasterLoginId());
-          preparedStatement.setLong(7, category.getCategoryId());
-        }
+      jdbcTemplate.update(sql, preparedStatement -> {
+        preparedStatement.setString(1, category.getCategoryName());
+        preparedStatement.setString(2, category.getCategoryDesc());
+        preparedStatement.setString(3, featureCode.toString());
+        preparedStatement.setString(4, featureType.toString());
+        preparedStatement.setLong(5, category.getActiveStatusInd());
+        preparedStatement.setString(6, category.getMasterLoginId());
+        preparedStatement.setLong(7, category.getCategoryId());
       });
       Boolean subCatExists = category.getSubCategories().size() > 0 ? true : false;
       if (subCatExists) {
@@ -2743,16 +2720,14 @@ public class UserRepositoryImpl implements UserRepository {
         subFeatureCode.append(category.getSubCategories().get(0).getSubCategoryId());
         subFeatureType.append("CHILD_" + featureCode);
 
-        jdbcTemplate.update(sql1, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, category.getSubCategories().get(0).getSubCategoryName());
-            preparedStatement.setString(2, category.getSubCategories().get(0).getSubCategoryDesc());
-            preparedStatement.setString(3, subFeatureCode.toString());
-            preparedStatement.setString(4, subFeatureType.toString());
-            preparedStatement.setLong(5, category.getSubCategories().get(0).getActivestatusInd());
-            preparedStatement.setString(6, category.getMasterLoginId());
-            preparedStatement.setLong(7, category.getSubCategories().get(0).getSubCategoryId());
-          }
+        jdbcTemplate.update(sql1, preparedStatement -> {
+          preparedStatement.setString(1, category.getSubCategories().get(0).getSubCategoryName());
+          preparedStatement.setString(2, category.getSubCategories().get(0).getSubCategoryDesc());
+          preparedStatement.setString(3, subFeatureCode.toString());
+          preparedStatement.setString(4, subFeatureType.toString());
+          preparedStatement.setLong(5, category.getSubCategories().get(0).getActivestatusInd());
+          preparedStatement.setString(6, category.getMasterLoginId());
+          preparedStatement.setLong(7, category.getSubCategories().get(0).getSubCategoryId());
         });
 
         //Update FeatureType of all sub categories
@@ -2762,12 +2737,10 @@ public class UserRepositoryImpl implements UserRepository {
 
           String sql2 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_TYPE=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
               + " WHERE FEATURE_TYPE=?";
-          jdbcTemplate.update(sql2, new PreparedStatementSetter() {
-            public void setValues(PreparedStatement preparedStatement) throws SQLException {
-              preparedStatement.setString(1, subFeatureType.toString());
-              preparedStatement.setString(2, category.getMasterLoginId());
-              preparedStatement.setString(3, "CHILD_" + category.getCategoryCode());
-            }
+          jdbcTemplate.update(sql2, preparedStatement -> {
+            preparedStatement.setString(1, subFeatureType.toString());
+            preparedStatement.setString(2, category.getMasterLoginId());
+            preparedStatement.setString(3, "CHILD_" + category.getCategoryCode());
           });
         }
 
@@ -2776,12 +2749,10 @@ public class UserRepositoryImpl implements UserRepository {
 
         String sql3 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_TYPE=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
             + " WHERE FEATURE_TYPE=?";
-        jdbcTemplate.update(sql3, new PreparedStatementSetter() {
-          public void setValues(PreparedStatement preparedStatement) throws SQLException {
-            preparedStatement.setString(1, "CHILD_" + featureCode);
-            preparedStatement.setString(2, category.getMasterLoginId());
-            preparedStatement.setString(3, "CHILD_" + category.getCategoryCode());
-          }
+        jdbcTemplate.update(sql3, preparedStatement -> {
+          preparedStatement.setString(1, "CHILD_" + featureCode);
+          preparedStatement.setString(2, category.getMasterLoginId());
+          preparedStatement.setString(3, "CHILD_" + category.getCategoryCode());
         });
       }
 
@@ -2802,12 +2773,10 @@ public class UserRepositoryImpl implements UserRepository {
         + "AND MASTER_LOGIN_ID=?";
     Boolean isValid = false;
     try {
-      isValid = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-        public void setValues(PreparedStatement preparedStatement) throws SQLException {
-          preparedStatement.setString(1, ticketId);
-          preparedStatement.setString(2, masterLogin);
-        }
-      }, new UserRepositoryImpl.TicketValidExtractor());
+      isValid = jdbcTemplate.query(sql, preparedStatement -> {
+        preparedStatement.setString(1, ticketId);
+        preparedStatement.setString(2, masterLogin);
+      }, new TicketValidExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -2817,22 +2786,6 @@ public class UserRepositoryImpl implements UserRepository {
     return isValid;
   }
 
-  public class TicketValidExtractor implements ResultSetExtractor<Boolean> {
-
-    @Override
-    public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-      Boolean isValid = false;
-      if (rs.next()) {
-        int validInd = rs.getInt("VALID_INDICATOR");
-        if (validInd > 0) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-      return isValid;
-    }
-  }
 
   public UserUnsuccessfulLoginAttemptBean getUserUnsuccessfulLoginAttempt(String userId) {
     UserUnsuccessfulLoginAttemptBean userList = null;
@@ -2841,13 +2794,7 @@ public class UserRepositoryImpl implements UserRepository {
             + "  FROM USERS U WHERE U.USER_ID = ?";
     try {
       userList =
-          jdbcTemplate.query(
-              sql,
-              new PreparedStatementSetter() {
-                public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                  preparedStatement.setString(1, userId);
-                }
-              },
+          jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, userId),
               new UserRepositoryImpl.UserLoginCountExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
