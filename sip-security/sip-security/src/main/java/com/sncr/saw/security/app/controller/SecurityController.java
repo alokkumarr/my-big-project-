@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.model.DskGroupReq;
 import com.sncr.saw.security.app.model.DskAttribute;
+import com.sncr.saw.security.app.model.DskGroupResp;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -869,7 +870,7 @@ public class SecurityController {
 
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
-    public Object addDskGroup(HttpServletRequest request, HttpServletResponse response,
+    public DskGroupResp addDskGroup(HttpServletRequest request, HttpServletResponse response,
         @RequestBody DskGroupReq dskGroupReq) {
       String jwtToken = JWTUtils.getToken(request);
       String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
@@ -888,11 +889,17 @@ public class SecurityController {
       DskValidity dskValidity =
           dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,custId);
 
-      Long groupSysId = dskValidity.getGroupId();
+      Long securityGroupSysId = dskValidity.getGroupId();
 
-      if (groupSysId == null) {
+      DskGroupResp resp = new DskGroupResp();
+
+      if (securityGroupSysId == null) {
         logger.error("Error occurred: " + dskValidity.getError());
-        return dskValidity;
+        response.setStatus(400);
+        resp.setValid(false);
+        resp.setMessage(dskValidity.getError());
+
+        return resp;
       }
 
       List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
@@ -906,50 +913,60 @@ public class SecurityController {
           attributeValues.setValue(value);
 
           dataSecurityKeyRepository
-               .addSecurityGroupDskAttributeValues(groupSysId,attributeValues);
+               .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
         }
       }
 
-      List<DskDetails> details = dataSecurityKeyRepository.fetchDskAllAttributeValues(groupSysId);
+      List<DskDetails> details =
+            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
 
-      return details;
+      resp.setSecurityGroupSysId(securityGroupSysId);
+      resp.setAttributes(details);
+      resp.setValid(true);
+
+      return resp;
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
-    public Object updateDatasecurityGroup(HttpServletRequest request, HttpServletResponse response,
-        @PathVariable(name = "securityGroupId", required = true) Long securityGroupId,
+    public DskGroupResp updateDatasecurityGroup(HttpServletRequest request, HttpServletResponse response,
+        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         @RequestBody DskGroupReq dskGroupReq) {
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+      String jwtToken = JWTUtils.getToken(request);
+      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
 
-        Long custId = Long.valueOf(extractValuesFromToken[1]);
-        String createdBy = extractValuesFromToken[2];
+      Long custId = Long.valueOf(extractValuesFromToken[1]);
+      String createdBy = extractValuesFromToken[2];
 
-        List<String> securityGroupAttributes = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupId);
-        securityGroupAttributes.add(0, String.valueOf(securityGroupId));
+      List<String> securityGroupAttributes = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupSysId);
+      securityGroupAttributes.add(0, String.valueOf(securityGroupSysId));
 
-        if (securityGroupAttributes != null && securityGroupAttributes.size() != 0)
-          dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
+      if (securityGroupAttributes != null && securityGroupAttributes.size() != 0)
+        dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
 
 
-        List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
 
-        for(DskAttribute dskAttributes : dsk) {
-            Set<String> values = dskAttributes.getValues();
+      for(DskAttribute dskAttributes : dsk) {
+        Set<String> values = dskAttributes.getValues();
 
-            for(String value: values) {
-                AttributeValues attributeValues = new AttributeValues();
-                attributeValues.setAttributeName(dskAttributes.getName());
-                attributeValues.setValue(value);
+        for(String value: values) {
+          AttributeValues attributeValues = new AttributeValues();
+          attributeValues.setAttributeName(dskAttributes.getName());
+          attributeValues.setValue(value);
 
-                dataSecurityKeyRepository
-                    .addSecurityGroupDskAttributeValues(securityGroupId,attributeValues);
-            }
+          dataSecurityKeyRepository
+            .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
         }
-        List<DskDetails> details =
-            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
+      }
+      List<DskDetails> attributes =
+            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
 
-        return details;
+      DskGroupResp resp = new DskGroupResp();
+      resp.setSecurityGroupSysId(securityGroupSysId);
+      resp.setAttributes(attributes);
+      resp.setValid(true);
+
+      return resp;
     }
 
     /**

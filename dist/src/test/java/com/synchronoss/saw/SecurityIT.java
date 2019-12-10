@@ -9,13 +9,17 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,6 +283,91 @@ public class SecurityIT extends BaseIT {
         "User successfully authenticated = validity : {}, message : {}",
         validity1,
         userAuthenticatedMsg);
+  }
+
+  @Test
+  public void testCreateSecurityGroup()
+      throws IOException, InterruptedException {
+    log.info("Testing create security group");
+
+    String jsonData = "{"
+            + "\"groupName\": \"secgroup1\","
+            + "\"groupDescription\": \"sample sec group\","
+            + "\"conjunction\": \"AND\","
+            + "\"dskAttributes\": [{"
+            + "\"name\": \"dsk1\","
+            + "\"values\": [\"v1\", \"v2\"]"
+            + "}]"
+            + "}";
+
+    ObjectNode secGroup = (ObjectNode)mapper.readTree(jsonData);
+
+    System.out.println(secGroup);
+
+    given(authSpec)
+      .contentType(ContentType.JSON)
+      .body(secGroup)
+      .when()
+      .post("/security/auth/admin/dsk-security-groups")
+      .then()
+      .assertThat()
+      .statusCode(200)
+      .body("valid", equalTo(true));
+  }
+
+
+  @Test
+  public void testUpdateSecurityGroup()
+      throws IOException, InterruptedException {
+    log.info("Testing update security group");
+
+    log.info("Creating security group");
+    String createData = "{"
+            + "\"groupName\": \"secgroup2\","
+            + "\"groupDescription\": \"sample sec group\","
+            + "\"conjunction\": \"AND\","
+            + "\"dskAttributes\": [{"
+            + "\"name\": \"dsk1\","
+            + "\"values\": [\"v1\", \"v2\"]"
+            + "}]"
+            + "}";
+
+    ObjectNode createSecGroupNode = (ObjectNode)mapper.readTree(createData);
+
+    ExtractableResponse response = given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(createSecGroupNode)
+        .when()
+        .post("/security/auth/admin/dsk-security-groups")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract();
+    JsonNode responseNode = response.as(JsonNode.class);
+
+    Long securityGroupId = responseNode.path("securityGroupSysId").asLong();
+
+    log.info("Created security group with ID = " + securityGroupId);
+
+    String updateData = "{"
+          + "\"conjunction\": \"AND\","
+          + "\"dskAttributes\": [{"
+          + "\"name\": \"dsk1\","
+          + "\"values\": [\"v3\", \"v4\"]"
+          + "}]"
+          + "}";
+
+    ObjectNode updateSecGroupNode = (ObjectNode)mapper.readTree(updateData);
+
+    given(authSpec)
+          .contentType(ContentType.JSON)
+          .body(updateSecGroupNode)
+          .when()
+          .put("/security/auth/admin/dsk-security-groups/" + securityGroupId)
+          .then()
+          .assertThat()
+          .statusCode(200)
+          .body("valid", equalTo(true));
   }
 
   /**
