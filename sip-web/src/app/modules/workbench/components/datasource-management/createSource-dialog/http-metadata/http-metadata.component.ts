@@ -96,12 +96,12 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
       this.generateHeaderAutoCompleteFilter(headerControl as FormGroup)
     );
 
-    this.initializeProvisionalHeaders();
+    this.initializeProvisionalHeaders(
+      this.parentForm.get('provisionalHeaders').value
+    );
   }
 
-  initializeProvisionalHeaders() {
-    const headers = this.parentForm.get('provisionalHeaders').value;
-
+  initializeProvisionalHeaders(headers) {
     const userAuth = find(
       headers,
       header =>
@@ -151,7 +151,7 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
       this.authorizationForm.valueChanges
         .pipe(debounceTime(500))
         .subscribe(() => {
-          this.updateProvisionalHeaders();
+          this.updateProvisionalHeaders(this.authorizationForm.value);
         })
     );
   }
@@ -161,9 +161,7 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
    *
    * @memberof HttpMetadataComponent
    */
-  updateProvisionalHeaders() {
-    const { type, userName, password } = this.authorizationForm.value;
-
+  updateProvisionalHeaders({ type, userName, password }) {
     switch (type) {
       case AUTHORIZATION_TYPES.USER:
         this.addUserAuthHeader(userName, password);
