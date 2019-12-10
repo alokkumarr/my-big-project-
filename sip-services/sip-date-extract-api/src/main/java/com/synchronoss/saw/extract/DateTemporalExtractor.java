@@ -12,7 +12,6 @@ import com.synchronoss.saw.store.base.BaseStructure;
 import com.synchronoss.saw.store.base.TemporalDateStructure;
 import org.apache.commons.lang3.time.DateUtils;
 import java.util.Date;
-import java.util.Arrays;
 
 public class DateTemporalExtractor {
 
@@ -59,9 +58,9 @@ public class DateTemporalExtractor {
         return dateGroups;
     }
 
-    public static boolean isCorrectFormat(String dateString, String... dateFormat)  {
+    public boolean isCorrectFormat(String dateString, String... dateFormat)  {
         try {
-            Date d = DateUtils.parseDateStrictly(dateString, dateFormat);
+            DateUtils.parseDateStrictly(dateString, dateFormat);
             return true;
         }catch(ParseException exception){
             return false;
