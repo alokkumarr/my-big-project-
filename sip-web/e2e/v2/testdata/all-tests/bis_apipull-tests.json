@@ -577,6 +577,70 @@
         },
         "description": "Admin should be able to create and delete an api pull route GET request with headers, query params and multibyte chars"
       }
+    },
+    "routeSchedule": {
+      "APISCHDE001": {
+        "suites": ["critical", "regression"],
+        "user": "admin",
+        "channelInfo": {
+          "sourceType": "API",
+          "testConnectivityMessage": "Connection Status = 200",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "GET",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": null,
+          "testConnectivityMessage": "Connection Status = 200"
+        },
+        "description": "Admin should be able to shceulde a route with GET request without header and query params"
+      },
+      "APISCHDE002": {
+        "suites": ["regression"],
+        "user": "admin",
+        "channelInfo": {
+          "testConnectivityMessage": "Connection Status = 201",
+          "sourceType": "API",
+          "channelName": "e2e",
+          "hostName": "https://jsonplaceholder.typicode.com",
+          "port": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "status": 1
+        },
+        "routeInfo": {
+          "routeName": "e2e route",
+          "destination": "",
+          "method": "POST",
+          "headers": null,
+          "queryParams": null,
+          "endPoint": "/posts",
+          "body": {
+            "title": "post title",
+            "body": "this is new post"
+          },
+          "testConnectivityMessage": "Connection Status = 201"
+        },
+        "description": "Admin should be able to schedule an api pull route with POST"
+      }
     }
   }
 }
