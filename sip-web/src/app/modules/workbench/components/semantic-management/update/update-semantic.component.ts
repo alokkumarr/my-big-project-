@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import CheckBox from 'devextreme/ui/check_box';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
+import { NUMBER_TYPES, DATE_TYPES } from '../../../../../../app/common/consts';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -15,7 +17,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
-
+import * as some from 'lodash/some';
 @Component({
   selector: 'update-semantic',
   templateUrl: './update-semantic.component.html',
@@ -30,6 +32,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   public isJoinEligible = false;
   public selectedDPDetails: any = [];
   public dpID = '';
+  public isDateTypeMatched = true;
 
   constructor(
     public router: Router,
@@ -90,6 +93,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
             }
           });
         }
+        this.isDateTypeMatched = some(this.selectedDPData[0].columns, obj => {
+          return DATE_TYPES.includes(obj.type);
+        });
       });
     });
   }
@@ -143,5 +149,19 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         });
         this.router.navigate(['workbench', 'dataobjects']);
       });
+  }
+
+  cellPrepared(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
+      if (
+        (!NUMBER_TYPES.includes(e.data.type) &&
+          !DATE_TYPES.includes(e.data.type)) ||
+        !this.isDateTypeMatched
+      ) {
+        CheckBox.getInstance(
+          e.cellElement.querySelector('.dx-checkbox')
+        ).option('disabled', true);
+      }
+    }
   }
 }
