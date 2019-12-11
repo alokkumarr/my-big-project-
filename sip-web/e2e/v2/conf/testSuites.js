@@ -65,6 +65,7 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //'dummy/dummyDevelopmentTests1.js',
   //'dummy/dummyDevelopmentTests2.js'
+  'reports/DLReportQuery.test.js'
 ];
 
 module.exports = {

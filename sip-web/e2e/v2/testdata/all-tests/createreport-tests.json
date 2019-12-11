@@ -99,6 +99,19 @@
           }
         ]
       }
+    },
+    "dlreportquery": {
+      "REPOR009": {
+        "suites": ["critical", "regression", "development"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report using query mode",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      }
     }
   }
 }
