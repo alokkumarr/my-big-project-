@@ -13,6 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Constants = require('../../helpers/Constants');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing create and delete chart tests from charts/createAndDelete.test.js', () => {
   let analysisId;
@@ -28,7 +29,11 @@ describe('Executing create and delete chart tests from charts/createAndDelete.te
   beforeAll(() => {
     logger.info('Starting charts/createAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 

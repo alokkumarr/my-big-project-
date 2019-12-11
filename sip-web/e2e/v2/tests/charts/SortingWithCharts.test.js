@@ -17,6 +17,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
+const users = require('../../helpers/data-generation/users');
 /**
  * LIMIT does't work with group by and more than one metric field
  */
@@ -32,7 +33,11 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   beforeAll(() => {
     logger.info('Starting charts/SortingWithCharts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -45,7 +50,12 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -53,7 +63,9 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
   });
 
   using(
-    testDataReader.testData['SORTING_CHARTS']['sort_asc'] ? testDataReader.testData['SORTING_CHARTS']['sort_asc'] : {},
+    testDataReader.testData['SORTING_CHARTS']['sort_asc']
+      ? testDataReader.testData['SORTING_CHARTS']['sort_asc']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
