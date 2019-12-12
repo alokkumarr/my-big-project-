@@ -91,14 +91,15 @@ function getFieldLabelWithAggregateFun(field) {
   }
 }
 
-function getYValueBasedOnAggregate(field, point) {
-  switch (field.aggregate) {
+function getYValueBasedOnAggregate(point) {
+  console.log(point);
+  switch (point.series.userOptions.aggregate) {
     case 'percentage':
       return Math.round((point.y || point.value) * 100) / 100 + '%';
     case 'percentagebyrow':
       return round(point.percentage, 2) + '%';
     default:
-      return isUndefined(point.value) ? point.y : point.value;
+      return isUndefined(point.value) ? round(point.y, 2) : round(point.value, 2);
   }
 }
 
@@ -130,7 +131,7 @@ export function getTooltipFormatter(fields, chartType) {
       : seriesName;
     const yString = `<tr>
       <td><strong>${yLabel}:</strong></td>
-      <td>${getYValueBasedOnAggregate(fields.y[0], point)}</td>
+      <td>${getYValueBasedOnAggregate(point)}</td>
     </tr>`;
 
     const zLabel = fields.z ? getFieldLabelWithAggregateFun(fields.z) : '';
