@@ -1,6 +1,7 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
+import static com.synchronoss.saw.util.SipMetadataUtils.getToken;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
@@ -231,17 +232,18 @@ public class AnalysisController {
       @PathVariable(name = "id") String id,
       @ApiParam(value = "internalCall", required = false)
       @RequestParam(name = "internalCall", required = false)
-          boolean internal,
-      @RequestHeader("Authorization") String authToken) {
+          String internal) {
+    String authToken = request.getHeader("Authorization");
     AnalysisResponse analysisResponse = new AnalysisResponse();
-    if (!internal && !authValidation(authToken)) {
+    boolean schduledAnalysis = Boolean.valueOf(internal);
+    if (!schduledAnalysis && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
-    Ticket authTicket = internal == true ? null : getTicket(request);
+    Ticket authTicket = schduledAnalysis ? null : getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
-    response = internal == true ? null
+    response = schduledAnalysis ? null
         : validateTicket(authTicket, PrivilegeNames.ACCESS, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());

@@ -43,6 +43,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -103,6 +104,7 @@ public class StorageProxyController {
   private StorageProxyService proxyService;
 
   public static final String CUSTOMER_CODE = "customerCode";
+  public static final String AUTHORIZATION = "Authorization";
 
   /**
    * This method is used to get the data based on the storage type<br> perform conversion based on
@@ -271,10 +273,10 @@ public class StorageProxyController {
       @RequestParam(name = "userId", required = false)
           String userId,
       HttpServletRequest request,
-      HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken)
+      HttpServletResponse response)
       throws IOException, IllegalAccessException {
     logger.debug("Request Body:{}", analysis);
+    String authToken = request.getHeader(AUTHORIZATION);
     if (analysis == null) {
       throw new JSONMissingSAWException("Analysis definition is missing in request body");
     }
@@ -298,13 +300,13 @@ public class StorageProxyController {
       return executeResponse;
     }
 
-    ArrayList<Products> productList = authTicket.getProducts();
-    Long category =
+    ArrayList<Products> productList = isScheduledExecution ? null : authTicket.getProducts();
+    Long category = isScheduledExecution ? null :
         analysis.getCategory() == null
             ? checkForPrivateCategory(authTicket)
             : Long.parseLong(analysis.getCategory());
     logger.debug("Cat " + category);
-    if (category == null) {
+    if (!isScheduledExecution && category == null) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       logger.error("BAD REQUEST : category should not be null!!");
       response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
@@ -316,7 +318,9 @@ public class StorageProxyController {
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return executeResponse;
-    } else if (!validatePrivilege(productList, category, PrivilegeNames.EXECUTE)) {
+    } else if (!isScheduledExecution && !isPublishedExecution && !validatePrivilege(productList,
+        category,
+        PrivilegeNames.EXECUTE)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the EXECUTE privilege!!");
       response
@@ -325,9 +329,11 @@ public class StorageProxyController {
     }
 
     // For published analysis, update analysis metadata table with the category information.
-    if (isPublishedExecution == true) {
+    if (isPublishedExecution) {
       Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
       analysis.setUserId(uid);
+      analysis.setModifiedTime(Instant.now().toEpochMilli());
+      analysis.setModifiedBy(authTicket.getUserFullName());
       proxyService.updateAnalysis(analysis);
     }
 
@@ -550,8 +556,13 @@ public class StorageProxyController {
       @ApiParam(value = "DSL query Id", required = true) @PathVariable(name = "id") String queryId,
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) throws IOException {
-    if (!authValidation(authToken)) {
+      @ApiParam(value = "internalCall", required = false)
+      @RequestParam(name = "internalCall", required = false)
+      String internal) throws IOException {
+    String authToken = request.getHeader(AUTHORIZATION);
+    boolean schduledAnalysis = Boolean.valueOf(internal);
+
+    if (!schduledAnalysis && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response
           .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
@@ -561,7 +572,7 @@ public class StorageProxyController {
       logger.info("Storage Proxy request to fetch list of executions");
 
       logger.trace("Extracting auth ticket details");
-      Ticket authTicket = (request == null) ? null : getTicket(request);
+      Ticket authTicket = schduledAnalysis ? null : getTicket(request);
 
       List<TicketDSKDetails> dskList =
           authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
@@ -607,9 +618,13 @@ public class StorageProxyController {
           String executionId,
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) throws IOException {
+      @ApiParam(value = "internalCall", required = false)
+      @RequestParam(name = "internalCall", required = false)
+          String internal) throws IOException {
+    String authToken = request.getHeader(AUTHORIZATION);
+    boolean schduledAnalysis = Boolean.valueOf(internal);
 
-    if (!authValidation(authToken)) {
+    if (!schduledAnalysis && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
       response
@@ -617,7 +632,7 @@ public class StorageProxyController {
       return executeResponse;
     }
 
-    Ticket authTicket = (request == null) ? null : getTicket(request);
+    Ticket authTicket = schduledAnalysis ? null : getTicket(request);
 
     List<TicketDSKDetails> dskList =
         authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
@@ -669,9 +684,13 @@ public class StorageProxyController {
           String analysisId,
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestHeader("Authorization") String authToken) throws IOException {
+      @ApiParam(value = "internalCall", required = false)
+      @RequestParam(name = "internalCall", required = false)
+          String internal) throws IOException {
+    String authToken = request.getHeader(AUTHORIZATION);
+    boolean schduledAnalysis = Boolean.valueOf(internal);
 
-    if (!authValidation(authToken)) {
+    if (!schduledAnalysis && !authValidation(authToken)) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
       response
@@ -679,7 +698,7 @@ public class StorageProxyController {
       return executeResponse;
     }
 
-    Ticket authTicket = (request == null) ? null : getTicket(request);
+    Ticket authTicket = schduledAnalysis ? null : getTicket(request);
 
     List<TicketDSKDetails> dskList =
         authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
