@@ -48,8 +48,8 @@
         [innerHTML]="data.value * 1000 | date: 'short' | highlight: searchTerm"
       ></span>
     </div>
-    <div *dxTemplate="let data of 'actionsTemplate'">
-      <datapod-actions [dpMetadata]="data.data"></datapod-actions>
+    <div *dxTemplate="let template of 'actionsTemplate'">
+      <datapod-actions [dpMetadata]="template.data"></datapod-actions>
     </div>
     <dxo-scrolling
       mode="virtual"
