@@ -269,7 +269,11 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
             if(format != null && !format.trim().isEmpty()
                 && extractor.isCorrectFormat(value, format.trim())){
                     dateFormatter.add(format.trim());
-                    return T_DATETIME;
+                    if (dateFormatter.size() > 1) {
+                        return T_STRING;
+                    } else {
+                        return T_DATETIME;
+                    }
             }
         }
     }
