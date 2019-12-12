@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class CategoryList implements Serializable {
 
-	private static final long serialVersionUID = -6682525829922872306L;
+	private static final long serialVersionUID = 1410873623318188573L;
 
 	private Boolean valid;
 	private String message;

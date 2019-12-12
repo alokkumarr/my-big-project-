@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class CategoryDetails implements Serializable {
 
-	private static final long serialVersionUID = -6682525829922872306L;
+	private static final long serialVersionUID = -1397743591150787459L;
 
 	private long customerId;
 	private long categoryId;
