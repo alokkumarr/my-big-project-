@@ -19,7 +19,7 @@ import { HeaderProgressService } from '../../../../../common/services';
 const kpiNotElgibleMsg =
   'This Dataset is not configured with any KPI eligible metrics.';
 const dateColMissingMsg =
-  'This Dataset does not contain at least one eligible Date type field..';
+  'This Dataset does not contain at least one eligible Date type field.';
 @Component({
   selector: 'widget-metric',
   templateUrl: './widget-metric.component.html',
