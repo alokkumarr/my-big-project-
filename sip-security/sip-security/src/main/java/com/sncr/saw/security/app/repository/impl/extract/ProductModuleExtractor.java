@@ -18,6 +18,7 @@ public class ProductModuleExtractor implements ResultSetExtractor<ProductModuleD
   public ProductModuleDetails extractData(ResultSet resultSet) throws SQLException, DataAccessException {
     while (resultSet.next()) {
       moduleDetails.setCustomerSysId(resultSet.getLong("CUSTOMER_SYS_ID"));
+      moduleDetails.setCustomerCode(resultSet.getString("CUSTOMER_CODE"));
       moduleDetails.setProductId(resultSet.getLong("PRODUCT_SYS_ID"));
       moduleDetails.setModuleId(resultSet.getLong("MODULE_SYS_ID"));
     }

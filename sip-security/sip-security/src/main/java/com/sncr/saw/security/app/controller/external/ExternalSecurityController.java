@@ -7,6 +7,8 @@ import com.sncr.saw.security.app.service.ExternalSecurityService;
 import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.utils.SipCommonUtils;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.List;
+
 /**
  * @author alok.kumarr
  * @since 3.5.0
@@ -32,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/sip-security/external")
 public class ExternalSecurityController {
+
+  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
 
   @Autowired
   private ExternalSecurityService securityService;
@@ -52,18 +58,18 @@ public class ExternalSecurityController {
           @ApiResponse(code = 401, message = "Unauthorized"),
           @ApiResponse(code = 415, message = "Unsupported Type. Representation not supported for the resource")})
   @RequestMapping(value = "/createRoleCategoryPrivilege", method = RequestMethod.POST)
-  public RoleCatPrivilegeResponse createRoleCategoryPrivilege(HttpServletRequest request,
+  public RoleCatPrivilegeResponse createRoleCategoryPrivilege(HttpServletRequest httpRequest,
                                                               HttpServletResponse httpResponse,
-                                                              @RequestBody RoleCategoryPrivilege roleCategoryPrivilege) {
+                                                              @RequestBody RoleCategoryPrivilege request) {
     RoleCatPrivilegeResponse response = new RoleCatPrivilegeResponse();
-    if (roleCategoryPrivilege == null) {
+    if (request == null) {
       httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       response.setValid(false);
       response.setMessage("Request body can't be blank or empty.");
       return response;
     }
 
-    Ticket ticket = SipCommonUtils.getTicket(request);
+    Ticket ticket = SipCommonUtils.getTicket(httpRequest);
     RoleType roleType = ticket.getRoleType();
     String masterLoginId = ticket.getMasterLoginId();
     if ((masterLoginId != null && !userRepository.validateUser(masterLoginId)) || !RoleType.ADMIN.equals(roleType)) {
@@ -73,9 +79,39 @@ public class ExternalSecurityController {
       return response;
     }
 
+    // validate role/category/subcategory name
+    String roleName = request.getRole().getRoleName();
+    List<CategoryDetails> categoryList = request.getCategories();
+    if (roleName != null && roleName.matches(NAME_REGEX)) {
+      httpResponse.setStatus(HttpStatus.OK.value());
+      response.setValid(false);
+      response.setMessage("Special symbol not allowed except _ and - for role name.");
+      return response;
+    } else if (categoryList != null && !categoryList.isEmpty()) {
+      boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName().matches(NAME_REGEX));
+      if (!invalidCategoryName) {
+        httpResponse.setStatus(HttpStatus.OK.value());
+        response.setValid(false);
+        response.setMessage("Special symbol not allowed except _ and - for category name.");
+        return response;
+      } else {
+        boolean[] invalidSubCatName = {false};
+        categoryList.stream().forEach(categoryDetails -> {
+          List<SubCategoryDetails> subCategoryList = categoryDetails.getSubCategories();
+          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.getSubCategoryName().matches(NAME_REGEX));
+        });
+        if (invalidSubCatName[0]) {
+          httpResponse.setStatus(HttpStatus.OK.value());
+          response.setValid(false);
+          response.setMessage("Special symbol not allowed except _ and - for sub category name.");
+          return response;
+        }
+      }
+    }
+
     ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId,
-        roleCategoryPrivilege.getProductName(),
-        roleCategoryPrivilege.getModuleName());
+        request.getProductName(),
+        request.getModuleName());
     final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
     if (customerSysId == null || customerSysId == 0) {
       httpResponse.setStatus(HttpStatus.OK.value());
@@ -83,7 +119,7 @@ public class ExternalSecurityController {
       response.setMessage("Product and Module does not exist for this user.");
       return response;
     }
-    response = securityService.createRoleCategoryPrivilege(httpResponse, roleCategoryPrivilege, masterLoginId, moduleDetails, customerSysId);
+    response = securityService.createRoleCategoryPrivilege(httpResponse, request, masterLoginId, moduleDetails);
     return response;
   }
 
