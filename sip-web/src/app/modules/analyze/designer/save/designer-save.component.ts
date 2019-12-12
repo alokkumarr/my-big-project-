@@ -32,7 +32,7 @@ export class DesignerSaveComponent implements OnInit {
 
   ngOnInit() {
     this.saveForm = this.fb.group({
-      name: ['', [Validators.required,
+      name: [this.analysis.name, [Validators.required,
         Validators.maxLength(30)],
         this.validatePattern
       ]
