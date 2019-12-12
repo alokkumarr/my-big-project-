@@ -45,8 +45,6 @@ export class FirstDashboardGuard implements CanActivate {
     const favouriteDashboardCategory = this.configService.getPreference(
       PREFERENCES.DEFAULT_DASHBOARD_CAT
     );
-    console.log('favouriteDashboardCategory', favouriteDashboardCategory);
-    console.log('favouriteDashboardId', favouriteDashboardId);
     if (!favouriteDashboardId) {
       this.redirectToFirstDash();
     } else {
