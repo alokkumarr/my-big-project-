@@ -416,6 +416,13 @@ public class StorageProxyController {
     }
     logger.trace(
         "response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
+    /** Sip scheduler doesn't requires holding the execution result data while processing the
+     request, which can be minimized by removing the data section for memory optimization **/
+    if (isScheduledExecution) {
+      executeResponse.setData(null);
+      logger.trace("Response returned back to scheduler {}",
+          objectMapper.writeValueAsString(executeResponse));
+    }
     return executeResponse;
   }
 
