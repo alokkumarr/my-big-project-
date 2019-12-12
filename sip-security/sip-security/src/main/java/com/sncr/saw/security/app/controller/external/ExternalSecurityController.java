@@ -78,7 +78,7 @@ public class ExternalSecurityController {
         roleCategoryPrivilege.getModuleName());
     final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
     if (customerSysId == null || customerSysId == 0) {
-      httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+      httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
       response.setMessage("Product and Module does not exist for this user.");
       return response;
