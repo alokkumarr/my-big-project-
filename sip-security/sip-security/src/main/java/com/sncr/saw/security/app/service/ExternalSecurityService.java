@@ -268,29 +268,41 @@ public class ExternalSecurityService {
     // fetch roles
     Role responseRole = new Role();
     if (request.getRole().getRoleName() != null && !request.getRole().getRoleName().isEmpty()) {
-      userRepository.getRoles(customerSysId).stream().forEach(fetchedRole -> {
-        if (request.getRole().getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
-          responseRole.setCustomerCode(fetchedRole.getCustomerCode());
-          responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
-          responseRole.setRoleSysId(fetchedRole.getRoleSysId());
-          responseRole.setCustomerSysId(fetchedRole.getCustSysId());
-          responseRole.setRoleName(fetchedRole.getRoleName());
-          responseRole.setRoleDesc(fetchedRole.getRoleDesc());
-          responseRole.setRoleType(fetchedRole.getRoleType());
-          responseRole.setMessage("Role fetched for Customer Product Module Combination.");
+      List<RoleDetails> rolesList = userRepository.getRoles(customerSysId);
+      if (rolesList != null && !rolesList.isEmpty()) {
+        rolesList.stream().forEach(fetchedRole -> {
+          if (request.getRole().getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
+            responseRole.setCustomerCode(fetchedRole.getCustomerCode());
+            responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
+            responseRole.setRoleSysId(fetchedRole.getRoleSysId());
+            responseRole.setCustomerSysId(fetchedRole.getCustSysId());
+            responseRole.setRoleName(fetchedRole.getRoleName());
+            responseRole.setRoleDesc(fetchedRole.getRoleDesc());
+            responseRole.setRoleType(fetchedRole.getRoleType());
+            responseRole.setMessage("Role fetched for Customer Product Module Combination.");
 
-          // fetch category/subcategory for this role
-          CategoryList categoryList = new CategoryList();
-          List<CategoryDetails> customerCatList =
-              userRepository.getCategories(customerSysId);
-          categoryList.setCategories(fetchResponseCategoryDetails(request, customerCatList));
-          categoryList.setMessage("Category/Subcategory fetched for Customer Product Module Combination.");
-
-          response.setValid(true);
-          response.setRole(responseRole);
-          response.setCategoryList(categoryList);
-        }
-      });
+            // fetch category/subcategory for this role
+            CategoryList categoryList = new CategoryList();
+            if ("Active".equalsIgnoreCase(fetchedRole.getActiveStatusInd())) {
+              List<CategoryDetails> customerCatList =
+                  userRepository.getCategories(customerSysId);
+              categoryList.setCategories(fetchResponseCategoryDetails(request, customerCatList));
+              categoryList.setMessage("Category/Subcategory fetched for Customer Product Module Combination.");
+              categoryList.setValid(true);
+            } else {
+              categoryList.setMessage("No Category/Subcategory displayed for Inactive Roles.");
+              categoryList.setValid(false);
+            }
+            response.setValid(true);
+            response.setRole(responseRole);
+            response.setCategoryList(categoryList);
+            response.setMessage("Record fetched successfully for Customer Role, Product and Module Combination.");
+          }
+        });
+      } else {
+        response.setValid(false);
+        response.setMessage("No details fetched for Customer Role, Product and Module Combination.");
+      }
     }
 
     // add the product/module id
