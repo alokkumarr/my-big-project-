@@ -23,7 +23,7 @@ public class SecurityService {
   private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
   String namePattern = "^[a-zA-Z]*$";
   String loginIdPattern = "^[A-z\\d_@.#$=!%^)(\\]:\\*;\\?\\/\\,}{'\\|<>\\[&\\+-`~]*$";
-  String emailPattern = "^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$";
+  String emailPattern = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
 
   @Autowired private UserRepository userRepository;
 
