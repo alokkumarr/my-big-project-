@@ -6,4 +6,6 @@ public class ErrorMessages {
   public static final String nullErrorMessage = "%s can't be null";
 
   public static final String notExistErrorMessage = "%s does not exists";
+
+  public static final String invalidMessage = "invalid %s";
 }
