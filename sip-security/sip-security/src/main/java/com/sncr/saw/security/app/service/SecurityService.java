@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
   private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
+  String namePattern = "^[a-zA-Z]*$";
+  String loginIdPattern = "^[A-z\\d_@.#$=!%^)(\\]:\\*;\\?\\/\\,}{'\\|<>\\[&\\+-`~]*$";
+  String emailPattern = "^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$";
 
   @Autowired private UserRepository userRepository;
 
@@ -34,6 +37,35 @@ public class SecurityService {
   public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId) {
     logger.trace("User details body :{}", userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+    if (!userDetails.getFirstName().matches(namePattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "FirstName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "FirstName"));
+      return userDetailsResponse;
+    }
+    if (!userDetails.getLastName().matches(namePattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "LastName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
+      return userDetailsResponse;
+    }
+
+    if (!userDetails.getMasterLoginId().matches(loginIdPattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      return userDetailsResponse;
+    }
+
+    if (!userDetails.getEmail().matches(emailPattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
+      return userDetailsResponse;
+    }
     validateUserDetails(userDetails);
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
     if (customerSysId == null) {
