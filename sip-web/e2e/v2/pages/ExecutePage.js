@@ -8,6 +8,8 @@ const Constants = require('../helpers/Constants');
 class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
+    commonFunctions.waitFor.pageToBeReady(/analysis/);
+
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
     this._actionMenuContents = element(
       by.xpath(`//*[@class="mat-menu-content"]`)
@@ -126,7 +128,7 @@ class ExecutePage extends ConfirmationModel {
 
   getAnalysisId() {
     //get analysis id from current url
-    browser.getCurrentUrl().then(url => {
+    return browser.getCurrentUrl().then(url => {
       return commonFunctions.getAnalysisIdFromUrl(url);
     });
   }
@@ -235,6 +237,18 @@ class ExecutePage extends ConfirmationModel {
         }
       })();
     });
+  }
+
+  verifyAnalysisDetailsAndDelete(reportName, reportDescription) {
+    this.verifyTitle(reportName);
+    this.clickOnActionLink();
+    this.clickOnDetails();
+    this.verifyDescription(reportDescription);
+    this.closeActionMenu();
+    // Delete the report
+    this.clickOnActionLink();
+    this.clickOnDelete();
+    this.confirmDelete();
   }
 }
 module.exports = ExecutePage;

@@ -33,7 +33,12 @@ describe('Executing pagination in execute page for reports from reports/DLReport
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
@@ -72,6 +77,9 @@ describe('Executing pagination in execute page for reports from reports/DLReport
         reportDesignerPage.clickOnPreviewButton();
         const executePage = new ExecutePage();
         // Pagination section
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.verifyPagination();
         executePage.verifyItemPerPage();
       }).result.testInfo = {

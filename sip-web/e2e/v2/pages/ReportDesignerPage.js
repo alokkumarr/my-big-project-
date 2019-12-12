@@ -28,6 +28,9 @@ class ReportDesignerPage extends Designer {
       by.xpath(`//*[contains(text(),'Aggregation')]`)
     );
     this._aggregation = name => element(by.xpath(`//span[text()="${name}"]`));
+    this._queryBtn = element(by.css(`[e2e='e2e-query-btn']`));
+    this._confirmOkBtn = element(by.css(`[(e2e='confirm-dialog-ok-btn')]`));
+    this._querySubmitButton = element(by.css(`[(e2e='e2e-query-submit')]`));
   }
 
   clickOnReportFields(tables) {
@@ -69,6 +72,37 @@ class ReportDesignerPage extends Designer {
     commonFunctions.elementToBeClickableAndClickByMouseMove(
       this._aggregation(aggregate.designerLabel)
     );
+  }
+
+  fillAnalysisDetailsAndCreate(tables, reportName, reportDescription) {
+    this.clickOnReportFields(tables);
+    this.verifyDisplayedColumns(tables);
+    this.clickOnSave();
+    this.enterAnalysisName(reportName);
+    this.enterAnalysisDescription(reportDescription);
+    this.clickOnSaveAndCloseDialogButton(/analyze/);
+  }
+
+  clickOnQueryTab() {
+    commonFunctions.clickOnElement(this._queryBtn);
+  }
+  fillQuery(query) {
+    browser
+      .actions()
+      .mouseMove($('.ace_active-line'))
+      .click()
+      .sendKeys(protractor.Key.chord(protractor.Key.COMMAND, 'a'))
+      .sendKeys(protractor.Key.BACK_SPACE)
+      .sendKeys(query)
+      .perform();
+  }
+
+  clickOnQuerySubmitButton() {
+    commonFunctions.clickOnElement(this._querySubmitButton);
+  }
+
+  clickOnConfirmButton() {
+    commonFunctions.clickOnElement(this._confirmOkBtn);
   }
 }
 module.exports = ReportDesignerPage;

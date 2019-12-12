@@ -32,6 +32,7 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
 
   afterEach(done => {
     setTimeout(() => {
+      console.log({ analysisId });
       if (analysisId) {
         new AnalysisHelper().deleteAnalysis(
           host,
@@ -62,44 +63,45 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
           loginPage.loginAs(data.user, /analyze/);
 
           const analyzePage = new AnalyzePage();
-          analyzePage.goToView('card');
-          analyzePage.clickOnAddAnalysisButton();
-          analyzePage.clickOnAnalysisType(analysisType);
-          analyzePage.clickOnNextButton();
-          analyzePage.clickOnDataPods(dataSets.report);
-          analyzePage.clickOnCreateButton();
+          analyzePage.goToDesignerPage('card', analysisType, dataSets.report);
 
           const reportDesignerPage = new ReportDesignerPage();
-          reportDesignerPage.clickOnReportFields(tables);
-          reportDesignerPage.verifyDisplayedColumns(tables);
+          reportDesignerPage.clickOnQueryTab();
+          reportDesignerPage.fillQuery('select * from SALES limit 10');
+          reportDesignerPage.clickOnQuerySubmitButton();
+          reportDesignerPage.clickOnConfirmButton();
           reportDesignerPage.clickOnSave();
           reportDesignerPage.enterAnalysisName(reportName);
           reportDesignerPage.enterAnalysisDescription(reportDescription);
           reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-          // Verify analysis displayed in list and card view
-          analyzePage.goToView('list');
-          analyzePage.verifyElementPresent(
-            analyzePage._analysisTitleLink(reportName),
-            true,
-            'report should be present in list/card view'
-          );
-          analyzePage.goToView('card');
-          // Go to detail page and very details
-          analyzePage.clickOnAnalysisLink(reportName);
+          // reportDesignerPage.fillAnalysisDetailsAndCreate(
+          //   tables,
+          //   reportName,
+          //   reportDescription
+          // );
+          // // Verify analysis displayed in list and card view
+          // analyzePage.goToView('list');
+          // analyzePage.verifyElementPresent(
+          //   analyzePage._analysisTitleLink(reportName),
+          //   true,
+          //   'report should be present in list/card view'
+          // );
+          // analyzePage.goToView('card');
+          // // Go to detail page and very details
+          // analyzePage.clickOnAnalysisLink(reportName);
 
-          const executePage = new ExecutePage();
-          executePage.verifyTitle(reportName);
-          analysisId = executePage.getAnalysisId();
-          executePage.clickOnActionLink();
-          executePage.clickOnDetails();
-          executePage.verifyDescription(reportDescription);
-          executePage.closeActionMenu();
-          // Delete the report
-          executePage.clickOnActionLink();
-          executePage.clickOnDelete();
-          executePage.confirmDelete();
-          analyzePage.verifyToastMessagePresent('Analysis deleted.');
-          analyzePage.verifyAnalysisDeleted();
+          // const executePage = new ExecutePage();
+
+          // executePage.getAnalysisId().then(id => {
+          //   analysisId = id;
+          // });
+
+          // executePage.verifyAnalysisDetailsAndDelete(
+          //   reportName,
+          //   reportDescription
+          // );
+          // analyzePage.verifyToastMessagePresent('Analysis deleted.');
+          // analyzePage.verifyAnalysisDeleted();
         } catch (e) {
           console.log(e);
         }
