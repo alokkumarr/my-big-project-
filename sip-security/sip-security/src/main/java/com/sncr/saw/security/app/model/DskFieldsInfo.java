@@ -11,7 +11,7 @@ public class DskFieldsInfo {
   private Boolean valid;
   private String message;
 
-  Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleData = new HashMap<>();
+  Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData = new HashMap<>();
 
   public Boolean getValid() {
     return valid;
@@ -29,12 +29,12 @@ public class DskFieldsInfo {
     this.message = message;
   }
 
-  public Map<String, Map<String, Map<Long, List<DskField>>>> getDskEligibleData() {
+  public Map<String, Map<String, Map<String, List<DskField>>>> getDskEligibleData() {
     return dskEligibleData;
   }
 
   public void setDskEligibleData(
-      Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleData) {
+      Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData) {
     this.dskEligibleData = dskEligibleData;
   }
 }
