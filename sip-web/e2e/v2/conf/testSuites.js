@@ -57,7 +57,8 @@ const CRITICAL = [
   'bis/APIPullChannelUpdateDelete.test.js',
   'bis/APIPullChannelActivateDeActivate.test.js',
   'bis/APIPullRouteCreateDelete.test.js',
-  'bis/APIPullRouteUpdateDelete.test.js'
+  'bis/APIPullRouteUpdateDelete.test.js',
+  'reports/DLReportQuery.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];
@@ -65,7 +66,6 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //'dummy/dummyDevelopmentTests1.js',
   //'dummy/dummyDevelopmentTests2.js'
-  'reports/DLReportQuery.test.js'
 ];
 
 module.exports = {

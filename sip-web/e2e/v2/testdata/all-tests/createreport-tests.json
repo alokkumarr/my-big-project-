@@ -102,7 +102,7 @@
     },
     "dlreportquery": {
       "REPOR009": {
-        "suites": ["critical", "regression", "development"],
+        "suites": ["critical", "regression"],
         "user": "userOne",
         "description": "userOne should be able create dl report using query mode",
         "tables": [

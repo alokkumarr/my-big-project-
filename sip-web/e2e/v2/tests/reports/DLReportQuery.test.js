@@ -67,41 +67,38 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
 
           const reportDesignerPage = new ReportDesignerPage();
           reportDesignerPage.clickOnQueryTab();
-          reportDesignerPage.fillQuery('select * from SALES limit 10');
+          reportDesignerPage.fillQuery('select * from SALES limit 5');
           reportDesignerPage.clickOnQuerySubmitButton();
           reportDesignerPage.clickOnConfirmButton();
+          reportDesignerPage.verifyRowsDisplayed(5);
           reportDesignerPage.clickOnSave();
           reportDesignerPage.enterAnalysisName(reportName);
           reportDesignerPage.enterAnalysisDescription(reportDescription);
           reportDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-          // reportDesignerPage.fillAnalysisDetailsAndCreate(
-          //   tables,
-          //   reportName,
-          //   reportDescription
-          // );
-          // // Verify analysis displayed in list and card view
-          // analyzePage.goToView('list');
-          // analyzePage.verifyElementPresent(
-          //   analyzePage._analysisTitleLink(reportName),
-          //   true,
-          //   'report should be present in list/card view'
-          // );
-          // analyzePage.goToView('card');
-          // // Go to detail page and very details
-          // analyzePage.clickOnAnalysisLink(reportName);
 
-          // const executePage = new ExecutePage();
+          // Verify analysis displayed in list and card view
+          analyzePage.goToView('list');
+          analyzePage.verifyElementPresent(
+            analyzePage._analysisTitleLink(reportName),
+            true,
+            'report should be present in list/card view'
+          );
+          analyzePage.goToView('card');
+          // Go to detail page and very details
+          analyzePage.clickOnAnalysisLink(reportName);
 
-          // executePage.getAnalysisId().then(id => {
-          //   analysisId = id;
-          // });
+          const executePage = new ExecutePage();
 
-          // executePage.verifyAnalysisDetailsAndDelete(
-          //   reportName,
-          //   reportDescription
-          // );
-          // analyzePage.verifyToastMessagePresent('Analysis deleted.');
-          // analyzePage.verifyAnalysisDeleted();
+          executePage.getAnalysisId().then(id => {
+            analysisId = id;
+          });
+
+          executePage.verifyAnalysisDetailsAndDelete(
+            reportName,
+            reportDescription
+          );
+          analyzePage.verifyToastMessagePresent('Analysis deleted.');
+          analyzePage.verifyAnalysisDeleted();
         } catch (e) {
           console.log(e);
         }

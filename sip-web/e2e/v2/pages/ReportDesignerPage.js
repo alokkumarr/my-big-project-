@@ -29,8 +29,10 @@ class ReportDesignerPage extends Designer {
     );
     this._aggregation = name => element(by.xpath(`//span[text()="${name}"]`));
     this._queryBtn = element(by.css(`[e2e='e2e-query-btn']`));
-    this._confirmOkBtn = element(by.css(`[(e2e='confirm-dialog-ok-btn')]`));
-    this._querySubmitButton = element(by.css(`[(e2e='e2e-query-submit')]`));
+    this._confirmOkBtn = element(by.css(`[e2e='confirm-dialog-ok-btn']`));
+    this._querySubmitButton = element(by.css(`[e2e='e2e-query-submit']`));
+    this._rows = element(by.xpath(`(//tbody)[2]/tr`));
+    this._totalRows = element.all(by.xpath(`(//tbody)[2]/tr`));
   }
 
   clickOnReportFields(tables) {
@@ -103,6 +105,11 @@ class ReportDesignerPage extends Designer {
 
   clickOnConfirmButton() {
     commonFunctions.clickOnElement(this._confirmOkBtn);
+  }
+
+  verifyRowsDisplayed(rows) {
+    commonFunctions.waitFor.elementToBeVisible(this._rows, 120000);
+    expect(this._totalRows.count()).toBe(rows + 1);
   }
 }
 module.exports = ReportDesignerPage;
