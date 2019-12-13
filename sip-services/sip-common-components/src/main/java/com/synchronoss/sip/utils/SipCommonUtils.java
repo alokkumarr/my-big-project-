@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 
 public class SipCommonUtils {
@@ -206,5 +208,35 @@ public class SipCommonUtils {
               });
     }
     return privateCategory[0];
+  }
+
+  /**
+   * Util method to set Response UnAuthorized.
+   *
+   * @param response
+   * @return
+   * @throws IOException
+   */
+  public static HttpServletResponse setUnAuthResponse(HttpServletResponse response)
+      throws IOException {
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response
+        .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    return response;
+  }
+
+  /**
+   * Util method to set Response BAD REQUEST.
+   *
+   * @param response
+   * @return
+   * @throws IOException
+   */
+  public static HttpServletResponse setBadRequest(HttpServletResponse response)
+      throws IOException {
+    response.setStatus(HttpStatus.BAD_REQUEST.value());
+    response
+        .sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+    return response;
   }
 }

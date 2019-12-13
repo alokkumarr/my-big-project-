@@ -5,6 +5,8 @@ import static com.synchronoss.saw.util.SipMetadataUtils.getToken;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
+import static com.synchronoss.sip.utils.SipCommonUtils.setBadRequest;
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
@@ -17,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -79,11 +82,11 @@ public class AnalysisController {
   @ResponseBody
   public AnalysisResponse createAnalysis(
       HttpServletRequest request, HttpServletResponse response, @RequestBody Analysis analysis,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     if (analysis == null || analysis.getCategory() == null) {
       analysisResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      setBadRequest(response);
       logger.error(
           String.format("Analysis body and category can't be null or empty : %s ", analysis));
       return analysisResponse;
@@ -92,7 +95,7 @@ public class AnalysisController {
     analysis.setId(id);
 
     if (!authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      setUnAuthResponse(response);
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -135,12 +138,12 @@ public class AnalysisController {
       HttpServletResponse response,
       @RequestBody Analysis analysis,
       @PathVariable(name = "id") String id,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
     AnalysisResponse analysisResponse = new AnalysisResponse();
 
     if (analysis == null || analysis.getCategory() == null) {
       analysisResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      setBadRequest(response);
       logger.error(
           String.format("Analysis body and category can't be null or empty : %s ", analysis));
       return analysisResponse;
@@ -148,7 +151,7 @@ public class AnalysisController {
     analysis.setId(id);
 
     if (!authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      setUnAuthResponse(response);
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -189,10 +192,10 @@ public class AnalysisController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
-      @RequestHeader("Authorization") String authToken) {
+      @RequestHeader("Authorization") String authToken) throws IOException {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     if (!authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      setUnAuthResponse(response);
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -232,12 +235,12 @@ public class AnalysisController {
       @PathVariable(name = "id") String id,
       @ApiParam(value = "internalCall", required = false)
       @RequestParam(name = "internalCall", required = false)
-          String internal) {
+          String internal) throws IOException {
     String authToken = request.getHeader("Authorization");
     AnalysisResponse analysisResponse = new AnalysisResponse();
     boolean schduledAnalysis = Boolean.valueOf(internal);
     if (!schduledAnalysis && !authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      setUnAuthResponse(response);
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
@@ -280,7 +283,7 @@ public class AnalysisController {
     AnalysisResponse analysisResponse = new AnalysisResponse();
     Ticket authTicket = getTicket(request);
     if (authTicket == null) {
-      response.setStatus(401);
+      setUnAuthResponse(response);
       analysisResponse.setMessage("Invalid authentication token");
 
       // TODO: return analysis response here. Will be taken care in the future.

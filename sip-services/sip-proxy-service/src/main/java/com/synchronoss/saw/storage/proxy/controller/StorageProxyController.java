@@ -7,6 +7,8 @@ import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQ
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
+import static com.synchronoss.sip.utils.SipCommonUtils.setBadRequest;
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -285,18 +287,14 @@ public class StorageProxyController {
 
     ExecuteAnalysisResponse executeResponse = new ExecuteAnalysisResponse();
     if (!isScheduledExecution && !authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     }
 
     Ticket authTicket = request != null && !isScheduledExecution ? getTicket(request) : null;
     if (authTicket == null && !isScheduledExecution) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("Invalid authentication token");
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     }
 
@@ -307,24 +305,19 @@ public class StorageProxyController {
             : Long.parseLong(analysis.getCategory());
     logger.debug("Cat " + category);
     if (!isScheduledExecution && category == null) {
-      response.setStatus(HttpStatus.BAD_REQUEST.value());
       logger.error("BAD REQUEST : category should not be null!!");
-      response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
+      setBadRequest(response);
       return executeResponse;
     }
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the PUBLISH privilege!!");
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     } else if (!isScheduledExecution && !isPublishedExecution && !validatePrivilege(productList,
         category,
         PrivilegeNames.EXECUTE)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       logger.error("UNAUTHORIZED ACCESS : User don't have the EXECUTE privilege!!");
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     }
 
@@ -563,9 +556,7 @@ public class StorageProxyController {
     boolean schduledAnalysis = Boolean.valueOf(internal);
 
     if (!schduledAnalysis && !authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return Collections.singletonList(HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
     try {
@@ -625,10 +616,8 @@ public class StorageProxyController {
     boolean schduledAnalysis = Boolean.valueOf(internal);
 
     if (!schduledAnalysis && !authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     }
 
@@ -691,10 +680,8 @@ public class StorageProxyController {
     boolean schduledAnalysis = Boolean.valueOf(internal);
 
     if (!schduledAnalysis && !authValidation(authToken)) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
       ExecutionResponse executeResponse = new ExecutionResponse();
-      response
-          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      setUnAuthResponse(response);
       return executeResponse;
     }
 

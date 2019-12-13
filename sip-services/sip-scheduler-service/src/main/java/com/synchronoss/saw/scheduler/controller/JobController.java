@@ -1,6 +1,8 @@
 package com.synchronoss.saw.scheduler.controller;
 
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
+import static com.synchronoss.sip.utils.SipCommonUtils.setBadRequest;
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.synchronoss.bda.sip.jwt.TokenParser;
@@ -73,32 +75,26 @@ public class JobController extends BaseJobController{
 
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
 		Ticket authTicket = TokenParser.retrieveTicket(auth.substring(TOKEN));
 		if (authTicket == null) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(jobDetail.getCategoryID());
 		if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 		//Job Name is mandatory
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
-			response.sendError(HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.getReasonPhrase());
+			setBadRequest(response);
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
     boolean isValidDispatch =
@@ -151,9 +147,7 @@ public class JobController extends BaseJobController{
 			throws IOException {
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return;
 		}
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
@@ -161,9 +155,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return;
 		}
 		logger.info("JobController unschedule() method");
@@ -179,9 +171,7 @@ public class JobController extends BaseJobController{
         logger.info("JobController delete() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -190,9 +180,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -224,9 +212,7 @@ public class JobController extends BaseJobController{
 		logger.info( "JobController pause() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -235,9 +221,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -271,9 +255,7 @@ public class JobController extends BaseJobController{
         logger.info("JobController resume() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -282,6 +264,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -320,9 +303,7 @@ public class JobController extends BaseJobController{
 		logger.debug("Job details  = " + jobDetail);
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -331,9 +312,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(jobDetail.getCategoryID());
 		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -384,9 +363,7 @@ public class JobController extends BaseJobController{
         logger.info("JobController getAllJobs() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -395,9 +372,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -416,9 +391,7 @@ public class JobController extends BaseJobController{
 
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -427,15 +400,13 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
 		//Job Name is mandatory
 		if(schedule.getJobName() == null || schedule.getJobName().trim().equals("")){
-			response.sendError(HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.getReasonPhrase());
+			setBadRequest(response);
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
 		
@@ -453,9 +424,7 @@ public class JobController extends BaseJobController{
 
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -464,9 +433,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 		boolean status = jobService.isJobRunning(schedule);
@@ -482,9 +449,7 @@ public class JobController extends BaseJobController{
         logger.info("JobController getJobState() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -493,9 +458,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.ACCESS)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -512,9 +475,7 @@ public class JobController extends BaseJobController{
         logger.info("JobController stopJob() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -523,9 +484,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -560,9 +519,7 @@ public class JobController extends BaseJobController{
 		logger.info("JobController startJobNow() method");
 		if (!authValidation(authToken)) {
 			logger.error("Invalid authentication token");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
@@ -571,9 +528,7 @@ public class JobController extends BaseJobController{
 		Long category = Long.parseLong(schedule.getCategoryId());
 		if (!validatePrivilege(productList, category, PrivilegeNames.EXPORT)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response
-					.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 		}
 
