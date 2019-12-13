@@ -676,38 +676,35 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
     }
 
-    public DskFieldsInfo fetchAllDskEligibleFields(String customerCode, String projectCode) {
+    public DskFieldsInfo fetchAllDskEligibleFields(String customerSysId, String productId) {
         String tableName = "dsk_eligible_fields";
 
-        String fetchQuery = "SELECT customer_code, project_code, semantic_id, field_name,"
-            + " display_name FROM " + tableName + " WHERE customer_code=? AND project_code=?";
+        String fetchQuery = "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME"
+            + " DISPLAY_NAME FROM " + tableName + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=?";
 
         DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
 
 
-        Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleFields = jdbcTemplate.query(fetchQuery, ps -> {
-            ps.setString(1, customerCode);
-            ps.setString(2, projectCode);
+        Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleFields = jdbcTemplate.query(fetchQuery, ps -> {
+            ps.setString(1, customerSysId);
+            ps.setString(2, productId);
+            ps.setBoolean(3, true);
         }, resultSet -> {
-            Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleData =
+            Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData =
                 dskFieldsInfo.getDskEligibleData();
             while(resultSet.next()) {
-                String cCode = resultSet.getString("customer_code");
-                String pCode = resultSet.getString("project_code");
+                String semanticId = resultSet.getString("SEMANTIC_ID");
 
-                Long semanticId = resultSet.getLong("semantic_id");
+                String fieldName = resultSet.getString("COLUMN_NAME");
+                String displayName = resultSet.getString("DISPLAY_NAME");
 
-                String fieldName = resultSet.getString("field_name");
-                String displayName = resultSet.getString("display_name");
+                logger.info("" + semanticId + " " + fieldName + " " + displayName);
 
-                logger.info("" + cCode + " " + pCode + " " +
-                    semanticId + " " + fieldName + " " + displayName);
+                Map<String, Map<String, List<DskField>>> customerDskFields
+                    = dskEligibleData.getOrDefault(customerSysId, new HashMap<>());
 
-                Map<String, Map<Long, List<DskField>>> customerDskFields
-                    = dskEligibleData.getOrDefault(customerCode, new HashMap<>());
-
-                Map<Long, List<DskField>> projectDskData
-                    = customerDskFields.getOrDefault(projectCode, new HashMap<>());
+                Map<String, List<DskField>> projectDskData
+                    = customerDskFields.getOrDefault(productId, new HashMap<>());
 
                 List<DskField> semanticDskFields
                     = projectDskData.getOrDefault(semanticId, new ArrayList<>());
@@ -721,9 +718,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 logger.debug("" + semanticDskFields);
                 projectDskData.put(semanticId, semanticDskFields);
 
-                customerDskFields.put(projectCode, projectDskData);
+                customerDskFields.put(productId, projectDskData);
 
-                dskEligibleData.put(customerCode, customerDskFields);
+                dskEligibleData.put(customerSysId, customerDskFields);
             }
             return dskEligibleData;
         });
