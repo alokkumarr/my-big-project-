@@ -1865,7 +1865,8 @@ public class SecurityController {
       return userDetailsResponse;
     }
     String masterLoginId = valuesFromToken[4];
-    return securityService.addUserDetails(userDetails, masterLoginId);
+    Long customerId=  Long.valueOf(valuesFromToken[1]);
+    return securityService.addUserDetails(userDetails, masterLoginId,customerId,response);
   }
 
   /**

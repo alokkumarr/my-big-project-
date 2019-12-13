@@ -9,12 +9,14 @@ import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,11 +32,14 @@ public class SecurityService {
   /**
    * Create user with dsk.
    *
-   * @param masterLoginId masterLoginId
    * @param userDetails UserDetails
+   * @param masterLoginId masterLoginId
+   * @param loginCustomerId
+   * @param response HttpServletResponse
    * @return Returns UserDetailsResponse
    */
-  public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId) {
+  public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId,
+      Long loginCustomerId, HttpServletResponse response) {
     logger.trace("User details body :{}", userDetails);
     validateUserDetails(userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
@@ -77,6 +82,13 @@ public class SecurityService {
       return userDetailsResponse;
     }
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
+    if (customerSysId != loginCustomerId) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
+      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
+      return userDetailsResponse;
+    }
     if (customerSysId == null) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(

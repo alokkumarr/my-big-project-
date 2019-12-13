@@ -8,4 +8,7 @@ public class ErrorMessages {
   public static final String notExistErrorMessage = "%s does not exists";
 
   public static final String invalidMessage = "invalid %s";
+
+  public static final String unAuthorizedMessage="You are not authorized to perform this operation";
+
 }
