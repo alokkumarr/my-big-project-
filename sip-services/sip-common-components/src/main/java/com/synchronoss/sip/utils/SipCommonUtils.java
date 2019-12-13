@@ -183,19 +183,19 @@ public class SipCommonUtils {
                                       prodModFeat -> {
                                         if (prodModFeat != null
                                             && !CollectionUtils.isEmpty(
-                                                prodModFeat.getProductModuleSubFeatures())
+                                            prodModFeat.getProductModuleSubFeatures())
                                             && FEATURE_NAME.equalsIgnoreCase(
-                                                prodModFeat.getProdModFeatureName())) {
+                                            prodModFeat.getProdModFeatureName())) {
                                           prodModFeat
                                               .getProductModuleSubFeatures()
                                               .forEach(
                                                   prodModSubFeat -> {
                                                     if (prodModSubFeat != null
                                                         && prodModSubFeat.getProdModFeatureName()
-                                                            != null
+                                                        != null
                                                         && MODULE_FEATURE_NAME.equalsIgnoreCase(
-                                                            prodModSubFeat
-                                                                .getProdModFeatureName())) {
+                                                        prodModSubFeat
+                                                            .getProdModFeatureName())) {
                                                       privateCategory[0] =
                                                           prodModSubFeat.getProdModFeatureID();
                                                     }
@@ -211,11 +211,10 @@ public class SipCommonUtils {
   }
 
   /**
-   * Util method to set Response UnAuthorized.
+   * Util method to set Response UNAUTHORIZED.
    *
-   * @param response
+   * @param response HttpServletResponse
    * @return
-   * @throws IOException
    */
   public static HttpServletResponse setUnAuthResponse(HttpServletResponse response)
       throws IOException {
@@ -228,9 +227,8 @@ public class SipCommonUtils {
   /**
    * Util method to set Response BAD REQUEST.
    *
-   * @param response
+   * @param response HttpServletResponse
    * @return
-   * @throws IOException
    */
   public static HttpServletResponse setBadRequest(HttpServletResponse response)
       throws IOException {
