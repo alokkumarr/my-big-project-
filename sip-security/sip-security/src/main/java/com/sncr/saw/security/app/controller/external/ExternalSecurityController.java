@@ -86,14 +86,14 @@ public class ExternalSecurityController {
       httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
       response.setMessage("Special symbol not allowed except _ and - for role name.");
-      return response;
+      // return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
       boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName().matches(NAME_REGEX));
       if (!invalidCategoryName) {
         httpResponse.setStatus(HttpStatus.OK.value());
         response.setValid(false);
         response.setMessage("Special symbol not allowed except _ and - for category name.");
-        return response;
+        // return response;
       } else {
         boolean[] invalidSubCatName = {false};
         categoryList.stream().forEach(categoryDetails -> {
@@ -104,7 +104,7 @@ public class ExternalSecurityController {
           httpResponse.setStatus(HttpStatus.OK.value());
           response.setValid(false);
           response.setMessage("Special symbol not allowed except _ and - for sub category name.");
-          return response;
+          // return response;
         }
       }
     }
