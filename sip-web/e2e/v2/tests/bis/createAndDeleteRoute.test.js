@@ -17,8 +17,7 @@ const logger = require('../../conf/logger')(__filename);
 
 describe('BIS tests: createAndDeleteRoute.test.js', () => {
   beforeAll(function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL =
-      protractorConf.timeouts.timeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
   beforeEach(function(done) {
@@ -45,9 +44,7 @@ describe('BIS tests: createAndDeleteRoute.test.js', () => {
         const uId = Utils.randomId();
 
         const channelName = `${data.channelName}${uId}`;
-        const channelDescription = `${
-          data.channelName
-        } description created at ${uId}`;
+        const channelDescription = `${data.channelName} description created at ${uId}`;
 
         const routeName = `${data.routeName}${uId}`;
         const desc = `${data.routeName} description created at ${uId}`;
@@ -73,11 +70,7 @@ describe('BIS tests: createAndDeleteRoute.test.js', () => {
         const destination = `/dest${time}`;
         const host = APICommonHelpers.getHost(browser.baseUrl);
 
-        new SshUtility(host, 8022, 'root', 'root').createDirectoryAndDummyFile(
-          source,
-          content,
-          fileName
-        );
+        new SshUtility(host, 8022, 'root', 'root').createDirectoryAndDummyFile(source, content, fileName);
 
         let routeInfo = {
           routeName,
