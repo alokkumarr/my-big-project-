@@ -157,7 +157,8 @@ public class ExternalSecurityService {
             List<SubCategoryDetails> subCategories = category.getSubCategories();
             if (subCategories != null && !subCategories.isEmpty()) {
               for (SubCategoryDetails subCategoryDetails : subCategories) {
-                if (subCategoryDetails.isAutoCreate()) {
+                boolean validPrivileges = subCategoryDetails.getPrivilege().stream().allMatch(s -> PrivilegeUtils.validPrivilege(s));
+                if (subCategoryDetails.isAutoCreate() && validPrivileges) {
                   CategoryDetails details = buildCategoryBean(customerId, null, subCategoryDetails);
                   details.setProductId(moduleDetails.getProductId());
                   details.setModuleId(moduleDetails.getModuleId());
@@ -199,7 +200,11 @@ public class ExternalSecurityService {
                     response.setCategoryList(catList);
                   }
                 } else {
-                  buildMessage(catList, "Sub categories can't be add for flag false.", false);
+                  if (!subCategoryDetails.isAutoCreate()) {
+                    buildMessage(catList, "Sub categories can't be add for flag false.", false);
+                  } else if (!validPrivileges) {
+                    buildMessage(catList, "Please provide the correct privileges for subcategory.", false);
+                  }
                   response.setCategoryList(catList);
                 }
               }
@@ -527,6 +532,7 @@ public class ExternalSecurityService {
 
   /**
    * Validate fine name with special charecter
+   *
    * @param name
    * @return true if matched else false
    */
