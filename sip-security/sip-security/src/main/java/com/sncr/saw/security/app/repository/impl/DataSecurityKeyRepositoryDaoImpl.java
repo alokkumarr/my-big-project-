@@ -1,9 +1,14 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.controller.ServerResponseMessages;
+import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.app.model.DskField;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -669,6 +674,60 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         else {
             return null;
         }
+    }
+
+    public DskFieldsInfo fetchAllDskEligibleFields(String customerCode, String projectCode) {
+        String tableName = "dsk_eligible_fields";
+
+        String fetchQuery = "SELECT customer_code, project_code, semantic_id, field_name,"
+            + " display_name FROM " + tableName + " WHERE customer_code=? AND project_code=?";
+
+        DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
+
+
+        Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleFields = jdbcTemplate.query(fetchQuery, ps -> {
+            ps.setString(1, customerCode);
+            ps.setString(2, projectCode);
+        }, resultSet -> {
+            Map<String, Map<String, Map<Long, List<DskField>>>> dskEligibleData =
+                dskFieldsInfo.getDskEligibleData();
+            while(resultSet.next()) {
+                String cCode = resultSet.getString("customer_code");
+                String pCode = resultSet.getString("project_code");
+
+                Long semanticId = resultSet.getLong("semantic_id");
+
+                String fieldName = resultSet.getString("field_name");
+                String displayName = resultSet.getString("display_name");
+
+                logger.info("" + cCode + " " + pCode + " " +
+                    semanticId + " " + fieldName + " " + displayName);
+
+                Map<String, Map<Long, List<DskField>>> customerDskFields
+                    = dskEligibleData.getOrDefault(customerCode, new HashMap<>());
+
+                Map<Long, List<DskField>> projectDskData
+                    = customerDskFields.getOrDefault(projectCode, new HashMap<>());
+
+                List<DskField> semanticDskFields
+                    = projectDskData.getOrDefault(semanticId, new ArrayList<>());
+
+                DskField dskField = new DskField();
+                dskField.setFieldName(fieldName);
+                dskField.setDisplayName(displayName);
+
+                semanticDskFields.add(dskField);
+
+                logger.debug("" + semanticDskFields);
+                projectDskData.put(semanticId, semanticDskFields);
+
+                customerDskFields.put(projectCode, projectDskData);
+
+                dskEligibleData.put(customerCode, customerDskFields);
+            }
+            return dskEligibleData;
+        });
+        return dskFieldsInfo;
     }
 
 

@@ -1,5 +1,7 @@
 package com.sncr.saw.security.app.repository;
 
+import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 
@@ -14,6 +16,7 @@ public interface DataSecurityKeyRepository {
     public List<String> fetchSecurityGroupDskAttributes(Long securityGroupId);
     public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList);
     public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
+    public DskFieldsInfo fetchAllDskEligibleFields(String customerCode, String projectCode);
     public Valid updateUser(String securityGroupName,Long userSysId, Long custId);
     public List<UserAssignment> getAllUserAssignments(Long custId);
     public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);

@@ -7,8 +7,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -55,7 +55,9 @@ import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -79,8 +81,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -1063,6 +1063,27 @@ public class SecurityController {
     @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.GET)
     public List<DskDetails> fetchDskAllAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)    {
         return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
+    }
+
+    @RequestMapping ( value = "/auth/admin/security-groups/dsk-eligible-fields", method = RequestMethod.GET)
+    public DskFieldsInfo getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
+        Ticket ticket = SipCommonUtils.getTicket(request);
+
+        String customerCode = ticket.getCustCode();
+        String projectCode = ticket.getDefaultProdID();
+        RoleType roleType = ticket.getRoleType();
+        if (roleType != RoleType.ADMIN) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            return null;
+        }
+
+        DskFieldsInfo dskEligibleFields = dataSecurityKeyRepository.fetchAllDskEligibleFields(customerCode, projectCode);
+
+        return dskEligibleFields;
     }
 
     /**
