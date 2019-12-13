@@ -1069,8 +1069,8 @@ public class SecurityController {
     public DskFieldsInfo getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
         Ticket ticket = SipCommonUtils.getTicket(request);
 
-        String customerCode = ticket.getCustCode();
-        String projectCode = ticket.getDefaultProdID();
+        String customerSysId = ticket.getCustID();
+        String defaultProdID = ticket.getDefaultProdID();
         RoleType roleType = ticket.getRoleType();
         if (roleType != RoleType.ADMIN) {
             Valid valid = new Valid();
@@ -1081,7 +1081,8 @@ public class SecurityController {
             return null;
         }
 
-        DskFieldsInfo dskEligibleFields = dataSecurityKeyRepository.fetchAllDskEligibleFields(customerCode, projectCode);
+        DskFieldsInfo dskEligibleFields = dataSecurityKeyRepository
+            .fetchAllDskEligibleFields(customerSysId, defaultProdID);
 
         return dskEligibleFields;
     }
