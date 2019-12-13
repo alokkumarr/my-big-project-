@@ -36,6 +36,7 @@ public class SecurityService {
    */
   public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId) {
     logger.trace("User details body :{}", userDetails);
+    validateUserDetails(userDetails);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     if (!userDetails.getFirstName().matches(namePattern)) {
       userDetailsResponse.setValid(false);
@@ -75,7 +76,6 @@ public class SecurityService {
       logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
       return userDetailsResponse;
     }
-    validateUserDetails(userDetails);
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
     if (customerSysId == null) {
       userDetailsResponse.setValid(false);
