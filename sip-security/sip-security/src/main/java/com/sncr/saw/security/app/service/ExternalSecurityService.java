@@ -51,17 +51,16 @@ public class ExternalSecurityService {
    * @param roleCategoryPrivilege
    * @param masterLoginId
    * @param moduleDetails
-   * @param customerSysId
    */
   public RoleCatPrivilegeResponse createRoleCategoryPrivilege(HttpServletResponse httpResponse, RoleCategoryPrivilege roleCategoryPrivilege,
-                                                              String masterLoginId, ProductModuleDetails moduleDetails, Long customerSysId) {
+                                                              String masterLoginId, ProductModuleDetails moduleDetails) {
     RoleCatPrivilegeResponse response = new RoleCatPrivilegeResponse();
     // add the product/module id
     response.setProductId(moduleDetails.getProductId());
     response.setModuleId(moduleDetails.getModuleId());
     response.setProductName(roleCategoryPrivilege.getProductName());
     response.setModuleName(roleCategoryPrivilege.getModuleName());
-
+    Long customerId = moduleDetails.getCustomerSysId();
     com.sncr.saw.security.common.bean.Role inputRole = roleCategoryPrivilege.getRole();
     Role responseRole = new Role();
     if (inputRole != null) {
@@ -78,9 +77,9 @@ public class ExternalSecurityService {
         httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         responseRole.setMessage("Role Name can't be blank or empty.");
       } else if (inputRole.getCustomerCode() != null && inputRole.isAutoCreate()
-          && !roleRepository.validateRoleByIdAndCustomerCode(customerSysId, inputRole)) {
+          && !roleRepository.validateRoleByIdAndCustomerCode(customerId, inputRole)) {
         // build role details bean from input
-        RoleDetails role = buildRoleDetails(masterLoginId, customerSysId, inputRole);
+        RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
         try {
           if (role != null) {
             Valid valid = userRepository.addRole(role);
@@ -128,7 +127,7 @@ public class ExternalSecurityService {
     if (categoryPrivilegeLis != null && !categoryPrivilegeLis.isEmpty()) {
       for (CategoryDetails category : categoryPrivilegeLis) {
         if (category.isAutoCreate()) {
-          CategoryDetails categoryDetails = buildCategoryBean(customerSysId, category, null);
+          CategoryDetails categoryDetails = buildCategoryBean(customerId, category, null);
           categoryDetails.setProductId(moduleDetails.getProductId());
           categoryDetails.setModuleId(moduleDetails.getModuleId());
           categoryDetails.setMasterLoginId(masterLoginId);
@@ -141,7 +140,7 @@ public class ExternalSecurityService {
             if (subCategories != null && !subCategories.isEmpty()) {
               for (SubCategoryDetails subCategoryDetails : subCategories) {
                 if (subCategoryDetails.isAutoCreate()) {
-                  CategoryDetails details = buildCategoryBean(customerSysId, null, subCategoryDetails);
+                  CategoryDetails details = buildCategoryBean(customerId, null, subCategoryDetails);
                   details.setProductId(moduleDetails.getProductId());
                   details.setModuleId(moduleDetails.getModuleId());
                   details.setMasterLoginId(masterLoginId);
@@ -272,7 +271,8 @@ public class ExternalSecurityService {
       if (rolesList != null && !rolesList.isEmpty()) {
         rolesList.stream().forEach(fetchedRole -> {
           if (request.getRole().getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
-            responseRole.setCustomerCode(fetchedRole.getCustomerCode());
+            responseRole.setCustomerCode(fetchedRole.getCustomerCode() != null && fetchedRole.getCustomerCode().isEmpty()
+                ? moduleDetails.getCustomerCode() : fetchedRole.getCustomerCode());
             responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
             responseRole.setRoleSysId(fetchedRole.getRoleSysId());
             responseRole.setCustomerSysId(fetchedRole.getCustSysId());
@@ -407,19 +407,19 @@ public class ExternalSecurityService {
    * Build role details bean from role, customerSysId, master login id
    *
    * @param masterLoginId
-   * @param customerSysId
+   * @param moduleDetails
    * @param inputRole
    * @return
    */
-  public static RoleDetails buildRoleDetails(String masterLoginId, Long customerSysId, com.sncr.saw.security.common.bean.Role inputRole) {
+  public static RoleDetails buildRoleDetails(String masterLoginId, ProductModuleDetails moduleDetails, com.sncr.saw.security.common.bean.Role inputRole) {
     RoleDetails role = new RoleDetails();
     role.setActiveStatusInd(Boolean.valueOf(inputRole.getActiveStatusInd()) ? "1" : "0");
-    role.setCustomerCode(inputRole.getCustomerCode());
+    role.setCustomerCode(moduleDetails.getCustomerCode());
     role.setMasterLoginId(masterLoginId);
     role.setRoleName(inputRole.getRoleName());
     role.setRoleDesc(inputRole.getRoleDesc());
     role.setRoleType(RoleType.fromValue(inputRole.getRoleType()));
-    role.setCustSysId(customerSysId);
+    role.setCustSysId(moduleDetails.getCustomerSysId());
     return role;
   }
 

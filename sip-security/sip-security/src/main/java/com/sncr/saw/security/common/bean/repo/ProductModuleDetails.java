@@ -14,7 +14,7 @@ public class ProductModuleDetails implements Serializable {
 	Long moduleId;
 	Long productId;
 	Long customerSysId;
-	Long customerProdModSysId;
+	String customerCode;
 
 	public Long getModuleId() {
 		return moduleId;
@@ -40,11 +40,11 @@ public class ProductModuleDetails implements Serializable {
 		this.customerSysId = customerSysId;
 	}
 
-	public Long getCustomerProdModSysId() {
-		return customerProdModSysId;
+	public String getCustomerCode() {
+		return customerCode;
 	}
 
-	public void setCustomerProdModSysId(Long customerProdModSysId) {
-		this.customerProdModSysId = customerProdModSysId;
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
 	}
 }
