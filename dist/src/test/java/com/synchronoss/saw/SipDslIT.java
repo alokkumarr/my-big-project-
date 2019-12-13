@@ -844,9 +844,9 @@ public class SipDslIT extends BaseIT {
   }
 
   @Test
-  public void testScheduleForMultiTenancy() throws IOException, InterruptedException {
+  public void testScheduleForMultiTenancy() throws IOException {
     JsonObject data = testData;
-    data.addProperty("category", "48");
+    data.addProperty("category", "46");
     analysisId = createAnalysis(customToken, data);
 
     ObjectNode scheduleObj = scheduleData();
@@ -859,6 +859,7 @@ public class SipDslIT extends BaseIT {
     scheduleObj.put("jobGroup", TENANT_A);
     scheduleObj.put("scheduleState", "new");
     scheduleObj.put("zip", false);
+    scheduleObj.put("categoryID", "46");
     String json = mapper.writeValueAsString(scheduleObj);
     createSchedule(json, customToken);
 
