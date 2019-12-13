@@ -51,7 +51,16 @@ public class SecurityService {
       logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
       return userDetailsResponse;
     }
-
+    String middleName=userDetails.getMiddleName();
+    if (middleName != null) {
+      if (!middleName.matches(namePattern)) {
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage(
+            String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        logger.debug(String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        return userDetailsResponse;
+      }
+    }
     if (!userDetails.getMasterLoginId().matches(loginIdPattern)) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
