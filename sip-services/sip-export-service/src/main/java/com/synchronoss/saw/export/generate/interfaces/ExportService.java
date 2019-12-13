@@ -26,6 +26,8 @@ public interface ExportService {
   void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)
       throws JSONValidationSAWException;
 
+  void pivotDispatchAsync(String executionId, RequestEntity request, String analysisId,String analysisType)
+      throws JSONValidationSAWException;
   List<String> listFtpsForCustomer(RequestEntity request);
 
   List<String> listS3ForCustomer(RequestEntity requestEntity);
