@@ -78,28 +78,6 @@ public class PrivilegeUtils {
   }
 
   /**
-   * Validate and check whether privilege is present.
-   *
-   * @param privName Privilege Name
-   * @param dec      Decimal number
-   * @return Boolean value
-   */
-  public boolean isPrivilegePresent(PrivilegeNames privName, Long dec) {
-    if (dec == null || privName == null) {
-      logger.error("PrivName or decimal code acn't be null!!");
-      return false;
-    }
-    int[] privCode = SipCommonUtils.decToBinary(dec);
-    int privValue = privilegeCodes.get(privName);
-    logger.info(
-        String.format("Privilege Name : %s , Privilege Value : %d ", privName, privValue));
-    if (privCode[privilegeCodes.get(PrivilegeNames.ALL)] == 1 || privCode[privValue] == 1) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Get the decimal value of binary for the privileges.
    *
    * @return privileges codes
@@ -124,5 +102,21 @@ public class PrivilegeUtils {
       logger.error("Error while getting decimal value for privileges.");
     }
     return privilegeCode;
+  }
+
+  /**
+   * Validate privilege type from string.
+   *
+   * @param type privilege name type Value.
+   * @return true if matches else false
+   */
+  public static boolean validPrivilege(String type) {
+    PrivilegeNames[] privilegeNames = PrivilegeNames.values();
+    for (PrivilegeNames privilege : privilegeNames) {
+      if (privilege.name().equalsIgnoreCase(type)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -72,20 +72,4 @@ public class SipCommonUtils {
               name));
     }
   }
-
-  /**
-   * Convert decimal to binary.
-   *
-   * @param value to be converted
-   * @return binary array of value
-   */
-  public static int[] decToBinary(Long value) {
-    String binString = Long.toBinaryString(value);
-    binString = binString.length() < 16 ? "00000000".concat(binString) : binString;
-
-    binString.toCharArray();
-    final int[] privCode = Stream.of(binString.split("")).mapToInt(Integer::parseInt).toArray();
-
-    return privCode;
-  }
 }

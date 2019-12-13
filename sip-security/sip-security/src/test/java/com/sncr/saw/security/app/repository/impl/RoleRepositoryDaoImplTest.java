@@ -31,6 +31,7 @@ public class RoleRepositoryDaoImplTest {
     Role role = new Role();
     role.setRoleCode("TESTCODE01");
     role.setRoleType("ADMIN");
-    when(roleRepoDao.validateRoleByIdAndCustomerCode(custId, role)).thenReturn(true);
+    role.setRoleName("TEST");
+    roleRepoDao.fetchRoleByIdAndCustomerCode(custId, role);
   }
 }

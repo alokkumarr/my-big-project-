@@ -1,8 +1,9 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.RoleRepository;
-import com.sncr.saw.security.app.repository.impl.extract.StringExtractor;
+import com.sncr.saw.security.app.repository.impl.extract.RoleDetailsExtractor;
 import com.sncr.saw.security.common.bean.Role;
+import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,9 @@ public class RoleRepositoryDaoImpl implements RoleRepository {
 
 
   @Override
-  public boolean validateRoleByIdAndCustomerCode(Long customerSysId, Role role) {
-    String sql = "select R.ROLE_CODE from ROLES R where R.CUSTOMER_SYS_ID =? AND ROLE_CODE = ? AND ROLE_TYPE = ?";
+  public RoleDetails fetchRoleByIdAndCustomerCode(Long customerSysId, Role role) {
+    String sql = "select R.ROLE_SYS_ID, R.ROLE_NAME, R.ACTIVE_STATUS_IND from ROLES R where R.CUSTOMER_SYS_ID =? AND ROLE_CODE = ? AND ROLE_TYPE = ?";
+    RoleDetails roleDetails = new RoleDetails();
     try {
       final StringBuffer roleCode = new StringBuffer();
       roleCode.append(role.getCustomerCode()).append("_");
@@ -65,17 +67,15 @@ public class RoleRepositoryDaoImpl implements RoleRepository {
       } else {
         roleCode.append(role.getRoleType());
       }
-      String code = jdbcTemplate.query(sql, preparedStatement -> {
+      roleDetails = jdbcTemplate.query(sql, preparedStatement -> {
         preparedStatement.setLong(1, customerSysId);
         preparedStatement.setString(2, roleCode.toString());
         preparedStatement.setString(3, role.getRoleType().toUpperCase());
-      }, new StringExtractor("ROLE_CODE"));
-
-      if (roleCode.toString().equalsIgnoreCase(code)) return true;
+      }, new RoleDetailsExtractor());
 
     } catch (Exception e) {
       logger.error("Exception encountered while ", e);
     }
-    return false;
+    return roleDetails;
   }
 }

@@ -4,6 +4,7 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.ProductModuleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.service.ExternalSecurityService;
+import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
@@ -36,8 +37,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/sip-security/external")
 public class ExternalSecurityController {
-
-  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
 
   @Autowired
   private ExternalSecurityService securityService;
@@ -80,31 +79,33 @@ public class ExternalSecurityController {
     }
 
     // validate role/category/subcategory name
-    String roleName = request.getRole().getRoleName();
+    Role role = request.getRole();
     List<CategoryDetails> categoryList = request.getCategories();
-    if (roleName != null && roleName.matches(NAME_REGEX)) {
+
+    boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName());
+    if (validateRoleName) {
       httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
-      response.setMessage("Special symbol not allowed except _ and - for role name.");
-      // return response;
+      response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
+      return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
-      boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName().matches(NAME_REGEX));
-      if (!invalidCategoryName) {
+      boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.isAutoCreate() && securityService.validateName(category.getCategoryName()));
+      if (invalidCategoryName) {
         httpResponse.setStatus(HttpStatus.OK.value());
         response.setValid(false);
-        response.setMessage("Special symbol not allowed except _ and - for category name.");
-        // return response;
+        response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for category name.");
+        return response;
       } else {
         boolean[] invalidSubCatName = {false};
         categoryList.stream().forEach(categoryDetails -> {
           List<SubCategoryDetails> subCategoryList = categoryDetails.getSubCategories();
-          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.getSubCategoryName().matches(NAME_REGEX));
+          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName()));
         });
         if (invalidSubCatName[0]) {
           httpResponse.setStatus(HttpStatus.OK.value());
           response.setValid(false);
-          response.setMessage("Special symbol not allowed except _ and - for sub category name.");
-          // return response;
+          response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for sub category name.");
+          return response;
         }
       }
     }

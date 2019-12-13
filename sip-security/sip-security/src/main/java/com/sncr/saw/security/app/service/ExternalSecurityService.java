@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,8 @@ public class ExternalSecurityService {
   private RoleRepository roleRepository;
   @Autowired
   private UserRepository userRepository;
+
+  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
 
   /**
    * Create Role , Category, Subcategory and Privilege
@@ -62,11 +66,15 @@ public class ExternalSecurityService {
     response.setModuleName(roleCategoryPrivilege.getModuleName());
     Long customerId = moduleDetails.getCustomerSysId();
     com.sncr.saw.security.common.bean.Role inputRole = roleCategoryPrivilege.getRole();
+    RoleDetails roleDetails = new RoleDetails();
     Role responseRole = new Role();
     if (inputRole != null) {
       if (inputRole.getCustomerCode() == null || inputRole.getCustomerCode().isEmpty()) {
         httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         responseRole.setMessage("Customer Code can't be blank or empty.");
+      } else if (!inputRole.getCustomerCode().equalsIgnoreCase(moduleDetails.getCustomerCode())) {
+        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        responseRole.setMessage("Customer Code not matched with the user ticket.");
       } else if (inputRole.getRoleType() == null || inputRole.getRoleType().isEmpty()) {
         httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         responseRole.setMessage("Role Type can't be blank or empty.");
@@ -76,47 +84,57 @@ public class ExternalSecurityService {
       } else if (inputRole.getRoleName() == null || inputRole.getRoleName().isEmpty()) {
         httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         responseRole.setMessage("Role Name can't be blank or empty.");
-      } else if (inputRole.getCustomerCode() != null && inputRole.isAutoCreate()
-          && !roleRepository.validateRoleByIdAndCustomerCode(customerId, inputRole)) {
-        // build role details bean from input
-        RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
-        try {
-          if (role != null) {
-            Valid valid = userRepository.addRole(role);
-            if (valid.getValid()) {
-              // fetched only matched roles
-              userRepository.getRoles(role.getCustSysId()).stream().forEach(fetchedRole -> {
-                if (inputRole.getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
-                  String customerCode = fetchedRole.getCustomerCode() != null ? fetchedRole.getCustomerCode() : inputRole.getCustomerCode();
-                  responseRole.setCustomerCode(customerCode);
-                  responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
-                  responseRole.setRoleSysId(fetchedRole.getRoleSysId());
-                  responseRole.setCustomerSysId(fetchedRole.getCustSysId());
-                  responseRole.setRoleName(fetchedRole.getRoleName());
-                  responseRole.setRoleDesc(fetchedRole.getRoleDesc());
-                  responseRole.setRoleType(fetchedRole.getRoleType());
-                }
-              });
-              response.setValid(true);
-              responseRole.setMessage("Role created for Customer Product Module Combination.");
+      } else if (inputRole.isAutoCreate()) {
+        roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
+        if (roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty()) {
+          // build role details bean from input
+          RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
+          try {
+            if (role != null) {
+              Valid valid = userRepository.addRole(role);
+              if (valid.getValid()) {
+                // fetched only matched roles
+                userRepository.getRoles(role.getCustSysId()).stream().forEach(fetchedRole -> {
+                  if (inputRole.getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
+                    String customerCode = fetchedRole.getCustomerCode() != null ? fetchedRole.getCustomerCode() : inputRole.getCustomerCode();
+                    responseRole.setCustomerCode(customerCode);
+                    responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
+                    responseRole.setRoleSysId(fetchedRole.getRoleSysId());
+                    responseRole.setCustomerSysId(fetchedRole.getCustSysId());
+                    responseRole.setRoleName(fetchedRole.getRoleName());
+                    responseRole.setRoleDesc(fetchedRole.getRoleDesc());
+                    responseRole.setRoleType(fetchedRole.getRoleType());
+                  }
+                });
+                response.setValid(true);
+                responseRole.setMessage("Role created for Customer Product Module Combination.");
+              } else {
+                response.setValid(false);
+                responseRole.setMessage("Role could not be added. " + valid.getError());
+              }
             } else {
               response.setValid(false);
-              responseRole.setMessage("Role could not be added. " + valid.getError());
+              responseRole.setMessage("Mandatory request params are missing for roles.");
             }
-          } else {
+          } catch (Exception e) {
             response.setValid(false);
-            responseRole.setMessage("Mandatory request params are missing for roles.");
+            String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+            responseRole.setMessage(message + " Please contact server Administrator for Roles.");
           }
-        } catch (Exception e) {
+        } else {
           response.setValid(false);
-          String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
-          responseRole.setMessage(message + " Please contact server Administrator for Roles.");
+          responseRole.setRoleSysId(roleDetails.getRoleSysId());
+          responseRole.setRoleName(roleDetails.getRoleName());
+          responseRole.setRoleDesc(inputRole.getRoleDesc());
+          responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
+          responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
+          responseRole.setCustomerCode(moduleDetails.getCustomerCode());
+          responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
+          responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
         }
       } else {
         response.setValid(false);
-        String roleMessage = !inputRole.isAutoCreate() ? "Role can't be add for flag false."
-            : "Role already exist in the system for Customer Product Module Combination.";
-        responseRole.setMessage(roleMessage);
+        responseRole.setMessage("Role can't be add for flag false.");
       }
       response.setRole(responseRole);
     }
@@ -163,8 +181,8 @@ public class ExternalSecurityService {
                           .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
                           .findAny().get();
 
-                      if (responseRole.getRoleSysId() > 0) {
-                        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, subCategoryDetails.getPrivilege());
+                      if (roleDetails.getRoleSysId() > 0) {
+                        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, roleDetails.getRoleSysId(), detailsCategory, subCategoryDetails.getPrivilege());
                         Valid valid = userRepository.upsertPrivilege(privilegeDetails);
                         if (valid.getValid()) {
                           String pMessage = "Category,Subcategory,Privileges added : " + String.join(",", subCategoryDetails.getPrivilege());
@@ -505,5 +523,16 @@ public class ExternalSecurityService {
     }
     catList.setValid(false);
     catList.setMessage(message);
+  }
+
+  /**
+   * Validate fine name with special charecter
+   * @param name
+   * @return true if matched else false
+   */
+  public boolean validateName(String name) {
+    Pattern special = Pattern.compile(NAME_REGEX);
+    Matcher hasSpecial = special.matcher(name);
+    return hasSpecial.find();
   }
 }
