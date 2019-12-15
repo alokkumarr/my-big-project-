@@ -8,8 +8,6 @@ const Constants = require('../helpers/Constants');
 class ExecutePage extends ConfirmationModel {
   constructor() {
     super();
-    commonFunctions.waitFor.pageToBeReady(/analysis/);
-
     this._actionMenuLink = element(by.css(`[e2e='actions-menu-toggle']`));
     this._actionMenuContents = element(
       by.xpath(`//*[@class="mat-menu-content"]`)
