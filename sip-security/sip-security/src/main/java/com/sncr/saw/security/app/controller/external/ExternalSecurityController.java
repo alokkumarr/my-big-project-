@@ -82,14 +82,14 @@ public class ExternalSecurityController {
     Role role = request.getRole();
     List<CategoryDetails> categoryList = request.getCategories();
 
-    boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName());
+    boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
     if (validateRoleName) {
       httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
       response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
       return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
-      boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.isAutoCreate() && securityService.validateName(category.getCategoryName()));
+      boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.isAutoCreate() && securityService.validateName(category.getCategoryName().trim()));
       if (invalidCategoryName) {
         httpResponse.setStatus(HttpStatus.OK.value());
         response.setValid(false);
@@ -99,7 +99,7 @@ public class ExternalSecurityController {
         boolean[] invalidSubCatName = {false};
         categoryList.stream().forEach(categoryDetails -> {
           List<SubCategoryDetails> subCategoryList = categoryDetails.getSubCategories();
-          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName()));
+          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName().trim()));
         });
         if (invalidSubCatName[0]) {
           httpResponse.setStatus(HttpStatus.OK.value());
@@ -170,15 +170,24 @@ public class ExternalSecurityController {
       return response;
     }
 
-    if (request.getRole() == null || request.getRole().getRoleName() == null || request.getRole().getRoleName().isEmpty()) {
-      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+    Role role = request.getRole();
+    if (role == null || role.getRoleName() == null || role.getRoleName().isEmpty()) {
+      httpResponse.setStatus(HttpStatus.OK.value());
       response.setMessage("Role Name can't be blank or empty.");
       response.setProductName(productName);
       response.setModuleName(moduleName);
       return response;
     }
-    response = securityService.fetchRoleCategoryPrivilege(request, productName, moduleName, moduleDetails, customerSysId);
 
+    boolean validateRoleName = role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
+    if (validateRoleName) {
+      httpResponse.setStatus(HttpStatus.OK.value());
+      response.setValid(false);
+      response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
+      return response;
+    }
+
+    response = securityService.fetchRoleCategoryPrivilege(request, productName, moduleName, moduleDetails, customerSysId);
     return response;
   }
 }
