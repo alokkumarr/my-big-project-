@@ -28,6 +28,7 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { lessThan } from '../../../../../common/validators';
 // import { correctTimeInterval } from '../../../../../common/time-interval-parser/time-interval-parser';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../consts';
+import { entityNameErrorMessage, minimumNameLength } from './../../../../../common/validators/field-name-rule.validator';
 
 import {
   AlertConfig,
@@ -37,7 +38,6 @@ import {
 import { ALERT_SEVERITY, ALERT_STATUS } from '../../../consts';
 import { SubscriptionLike, of, Observable, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
 const LAST_STEP_INDEX = 3;
 
 const floatingPointRegex = '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$';
@@ -75,6 +75,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
   alertSeverity = ALERT_SEVERITY;
   alertStatus = ALERT_STATUS;
   subscriptions: SubscriptionLike[] = [];
+  nameLengthLimit;
   endActionText = 'Add';
   endPayload: AlertConfig;
   showNotificationEmail = false;
@@ -136,6 +137,7 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     );
     this.operators$ = this._configureAlertService.getOperators();
     this.notifications$ = of(notificationsOptions);
+    this.nameLengthLimit = minimumNameLength;
   }
 
   ngOnDestroy() {
@@ -187,9 +189,25 @@ export class AddAlertComponent implements OnInit, OnDestroy {
     return notifications;
   }
 
+  displayErrorMessage(state) {
+    return entityNameErrorMessage(state);
+  }
+
+  validatePattern(control) {
+    return new Promise((resolve, reject) => {
+      if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
+          resolve({ nameIsInValid: true });
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
   createAlertForm() {
     this.alertDefFormGroup = this._formBuilder.group({
-      alertRuleName: ['', Validators.required],
+      alertRuleName: ['', [Validators.required,
+        Validators.maxLength(30)],
+        this.validatePattern],
       alertRuleDescription: [''],
       alertSeverity: ['', [Validators.required]],
       notification: [[], [Validators.required]],
@@ -561,6 +579,10 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   createAlert() {
     const payload = this.constructPayload();
+    if (this.alertDefFormGroup.invalid) {
+      return;
+    }
+
     const createSubscriber = this._configureAlertService
       .createAlert(payload)
       .subscribe((data: any) => {
@@ -571,6 +593,9 @@ export class AddAlertComponent implements OnInit, OnDestroy {
 
   updateAlert() {
     const payload = this.constructPayload();
+    if (this.alertDefFormGroup.invalid) {
+      return;
+    }
     const alertID = this.alertDefinition.alertConfig.alertRulesSysId;
     const updateSubscriber = this._configureAlertService
       .updateAlert(alertID, payload)
