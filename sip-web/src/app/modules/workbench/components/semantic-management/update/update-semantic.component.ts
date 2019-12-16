@@ -9,7 +9,7 @@ import { NUMBER_TYPES, DATE_TYPES } from '../../../../../../app/common/consts';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as forIn from 'lodash/forIn';
+import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
 import * as find from 'lodash/find';
@@ -79,7 +79,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
     this.workBench.getSemanticDetails(id).subscribe((data: any) => {
       this.selectedDPDetails = omit(data, 'statusMessage');
       this.selectedDPData = get(data, 'artifacts');
-      forIn(this.selectedDPData, dp => {
+      forEach(this.selectedDPData, dp => {
         const parentDSName = dp.artifactName;
         const parentDSData = find(this.availableDS, obj => {
           return obj.system.name === parentDSName;
@@ -87,7 +87,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         if (!isUndefined(parentDSData)) {
           this.isJoinEligible = parentDSData.joinEligible;
           this.injectFieldProperties(parentDSData);
-          forIn(parentDSData.schema.fields, obj => {
+          forEach(parentDSData.schema.fields, obj => {
             if (findIndex(dp.columns, ['columnName', obj.columnName]) === -1) {
               dp.columns.push(obj);
             }
@@ -129,18 +129,70 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Updates the saemantic definition with user changes.
+   * Updates the semantic definition with user changes.
    *
    * @memberof UpdateSemanticComponent
    */
   updateSemantic() {
+    const msg =
+      'Please select atleast one entry from <strong>KPI Eligible</strong> column which has <strong>date or timestamp</strong> data type.';
+    const title = 'Date data type is missing.';
+
     this.selectedDPDetails.artifacts = [];
-    forIn(this.selectedDPData, ds => {
+    forEach(this.selectedDPData, ds => {
       this.selectedDPDetails.artifacts.push({
         artifactName: ds.artifactName,
         columns: filter(ds.columns, 'include')
       });
     });
+
+    /**
+     * Checking in KPI Eligible column
+     * 1.) If no entry selected then update dp.
+     * 2.) If any one field other than date type is selected then ask user to select at least one date type field and then update dp.
+     * 3.) If no field with date type is present then update dp
+     *
+     * Added as a part of SIP-9373.
+     */
+    const anyColSelected = some(
+      this.selectedDPDetails.artifacts[0].columns,
+      obj => {
+        return !DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+      }
+    );
+
+    const dateColAvailable = some(
+      this.selectedDPDetails.artifacts[0].columns,
+      obj => {
+        return DATE_TYPES.includes(obj.type);
+      }
+    );
+
+    const dateAndKpiSelected = some(
+      this.selectedDPDetails.artifacts[0].columns,
+      obj => {
+        return DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+      }
+    );
+
+    if (anyColSelected) {
+      if (dateColAvailable) {
+        if (dateAndKpiSelected) {
+          this.updateDatapod();
+        } else {
+          this.notify.warn(msg, title, {
+            hideDelay: 9000
+          });
+        }
+      } else {
+        this.updateDatapod();
+      }
+    } else {
+      this.updateDatapod();
+    }
+  }
+
+  updateDatapod() {
     this.workBench
       .updateSemanticDetails(this.selectedDPDetails)
       .subscribe((data: any[]) => {
@@ -151,6 +203,12 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   *
+   * @param e
+   * Disable checkbox of non numeric and date type fields in KPI Eligible column.
+   * Added as part of SIP-9373
+   */
   cellPrepared(e) {
     if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
       if (
