@@ -5,6 +5,7 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DskEligibleFieldsRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.util.JWTUtils;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -28,12 +29,13 @@ public class DskEligibleFieldService {
   private final String AdminRole = "ADMIN";
 
   public Valid AddDskEligibleFields(DskEligibleFields dskEligibleFields, HttpServletRequest request,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     Valid valid = new Valid();
     String jwtToken = JWTUtils.getToken(request);
     String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nssoProperties.getJwtSecretKey());
     Long custId = Long.valueOf(valuesFromToken[1]);
     if (dskEligibleFields.getCustomerSysId() == null || dskEligibleFields.getCustomerSysId() == 0) {
+      response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
       valid.setValid(Boolean.FALSE);
       valid.setError("Customer Id can't be null or 0");
       logger.error("Customer Sys Id can't be null or empty :");
@@ -55,6 +57,7 @@ public class DskEligibleFieldService {
     }
 
     if (dskEligibleFields.getProductSysId() == null || dskEligibleFields.getProductSysId() == 0) {
+      response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
       valid.setValid(Boolean.FALSE);
       valid.setError("Product Id can't be null or 0");
       logger.error("Product Id can't be null or 0");
@@ -62,6 +65,7 @@ public class DskEligibleFieldService {
     }
 
     if (StringUtils.isEmpty(dskEligibleFields.getSemantic_id())) {
+      response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
       valid.setValid(Boolean.FALSE);
       valid.setError("semantic Id can't be null or empty");
       logger.error("semantic Id can't be null or empty");
@@ -71,4 +75,21 @@ public class DskEligibleFieldService {
     return dskEligibleFieldsRepository.createDskEligibleFields(dskEligibleFields);
   }
 
+  public Valid deleteDskEligibleFields(String semanticId, HttpServletRequest request,
+      HttpServletResponse response) {
+    Valid valid = new Valid();
+    String jwtToken = JWTUtils.getToken(request);
+    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nssoProperties.getJwtSecretKey());
+    Long custId = Long.valueOf(valuesFromToken[1]);
+    Long prodId = Long.valueOf(valuesFromToken[4]);
+
+    if (StringUtils.isEmpty(semanticId)) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      valid.setValid(Boolean.FALSE);
+      valid.setError("semantic Id can't be null or empty");
+      logger.error("semantic Id can't be null or empty");
+      return valid;
+    }
+    return dskEligibleFieldsRepository.deleteDskEligibleFields(custId, prodId, semanticId);
+  }
 }

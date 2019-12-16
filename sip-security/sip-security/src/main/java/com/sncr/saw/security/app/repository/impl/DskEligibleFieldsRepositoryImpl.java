@@ -71,4 +71,38 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
     );
     return valid;
   }
+
+  @Override
+  public Valid deleteDskEligibleFields(Long custId, Long prodId, String semanticId) {
+    String sql = "DELETE FROM DSK_ELIGIBLE_FIELDS "
+        + " WHERE SEMANTIC_ID = ? AND PRODUCT_ID= ? AND CUSTOMER_SYS_ID = ?";
+    Valid valid = new Valid();
+    try {
+      jdbcTemplate.update(sql, ps -> {
+        ps.setString(1, semanticId);
+        ps.setLong(2, prodId);
+        ps.setLong(3, custId);
+        valid.setValid(Boolean.TRUE);
+        valid.setValidityMessage("Success");
+      });
+
+    } catch (DuplicateKeyException dke) {
+      logger
+          .error("Exception encountered while creating a new user " + dke.getMessage(), null,
+              dke);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(dke.getMessage());
+    } catch (DataIntegrityViolationException de) {
+      logger.error("Exception encountered while creating a new user " + de.getMessage(), null,
+          de);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(de.getMessage());
+    } catch (Exception e) {
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), null,
+          e);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(e.getMessage());
+    }
+    return valid;
+  }
 }
