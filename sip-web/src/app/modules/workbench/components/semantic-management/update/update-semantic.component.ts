@@ -13,7 +13,6 @@ import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
 import * as find from 'lodash/find';
-import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
@@ -88,7 +87,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           this.isJoinEligible = parentDSData.joinEligible;
           this.injectFieldProperties(parentDSData);
           forEach(parentDSData.schema.fields, obj => {
-            if (findIndex(dp.columns, ['columnName', obj.columnName]) === -1) {
+            if (!some(dp.columns, ['columnName', obj.columnName])) {
               dp.columns.push(obj);
             }
           });
