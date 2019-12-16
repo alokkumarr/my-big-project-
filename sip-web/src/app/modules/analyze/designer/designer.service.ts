@@ -283,9 +283,12 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
+      }
+      if (artifactColumn.area === 'data' && artifactColumn.type === 'string') {
+        artifactColumn.aggregate = 'count';
       }
     };
 
@@ -293,7 +296,8 @@ export class DesignerService {
       artifactColumn.groupInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
-    const canAcceptDataType = canAcceptNumberType;
+    const canAcceptDataType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInData = () => canAcceptDataType;
     const canAcceptRowType = canAcceptAnyType;
     const canAcceptInRow = maxAllowedDecorator(canAcceptRowType);
@@ -404,9 +408,9 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
       }
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
@@ -552,7 +556,8 @@ export class DesignerService {
       );
     };
 
-    const canAcceptMetricType = canAcceptNumberType;
+    const canAcceptMetricType = (column: ArtifactColumnChart) =>
+      canAcceptNumberType(column) || canAcceptStringType(column);
     const canAcceptInMetric = maxAllowedDecorator(
       canAcceptMetricType,
       metricRejectFn
@@ -590,9 +595,12 @@ export class DesignerService {
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
 
-        artifactColumn.dataField = DesignerService.dataFieldFor(<
-          ArtifactColumnDSL
-        >artifactColumn);
+        artifactColumn.dataField = DesignerService.dataFieldFor(
+          <ArtifactColumnDSL>artifactColumn
+        );
+      }
+      if (artifactColumn.area === 'y' && artifactColumn.type === 'string') {
+        artifactColumn.aggregate = 'count';
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
