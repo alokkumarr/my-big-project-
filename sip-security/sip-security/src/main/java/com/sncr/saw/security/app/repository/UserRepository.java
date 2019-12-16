@@ -72,7 +72,7 @@ public interface UserRepository {
 	DataSecurityKeys fetchDSKDetailByUserId(String userId);
     Long getCustomerSysid(String customerCode);
 
-    Long getSecurityGroupSysid(String dskGroup);
+    Long getSecurityGroupSysid(String dskGroup,Long customerSysId);
 
     Long getRoleSysId(String roleName,Long customerSysId);
 

@@ -99,7 +99,7 @@ public class SecurityService {
     String securityGroupName = userDetails.getSecurityGroupName();
     Long groupSysId = null;
     if (securityGroupName != null) {
-      groupSysId = userRepository.getSecurityGroupSysid(securityGroupName);
+      groupSysId = userRepository.getSecurityGroupSysid(securityGroupName,customerSysId);
       if (groupSysId == null) {
         userDetailsResponse.setValid(false);
         userDetailsResponse.setValidityMessage(

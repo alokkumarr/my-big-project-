@@ -3200,15 +3200,18 @@ public class UserRepositoryImpl implements UserRepository {
 
 
   @Override
-  public Long getSecurityGroupSysid(String dskGroup) {
-      String sql = "select S.SEC_GROUP_SYS_ID  from SEC_GROUP S where S.SEC_GROUP_NAME =?";
+  public Long getSecurityGroupSysid(String dskGroup,Long customerSysid) {
+      String sql = "select S.SEC_GROUP_SYS_ID  from SEC_GROUP S where S.SEC_GROUP_NAME =? AND S.CUSTOMER_SYS_ID=?";
       Long secGroupSysId = null;
       try {
-          secGroupSysId =
-              jdbcTemplate.query(
-                  sql,
-                  preparedStatement -> preparedStatement.setString(1, dskGroup),
-                  new LongExtractor("SEC_GROUP_SYS_ID"));
+      secGroupSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, dskGroup);
+                preparedStatement.setLong(2, customerSysid);
+              },
+              new LongExtractor("SEC_GROUP_SYS_ID"));
       } catch (Exception e) {
           logger.error("Exception encountered while ", e);
       }
