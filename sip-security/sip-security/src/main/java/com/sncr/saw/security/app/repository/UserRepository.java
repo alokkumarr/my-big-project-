@@ -74,7 +74,7 @@ public interface UserRepository {
 
     Long getSecurityGroupSysid(String dskGroup);
 
-    Long getRoleSysId(String roleName);
+    Long getRoleSysId(String roleName,Long customerSysId);
 
     UserDetails getUser(String masterLoginId, Long customerSysId);
 

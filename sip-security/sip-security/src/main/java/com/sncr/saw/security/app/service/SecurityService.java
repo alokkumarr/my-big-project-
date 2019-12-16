@@ -108,7 +108,7 @@ public class SecurityService {
         return userDetailsResponse;
       }
     }
-    Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName());
+    Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName(),customerSysId);
     if (roleSysId == null) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(

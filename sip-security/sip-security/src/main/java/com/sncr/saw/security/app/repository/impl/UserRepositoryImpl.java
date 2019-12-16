@@ -3217,15 +3217,18 @@ public class UserRepositoryImpl implements UserRepository {
 
 
   @Override
-  public Long getRoleSysId(String roleName) {
-      String sql = "select R.ROLE_SYS_ID from ROLES R where R.ROLE_NAME =?";
+  public Long getRoleSysId(String roleName,Long customerSysid) {
+      String sql = "select R.ROLE_SYS_ID from ROLES R where R.ROLE_NAME =? AND R.CUSTOMER_SYS_ID=?";
       Long roleSysId = null;
       try {
-          roleSysId =
-              jdbcTemplate.query(
-                  sql,
-                  preparedStatement -> preparedStatement.setString(1, roleName),
-                  new LongExtractor("ROLE_SYS_ID"));
+      roleSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, roleName);
+                preparedStatement.setLong(2, customerSysid);
+              },
+              new LongExtractor("ROLE_SYS_ID"));
       } catch (Exception e) {
           logger.error("Exception encountered while ", e);
       }
@@ -3319,7 +3322,7 @@ public class UserRepositoryImpl implements UserRepository {
     String sql =
         "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME,"
             + " U.LAST_NAME, U.ACTIVE_STATUS_IND ,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME,C.CUSTOMER_CODE FROM USERS U  left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID "
-            + "inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID WHERE U.CUSTOMER_SYS_ID=?";
+            + "inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.CUSTOMER_SYS_ID=?";
     try {
       userDetailsList =
           jdbcTemplate.query(
