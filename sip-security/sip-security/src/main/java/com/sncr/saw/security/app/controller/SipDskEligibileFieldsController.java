@@ -1,19 +1,21 @@
 package com.sncr.saw.security.app.controller;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.app.model.DskField;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.service.DskEligibleFieldService;
 import com.sncr.saw.security.common.bean.Valid;
-import com.sncr.saw.security.common.util.JWTUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +50,7 @@ public class SipDskEligibileFieldsController {
   public Valid addDskEligibleFields(@RequestBody DskEligibleFields dskEligibleFields,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     return dskEligibleFieldService
-        .AddDskEligibleFields(dskEligibleFields, request, response);
+        .addDskEligibleFields(dskEligibleFields, request, response);
   }
 
   @ApiOperation(
@@ -68,4 +70,19 @@ public class SipDskEligibileFieldsController {
         .deleteDskEligibleFields(semanticId, request, response);
   }
 
+    @ApiOperation(
+        value = " Update DSK Eligible Fields ",
+        nickname = "UpdateDskFields",
+        notes = "Admin can only use this API to update DSK Eligible Fields",
+        response = Valid.class)
+    @RequestMapping(
+        value = "/fields/{semanticId}",
+        method = RequestMethod.PUT)
+    @ResponseBody
+    public Valid updateDskEligibleFields(HttpServletRequest request, HttpServletResponse response,
+        @PathVariable(name = "semanticId") String semanticId,
+        @RequestBody List<DskField> dskEligibleFields) throws IOException {
+        return dskEligibleFieldService
+            .updateDskEligibleFields(request, response, semanticId, dskEligibleFields);
+    }
 }

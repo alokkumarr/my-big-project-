@@ -1,8 +1,10 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.app.model.DskField;
 import com.sncr.saw.security.app.repository.DskEligibleFieldsRepository;
 import com.sncr.saw.security.common.bean.Valid;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,52 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
     );
     return valid;
   }
+
+    public Valid updateDskFields(Long customerSysId, Long productId,
+        String semanticId, List<DskField> dskFields)
+    {
+        Valid valid;
+        valid = deleteDskEligibleFields(customerSysId, productId, semanticId);
+
+        if (valid.getValid() == true) {
+            String insertDsk = "INSERT INTO DSK_ELIGIBLE_FIELDS "
+                + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
+                + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_DATE , CREATED_BY,"
+                + " MODIFIED_DATE, MODIFIED_BY)"
+                + " VALUES (?,?,?,?,?,?,sysdate(),?, sysdate(), ?)";
+
+            dskFields.forEach(
+                dskField -> {
+                    try {
+                        jdbcTemplate.update(
+                            insertDsk,
+                            ps -> {
+                                ps.setLong(1, customerSysId);
+                                ps.setLong(2, productId);
+                                ps.setString(3, semanticId);
+                                ps.setString(4, dskField.getColumnName());
+                                ps.setString(5, dskField.getDisplayName());
+                                ps.setInt(6, ACTIVE_STATUS);
+                                //TODO: Change default user to valid user
+                                ps.setString(7, "default user");
+                                ps.setString(8, "default user");
+                            });
+                        valid.setValid(Boolean.TRUE);
+                        valid.setValidityMessage("Success");
+                    } catch (Exception e) {
+                        logger.error("Exception encountered while update DSK " + e.getMessage(), null,
+                            e);
+                        valid.setValid(Boolean.FALSE);
+                        valid.setValidityMessage(e.getMessage());
+                    }
+                }
+            );
+            return valid;
+        }
+
+
+        return valid;
+    }
 
   @Override
   public Valid deleteDskEligibleFields(Long custId, Long prodId, String semanticId) {

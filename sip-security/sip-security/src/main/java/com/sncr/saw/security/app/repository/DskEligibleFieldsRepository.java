@@ -1,7 +1,9 @@
 package com.sncr.saw.security.app.repository;
 
     import com.sncr.saw.security.app.model.DskEligibleFields;
+    import com.sncr.saw.security.app.model.DskField;
     import com.sncr.saw.security.common.bean.Valid;
+    import java.util.List;
     import org.springframework.stereotype.Service;
 
 public interface DskEligibleFieldsRepository {
@@ -10,4 +12,5 @@ public interface DskEligibleFieldsRepository {
 
   Valid deleteDskEligibleFields(Long custId, Long prodId, String semanticId);
 
+  Valid updateDskFields(Long customerSysId, Long productId, String semanticId, List<DskField> dskFields);
 }

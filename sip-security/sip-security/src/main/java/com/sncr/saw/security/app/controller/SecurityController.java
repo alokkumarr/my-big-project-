@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.DskField;
 import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
@@ -90,6 +91,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sun.misc.Request;
 
 /**
  * @author gsan0003
@@ -1066,7 +1068,7 @@ public class SecurityController {
     }
 
     @RequestMapping ( value = "/auth/admin/security-groups/dsk-eligible-fields", method = RequestMethod.GET)
-    public DskFieldsInfo getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
+    public Object getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
         Ticket ticket = SipCommonUtils.getTicket(request);
 
         String customerSysId = ticket.getCustID();
@@ -1078,7 +1080,7 @@ public class SecurityController {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
-            return null;
+            return valid;
         }
 
         DskFieldsInfo dskEligibleFields = dataSecurityKeyRepository

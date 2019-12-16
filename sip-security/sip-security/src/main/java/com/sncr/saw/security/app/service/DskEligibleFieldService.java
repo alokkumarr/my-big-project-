@@ -1,11 +1,16 @@
 package com.sncr.saw.security.app.service;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.app.model.DskField;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DskEligibleFieldsRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.util.JWTUtils;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -20,16 +25,15 @@ public class DskEligibleFieldService {
 
   private static final Logger logger = LoggerFactory.getLogger(DskEligibleFieldService.class);
 
-  @Autowired
-  private DskEligibleFieldsRepository dskEligibleFieldsRepository;
+  @Autowired private DskEligibleFieldsRepository dskEligibleFieldsRepository;
 
-  @Autowired
-  NSSOProperties nssoProperties;
+  @Autowired NSSOProperties nssoProperties;
 
   private final String AdminRole = "ADMIN";
 
-  public Valid AddDskEligibleFields(DskEligibleFields dskEligibleFields, HttpServletRequest request,
-      HttpServletResponse response) throws IOException {
+  public Valid addDskEligibleFields(
+      DskEligibleFields dskEligibleFields, HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     Valid valid = new Valid();
     String jwtToken = JWTUtils.getToken(request);
     String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nssoProperties.getJwtSecretKey());
@@ -75,8 +79,8 @@ public class DskEligibleFieldService {
     return dskEligibleFieldsRepository.createDskEligibleFields(dskEligibleFields);
   }
 
-  public Valid deleteDskEligibleFields(String semanticId, HttpServletRequest request,
-      HttpServletResponse response) {
+  public Valid deleteDskEligibleFields(
+      String semanticId, HttpServletRequest request, HttpServletResponse response) {
     Valid valid = new Valid();
     String jwtToken = JWTUtils.getToken(request);
     String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nssoProperties.getJwtSecretKey());
@@ -91,5 +95,19 @@ public class DskEligibleFieldService {
       return valid;
     }
     return dskEligibleFieldsRepository.deleteDskEligibleFields(custId, prodId, semanticId);
+  }
+
+  public Valid updateDskEligibleFields(HttpServletRequest request, HttpServletResponse response,
+      String semanticId, List<DskField> dskFields)
+      throws IOException {
+    Valid valid = new Valid();
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    Long customerSysId = Long.valueOf(ticket.getCustID());
+    Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
+    RoleType roleType = ticket.getRoleType();
+
+    return dskEligibleFieldsRepository.updateDskFields(customerSysId,
+        defaultProdID, semanticId, dskFields);
   }
 }
