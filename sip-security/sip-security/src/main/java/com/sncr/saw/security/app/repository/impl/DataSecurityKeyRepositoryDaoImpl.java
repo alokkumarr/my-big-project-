@@ -710,7 +710,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     = projectDskData.getOrDefault(semanticId, new ArrayList<>());
 
                 DskField dskField = new DskField();
-                dskField.setFieldName(fieldName);
+                dskField.setColumnName(fieldName);
                 dskField.setDisplayName(displayName);
 
                 semanticDskFields.add(dskField);

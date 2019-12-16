@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DskField {
-  private String fieldName;
+  private String columnName;
   private String displayName;
 
-  public String getFieldName() {
-    return fieldName;
+  public String getColumnName() {
+    return columnName;
   }
 
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
+  public void setColumnName(String columnName) {
+    this.columnName = columnName;
   }
 
   public String getDisplayName() {

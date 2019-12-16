@@ -1,11 +1,12 @@
 package com.sncr.saw.security.app.repository;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
+import com.sncr.saw.security.common.bean.Valid;
 import org.springframework.stereotype.Service;
 
 public interface DskEligibleFieldsRepository {
 
-  DskEligibleFields createDskEligibleFields(DskEligibleFields dskEligibleFields);
+  Valid createDskEligibleFields(DskEligibleFields dskEligibleFields);
 
 
 }
