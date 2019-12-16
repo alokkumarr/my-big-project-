@@ -1,5 +1,7 @@
 package com.synchronoss.saw.export.generate;
 
+import static com.synchronoss.saw.export.model.DispatchMethod.DISPATCH_TO_MAIL;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
@@ -8,8 +10,8 @@ import com.synchronoss.saw.export.S3Config;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
-import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataResponse;
+import com.synchronoss.saw.export.model.DispatchMethod;
 import com.synchronoss.saw.export.model.DispatchType;
 import com.synchronoss.saw.export.model.S3.S3Customer;
 import com.synchronoss.saw.export.model.S3.S3Details;
@@ -24,23 +26,19 @@ import com.synchronoss.sip.utils.RestUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -62,9 +60,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -226,7 +221,6 @@ public class ExportServiceImpl implements ExportService {
           analysisType,
           exportBean,
           recipients,
-          requestEntity,
           s3,
           ftp,
           zip,
@@ -298,12 +292,11 @@ public class ExportServiceImpl implements ExportService {
       Long recordsToSkip,
       Long recordsTolimit) {
     List<Object> data = entity.getBody().getData();
-
+    logger.debug("data size size to stream to csv report:{}", data.size());
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;
     }
-
     data.stream()
         .skip(recordsToSkip)
         .limit(recordsTolimit)
@@ -369,7 +362,7 @@ public class ExportServiceImpl implements ExportService {
                                 })
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
-                    logger.debug("Line Item for report: " + line.toString());
+                    logger.trace("Line Item for report: " + line.toString());
                   }
                 }
               } catch (Exception e) {
@@ -427,16 +420,14 @@ public class ExportServiceImpl implements ExportService {
         rowCount = flag ? rowCount : rowCount + batchSize;
         xlsxExporter.buildXlsxSheet(
             sipQuery, exportBean, workBook, sheet, data, batchSize, rowCount);
-        logger.info("count row " + rowCount);
+        logger.debug("count row " + rowCount);
 
         // recalculate the total number of batch size if available record less than export size.
         totalRowsCount = response.getTotalRows();
         if (totalRowsCount < totalExportSize && flag) {
           totalNumberOfBatch = totalRowsCount / batchSize;
-          flag = false;
-        } else {
-          flag = false;
         }
+        flag = false;
       }
 
       // final rows to process
@@ -446,18 +437,20 @@ public class ExportServiceImpl implements ExportService {
       } else {
         leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
       }
-
-      if (leftOutRows > 0 && totalNumberOfBatch > 0) {
+      logger.debug("left out rows = {}", leftOutRows);
+      if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
         entity =
             getExecutionData(
                 executionId, restTemplate, analysisType, pageNo, batchSize, DataResponse.class);
         DataResponse response = entity.getBody();
         List<Object> data = response.getData();
+        List<Object> leftOutRowsToProcess =
+            data.stream().limit(leftOutRows).collect(Collectors.toList());
 
         // point the cursor in excel file
         rowCount = flag ? rowCount : rowCount + batchSize;
         xlsxExporter.buildXlsxSheet(
-            sipQuery, exportBean, workBook, sheet, data, leftOutRows, rowCount);
+            sipQuery, exportBean, workBook, sheet, leftOutRowsToProcess, leftOutRows, rowCount);
       }
       workBook.write(stream);
     } catch (IOException ex) {
@@ -467,322 +460,6 @@ public class ExportServiceImpl implements ExportService {
       stream.close();
     }
     return true;
-  }
-
-  @Override
-  @Async
-  public void pivotToBeDispatchedAsync(
-      String executionId, RequestEntity request, String analysisId) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-    AsyncRestTemplate asyncRestTemplate = restUtil.asyncRestTemplate();
-    Object dispatchBean = request.getBody();
-    String recipients = null;
-    String ftp = null;
-    String s3 = null;
-    String jobGroup;
-    boolean isZipRequired = false;
-    ExportBean exportBean = new ExportBean();
-    final SipQuery sipQuery = getSipQuery(analysisId);
-
-    // check beforehand if the request is not null
-    if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
-      Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
-      Object ftpObj = ((LinkedHashMap) dispatchBean).get("ftp");
-      Object s3Obj = ((LinkedHashMap) dispatchBean).get("s3");
-      if (((LinkedHashMap) dispatchBean).get("zip") != null) {
-        isZipRequired = (Boolean) ((LinkedHashMap) dispatchBean).get("zip");
-      }
-
-      if (recipientsObj != null) {
-        recipients = String.valueOf(recipientsObj);
-      }
-
-      if (ftpObj != null) {
-        ftp = String.valueOf(ftpObj);
-      }
-
-      if (s3Obj != null) {
-        s3 = String.valueOf(s3Obj);
-      }
-      jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
-
-      logger.debug("recipients: " + recipients);
-      logger.debug("ftp: " + ftp);
-      logger.debug("s3: " + s3);
-
-      if ((recipients != null && !recipients.equals(""))
-          || ((s3 != null && s3 != ""))
-          || ((ftp != null && ftp != ""))) {
-
-        String url =
-            storageProxyUrl
-                + "/internal/proxy/storage/"
-                + executionId
-                + "/executions/data";
-
-        ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
-            asyncRestTemplate.getForEntity(url, JsonNode.class);
-
-        logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
-        String s3bucket = s3;
-        String finalRecipients = recipients;
-        String finalFtp = ftp;
-        String finalJobGroup = jobGroup;
-        boolean isZip = isZipRequired;
-        responseStringFuture.addCallback(
-            new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
-              @Override
-              public void onSuccess(ResponseEntity<JsonNode> entity) {
-                JsonNode jsonDataNode = entity.getBody().get("data");
-                IFileExporter iFileExporter = new XlsxExporter();
-
-                // build export bean to process file
-                ExportUtils.buildExportBean(exportBean, dispatchBean);
-                String dir = UUID.randomUUID().toString();
-                String fileName =
-                    ExportUtils.prepareFileName(
-                        String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
-                        exportBean.getFileType());
-                exportBean.setFileName(
-                    publishedPath + File.separator + dir + File.separator + fileName);
-
-                try {
-                  // create a directory with unique name in published location to avoid file
-                  // conflict for dispatch.
-                  File file = new File(exportBean.getFileName());
-                  file.getParentFile().mkdir();
-
-                  List<Field> fieldList = getPivotFields(sipQuery);
-                  ElasticSearchAggregationParser responseParser =
-                      new ElasticSearchAggregationParser(fieldList);
-                  responseParser.setColumnDataType(exportBean);
-
-                  List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-                  logger.trace("Parse data for workbook writing : " + dataObj);
-                  logger.trace("Data size = " + dataObj.size());
-
-                  Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-                  logger.debug("workbook created with DSL : " + workbook);
-                  CreatePivotTable createPivotTable = new CreatePivotTable();
-                  createPivotTable.createPivot(workbook, file, fieldList);
-                  if (finalRecipients != null && !finalRecipients.equals("")) {
-                    logger.debug(
-                        "In Email dispatcher: [Success] Response :" + entity.getStatusCode());
-                    dispatchMailForPivot(exportBean, finalRecipients, entity, isZip);
-                  }
-                } catch (IOException e) {
-                  logger.error(
-                      "Exception occurred while dispatching pivot :"
-                          + this.getClass().getName()
-                          + "  method dataToBeDispatchedAsync()");
-                }
-
-                logger.debug("S3 details = " + s3bucket);
-                if (s3bucket != null && s3bucket != "") {
-                  logger.debug("S3 details set. Dispatching to S3");
-                  s3DispatcherPivot(s3bucket, finalJobGroup, exportBean, isZip);
-                }
-                logger.debug("Deleting exported file11.");
-                ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-                if (isZip) {
-                  File file = new File(exportBean.getFileName());
-                  String zipFileName = file.getAbsolutePath().concat(".zip");
-                  ExportUtils.deleteDispatchedFile(zipFileName, serviceUtils);
-                }
-                logger.debug("ftp details = " + finalFtp);
-                if (finalFtp != null && finalFtp != "") {
-                  logger.debug("FTP details set. Dispatching to FTP");
-                  ftpDispatcherPivot(
-                      executionId,
-                      finalFtp,
-                      asyncRestTemplate,
-                      dispatchBean,
-                      finalJobGroup,
-                      sipQuery,
-                      isZip);
-                }
-              }
-
-              @Override
-              public void onFailure(Throwable t) {
-                logger.error("[Failed] Getting string response:" + t);
-              }
-            });
-      }
-    }
-  }
-
-  public void ftpDispatcherPivot(
-      String executionId,
-      String ftp,
-      AsyncRestTemplate asyncRestTemplate,
-      Object dispatchBean,
-      String jobGroup,
-      SipQuery sipQuery,
-      boolean isZip) {
-    if (ftp != null && !ftp.equals("")) {
-      String url =
-          storageProxyUrl
-              + "/internal/proxy/storage/"
-              + executionId
-              + "/executions/data?page=1&pageSize="
-              + ftpExportSize;
-      ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
-          asyncRestTemplate.getForEntity(url, JsonNode.class);
-
-      logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
-      String finalFtp = ftp;
-      String finalJobGroup = jobGroup;
-      responseStringFuture.addCallback(
-          new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
-            @Override
-            public void onSuccess(ResponseEntity<JsonNode> entity) {
-              JsonNode jsonNode = entity.getBody().get("data");
-              logger.debug("In FTP dispatcher: [Success] Response :" + entity.getStatusCode());
-
-              IFileExporter iFileExporter = new XlsxExporter();
-              ExportBean exportBean = new ExportBean();
-
-              // build export bean to process file
-              ExportUtils.buildExportBean(exportBean, dispatchBean);
-              String dir = UUID.randomUUID().toString();
-              String excelFileName =
-                  ExportUtils.prepareFileName(
-                      String.valueOf(((LinkedHashMap) dispatchBean).get("name")),
-                      exportBean.getFileType());
-              exportBean.setFileName(
-                  publishedPath + File.separator + dir + File.separator + excelFileName);
-
-              File cfile = new File(exportBean.getFileName());
-              String fileName = cfile.getAbsolutePath();
-              try {
-                // create a directory with unique name in published location to avoid file conflict
-                // for dispatch.
-                File file = new File(exportBean.getFileName());
-                file.getParentFile().mkdir();
-
-                List<Field> fieldList = getPivotFields(sipQuery);
-                ElasticSearchAggregationParser responseParser =
-                    new ElasticSearchAggregationParser(fieldList);
-                responseParser.setColumnDataType(exportBean);
-
-                List<Object> dataObj = responseParser.parsePivotData(jsonNode);
-                logger.trace("Parse data for workbook writing : " + dataObj);
-                logger.trace("Data size = " + dataObj.size());
-
-                Workbook workbook = iFileExporter.getWorkBook(exportBean, dataObj);
-                logger.debug("workbook successfully with DSL" + workbook);
-                CreatePivotTable createPivotTable = new CreatePivotTable();
-                createPivotTable.createPivot(workbook, file, fieldList);
-
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
-                LocalDateTime now = LocalDateTime.now();
-
-                try {
-
-                  if (isZip) {
-                    fileName = fileName.concat(".zip");
-                    FileOutputStream fos = new FileOutputStream(fileName);
-                    ZipOutputStream zos = new ZipOutputStream(fos);
-                    zos.putNextEntry(new ZipEntry(cfile.getName()));
-                    byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
-                    zos.write(bytes, 0, bytes.length);
-                    zos.closeEntry();
-                    zos.close();
-                  }
-
-                  logger.debug("ftp servers: " + finalFtp);
-
-                  for (String tempAlias : finalFtp.split(",")) {
-                    ObjectMapper jsonMapper = new ObjectMapper();
-                    try {
-                      FtpCustomer obj =
-                          jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
-                      for (FTPDetails alias : obj.getFtpList()) {
-                        logger.debug("Processing Host: " + alias.getHost());
-                        logger.debug("jobGroup: " + alias.getCustomerName());
-                        logger.debug("Alias: " + tempAlias.equals(alias.getAlias()));
-
-                        if (alias.getCustomerName().equals(finalJobGroup)
-                            && tempAlias.equals(alias.getAlias())) {
-                          logger.debug("Inside If");
-
-                          String destinationFileName =
-                              file.getName().substring(0, cfile.getName().lastIndexOf(".") + 1)
-                                  + dtf.format(now).concat(".").concat(exportBean.getFileType());
-                          if (isZip) {
-                            destinationFileName = destinationFileName.concat(".zip");
-                          }
-
-                          serviceUtils.uploadToFtp(
-                              alias.getHost(),
-                              alias.getPort(),
-                              alias.getUsername(),
-                              alias.getPassword(),
-                              fileName,
-                              alias.getLocation(),
-                              destinationFileName,
-                              alias.getType());
-                          logger.debug(
-                              "Uploaded to ftp alias: "
-                                  + alias.getCustomerName()
-                                  + ":"
-                                  + alias.getHost());
-                        }
-                      }
-                    } catch (IOException e) {
-                      logger.error(e.getMessage());
-                    } catch (Exception e) {
-                      logger.error(e.getMessage());
-                    }
-                  }
-                } catch (FileNotFoundException e) {
-                  logger.error("Zip file error FileNotFound: " + e.getMessage());
-                } catch (IOException e) {
-                  logger.error("Zip file error IOException: " + e.getMessage());
-                }
-
-                logger.debug("Removing the file from published location");
-
-                ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-                ExportUtils.deleteDispatchedFile(fileName, serviceUtils);
-              } catch (IOException e) {
-                logger.error(
-                    "Exception occurred while dispatching pivot :"
-                        + this.getClass().getName()
-                        + "  method dataToBeDispatchedAsync()");
-              }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              logger.error("[Failed] Getting string response:" + t);
-            }
-          });
-    }
-  }
-
-  public void s3DispatcherPivot(String s3, String jobGroup, ExportBean exportBean, boolean isZip) {
-    logger.info("Inside S3 dispatch Pivot");
-    String finalS3 = s3;
-    String finalJobGroup = jobGroup;
-    File file = new File(exportBean.getFileName());
-    if (isZip) {
-      logger.debug("S3 - zip = true!!");
-      try {
-        String zipFileName = ExportUtils.buildZipFile(exportBean, file);
-        s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName));
-        logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-        logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
-      } catch (Exception e) {
-        logger.error("Error writing to zip!!");
-      }
-    } else {
-      s3DispatchExecutor(finalS3, finalJobGroup, file);
-      logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-    }
   }
 
   @Override
@@ -850,7 +527,7 @@ public class ExportServiceImpl implements ExportService {
    * @param userFileName Name of the report file
    * @return True if the mail dispatched successfully else false
    */
-  public boolean dispatchMail(
+  public boolean dispatchToMail(
       String executionId,
       String analysisType,
       ExportBean exportBean,
@@ -858,7 +535,7 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       RestTemplate restTemplate,
       String userFileName) {
-    logger.debug("Inside dispatch mail for file type :{}", exportBean.getFileType());
+    logger.debug("Inside dispatch mail for fileType :{}", exportBean.getFileType());
     if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
       try {
         prepareFileWithSize(executionId, analysisType, emailExportSize, restTemplate, exportBean);
@@ -919,7 +596,7 @@ public class ExportServiceImpl implements ExportService {
     return true;
   }
 
-  public void dispatchFileToS3(
+  public void dispatchToS3(
       String executionId,
       String analysisType,
       ExportBean exportBean,
@@ -1019,7 +696,6 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean exportBean,
       String recipients,
-      HttpEntity<?> requestEntity,
       String s3,
       String ftp,
       boolean zip,
@@ -1027,45 +703,68 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate) {
     String userFileName = exportBean.getFileName();
     // create a directory with unique name in published location.
-    final String dispatchFileName = filePath(userFileName);
+    final String dispatchFileName = filePath(null, userFileName);
     exportBean.setFileName(dispatchFileName);
     exportBean.setSipQuery(getSipQuery(analysisId));
+    Map<DispatchMethod, Long> sizeMap = new HashMap<>();
+
     if (recipients != null && !recipients.equals("")) {
-      dispatchMail(
-          executionId,
-          analysisType,
-          exportBean,
-          recipients,
-          zip,
-          restTemplate,
-          userFileName);
+      sizeMap.put(DISPATCH_TO_MAIL, Long.valueOf(emailExportSize));
     }
     if (ftp != null && ftp != "") {
-      logger.debug("ftp dispatch started : ");
-      dispatchToFtp(
-          executionId,
-          analysisType,
-          exportBean,
-          ftp,
-          zip,
-          jobGroup,
-          requestEntity,
-          restTemplate,
-          userFileName);
+      sizeMap.put(DispatchMethod.DISPATCH_TO_FTP, Long.valueOf(ftpExportSize));
     }
 
     if (s3 != null && s3 != "") {
-      logger.debug("S3 details set. Dispatching to S3");
-      dispatchFileToS3(
-          executionId,
-          analysisType,
-          exportBean,
-          s3,
-          zip,
-          jobGroup,
-          restTemplate,
-          userFileName);
+      sizeMap.put(DispatchMethod.DISPATCH_TO_S3, Long.valueOf(s3ExportSize));
     }
+
+    /* Here we are maintaing the methods in a map and sorting the the map based on the dispatch limit because
+    * for csv format we are reusing the same file across all types of dispatch(mail,ftp,s3), so because of that while preparig
+    * the csv we should prepare lower size data first and we should append the data incrementally.*/
+    LinkedHashMap<DispatchMethod, Long> finalSortedMap = new LinkedHashMap<>();
+
+    sizeMap.entrySet().stream()
+        .sorted(Map.Entry.comparingByValue())
+        .forEachOrdered(x -> finalSortedMap.put(x.getKey(), x.getValue()));
+    sizeMap = null;
+    logger.debug("sorted map:{}", finalSortedMap);
+    finalSortedMap.forEach(
+        (key, vaue) -> {
+          switch (key) {
+            case DISPATCH_TO_MAIL:
+              dispatchToMail(
+                  executionId,
+                  analysisType,
+                  exportBean,
+                  recipients,
+                  zip,
+                  restTemplate,
+                  userFileName);
+              break;
+            case DISPATCH_TO_FTP:
+              dispatchToFtp(
+                  executionId,
+                  analysisType,
+                  exportBean,
+                  ftp,
+                  zip,
+                  jobGroup,
+                  restTemplate,
+                  userFileName);
+            case DISPATCH_TO_S3:
+              dispatchToS3(
+                  executionId,
+                  analysisType,
+                  exportBean,
+                  ftp,
+                  zip,
+                  jobGroup,
+                  restTemplate,
+                  userFileName);
+          }
+        });
+
     logger.info("Deleting exported file.");
     try {
       logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
@@ -1088,7 +787,7 @@ public class ExportServiceImpl implements ExportService {
     logger.debug("lastExportLimit = {}",lastExportLimit);
     Integer currentPage=exportBean.getPageNo();
     currentPage = currentPage==null?1:currentPage;
-    logger.debug("currentPage = " + currentPage);
+    logger.debug("currentPage = {}", currentPage);
     if (!(lastExportedSize != null
         && lastExportLimit != null
         && (lastExportedSize < lastExportLimit))) {
@@ -1110,7 +809,7 @@ public class ExportServiceImpl implements ExportService {
             getExecutionData(
                 executionId, restTemplate, analysisType, page, limitPerPage, DataResponse.class);
         totalRowCount = entity.getBody().getTotalRows();
-        logger.debug("Response size = " + entity.getBody().getData());
+        logger.trace("Response data = " + entity.getBody().getData());
         logger.debug("Total row count = " + totalRowCount);
         if (totalRowCount <= Double.parseDouble(exportSize) && flag) {
           noOfPages = Math.ceil(totalRowCount / limitPerPage);
@@ -1125,27 +824,25 @@ public class ExportServiceImpl implements ExportService {
       long leftOutRows = 0;
       if (totalRowCount!=0 && totalRowCount <= Double.parseDouble(exportSize)) {
         leftOutRows = totalRowCount - (currentPage - 1) * limitPerPage;
-        logger.info("left out rows1 " + "::" + leftOutRows);
       } else {
         leftOutRows = Long.parseLong(exportSize) - (currentPage - 1) * limitPerPage;
-        logger.info("left out rows2 " + "::" + leftOutRows);
       }
-      logger.info("left out rows " + "::" + leftOutRows);
+      logger.debug("left out rows " + "::" + leftOutRows);
       page += 1;
       if (leftOutRows > 0) {
           recordsTolimit=leftOutRows;
         entity =
             getExecutionData(
                 executionId, restTemplate, analysisType, page, limitPerPage, DataResponse.class);
-        logger.debug("Execution response = " + entity);
         streamResponseToFile(exportBean, entity, recordsToSkip, recordsTolimit);
       }
       Long lastExportSize = (currentPage - 1) * limitPerPage + leftOutRows;
-      logger.debug("last excuted size = " + lastExportSize);
+      logger.debug("setting  lastExportSize  :{}" , lastExportSize);
       exportBean.setLastExportedSize(lastExportSize);
       logger.debug("File created");
     }
-    exportBean.setLastExportLimit(Long.valueOf(exportSize));
+      logger.debug("setting  lastExportLimit :{}" , exportSize);
+      exportBean.setLastExportLimit(Long.valueOf(exportSize));
   }
 
   /**
@@ -1157,7 +854,6 @@ public class ExportServiceImpl implements ExportService {
    * @param finalFtp
    * @param zip
    * @param finalJobGroup
-   * @param requestEntity
    * @param restTemplate
    * @param userFileName
    */
@@ -1168,7 +864,6 @@ public class ExportServiceImpl implements ExportService {
       String finalFtp,
       boolean zip,
       String finalJobGroup,
-      HttpEntity<?> requestEntity,
       RestTemplate restTemplate,
       String userFileName) {
     if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
@@ -1305,36 +1000,6 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
-  public void dispatchMailForPivot(
-      ExportBean bean, String recipients, ResponseEntity<JsonNode> entity, boolean isZip) {
-    ExportBean exportBean = bean;
-    MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-    try {
-      File file = new File(exportBean.getFileName());
-      if (isZip) {
-        logger.debug("Pivot - zip = true!!");
-
-        String zipFileName = ExportUtils.buildZipFile(exportBean, file);
-        MailSender.sendMail(
-            recipients,
-            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-            serviceUtils.prepareMailBody(exportBean, mailBody),
-            zipFileName);
-        logger.info("Email sent successfully");
-      } else {
-        MailSender.sendMail(
-            recipients,
-            exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-            serviceUtils.prepareMailBody(exportBean, mailBody),
-            exportBean.getFileName());
-        logger.info("Email sent successfully");
-      }
-
-    } catch (Exception e) {
-      logger.error("Error sending mail" + e.getMessage() + ":::" + e.getStackTrace());
-    }
-  }
-
   /**
    * This method to organize the pivot table structure
    *
@@ -1363,14 +1028,6 @@ public class ExportServiceImpl implements ExportService {
       }
     }
     return fieldList;
-  }
-
-  private String filePath(String fileName) {
-    return publishedPath
-        + File.separator
-        + ExportUtils.generateRandomStringDir()
-        + File.separator
-        + fileName;
   }
 
   private String filePath(String type, String fileName) {
@@ -1447,7 +1104,6 @@ public class ExportServiceImpl implements ExportService {
             isZipRequired,
             executionId,
             restTemplate,
-            dispatchBean,
             analysisType,
             userFileName);
       }
@@ -1458,7 +1114,6 @@ public class ExportServiceImpl implements ExportService {
             isZipRequired,
             executionId,
             restTemplate,
-            dispatchBean,
             analysisType,
             userFileName,
             finalJobGroup,
@@ -1472,7 +1127,6 @@ public class ExportServiceImpl implements ExportService {
             isZipRequired,
             executionId,
             restTemplate,
-            dispatchBean,
             analysisType,
             userFileName,
             finalJobGroup,
@@ -1487,15 +1141,9 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       long totalExportSize,
       ExportBean exportBean,
-      RestTemplate restTemplate,
-      Object dispatchBean) {
+      RestTemplate restTemplate) {
     {
-      logger.info("sipquery" + sipQuery);
-      logger.info("executionId" + executionId);
-      logger.info("analysisType" + analysisType);
-      logger.info("totalExportSize" + totalExportSize);
-      logger.info("exportBean" + exportBean);
-      logger.info("restTemplate" + restTemplate);
+      logger.debug("exportBean" + exportBean);
 
       long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
       long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 01;
@@ -1505,17 +1153,12 @@ public class ExportServiceImpl implements ExportService {
       long pageNo, totalRowsCount = 0, rowCount = 1;
       XlsxExporter xlsxExporter = new XlsxExporter();
       Workbook workBook = new XSSFWorkbook();
-      logger.info("name of sheet" + exportBean.getReportName());
       String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
       XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
       List<Field> fieldList = getPivotFields(sipQuery);
       ElasticSearchAggregationParser responseParser = new ElasticSearchAggregationParser(fieldList);
       ResponseEntity<JsonNode> entity = null;
       responseParser.setColumnDataType(exportBean);
-      logger.info("workbook" + workBook);
-      logger.info("sheetName" + sheetName);
-      logger.info("sheet" + sheet);
-
       for (pageNo = 1; pageNo <= totalNumberOfBatch; pageNo++) {
 
         entity =
@@ -1544,8 +1187,8 @@ public class ExportServiceImpl implements ExportService {
       } else {
         leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
       }
-      logger.info("left our rows ={}", leftOutRows);
-      if (leftOutRows > 0 && totalNumberOfBatch > 0) {
+      logger.debug("left our rows ={}", leftOutRows);
+      if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
         entity =
             getExecutionData(
                 executionId, restTemplate, analysisType, pageNo, batchSize, JsonNode.class);
@@ -1553,6 +1196,7 @@ public class ExportServiceImpl implements ExportService {
         List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
         List<Object> leftOutRowsToProcess =
             dataObj.stream().limit(leftOutRows).collect(Collectors.toList());
+        logger.debug("rows to process:{}", leftOutRowsToProcess.size());
         rowCount = flag ? rowCount : rowCount + batchSize;
         xlsxExporter.addxlsxRows(exportBean, workBook, sheet, leftOutRowsToProcess, rowCount);
       }
@@ -1571,7 +1215,6 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String executionId,
       RestTemplate restTemplate,
-      Object dispatchBean,
       String analysisType,
       String userFileName) {
     exportBean.setFileName(filePath(DispatchType.MAIL.value(), userFileName));
@@ -1582,8 +1225,7 @@ public class ExportServiceImpl implements ExportService {
           analysisType,
           Long.valueOf(emailExportSize),
           exportBean,
-          restTemplate,
-          dispatchBean);
+          restTemplate);
       dispatchMail(exportBean, zip, recipients);
     } catch (Exception e) {
       logger.error("Exception occurred while dispatching Email for pivot:{}", e);
@@ -1597,7 +1239,6 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String executionId,
       RestTemplate restTemplate,
-      Object dispatchBean,
       String analysisType,
       String userFileName,
       String finalJobGroup,
@@ -1611,8 +1252,7 @@ public class ExportServiceImpl implements ExportService {
           analysisType,
           Long.valueOf(ftpExportSize),
           exportBean,
-          restTemplate,
-          dispatchBean);
+          restTemplate);
       createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
     } catch (Exception e) {
       logger.error("Exception ocurred while dispatching FTP for pivot:{}", e);
@@ -1627,7 +1267,6 @@ public class ExportServiceImpl implements ExportService {
       boolean zip,
       String executionId,
       RestTemplate restTemplate,
-      Object dispatchBean,
       String analysisType,
       String userFileName,
       String finalJobGroup,
@@ -1641,8 +1280,7 @@ public class ExportServiceImpl implements ExportService {
           analysisType,
           Long.valueOf(s3ExportSize),
           exportBean,
-          restTemplate,
-          dispatchBean);
+          restTemplate);
       dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
       ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
     } catch (Exception e) {
