@@ -7,6 +7,8 @@ import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.util.JWTUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,18 +37,35 @@ public class SipDskEligibileFieldsController {
   DskEligibleFieldService dskEligibleFieldService;
 
   @ApiOperation(
-      value = " Fetch Users API ",
-      nickname = "FetchUsers",
-      notes = "Admin can only use this API to fetch the users",
+      value = " Add DSK Eligible Fields ",
+      nickname = "AddDskFields",
+      notes = "Admin can only use this API to add DSK Eligible Fields",
       response = Valid.class)
   @RequestMapping(
       value = "/fields",
       method = RequestMethod.POST)
-  public Valid getUserList(@RequestBody DskEligibleFields dskEligibleFields,
-      HttpServletRequest request, HttpServletResponse response) {
+  @ResponseBody
+  public Valid addDskEligibleFields(@RequestBody DskEligibleFields dskEligibleFields,
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
     return dskEligibleFieldService
-        .AddDskEligibleFields(dskEligibleFields,request, response);
+        .AddDskEligibleFields(dskEligibleFields, request, response);
   }
 
+  @ApiOperation(
+      value = " Delete DSK Eligible Fields ",
+      nickname = "DeleteDskFields",
+      notes = "Admin can only use this API to add DSK Eligible Fields",
+      response = Valid.class)
+  @RequestMapping(
+      value = "/fields",
+      method = RequestMethod.DELETE)
+  @ResponseBody
+  public Valid deleteDskEligibleFields(
+      @ApiParam(value = "semantic id", required = true)
+      @RequestParam(name = "semanticId", required = true) String semanticId,
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
+    return dskEligibleFieldService
+        .deleteDskEligibleFields(semanticId, request, response);
+  }
 
 }
