@@ -81,4 +81,6 @@ public interface UserRepository {
     Valid addUserDetails(UserDetails userDetails, String masterLoginId);
 
     List<UserDetails> getUsersDetailList(Long customerId);
+
+     boolean getRoleStatus(Long roleId);
 }

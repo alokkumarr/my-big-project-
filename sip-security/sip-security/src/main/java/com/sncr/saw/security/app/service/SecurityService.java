@@ -116,6 +116,15 @@ public class SecurityService {
       logger.debug(String.format(ErrorMessages.notExistErrorMessage, "roleName"));
       return userDetailsResponse;
     }
+
+    boolean isRoleActive = userRepository.getRoleStatus(roleSysId);
+    if (!isRoleActive) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.roleInActiveMessage);
+      logger.debug(ErrorMessages.roleInActiveMessage);
+      return userDetailsResponse;
+    }
+
     if (StringUtils.isBlank(userDetails.getPassword())) {
       logger.debug("setting random password");
       userDetails.setPassword(generateRandomPassowrd());

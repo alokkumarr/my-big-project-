@@ -3349,5 +3349,17 @@ public class UserRepositoryImpl implements UserRepository {
     return userDetailsList;
   }
 
-
+  @Override
+  public boolean getRoleStatus(Long roleId) {
+    String sql = "select R.ACTIVE_STATUS_IND from ROLES R where R.ROLE_SYS_ID =?";
+    try {
+      int roleStatus = jdbcTemplate.queryForObject(sql, new Object[] {roleId}, Integer.class);
+      if (roleStatus == 1) {
+        return true;
+      }
+    } catch (Exception e) {
+      logger.error("Exception encountered while ", e);
+    }
+    return false;
+  }
 }

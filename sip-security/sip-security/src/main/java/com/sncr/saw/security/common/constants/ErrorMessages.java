@@ -11,4 +11,6 @@ public class ErrorMessages {
 
   public static final String unAuthorizedMessage="You are not authorized to perform this operation";
 
+  public static final String roleInActiveMessage = "User can't be created as role is in Inactive state";
+
 }
