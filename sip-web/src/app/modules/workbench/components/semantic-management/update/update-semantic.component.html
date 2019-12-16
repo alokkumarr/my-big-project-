@@ -87,7 +87,6 @@
               [rowAlternationEnabled]="true"
               [showColumnLines]="false"
               style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
-              (onCellPrepared)="cellPrepared($event)"
             >
               <dxo-editing mode="cell" [allowUpdating]="true"> </dxo-editing>
               <dxi-column
@@ -122,7 +121,7 @@
                 [width]="80"
                 caption="KPI Eligible"
                 dataField="kpiEligible"
-                dataType="boolean"
+                cellTemplate="booleanTemplate"
               ></dxi-column>
               <dxi-column
                 [width]="80"
@@ -141,6 +140,13 @@
                 [applyFilter]="auto"
               ></dxo-filter-row>
               <dxo-header-filter [visible]="false"></dxo-header-filter>
+
+              <div *dxTemplate="let cell of 'booleanTemplate'">
+                <dx-check-box
+                  [disabled]="shouldDisableCheckBox(cell.data)"
+                  [value]="cell.value"
+                ></dx-check-box>
+              </div>
             </dx-data-grid>
           </mat-tab>
         </mat-tab-group>

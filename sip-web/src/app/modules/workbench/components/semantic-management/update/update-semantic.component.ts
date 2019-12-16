@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import CheckBox from 'devextreme/ui/check_box';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
@@ -153,39 +152,25 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
      *
      * Added as a part of SIP-9373.
      */
+    const { columns } = this.selectedDPDetails.artifacts[0];
     const anyColSelected = some(
-      this.selectedDPDetails.artifacts[0].columns,
-      obj => {
-        return !DATE_TYPES.includes(obj.type) && obj.kpiEligible;
-      }
+      columns,
+      obj => !DATE_TYPES.includes(obj.type) && obj.kpiEligible
     );
 
-    const dateColAvailable = some(
-      this.selectedDPDetails.artifacts[0].columns,
-      obj => {
-        return DATE_TYPES.includes(obj.type);
-      }
+    const dateColAvailable = some(columns, obj =>
+      DATE_TYPES.includes(obj.type)
     );
 
     const dateAndKpiSelected = some(
-      this.selectedDPDetails.artifacts[0].columns,
-      obj => {
-        return DATE_TYPES.includes(obj.type) && obj.kpiEligible;
-      }
+      columns,
+      obj => DATE_TYPES.includes(obj.type) && obj.kpiEligible
     );
 
-    if (anyColSelected) {
-      if (dateColAvailable) {
-        if (dateAndKpiSelected) {
-          this.updateDatapod();
-        } else {
-          this.notify.warn(msg, title, {
-            hideDelay: 9000
-          });
-        }
-      } else {
-        this.updateDatapod();
-      }
+    if (anyColSelected && dateColAvailable && !dateAndKpiSelected) {
+      this.notify.warn(msg, title, {
+        hideDelay: 9000
+      });
     } else {
       this.updateDatapod();
     }
@@ -194,7 +179,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   updateDatapod() {
     this.workBench
       .updateSemanticDetails(this.selectedDPDetails)
-      .subscribe((data: any[]) => {
+      .subscribe(() => {
         this.notify.info('Datapod Updated successfully', 'Datapod', {
           hideDelay: 9000
         });
@@ -208,17 +193,11 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * Disable checkbox of non numeric and date type fields in KPI Eligible column.
    * Added as part of SIP-9373
    */
-  cellPrepared(e) {
-    if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
-      if (
-        (!NUMBER_TYPES.includes(e.data.type) &&
-          !DATE_TYPES.includes(e.data.type)) ||
-        !this.isDateTypeMatched
-      ) {
-        CheckBox.getInstance(
-          e.cellElement.querySelector('.dx-checkbox')
-        ).option('disabled', true);
-      }
-    }
+  shouldDisableCheckBox(dataRow) {
+    const { type } = dataRow;
+    const shouldDisable =
+      !this.isDateTypeMatched ||
+      (!NUMBER_TYPES.includes(type) && !DATE_TYPES.includes(type));
+    return shouldDisable;
   }
 }
