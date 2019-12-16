@@ -48,6 +48,9 @@ public class ExternalSecurityService {
 
   private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
 
+  private boolean haveCategoryCheck = false;
+  private boolean haveSubCategoryFlag = false;
+
   /**
    * Create Role , Category, Subcategory and Privilege
    *
@@ -153,7 +156,7 @@ public class ExternalSecurityService {
           addCategory(catList, categoryDetails, roleCategoryPrivilege, response);
           response.setCategoryList(catList);
 
-          if (catList.getValid()) {
+          if (catList.getValid() || haveCategoryCheck) {
             List<SubCategoryDetails> subCategories = category.getSubCategories();
             if (subCategories != null && !subCategories.isEmpty()) {
               for (SubCategoryDetails subCategoryDetails : subCategories) {
@@ -173,7 +176,7 @@ public class ExternalSecurityService {
                   boolean checkSubCategory = userRepository.checkSubCatExists(details);
                   if (!checkSubCategory) {
                     details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
-                    addCategory(catList, details, roleCategoryPrivilege, response);
+                    addSubCategory(catList, details, roleCategoryPrivilege, response);
                     response.setCategoryList(catList);
 
                     // add privilege for the subcategory
@@ -182,11 +185,11 @@ public class ExternalSecurityService {
                           .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
                           .findAny().get();
 
-                      if (roleDetails.getRoleSysId() > 0) {
-                        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, roleDetails.getRoleSysId(), detailsCategory, subCategoryDetails.getPrivilege());
+                      if (responseRole.getRoleSysId() > 0) {
+                        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, subCategoryDetails.getPrivilege());
                         Valid valid = userRepository.upsertPrivilege(privilegeDetails);
                         if (valid.getValid()) {
-                          String pMessage = "Category,Subcategory,Privileges added : " + String.join(",", subCategoryDetails.getPrivilege());
+                          String pMessage = "Privileges added for sub category: " + String.join(",", subCategoryDetails.getPrivilege());
                           detailsCategory.getSubCategory().forEach(subCat -> subCat.setPrivilege(subCategoryDetails.getPrivilege()));
                           response.setMessage(pMessage);
                         }
@@ -196,14 +199,14 @@ public class ExternalSecurityService {
                       }
                     }
                   } else {
-                    buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false);
+                    buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false, false);
                     response.setCategoryList(catList);
                   }
                 } else {
                   if (!subCategoryDetails.isAutoCreate()) {
-                    buildMessage(catList, "Sub categories can't be add for flag false.", false);
+                    buildMessage(catList, "Sub categories can't be add/fetch for flag false.", false, true);
                   } else if (!validPrivileges) {
-                    buildMessage(catList, "Please provide the correct privileges for subcategory.", false);
+                    buildMessage(catList, "Please provide the correct privileges for subcategory.", false, false);
                   }
                   response.setCategoryList(catList);
                 }
@@ -211,7 +214,7 @@ public class ExternalSecurityService {
             }
           }
         } else {
-          buildMessage(catList, "Categories can't be add for flag false.", false);
+          buildMessage(catList, "Categories can't be add/fetch for flag false.", true, false);
           response.setCategoryList(catList);
         }
       }
@@ -232,25 +235,60 @@ public class ExternalSecurityService {
     try {
       if (categoryDetails != null) {
         if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
-          boolean checkCatExist = !categoryDetails.isSubCategoryInd() ? !userRepository.checkCatExists(categoryDetails) : false;
-          boolean checkSubCatExist = categoryDetails.isSubCategoryInd() ? userRepository.checkSubCatExists(categoryDetails) : false;
-          if (checkCatExist || !checkSubCatExist) {
-            addCategorySubcategory(catList, categoryDetails, request, response);
-          } else if (checkCatExist) {
-            buildMessage(catList, "Category Name already exists for this Customer Product Module Combination.", false);
-          } else if (checkSubCatExist) {
-            buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false);
+          boolean checkCatExist = userRepository.checkCatExists(categoryDetails);
+          haveCategoryCheck = checkCatExist;
+          if (!checkCatExist && !categoryDetails.isSubCategoryInd()) {
+            addCategorySubcategory(catList, categoryDetails, request, response, true, false);
+          } else {
+            buildCategoryResponse(catList, categoryDetails, request, response);
+            buildMessage(catList, "Category Name already exists for this Customer Product Module Combination.", false, false);
           }
         } else {
-          buildMessage(catList, "Adding Categories and Sub Categories for Alert Module is not allowed.", false);
+          buildMessage(catList, "Adding Categories and Sub Categories for Alert Module is not allowed.", false, false);
         }
       } else {
-        buildMessage(catList, "Mandatory request params are missing.", false);
+        buildMessage(catList, "Mandatory request params are missing.", false, false);
       }
     } catch (Exception e) {
       String message = (e instanceof DataAccessException) ? "Database error. Please contact server Administrator."
           : "Error. Please contact server Administrator";
-      buildMessage(catList, message, true);
+      buildMessage(catList, message, true, false);
+    }
+  }
+
+
+  /**
+   * Add category details and build messge.
+   *
+   * @param catList
+   * @param categoryDetails
+   * @param request
+   * @param response
+   */
+  private void addSubCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
+    try {
+      if (categoryDetails != null) {
+        if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
+          boolean checkSubCatExist = categoryDetails.isSubCategoryInd() ? userRepository.checkSubCatExists(categoryDetails) : false;
+          if (categoryDetails.isSubCategoryInd()) {
+            if (!checkSubCatExist) {
+              addCategorySubcategory(catList, categoryDetails, request, response, false, true);
+            } else if (!haveSubCategoryFlag) {
+              buildMessage(catList, "Sub categories can't be add/fetch for flag false.", false, false);
+            } else {
+              buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false, false);
+            }
+          }
+        } else {
+          buildMessage(catList, "Adding Categories and Sub Categories for Alert Module is not allowed.", true, false);
+        }
+      } else {
+        buildMessage(catList, "Mandatory request params are missing.", true, false);
+      }
+    } catch (Exception e) {
+      String message = (e instanceof DataAccessException) ? "Database error. Please contact server Administrator."
+          : "Error. Please contact server Administrator";
+      buildMessage(catList, message, true, false);
     }
   }
 
@@ -262,17 +300,21 @@ public class ExternalSecurityService {
    * @param request
    * @param response
    */
-  private void addCategorySubcategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
+  private void addCategorySubcategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response, boolean isCat, boolean isSubCat) {
     Valid valid = userRepository.addCategory(categoryDetails);
     if (valid.getValid()) {
-      List<CategoryDetails> customerCatList =
-          userRepository.getCategories(categoryDetails.getCustomerId());
-      catList.setCategories(getResponseCategoryDetails(request, response, customerCatList));
+      buildCategoryResponse(catList, categoryDetails, request, response);
       catList.setValid(true);
       catList.setMessage("Category/SubCategory created for Customer Product Module Combination.");
     } else {
-      buildMessage(catList, "Category/SubCategory could not be added. " + valid.getError(), true);
+      buildMessage(catList, "Category/SubCategory already exist in the system.", false, false);
     }
+  }
+
+  private void buildCategoryResponse(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
+    List<CategoryDetails> customerCatList =
+        userRepository.getCategories(categoryDetails.getCustomerId());
+    catList.setCategories(getResponseCategoryDetails(request, response, customerCatList));
   }
 
   /**
@@ -522,9 +564,11 @@ public class ExternalSecurityService {
    * @param catList
    * @param message
    */
-  public static void buildMessage(CategoryList catList, String message, boolean haveCategory) {
+  public static void buildMessage(CategoryList catList, String message, boolean haveCategory, boolean haveSubCategory) {
     if (haveCategory) {
       catList.setCategories(null);
+    } else if (haveSubCategory) {
+      catList.getCategories().stream().forEach(cat -> cat.setSubCategory(null));
     }
     catList.setValid(false);
     catList.setMessage(message);

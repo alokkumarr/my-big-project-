@@ -2453,7 +2453,6 @@ public class UserRepositoryImpl implements UserRepository {
         }, new UserRepositoryImpl.SubCatExistsExtractor());
         if (isFeatureCodeExist) {
           valid.setValid(false);
-          valid.setError("Subcategory Name already exit.");
           return valid;
         }
       } catch (Exception e) {
