@@ -293,6 +293,8 @@ public class ExportServiceImpl implements ExportService {
       Long recordsTolimit) {
     List<Object> data = entity.getBody().getData();
     logger.debug("data size size to stream to csv report:{}", data.size());
+    logger.debug("recordsTolimit:{}", recordsTolimit);
+    logger.debug("recordsToSkip:{}", recordsToSkip);
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;
@@ -438,7 +440,7 @@ public class ExportServiceImpl implements ExportService {
         leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
       }
       logger.debug("left out rows = {}", leftOutRows);
-      if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
+      if (leftOutRows > 0 && totalNumberOfBatch >= 0 && batchSize>0) {
         entity =
             getExecutionData(
                 executionId, restTemplate, analysisType, pageNo, batchSize, DataResponse.class);
@@ -536,6 +538,7 @@ public class ExportServiceImpl implements ExportService {
       RestTemplate restTemplate,
       String userFileName) {
     logger.debug("Inside dispatch mail for fileType :{}", exportBean.getFileType());
+    logger.debug("Export Bean = " + exportBean);
     if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
       try {
         prepareFileWithSize(executionId, analysisType, emailExportSize, restTemplate, exportBean);
@@ -605,7 +608,7 @@ public class ExportServiceImpl implements ExportService {
       String finalJobGroup,
       RestTemplate restTemplate,
       String userFileName) {
-    logger.trace("Inside S3 dispatcher");
+    logger.debug("Inside dispatch S3 for fileType :{}", exportBean.getFileType());
     logger.debug("Export Bean = " + exportBean);
     if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
       prepareFileWithSize(
@@ -720,8 +723,8 @@ public class ExportServiceImpl implements ExportService {
     }
 
     /* Here we are maintaing the methods in a map and sorting the the map based on the dispatch limit because
-    * for csv format we are reusing the same file across all types of dispatch(mail,ftp,s3), so because of that while preparig
-    * the csv we should prepare lower size data first and we should append the data incrementally.*/
+     * for csv format we are reusing the same file across all types of dispatch(mail,ftp,s3), so because of that while preparig
+     * the csv we should prepare lower size data first and we should append the data incrementally.*/
     LinkedHashMap<DispatchMethod, Long> finalSortedMap = new LinkedHashMap<>();
 
     sizeMap.entrySet().stream()
@@ -729,48 +732,54 @@ public class ExportServiceImpl implements ExportService {
         .forEachOrdered(x -> finalSortedMap.put(x.getKey(), x.getValue()));
     sizeMap = null;
     logger.debug("sorted map:{}", finalSortedMap);
-    finalSortedMap.forEach(
-        (key, vaue) -> {
-          switch (key) {
-            case DISPATCH_TO_MAIL:
-              dispatchToMail(
-                  executionId,
-                  analysisType,
-                  exportBean,
-                  recipients,
-                  zip,
-                  restTemplate,
-                  userFileName);
-              break;
-            case DISPATCH_TO_FTP:
-              dispatchToFtp(
-                  executionId,
-                  analysisType,
-                  exportBean,
-                  ftp,
-                  zip,
-                  jobGroup,
-                  restTemplate,
-                  userFileName);
-            case DISPATCH_TO_S3:
-              dispatchToS3(
-                  executionId,
-                  analysisType,
-                  exportBean,
-                  ftp,
-                  zip,
-                  jobGroup,
-                  restTemplate,
-                  userFileName);
-          }
-        });
-
-    logger.info("Deleting exported file.");
     try {
-      logger.debug("ExportBean.getFileName() to delete -  mail : " + exportBean.getFileName());
-      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
+      finalSortedMap.forEach(
+          (key, vaue) -> {
+            switch (key) {
+              case DISPATCH_TO_MAIL:
+                dispatchToMail(
+                    executionId,
+                    analysisType,
+                    exportBean,
+                    recipients,
+                    zip,
+                    restTemplate,
+                    userFileName);
+                break;
+              case DISPATCH_TO_FTP:
+                dispatchToFtp(
+                    executionId,
+                    analysisType,
+                    exportBean,
+                    ftp,
+                    zip,
+                    jobGroup,
+                    restTemplate,
+                    userFileName);
+                break;
+              case DISPATCH_TO_S3:
+                dispatchToS3(
+                    executionId,
+                    analysisType,
+                    exportBean,
+                    s3,
+                    zip,
+                    jobGroup,
+                    restTemplate,
+                    userFileName);
+                break;
+            }
+          });
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("error occured while dispatching report:{}", e);
+    } finally {
+      logger.info("Deleting exported file.");
+      try {
+        logger.debug("ExportBean.getFileName() to delete : " + exportBean.getFileName());
+        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
+      } catch (Exception e) {
+        logger.error(e.getMessage());
+      }
     }
   }
 
@@ -830,7 +839,7 @@ public class ExportServiceImpl implements ExportService {
       logger.debug("left out rows " + "::" + leftOutRows);
       page += 1;
       if (leftOutRows > 0) {
-          recordsTolimit=leftOutRows;
+        recordsTolimit = leftOutRows-recordsToSkip;
         entity =
             getExecutionData(
                 executionId, restTemplate, analysisType, page, limitPerPage, DataResponse.class);
@@ -866,6 +875,8 @@ public class ExportServiceImpl implements ExportService {
       String finalJobGroup,
       RestTemplate restTemplate,
       String userFileName) {
+      logger.debug("Inside dispatch FTP for fileType :{}", exportBean.getFileType());
+      logger.debug("Export Bean = " + exportBean);
     if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
       prepareFileWithSize(
           executionId,
