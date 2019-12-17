@@ -93,7 +93,6 @@ function getFieldLabelWithAggregateFun(field) {
 }
 
 function getYValueBasedOnAggregate(point) {
-  console.log(point);
   const aggregate = get(point.series, 'userOptions.aggregate') || '';
   switch (aggregate) {
     case 'percentage':
