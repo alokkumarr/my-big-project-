@@ -149,6 +149,24 @@ export class JwtService {
     return get(token, 'ticket.custCode', 'Synchronoss');
   }
 
+  get customerId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.custID', '');
+  }
+
+  get productId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.defaultProdID', '');
+  }
+
   isValid(token) {
     return (
       get(token, 'ticket.valid', false) &&
