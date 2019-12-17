@@ -32,7 +32,7 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
   public Valid createDskEligibleFields(DskEligibleFields dskEligibleFields) {
     String sql = "INSERT INTO DSK_ELIGIBLE_FIELDS "
         + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
-        + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_DATE , CREATED_BY)"
+        + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY)"
         + " VALUES (?,?,?,?,?,?,sysdate(),?)";
     Valid valid = new Valid();
 
@@ -83,8 +83,8 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
         if (valid.getValid() == true) {
             String insertDsk = "INSERT INTO DSK_ELIGIBLE_FIELDS "
                 + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
-                + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_DATE , CREATED_BY,"
-                + " MODIFIED_DATE, MODIFIED_BY)"
+                + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY,"
+                + " MODIFIED_TIME, MODIFIED_BY)"
                 + " VALUES (?,?,?,?,?,?,sysdate(),?, sysdate(), ?)";
 
             dskFields.forEach(
