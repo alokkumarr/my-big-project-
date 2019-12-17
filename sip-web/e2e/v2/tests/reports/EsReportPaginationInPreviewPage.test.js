@@ -71,9 +71,6 @@ describe('Executing pagination in preview page for reports from reports/EsReport
         reportDesignerPage.verifyDisplayedColumns(tables);
         reportDesignerPage.clickOnPreviewButton();
         const executePage = new ExecutePage();
-        executePage.getAnalysisId().then(id => {
-          analysisId = id;
-        });
         // Pagination section
         executePage.verifyPagination();
         executePage.verifyItemPerPage();

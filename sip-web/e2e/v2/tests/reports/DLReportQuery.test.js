@@ -67,10 +67,13 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
 
           const reportDesignerPage = new ReportDesignerPage();
           reportDesignerPage.clickOnQueryTab();
-          reportDesignerPage.fillQuery('select * from SALES limit 5');
+          reportDesignerPage.fillQuery(data.query);
           reportDesignerPage.clickOnQuerySubmitButton();
           reportDesignerPage.clickOnConfirmButton();
-          reportDesignerPage.verifyRowsDisplayed(5);
+          reportDesignerPage.verifyRowsDisplayed(
+            data.recordCount,
+            data.columnData
+          );
           reportDesignerPage.clickOnSave();
           reportDesignerPage.enterAnalysisName(reportName);
           reportDesignerPage.enterAnalysisDescription(reportDescription);

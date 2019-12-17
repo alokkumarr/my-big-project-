@@ -33,6 +33,8 @@ class ReportDesignerPage extends Designer {
     this._querySubmitButton = element(by.css(`[e2e='e2e-query-submit']`));
     this._rows = element(by.xpath(`(//tbody)[2]/tr`));
     this._totalRows = element.all(by.xpath(`(//tbody)[2]/tr`));
+    this._rowData = (row, col) =>
+      element(by.xpath(`(//tbody)[2]/tr[${row}]/td[${col}]`));
   }
 
   clickOnReportFields(tables) {
@@ -107,9 +109,16 @@ class ReportDesignerPage extends Designer {
     commonFunctions.clickOnElement(this._confirmOkBtn);
   }
 
-  verifyRowsDisplayed(rows) {
-    commonFunctions.waitFor.elementToBeVisible(this._rows, 120000);
+  verifyRowsDisplayed(rows, columnData = null, sort = null) {
+    let self = this;
+    commonFunctions.waitFor.elementToBeVisible(this._rows, 120000); //120 sec is max it can be found before that
     expect(this._totalRows.count()).toBe(rows + 1);
+    if (columnData) {
+      // check first column data of all the rows
+      for (let i = 1; i <= rows; i++) {
+        expect(this._rowData(i, 1).getText()).toBe(columnData);
+      }
+    }
   }
 }
 module.exports = ReportDesignerPage;
