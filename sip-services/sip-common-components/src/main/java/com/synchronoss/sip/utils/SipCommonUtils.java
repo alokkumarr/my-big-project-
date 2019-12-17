@@ -3,7 +3,6 @@ package com.synchronoss.sip.utils;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.io.IOException;
-import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

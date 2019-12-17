@@ -2,14 +2,14 @@ package com.sncr.saw.security.app.service;
 
 import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
-import com.sncr.saw.security.common.bean.external.response.CategoryList;
-import com.sncr.saw.security.common.bean.external.response.Role;
-import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
+import com.sncr.saw.security.common.bean.external.response.*;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryWithPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -69,78 +68,63 @@ public class ExternalSecurityService {
     response.setModuleName(roleCategoryPrivilege.getModuleName());
     Long customerId = moduleDetails.getCustomerSysId();
     com.sncr.saw.security.common.bean.Role inputRole = roleCategoryPrivilege.getRole();
-    RoleDetails roleDetails = new RoleDetails();
+    RoleDetails roleDetails;
     Role responseRole = new Role();
-    if (inputRole != null) {
-      if (inputRole.getCustomerCode() == null || inputRole.getCustomerCode().isEmpty()) {
-        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        responseRole.setMessage("Customer Code can't be blank or empty.");
-      } else if (!inputRole.getCustomerCode().equalsIgnoreCase(moduleDetails.getCustomerCode())) {
-        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        responseRole.setMessage("Customer Code not matched with the user ticket.");
-      } else if (inputRole.getRoleType() == null || inputRole.getRoleType().isEmpty()) {
-        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        responseRole.setMessage("Role Type can't be blank or empty.");
-      } else if (!RoleType.validRoleType(inputRole.getRoleType())) {
-        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        responseRole.setMessage("Only ADMIN|USER Role Type are allowed.");
-      } else if (inputRole.getRoleName() == null || inputRole.getRoleName().isEmpty()) {
-        httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        responseRole.setMessage("Role Name can't be blank or empty.");
-      } else if (inputRole.isAutoCreate()) {
-        roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
-        if (roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty()) {
-          // build role details bean from input
-          RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
-          try {
-            if (role != null) {
-              Valid valid = userRepository.addRole(role);
-              if (valid.getValid()) {
-                // fetched only matched roles
-                userRepository.getRoles(role.getCustSysId()).stream().forEach(fetchedRole -> {
-                  if (inputRole.getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
-                    String customerCode = fetchedRole.getCustomerCode() != null ? fetchedRole.getCustomerCode() : inputRole.getCustomerCode();
-                    responseRole.setCustomerCode(customerCode);
-                    responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
-                    responseRole.setRoleSysId(fetchedRole.getRoleSysId());
-                    responseRole.setCustomerSysId(fetchedRole.getCustSysId());
-                    responseRole.setRoleName(fetchedRole.getRoleName());
-                    responseRole.setRoleDesc(fetchedRole.getRoleDesc());
-                    responseRole.setRoleType(fetchedRole.getRoleType());
-                  }
-                });
-                response.setValid(true);
-                responseRole.setMessage("Role created for Customer Product Module Combination.");
-              } else {
-                response.setValid(false);
-                responseRole.setMessage("Role could not be added. " + valid.getError());
-              }
+
+    if (inputRole.isAutoCreate()) {
+      roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
+      if (roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty()) {
+        // build role details bean from input
+        RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
+        try {
+          if (role != null) {
+            Valid valid = userRepository.addRole(role);
+            if (valid.getValid()) {
+              // fetched only matched roles
+              userRepository.getRoles(role.getCustSysId()).stream().forEach(fetchedRole -> {
+                if (inputRole.getRoleName().equalsIgnoreCase(fetchedRole.getRoleName())) {
+                  String customerCode = fetchedRole.getCustomerCode() != null ? fetchedRole.getCustomerCode() : inputRole.getCustomerCode();
+                  responseRole.setCustomerCode(customerCode);
+                  responseRole.setActiveStatusInd(fetchedRole.getActiveStatusInd());
+                  responseRole.setRoleSysId(fetchedRole.getRoleSysId());
+                  responseRole.setCustomerSysId(fetchedRole.getCustSysId());
+                  responseRole.setRoleName(fetchedRole.getRoleName());
+                  responseRole.setRoleDesc(fetchedRole.getRoleDesc());
+                  responseRole.setRoleType(fetchedRole.getRoleType());
+                }
+              });
+              response.setValid(true);
+              responseRole.setMessage("Role created for Customer Product Module Combination.");
             } else {
               response.setValid(false);
-              responseRole.setMessage("Mandatory request params are missing for roles.");
+              responseRole.setMessage("Role could not be added. " + valid.getError());
             }
-          } catch (Exception e) {
+          } else {
             response.setValid(false);
-            String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
-            responseRole.setMessage(message + " Please contact server Administrator for Roles.");
+            responseRole.setMessage("Mandatory request params are missing for roles.");
           }
-        } else {
+        } catch (Exception e) {
           response.setValid(false);
-          responseRole.setRoleSysId(roleDetails.getRoleSysId());
-          responseRole.setRoleName(roleDetails.getRoleName());
-          responseRole.setRoleDesc(inputRole.getRoleDesc());
-          responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
-          responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
-          responseRole.setCustomerCode(moduleDetails.getCustomerCode());
-          responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
-          responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
+          String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+          responseRole.setMessage(message + " Please contact server Administrator for Roles.");
         }
       } else {
         response.setValid(false);
-        responseRole.setMessage("Role can't be add for flag false.");
+        responseRole.setRoleSysId(roleDetails.getRoleSysId());
+        responseRole.setRoleName(roleDetails.getRoleName());
+        responseRole.setRoleDesc(inputRole.getRoleDesc());
+        responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
+        responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
+        responseRole.setCustomerCode(moduleDetails.getCustomerCode());
+        responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
+        responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
       }
-      response.setRole(responseRole);
+    } else {
+      response.setValid(false);
+      responseRole.setMessage("Role can't be add for flag false.");
     }
+    response.setRole(responseRole);
+
 
     // add category
     CategoryList catList = new CategoryList();
@@ -189,11 +173,21 @@ public class ExternalSecurityService {
                         List<String> privilege = subCategoryDetails.getPrivilege();
                         String subCategoryName = subCategoryDetails.getSubCategoryName();
                         AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, privilege, subCategoryName);
-                        Valid valid = userRepository.upsertPrivilege(privilegeDetails);
-                        if (valid.getValid()) {
-                          String pMessage = "Privileges added for sub category: " + String.join(",", privilege);
-                          detailsCategory.getSubCategory().forEach(subCat -> subCat.setPrivilege(privilege));
-                          response.setMessage(pMessage);
+                        if (privilegeDetails.getSubCategoriesPrivilege() != null && privilegeDetails.getSubCategoriesPrivilege().size() > 0) {
+                          Valid valid = userRepository.upsertPrivilege(privilegeDetails);
+                          if (valid.getValid()) {
+                            String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
+                            List<Privilege> privilegeList = new ArrayList<>();
+                            detailsCategory.getSubCategory().forEach(subCat -> {
+                              privilege.forEach(privName -> {
+                                Privilege privileges = new Privilege();
+                                privileges.setPrivilegeDesc(privName);
+                                privilegeList.add(privileges);
+                              });
+                              subCat.setPrivileges(privilegeList);
+                            });
+                            response.setMessage(pMessage);
+                          }
                         }
                       } else {
                         response.getCategoryList().setValid(false);
@@ -355,7 +349,7 @@ public class ExternalSecurityService {
             if ("Active".equalsIgnoreCase(fetchedRole.getActiveStatusInd())) {
               List<CategoryDetails> customerCatList =
                   userRepository.getCategories(customerSysId);
-              categoryList.setCategories(fetchResponseCategoryDetails(request, customerCatList));
+              categoryList.setCategories(fetchResponseCategoryDetails(request, moduleDetails, fetchedRole.getRoleSysId(), customerCatList));
               categoryList.setMessage("Category/Subcategory fetched for Customer Product Module Combination.");
               categoryList.setValid(true);
             } else {
@@ -459,7 +453,8 @@ public class ExternalSecurityService {
    * @param filterCat
    * @return sub category response
    */
-  private static List<com.sncr.saw.security.common.bean.external.response.SubCategoryDetails> buildSubCategoryDetails(
+  private List<com.sncr.saw.security.common.bean.external.response.SubCategoryDetails> buildSubCategoryDetails(
+      ProductModuleDetails productModuleDetails, Long roleId,
       com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails filterCat) {
     List<com.sncr.saw.security.common.bean.external.response.SubCategoryDetails> subCategoryList = new ArrayList<>();
     if (filterCat.getSubCategories() != null && !filterCat.getSubCategories().isEmpty()) {
@@ -470,10 +465,48 @@ public class ExternalSecurityService {
         subCategoryDetails.setSubCategoryId(subDetails.getSubCategoryId());
         subCategoryDetails.setSubCategoryName(subDetails.getSubCategoryName());
         subCategoryDetails.setSubCategoryDesc(subDetails.getSubCategoryDesc());
+
+        // fetch privileges
+        if (roleId > 0) {
+          List<Privilege> privileges = fetchPrivileges(productModuleDetails, subDetails.getSubCategoryId(), filterCat.getCategoryCode(), roleId);
+          subCategoryDetails.setPrivileges(privileges);
+        }
         subCategoryList.add(subCategoryDetails);
       });
     }
     return subCategoryList;
+  }
+
+  /**
+   * Fetch privileges for subcategories
+   *
+   * @param productModuleDetails
+   * @param subCategoryId
+   * @param roleId
+   * @return list of privileges
+   */
+  private List<Privilege> fetchPrivileges(ProductModuleDetails productModuleDetails, Long subCategoryId, String categoryCode, Long roleId) {
+    List<Privilege> privileges = new ArrayList<>();
+
+    CustomerProductSubModule cpsm = new CustomerProductSubModule();
+    cpsm.setRoleId(roleId);
+    cpsm.setModuleId(productModuleDetails.getModuleId());
+    cpsm.setProductId(productModuleDetails.getProductId());
+    cpsm.setCustomerId(productModuleDetails.getCustomerSysId());
+    cpsm.setCategoryCode(categoryCode);
+
+    List<SubCategoryWithPrivilegeDetails> withPrivilegeDetails = userRepository.getSubCategoriesWithPrivilege(cpsm);
+    if (withPrivilegeDetails != null && !withPrivilegeDetails.isEmpty()) {
+      withPrivilegeDetails.stream().forEach(subCategoryWithPrivilegeDetails -> {
+        if (subCategoryId.equals(subCategoryWithPrivilegeDetails.getSubCategoryId()) && subCategoryWithPrivilegeDetails.getPrivilegeId() > 0) {
+          Privilege privilege = new Privilege();
+          privilege.setPrivilegeId(subCategoryWithPrivilegeDetails.getPrivilegeId());
+          privilege.setPrivilegeDesc(subCategoryWithPrivilegeDetails.getPrivilegeDesc());
+          privileges.add(privilege);
+        }
+      });
+    }
+    return privileges;
   }
 
   /**
@@ -538,7 +571,7 @@ public class ExternalSecurityService {
                                                        List<String> privileges, String subCategoryName) {
 
     AddPrivilegeDetails privilegeDetails = new AddPrivilegeDetails();
-    if (category.getSubCategory() != null && !category.getSubCategory().isEmpty()) {
+    if (category.getSubCategory() != null && !category.getSubCategory().isEmpty() && category.getSubCategory().size() > 0) {
       category.getSubCategory().forEach(subCategoryDetails -> {
         if (subCategoryDetails.getSubCategoryName().equalsIgnoreCase(subCategoryName)) {
           privilegeDetails.setCategoryCode(category.getCategoryCode());
@@ -574,8 +607,10 @@ public class ExternalSecurityService {
    * @param customerCatList
    * @return list of category details
    */
-  public static List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> fetchResponseCategoryDetails(RoleCategoryPrivilege categoryPrivilege,
-                                                                                                                       List<com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails> customerCatList) {
+  public List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> fetchResponseCategoryDetails(RoleCategoryPrivilege categoryPrivilege,
+                                                                                                                ProductModuleDetails productModuleDetails,
+                                                                                                                Long roleId,
+                                                                                                                List<com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails> customerCatList) {
 
     List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> finalCategory = new ArrayList<>();
     if (customerCatList != null) {
@@ -594,7 +629,7 @@ public class ExternalSecurityService {
         catDetails.setCategoryDesc(filterCat.getCategoryDesc());
         catDetails.setCustomerId(filterCat.getCustomerId());
         catDetails.setCategoryId(filterCat.getCategoryId());
-        catDetails.setSubCategory(buildSubCategoryDetails(filterCat));
+        catDetails.setSubCategory(buildSubCategoryDetails(productModuleDetails, roleId, filterCat));
         finalCategory.add(catDetails);
       });
     }

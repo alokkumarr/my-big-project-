@@ -78,10 +78,37 @@ public class ExternalSecurityController {
       return response;
     }
 
-    // validate role/category/subcategory name
     Role role = request.getRole();
-    List<CategoryDetails> categoryList = request.getCategories();
+    if (role.getCustomerCode() == null || role.getCustomerCode().isEmpty()) {
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setMessage("Customer Code can't be blank or empty.");
+      response.setValid(false);
+      return response;
+    }
 
+    if (role.getRoleType() == null || role.getRoleType().isEmpty()) {
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setMessage("Role Type can't be blank or empty.");
+      response.setValid(false);
+      return response;
+    }
+
+    if (!RoleType.validRoleType(role.getRoleType())) {
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setMessage("Only ADMIN|USER Role Type are allowed.");
+      response.setValid(false);
+      return response;
+    }
+
+    if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setMessage("Role Name can't be blank or empty.");
+      response.setValid(false);
+      return response;
+    }
+
+      // validate role/category/subcategory name
+    List<CategoryDetails> categoryList = request.getCategories();
     boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
     if (validateRoleName) {
       httpResponse.setStatus(HttpStatus.OK.value());
@@ -120,6 +147,14 @@ public class ExternalSecurityController {
       response.setMessage("Product and Module does not exist for this user.");
       return response;
     }
+
+    if (!role.getCustomerCode().equalsIgnoreCase(moduleDetails.getCustomerCode())) {
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setMessage("Customer Code not matched with the user ticket.");
+      response.setValid(false);
+      return response;
+    }
+
     response = securityService.createRoleCategoryPrivilege(httpResponse, request, masterLoginId, moduleDetails);
     return response;
   }

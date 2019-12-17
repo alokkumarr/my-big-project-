@@ -15,7 +15,7 @@ public class SubCategoryDetails implements Serializable {
   private String subCategoryName;
   private String subCategoryDesc;
   private Long activeStatusInd;
-  private List<String> privilege;
+  private List<Privilege> privileges;
 
   public long getSubCategoryId() {
     return subCategoryId;
@@ -49,11 +49,11 @@ public class SubCategoryDetails implements Serializable {
     this.activeStatusInd = activeStatusInd;
   }
 
-  public List<String> getPrivilege() {
-    return privilege;
+  public List<Privilege> getPrivileges() {
+    return privileges;
   }
 
-  public void setPrivilege(List<String> privilege) {
-    this.privilege = privilege;
+  public void setPrivileges(List<Privilege> privileges) {
+    this.privileges = privileges;
   }
 }

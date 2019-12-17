@@ -2082,6 +2082,7 @@ public class UserRepositoryImpl implements UserRepository {
         + "   CPMF.FEATURE_NAME, "
         + "   IFNULL(PV.PRIVILEGE_CODE,0) PRIVILEGE_CODE, "
         + "   IFNULL(PV.PRIVILEGE_SYS_ID,0) PRIVILEGE_SYS_ID, "
+        + "   PV.PRIVILEGE_DESC, "
         + "   CPMF.FEATURE_CODE  "
         + "FROM    "
         + "   USERS U  "
@@ -2146,6 +2147,7 @@ public class UserRepositoryImpl implements UserRepository {
         subCategory.setSubCategoryName(rs.getString("FEATURE_NAME"));
         subCategory.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));
         subCategory.setPrivilegeId(rs.getLong("PRIVILEGE_SYS_ID"));
+        subCategory.setPrivilegeDesc(rs.getString("PRIVILEGE_DESC"));
         subCategory.setSubCategoryCode("FEATURE_CODE");
         subCatList.add(subCategory);
       }
