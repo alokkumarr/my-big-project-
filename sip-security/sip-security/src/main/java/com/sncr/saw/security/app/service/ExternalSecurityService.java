@@ -177,10 +177,13 @@ public class ExternalSecurityService {
                           Valid valid = userRepository.upsertPrivilege(privilegeDetails);
                           if (valid.getValid()) {
                             String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
-                            List<Privilege> privilegeList = new ArrayList<>();
-                            Privilege privileges = new Privilege();
-                            privileges.setPrivilegeDesc(String.join(",", privilege));
-                            privilegeList.add(privileges);
+                            detailsCategory.getSubCategory().forEach(subCat -> {
+                              List<Privilege> privilegeList = new ArrayList<>();
+                              Privilege privileges = new Privilege();
+                              privileges.setPrivilegeDesc(String.join(",", privilege));
+                              privilegeList.add(privileges);
+                              subCat.setPrivileges(privilegeList);
+                            });
                             response.setMessage(pMessage);
                           }
                         }
