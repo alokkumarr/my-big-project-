@@ -386,31 +386,31 @@ public class SecurityIT extends BaseIT {
     roleDetails.put("autoCreate", true);
     roleDetails.put("customerCode", "SYNCHRONOSS");
     roleDetails.put("roleDesc", "Admin User");
-    roleDetails.put("roleName", "Test Role Name");
+    roleDetails.put("roleName", "ROLENAME");
     roleDetails.put("roleType", "ADMIN");
     objectNode.set("role", roleDetails);
 
     ObjectNode categoryDetail = mapper.createObjectNode();
     categoryDetail.put("autoCreate", true);
     categoryDetail.put("categoryDesc", "Category Description");
-    categoryDetail.put("categoryName", "New Category 01");
+    categoryDetail.put("categoryName", "NewCategory01");
     categoryDetail.put("categoryType", "000121");
 
     ObjectNode subCategoryDetail = mapper.createObjectNode();
     subCategoryDetail.put("autoCreate", true);
 
-    ArrayNode privileges = subCategoryDetail.putArray("subCategory");
+    ArrayNode privileges = subCategoryDetail.putArray("privilege");
     privileges.add("CREATE");
     privileges.add("PUBLISH");
     privileges.add("DELETE");
 
     subCategoryDetail.put("subCategoryDesc", "Sub Category Description");
-    subCategoryDetail.put("subCategoryName", "New Sub Category 01");
+    subCategoryDetail.put("subCategoryName", "New_Sub_Category01");
 
-    ArrayNode subCategory = categoryDetail.putArray("subCategory");
+    ArrayNode subCategory = categoryDetail.putArray("subCategories");
     subCategory.add(subCategoryDetail);
 
-    ArrayNode category = objectNode.putArray("category");
+    ArrayNode category = objectNode.putArray("categories");
     category.add(categoryDetail);
     return objectNode;
   }
