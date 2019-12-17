@@ -214,14 +214,6 @@ public class ExternalSecurityController {
       return response;
     }
 
-    boolean validateRoleName = role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
-    if (validateRoleName) {
-      httpResponse.setStatus(HttpStatus.OK.value());
-      response.setValid(false);
-      response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
-      return response;
-    }
-
     response = securityService.fetchRoleCategoryPrivilege(request, productName, moduleName, moduleDetails, customerSysId);
     return response;
   }
