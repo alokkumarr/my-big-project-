@@ -2,6 +2,7 @@ import * as Highcharts from 'highcharts/highcharts';
 import * as isUndefined from 'lodash/isUndefined';
 import * as round from 'lodash/round';
 import moment from 'moment';
+import * as get from 'lodash/get';
 
 import {
   FLOAT_TYPES,
@@ -92,7 +93,9 @@ function getFieldLabelWithAggregateFun(field) {
 }
 
 function getYValueBasedOnAggregate(point) {
-  switch (point.series.userOptions.aggregate) {
+  console.log(point);
+  const aggregate = get(point.series, 'userOptions.aggregate') || '';
+  switch (aggregate) {
     case 'percentage':
       return Math.round((point.y || point.value) * 100) / 100 + '%';
     case 'percentagebyrow':
