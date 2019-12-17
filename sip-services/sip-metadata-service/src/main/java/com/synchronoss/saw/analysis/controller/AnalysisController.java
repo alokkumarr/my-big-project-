@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -108,6 +109,7 @@ public class AnalysisController {
     }
 
     analysis.setCreatedBy(authTicket.getUserFullName());
+    analysis.setCreatedTime(Instant.now().toEpochMilli());
     analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.createAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
@@ -165,6 +167,7 @@ public class AnalysisController {
     }
 
     analysis.setModifiedBy(authTicket.getUserFullName());
+    analysis.setModifiedTime(Instant.now().toEpochMilli());
     analysis.setUserId(authTicket.getUserId());
     analysisResponse.setAnalysis(analysisService.updateAnalysis(analysis, authTicket));
     analysisResponse.setAnalysisId(id);
