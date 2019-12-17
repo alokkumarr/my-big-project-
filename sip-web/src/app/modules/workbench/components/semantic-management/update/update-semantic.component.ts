@@ -109,7 +109,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: false,
+        filterEligible: true,
         joinEligible: false,
         kpiEligible: false,
         include: false,
