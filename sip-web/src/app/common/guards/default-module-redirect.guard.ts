@@ -4,10 +4,18 @@ import { CanActivate, Router } from '@angular/router';
 import { CONFIG_KEY, PREFERENCES } from '../services/configuration.service';
 
 const DEFAULT_ROUTE = '/analyze';
+import { JwtService } from './../../common/services/jwt.service';
+import {
+  map,
+  get
+} from 'lodash';
 
 @Injectable()
 export class DefaultModuleGuard implements CanActivate {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    public jwt: JwtService
+  ) {}
 
   canActivate() {
     const config = localStorage.getItem(CONFIG_KEY);
@@ -18,6 +26,8 @@ export class DefaultModuleGuard implements CanActivate {
 
     try {
       const pref = JSON.parse(config);
+      const isObservePrivileged = this.checkObservePrivilege();
+
       if (!Array.isArray(pref.preferences)) {
         this.router.navigate([DEFAULT_ROUTE]);
         return false;
@@ -34,7 +44,8 @@ export class DefaultModuleGuard implements CanActivate {
         !defaultDashboard ||
         !defaultDashboardCat ||
         !defaultDashboard.preferenceValue ||
-        !defaultDashboardCat.preferenceValue
+        !defaultDashboardCat.preferenceValue ||
+        !isObservePrivileged
       ) {
         this.router.navigate([DEFAULT_ROUTE]);
         return false;
@@ -50,5 +61,16 @@ export class DefaultModuleGuard implements CanActivate {
       this.router.navigate([DEFAULT_ROUTE]);
       return false;
     }
+  }
+
+  checkObservePrivilege() {
+    const token = this.jwt.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    const modules = [
+      ...map(product.productModules, ({ productModName }) => {
+        return productModName;
+      })
+    ];
+    return modules.includes('OBSERVE');
   }
 }
