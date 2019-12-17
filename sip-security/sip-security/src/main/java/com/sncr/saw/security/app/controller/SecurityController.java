@@ -799,8 +799,7 @@ public class SecurityController {
 	public UsersList getUsers(HttpServletRequest request, @RequestBody Long customerId) {
 		UsersList userList = new UsersList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (SipCommonUtils.haveValidCustomerId(customerId, request)) {
 				userList.setUsers(userRepository.getUsers(customerId));
 				userList.setValid(true);
 			} else {
