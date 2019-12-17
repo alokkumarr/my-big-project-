@@ -15,6 +15,7 @@ class LoginPage {
     this._accountMenuButton = element(by.css(`[e2e='account-settings-menu-btn']`));
     this._logoutButton = element(by.css(`[e2e='account-settings-selector-logout']`));
     this._loginErrorMessage = element(by.css(`[e2e='error-msg']`));
+    this._errorMessage = element(by.css(`[e2e='error-msg']`));
   }
 
   fillUserNameField(userName) {

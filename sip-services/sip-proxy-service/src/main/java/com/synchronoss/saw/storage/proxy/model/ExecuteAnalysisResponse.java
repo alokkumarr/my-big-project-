@@ -10,6 +10,7 @@ public class ExecuteAnalysisResponse {
   long totalRows;
   String executionId;
   String query;
+  String userId;
 
   /**
    * Gets data.
@@ -62,4 +63,18 @@ public class ExecuteAnalysisResponse {
 
   /** Sets query. */
   public void setQuery(String query) { this.query = query; }
+
+  /**
+   * Gets userId.
+   *
+   * @return value of userId
+   */
+  public String getUserId() {
+    return userId;
+  }
+
+  /** Sets userId. */
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 }

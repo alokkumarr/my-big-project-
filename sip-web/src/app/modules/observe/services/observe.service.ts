@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map as mapObservable } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Analysis, AnalysisDSL } from '../../analyze/types';
-import { AnalysisMapDSL } from '../../analyze/models';
-import { CUSTOM_HEADERS } from '../../../common/consts';
-
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as add from 'lodash/add';
 
+import { CUSTOM_HEADERS } from '../consts';
+import { Analysis, AnalysisDSL } from '../../analyze/types';
+import { AnalysisMapDSL } from '../../analyze/models';
 import {
   JwtService,
   MenuService,
@@ -62,13 +61,7 @@ export class ObserveService {
     };
     const analysis = await this.analyze.readAnalysis(id, true, skipToastHeader);
 
-    // If dsl analysis is successfully returned, use it
-    if (analysis) {
-      return analysis;
-    }
-
-    // Otherwise, try to get the analysis from legacy api
-    return this.analyze.readAnalysis(id, false, skipToastHeader);
+    return analysis;
   }
 
   getRequest<T>(path) {
@@ -144,9 +137,13 @@ export class ObserveService {
     });
   }
 
-  getDashboard(entityId: string): Observable<Dashboard> {
+  getDashboard(
+    entityId: string,
+    options: { headers?: HttpHeaders } = {}
+  ): Observable<Dashboard> {
+    const { headers } = options;
     return this.http
-      .get(`${this.api}/observe/dashboards/${entityId}`)
+      .get(`${this.api}/observe/dashboards/${entityId}`, { headers })
       .pipe(mapObservable(fpGet('contents.observe.0')));
   }
 

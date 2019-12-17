@@ -17,6 +17,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.util.List;
 
@@ -24,14 +25,14 @@ public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
 	boolean[] authenticateUser(String masterLoginId, String password);
 	void prepareTicketDetails(User user, Boolean onlyDef);
-	void invalidateTicket(String ticketId, String validityMessage);	
+	void invalidateTicket(String ticketId, String validityMessage);
 	String updateUserPass(String masterLoginId, String newPassEncrp);
 	Ticket getTicketDetails(String ticketId);
-    String rstchangePassword(String loginId, String newPass, String rhc);
-    String changePassword(String loginId, String newPass, String oldPass);
+  String rstchangePassword(String loginId, String newPass, String rhc);
+  String changePassword(String loginId, String newPass, String oldPass);
 	String getUserEmailId(String userId);
 	void insertResetPasswordDtls(String userId, String randomHash,
-			Long createdTime, long validUpto);
+	Long createdTime, long validUpto);
 	ResetValid validateResetPasswordDtls(String randomHash);
 	boolean createAnalysis (AnalysisSummary analysis);
 	boolean updateAnalysis(AnalysisSummary analysis);
@@ -59,12 +60,13 @@ public interface UserRepository {
 	List<CategoryDetails> getCategories(Long customerId);
 	Valid addCategory(CategoryDetails category);
 	boolean checkCatExists(CategoryDetails category);
+    boolean checkIsModulePresent(Long moduleId,String moduleName);
 	boolean deleteCategory(Long categoryId);
 	List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode);
 	List<SubCategoryWithPrivilegeDetails> getSubCategoriesWithPrivilege(CustomerProductSubModule cpsm);
 	Valid updateCategory(CategoryDetails category);
 	boolean checkSubCatExists(CategoryDetails category);
 	Long createAdminUserForOnboarding(User user);
-
-    Boolean IsTicketValid(String ticketId, String masterLogin);
+  Boolean IsTicketValid(String ticketId, String masterLogin);
+	DataSecurityKeys fetchDSKDetailByUserId(String userId);
 }

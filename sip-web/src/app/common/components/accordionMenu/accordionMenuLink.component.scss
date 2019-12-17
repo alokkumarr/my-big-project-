@@ -6,7 +6,7 @@
   line-height: 40px;
   max-height: 60px;
   font-weight: 400;
-  color: #FFF;
+  color: #fff;
 }
 
 .activeButton {
@@ -24,12 +24,12 @@
   padding-left: 25px;
 
   a {
-    color: #FFF;
+    color: #fff;
     font-weight: normal;
 
     mat-icon {
       font-size: 18px;
-      color: #FCD53E;
+      color: #fcd53e;
       margin: 0;
     }
   }
@@ -42,11 +42,18 @@
     margin: 0 !important;
     font-size: 41px !important;
   }
+
+  .child-item {
+    white-space: nowrap;
+    overflow-x: hidden;
+    display: block;
+    text-overflow: ellipsis;
+  }
 }
 
 mat-panel-title.sidenav-mainmenu {
   border-radius: 0;
-  color: #FFF;
+  color: #fff;
   cursor: pointer;
   display: block;
   align-items: inherit;

@@ -208,7 +208,7 @@ public class RTPSPipelineProcessor {
             ngParserCtxSvc.getNgctx().dataSetName = parserKey;
 			ngParserCtxSvc.getNgctx().datafileDFmap.putAll ( this.datafileDFmap);
 			ngParserCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-			//ngParserCtxSvc.getNgctx().persistMode = persistFlag;
+			ngParserCtxSvc.getNgctx().persistMode = persistFlag;
 
 			NGParser component = null;
 
@@ -287,7 +287,7 @@ public class RTPSPipelineProcessor {
 
 			ngTransformerCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
 			ngTransformerCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-			//ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
+			ngTransformerCtxSvc.getNgctx().persistMode = persistFlag;
             
 			//ngTransformerCtxSvc.getNgctx().dataSetName = transInKey;
 			//ngTransformerCtxSvc.getNgctx().datafileDFmap.put(transInKey, datafileDFmap.get(dataSetName));
@@ -375,7 +375,7 @@ public class RTPSPipelineProcessor {
 			ngSQLCtxSvc.getNgctx().datafileDFmap.putAll(this.datafileDFmap);
 			//ngSQLCtxSvc.getNgctx().datafileDFmap.put(sqlInKey, datafileDFmap.get(dataSetName)); // TRANS_OUT
 			ngSQLCtxSvc.getNgctx().runningPipeLine = RUNNING_MODE;
-			//ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
+			ngSQLCtxSvc.getNgctx().persistMode = persistFlag;
 			ngSQLCtxSvc.getNgctx().pipeComponentName = "sql";
 
 			NGSQLComponent sqlcomponent = new NGSQLComponent(ngSQLCtxSvc.getNgctx());
@@ -442,8 +442,8 @@ public class RTPSPipelineProcessor {
 
 			logger.trace("Output datasets:   ");
 
-			ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.trace(id));
-			ngESCtxSvc.registerOutputDataSet();
+			ngESCtxSvc.getNgctx().registeredOutputDSIds.forEach(id -> logger.debug(id));
+			//ngESCtxSvc.registerOutputDataSet();
 
 			String dataSetInKey = config.getInputs().get(0).getDataSet();
 

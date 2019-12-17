@@ -21,6 +21,8 @@ ARG rpmd1=java-1.8.0-openjdk-headless-1.8.0.222.b10-1.el7_7.x86_64.rpm
 ARG rpmd2=java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64.rpm
 ARG rpm=java-1.8.0-openjdk-devel-1.8.0.222.b10-1.el7_7.x86_64.rpm
 
+ARG secure_enviroment
+
 # Workaround: Package installations (like mapr-core which depends on
 # initscript) can force a CentOS upgrades, which go beyond the CentOS
 # versions supported by MapR.  So use the CentOS Vault repositories to
@@ -113,10 +115,12 @@ RUN curl -O $path/$rpm \
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64/
 
 # COPY java.security into the directory
-COPY java.security /usr/lib/jvm/java-1.8.0-amazon-corretto/jre/lib/security/
+COPY java.security /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64/jre/lib/security/
 
 # Add SIP container health check command
 COPY sip-health-check /root/
+
+ENV secure_env=$secure_enviroment
 
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD /root/sip-health-check

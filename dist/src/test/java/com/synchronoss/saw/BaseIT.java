@@ -28,6 +28,11 @@ import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 public class BaseIT {
+  private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
+  private static final String TEST_PASSWORD = "Sawsyncnewuser1!";
+  @Rule public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+  protected final Logger log = LoggerFactory.getLogger(getClass().getName());
+
   @Rule
   public TestWatcher watcher =
       new TestWatcher() {
@@ -37,10 +42,6 @@ public class BaseIT {
         }
       };
 
-  @Rule public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
-
-  protected final Logger log = LoggerFactory.getLogger(getClass().getName());
-
   protected RequestSpecification spec;
   protected RequestSpecification authSpec;
   protected ObjectMapper mapper;
@@ -49,14 +50,23 @@ public class BaseIT {
   @BeforeClass
   public static void setUpClass() {
     String host = System.getProperty("saw.docker.host");
-    String port = System.getProperty("saw.docker.port");
+    String port;
+    String secure = System.getProperty("sip.cloud.secure");
+    if (secure != null && secure.equalsIgnoreCase("True")) {
+      port = System.getProperty("sip.docker.secure.port");
+      RestAssured.useRelaxedHTTPSValidation();
+      RestAssured.baseURI = "https://" + host + ":" + port + "/";
+    } else {
+      port = System.getProperty("saw.docker.port");
+      RestAssured.baseURI = "http://" + host + ":" + port + "/";
+    }
+
     if (host == null) {
       throw new RuntimeException("Property saw.docker.host unset");
     }
     if (port == null) {
       throw new RuntimeException("Property saw.docker.port unset");
     }
-    RestAssured.baseURI = "http://" + host + ":" + port + "/";
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
   }
 
@@ -73,9 +83,6 @@ public class BaseIT {
             .build()
             .header("Authorization", "Bearer " + token);
   }
-
-  private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
-  private static final String TEST_PASSWORD = "Sawsyncnewuser1!";
 
   private String authenticate() throws JsonProcessingException {
     ObjectNode node = mapper.createObjectNode();

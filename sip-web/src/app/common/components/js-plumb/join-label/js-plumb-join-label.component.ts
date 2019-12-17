@@ -23,9 +23,7 @@ export class JsPlumbJoinLabelComponent {
 
   getIdentifier() {
     const [source, target] = this.join.criteria;
-    return `${source.tableName}:${source.columnName}-${this.join.type}-${
-      target.tableName
-    }:${target.columnName}`;
+    return `${source.tableName}:${source.columnName}-${this.join.type}-${target.tableName}:${target.columnName}`;
   }
 
   openJoinModal() {

@@ -29,6 +29,7 @@ export class DesignerRegionSelectorComponent implements OnInit {
 
   ngOnInit() {
     const defaultRegion = this.artifactColumn.geoRegion || { name: '' };
+    this.stateForm.get('regionCtrl').setValue(defaultRegion);
     this.filteredRegions = this.stateForm.get('regionCtrl').valueChanges.pipe(
       startWith(defaultRegion),
       map(value => {

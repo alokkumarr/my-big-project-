@@ -90,7 +90,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
        * gracefully by letting the Workbench Service still start up.
        * If Apache Livy is later installed, the Workbench Service will
        * be able to recover by reattempting to create the client.  */
-      log.warn("Unable to create Workbench client upon startup", e);
+      log.error("Unable to create Workbench client upon startup", e);
     }
   }
 

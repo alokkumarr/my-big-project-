@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import * as isNumber from 'lodash/isNumber';
+import * as reject from 'lodash/reject';
 import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
 import { IAdminDataService } from '../admin-data-service.interface';
@@ -115,7 +116,12 @@ export class CategoryService implements IAdminDataService {
   }) {
     return this._adminService
       .request<ModulesResponse>('modules/list', params)
-      .pipe(map(resp => resp.modules))
+      .pipe(
+        map(resp => resp.modules),
+        map(modules =>
+          reject(modules, ({ moduleName }) => moduleName === 'ALERTS')
+        )
+      )
       .toPromise();
   }
 

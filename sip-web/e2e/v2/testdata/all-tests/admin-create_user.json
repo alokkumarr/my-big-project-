@@ -3,7 +3,7 @@
     "positiveTest": {
       "ADMIN": {
         "suites": [
-          "development"
+          "regression"
         ],
         "role": "TestAdmin",
         "roleDescription": "masterAdmin Should be able to create Admin with Role",
@@ -30,7 +30,7 @@
       },
       "USER": {
         "suites": [
-          "development"
+          "regression"
         ],
         "role": "TestUser",
         "roleDescription": "Master admin should be able to create User with Role",
@@ -58,7 +58,7 @@
     },
     "negativeTest": {
       "ADMIN": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "masterAdmin",
         "role": "AdminNegative",
         "roleType": "ADMIN",
@@ -74,7 +74,7 @@
         "inactiveStatus": "INACTIVE"
       },
       "USER": {
-        "suites": ["development"],
+        "suites": ["regression"],
         "user": "masterAdmin",
         "role": "UserNegative",
         "roleType": "USER",

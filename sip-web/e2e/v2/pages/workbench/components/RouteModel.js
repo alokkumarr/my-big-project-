@@ -41,12 +41,8 @@ class RouteModel extends TestConnectivity {
           `//span[@class="mat-option-text" and contains(text(),"${numer}")][1]`
         )
       );
-    this._startDate = element(
-      by.xpath(`(//input[contains(@class,"date-input")])[1]`)
-    );
-    this._endDate = element(
-      by.xpath(`(//input[contains(@class,"date-input")])[2]`)
-    );
+    this._startDate = element(by.css(`[e2e='schedule-start-date-time']`));
+    this._endDate = element(by.css(`[e2e='schedule-end-date-time']`));
     this._increaseMinute = element(
       by.xpath(`(//span[@class="owl-dt-control-button-content"])[3]`)
     );
@@ -56,6 +52,11 @@ class RouteModel extends TestConnectivity {
     this._errorMessage = element(
       by.xpath(`//span[contains(@class,"errorTextMsg")]`)
     );
+    this._apiRouteNameInput = element(by.css(`[e2e='name-of-route']`));
+    this._apiRouteDestinationInput = element(
+      by.css(`[e2e='destination-location-input']`)
+    );
+    this._updateRouteBtn = element(by.css(`[e2e='route-schd-update-btn']`));
   }
 
   fillRouteName(name) {
@@ -103,6 +104,19 @@ class RouteModel extends TestConnectivity {
     commonFunctions.clickOnElement(this._increaseMinute);
     commonFunctions.clickOnElement(this._set);
   }
+  // to fix 9320
+  setScheduleEndDate() {
+    commonFunctions.clickOnElement(this._endDate);
+    browser.sleep(1000);
+    commonFunctions.clickOnElement(this._increaseMinute);
+    browser.sleep(1000);
+    commonFunctions.clickOnElement(this._increaseMinute);
+    browser.sleep(1000);
+    commonFunctions.clickOnElement(this._increaseMinute);
+    browser.sleep(1000);
+    commonFunctions.clickOnElement(this._increaseMinute);
+    commonFunctions.clickOnElement(this._set);
+  }
 
   clickOnTestConnectivity() {
     commonFunctions.clickOnElement(this._testConnBtn);
@@ -121,6 +135,17 @@ class RouteModel extends TestConnectivity {
         }
       })
     );
+  }
+
+  fillApiRouteName(name) {
+    commonFunctions.fillInput(this._apiRouteNameInput, name);
+  }
+
+  fillApiRouteDestination(destination) {
+    commonFunctions.fillInput(this._apiRouteDestinationInput, destination);
+  }
+  clickOnUpdateRoute() {
+    commonFunctions.clickOnElement(this._updateRouteBtn);
   }
 }
 module.exports = RouteModel;

@@ -164,9 +164,7 @@ exports.config = {
       })()
     );
 
-    browser.baseUrl = JSON.parse(
-      fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', 'utf8')
-    ).baseUrl;
+    browser.baseUrl = JSON.parse(fs.readFileSync(Constants.E2E_OUTPUT_BASE_DIR + '/url.json', 'utf8')).baseUrl;
 
     browser.get(browser.baseUrl);
     return browser.wait(() => {
@@ -204,10 +202,7 @@ exports.config = {
           process.exit(1);
         }
         let TestDataGenerator = require('../helpers/data-generation/TestDataGenerator');
-        new TestDataGenerator().generateUsersRolesPrivilegesCategories(
-          apiBaseUrl,
-          token
-        );
+        new TestDataGenerator().generateUsersRolesPrivilegesCategories(apiBaseUrl, token);
       } catch (e) {
         logger.error(
           'There is some error during cleanup and setting up test data for e2e tests, ' +

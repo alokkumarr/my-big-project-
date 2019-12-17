@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 import * as isEmpty from 'lodash/isEmpty';
+import { validatePassword } from 'src/app/common/validators/password-policy.validator';
 
 @Component({
   selector: 'password-change',
@@ -28,12 +29,21 @@ export class PasswordChangeComponent {
   };
 
   public errorMsg;
+  public newPasswordError: string;
+  public confPasswordError: string;
 
   public formState: boolean;
   public validationCheck = true;
 
   changePwd() {
-    if (isEmpty(this.formData.oldPwd) || isEmpty(this.formData.newPwd) || isEmpty(this.formData.confNewPwd)) {
+    this.validatePassword();
+    if (
+      isEmpty(this.formData.oldPwd) ||
+      isEmpty(this.formData.newPwd) ||
+      isEmpty(this.formData.confNewPwd) ||
+      this.newPasswordError ||
+      this.confPasswordError
+    ) {
       return;
     }
     const token = this._JwtService.get();
@@ -56,8 +66,23 @@ export class PasswordChangeComponent {
     });
   }
 
+  get allErrors(): string {
+    return [this.errorMsg, this.newPasswordError, this.confPasswordError]
+      .filter(error => Boolean(error))
+      .join('\n');
+  }
+
   cancel() {
     this._router.navigate(['login']);
+  }
+
+  validatePassword() {
+    const username = this._JwtService.getLoginId();
+    this.newPasswordError = validatePassword(this.formData.newPwd, username);
+    this.confPasswordError =
+      this.formData.newPwd !== this.formData.confNewPwd
+        ? 'Confirm Password needs to be same as new password.'
+        : '';
   }
 
   onPasswordChanged(event, type) {

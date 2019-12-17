@@ -7,6 +7,7 @@
             !parentForm.get('apiEndPoint').valid ||
             !parentForm.get('bodyParameters.content').valid
         }"
+        e2e="e2e-request-tab"
       >
         Request
       </span>
@@ -17,14 +18,14 @@
         <mat-label i18n>Request Method</mat-label>
         <mat-select
           formControlName="httpMethod"
-          e2e="http-method-select"
+          e2e="e2e-http-method-select"
           (selectionChange)="httpMethodChanged()"
           required
         >
           <mat-option
             *ngFor="let method of httpMethods"
             [value]="method"
-            [e2e]="'http-method-' + method"
+            [attr.e2e]="'e2e-http-method-' + method"
             i18n
             >{{ method }}</mat-option
           >
@@ -44,7 +45,7 @@
           placeholder="Endpoint"
           [required]="isRequired('apiEndPoint')"
           name="api-endpoint"
-          e2e="api-endpoint"
+          e2e="e2e-api-endpoint"
           formControlName="apiEndPoint"
           autocomplete="new-password"
         />
@@ -71,7 +72,7 @@
         <textarea
           matInput
           formControlName="content"
-          e2e="body-parameter-content"
+          e2e="e2e-body-parameter-content"
         ></textarea>
         <mat-error
           *ngIf="
@@ -94,6 +95,7 @@
         fxLayout="row"
         fxLayoutAlign="center center"
         [ngClass]="{ 'tab-error': !headerParams.valid }"
+        e2e="e2e-headers-tab"
       >
         Headers &nbsp;
         <ng-container *ngIf="headerParams.controls.length">
@@ -108,6 +110,7 @@
         mat-stroked-button
         color="primary"
         (click)="addHeader()"
+        e2e="e2e-add-header-btn"
       >
         + Header
       </button>
@@ -133,7 +136,7 @@
           <input
             matInput
             name="name-of-header"
-            [e2e]="'name-of-header-' + i"
+            [attr.e2e]="'e2e-name-of-header-' + i"
             formControlName="key"
             required
             autocomplete="off"
@@ -143,6 +146,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderFields[i] | async"
               [value]="option"
+              [attr.e2e]="'header-name-options-' + i + '-' + option"
             >
               {{ option }}
             </mat-option>
@@ -158,7 +162,7 @@
           <input
             matInput
             name="value-of-header"
-            [e2e]="'value-of-header-' + i"
+            [attr.e2e]="'e2e-value-of-header-' + i"
             formControlName="value"
             required
             [matAutocomplete]="headerValueAuto"
@@ -168,6 +172,7 @@
             <mat-option
               *ngFor="let option of filteredHeaderValues[i] | async"
               [value]="option"
+              [attr.e2e]="'header-value-options-' + i + '-' + option"
             >
               {{ option }}
             </mat-option>
@@ -177,7 +182,12 @@
             <strong>required</strong>
           </mat-error>
         </mat-form-field>
-        <button mat-icon-button (click)="removeHeader(i)" fxFlex="0 1 auto">
+        <button
+          mat-icon-button
+          (click)="removeHeader(i)"
+          fxFlex="0 1 auto"
+          [attr.e2e]="'e2e-remove-header-' + i"
+        >
           <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
       </div>
@@ -190,6 +200,7 @@
         fxLayout="row"
         fxLayoutAlign="center center"
         [ngClass]="{ 'tab-error': !queryParams.valid }"
+        e2e="e2e-query-tab"
       >
         Query Params &nbsp;
         <ng-container *ngIf="queryParams.controls.length">
@@ -204,6 +215,7 @@
         mat-stroked-button
         color="primary"
         (click)="addQueryParam()"
+        e2e="e2e-add-query-param-btn"
       >
         + Parameter
       </button>
@@ -225,7 +237,7 @@
           <input
             matInput
             name="name-of-query-param"
-            [e2e]="'name-of-query-param-' + i"
+            [attr.e2e]="'e2e-name-of-query-param-' + i"
             formControlName="key"
             required
             autocomplete="off"
@@ -242,7 +254,7 @@
           <input
             matInput
             name="value-of-query-parameter"
-            [e2e]="'value-of-query-parameter-' + i"
+            [attr.e2e]="'e2e-value-of-query-parameter-' + i"
             formControlName="value"
             required
             autocomplete="off"
@@ -252,7 +264,12 @@
             <strong>required</strong>
           </mat-error>
         </mat-form-field>
-        <button mat-icon-button (click)="removeQueryParam(i)" fxFlex="0 1 auto">
+        <button
+          mat-icon-button
+          (click)="removeQueryParam(i)"
+          fxFlex="0 1 auto"
+          [attr.e2e]="'e2e-remove-query-param-btn-' + i"
+        >
           <mat-icon fontIcon="icon-delete" color="warn"></mat-icon>
         </button>
       </div>

@@ -6,63 +6,146 @@
     <ng-template matStepperIcon="done">
       <mat-icon fontIcon="icon-checkmark"></mat-icon>
     </ng-template>
-    <mat-step e2e="create-dataset-first-window" [completed]="selectFullfilled" label="SELECT">
-      <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
+    <mat-step
+      e2e="create-dataset-first-window"
+      [completed]="selectFullfilled"
+      label="SELECT"
+    >
+      <select-rawdata
+        (onSelectFullfilled)="markSelectDone($event)"
+      ></select-rawdata>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="first-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
+        <button
+          e2e="first-window-stepperCancel"
+          mat-stroked-button
+          (click)="backtoLists()"
+          color="warn"
+          class="stepperBtn"
+        >
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button mat-raised-button e2e="first-window-stepperFwd" color="primary" matStepperNext class="stepperBtn">
+        <button
+          mat-raised-button
+          e2e="first-window-stepperFwd"
+          color="primary"
+          matStepperNext
+          class="stepperBtn"
+        >
           <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="create-dataset-second-window" [completed]="detailsFilled" label="DETAILS">
-      <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
+    <mat-step
+      e2e="create-dataset-second-window"
+      [completed]="detailsFilled"
+      label="DETAILS"
+    >
+      <dataset-details
+        #detailsComponent
+        [selFiles]="selectedFiles"
+        [previewConfig]="csvConfig"
+        (onDetailsFilled)="markDetailsDone($event)"
+      ></dataset-details>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="second-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
+        <button
+          e2e="second-window-stepperCancel"
+          mat-stroked-button
+          (click)="backtoLists()"
+          color="warn"
+          class="stepperBtn"
+        >
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button mat-stroked-button e2e="second-window-stepperPrev" color="primary" matStepperPrevious class="stepperBtn previous ">
+        <button
+          mat-stroked-button
+          e2e="second-window-stepperPrev"
+          color="primary"
+          matStepperPrevious
+          class="stepperBtn previous "
+        >
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <button mat-raised-button e2e="second-window-stepperFwd" color="primary" matStepperNext class="stepperBtn">
+        <button
+          mat-raised-button
+          e2e="second-window-stepperFwd"
+          color="primary"
+          matStepperNext
+          class="stepperBtn"
+        >
           <span i18n> Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="create-dataset-third-window" [completed]="previewDone" label="PREVIEW">
-      <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent
-        (parserConfig)="getParserConfig($event)"></parser-preview>
+    <mat-step
+      e2e="create-dataset-third-window"
+      [completed]="previewDone"
+      label="PREVIEW"
+    >
+      <parser-preview
+        *ngIf="selectedIndex === 2 || selectedIndex === 3"
+        [previewObj]="parsedPreview"
+        #previewComponent
+        (parserConfig)="getParserConfig($event)"
+      ></parser-preview>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="third-window-stepperCancel" mat-stroked-button (click)="backtoLists()" color="warn" class="stepperBtn">
+        <button
+          e2e="third-window-stepperCancel"
+          mat-stroked-button
+          (click)="backtoLists()"
+          color="warn"
+          class="stepperBtn"
+        >
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button e2e="third-window-stepperPrev" mat-stroked-button matStepperPrevious color="primary" class="stepperBtn previous">
+        <button
+          e2e="third-window-stepperPrev"
+          mat-stroked-button
+          matStepperPrevious
+          color="primary"
+          class="stepperBtn previous"
+        >
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <button e2e="third-window-stepperFwd" mat-raised-button color="primary" matStepperNext class="stepperBtn">
+        <button
+          e2e="third-window-stepperFwd"
+          mat-raised-button
+          color="primary"
+          matStepperNext
+          class="stepperBtn"
+        >
           <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="create-dataset-fourth-window" label="ADD_DATASET" [stepControl]="nameFormGroup">
+    <mat-step
+      e2e="create-dataset-fourth-window"
+      label="ADD_DATASET"
+      [stepControl]="nameFormGroup"
+    >
       <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
           <mat-list>
             <h3 class="list-header" mat-subheader i18n>Selected Files</h3>
-            <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
-              <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
+            <mat-list-item
+              class="list-items"
+              *ngFor="let file of selectedFiles; index as i"
+              (click)="previewDialog(file)"
+            >
+              <p mat-line>{{ i + 1 }}. &ensp; {{ file.name }}</p>
               <div class="icon-div">
-                <mat-icon mat-list-icon class="preview-icon" fontIcon="icon-show"></mat-icon>
+                <mat-icon
+                  mat-list-icon
+                  class="preview-icon"
+                  fontIcon="icon-show"
+                ></mat-icon>
               </div>
               <mat-divider></mat-divider>
             </mat-list-item>
@@ -75,17 +158,33 @@
           <mat-card-content>
             <div class="form-div">
               <form [formGroup]="nameFormGroup">
-                <section class="input-section">
+                <section class="input-section ">
                   <mat-form-field class="margin20">
-                    <input matInput placeholder="Dataset Name" e2e="dataset-name" name="datasetName" formControlName="nameControl"
-                      maxlength="18" required />
-                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')" i18n>
+                    <input
+                      matInput
+                      placeholder="Dataset Name"
+                      e2e="dataset-name"
+                      name="datasetName"
+                      formControlName="nameControl"
+                      maxlength="18"
+                      required
+                    />
+                    <mat-error
+                      *ngIf="
+                        nameFormGroup.controls.nameControl.hasError('required')
+                      "
+                      i18n
+                    >
                       Dataset Name is
                       <strong>required</strong>
                     </mat-error>
-                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('pattern')" i18n>
-                      <strong> Only alphabets, numbers are allowed
-                      </strong>
+                    <mat-error
+                      *ngIf="
+                        nameFormGroup.controls.nameControl.hasError('pattern')
+                      "
+                      i18n
+                    >
+                      <strong> Only alphabets, numbers are allowed </strong>
                     </mat-error>
                     <mat-hint> Only alphabets, numbers are allowed </mat-hint>
                   </mat-form-field>
@@ -102,9 +201,21 @@
                 </section>
                 <section class="input-section">
                   <mat-form-field class="margin20">
-                    <input matInput placeholder="Description" name="description" e2e="dataset-desc" formControlName="descControl"
-                      maxlength="50" required />
-                    <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')" i18n>
+                    <input
+                      matInput
+                      placeholder="Description"
+                      name="description"
+                      e2e="dataset-desc"
+                      formControlName="descControl"
+                      maxlength="50"
+                      required
+                    />
+                    <mat-error
+                      *ngIf="
+                        nameFormGroup.controls.descControl.hasError('required')
+                      "
+                      i18n
+                    >
                       Dataset description is
                       <strong>required</strong>
                     </mat-error>
@@ -132,16 +243,34 @@
         </mat-card>
       </div>
       <div fxLayout="row" fxLayoutGap="20px">
-        <button e2e="fourth-window-stepperCancel" mat-stroked-button (click)="backtoLists()" class="stepperBtn Outline">
+        <button
+          e2e="fourth-window-stepperCancel"
+          mat-stroked-button
+          (click)="backtoLists()"
+          class="stepperBtn Outline"
+        >
           <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button e2e="fourth-window-stepperPrev" mat-stroked-button color="primary" matStepperPrevious class="stepperBtn previous">
+        <button
+          e2e="fourth-window-stepperPrev"
+          mat-stroked-button
+          color="primary"
+          matStepperPrevious
+          class="stepperBtn previous"
+        >
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <button e2e="fourth-window-stepperAdd" mat-raised-button color="primary" matStepperNext [disabled]="!nameFormGroup.valid"
-          (click)="triggerParser()" class="stepperBtn">
+        <button
+          e2e="fourth-window-stepperAdd"
+          mat-raised-button
+          color="primary"
+          matStepperNext
+          [disabled]="!nameFormGroup.valid"
+          (click)="triggerParser()"
+          class="stepperBtn"
+        >
           <span i18n>ADD</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
