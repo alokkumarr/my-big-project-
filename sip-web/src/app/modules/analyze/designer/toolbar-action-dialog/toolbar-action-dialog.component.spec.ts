@@ -92,38 +92,4 @@ describe('Designer Chart Component', () => {
   it('should exist', () => {
     expect(fixture.componentInstance).not.toBeNull;
   });
-
-  it('validation for analysis name should fail if name has a * special character', () => {
-    const checkAnalysisNameChar = fixture.componentInstance.validateSaving('ABC*');
-    // should fail for usage of special characters
-    // disabled state is set to true.
-    expect(checkAnalysisNameChar).toBeTruthy();
-  });
-
-  it('should fail for length validation', () => {
-    const checkAnalysisNameChar = fixture.componentInstance.validateSaving(
-      'QWERTYUIOPSDFGHJKLZXCVBNM234567890QWERTYUIOPASDFGHJKL'
-    );
-    // should fail for length validation
-    // disabled state is set to true.
-    expect(checkAnalysisNameChar).toBeTruthy();
-  });
-
-  it('should accept a correct analysis name', () => {
-    const checkAnalysisNameChar = fixture.componentInstance.validateSaving(
-      'Untitled Analysis'
-    );
-    // should accept a correct form of analysis name
-    // disabled state is set to false.
-    expect(checkAnalysisNameChar).toBeFalsy();
-  });
-
-  it('should accept a correct analysis name with multi byte characters', () => {
-    const checkAnalysisNameChar = fixture.componentInstance.validateSaving(
-      'Untitled Analysis 😴 漢字'
-    );
-    // should accept a correct form of analysis name
-    // disabled state is set to false.
-    expect(checkAnalysisNameChar).toBeFalsy();
-  });
 });

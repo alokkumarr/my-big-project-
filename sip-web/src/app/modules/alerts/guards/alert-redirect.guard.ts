@@ -12,10 +12,8 @@ export class AlertRedirectGuard implements CanActivate {
     const cat = this._jwt.getCategories('ALERTS');
     const subFeatures = get(cat, '0.productModuleSubFeatures');
     const firstFeature = first(subFeatures);
-    console.log('subFeatures', subFeatures);
     if (firstFeature) {
       const url = firstFeature.defaultURL;
-      console.log('url', url);
       setTimeout(() => {
         this._router.navigate(['alerts', url]);
       }, 100);
