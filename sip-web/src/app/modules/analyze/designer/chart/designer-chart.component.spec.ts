@@ -16,6 +16,47 @@ class ChartStubComponent {
 
 class ChartStubService {}
 
+const sipQuery = {
+  artifacts: [
+    {
+      artifactsName: 'sales',
+      fields: [
+        {
+          area: 'x',
+          columnName: 'date',
+          alias: '',
+          dataField: 'date',
+          displayName: 'Date',
+          groupInterval: null,
+          name: 'date',
+          table: 'sales',
+          type: 'date'
+        },
+        {
+          area: 'y',
+          columnName: 'double',
+          alias: '',
+          dataField: 'double',
+          displayName: 'Double',
+          groupInterval: null,
+          name: 'double',
+          table: 'sales',
+          type: 'double'
+        }
+      ]
+    }
+  ],
+  filters: [],
+  sorts: [],
+  joins: [],
+  store: {
+    dataStore: null,
+    storageType: null
+  },
+  semanticId: 'workbench::sample-elasticsearch',
+  booleanCriteria: 'AND'
+};
+
 describe('Designer Chart Component', () => {
   let fixture: ComponentFixture<DesignerChartComponent>;
 
@@ -39,52 +80,14 @@ describe('Designer Chart Component', () => {
 
   it('should set sqlbuilder', () => {
     const component = fixture.componentInstance;
-    component.setSipQuery = {
-      artifacts: [
-        {
-          artifactsName: 'sales',
-          fields: [
-            {
-              area: 'x',
-              columnName: 'date',
-              alias: '',
-              dataField: 'date',
-              displayName: 'Date',
-              groupInterval: null,
-              name: 'date',
-              table: 'sales',
-              type: 'date'
-            },
-            {
-              area: 'y',
-              columnName: 'double',
-              alias: '',
-              dataField: 'double',
-              displayName: 'Double',
-              groupInterval: null,
-              name: 'double',
-              table: 'sales',
-              type: 'double'
-            }
-          ]
-        }
-      ],
-      filters: [],
-      sorts: [],
-      joins: [],
-      store: {
-        dataStore: null,
-        storageType: null
-      },
-      semanticId: 'workbench::sample-elasticsearch',
-      booleanCriteria: 'AND'
-    };
+    component.setSipQuery = sipQuery;
     expect(component.sipQuery).not.toBeNull();
   });
 
   it('should reload chart on data change', () => {
     const component = fixture.componentInstance;
     const reloadChartSpy = spyOn(component, 'reloadChart');
+    component.sipQuery = sipQuery;
     component.data = [{}];
     expect(reloadChartSpy).toHaveBeenCalled();
   });
@@ -95,6 +98,7 @@ describe('Designer Chart Component', () => {
     component.auxSettings = [{}];
     expect(reloadChartSpy).not.toHaveBeenCalled();
 
+    component.sipQuery = sipQuery;
     component.data = [{}];
     component.auxSettings = [{}, {}];
     expect(reloadChartSpy).toHaveBeenCalledTimes(2);
