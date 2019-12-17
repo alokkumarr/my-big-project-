@@ -325,6 +325,8 @@ public class StorageProxyController {
     if (isPublishedExecution) {
       Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
       analysis.setUserId(uid);
+      analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
+          : analysis.getCreatedTime());
       analysis.setModifiedTime(Instant.now().toEpochMilli());
       analysis.setModifiedBy(authTicket.getUserFullName());
       proxyService.updateAnalysis(analysis);

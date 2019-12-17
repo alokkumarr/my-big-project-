@@ -31,12 +31,21 @@
                 formControlName="alertRuleName"
                 e2e="alertRuleName"
               />
+
               <mat-error
                 *ngIf="
                   alertDefFormGroup.controls.alertRuleName.hasError('required')
                 "
                 >This field is required</mat-error
               >
+              <mat-error *ngIf="alertDefFormGroup.value.alertRuleName.length > nameLengthLimit" i18n>
+                <strong> {{displayErrorMessage('nameLength')}}
+                </strong>
+              </mat-error>
+              <mat-error *ngIf="alertDefFormGroup.controls.alertRuleName.hasError('nameIsInValid')" i18n>
+                <strong> {{displayErrorMessage('specialChars')}}
+                </strong>
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
