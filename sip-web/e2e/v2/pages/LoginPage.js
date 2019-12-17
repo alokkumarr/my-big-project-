@@ -12,6 +12,9 @@ class LoginPage {
     this._password = element(by.css(`[e2e='password-input']`));
     this._loginButton = element(by.css(`[e2e='login-btn']`));
     this._errorMessage = element(by.css(`[e2e='error-msg-section']`));
+    this._accountMenuButton = element(by.css(`[e2e='account-settings-menu-btn']`));
+    this._logoutButton = element(by.css(`[e2e='account-settings-selector-logout']`));
+    this._loginErrorMessage = element(by.css(`[e2e='error-msg']`));
   }
 
   fillUserNameField(userName) {
@@ -27,6 +30,19 @@ class LoginPage {
   clickOnLoginButton() {
     logger.debug('Click on login button');
     commonFunctions.clickOnElement(this._loginButton);
+  }
+
+  clickAccountSettings() {
+    logger.debug('Click on Account Menu button');
+    commonFunctions.waitFor.elementToBeClickable(this._accountMenuButton,10000);
+    commonFunctions.clickOnElement(this._accountMenuButton);
+  }
+
+  clickLogout() {
+    logger.debug('Click on logout button');
+    commonFunctions.waitFor.elementToBeClickable(this._logoutButton,10000);
+    commonFunctions.clickOnElement(this._logoutButton);
+    commonFunctions.waitFor.elementToBeNotVisible(this._logoutButton,10000);
   }
 
   doLogin(userName, password) {
@@ -107,9 +123,10 @@ class LoginPage {
     }
   }
 
-  verifyError(expectedMessage) {
-    commonFunctions.waitFor.elementToBeVisible(this._errorMessage);
-    expect(this._errorMessage.getText()).toEqual(expectedMessage);
+  verifyErrorMessage(expectedMessage) {
+    commonFunctions.waitFor.elementToBeVisible(this._loginErrorMessage);
+    expect(this._loginErrorMessage.getText()).toEqual(expectedMessage);
+    logger.debug('Error Message validation successful');
   }
 }
 module.exports = LoginPage;

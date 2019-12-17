@@ -190,7 +190,7 @@ exports.config = {
         process.exit(1);
       }
 
-      try {
+       try {
         logger.info('Generating test for this run...');
 
         let APICommonHelpers = require('../helpers/api/APICommonHelpers');

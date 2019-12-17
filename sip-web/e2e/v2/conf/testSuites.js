@@ -59,13 +59,13 @@ const CRITICAL = [
 // All tests which were executed in critical with larger data set
 const REGRESSION = [
   ...CRITICAL,
-  TEST_BASE_DIR + 'change-password/changepassword.test.js'
+  TEST_BASE_DIR + 'change-password/changepassword.test.js',
+  TEST_BASE_DIR + 'admin/userManagement-create-role_user.test.js'
 ];
 // Used for local development and testing some implementations
 const DEVELOPMENT = [
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests1.js',
   //TEST_BASE_DIR + 'dummy/dummyDevelopmentTests2.js'
-  TEST_BASE_DIR + 'admin-page/user-Management.test.js'
 ];
 
 module.exports = {

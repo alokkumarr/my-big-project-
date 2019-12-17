@@ -1,0 +1,94 @@
+{
+  "ADMIN_MODULE": {
+    "positiveTest": {
+      "ADMIN": {
+        "suites": [
+          "development"
+        ],
+        "role": "TestAdmin",
+        "roleDescription": "masterAdmin Should be able to create Admin with Role",
+        "roleType": "ADMIN",
+        "user": "masterAdmin",
+        "firstName": "ADMIN",
+        "middleName": "0",
+        "lastName": "USER",
+        "loginid": "ADMIN001",
+        "pwd": "Login@001",
+        "spacePassword": "   ",
+        "lowercasePassword": "login",
+        "uppercasePassword": "LOGIN",
+        "lowerUpperCasePassword": "loginLogin",
+        "lowercaseNumberPassword": "login1234",
+        "uppercaseNumberPassword": "LOGIN1234",
+        "numberPassword": "12345678",
+        "passwordStatus": "false",
+        "errorMessage": "Password should have",
+        "email": "ADMIN001@xyz.com",
+        "invalidEmail": "ADMIN001",
+        "activeStatus": "ACTIVE",
+        "description": "masterAdmin Should be able to create Admin user with validating email and password fields"
+      },
+      "USER": {
+        "suites": [
+          "development"
+        ],
+        "role": "TestUser",
+        "roleDescription": "Master admin should be able to create User with Role",
+        "roleType": "USER",
+        "user": "masterAdmin",
+        "firstName": "TEST",
+        "middleName": "0",
+        "lastName": "USER",
+        "loginid": "USER001",
+        "pwd": "Login@001",
+        "spacePassword": "   ",
+        "lowercasePassword": "login",
+        "uppercasePassword": "LOGIN",
+        "lowerUpperCasePassword": "loginLogin",
+        "lowercaseNumberPassword": "login1234",
+        "uppercaseNumberPassword": "LOGIN1234",
+        "numberPassword": "12345678",
+        "passwordStatus": "false",
+        "errorMessage": "Password should have",
+        "email": "USER001@xyz.com",
+        "invalidEmail": "ADMIN001",
+        "activeStatus": "ACTIVE",
+        "description": "masterAdmin Should be able to create user with validating email and password fields"
+      }
+    },
+    "negativeTest": {
+      "ADMIN": {
+        "suites": ["development"],
+        "user": "masterAdmin",
+        "role": "AdminNegative",
+        "roleType": "ADMIN",
+        "firstName": "TEST",
+        "middleName": "0",
+        "lastName": "ADMIN",
+        "loginid": "ADMIN002",
+        "pwd": "Login@002",
+        "email": "ADMIN002@xyz.com",
+        "roleDescription": "masterAdmin Should not be able to create Admin user with Inactive Status",
+        "description": "masterAdmin Should not be able to create Admin user with Inactive Status",
+        "activeStatus": "ACTIVE",
+        "inactiveStatus": "INACTIVE"
+      },
+      "USER": {
+        "suites": ["development"],
+        "user": "masterAdmin",
+        "role": "UserNegative",
+        "roleType": "USER",
+        "firstName": "TEST",
+        "middleName": "0",
+        "lastName": "USER",
+        "loginid": "USER002",
+        "pwd": "Login@002",
+        "email": "USER002@xyz.com",
+        "roleDescription": "masterAdmin Should not be able to create user with Inactive Status",
+        "description": "masterAdmin Should not be able to create user with Inactive Status",
+        "activeStatus": "ACTIVE",
+        "inactiveStatus": "INACTIVE"
+      }
+    }
+  }
+}

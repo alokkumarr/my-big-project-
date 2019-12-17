@@ -99,5 +99,11 @@ class Header extends SideNav {
   clickOnToastMessage() {
     commonFunctions.clickOnElement(this._toastMessage);
   }
+  clickOnAdminLink(PageName) {
+    commonFunctions.clickOnElement(this._adminLink);
+  }
+  verifyStatusOfAdminLink() {
+    commonFunctions.waitFor.elementToBeNotVisible(this._adminLink);
+  }
 }
 module.exports = Header;

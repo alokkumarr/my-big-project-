@@ -215,8 +215,8 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dummyDevelopmentTests1.js',
-      testBaseDir + 'dummyDevelopmentTests2.js'
+      /* testBaseDir + 'dummyDevelopmentTests1.js',
+      testBaseDir + 'dummyDevelopmentTests2.js', */
     ]
   },
   onCleanUp: function(results) {
@@ -320,7 +320,7 @@ exports.config = {
         process.exit(1);
       }
 
-      try {
+       try {
         logger.info('Generating test for this run...');
 
         let APICommonHelpers = require('./v2/helpers/api/APICommonHelpers');

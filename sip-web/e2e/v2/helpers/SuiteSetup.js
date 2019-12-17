@@ -169,6 +169,7 @@ class SuiteSetup {
       logger.info('Reading file for executing test suite: ' + file);
       let data = JSON.parse(fs.readFileSync(location + '/' + file, 'utf8'));
       completeTestData = Object.assign(data, completeTestData);
+      logger.info('Read file for execution: ' + file);
     });
     // Filter the data based on suite
     if (currentSuite) {

@@ -31,7 +31,7 @@ describe('Executing login tests from ChangePasswd.test.js', () => {
   using(testDataReader.testData['CHANGEPWD']['negativeTests'] ? testDataReader.testData['CHANGEPWD']['negativeTests'] : {}, (data, id) => {
         it(`${id}:${data.description}`, () => {
         let loginPage = new LoginPage();
-        loginPage.doLogin(users[data.user].loginId,users.anyUser.password);;
+        loginPage.doLogin(users[data.user].loginId,users.anyUser.password);
         let header = new Header();
         header.verifyLogo();
         header.doChangePassword();
@@ -59,5 +59,5 @@ describe('Executing login tests from ChangePasswd.test.js', () => {
       header.verifyLogo();
       header.doLogout();
   }).result.testInfo = { testId: id, data: data, feature: 'CHANGEPWD', dataProvider: 'positiveTests' };
-}); 
+});
 });
