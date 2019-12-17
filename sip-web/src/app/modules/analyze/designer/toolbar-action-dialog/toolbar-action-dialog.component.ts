@@ -6,6 +6,8 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
+import { validateEntityName
+} from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
   selector: 'toolbar-action-dialog',
@@ -16,7 +18,6 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;
   progressSub;
   filterValid = true;
-  validateCheck: any;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -41,17 +42,8 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.progressSub.unsubscribe();
   }
 
-  validateSaving(analysisName) {
-    const analysisNameLength = analysisName.length;
-    // Due to an error in generating an excel file during dispatch opearation,
-    // we need to apply the following length and special character rules.
-    this.validateCheck = {
-      validateLength: analysisNameLength === 0 || analysisNameLength > 30 ? true : false,
-      validateCharacters: /[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(analysisName)
-    };
-    const { validateLength, validateCharacters } = this.validateCheck;
-    const validationStateFail = validateLength || validateCharacters;
-    return validationStateFail;
+  validateNameField(name) {
+    return validateEntityName(name);
   }
 
   onBack() {
@@ -93,6 +85,9 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   }
 
   save(action) {
+    if (this.validateNameField(this.data.analysis.name).state) {
+      return;
+    }
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then((response: any) => {
