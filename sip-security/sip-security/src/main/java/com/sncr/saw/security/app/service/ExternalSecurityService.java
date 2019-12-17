@@ -45,7 +45,7 @@ public class ExternalSecurityService {
   @Autowired
   private UserRepository userRepository;
 
-  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\[\\]\\\\]";
+  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\s+\\[\\]\\\\]";
 
   private boolean haveCategoryCheck = false;
   private boolean haveSubCategoryFlag = false;
