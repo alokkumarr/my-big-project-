@@ -50,7 +50,7 @@ public class SipCommonUtils {
   /**
    * Validates the Name for file, analysis etc.
    *
-   * @param name  name
+   * @param name name
    */
   public static void validateName(String name) {
     if (name.isEmpty()) {
@@ -70,5 +70,17 @@ public class SipCommonUtils {
                   + "less than or equal to 30",
               name));
     }
+  }
+
+  /**
+   * Validate customerId to avoid direct reference.
+   *
+   * @param customerId customer id from customer
+   * @param request HttpServletRequest request from SIP token
+   * @return true if id matched.
+   */
+  public static boolean haveValidCustomerId(Long customerId, HttpServletRequest request) {
+    Ticket ticket = getTicket(request);
+    return !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId);
   }
 }

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
@@ -80,8 +79,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -1092,8 +1089,7 @@ public class SecurityController {
 		Valid valid = null;
 
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (user != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(user.getCustomerId())) {
+      if (user != null && SipCommonUtils.haveValidCustomerId(user.getCustomerId(), request)) {
 			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
                 userList.setValid(validity.getValid());
                 userList.setValidityMessage(validity.getValidityMessage());
@@ -1131,10 +1127,8 @@ public class SecurityController {
 	public UsersList updateUser(HttpServletRequest request, @RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
-        int validPatternCnt= 0;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (user != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(user.getCustomerId())) {
+      if (user != null && SipCommonUtils.haveValidCustomerId(user.getCustomerId(), request)) {
 				userList.setValid(true);
 				if (user.getPassword() != null) {
 				    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
@@ -1175,9 +1169,8 @@ public class SecurityController {
 	public UsersList deleteUser(HttpServletRequest request, @RequestBody DeleteUser deleteUser) {
 		UsersList userList = new UsersList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null
-          && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(deleteUser.getCustomerId())) {
+          && SipCommonUtils.haveValidCustomerId(deleteUser.getCustomerId(), request)) {
 				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
 					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
 					userList.setValid(true);
@@ -1208,8 +1201,7 @@ public class SecurityController {
 	public RolesDropDownList getRoles(HttpServletRequest request, @RequestBody Long customerId) {
 		RolesDropDownList roles = new RolesDropDownList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (customerId != null && SipCommonUtils.haveValidCustomerId(customerId, request)) {
 				roles.setRoles(userRepository.getRolesDropDownList(customerId));
 				roles.setValid(true);
 			} else {
@@ -1236,7 +1228,7 @@ public class SecurityController {
 		RolesList roleList = new RolesList();
 		try {
       Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (customerId != null && SipCommonUtils.haveValidCustomerId(customerId, request)) {
 				roleList.setRoles(userRepository.getRoles(customerId));
 				roleList.setValid(true);
 			} else {
@@ -1285,8 +1277,7 @@ public class SecurityController {
 		RolesList roleList = new RolesList();
 		Valid valid = null;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-			if (role != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(role.getCustSysId())) {
+			if (role != null && SipCommonUtils.haveValidCustomerId(role.getCustSysId(), request)) {
 				valid = userRepository.addRole(role);
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
@@ -1321,7 +1312,7 @@ public class SecurityController {
 		try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteRole.getRoleId() != null && deleteRole.getCustomerId() != null && deleteRole.getMasterLoginId() != null
-          && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(deleteRole.getCustomerId())) {
+          && SipCommonUtils.haveValidCustomerId(deleteRole.getCustomerId(), request)) {
 				if (userRepository.checkUserExists(deleteRole.getRoleId())) {
 					roleList.setValid(false);
 					roleList.setValidityMessage("Role could not be deleted as User(s) exists in this role.");
@@ -1360,8 +1351,7 @@ public class SecurityController {
 		RolesList roleList = new RolesList();
 		Valid valid = null;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-			if (role != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(role.getCustSysId())) {
+      if (role != null && SipCommonUtils.haveValidCustomerId(role.getCustSysId(), request)) {
 				valid = userRepository.updateRole(role);
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
@@ -1393,8 +1383,7 @@ public class SecurityController {
 	public PrivilegesList getPrivileges(HttpServletRequest request, @RequestBody Long customerId) {
 		PrivilegesList privList = new PrivilegesList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (customerId != null && SipCommonUtils.haveValidCustomerId(customerId, request)) {
 				privList.setPrivileges(userRepository.getPrivileges(customerId));
 				privList.setValid(true);
 			} else {
@@ -1421,8 +1410,7 @@ public class SecurityController {
 	public ProductDropDownList getProductsList(HttpServletRequest request, @RequestBody Long customerId) {
 		ProductDropDownList products = new ProductDropDownList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (customerId != null && SipCommonUtils.haveValidCustomerId(customerId, request)) {
         products.setProducts(userRepository.getProductsDropDownList(customerId));
         products.setValid(true);
       } else {
@@ -1448,8 +1436,7 @@ public class SecurityController {
 	public ModuleDropDownList getModulesList(HttpServletRequest request, @RequestBody CustProdModule cpm) {
 		ModuleDropDownList modules = new ModuleDropDownList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpm.getCustomerId())) {
+      if (SipCommonUtils.haveValidCustomerId(cpm.getCustomerId(), request)) {
         modules.setModules(userRepository.getModulesDropDownList(cpm.getCustomerId(), cpm.getProductId()));
         modules.setValid(true);
       } else {
@@ -1476,8 +1463,7 @@ public class SecurityController {
 	public CategoryList getcategoriesList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpm.getCustomerId())) {
+      if (SipCommonUtils.haveValidCustomerId(cpm.getCustomerId(), request)) {
         categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(), false));
         categories.setValid(true);
       } else {
@@ -1504,8 +1490,7 @@ public class SecurityController {
 	public SubCategoryWithPrivilegeList getSubCategoriesList(HttpServletRequest request, @RequestBody CustomerProductSubModule cpsm) {
 		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpsm.getCustomerId())){
+      if (SipCommonUtils.haveValidCustomerId(cpsm.getCustomerId(), request)){
         subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
         subcategories.setValid(true);
       } else {
@@ -1532,8 +1517,7 @@ public class SecurityController {
 		PrivilegesList privList = new PrivilegesList();
 		Valid valid = null;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-			if (addPrivilegeDetails != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(addPrivilegeDetails.getCustomerId())) {
+      if (addPrivilegeDetails != null && SipCommonUtils.haveValidCustomerId(addPrivilegeDetails.getCustomerId(), request)) {
 				valid = userRepository.upsertPrivilege(addPrivilegeDetails);
 				if (valid.getValid()) {
 					privList.setPrivileges(userRepository.getPrivileges(addPrivilegeDetails.getCustomerId()));
@@ -1566,8 +1550,7 @@ public class SecurityController {
 		PrivilegesList privList = new PrivilegesList();
 		Valid valid = null;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-			if (privilege != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(privilege.getCustomerId())) {
+      if (privilege != null && SipCommonUtils.haveValidCustomerId(privilege.getCustomerId(), request)) {
 				valid = userRepository.updatePrivilege(privilege);
 				if (valid.getValid()) {
 					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
@@ -1599,8 +1582,7 @@ public class SecurityController {
 	public PrivilegesList deletePrivilege(HttpServletRequest request, @RequestBody DeletePrivilege privilege) {
 		PrivilegesList privList = new PrivilegesList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (privilege != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(privilege.getCustomerId())) {
+      if (privilege != null && SipCommonUtils.haveValidCustomerId(privilege.getCustomerId(), request)) {
 				if (userRepository.deletePrivilege(privilege.getPrivilegeId())) {
 					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
 					privList.setValid(true);
@@ -1631,8 +1613,7 @@ public class SecurityController {
 	public CategoryList getCategories(HttpServletRequest request, @RequestBody Long customerId) {
 		CategoryList catList = new CategoryList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (customerId != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId)) {
+      if (customerId != null && SipCommonUtils.haveValidCustomerId(customerId, request)) {
 				catList.setCategories(userRepository.getCategories(customerId));
 				catList.setValid(true);
 			} else {
@@ -1660,8 +1641,7 @@ public class SecurityController {
 		CategoryList catList = new CategoryList();
 		Valid valid = null;
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (category != null && !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+      if (category != null && SipCommonUtils.haveValidCustomerId(category.getCustomerId(), request)) {
 			 if(!userRepository.checkIsModulePresent(category.getModuleId(),ALERTS)){
 				if (!userRepository.checkCatExists(category)) {
 					valid = userRepository.addCategory(category);
@@ -1705,8 +1685,7 @@ public class SecurityController {
 	public CategoryList getcategoriesOnlyList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(cpm.getCustomerId())) {
+      if (SipCommonUtils.haveValidCustomerId(cpm.getCustomerId(), request)) {
         categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
         categories.setValid(true);
       } else {
@@ -1764,8 +1743,7 @@ public class SecurityController {
 	public CategoryList deleteSubCategories(HttpServletRequest request, @RequestBody DeleteCategory category) {
 		CategoryList catList = new CategoryList();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+      if (SipCommonUtils.haveValidCustomerId(category.getCustomerId(), request)) {
         if (userRepository.deleteCategory(category.getCategoryId())) {
           catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
           catList.setValid(true);
@@ -1797,8 +1775,7 @@ public class SecurityController {
 		CategoryList catList = new CategoryList();
 		Valid valid = new Valid();
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      if (!ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(category.getCustomerId())) {
+      if (SipCommonUtils.haveValidCustomerId(category.getCustomerId(), request)) {
         if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
           catList.setValid(false);
           catList.setValidityMessage(
