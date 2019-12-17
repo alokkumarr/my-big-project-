@@ -178,14 +178,9 @@ public class ExternalSecurityService {
                           if (valid.getValid()) {
                             String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
                             List<Privilege> privilegeList = new ArrayList<>();
-                            detailsCategory.getSubCategory().forEach(subCat -> {
-                              privilege.forEach(privName -> {
-                                Privilege privileges = new Privilege();
-                                privileges.setPrivilegeDesc(privName);
-                                privilegeList.add(privileges);
-                              });
-                              subCat.setPrivileges(privilegeList);
-                            });
+                            Privilege privileges = new Privilege();
+                            privileges.setPrivilegeDesc(String.join(",", privilege));
+                            privilegeList.add(privileges);
                             response.setMessage(pMessage);
                           }
                         }
@@ -347,8 +342,7 @@ public class ExternalSecurityService {
             // fetch category/subcategory for this role
             CategoryList categoryList = new CategoryList();
             if ("Active".equalsIgnoreCase(fetchedRole.getActiveStatusInd())) {
-              List<CategoryDetails> customerCatList =
-                  userRepository.getCategories(customerSysId);
+              List<CategoryDetails> customerCatList = userRepository.fetchCategoriesByProdModId(moduleDetails, fetchedRole.getRoleSysId());
               categoryList.setCategories(fetchResponseCategoryDetails(request, moduleDetails, fetchedRole.getRoleSysId(), customerCatList));
               categoryList.setMessage("Category/Subcategory fetched for Customer Product Module Combination.");
               categoryList.setValid(true);
@@ -553,6 +547,7 @@ public class ExternalSecurityService {
     role.setRoleDesc(inputRole.getRoleDesc());
     role.setRoleType(RoleType.fromValue(inputRole.getRoleType()));
     role.setCustSysId(moduleDetails.getCustomerSysId());
+    role.setMyAnalysis(true);
     return role;
   }
 

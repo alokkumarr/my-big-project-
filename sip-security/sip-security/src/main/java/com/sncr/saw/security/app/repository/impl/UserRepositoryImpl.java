@@ -16,6 +16,7 @@ import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.CustomerProductModuleFeature;
 import com.sncr.saw.security.common.bean.repo.PasswordDetails;
+import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.TicketDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
@@ -2873,4 +2874,70 @@ public class UserRepositoryImpl implements UserRepository {
     }
     return false;
   }
+
+  @Override
+  public List<CategoryDetails> fetchCategoriesByProdModId(ProductModuleDetails productModuleDetails, Long roleId) {
+    ArrayList<CategoryDetails> categoryList = null;
+    ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
+        + "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,CPMF.FEATURE_CODE,"
+        + " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND FROM USERS U "
+        + " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
+        + " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
+        + " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
+        + " ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) INNER JOIN PRODUCTS P ON "
+        + " (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON "
+        + " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+        + " WHERE "
+        + " P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
+        + " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  AND C.CUSTOMER_SYS_ID=? AND P.PRODUCT_SYS_ID = ? AND M.MODULE_SYS_ID = ?");
+
+
+    try {
+      categoryList = jdbcTemplate.query(sql.toString(), preparedStatement -> {
+        preparedStatement.setLong(1, productModuleDetails.getCustomerSysId());
+        preparedStatement.setLong(2, productModuleDetails.getProductId());
+        preparedStatement.setLong(3, productModuleDetails.getModuleId());
+      }, new UserRepositoryImpl.CategoryDetailExtractor());
+
+      ArrayList<CategoryDetails> categoryParentSorted = new ArrayList<CategoryDetails>();
+      ArrayList<CategoryDetails> categoryChildSorted = new ArrayList<CategoryDetails>();
+      ArrayList<SubCategoryDetails> subCategory = null;
+
+      for (CategoryDetails catDetails : categoryList) {
+
+        if (catDetails.getCategoryType().split("_")[0].equals("PARENT")) {
+          categoryParentSorted.add(catDetails);
+        } else if (catDetails.getCategoryType().split("_")[0].equals("CHILD")) {
+          categoryChildSorted.add(catDetails);
+        }
+      }
+
+      for (CategoryDetails catPDetails : categoryParentSorted) {
+        subCategory = new ArrayList<SubCategoryDetails>();
+        for (CategoryDetails catCDetails : categoryChildSorted) {
+          SubCategoryDetails subCategories = new SubCategoryDetails();
+          if (catCDetails.getCategoryType().split("_")[1].equals(catPDetails.getCategoryCode())) {
+            subCategories.setSubCategoryId(catCDetails.getCategoryId());
+            subCategories.setSubCategoryName(catCDetails.getCategoryName());
+            subCategories.setSubCategoryDesc(catCDetails.getCategoryDesc());
+            subCategories.setActivestatusInd(catCDetails.getActiveStatusInd());
+            subCategory.add(subCategories);
+          }
+        }
+        catPDetails.setSubCategories(subCategory);
+        catList.add(catPDetails);
+      }
+
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
+    }
+    return catList;
+  }
+
+
 }

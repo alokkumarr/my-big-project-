@@ -8,6 +8,7 @@ import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryWithPrivilegeDetails;
@@ -69,4 +70,5 @@ public interface UserRepository {
 	Long createAdminUserForOnboarding(User user);
 	Boolean IsTicketValid(String ticketId, String masterLogin);
 	DataSecurityKeys fetchDSKDetailByUserId(String userId);
+	List<CategoryDetails> fetchCategoriesByProdModId(ProductModuleDetails productModuleDetails, Long roleId);
 }
