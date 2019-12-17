@@ -29,10 +29,17 @@ export class PrivilegeRowComponent {
   PRIVILEGE_NAMES = PRIVILEGE_NAMES;
   privilegeCodeList: Boolean[];
   subCategory;
+  isDraftsSubCategory = false;
+
+  @Input() categoryName: string;
+
   @Input('subCategory') set _subCategory(subCategory) {
     if (!subCategory) {
       return;
     }
+    this.isDraftsSubCategory =
+      this.categoryName === 'My Analysis' &&
+      subCategory.subCategoryName === 'DRAFTS';
     this.subCategory = subCategory;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
@@ -84,7 +91,15 @@ export class PrivilegeRowComponent {
   }
 
   onAccessClicked() {
-    this.privilegeCodeList[0] = !this.privilegeCodeList[0];
+    const hasAccess = this.privilegeCodeList[0];
+    this.privilegeCodeList[0] = !hasAccess;
+    if (this.isDraftsSubCategory) {
+      if (hasAccess) {
+        this.onAllClicked();
+      } else {
+        this.onAllClicked();
+      }
+    }
     const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
     this.categoryChange.emit(privilege);
   }

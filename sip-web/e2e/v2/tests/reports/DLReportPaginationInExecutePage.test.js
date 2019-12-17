@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing pagination in execute page for reports from reports/DLReportPaginationInExecutePage.test.js', () => {
   let analysisId;
@@ -20,7 +21,11 @@ describe('Executing pagination in execute page for reports from reports/DLReport
   beforeAll(() => {
     logger.info('Starting reports/DLReportPaginationInExecutePage tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -33,7 +38,12 @@ describe('Executing pagination in execute page for reports from reports/DLReport
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();

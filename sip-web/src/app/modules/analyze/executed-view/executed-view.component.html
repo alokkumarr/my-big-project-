@@ -158,6 +158,7 @@
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
           <div
+            *ngIf="canUserExecute; else elseBlock"
             class="prompt-execution-container"
             fxLayout="column"
             fxLayoutAlign="center center"
@@ -176,6 +177,15 @@
               Execute
             </button>
           </div>
+          <ng-template #elseBlock>
+            <div
+              class="prompt-execution-container"
+              fxLayout="column"
+              fxLayoutAlign="center center"
+            >
+              <span i18n>You are not authorized to view this</span>
+            </div>
+          </ng-template>
         </div>
 
         <div

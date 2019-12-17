@@ -66,12 +66,12 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     {
       label: 'Publish',
       value: 'publish',
-      fn: this.publish.bind(this, 'publish')
+      fn: this.publish.bind(this)
     },
     {
       label: 'Schedule',
       value: 'publish',
-      fn: this.publish.bind(this, 'schedule')
+      fn: this.schedule.bind(this)
     },
     {
       label: 'Export',
@@ -133,14 +133,20 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     });
   }
 
-  publish(type) {
+  publish() {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService
-      .publish(analysis, type)
-      .then(publishedAnalysis => {
-        this.analysis = publishedAnalysis;
-        this.afterPublish.emit(publishedAnalysis);
-      });
+    this._analyzeActionsService.publish(analysis).then(publishedAnalysis => {
+      this.analysis = publishedAnalysis;
+      this.afterPublish.emit(publishedAnalysis);
+    });
+  }
+
+  schedule() {
+    const analysis = clone(this.analysis);
+    this._analyzeActionsService.schedule(analysis).then(scheduledAnalysis => {
+      this.analysis = scheduledAnalysis;
+      this.afterPublish.emit(scheduledAnalysis);
+    });
   }
 
   export() {
