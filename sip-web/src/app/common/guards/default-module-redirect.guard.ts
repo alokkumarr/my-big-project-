@@ -5,10 +5,8 @@ import { CONFIG_KEY, PREFERENCES } from '../services/configuration.service';
 
 const DEFAULT_ROUTE = '/analyze';
 import { JwtService } from './../../common/services/jwt.service';
-import {
-  map,
-  get
-} from 'lodash';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
 
 @Injectable()
 export class DefaultModuleGuard implements CanActivate {
