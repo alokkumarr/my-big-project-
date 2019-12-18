@@ -21,7 +21,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
   @Input() placeholder: string;
   @Input() delay: number;
 
-  @ViewChild('searchInput') searchInput: ElementRef;
+  @ViewChild('searchInput', { static: true }) searchInput: ElementRef;
 
   states = {
     hovered: false,

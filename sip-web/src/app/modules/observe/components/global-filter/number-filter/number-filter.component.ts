@@ -26,7 +26,7 @@ import * as get from 'lodash/get';
 })
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
-  @ViewChild('slider') slider: DxRangeSliderComponent;
+  @ViewChild('slider', { static: true }) slider: DxRangeSliderComponent;
 
   public _filter;
   public step = 1; // tslint:disable-line

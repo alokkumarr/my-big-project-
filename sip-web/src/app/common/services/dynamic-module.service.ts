@@ -17,7 +17,6 @@ import * as AngularBrowswer from '@angular/platform-browser';
 import * as AngularBrowserDynamic from '@angular/platform-browser-dynamic';
 import * as AngularSplit from 'angular-split';
 import * as AngularCountTo from 'angular2-counto';
-import * as CoreJs from 'core-js';
 import * as DevextremeAngular from 'devextreme-angular';
 import * as Lodash from 'lodash';
 import * as LodashFp from 'lodash/fp';
@@ -46,7 +45,6 @@ const dependencies = {
   '@angular/platform-browser-dynamic': AngularBrowserDynamic,
   'angular-split': AngularSplit,
   'angular2-counto': AngularCountTo,
-  'core-js': CoreJs,
   'devextreme-angular': DevextremeAngular,
   'rxjs': Rxjs,
   'rxjs/operators': RxjsOperators,

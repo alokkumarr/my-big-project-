@@ -89,7 +89,7 @@ export class ChartGridComponent {
       this._headerProgress.hide();
     });
   }
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
 
   public analysis: AnalysisDSL;
   public chartOptions: ChartOptions;
