@@ -20,6 +20,7 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as omit from 'lodash/omit';
 import * as includes from 'lodash/includes';
 import * as keys from 'lodash/keys';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -553,10 +554,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       .createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis | AnalysisDSL) => {
         this.analysis = {
-          ...analysis,
-          ...{
-            id: newAnalysis.id
-          },
+          ...omit(analysis, 'category'),
+          id: newAnalysis.id,
           ...(isDSLAnalysis(newAnalysis)
             ? {
                 id: newAnalysis.id,
