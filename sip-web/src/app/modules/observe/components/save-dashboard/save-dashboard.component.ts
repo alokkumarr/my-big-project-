@@ -17,6 +17,7 @@ import {
   JwtService
 } from '../../../../common/services';
 import { requireIf } from '../../../../common/validators/index';
+import { entityNameErrorMessage, minimumNameLength } from './../../../../common/validators/field-name-rule.validator';
 
 export const REFRESH_INTERVALS = [
   {
@@ -74,7 +75,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   public showProgress = false;
   public listeners: Array<Subscription> = [];
   progressSub;
-
+  nameLengthLimit;
   constructor(
     public dialogRef: MatDialogRef<SaveDashboardComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -92,7 +93,10 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.dashboardForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required,
+        Validators.maxLength(30)],
+        this.validatePattern
+      ],
       description: [''],
       categoryId: ['', Validators.required],
       autoRefreshEnabled: [false, Validators.required],
@@ -103,6 +107,17 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.disableIntervalConditionally();
+    this.nameLengthLimit = minimumNameLength;
+  }
+
+  validatePattern(control) {
+    return new Promise((resolve, reject) => {
+      if (/[`~!@#$%^&*()+={}|"':;?/>.<,*:/?[\]\\]/g.test(control.value)) {
+          resolve({ nameIsInValid: true });
+      } else {
+        resolve(null);
+      }
+    });
   }
 
   disableIntervalConditionally() {
@@ -179,6 +194,10 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
 
   closeDashboard(data) {
     this.dialogRef.close(data);
+  }
+
+  displayErrorMessage(state) {
+    return entityNameErrorMessage(state);
   }
 
   saveDashboard() {

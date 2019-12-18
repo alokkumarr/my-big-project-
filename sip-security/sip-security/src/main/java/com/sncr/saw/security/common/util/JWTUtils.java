@@ -7,7 +7,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +28,8 @@ public class JWTUtils {
 
     // This checks the validity of the token. logging out does not need
     // the token to be active.
-    Set<Map.Entry<String, Object>> claimsSet = ((Map<String, Object>) claims.get("ticket")).entrySet();
-    Iterator<?> it = claimsSet.iterator();
-    String[] parsedValues = new String[claimsSet.size()];
+    Iterator<?> it = ((Map<String, Object>) claims.get("ticket")).entrySet().iterator();
+    String[] parsedValues = new String[5];
     while (it.hasNext()) {
       Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
       if (pair.getKey().equals("userId")) {

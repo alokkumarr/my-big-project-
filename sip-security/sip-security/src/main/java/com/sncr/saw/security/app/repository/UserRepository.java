@@ -7,6 +7,7 @@ import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
@@ -40,7 +41,7 @@ public interface UserRepository {
 	boolean deleteAnalysis(AnalysisSummary analysis);
 	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
 	List<User> getUsers(Long customerId);
-	Valid addUser(User user);
+	Valid addUser(User user,String createdBy);
 	Valid updateUser(User user);
 	boolean deleteUser(Long userId, String masterLoginId);
 	List<Role> getRolesDropDownList(Long customerId);
@@ -71,4 +72,11 @@ public interface UserRepository {
 	Boolean IsTicketValid(String ticketId, String masterLogin);
 	DataSecurityKeys fetchDSKDetailByUserId(String userId);
 	List<CategoryDetails> fetchCategoriesByProdModId(ProductModuleDetails productModuleDetails, Long roleId);
+  Long getCustomerSysid(String customerCode);
+  Long getSecurityGroupSysid(String dskGroup,Long customerSysId);
+  Long getRoleSysId(String roleName,Long customerSysId);
+  UserDetails getUser(String masterLoginId, Long customerSysId);
+  Valid addUserDetails(UserDetails userDetails, String masterLoginId);
+  List<UserDetails> getUsersDetailList(Long customerId);
+  boolean getRoleStatus(Long roleId);
 }
