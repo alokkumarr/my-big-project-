@@ -321,17 +321,6 @@ public class StorageProxyController {
       return executeResponse;
     }
 
-    // For published analysis, update analysis metadata table with the category information.
-    if (isPublishedExecution) {
-      Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
-      analysis.setUserId(uid);
-      analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
-          : analysis.getCreatedTime());
-      analysis.setModifiedTime(Instant.now().toEpochMilli());
-      analysis.setModifiedBy(authTicket.getUserFullName());
-      proxyService.updateAnalysis(analysis);
-    }
-
     List<TicketDSKDetails> dskList = new ArrayList<>();
     DataSecurityKeys dataSecurityKeys = null;
     // fetch DSK details for scheduled
@@ -437,6 +426,15 @@ public class StorageProxyController {
                 dataSecurityKeyNode,
                 (List<Object>) executeResponse.getData());
         proxyService.saveDslExecutionResult(executionResult);
+        // For published analysis, update analysis metadata table with the category information.
+        analysis = executionResult.getAnalysis();
+        Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
+        analysis.setUserId(uid);
+        analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
+            : analysis.getCreatedTime());
+        analysis.setModifiedTime(Instant.now().toEpochMilli());
+        analysis.setModifiedBy(authTicket.getUserFullName());
+        proxyService.updateAnalysis(analysis);
       }
       if (!analysis.getType().equalsIgnoreCase("report")) {
         logger.info("analysis ." + "not a DL report");
