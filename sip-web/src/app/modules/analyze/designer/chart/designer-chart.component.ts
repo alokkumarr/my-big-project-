@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
+import * as reverse from 'lodash/reverse';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -19,7 +20,10 @@ import { CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../../common/services/chart.service';
 import { QueryDSL } from 'src/app/models';
-import { setReverseProperty } from './../../../../common/utils/dataFlattener';
+import {
+  setReverseProperty,
+  shouldReverseChart
+} from './../../../../common/utils/dataFlattener';
 import { DesignerState } from '../state/designer.state';
 @Component({
   selector: 'designer-chart',
@@ -67,9 +71,13 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   @Input()
   set data(executionData) {
-    this._data = executionData;
-    if (executionData && executionData.length) {
-      this.reloadChart(executionData, [...this.getLegendConfig()]);
+    const processedData = this.reverseDataIfNeeded(
+      this.sipQuery,
+      executionData
+    );
+    this._data = processedData;
+    if (processedData && processedData.length) {
+      this.reloadChart(processedData, [...this.getLegendConfig()]);
     }
   }
 
@@ -91,6 +99,13 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     this.chartHgt.height = this.getChartHeight();
+  }
+
+  reverseDataIfNeeded(sipQuery, data) {
+    if (shouldReverseChart(sipQuery)) {
+      return reverse(data);
+    }
+    return data;
   }
 
   /**

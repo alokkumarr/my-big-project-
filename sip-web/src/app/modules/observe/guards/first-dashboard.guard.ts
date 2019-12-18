@@ -1,28 +1,22 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
-import { ObserveService } from '../services/observe.service';
-
-import { map } from 'rxjs/operators';
-
 import * as find from 'lodash/find';
+
+import { ObserveService } from '../services/observe.service';
+import {
+  PREFERENCES,
+  ConfigService
+} from '../../../common/services/configuration.service';
 
 @Injectable()
 export class FirstDashboardGuard implements CanActivate {
-  constructor(private router: Router, private observe: ObserveService) {}
+  constructor(
+    private router: Router,
+    private observe: ObserveService,
+    private configService: ConfigService
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot) {
-    return this.observe.reloadMenu().pipe(
-      map(menu => {
-        return this.redirectToFirstDash(route, menu);
-      })
-    );
-  }
-
-  redirectToFirstDash(
-    route: ActivatedRouteSnapshot,
-    menu,
-    force = false
-  ): boolean {
     let basePath, dashboard, mode;
 
     if (route && route.children && route.children.length) {
@@ -37,43 +31,81 @@ export class FirstDashboardGuard implements CanActivate {
      * If force is set, this behaviour is overriden, and first dashboard is
      * loaded regardless.
      */
-    if (((basePath && basePath !== 'observe') || dashboard || mode) && !force) {
+    if ((basePath && basePath !== 'observe') || dashboard || mode) {
       return true;
     }
+    this.redirectToFavoriteOrFirstDashboard();
+    return true;
+  }
 
-    const categoryWithDashboard = find(menu, cat => {
-      const subCategory = find(cat.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      return Boolean(subCategory);
-    });
-
-    const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
-
-    if (categoryWithDashboard) {
-      /* If a dashboard has been found in some category/subcategory, redirect to that */
-      const subCategory = find(categoryWithDashboard.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      this.router.navigate(['observe', subCategory.id], {
-        queryParams: {
-          dashboard: subCategory.children[0].id
-        }
-      });
-      return false;
-    } else if (categoryWithSubCategory) {
-      /* Otherwise, redirect to the first empty subcategory available. */
-      this.router.navigate(
-        ['observe', categoryWithSubCategory.children[0].id],
-        {
-          queryParams: {
-            dashboard: ''
-          }
-        }
+  redirectToFavoriteOrFirstDashboard() {
+    const favouriteDashboardId = this.configService.getPreference(
+      PREFERENCES.DEFAULT_DASHBOARD
+    );
+    const favouriteDashboardCategory = this.configService.getPreference(
+      PREFERENCES.DEFAULT_DASHBOARD_CAT
+    );
+    if (!favouriteDashboardId) {
+      this.redirectToFirstDash();
+    } else {
+      this.redirectToFavoriteDashboard(
+        favouriteDashboardCategory,
+        favouriteDashboardId
       );
-      return false;
     }
+  }
+
+  redirectToFavoriteDashboard(
+    favouriteDashboardCategory,
+    favouriteDashboardId
+  ) {
+    this.router.navigate(['observe', favouriteDashboardCategory], {
+      queryParams: {
+        dashboard: favouriteDashboardId
+      }
+    });
+  }
+
+  redirectToFirstDash(): void {
+    this.observe
+      .reloadMenu()
+      .toPromise()
+      .then(menu => {
+        const categoryWithDashboard = find(menu, cat => {
+          const subCategory = find(cat.children, subCat => {
+            return subCat.children.length > 0;
+          });
+
+          return Boolean(subCategory);
+        });
+
+        const categoryWithSubCategory = find(
+          menu,
+          cat => cat.children.length > 0
+        );
+
+        if (categoryWithDashboard) {
+          /* If a dashboard has been found in some category/subcategory, redirect to that */
+          const subCategory = find(categoryWithDashboard.children, subCat => {
+            return subCat.children.length > 0;
+          });
+
+          this.router.navigate(['observe', subCategory.id], {
+            queryParams: {
+              dashboard: subCategory.children[0].id
+            }
+          });
+        } else if (categoryWithSubCategory) {
+          /* Otherwise, redirect to the first empty subcategory available. */
+          this.router.navigate(
+            ['observe', categoryWithSubCategory.children[0].id],
+            {
+              queryParams: {
+                dashboard: ''
+              }
+            }
+          );
+        }
+      });
   }
 }

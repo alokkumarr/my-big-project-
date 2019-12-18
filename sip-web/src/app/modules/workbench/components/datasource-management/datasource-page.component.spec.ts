@@ -8,9 +8,11 @@ import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { Router } from '@angular/router';
 import { DatasourceService } from '../../services/datasource.service';
 import { DatasourceComponent } from './datasource-page.component';
-import { ToastService } from '../../../../common/services/toastMessage.service';
+import {
+  ToastService,
+  HeaderProgressService
+} from '../../../../common/services';
 import { Observable } from 'rxjs';
-import { HeaderProgressService } from 'src/app/common/services';
 
 const DatasourceServiceStub = {
   getSourceList: () => {
@@ -21,7 +23,6 @@ const DatasourceServiceStub = {
 const ToastServiceStub: Partial<ToastService> = {};
 
 class RouterServiceStub {}
-
 class HeaderProgressServiceStub {
   subscribe() {}
 }
@@ -47,7 +48,8 @@ describe('DatasourcePageComponent', () => {
         },
         { provide: DatasourceService, useValue: DatasourceServiceStub },
         { provide: ToastService, useValue: ToastServiceStub },
-        { provide: Router, useClass: RouterServiceStub }
+        { provide: Router, useClass: RouterServiceStub },
+        { provide: HeaderProgressService, useClass: HeaderProgressServiceStub }
       ]
     }).compileComponents();
   }));
