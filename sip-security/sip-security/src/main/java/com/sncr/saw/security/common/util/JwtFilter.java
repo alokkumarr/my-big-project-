@@ -77,17 +77,17 @@ public class JwtFilter extends GenericFilterBean {
           mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
-          // response.sendError(401, "Token has expired. Please re-login.");
+          response.sendError(401, "Token has expired. Please re-login.");
         }
         else if (requestURI.startsWith("/sip-security/auth/admin")
             && !ticket.getRoleType().equals(RoleType.ADMIN)) {
-          // response.sendError(401, "You are not authorized to perform this operation.");
+          response.sendError(401, "You are not authorized to perform this operation.");
         }
         // In case user already logged-out and token is invalidated , same token can't be
         // reused.
         else if (!(ticket.getTicketId() != null
             && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))){
-          // response.sendError(401, "Token is not valid ");
+          response.sendError(401, "Token is not valid ");
         }
       }
     }
