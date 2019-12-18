@@ -66,6 +66,7 @@ const REGRESSION = [...CRITICAL];
 const DEVELOPMENT = [
   //'dummy/dummyDevelopmentTests1.js',
   //'dummy/dummyDevelopmentTests2.js'
+  'pivots/UpdateAndDeletePivot.test.js'
 ];
 
 module.exports = {
