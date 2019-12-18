@@ -1,10 +1,15 @@
 {
-  "PIVOT": {
+  "UPDATE_PIVOT": {
     "updatePivot": {
-      "UPDATE_PIVOT001": {
-        "suites": ["critical", "regression", "development"],
+      "UPDPIVOT001": {
+        "suites": ["regression"],
         "user": "admin",
         "description": "Admin should be able to update the pivot"
+      },
+      "UPDPIVOT002": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "User should be able to update the pivot"
       }
     }
   }

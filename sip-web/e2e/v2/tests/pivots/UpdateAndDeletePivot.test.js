@@ -3,8 +3,8 @@ const testDataReader = require('../../testdata/testDataReader.js');
 const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../../pages/utils/commonFunctions');
-const dataSets = require('../../helpers/data-generation/datasets');
-
+const chai = require('chai');
+const assert = chai.assert;
 let AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
@@ -12,19 +12,19 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
-let AnalysisHelper = require('../../helpers/api/AnalysisHelper');
+const Constants = require('../../helpers/Constants');
+const categories = require('../../helpers/data-generation/categories');
+const subCategories = require('../../helpers/data-generation/subCategories');
+const Header = require('../../pages/components/Header');
 
 describe('Executing update and delete tests for pivots from pivots/UpdateAndDeletePivot.test.js', () => {
-  let analysisId;
+  let analysesDetails = [];
   let host;
   let token;
-  const metricName = dataSets.pivotChart;
-  const analysisType = 'table:pivot';
+  const categoryName = categories.analyses.name;
+  const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
   const dateFieldName = 'Date';
   const numberFieldName = 'Integer';
-  const dataOption = 'SUM(Integer)';
-  const stringFieldName = 'String';
-  const selectedAggregate = 'sum';
   beforeAll(() => {
     logger.info('Starting pivots/UpdateAndDeletePivot.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
@@ -40,22 +40,26 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
 
   afterEach(function(done) {
     setTimeout(function() {
-      if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
-      }
+      //Delete analysis
+      analysesDetails.forEach(currentAnalysis => {
+        if (currentAnalysis.analysisId) {
+          new AnalysisHelper().deleteAnalysis(
+            host,
+            token,
+            protractorConf.config.customerCode,
+            currentAnalysis.analysisId,
+            Constants.PIVOT
+          );
+        }
+      });
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   using(
-    testDataReader.testData['PIVOT']['updatePivot']
-      ? testDataReader.testData['PIVOT']['updatePivot']
+    testDataReader.testData['UPDATE_PIVOT']['updatePivot']
+      ? testDataReader.testData['UPDATE_PIVOT']['updatePivot']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -68,7 +72,7 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
           token,
           pivotName,
           pivotDescription,
-          PIVOT,
+          Constants.PIVOT,
           null, // No subtype of Pivot.
           null
         );
@@ -78,17 +82,60 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
+        const header = new Header();
+        header.openCategoryMenu();
+        header.selectCategory(categoryName);
+        header.selectSubCategory(subCategoryName);
 
         const analyzePage = new AnalyzePage();
         analyzePage.goToView('card');
-        analyzePage.clickOnAnalysisLink(chartName);
+        analyzePage.clickOnAnalysisLink(pivotName);
 
         const executePage = new ExecutePage();
         executePage.clickOnEditLink();
+
+        const chartDesignerPage = new ChartDesignerPage();
+        chartDesignerPage.searchInputPresent();
+        chartDesignerPage.clearAttributeSelection();
+        chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
+        chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
+        // Save the analysis
+        const updatedName = pivotName + ' updated';
+        const updatedDescription = pivotDescription + 'updated';
+        chartDesignerPage.clickOnSave();
+        chartDesignerPage.enterAnalysisName(updatedName);
+        chartDesignerPage.enterAnalysisDescription(updatedDescription);
+        chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
+
+        // Verify analysis displayed in list and card view
+        analyzePage.goToView('list');
+        analyzePage.verifyElementPresent(
+          analyzePage._analysisTitleLink(updatedName),
+          true,
+          'report should be present in list/card view'
+        );
+        analyzePage.goToView('card');
+        // Go to detail page and very details
+        analyzePage.clickOnAnalysisLink(updatedName);
+
+        executePage.verifyTitle(updatedName);
+        executePage.getAnalysisId().then(id => {
+          analysesDetails.push({ analysisId: id });
+        });
+        executePage.clickOnActionLink();
+        executePage.clickOnDetails();
+        executePage.verifyDescription(updatedDescription);
+        executePage.closeActionMenu();
+        // Delete the report
+        executePage.clickOnActionLink();
+        executePage.clickOnDelete();
+        executePage.confirmDelete();
+        analyzePage.verifyToastMessagePresent('Analysis deleted.');
+        analyzePage.verifyAnalysisDeleted();
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'PIVOT',
+        feature: 'UPDATE_PIVOT',
         dataProvider: 'updatePivot'
       };
     }
