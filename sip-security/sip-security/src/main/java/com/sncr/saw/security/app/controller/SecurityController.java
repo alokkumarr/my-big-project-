@@ -1182,10 +1182,12 @@ public class SecurityController {
 	public UsersList deleteUser(HttpServletRequest request, @RequestBody DeleteUser deleteUser) {
 		UsersList userList = new UsersList();
 		try {
+			Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null
           && SipCommonUtils.haveValidCustomerId(deleteUser.getCustomerId(), request)) {
 				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
 					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
+					userRepository.invalidateTicket(ticket.getTicketId(), "User has been deleted.");
 					userList.setValid(true);
 				} else {
 					userList.setValid(false);
