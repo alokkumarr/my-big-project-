@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.sncr.saw.security.app.controller;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,6 +9,7 @@ import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.SecurityService;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
@@ -26,6 +24,7 @@ import com.sncr.saw.security.common.bean.ResetPwdDtls;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserPreferences;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
@@ -39,6 +38,8 @@ import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
+import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
+import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -59,6 +60,8 @@ import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -79,6 +82,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,6 +91,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -114,6 +119,8 @@ public class SecurityController {
 
 	@Autowired
     DataSecurityKeyRepository dataSecurityKeyRepository;
+
+    @Autowired SecurityService securityService;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -1075,26 +1082,33 @@ public class SecurityController {
 	    return dataSecurityKeyRepository.getAllUserAssignments(custId);
     }
 
+  /**
+   * @param user
+   * @return
+   */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUser",
+      notes = "",
+      response = UsersList.class)
+  @RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
+  public UsersList addUser(HttpServletRequest request,
+      @ApiParam(value = "Authorization token") @RequestHeader("Authorization") String authToken,
+      @ApiParam(value = "User details to store", required = true) @RequestBody User user) {
+    String[] valuesFromToken =
+        JWTUtils.parseToken(authToken.substring(7), nSSOProperties.getJwtSecretKey());
 
-
-    /**
-	 *
-	 * @param user
-	 * @return
-	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
-	public UsersList addUser(HttpServletRequest request, @RequestBody User user) {
-		UsersList userList = new UsersList();
-		Valid valid = null;
-
-		try {
+    String masterLoginId = valuesFromToken[4];
+    UsersList userList = new UsersList();
+    Valid valid;
+    try {
       if (user != null && SipCommonUtils.haveValidCustomerId(user.getCustomerId(), request)) {
-			    Valid validity = PasswordValidation.validatePassword(user.getPassword(),user.getMasterLoginId());
-                userList.setValid(validity.getValid());
-                userList.setValidityMessage(validity.getValidityMessage());
+        Valid validity = PasswordValidation.validatePassword(user.getPassword(), user.getMasterLoginId());
+        userList.setValid(validity.getValid());
+        userList.setValidityMessage(validity.getValidityMessage());
 
 				if (userList.getValid()) {
-					valid = userRepository.addUser(user);
+					valid = userRepository.addUser(user,masterLoginId);
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
@@ -1309,7 +1323,6 @@ public class SecurityController {
 		RolesList roleList = new RolesList();
 		roleList.setValid(true);
 		try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteRole.getRoleId() != null && deleteRole.getCustomerId() != null && deleteRole.getMasterLoginId() != null
           && SipCommonUtils.haveValidCustomerId(deleteRole.getCustomerId(), request)) {
 				if (userRepository.checkUserExists(deleteRole.getRoleId())) {
@@ -1453,11 +1466,10 @@ public class SecurityController {
 	}
 
 	/**
-	 *
+	 * Fetch category by customer product and module
 	 * @param cpm
 	 * @return
 	 */
-
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/list", method = RequestMethod.POST)
 	public CategoryList getcategoriesList(HttpServletRequest request, @RequestBody  CustProdModule cpm) {
 		CategoryList categories = new CategoryList();
@@ -1480,11 +1492,10 @@ public class SecurityController {
 	}
 
 	/**
-	 *
-	 * @param cpsm
+	 * Fetch sub categories by customer product and module
+   * @param cpsm
 	 * @return
 	 */
-
 	@RequestMapping(value = "/auth/admin/cust/manage/subCategoriesWithPrivilege/list", method = RequestMethod.POST)
 	public SubCategoryWithPrivilegeList getSubCategoriesList(HttpServletRequest request, @RequestBody CustomerProductSubModule cpsm) {
 		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
@@ -1852,4 +1863,71 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+  /**
+   * Create user with dsk.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param userDetails UserDetails
+   * @return Returns UserDetailsResponse
+   */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUserWithDsk",
+      notes = "Admin can only use this API to create the user",
+      response = UserDetailsResponse.class)
+  @RequestMapping(
+      value = "/auth/admin/cust/manage/external/users/create",
+      method = RequestMethod.POST)
+  @ResponseBody
+  public UserDetailsResponse createUser(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @ApiParam(value = "User details to store", required = true) @RequestBody
+          UserDetails userDetails) {
+    String jwtToken = JWTUtils.getToken(request);
+    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+    if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      logger.error("user is not admin");
+      userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+      return userDetailsResponse;
+    }
+    String masterLoginId = valuesFromToken[4];
+    Long customerId=  Long.valueOf(valuesFromToken[1]);
+    return securityService.addUserDetails(userDetails, masterLoginId,customerId,response);
+  }
+
+  /**
+   * gets all users.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @return Returns UsersDetailsList
+   */
+  @ApiOperation(
+      value = " Fetch Users API ",
+      nickname = "FetchUsers",
+      notes = "Admin can only use this API to fetch the users",
+      response = UsersDetailsList.class)
+  @RequestMapping(
+      value = "/auth/admin/cust/manage/external/users/fetch",
+      method = RequestMethod.GET)
+  public UsersDetailsList getUserList(HttpServletRequest request, HttpServletResponse response) {
+    String jwtToken = JWTUtils.getToken(request);
+    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nSSOProperties.getJwtSecretKey());
+    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+    if (!valuesFromToken[3].equalsIgnoreCase("admin")) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      usersDetailsListResponse.setValid(false);
+      usersDetailsListResponse.setValidityMessage(
+          "You are not authorized to perform this operation");
+      return usersDetailsListResponse;
+    }
+    Long customerId = Long.valueOf(valuesFromToken[1]);
+    return securityService.getUsersDetailList(customerId);
+  }
 }
