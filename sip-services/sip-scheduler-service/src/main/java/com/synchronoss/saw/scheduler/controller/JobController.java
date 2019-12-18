@@ -165,7 +165,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(schedule.getCategoryId());
-		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return;
@@ -201,7 +201,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(schedule.getCategoryId());
-		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
@@ -252,7 +252,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(schedule.getCategoryId());
-		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
@@ -295,7 +295,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(schedule.getCategoryId());
-		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
@@ -343,7 +343,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(jobDetail.getCategoryID());
-		if (!validatePrivilege(productList, category, PrivilegeNames.EDIT)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
@@ -524,7 +524,7 @@ public class JobController extends BaseJobController{
 		Ticket authTicket = TokenParser.retrieveTicket(authToken.substring(TOKEN));
 		ArrayList<Products> productList = authTicket.getProducts();
 		Long category = Long.parseLong(schedule.getCategoryId());
-		if (!validatePrivilege(productList, category, PrivilegeNames.DELETE)) {
+		if (!validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
 			logger.error("Invalid authentication token, Unauthorized access!!");
 			setUnAuthResponse(response);
 			return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
