@@ -213,7 +213,7 @@ public class JobController extends BaseJobController{
 			if (analysis.getUserId() != null && analysis.getUserId() != authTicket.getUserId()) {
 				setUnAuthResponse(response);
 				logger.error("Invalid authentication token, Unauthorized access!!");
-				return;
+				return getServerResponse(HttpStatus.UNAUTHORIZED.value(), false);
 			}
 		}
 
