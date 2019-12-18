@@ -353,7 +353,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (
         !filtr.isRuntimeFilter &&
         !filtr.isGlobalFilter &&
-        filtr.type === 'date' && filtr.model.operator === 'BTW'
+        filtr.type === 'date' &&
+        filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value, 'MM-DD-YYYY').format(
           'YYYY-MM-DD'
@@ -562,7 +563,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
                 semanticId: newAnalysis.semanticId,
                 createdTime: newAnalysis.createdTime,
                 createdBy: newAnalysis.createdBy,
-                userId: newAnalysis.userId
+                userId: newAnalysis.userId,
+                parentAnalysisId: analysis.id
               }
             : {
                 metric: newAnalysis.metric,
