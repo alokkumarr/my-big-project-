@@ -1187,7 +1187,6 @@ public class SecurityController {
           && SipCommonUtils.haveValidCustomerId(deleteUser.getCustomerId(), request)) {
 				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
 					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
-					userRepository.invalidateTicket(ticket.getTicketId(), "User has been deleted.");
 					userList.setValid(true);
 				} else {
 					userList.setValid(false);

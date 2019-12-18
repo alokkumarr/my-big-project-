@@ -38,22 +38,20 @@ public class JwtFilter extends GenericFilterBean {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
-      throws IOException, ServletException {
+  public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain) throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
-    if (!("OPTIONS".equals(request.getMethod()))) {
-      Ticket ticket = null;
+    boolean haveInValidFlow = false;
+    String errorMessage = null;
 
+    if (!("OPTIONS".equals(request.getMethod()))) {
       final String authHeader = request.getHeader("Authorization");
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
         throw new ServletException("Missing or invalid Authorization header.");
       }
 
-      final String token = authHeader.substring(7); // The part after
-      // "Bearer "
+      final String token = authHeader.substring(7); // The part after Bearer
       Claims claims = null;
-
       try {
         claims =
             Jwts.parser()
@@ -74,22 +72,27 @@ public class JwtFilter extends GenericFilterBean {
       String requestURI = request.getRequestURI();
       logger.trace("Request Header URI : " + requestURI);
       if (!requestURI.equals("/sip-security/auth/doLogout")) {
-          mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        Ticket ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
-          response.sendError(401, "Token has expired. Please re-login.");
-        }
-        else if (requestURI.startsWith("/sip-security/auth/admin")
-            && !ticket.getRoleType().equals(RoleType.ADMIN)) {
-          response.sendError(401, "You are not authorized to perform this operation.");
-        }
-        // In case user already logged-out and token is invalidated , same token can't be
-        // reused.
-        else if (!(ticket.getTicketId() != null
-            && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId())))
+          haveInValidFlow = true;
+          errorMessage = "Token has expired. Please re-login.";
+        } else if (requestURI.startsWith("/sip-security/auth/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
+          haveInValidFlow = true;
+          errorMessage = "You are not authorized to perform this operation.";
+        } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
+          haveInValidFlow = true;
+          errorMessage = "Token is not valid.";
+        } else if (!(ticket.getTicketId() != null
+            && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
           response.sendError(401, "Token is not valid ");
+        }
       }
     }
-    chain.doFilter(req, response);
+    if (haveInValidFlow) {
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
+    } else {
+      chain.doFilter(req, response);
+    }
   }
 }
