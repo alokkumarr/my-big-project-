@@ -5,6 +5,8 @@ import com.sncr.saw.security.app.model.DskField;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.service.DskEligibleFieldService;
 import com.sncr.saw.security.common.bean.Valid;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,33 +26,47 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(value = "The controller provides operations to DskEligible Fields of"
-    + "synchronoss insights platform ")
+@Api(
+    value =
+        "The controller provides operations to DskEligible Fields of"
+            + "synchronoss insights platform ")
 @RequestMapping("/sip-security/auth/admin/dsk")
 public class SipDskEligibileFieldsController {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(SipDskEligibileFieldsController.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(SipDskEligibileFieldsController.class);
 
-  @Autowired
-  NSSOProperties nssoProperties;
+  @Autowired NSSOProperties nssoProperties;
 
-  @Autowired
-  DskEligibleFieldService dskEligibleFieldService;
+  @Autowired DskEligibleFieldService dskEligibleFieldService;
 
   @ApiOperation(
       value = " Add DSK Eligible Fields ",
       nickname = "AddDskFields",
       notes = "Admin can only use this API to add DSK Eligible Fields",
       response = Valid.class)
-  @RequestMapping(
-      value = "/fields",
-      method = RequestMethod.POST)
+  @RequestMapping(value = "/fields", method = RequestMethod.POST)
   @ResponseBody
-  public Valid addDskEligibleFields(@RequestBody DskEligibleFields dskEligibleFields,
-      HttpServletRequest request, HttpServletResponse response) throws IOException {
-    return dskEligibleFieldService
-        .addDskEligibleFields(dskEligibleFields, request, response);
+  public Valid addDskEligibleFields(
+      @RequestParam(name = "semanticId") String semanticId,
+      @RequestBody List<DskField> dskFields,
+      HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    Long customerSysId = Long.valueOf(ticket.getCustID());
+    Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
+    String createdBy = ticket.getUserFullName();
+
+    DskEligibleFields dskEligibleFields = new DskEligibleFields();
+    dskEligibleFields.setCustomerSysId(customerSysId);
+    dskEligibleFields.setProductSysId(defaultProdID);
+    dskEligibleFields.setSemanticId(semanticId);
+    dskEligibleFields.setCreatedBy(createdBy);
+    dskEligibleFields.setFields(dskFields);
+
+    return dskEligibleFieldService.addDskEligibleFields(dskEligibleFields, request, response);
   }
 
   @ApiOperation(
@@ -58,31 +74,32 @@ public class SipDskEligibileFieldsController {
       nickname = "DeleteDskFields",
       notes = "Admin can only use this API to add DSK Eligible Fields",
       response = Valid.class)
-  @RequestMapping(
-      value = "/fields",
-      method = RequestMethod.DELETE)
+  @RequestMapping(value = "/fields", method = RequestMethod.DELETE)
   @ResponseBody
   public Valid deleteDskEligibleFields(
       @ApiParam(value = "semantic id", required = true)
-      @RequestParam(name = "semanticId", required = true) String semanticId,
-      HttpServletRequest request, HttpServletResponse response) throws IOException {
-    return dskEligibleFieldService
-        .deleteDskEligibleFields(semanticId, request, response);
+          @RequestParam(name = "semanticId", required = true)
+          String semanticId,
+      HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    return dskEligibleFieldService.deleteDskEligibleFields(semanticId, request, response);
   }
 
-    @ApiOperation(
-        value = " Update DSK Eligible Fields ",
-        nickname = "UpdateDskFields",
-        notes = "Admin can only use this API to update DSK Eligible Fields",
-        response = Valid.class)
-    @RequestMapping(
-        value = "/fields/{semanticId}",
-        method = RequestMethod.PUT)
-    @ResponseBody
-    public Valid updateDskEligibleFields(HttpServletRequest request, HttpServletResponse response,
-        @PathVariable(name = "semanticId") String semanticId,
-        @RequestBody List<DskField> dskEligibleFields) throws IOException {
-        return dskEligibleFieldService
-            .updateDskEligibleFields(request, response, semanticId, dskEligibleFields);
-    }
+  @ApiOperation(
+      value = " Update DSK Eligible Fields ",
+      nickname = "UpdateDskFields",
+      notes = "Admin can only use this API to update DSK Eligible Fields",
+      response = Valid.class)
+  @RequestMapping(value = "/fields", method = RequestMethod.PUT)
+  @ResponseBody
+  public Valid updateDskEligibleFields(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestParam(name = "semanticId") String semanticId,
+      @RequestBody List<DskField> dskEligibleFields)
+      throws IOException {
+    return dskEligibleFieldService.updateDskEligibleFields(
+        request, response, semanticId, dskEligibleFields);
+  }
 }

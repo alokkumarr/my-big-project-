@@ -16,6 +16,6 @@ CREATE TABLE dsk_eligible_fields
    ACTIVE_STATUS_IND tinyint(4) NOT NULL,
    CREATED_TIME datetime NOT NULL,
    CREATED_BY varchar(255) NOT NULL,
-   MODIFIED_TIME datetime NOT NULL,
-   MODIFIED_BY varchar(255) NOT NULL
+   MODIFIED_TIME datetime,
+   MODIFIED_BY varchar(255)
 ) ENGINE=InnoDB;

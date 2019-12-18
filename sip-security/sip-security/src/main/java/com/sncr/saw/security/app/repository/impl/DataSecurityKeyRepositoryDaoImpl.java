@@ -679,7 +679,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskFieldsInfo fetchAllDskEligibleFields(String customerSysId, String productId) {
         String tableName = "dsk_eligible_fields";
 
-        String fetchQuery = "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME"
+        String fetchQuery = "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME,"
             + " DISPLAY_NAME FROM " + tableName + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=?";
 
         DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
@@ -695,10 +695,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             while(resultSet.next()) {
                 String semanticId = resultSet.getString("SEMANTIC_ID");
 
-                String fieldName = resultSet.getString("COLUMN_NAME");
+                String columnName = resultSet.getString("COLUMN_NAME");
                 String displayName = resultSet.getString("DISPLAY_NAME");
 
-                logger.info("" + semanticId + " " + fieldName + " " + displayName);
+                logger.info("" + semanticId + " " + columnName + " " + displayName);
 
                 Map<String, Map<String, List<DskField>>> customerDskFields
                     = dskEligibleData.getOrDefault(customerSysId, new HashMap<>());
@@ -710,7 +710,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     = projectDskData.getOrDefault(semanticId, new ArrayList<>());
 
                 DskField dskField = new DskField();
-                dskField.setColumnName(fieldName);
+                dskField.setColumnName(columnName);
                 dskField.setDisplayName(displayName);
 
                 semanticDskFields.add(dskField);

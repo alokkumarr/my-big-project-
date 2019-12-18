@@ -44,7 +44,7 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
                 ps -> {
                   ps.setLong(1, dskEligibleFields.getCustomerSysId());
                   ps.setLong(2, dskEligibleFields.getProductSysId());
-                  ps.setString(3, dskEligibleFields.getSemantic_id());
+                  ps.setString(3, dskEligibleFields.getSemanticId());
                   ps.setString(4, dskField.getColumnName());
                   ps.setString(5, dskField.getDisplayName());
                   ps.setInt(6, ACTIVE_STATUS);

@@ -68,7 +68,7 @@ public class DskEligibleFieldService {
       return valid;
     }
 
-    if (StringUtils.isEmpty(dskEligibleFields.getSemantic_id())) {
+    if (StringUtils.isEmpty(dskEligibleFields.getSemanticId())) {
       response.sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
       valid.setValid(Boolean.FALSE);
       valid.setError("semantic Id can't be null or empty");
