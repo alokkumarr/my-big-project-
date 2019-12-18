@@ -12,6 +12,7 @@ import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.PrivilegeUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -107,8 +108,9 @@ public class ExternalSecurityController {
       return response;
     }
 
-      // validate role/category/subcategory name
+    // validate role/category/subcategory name
     List<CategoryDetails> categoryList = request.getCategories();
+    List<SubCategoryDetails> subCategoryList = null;
     boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
     if (validateRoleName) {
       httpResponse.setStatus(HttpStatus.OK.value());
@@ -124,16 +126,31 @@ public class ExternalSecurityController {
         return response;
       } else {
         boolean[] invalidSubCatName = {false};
-        categoryList.stream().forEach(categoryDetails -> {
-          List<SubCategoryDetails> subCategoryList = categoryDetails.getSubCategories();
+        for (CategoryDetails categoryDetails : categoryList) {
+          subCategoryList = categoryDetails.getSubCategories();
           invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName().trim()));
-        });
+        }
         if (invalidSubCatName[0]) {
           httpResponse.setStatus(HttpStatus.OK.value());
           response.setValid(false);
           response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for sub category name.");
           return response;
         }
+      }
+    }
+
+    // validate privileges names
+    if (subCategoryList != null && !subCategoryList.isEmpty() && subCategoryList.size() > 0) {
+      boolean[] validPrivileges = {false};
+      subCategoryList.stream().forEach(subCat -> {
+        validPrivileges[0] = subCat.getPrivilege().stream().allMatch(s -> PrivilegeUtils.validPrivilege(s));
+      });
+
+      if (!validPrivileges[0]) {
+        httpResponse.setStatus(HttpStatus.OK.value());
+        response.setValid(false);
+        response.setMessage("Please provide the correct privileges for category/subcategory.");
+        return response;
       }
     }
 
