@@ -19,8 +19,8 @@ public class ProductModuleExtractor implements ResultSetExtractor<ProductModuleD
     while (resultSet.next()) {
       moduleDetails.setCustomerSysId(resultSet.getLong("CUSTOMER_SYS_ID"));
       moduleDetails.setCustomerCode(resultSet.getString("CUSTOMER_CODE"));
-      moduleDetails.setProductId(resultSet.getLong("PRODUCT_SYS_ID"));
-      moduleDetails.setModuleId(resultSet.getLong("MODULE_SYS_ID"));
+      moduleDetails.setProductId(resultSet.getLong("CUST_PROD_SYS_ID"));
+      moduleDetails.setModuleId(resultSet.getLong("CUST_PROD_MOD_SYS_ID"));
     }
     return moduleDetails;
   }

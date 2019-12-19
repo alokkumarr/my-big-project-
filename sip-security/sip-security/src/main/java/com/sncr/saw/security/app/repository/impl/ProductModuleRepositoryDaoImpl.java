@@ -81,10 +81,17 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
   @Override
   public ProductModuleDetails fetchModuleProductDetail(String loginId, String productName, String moduleName) {
 
-    String sql = "select C.CUSTOMER_SYS_ID, C.CUSTOMER_CODE, PR.PRODUCT_SYS_ID, M.MODULE_SYS_ID from PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM, PRODUCTS PR, MODULES M, USERS U, CUSTOMERS C " +
-        "WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND CPM.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND PR.PRODUCT_SYS_ID=PM.PRODUCT_SYS_ID " +
-        "AND M.MODULE_SYS_ID=PM.MODULE_SYS_ID AND CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID " +
-        "AND PR.PRODUCT_NAME = ? AND M.MODULE_NAME = ? AND U.USER_ID = ?;";
+    String sql = "select C.CUSTOMER_SYS_ID, C.CUSTOMER_CODE, CPM.CUST_PROD_MOD_SYS_ID, CP.CUST_PROD_SYS_ID\n" +
+        "from PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM, CUSTOMER_PRODUCTS CP, PRODUCTS PR, MODULES M, USERS U, CUSTOMERS C \n" +
+        "WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID \n" +
+        "AND CP.PRODUCT_SYS_ID = PR.PRODUCT_SYS_ID\n" +
+        "AND CPM.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID \n" +
+        "AND PR.PRODUCT_SYS_ID=PM.PRODUCT_SYS_ID \n" +
+        "AND M.MODULE_SYS_ID=PM.MODULE_SYS_ID \n" +
+        "AND CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID \n" +
+        "AND PR.PRODUCT_NAME = ?\n" +
+        "AND M.MODULE_NAME = ?\n" +
+        "AND U.USER_ID = ?;";
     try {
       return jdbcTemplate.query(sql, preparedStatement -> {
         preparedStatement.setString(1, productName);

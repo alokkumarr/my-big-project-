@@ -151,9 +151,9 @@ public class ExternalSecurityService {
                   details.setModuleId(moduleDetails.getModuleId());
                   details.setMasterLoginId(masterLoginId);
                   List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> categoryList = catList.getCategories() != null
-                      ? catList.getCategories() : new ArrayList<>();
-                  String categoryCode = categoryList.stream().filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
-                      .findAny().get().getCategoryCode();
+                      ? catList.getCategories() : null;
+                  String categoryCode = categoryList != null && categoryList.size() > 0 ? categoryList.stream().filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
+                      .findAny().get().getCategoryCode() : moduleDetails.getCustomerCode();
                   details.setCategoryCode(categoryCode);
 
                   // add sub categories

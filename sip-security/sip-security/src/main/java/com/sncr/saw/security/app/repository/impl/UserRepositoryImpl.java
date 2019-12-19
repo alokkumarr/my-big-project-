@@ -2641,7 +2641,7 @@ public class UserRepositoryImpl implements UserRepository {
             "       AND PM.module_sys_id = ? " +
             "       AND CP.cust_prod_sys_id = CPM.cust_prod_sys_id " +
             "       AND PM.prod_mod_sys_id = CPM.prod_mod_sys_id " +
-            "       AND CP.product_sys_id = ? " +
+            "       AND CP.cust_prod_sys_id = ? " +
             "       AND CPMF.cust_prod_mod_sys_id = CPM.cust_prod_mod_sys_id " +
             "       AND feature_name = ? " +
             "       AND cust_prod_mod_feature_sys_id != 0 " ;
@@ -3036,7 +3036,7 @@ public class UserRepositoryImpl implements UserRepository {
         + " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
         + " WHERE "
         + " P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
-        + " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  AND C.CUSTOMER_SYS_ID=? AND P.PRODUCT_SYS_ID = ? AND M.MODULE_SYS_ID = ?");
+        + " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  AND C.CUSTOMER_SYS_ID=? AND CP.CUST_PROD_SYS_ID = ? AND CPMF.CUST_PROD_MOD_SYS_ID = ?");
 
 
     try {
