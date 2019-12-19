@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import CheckBox from 'devextreme/ui/check_box';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
@@ -12,6 +13,7 @@ import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
 import * as find from 'lodash/find';
+import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
@@ -86,7 +88,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           this.isJoinEligible = parentDSData.joinEligible;
           this.injectFieldProperties(parentDSData);
           forEach(parentDSData.schema.fields, obj => {
-            if (!some(dp.columns, ['columnName', obj.columnName])) {
+            if (findIndex(dp.columns, ['columnName', obj.columnName]) === -1) {
               dp.columns.push(obj);
             }
           });
@@ -113,7 +115,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: false,
+        filterEligible: true,
         joinEligible: false,
         kpiEligible: false,
         include: false,
@@ -152,39 +154,49 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
      *
      * Added as a part of SIP-9373.
      */
+
     const { columns } = this.selectedDPDetails.artifacts[0];
-    const anyColSelected = some(
-      columns,
-      obj => !DATE_TYPES.includes(obj.type) && obj.kpiEligible
-    );
+    const anyColSelected = some(columns, obj => {
+      return !DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+    });
 
-    const dateColAvailable = some(columns, obj =>
-      DATE_TYPES.includes(obj.type)
-    );
+    const dateColAvailable = some(columns, obj => {
+      return DATE_TYPES.includes(obj.type);
+    });
 
-    const dateAndKpiSelected = some(
-      columns,
-      obj => DATE_TYPES.includes(obj.type) && obj.kpiEligible
-    );
+    const dateAndKpiSelected = some(columns, obj => {
+      return DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+    });
 
     if (anyColSelected && dateColAvailable && !dateAndKpiSelected) {
       this.notify.warn(msg, title, {
         hideDelay: 9000
       });
     } else {
-      this.updateDatapod();
-    }
-  }
-
-  updateDatapod() {
-    this.workBench
-      .updateSemanticDetails(this.selectedDPDetails)
-      .subscribe(() => {
-        this.notify.info('Datapod Updated successfully', 'Datapod', {
-          hideDelay: 9000
+      this.workBench
+        .updateSemanticDetails(this.selectedDPDetails)
+        .subscribe(() => {
+          this.notify.info('Datapod Updated successfully', 'Datapod', {
+            hideDelay: 9000
+          });
+          this.router.navigate(['workbench', 'dataobjects']);
         });
-        this.router.navigate(['workbench', 'dataobjects']);
-      });
+    }
+    /* if (anyColSelected) {
+      if (dateColAvailable) {
+        if (dateAndKpiSelected) {
+          this.updateDatapod();
+        } else {
+          this.notify.warn(msg, title, {
+            hideDelay: 9000
+          });
+        }
+      } else {
+        this.updateDatapod();
+      }
+    } else {
+      this.updateDatapod();
+    } */
   }
 
   /**
@@ -193,11 +205,17 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * Disable checkbox of non numeric and date type fields in KPI Eligible column.
    * Added as part of SIP-9373
    */
-  shouldDisableCheckBox(dataRow) {
-    const { type } = dataRow;
-    const shouldDisable =
-      !this.isDateTypeMatched ||
-      (!NUMBER_TYPES.includes(type) && !DATE_TYPES.includes(type));
-    return shouldDisable;
+  cellPrepared(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
+      if (
+        (!NUMBER_TYPES.includes(e.data.type) &&
+          !DATE_TYPES.includes(e.data.type)) ||
+        !this.isDateTypeMatched
+      ) {
+        CheckBox.getInstance(
+          e.cellElement.querySelector('.dx-checkbox')
+        ).option('disabled', true);
+      }
+    }
   }
 }
