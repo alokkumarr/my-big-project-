@@ -659,9 +659,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     this.canUserPublish = this._jwt.hasPrivilege('PUBLISH', {
       subCategoryId: categoryId
     });
-    this.canUserFork = this._jwt.hasPrivilege('FORK', {
+    const canForkInCurrentFolder = this._jwt.hasPrivilege('FORK', {
       subCategoryId: categoryId
     });
+    const canForkInDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder('FORK');
+    this.canUserFork = canForkInCurrentFolder && canForkInDraftsFolder;
     this.canUserExecute = this._jwt.hasPrivilege('EXECUTE', {
       subCategoryId: categoryId
     });

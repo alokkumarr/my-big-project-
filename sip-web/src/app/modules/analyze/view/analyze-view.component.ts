@@ -102,10 +102,16 @@ export class AnalyzeViewComponent implements OnInit {
 
   onParamsChange(params) {
     this.subCategoryId = params.id;
-    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
-      subCategoryId: this.subCategoryId
+    const subCategoryId = this.subCategoryId;
+    const privilegeName = 'CREATE';
+    const hasPrivilegeForCurrentFolder = this._jwt.hasPrivilege(privilegeName, {
+      subCategoryId
     });
-
+    const hasPrivilegeForDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder(
+      privilegeName
+    );
+    this.canUserCreate =
+      hasPrivilegeForCurrentFolder && hasPrivilegeForDraftsFolder;
     this.categoryName = this._analyzeService
       .getCategory(this.subCategoryId)
       .then(category => category.name);

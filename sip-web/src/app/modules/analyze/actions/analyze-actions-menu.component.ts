@@ -99,14 +99,31 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     this.actions = filter(this.actions, ({ value }) => {
       const notExcluded = !actionsToExclude.includes(value);
       const privilegeName = upperCase(privilegeMap[value] || value);
-      const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
-        subCategoryId: isDSLAnalysis(this.analysis)
-          ? this.analysis.category
-          : this.analysis.categoryId
-      });
-
+      const subCategoryId = isDSLAnalysis(this.analysis)
+        ? this.analysis.category
+        : this.analysis.categoryId;
+      const hasPriviledge = this.doesUserHavePrivilege(
+        privilegeName,
+        subCategoryId
+      );
       return notExcluded && hasPriviledge;
     });
+  }
+
+  doesUserHavePrivilege(privilegeName, subCategoryId) {
+    const hasPrivilegeForCurrentFolder = this._jwt.hasPrivilege(privilegeName, {
+      subCategoryId
+    });
+    const needsPrivilegeForDraftsFolder = ['EDIT', 'FORK', 'CREATE'].includes(
+      privilegeName
+    );
+    const hasPrivilegeForDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder(
+      privilegeName
+    );
+    return (
+      hasPrivilegeForCurrentFolder &&
+      (!needsPrivilegeForDraftsFolder || hasPrivilegeForDraftsFolder)
+    );
   }
 
   edit() {
