@@ -26,22 +26,26 @@ import com.synchronoss.sip.utils.RestUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -106,11 +110,18 @@ public class ExportServiceImpl implements ExportService {
   @Autowired
   private ApplicationContext appContext;
 
-  @Autowired
-  private ServiceUtils serviceUtils;
+  @Autowired private ServiceUtils serviceUtils;
 
-  @Autowired
-  private RestUtil restUtil;
+  @Autowired private RestUtil restUtil;
+
+  private RestTemplate restTemplate = null;
+
+  private static final String pivotAnalysisType = "pivot";
+
+  @PostConstruct
+  public void init() {
+    restTemplate = restUtil.restTemplate();
+  }
 
   private static final String DEFAULT_FILE_TYPE = "csv";
 
@@ -163,7 +174,6 @@ public class ExportServiceImpl implements ExportService {
      * The AsyncRestTemplate api deprecated with spring(WebClient) which is having erroneous method,
      * So instead of calling asyncTemplate will call RestTemplate to perform UI export.
      */
-    RestTemplate restTemplate = restUtil.restTemplate();
     ResponseEntity<DataResponse> responseStringFuture =
         restTemplate.exchange(url, HttpMethod.GET, requestEntity, DataResponse.class);
 
@@ -182,7 +192,6 @@ public class ExportServiceImpl implements ExportService {
 
     // at times we need synchronous processing even in async as because of massive parallelism
     // it may halt entire system or may not complete the request
-    RestTemplate restTemplate = restUtil.restTemplate();
     Object dispatchBean = request.getBody();
 
     logger.debug("Dispatch Bean = " + dispatchBean);
@@ -216,16 +225,7 @@ public class ExportServiceImpl implements ExportService {
         || (s3 != null && s3 != "")) {
       logger.trace("Recipients: " + recipients);
       dispatchReport(
-          analysisId,
-          executionId,
-          analysisType,
-          exportBean,
-          recipients,
-          s3,
-          ftp,
-          zip,
-          jobGroup,
-          restTemplate);
+          analysisId, executionId, analysisType, exportBean, recipients, s3, ftp, zip, jobGroup);
     }
   }
 
@@ -292,9 +292,9 @@ public class ExportServiceImpl implements ExportService {
       Long recordsToSkip,
       Long recordsTolimit) {
     List<Object> data = entity.getBody().getData();
-    logger.debug("data size size to stream to csv report:{}", data.size());
-    logger.debug("recordsTolimit:{}", recordsTolimit);
-    logger.debug("recordsToSkip:{}", recordsToSkip);
+    logger.trace("data size size to stream to csv report:{}", data.size());
+    logger.trace("recordsTolimit:{}", recordsTolimit);
+    logger.trace("recordsToSkip:{}", recordsToSkip);
     if (data == null || data.size() == 0) {
       logger.info("No data to export");
       return;
@@ -364,7 +364,6 @@ public class ExportServiceImpl implements ExportService {
                                 })
                             .collect(Collectors.joining(",")));
                     osw.write(System.getProperty("line.separator"));
-                    logger.trace("Line Item for report: " + line.toString());
                   }
                 }
               } catch (Exception e) {
@@ -386,81 +385,119 @@ public class ExportServiceImpl implements ExportService {
       String executionId,
       String analysisType,
       long totalExportSize,
-      ExportBean exportBean,
-      RestTemplate restTemplate)
+      ExportBean exportBean)
       throws IOException {
-
-    exportBean.setColumnHeader(null);
-
-    File xlsxFile = new File(exportBean.getFileName());
-    xlsxFile.getParentFile().mkdir();
-    xlsxFile.createNewFile();
-    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
-    XlsxExporter xlsxExporter = new XlsxExporter();
-    Workbook workBook = new SXSSFWorkbook();
-    workBook.getSpreadsheetVersion();
-    String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
-    SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(sheetName);
-    ResponseEntity<DataResponse> entity = null;
-    try {
-      // write the data in excel sheet in batch
-      long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
-      long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 0l;
-
-      boolean flag = true;
-      long pageNo, totalRowsCount = 0, rowCount = 1;
-      for (pageNo = 1; pageNo <= totalNumberOfBatch; pageNo++) {
-        entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, pageNo, batchSize, DataResponse.class);
-        DataResponse response = entity.getBody();
-        List<Object> data = response.getData();
-
-        // break if no data available
-        if (data == null || data.size() == 0) return false;
-        // point the cursor in excel file
-        rowCount = flag ? rowCount : rowCount + batchSize;
-        xlsxExporter.buildXlsxSheet(
-            sipQuery, exportBean, workBook, sheet, data, batchSize, rowCount);
-        logger.debug("count row " + rowCount);
-
-        // recalculate the total number of batch size if available record less than export size.
-        totalRowsCount = response.getTotalRows();
-        if (totalRowsCount < totalExportSize && flag) {
-          totalNumberOfBatch = totalRowsCount / batchSize;
+    logger.trace("Preparing file with size = {}", totalExportSize);
+    Long lastExportedSize = exportBean.getLastExportedSize();
+    logger.trace("lastExportedSize = {}", lastExportedSize);
+    Long lastExportLimit = exportBean.getLastExportLimit();
+    logger.trace("lastExportLimit = {}", lastExportLimit);
+    Integer currentPage = exportBean.getPageNo();
+    currentPage = currentPage == null ? 1 : currentPage;
+    logger.trace("currentPage = {}", currentPage);
+    long currentXlsRow = lastExportedSize == null ? 1 : lastExportedSize + 1;
+    if (!(lastExportedSize != null
+        && lastExportLimit != null
+        && (lastExportedSize < lastExportLimit))) {
+      File xlsxFile = new File(exportBean.getFileName());
+      BufferedOutputStream stream = null;
+      XlsxExporter xlsxExporter = new XlsxExporter();
+      Workbook workBook = null;
+      String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
+      SXSSFSheet sheet = null;
+      FileInputStream input = null;
+      if (xlsxFile.exists()) {
+        try {
+          input = new FileInputStream(xlsxFile);
+          workBook = new SXSSFWorkbook((XSSFWorkbook) WorkbookFactory.create(input));
+          sheet = (SXSSFSheet) workBook.getSheet(sheetName);
+        } catch (Exception e) {
+          logger.error("ERROR: didn't create workbook :{} ", e);
         }
-        flag = false;
-      }
-
-      // final rows to process
-      long leftOutRows;
-      if (totalRowsCount > 0 && totalRowsCount <= totalExportSize) {
-        leftOutRows = totalRowsCount - (pageNo - 1) * batchSize;
       } else {
-        leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
+        xlsxFile.getParentFile().mkdir();
+        xlsxFile.createNewFile();
+        workBook = new SXSSFWorkbook();
+        sheet = (SXSSFSheet) workBook.createSheet(sheetName);
       }
-      logger.debug("left out rows = {}", leftOutRows);
-      if (leftOutRows > 0 && totalNumberOfBatch >= 0 && batchSize>0) {
-        entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, pageNo, batchSize, DataResponse.class);
-        DataResponse response = entity.getBody();
-        List<Object> data = response.getData();
-        List<Object> leftOutRowsToProcess =
-            data.stream().limit(leftOutRows).collect(Collectors.toList());
+      ResponseEntity<DataResponse> entity = null;
+      try {
+        // write the data in excel sheet in batch
+        long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
+        long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 0l;
+        Long recordsToSkip = 0l;
+        if (lastExportedSize != null)
+          recordsToSkip = lastExportedSize - ((currentPage - 1) * batchSize);
+        boolean flag = true;
+        long pageNo, totalRowsCount = 0;
+        for (pageNo = currentPage; pageNo <= totalNumberOfBatch; pageNo++) {
+          entity =
+              getExecutionData(executionId, analysisType, pageNo, batchSize, DataResponse.class);
+          DataResponse response = entity.getBody();
+          List<Object> data = response.getData();
+          logger.trace("total record count:{}", response.getTotalRows());
 
-        // point the cursor in excel file
-        rowCount = flag ? rowCount : rowCount + batchSize;
-        xlsxExporter.buildXlsxSheet(
-            sipQuery, exportBean, workBook, sheet, leftOutRowsToProcess, leftOutRows, rowCount);
+          // break if no data available
+          if (data == null || data.size() == 0) return false;
+          // point the cursor in excel file
+          if (recordsToSkip > 0) {
+            data = data.stream().skip(recordsToSkip).collect(Collectors.toList());
+            recordsToSkip = 0l;
+          }
+          xlsxExporter.buildXlsxSheet(
+              sipQuery, exportBean, workBook, sheet, data, batchSize, currentXlsRow);
+          currentXlsRow = currentXlsRow + data.size();
+          currentPage++;
+          // recalculate the total number of batch size if available record less than export size.
+          totalRowsCount = response.getTotalRows();
+          if (totalRowsCount < totalExportSize && flag) {
+            totalNumberOfBatch = totalRowsCount / batchSize;
+          }
+          flag = false;
+        }
+        exportBean.setPageNo(currentPage);
+
+        // final rows to process
+        long leftOutRows;
+        if (totalRowsCount > 0 && totalRowsCount <= totalExportSize) {
+          leftOutRows = totalRowsCount - (pageNo - 1) * batchSize;
+        } else {
+          leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
+        }
+        if (leftOutRows > 0 && totalNumberOfBatch >= 0 && batchSize > 0) {
+          entity =
+              getExecutionData(executionId, analysisType, pageNo, batchSize, DataResponse.class);
+          DataResponse response = entity.getBody();
+          List<Object> data = response.getData();
+          // point the cursor in excel file
+          long remainingRows = leftOutRows - recordsToSkip;
+          logger.trace("left out rows = {}", leftOutRows);
+          List<Object> leftOutRowsToProcess =
+              data.stream().skip(recordsToSkip).limit(remainingRows).collect(Collectors.toList());
+          xlsxExporter.buildXlsxSheet(
+              sipQuery,
+              exportBean,
+              workBook,
+              sheet,
+              leftOutRowsToProcess,
+              remainingRows,
+              currentXlsRow);
+        }
+        Long lastExportSize = (currentPage - 1) * batchSize + leftOutRows;
+        logger.trace("setting  lastExportSize  :{}", lastExportSize);
+        exportBean.setLastExportedSize(lastExportSize);
+        stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
+        workBook.write(stream);
+      } catch (IOException ex) {
+        logger.error("Error occurred while writing the data in xls sheet with POI Api: {}", ex);
+      } catch (Exception e) {
+        logger.error("Exception occured while writing data to xlsx sheet:{}", e);
+      } finally {
+        stream.flush();
+        stream.close();
       }
-      workBook.write(stream);
-    } catch (IOException ex) {
-      logger.error("Error occurred while writing the data in xls sheet with POI Api: {}", ex);
-    } finally {
-      stream.flush();
-      stream.close();
     }
+    exportBean.setLastExportLimit(Long.valueOf(totalExportSize));
     return true;
   }
 
@@ -525,8 +562,6 @@ public class ExportServiceImpl implements ExportService {
    * @param exportBean exportBean bean have all the required filed to build sheet
    * @param recipients recipients mail to be sent
    * @param zip Boolean flag if zip checkbox selected from UI
-   * @param restTemplate RestTemplate
-   * @param userFileName Name of the report file
    * @return True if the mail dispatched successfully else false
    */
   public boolean dispatchToMail(
@@ -534,35 +569,25 @@ public class ExportServiceImpl implements ExportService {
       String analysisType,
       ExportBean exportBean,
       String recipients,
-      boolean zip,
-      RestTemplate restTemplate,
-      String userFileName) {
+      boolean zip) {
     logger.debug("Inside dispatch mail for fileType :{}", exportBean.getFileType());
-    logger.debug("Export Bean = " + exportBean);
-    if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
-      try {
-        prepareFileWithSize(executionId, analysisType, emailExportSize, restTemplate, exportBean);
+    try {
+      if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
+        prepareFileWithSize(executionId, analysisType, emailExportSize, exportBean);
         dispatchMail(exportBean, zip, recipients);
-      } catch (Exception e) {
-        logger.error("Exception ocurred while dispatching Email csv report:{}", e);
-        return false;
-      }
-    } else {
-      exportBean.setFileName(filePath(DispatchType.MAIL.value(), userFileName));
-      try {
+
+      } else {
         streamToXlsxReport(
             exportBean.getSipQuery(),
             executionId,
             analysisType,
             Long.valueOf(emailExportSize),
-            exportBean,
-            restTemplate);
+            exportBean);
         dispatchMail(exportBean, zip, recipients);
-        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-      } catch (Exception e) {
-        logger.error("Exception ocurred while dispatching Email xlsx report:{}", e);
-        return false;
       }
+    } catch (Exception e) {
+      logger.error("Exception occurred while dispatching email  report:{}", e);
+      return false;
     }
     return true;
   }
@@ -605,34 +630,23 @@ public class ExportServiceImpl implements ExportService {
       ExportBean exportBean,
       String finalS3,
       boolean zip,
-      String finalJobGroup,
-      RestTemplate restTemplate,
-      String userFileName) {
+      String finalJobGroup) {
     logger.debug("Inside dispatch S3 for fileType :{}", exportBean.getFileType());
-    logger.debug("Export Bean = " + exportBean);
-    if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
-      prepareFileWithSize(
-          executionId,
-          analysisType,
-          s3ExportSize,
-          restTemplate,
-          exportBean);
-      dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
-    } else {
-      exportBean.setFileName(filePath(DispatchType.S3.value(), userFileName));
-      try {
+    try {
+      if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
+        prepareFileWithSize(executionId, analysisType, s3ExportSize, exportBean);
+        dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
+      } else {
         streamToXlsxReport(
             exportBean.getSipQuery(),
             executionId,
             analysisType,
             Long.valueOf(s3ExportSize),
-            exportBean,
-            restTemplate);
+            exportBean);
         dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
-        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-      } catch (Exception e) {
-        logger.error("Exception ocurred while dispatching S3 xlsx report:{}", e);
       }
+    } catch (Exception e) {
+      logger.error("Exception ocurred while dispatching S3  report:{}", e);
     }
   }
 
@@ -648,7 +662,7 @@ public class ExportServiceImpl implements ExportService {
         s3DispatchExecutor(finalS3, finalJobGroup, new File(zipFileName));
 
         logger.debug("ExportBean.getFileName() - to delete in S3 : " + exportBean.getFileName());
-         ExportUtils.deleteDispatchedFile(zipFileName, serviceUtils);
+        ExportUtils.deleteDispatchedFile(zipFileName, serviceUtils);
         logger.debug("ExportBean.getFileName() - to delete in S3 : " + zipFileName);
 
       } catch (Exception e) {
@@ -702,8 +716,7 @@ public class ExportServiceImpl implements ExportService {
       String s3,
       String ftp,
       boolean zip,
-      String jobGroup,
-      RestTemplate restTemplate) {
+      String jobGroup) {
     String userFileName = exportBean.getFileName();
     // create a directory with unique name in published location.
     final String dispatchFileName = filePath(null, userFileName);
@@ -737,37 +750,32 @@ public class ExportServiceImpl implements ExportService {
           (key, vaue) -> {
             switch (key) {
               case DISPATCH_TO_MAIL:
-                dispatchToMail(
-                    executionId,
-                    analysisType,
-                    exportBean,
-                    recipients,
-                    zip,
-                    restTemplate,
-                    userFileName);
-                break;
+                {
+                  Instant start = Instant.now();
+                  dispatchToMail(executionId, analysisType, exportBean, recipients, zip);
+                  Instant finish = Instant.now();
+                  long timeElapsed = Duration.between(start, finish).toMillis();
+                  logger.trace("time taken for email dispatch:{}", timeElapsed);
+                  break;
+                }
               case DISPATCH_TO_FTP:
-                dispatchToFtp(
-                    executionId,
-                    analysisType,
-                    exportBean,
-                    ftp,
-                    zip,
-                    jobGroup,
-                    restTemplate,
-                    userFileName);
-                break;
+                {
+                  Instant start = Instant.now();
+                  dispatchToFtp(executionId, analysisType, exportBean, ftp, zip, jobGroup);
+                  Instant finish = Instant.now();
+                  long timeElapsed = Duration.between(start, finish).toMillis();
+                  logger.trace("time taken for FTP dispatch:{}", timeElapsed);
+                  break;
+                }
               case DISPATCH_TO_S3:
-                dispatchToS3(
-                    executionId,
-                    analysisType,
-                    exportBean,
-                    s3,
-                    zip,
-                    jobGroup,
-                    restTemplate,
-                    userFileName);
-                break;
+                {
+                  Instant start = Instant.now();
+                  dispatchToS3(executionId, analysisType, exportBean, s3, zip, jobGroup);
+                  Instant finish = Instant.now();
+                  long timeElapsed = Duration.between(start, finish).toMillis();
+                  logger.trace("time taken for S3 dispatch:{}", timeElapsed);
+                  break;
+                }
             }
           });
     } catch (Exception e) {
@@ -784,19 +792,15 @@ public class ExportServiceImpl implements ExportService {
   }
 
   public void prepareFileWithSize(
-      String executionId,
-      String analysisType,
-      String exportSize,
-      RestTemplate restTemplate,
-      ExportBean exportBean) {
-    logger.debug("Preparing file with size = {}", exportSize);
+      String executionId, String analysisType, String exportSize, ExportBean exportBean) {
+    logger.trace("Preparing file with size = {}", exportSize);
     Long lastExportedSize = exportBean.getLastExportedSize();
-    logger.debug("lastExportedSize = {}", lastExportedSize);
+    logger.trace("lastExportedSize = {}", lastExportedSize);
     Long lastExportLimit = exportBean.getLastExportLimit();
-    logger.debug("lastExportLimit = {}",lastExportLimit);
-    Integer currentPage=exportBean.getPageNo();
-    currentPage = currentPage==null?1:currentPage;
-    logger.debug("currentPage = {}", currentPage);
+    logger.trace("lastExportLimit = {}", lastExportLimit);
+    Integer currentPage = exportBean.getPageNo();
+    currentPage = currentPage == null ? 1 : currentPage;
+    logger.trace("currentPage = {}", currentPage);
     if (!(lastExportedSize != null
         && lastExportLimit != null
         && (lastExportedSize < lastExportLimit))) {
@@ -809,21 +813,18 @@ public class ExportServiceImpl implements ExportService {
       Long recordsTolimit = limitPerPage;
       if (lastExportedSize != null)
         recordsToSkip = lastExportedSize - ((currentPage - 1) * limitPerPage);
-        logger.debug("recordsToSkip = " + recordsToSkip);
+      logger.trace("recordsToSkip = " + recordsToSkip);
       ResponseEntity<DataResponse> entity = null;
-      for (int i = currentPage; i <= noOfPages; i += 1) {
+      for (page = currentPage; page <= noOfPages; page += 1) {
         recordsTolimit = limitPerPage;
-        page = i;
         entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, page, limitPerPage, DataResponse.class);
+            getExecutionData(executionId, analysisType, page, limitPerPage, DataResponse.class);
         totalRowCount = entity.getBody().getTotalRows();
-        logger.trace("Response data = " + entity.getBody().getData());
-        logger.debug("Total row count = " + totalRowCount);
+        logger.trace("Total row count = " + totalRowCount);
         if (totalRowCount <= Double.parseDouble(exportSize) && flag) {
           noOfPages = Math.ceil(totalRowCount / limitPerPage);
         }
-        flag=false;
+        flag = false;
         streamResponseToFile(exportBean, entity, recordsToSkip, recordsTolimit);
         recordsToSkip = 0l;
         currentPage++;
@@ -831,27 +832,26 @@ public class ExportServiceImpl implements ExportService {
       exportBean.setPageNo(currentPage);
       // final rows to process
       long leftOutRows = 0;
-      if (totalRowCount!=0 && totalRowCount <= Double.parseDouble(exportSize)) {
+      if (totalRowCount != 0 && totalRowCount <= Double.parseDouble(exportSize)) {
         leftOutRows = totalRowCount - (currentPage - 1) * limitPerPage;
       } else {
         leftOutRows = Long.parseLong(exportSize) - (currentPage - 1) * limitPerPage;
       }
-      logger.debug("left out rows " + "::" + leftOutRows);
-      page += 1;
+      logger.trace("left out rows " + "::" + leftOutRows);
+
       if (leftOutRows > 0) {
-        recordsTolimit = leftOutRows-recordsToSkip;
+        recordsTolimit = leftOutRows - recordsToSkip;
         entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, page, limitPerPage, DataResponse.class);
+            getExecutionData(executionId, analysisType, page, limitPerPage, DataResponse.class);
         streamResponseToFile(exportBean, entity, recordsToSkip, recordsTolimit);
       }
       Long lastExportSize = (currentPage - 1) * limitPerPage + leftOutRows;
-      logger.debug("setting  lastExportSize  :{}" , lastExportSize);
+      logger.trace("setting  lastExportSize  :{}", lastExportSize);
       exportBean.setLastExportedSize(lastExportSize);
       logger.debug("File created");
     }
-      logger.debug("setting  lastExportLimit :{}" , exportSize);
-      exportBean.setLastExportLimit(Long.valueOf(exportSize));
+    logger.trace("setting  lastExportLimit :{}", exportSize);
+    exportBean.setLastExportLimit(Long.valueOf(exportSize));
   }
 
   /**
@@ -863,8 +863,6 @@ public class ExportServiceImpl implements ExportService {
    * @param finalFtp
    * @param zip
    * @param finalJobGroup
-   * @param restTemplate
-   * @param userFileName
    */
   public void dispatchToFtp(
       String executionId,
@@ -872,34 +870,23 @@ public class ExportServiceImpl implements ExportService {
       ExportBean exportBean,
       String finalFtp,
       boolean zip,
-      String finalJobGroup,
-      RestTemplate restTemplate,
-      String userFileName) {
-      logger.debug("Inside dispatch FTP for fileType :{}", exportBean.getFileType());
-      logger.debug("Export Bean = " + exportBean);
-    if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
-      prepareFileWithSize(
-          executionId,
-          analysisType,
-          ftpExportSize,
-          restTemplate,
-          exportBean);
-      createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
-    } else {
-      exportBean.setFileName(filePath(DispatchType.FTP.value(), userFileName));
-      try {
+      String finalJobGroup) {
+    logger.trace("Inside dispatch FTP for fileType :{}", exportBean.getFileType());
+    try {
+      if (exportBean.getFileType().equalsIgnoreCase(DEFAULT_FILE_TYPE)) {
+        prepareFileWithSize(executionId, analysisType, ftpExportSize, exportBean);
+        createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
+      } else {
         streamToXlsxReport(
             exportBean.getSipQuery(),
             executionId,
             analysisType,
             Long.valueOf(ftpExportSize),
-            exportBean,
-            restTemplate);
+            exportBean);
         createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
-        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
-      } catch (Exception e) {
-        logger.error("Exception ocurred while dispatching FTP xlsx report:{}", e);
       }
+    } catch (Exception e) {
+      logger.error("Exception ocurred while dispatching FTP  report:{}", e);
     }
   }
 
@@ -994,7 +981,6 @@ public class ExportServiceImpl implements ExportService {
    */
   public SipQuery getSipQuery(String analysisId) {
     try {
-      RestTemplate restTemplate = restUtil.restTemplate();
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -1059,8 +1045,7 @@ public class ExportServiceImpl implements ExportService {
 
   @Override
   @Async
-  public void pivotDispatchAsync(
-      String executionId, RequestEntity request, String analysisId, String analysisType) {
+  public void pivotDispatchAsync(String executionId, RequestEntity request, String analysisId) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -1074,7 +1059,7 @@ public class ExportServiceImpl implements ExportService {
     ExportBean exportBean = setExportBeanProps(dispatchBean);
     exportBean.setSipQuery(sipQuery);
     String userFileName = exportBean.getFileName();
-    logger.info("File name" + userFileName);
+    logger.trace("File name" + userFileName);
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
@@ -1101,7 +1086,6 @@ public class ExportServiceImpl implements ExportService {
     logger.debug("recipients: " + recipients);
     logger.debug("ftp: " + ftp);
     logger.debug("s3: " + s3);
-    RestTemplate restTemplate = restUtil.restTemplate();
     if ((recipients != null && !recipients.equals(""))
         || ((s3 != null && s3 != ""))
         || ((ftp != null && ftp != ""))) {
@@ -1109,115 +1093,93 @@ public class ExportServiceImpl implements ExportService {
       logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
 
       if (recipients != null && !recipients.equals("")) {
-        mailDispatchForPivot(
-            exportBean,
-            recipients,
-            isZipRequired,
-            executionId,
-            restTemplate,
-            analysisType,
-            userFileName);
+        logger.debug("mail dispatch started for pivot: ");
+        Instant start = Instant.now();
+        mailDispatchForPivot(exportBean, recipients, isZipRequired, executionId, userFileName);
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        logger.trace("time taken for mail dispatch for pivot:{}", timeElapsed);
       }
       if (ftp != null && ftp != "") {
         logger.debug("ftp dispatch started for pivot: ");
+        Instant start = Instant.now();
         ftpDispatchForPivot(
-            exportBean,
-            isZipRequired,
-            executionId,
-            restTemplate,
-            analysisType,
-            userFileName,
-            finalJobGroup,
-            ftp);
+            exportBean, isZipRequired, executionId, userFileName, finalJobGroup, ftp);
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        logger.trace("time taken for ftp dispatch for pivot:{}", timeElapsed);
       }
 
       if (s3 != null && s3 != "") {
         logger.debug("S3 dispatch started for pivot");
-        s3DispatchForPivot(
-            exportBean,
-            isZipRequired,
-            executionId,
-            restTemplate,
-            analysisType,
-            userFileName,
-            finalJobGroup,
-            s3);
+        Instant start = Instant.now();
+        s3DispatchForPivot(exportBean, isZipRequired, executionId, userFileName, finalJobGroup, s3);
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        logger.trace("time taken for s3 dispatch for pivot:{}", timeElapsed);
       }
     }
   }
 
   public Boolean streamToXlsxPivot(
-      SipQuery sipQuery,
-      String executionId,
-      String analysisType,
-      long totalExportSize,
-      ExportBean exportBean,
-      RestTemplate restTemplate) {
-    {
-      logger.debug("exportBean" + exportBean);
+      SipQuery sipQuery, String executionId, long totalExportSize, ExportBean exportBean) {
+    long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
+    long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 01;
+    File file = new File(exportBean.getFileName());
+    file.getParentFile().mkdir();
+    boolean flag = true;
+    long pageNo, totalRowsCount = 0, rowCount = 1;
+    XlsxExporter xlsxExporter = new XlsxExporter();
+    Workbook workBook = new XSSFWorkbook();
+    String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
+    XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
+    List<Field> fieldList = getPivotFields(sipQuery);
+    ElasticSearchAggregationParser responseParser = new ElasticSearchAggregationParser(fieldList);
+    ResponseEntity<JsonNode> entity = null;
+    responseParser.setColumnDataType(exportBean);
+    for (pageNo = 1; pageNo <= totalNumberOfBatch; pageNo++) {
 
-      long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
-      long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 01;
-      File file = new File(exportBean.getFileName());
-      file.getParentFile().mkdir();
-      boolean flag = true;
-      long pageNo, totalRowsCount = 0, rowCount = 1;
-      XlsxExporter xlsxExporter = new XlsxExporter();
-      Workbook workBook = new XSSFWorkbook();
-      String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
-      XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
-      List<Field> fieldList = getPivotFields(sipQuery);
-      ElasticSearchAggregationParser responseParser = new ElasticSearchAggregationParser(fieldList);
-      ResponseEntity<JsonNode> entity = null;
-      responseParser.setColumnDataType(exportBean);
-      for (pageNo = 1; pageNo <= totalNumberOfBatch; pageNo++) {
-
-        entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, pageNo, batchSize, JsonNode.class);
-        JsonNode jsonDataNode = entity.getBody().get("data");
-        if (jsonDataNode == null) {
-          logger.debug("Cannot process the dispatch for pivot as data is null");
-          return false;
-        }
-        List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-        rowCount = flag ? rowCount : rowCount + batchSize;
-        logger.trace("Parse data for workbook writing : " + dataObj);
-        logger.trace("Data size = " + dataObj.size());
-        totalRowsCount = entity.getBody().get("totalRows").asLong();
-        if (totalRowsCount < totalExportSize && flag) {
-          totalNumberOfBatch = totalRowsCount / batchSize;
-        }
-        flag = false;
-        xlsxExporter.addxlsxRows(exportBean, workBook, sheet, dataObj, rowCount);
+      entity = getExecutionData(executionId, pivotAnalysisType, pageNo, batchSize, JsonNode.class);
+      JsonNode jsonDataNode = entity.getBody().get("data");
+      if (jsonDataNode == null) {
+        logger.debug("Cannot process the dispatch for pivot as data is null");
+        return false;
       }
-      // final rows to process
-      long leftOutRows;
-      if (totalRowsCount > 0 && totalRowsCount <= totalExportSize) {
-        leftOutRows = totalRowsCount - (pageNo - 1) * batchSize;
-      } else {
-        leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
+      List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
+      rowCount = flag ? rowCount : rowCount + batchSize;
+      logger.trace("Parse data for workbook writing : " + dataObj);
+      logger.trace("Data size = " + dataObj.size());
+      totalRowsCount = entity.getBody().get("totalRows").asLong();
+      if (totalRowsCount < totalExportSize && flag) {
+        totalNumberOfBatch = totalRowsCount / batchSize;
       }
-      logger.debug("left our rows ={}", leftOutRows);
-      if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
-        entity =
-            getExecutionData(
-                executionId, restTemplate, analysisType, pageNo, batchSize, JsonNode.class);
-        JsonNode jsonDataNode = entity.getBody().get("data");
-        List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-        List<Object> leftOutRowsToProcess =
-            dataObj.stream().limit(leftOutRows).collect(Collectors.toList());
-        logger.debug("rows to process:{}", leftOutRowsToProcess.size());
-        rowCount = flag ? rowCount : rowCount + batchSize;
-        xlsxExporter.addxlsxRows(exportBean, workBook, sheet, leftOutRowsToProcess, rowCount);
-      }
-
-      logger.debug("Creating pivot table: ");
-      CreatePivotTable createPivotTable = new CreatePivotTable();
-      createPivotTable.createPivot(workBook, file, fieldList);
-      logger.debug(" pivot table created ");
-      return true;
+      flag = false;
+      xlsxExporter.addxlsxRows(exportBean, workBook, sheet, dataObj, rowCount);
     }
+    // final rows to process
+    long leftOutRows;
+    if (totalRowsCount > 0 && totalRowsCount <= totalExportSize) {
+      leftOutRows = totalRowsCount - (pageNo - 1) * batchSize;
+    } else {
+      leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
+    }
+    logger.trace("left our rows ={}", leftOutRows);
+    if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
+      entity = getExecutionData(executionId, pivotAnalysisType, pageNo, batchSize, JsonNode.class);
+      JsonNode jsonDataNode = entity.getBody().get("data");
+      List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
+      List<Object> leftOutRowsToProcess =
+          dataObj.stream().limit(leftOutRows).collect(Collectors.toList());
+      logger.trace("rows to process:{}", leftOutRowsToProcess.size());
+      rowCount = flag ? rowCount : rowCount + batchSize;
+      xlsxExporter.addxlsxRows(exportBean, workBook, sheet, leftOutRowsToProcess, rowCount);
+    }
+
+    logger.debug("Creating pivot table: ");
+    CreatePivotTable createPivotTable = new CreatePivotTable();
+    createPivotTable.createPivot(workBook, file, fieldList);
+    logger.debug(" pivot table created ");
+    return true;
   }
 
   void mailDispatchForPivot(
@@ -1225,18 +1187,11 @@ public class ExportServiceImpl implements ExportService {
       String recipients,
       boolean zip,
       String executionId,
-      RestTemplate restTemplate,
-      String analysisType,
       String userFileName) {
     exportBean.setFileName(filePath(DispatchType.MAIL.value(), userFileName));
     try {
       streamToXlsxPivot(
-          exportBean.getSipQuery(),
-          executionId,
-          analysisType,
-          Long.valueOf(emailExportSize),
-          exportBean,
-          restTemplate);
+          exportBean.getSipQuery(), executionId, Long.valueOf(emailExportSize), exportBean);
       dispatchMail(exportBean, zip, recipients);
     } catch (Exception e) {
       logger.error("Exception occurred while dispatching Email for pivot:{}", e);
@@ -1249,8 +1204,6 @@ public class ExportServiceImpl implements ExportService {
       ExportBean exportBean,
       boolean zip,
       String executionId,
-      RestTemplate restTemplate,
-      String analysisType,
       String userFileName,
       String finalJobGroup,
       String finalFtp) {
@@ -1258,18 +1211,12 @@ public class ExportServiceImpl implements ExportService {
     exportBean.setColumnHeader(null);
     try {
       streamToXlsxPivot(
-          exportBean.getSipQuery(),
-          executionId,
-          analysisType,
-          Long.valueOf(ftpExportSize),
-          exportBean,
-          restTemplate);
+          exportBean.getSipQuery(), executionId, Long.valueOf(ftpExportSize), exportBean);
       createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
     } catch (Exception e) {
       logger.error("Exception ocurred while dispatching FTP for pivot:{}", e);
-    }
-    finally{
-        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
+    } finally {
+      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
     }
   }
 
@@ -1277,8 +1224,6 @@ public class ExportServiceImpl implements ExportService {
       ExportBean exportBean,
       boolean zip,
       String executionId,
-      RestTemplate restTemplate,
-      String analysisType,
       String userFileName,
       String finalJobGroup,
       String finalS3) {
@@ -1286,12 +1231,7 @@ public class ExportServiceImpl implements ExportService {
     exportBean.setColumnHeader(null);
     try {
       streamToXlsxPivot(
-          exportBean.getSipQuery(),
-          executionId,
-          analysisType,
-          Long.valueOf(s3ExportSize),
-          exportBean,
-          restTemplate);
+          exportBean.getSipQuery(), executionId, Long.valueOf(s3ExportSize), exportBean);
       dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
       ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
     } catch (Exception e) {
@@ -1301,13 +1241,8 @@ public class ExportServiceImpl implements ExportService {
     }
   }
 
-  private <T>ResponseEntity<T> getExecutionData(
-      String executionId,
-      RestTemplate restTemplate,
-      String analysisType,
-      long pageNo,
-      long batchSize,
-      Class<T> classType) {
+  private <T> ResponseEntity<T> getExecutionData(
+      String executionId, String analysisType, long pageNo, long batchSize, Class<T> classType) {
     String proxyEndPoint =
         "/internal/proxy/storage/%s/executions/data?page=%s&pageSize=%s&executionType=scheduled&analysisType=%s";
     String url =
@@ -1316,7 +1251,7 @@ public class ExportServiceImpl implements ExportService {
     ResponseEntity<T> entity = null;
     try {
       logger.info("returning Execution data");
-      return restTemplate.getForEntity(url,classType);
+      return restTemplate.getForEntity(url, classType);
     } catch (Exception e) {
       System.out.println(e);
     }

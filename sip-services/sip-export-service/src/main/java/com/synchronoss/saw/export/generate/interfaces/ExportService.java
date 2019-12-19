@@ -23,7 +23,7 @@ public interface ExportService {
       String executionId, RequestEntity request, String analysisId, String analysisType)
       throws JSONValidationSAWException;
 
-  void pivotDispatchAsync(String executionId, RequestEntity request, String analysisId,String analysisType)
+  void pivotDispatchAsync(String executionId, RequestEntity request, String analysisId)
       throws JSONValidationSAWException;
   List<String> listFtpsForCustomer(RequestEntity request);
 

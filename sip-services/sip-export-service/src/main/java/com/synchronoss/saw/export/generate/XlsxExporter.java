@@ -25,13 +25,14 @@ public class XlsxExporter implements IFileExporter {
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporter.class);
   private static final String DATA_SPLITER = "|||";
   private static final String GENERAL = "General";
+  private static final Long  startingRowNumber = 1l;
 
   @Override
   public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) {
     Workbook workBook = new XSSFWorkbook();
     String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
-    addxlsxRows(exportBean, workBook, sheet, recordRowList,1l);
+    addxlsxRows(exportBean, workBook, sheet, recordRowList, startingRowNumber);
     return workBook;
   }
 

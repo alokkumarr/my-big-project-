@@ -96,7 +96,7 @@ public class DataExportController {
     if (analysisType.equalsIgnoreCase("report") || analysisType.equalsIgnoreCase("esReport"))
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId, analysisType);
     else if(analysisType.equalsIgnoreCase("pivot"))
-      exportService.pivotDispatchAsync(executionId, request, analysisId,analysisType);
+      exportService.pivotDispatchAsync(executionId, request, analysisId);
   }
 
   @RequestMapping(value = "/listFTP", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
