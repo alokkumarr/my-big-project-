@@ -526,7 +526,7 @@ public class ExternalSecurityService {
     }
     if (subCategoryDetails != null && subCategoryDetails.getSubCategoryDesc() != null) {
       categoryDetails.setCategoryDesc(subCategoryDetails.getSubCategoryDesc());
-    } else {
+    } else if (category != null && category.getCategoryDesc() != null){
       categoryDetails.setCategoryDesc(category.getCategoryDesc());
     }
     categoryDetails.setActiveStatusInd(1L);
