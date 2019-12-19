@@ -32,7 +32,6 @@ describe('Executing DLReportQuery tests from DLReportQuery.test.js', () => {
 
   afterEach(done => {
     setTimeout(() => {
-      console.log({ analysisId });
       if (analysisId) {
         new AnalysisHelper().deleteAnalysis(
           host,
