@@ -41,7 +41,7 @@ export class CreateDashboardComponent
 
   editSubscription: Subscription;
 
-  @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
+  @ViewChild('widgetChoice', { static: true }) widgetSidenav: MatSidenav;
 
   constructor(
     public dialog: MatDialog,

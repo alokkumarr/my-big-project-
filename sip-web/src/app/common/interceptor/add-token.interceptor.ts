@@ -18,8 +18,8 @@ export class AddTokenInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     // Clone the request to add the new header.
-    // Don't add headers to assets like svg
-    const authReq = /\.svg$/.test(req.url)
+    // Don't add headers to assets like svg or json files
+    const authReq = /\.svg$|\.json$/.test(req.url)
       ? req.clone()
       : req.clone({
           headers: req.headers.set(
@@ -28,8 +28,10 @@ export class AddTokenInterceptor implements HttpInterceptor {
           )
         });
     // send the newly created request
-    return next.handle(authReq).pipe(catchError((error, caught) => {
-      return throwError(error);
-    }) as any);
+    return next.handle(authReq).pipe(
+      catchError((error, caught) => {
+        return throwError(error);
+      }) as any
+    );
   }
 }

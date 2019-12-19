@@ -52,7 +52,7 @@ export class ParserPreviewComponent
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.previewgridConfig = this.getPreviewGridConfig();

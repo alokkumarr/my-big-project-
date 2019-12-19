@@ -36,7 +36,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     public notify: ToastService
   ) {}
 
-  @ViewChild('sqlscript') public scriptComponent: SqlScriptComponent;
+  @ViewChild('sqlscript', { static: true }) public scriptComponent: SqlScriptComponent;
 
   ngOnInit() {
     this.getPageData();

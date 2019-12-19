@@ -41,7 +41,7 @@ enum MODE {
   styleUrls: ['./derived-metric.component.scss']
 })
 export class DerivedMetricComponent implements OnDestroy, AfterViewInit {
-  @ViewChild('editor') editor: AceEditorComponent;
+  @ViewChild('editor', { static: true }) editor: AceEditorComponent;
 
   editorOptions: any = {
     displayIndentGuides: true,

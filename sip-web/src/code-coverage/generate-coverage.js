@@ -8,5 +8,5 @@ fs.readFile('./coverage/index.html', (err, htmlCoverage) => {
 
   const coverage = html2Map(htmlCoverage);
   const json = JSON.stringify(coverage);
-  fs.writeFile('./src/code-coverage/last-coverage.json', json, 'utf8');
+  fs.writeFileSync('./src/code-coverage/last-coverage.json', json, 'utf8');
 });
