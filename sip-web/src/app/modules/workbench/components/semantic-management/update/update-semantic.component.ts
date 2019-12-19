@@ -182,21 +182,6 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           this.router.navigate(['workbench', 'dataobjects']);
         });
     }
-    /* if (anyColSelected) {
-      if (dateColAvailable) {
-        if (dateAndKpiSelected) {
-          this.updateDatapod();
-        } else {
-          this.notify.warn(msg, title, {
-            hideDelay: 9000
-          });
-        }
-      } else {
-        this.updateDatapod();
-      }
-    } else {
-      this.updateDatapod();
-    } */
   }
 
   /**
