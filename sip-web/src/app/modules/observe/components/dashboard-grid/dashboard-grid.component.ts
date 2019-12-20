@@ -62,7 +62,7 @@ export const DASHBOARD_MODES = {
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {
-  @ViewChild('gridster') gridster: GridsterComponent;
+  @ViewChild('gridster', { static: true }) gridster: GridsterComponent;
   @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
   model: Dashboard;

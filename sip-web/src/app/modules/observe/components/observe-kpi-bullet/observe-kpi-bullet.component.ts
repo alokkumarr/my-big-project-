@@ -80,7 +80,7 @@ export class ObserveKPIBulletComponent
   @Input() enableChartDownload: boolean;
   @Input() updater: BehaviorSubject<Array<any>>;
   @Output() onRefresh = new EventEmitter<any>();
-  @ViewChild(ChartComponent) chartComponent: ChartComponent;
+  @ViewChild(ChartComponent, { static: false }) chartComponent: ChartComponent;
 
   constructor(
     public observe: ObserveService,

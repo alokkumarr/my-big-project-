@@ -46,7 +46,12 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -115,8 +120,10 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
 
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(chartDescription);

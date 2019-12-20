@@ -23,7 +23,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() query: string;
   @Output() queryChange = new EventEmitter<string>();
 
-  @ViewChild('editor') editor: AceEditorComponent;
+  @ViewChild('editor', { static: true }) editor: AceEditorComponent;
 
   public _artifacts: Array<any>;
   public editorOptions = {

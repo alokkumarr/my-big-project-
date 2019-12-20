@@ -12,7 +12,7 @@ export class SidenavComponent implements OnInit {
   @Input() id: any;
 
   constructor(public _sidenav: SidenavMenuService) {}
-  @ViewChild('sidenav') public sidenav;
+  @ViewChild('sidenav', { static: true }) public sidenav;
 
   public unregister: any;
   public _moduleName: string;

@@ -29,7 +29,7 @@ export class DatasetsGridPageComponent
     public workbench: WorkbenchService
   ) {}
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.gridConfig = this.getGridConfig();
