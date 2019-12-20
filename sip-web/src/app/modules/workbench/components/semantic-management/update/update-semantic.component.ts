@@ -7,13 +7,14 @@ import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
-import * as forIn from 'lodash/forIn';
+import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
-import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
-import * as findIndex from 'lodash/findIndex';
+import * as some from 'lodash/some';
 import * as omit from 'lodash/omit';
+import * as isUndefined from 'lodash/isUndefined';
+import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'update-semantic',
@@ -75,20 +76,20 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
     this.workBench.getSemanticDetails(id).subscribe((data: any) => {
       this.selectedDPDetails = omit(data, 'statusMessage');
       this.selectedDPData = get(data, 'artifacts');
-      forIn(this.selectedDPData, dp => {
+      forEach(this.selectedDPData, dp => {
         const parentDSName = dp.artifactName;
         const parentDSData = find(this.availableDS, obj => {
           return obj.system.name === parentDSName;
         });
-        this.isJoinEligible = parentDSData.joinEligible;
-
-        this.injectFieldProperties(parentDSData);
-
-        forIn(parentDSData.schema.fields, obj => {
-          if (findIndex(dp.columns, ['columnName', obj.columnName]) === -1) {
-            dp.columns.push(obj);
-          }
-        });
+        if (!isUndefined(parentDSData)) {
+          this.isJoinEligible = parentDSData.joinEligible;
+          this.injectFieldProperties(parentDSData);
+          forEach(parentDSData.schema.fields, obj => {
+            if (!some(dp.columns, ['columnName', obj.columnName])) {
+              dp.columns.push(obj);
+            }
+          });
+        }
       });
     });
   }
@@ -128,7 +129,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    */
   updateSemantic() {
     this.selectedDPDetails.artifacts = [];
-    forIn(this.selectedDPData, ds => {
+    forEach(this.selectedDPData, ds => {
       this.selectedDPDetails.artifacts.push({
         artifactName: ds.artifactName,
         columns: filter(ds.columns, 'include')

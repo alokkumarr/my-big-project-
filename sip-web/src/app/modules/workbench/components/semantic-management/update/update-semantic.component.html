@@ -37,7 +37,7 @@
           [showColumnLines]="false"
           [hoverStateEnabled]="true"
           (onSelectionChanged)="
-            onDPSelectionChanged($event.currentSelectedRowKeys[0])
+            onDPSelectionChanged($event.currentSelectedRowKeys[0].id)
           "
         >
           <dxo-selection mode="single"></dxo-selection>
