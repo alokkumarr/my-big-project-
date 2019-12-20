@@ -52,7 +52,13 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
       }
       analyses.forEach(id => {
         logger.warn('deleting analysis with id: ' + id);
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.CHART);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          id,
+          Constants.CHART
+        );
       });
 
       commonFunctions.clearLocalStorage();
@@ -146,8 +152,9 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         analyzePage.clickOnAnalysisLink(forkedName);
 
         executePage.verifyTitle(forkedName);
-        forkedAnalysisId = executePage.getAnalysisId();
-
+        executePage.getAnalysisId().then(id => {
+          forkedAnalysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(forkedDescription);

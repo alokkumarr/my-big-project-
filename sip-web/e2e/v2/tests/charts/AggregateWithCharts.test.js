@@ -41,7 +41,12 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -106,11 +111,17 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
 
         // Verify the selected aggregate.
-        chartDesignerPage.validateSelectedAggregate(metrics, data.aggregate.designerLabel, data.aggregate.value);
+        chartDesignerPage.validateSelectedAggregate(
+          metrics,
+          data.aggregate.designerLabel,
+          data.aggregate.value
+        );
         chartDesignerPage.clickOnSave();
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
         // Delete the analysis

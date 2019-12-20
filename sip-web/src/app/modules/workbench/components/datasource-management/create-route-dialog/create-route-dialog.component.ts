@@ -30,8 +30,8 @@ export class CreateRouteDialogComponent {
   startDateCorrectFlag = true;
 
   // All route forms implement this interface to guarantee common properties
-  @ViewChild('sftpForm') sftpForm: DetailForm;
-  @ViewChild('apiForm') apiForm: DetailForm;
+  @ViewChild('sftpForm', { static: false }) sftpForm: DetailForm;
+  @ViewChild('apiForm', { static: false }) apiForm: DetailForm;
 
   constructor(
     private dialogRef: MatDialogRef<CreateRouteDialogComponent>,

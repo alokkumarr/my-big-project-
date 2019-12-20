@@ -1,14 +1,17 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 $header-padding-top: 12px;
 $header-padding-bottom: 12px;
 $header-font-size: 18px;
-$report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size});
+$report-height: calc(
+  100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size}
+);
 
 .chart.report-title {
   margin: 0;
   padding: $header-padding-top 0 $header-padding-bottom;
   text-align: center;
-  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+  font-family: 'Lucida Grande', 'Lucida Sans Unicode', Arial, Helvetica,
+    sans-serif;
   font-weight: normal;
   font-size: $header-font-size;
 }
@@ -38,7 +41,7 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
 }
 
 mat-icon.export {
-  background-image: url('/assets/img/excel.png');
+  background-image: url('src/assets/img/excel.png');
   transform: scale(0.7);
 }
 

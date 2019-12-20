@@ -16,7 +16,8 @@ const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 
 describe('Running create and delete dashboards with Snapshot KPIS in create-delete-dashboards/snapshotKPI.test.js', () => {
-  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
+  const subCategoryName =
+    subCategories.createSubCategories.observeSubCategory.name;
   let host;
   let token;
   let dashboardId;
@@ -47,7 +48,9 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
   });
 
   using(
-    testDataReader.testData['SNAPSHOT_KPI']['dashboard'] ? testDataReader.testData['SNAPSHOT_KPI']['dashboard'] : {},
+    testDataReader.testData['SNAPSHOT_KPI']['dashboard']
+      ? testDataReader.testData['SNAPSHOT_KPI']['dashboard']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
@@ -60,8 +63,10 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
 
           const currentTime = new Date().getTime();
           const dashboardName = 'AT Dashboard Name' + currentTime;
-          const dashboardDescription = 'AT Dashboard description ' + currentTime;
-          const kpiName = 'AT kpi' + data.kpiInfo.column + globalVariables.e2eId;
+          const dashboardDescription =
+            'AT Dashboard description ' + currentTime;
+          const kpiName =
+            'AT kpi' + data.kpiInfo.column + globalVariables.e2eId;
 
           const headerPage = new HeaderPage();
           headerPage.clickOnModuleLauncher();
@@ -74,16 +79,24 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnSnapshotKPILink();
           dashboardDesigner.clickOnCategoryOrMetricName(metricName);
-          dashboardDesigner.clickOnKpiColumnByName(data.kpiInfo.column.toLowerCase());
+          dashboardDesigner.clickOnKpiColumnByName(
+            data.kpiInfo.column.toLowerCase()
+          );
           dashboardDesigner.fillKPINameDetails(kpiName);
           dashboardDesigner.clickOnDateFieldSelect();
           dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.date);
           dashboardDesigner.clickOnDatePreSelect();
-          dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.filter);
+          dashboardDesigner.clickOnDateOrAggregationElement(
+            data.kpiInfo.filter
+          );
           dashboardDesigner.clickOnAggregationSelect();
-          dashboardDesigner.clickOnDateOrAggregationElement(data.kpiInfo.primaryAggregation);
+          dashboardDesigner.clickOnDateOrAggregationElement(
+            data.kpiInfo.primaryAggregation
+          );
           dashboardDesigner.addSecondryAggregations(data.kpiInfo);
-          dashboardDesigner.clickOnBackgroundColorByName(data.kpiInfo.backgroundColor);
+          dashboardDesigner.clickOnBackgroundColorByName(
+            data.kpiInfo.backgroundColor
+          );
           dashboardDesigner.clickOnApplyKPIButton();
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
@@ -93,8 +106,9 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
 
-          dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
-
+          commonFunctions.getDashboardId().then(id => {
+            dashboardId = id;
+          });
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyKpiByName(kpiName);
           observePage.verifyFilterByName(data.kpiInfo.filter);
