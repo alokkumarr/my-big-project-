@@ -1,6 +1,5 @@
 package com.synchronoss.saw.export.generate;
 
-import static com.synchronoss.saw.export.model.DispatchMethod.DISPATCH_TO_MAIL;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +10,6 @@ import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
-import com.synchronoss.saw.export.model.DispatchMethod;
 import com.synchronoss.saw.export.model.DispatchType;
 import com.synchronoss.saw.export.model.S3.S3Customer;
 import com.synchronoss.saw.export.model.S3.S3Details;
@@ -722,23 +720,23 @@ public class ExportServiceImpl implements ExportService {
     final String dispatchFileName = filePath(null, userFileName);
     exportBean.setFileName(dispatchFileName);
     exportBean.setSipQuery(getSipQuery(analysisId));
-    Map<DispatchMethod, Long> sizeMap = new HashMap<>();
+    Map<DispatchType, Long> sizeMap = new HashMap<>();
 
     if (recipients != null && !recipients.equals("")) {
-      sizeMap.put(DISPATCH_TO_MAIL, Long.valueOf(emailExportSize));
+      sizeMap.put(DispatchType.MAIL, Long.valueOf(emailExportSize));
     }
     if (ftp != null && ftp != "") {
-      sizeMap.put(DispatchMethod.DISPATCH_TO_FTP, Long.valueOf(ftpExportSize));
+      sizeMap.put(DispatchType.FTP, Long.valueOf(ftpExportSize));
     }
 
     if (s3 != null && s3 != "") {
-      sizeMap.put(DispatchMethod.DISPATCH_TO_S3, Long.valueOf(s3ExportSize));
+      sizeMap.put(DispatchType.S3, Long.valueOf(s3ExportSize));
     }
 
     /* Here we are maintaing the methods in a map and sorting the the map based on the dispatch limit because
      * for csv format we are reusing the same file across all types of dispatch(mail,ftp,s3), so because of that while preparig
      * the csv we should prepare lower size data first and we should append the data incrementally.*/
-    LinkedHashMap<DispatchMethod, Long> finalSortedMap = new LinkedHashMap<>();
+    LinkedHashMap<DispatchType, Long> finalSortedMap = new LinkedHashMap<>();
 
     sizeMap.entrySet().stream()
         .sorted(Map.Entry.comparingByValue())
@@ -749,7 +747,7 @@ public class ExportServiceImpl implements ExportService {
       finalSortedMap.forEach(
           (key, vaue) -> {
             switch (key) {
-              case DISPATCH_TO_MAIL:
+              case MAIL:
                 {
                   Instant start = Instant.now();
                   dispatchToMail(executionId, analysisType, exportBean, recipients, zip);
@@ -758,7 +756,7 @@ public class ExportServiceImpl implements ExportService {
                   logger.trace("time taken for email dispatch:{}", timeElapsed);
                   break;
                 }
-              case DISPATCH_TO_FTP:
+              case FTP:
                 {
                   Instant start = Instant.now();
                   dispatchToFtp(executionId, analysisType, exportBean, ftp, zip, jobGroup);
@@ -767,7 +765,7 @@ public class ExportServiceImpl implements ExportService {
                   logger.trace("time taken for FTP dispatch:{}", timeElapsed);
                   break;
                 }
-              case DISPATCH_TO_S3:
+              case S3:
                 {
                   Instant start = Instant.now();
                   dispatchToS3(executionId, analysisType, exportBean, s3, zip, jobGroup);
