@@ -1147,7 +1147,6 @@ public class ExportServiceImpl implements ExportService {
       }
       List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
       rowCount = flag ? rowCount : rowCount + batchSize;
-      logger.trace("Parse data for workbook writing : " + dataObj);
       logger.trace("Data size = " + dataObj.size());
       totalRowsCount = entity.getBody().get("totalRows").asLong();
       if (totalRowsCount < totalExportSize && flag) {
