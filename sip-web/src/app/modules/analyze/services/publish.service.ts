@@ -19,7 +19,7 @@ export class PublishService {
     lastCategoryId: number | string = null
   ): Promise<AnalysisDSL> {
     await this.updateScheduleBeforePublishing(analysis, lastCategoryId);
-    await this._executeService.executeAnalysis(
+    await this._executeService.executeAnalysisAndReturnAfterDone(
       analysis,
       EXECUTION_MODES.PUBLISH
     );
