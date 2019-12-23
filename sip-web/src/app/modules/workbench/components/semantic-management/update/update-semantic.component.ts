@@ -15,6 +15,8 @@ import * as some from 'lodash/some';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
+import * as set from 'lodash/set';
+import * as has from 'lodash/has';
 
 @Component({
   selector: 'update-semantic',
@@ -89,6 +91,16 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
               dp.columns.push(obj);
             }
           });
+
+          /**
+           * Checking here if dskEligible property for all the columns are available. If not add it and set the default value to false.
+           * Added as a fix for SIP-9483.
+           */
+          forEach(dp.columns, col => {
+            if (!has(col, 'dskEligible')) {
+              set(col, 'dskEligible', false);
+            }
+          });
         }
       });
     });
@@ -109,9 +121,10 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: false,
+        filterEligible: true,
         joinEligible: false,
         kpiEligible: false,
+        dskEligible: false,
         include: false,
         name: value.name,
         table: artifactName,

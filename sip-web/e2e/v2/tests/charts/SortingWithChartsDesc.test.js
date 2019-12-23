@@ -45,7 +45,12 @@ describe('Executing Sorting for charts tests from charts/SortingWithChartsDesc.t
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -113,7 +118,10 @@ describe('Executing Sorting for charts tests from charts/SortingWithChartsDesc.t
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
         chartDesignerPage.clickOnSortButton();
         // Verify sort options are applied
