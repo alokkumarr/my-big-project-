@@ -47,6 +47,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
+import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
@@ -1050,6 +1051,16 @@ public class SecurityController {
             response.setStatus(400);
             return dskValidity;
         }
+    }
+
+    /**
+     * Fetching all Dsk attribute values.
+     * @param securityGroupId
+     * @return List of Attribute-values
+     */
+    @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.GET)
+    public List<DskDetails> fetchDskAllAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)    {
+        return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
     }
 
     /**
