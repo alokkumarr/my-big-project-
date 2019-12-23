@@ -587,8 +587,98 @@ not supported.
 
 === SIP Security : External APIs
 
-SIP security provides external API to manage `users` and their `roles`,`categories`,`subcategories`,  `privileges` and `data security key`.
+SIP security provides external API to manage `users` and their `roles`,`categories`,`subcategories`,  `privileges` and `data security key`
 
+==== API for creating  and fetching the users.
+
+These  APIs managed by the admin only.While creating the user  middleName, securityGroupName are non-manadatory
+and for ID3 login passowrd is non-manadatory.
+
+Create User API [POST]: `https://{hostname}/sip/security/auth/admin/cust/manage/external/users/create`
+
+sample request body::
+----
+{
+
+    "firstName": "Anil",
+    "middleName": null,
+    "lastName": "Deshagani",
+    "masterLoginId": "Anil10.Deshagani",
+    "password": "Sawsyncnewuser1!",
+    "email": "sawadminq@synchronoss.com",
+    "activeStatusInd": true,
+    "customerCode":"synchronoss",
+    "roleName":"ADMIN",
+	 "id3Enabled": true,
+    "securityGroupName":"test"
+}
+----
+sample response::
+----
+{
+    "user": {
+        "activeStatusInd": true,
+        "customerCode": "SYNCHRONOSS",
+        "email": "sawadminq@synchronoss.com",
+        "firstName": "Anil",
+        "middleName": null,
+        "lastName": "Deshagani",
+        "masterLoginId": "Anil10.Deshagani",
+        "roleName": "ADMIN",
+        "userId": 105,
+        "roleId": 1,
+        "secGroupSysId": null,
+        "securityGroupName": null,
+        "customerId": 1
+    },
+    "error": null,
+    "valid": true,
+    "validityMessage": null
+}
+----
+
+Fetch API [GET]: `https://{hostname}/sip/security/auth/admin/cust/manage/external/users/fetch`
+sample response:
+----
+{
+    "error": null,
+    "valid": true,
+    "recordCount": 17,
+    "validityMessage": null,
+    "users": [
+        {
+            "activeStatusInd": true,
+            "customerCode": "SYNCHRONOSS",
+            "email": "sysadmin@synchronoss.com",
+            "firstName": "system",
+            "middleName": "sncr",
+            "lastName": "admin",
+            "masterLoginId": "sawadmin@synchronoss.com",
+            "roleName": "ADMIN",
+            "userId": 1,
+            "roleId": 1,
+            "secGroupSysId": null,
+            "securityGroupName": null,
+            "customerId": 1
+        },
+        {
+            "activeStatusInd": true,
+            "customerCode": "SYNCHRONOSS",
+            "email": "sawadminq@synchronoss.com",
+            "firstName": "Anil",
+            "middleName": null,
+            "lastName": "Deshagani",
+            "masterLoginId": "Anil.Deshagani",
+            "roleName": "ADMIN",
+            "userId": 85,
+            "roleId": 1,
+            "secGroupSysId": null,
+            "securityGroupName": null,
+            "customerId": 1
+        }
+    ]
+}
+----
 ==== API for Role, Categories, Subcategories, Privileges
 
 Add API [POST]: `https://{hostname}/sip/security/external/createRoleCategoryPrivilege`
