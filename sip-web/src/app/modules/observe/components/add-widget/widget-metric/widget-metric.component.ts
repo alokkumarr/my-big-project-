@@ -9,6 +9,7 @@ import { from } from 'rxjs';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
+import * as set from 'lodash/set';
 
 import { guid } from '../../../../../common/utils/guid';
 import { DATE_TYPES } from '../../../../../common/consts';
@@ -83,12 +84,15 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
     metric.kpiEligible =
       metric.kpiColumns.length > 0 && metric.dateColumns.length > 0;
 
-    this.errorMessage =
+    const errorMessage =
       metric.kpiColumns.length === 0
         ? kpiNotElgibleMsg
         : metric.dateColumns.length === 0
         ? dateColMissingMsg
         : kpiNotElgibleMsg;
+
+    // Setting the specific error message for each metric. Added as part of SIP-9254.
+    set(metric, 'errorMessage', errorMessage);
   }
 
   onSelectMetricColumn(column, metric) {
