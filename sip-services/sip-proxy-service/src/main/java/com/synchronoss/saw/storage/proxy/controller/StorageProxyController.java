@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -433,7 +432,7 @@ public class StorageProxyController {
         analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
             : analysis.getCreatedTime());
         analysis.setModifiedTime(Instant.now().toEpochMilli());
-        analysis.setModifiedBy(authTicket.getUserFullName());
+        analysis.setModifiedBy(authTicket != null && !authTicket.getUserFullName().isEmpty() ? authTicket.getUserFullName() : "schedule");
         proxyService.updateAnalysis(analysis);
       }
       if (!analysis.getType().equalsIgnoreCase("report")) {
