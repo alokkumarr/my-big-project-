@@ -44,8 +44,6 @@ public class ExternalSecurityController {
   @Autowired
   private UserRepository userRepository;
   @Autowired
-  private NSSOProperties nSSOProperties;
-  @Autowired
   private ProductModuleRepository productModuleRepository;
 
   @ApiOperation(value = "Create all the Role-Category-Privileges list", nickname = "createRoleCategoryPrivilege", notes = "",
@@ -108,6 +106,17 @@ public class ExternalSecurityController {
       return response;
     }
 
+    ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId,
+        request.getProductName(),
+        request.getModuleName());
+    final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
+    if (customerSysId == null || customerSysId == 0) {
+      httpResponse.setStatus(HttpStatus.OK.value());
+      response.setValid(false);
+      response.setMessage("Product and Module does not exist for this user.");
+      return response;
+    }
+
     // validate role/category/subcategory name
     List<CategoryDetails> categoryList = request.getCategories();
     List<SubCategoryDetails> subCategoryList = null;
@@ -158,26 +167,15 @@ public class ExternalSecurityController {
     if (subCategoryList != null && !subCategoryList.isEmpty() && subCategoryList.size() > 0) {
       boolean[] validPrivileges = {false};
       subCategoryList.stream().forEach(subCat -> {
-        validPrivileges[0] = subCat.getPrivilege().stream().allMatch(s -> PrivilegeUtils.validPrivilege(s));
+        validPrivileges[0] = securityService.validPrivileges(subCat.getPrivilege(), request.getModuleName());
       });
 
       if (!validPrivileges[0]) {
         httpResponse.setStatus(HttpStatus.OK.value());
         response.setValid(false);
-        response.setMessage("Please provide the correct privileges for category/subcategory.");
+        response.setMessage("Please provide the valid module privileges for category/subcategory.");
         return response;
       }
-    }
-
-    ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId,
-        request.getProductName(),
-        request.getModuleName());
-    final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
-    if (customerSysId == null || customerSysId == 0) {
-      httpResponse.setStatus(HttpStatus.OK.value());
-      response.setValid(false);
-      response.setMessage("Product and Module does not exist for this user.");
-      return response;
     }
 
     if (!role.getCustomerCode().equalsIgnoreCase(moduleDetails.getCustomerCode())) {

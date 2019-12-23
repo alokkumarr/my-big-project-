@@ -1,11 +1,13 @@
 package com.sncr.saw.security.app.service;
 
+import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.external.response.*;
+import com.sncr.saw.security.common.bean.repo.ModulePrivileges;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
@@ -44,6 +46,8 @@ public class ExternalSecurityService {
   private RoleRepository roleRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private ModulePrivilegeRepository privilegeRepository;
 
   private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\s+\\[\\]\\\\]";
 
@@ -527,7 +531,7 @@ public class ExternalSecurityService {
     }
     if (subCategoryDetails != null && subCategoryDetails.getSubCategoryDesc() != null) {
       categoryDetails.setCategoryDesc(subCategoryDetails.getSubCategoryDesc());
-    } else if (category != null && category.getCategoryDesc() != null){
+    } else if (category != null && category.getCategoryDesc() != null) {
       categoryDetails.setCategoryDesc(category.getCategoryDesc());
     }
     categoryDetails.setActiveStatusInd(1L);
@@ -661,5 +665,28 @@ public class ExternalSecurityService {
     Pattern special = Pattern.compile(NAME_REGEX);
     Matcher hasSpecial = special.matcher(name);
     return hasSpecial.find();
+  }
+
+  /**
+   * Validate requested privileges with the module privileges
+   *
+   * @param privileges
+   * @return if the requested privileges valid return true else false
+   */
+  public boolean validPrivileges(List<String> privileges, String moduleName) {
+    boolean haveValidPrivileges = false;
+    try {
+      if (privileges != null && !privileges.isEmpty()) {
+        List<ModulePrivileges> modulePrivileges = privilegeRepository.getModulePrivileges();
+        if (modulePrivileges != null && !modulePrivileges.isEmpty()) {
+          List<String> list = modulePrivileges.stream().filter(module -> module.getModuleName().equalsIgnoreCase(moduleName))
+              .map(modName -> modName.getPrivilegeCodeName()).collect(Collectors.toList());
+          haveValidPrivileges = privileges.stream().allMatch(privilege -> list.contains(privilege));
+        }
+      }
+    } catch (Exception ex) {
+      haveValidPrivileges = false;
+    }
+    return haveValidPrivileges;
   }
 }
