@@ -585,6 +585,84 @@ first installation of SIP and not changed thereafter.  Changing the
 value after the initial installation for an existing environment is
 not supported.
 
+=== SIP Security : External APIs
+
+SIP security provides external API to manage `users` and their `roles`,`categories`,`subcategories`,  `privileges` and `data security key`.
+
+==== API for Role, Categories, Subcategories, Privileges
+
+Add API [POST]: `https://{hostname}/sip/security/external/createRoleCategoryPrivilege`
+
+This API managed by the admin only. This API contains the Roles, Categories, subCategories and Privileges which allow options for above
+json hierarchy to create the respective options roles, categories, subCategories and privileges if `"autoCreate": true`.
+
+Below are the few consideration while create/fetch roles, categories, subcategories ans privileges.
+
+- Product name and Module name can't be created using API, it should be already exists in SIP. In case it doesn't exists then error will
+be thrown `Product and Module does not exist for this user.` as precondition check failed.
+- By default `autoCreate` will be false (ie. not be created). If in case respective privileges and options already existing then API will be
+return the information as details already exists in SIP.
+- Below are the validation to create role, categories, subcategories and privileges.
+.. Customer code should be matched with the access token.
+.. Role/Category/Subcategory name should not allowed special symbol except [_ and -].
+.. Role type should be ADMIN or USER only
+.. Given privilege should be valid.
+
+[source,json]
+----
+{
+  "moduleName": "string",
+  "productName": "string",
+  "role": {
+     "activeStatusInd": true,
+     "autoCreate": false,
+     "customerCode": "string",
+     "roleDesc": "string",
+     "roleName": "string",
+     "roleType": "string"
+  },
+  "categories": [
+   {
+     "autoCreate": false,
+     "categoryDesc": "string",
+	 "categoryName": "string",
+	 "categoryType": "string",
+	 "subCategories": [
+	   {
+	    "autoCreate": false,
+	    "privilege": [
+	       "ACCESS",
+	       "CREATE",
+	       "EXECUTE",
+	       "PUBLISH",
+	       "FORK",
+	       "EDIT",
+	       "EXPORT",
+	       "DELETE"
+	       ],
+	     "subCategoryDesc": "string",
+	     "subCategoryName": "string"
+	   }]
+     }]
+}
+----
+
+
+Fetch API [GET]: `https://{hostname}/sip/security/external/fetchRoleCategoryPrivilege`
+
+This api will fetch the details (roles, categories/subcategories and privileges) based upon the `product name, module name` and `role name` name.
+
+[source,json]
+----
+{
+  "moduleName": "string",
+  "productName": "string",
+  "role": {
+    "roleName": "string"
+  }
+}
+----
+
 === Data in flight
 
 Enabling the secure mode will make SIP use HTTPS for communication
