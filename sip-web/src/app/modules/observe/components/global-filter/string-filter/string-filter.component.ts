@@ -25,7 +25,7 @@ import {
 })
 export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
-  @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
+  @ViewChild(MatAutocompleteTrigger, { static: true }) trigger: MatAutocompleteTrigger;
 
   filterCtrl: FormControl;
   public _filter;

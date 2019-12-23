@@ -3,8 +3,8 @@ const testDataReader = require('../../testdata/testDataReader.js');
 const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const commonFunctions = require('../../pages/utils/commonFunctions');
-const dataSets = require('../../helpers/data-generation/datasets');
-
+const chai = require('chai');
+const assert = chai.assert;
 let AnalysisHelper = require('../../helpers/api/AnalysisHelper');
 let APICommonHelpers = require('../../helpers/api/APICommonHelpers');
 
@@ -12,21 +12,21 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
-const moment = require('moment');
+const Constants = require('../../helpers/Constants');
+const categories = require('../../helpers/data-generation/categories');
+const subCategories = require('../../helpers/data-generation/subCategories');
+const Header = require('../../pages/components/Header');
 
-describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.test.js', () => {
-  let analysisId;
+describe('Executing update and delete tests for pivots from pivots/UpdateAndDeletePivot.test.js', () => {
+  let analysesDetails = [];
   let host;
   let token;
-  const metricName = dataSets.pivotChart;
-  const analysisType = 'table:pivot';
+  const categoryName = categories.analyses.name;
+  const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
   const dateFieldName = 'Date';
   const numberFieldName = 'Integer';
-  const dataOption = 'SUM(Integer)';
-  const stringFieldName = 'String';
-  const selectedAggregate = 'sum';
   beforeAll(() => {
-    logger.info('Starting pivots/PivotsWithAggregate.test.js.....');
+    logger.info('Starting pivots/UpdateAndDeletePivot.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -40,22 +40,26 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
 
   afterEach(function(done) {
     setTimeout(function() {
-      if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(
-          host,
-          token,
-          protractorConf.config.customerCode,
-          analysisId
-        );
-      }
+      //Delete analysis
+      analysesDetails.forEach(currentAnalysis => {
+        if (currentAnalysis.analysisId) {
+          new AnalysisHelper().deleteAnalysis(
+            host,
+            token,
+            protractorConf.config.customerCode,
+            currentAnalysis.analysisId,
+            Constants.PIVOT
+          );
+        }
+      });
       commonFunctions.clearLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   using(
-    testDataReader.testData['AGGREGATE_PIVOTS']['aggr_pivots']
-      ? testDataReader.testData['AGGREGATE_PIVOTS']['aggr_pivots']
+    testDataReader.testData['UPDATE_PIVOT']['updatePivot']
+      ? testDataReader.testData['UPDATE_PIVOT']['updatePivot']
       : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
@@ -63,58 +67,66 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
         const now = new Date().getTime();
         const pivotName = `e2e ${now}`;
         const pivotDescription = `e2e pivot description ${now}`;
+        let analysis = new AnalysisHelper().createNewAnalysis(
+          host,
+          token,
+          pivotName,
+          pivotDescription,
+          Constants.PIVOT,
+          null, // No subtype of Pivot.
+          null
+        );
+        expect(analysis).toBeTruthy();
+        assert.isNotNull(analysis, 'analysis cannot be null');
+        analysesDetails.push(analysis);
+
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);
+        const header = new Header();
+        header.openCategoryMenu();
+        header.selectCategory(categoryName);
+        header.selectSubCategory(subCategoryName);
 
         const analyzePage = new AnalyzePage();
-        analyzePage.clickOnAddAnalysisButton();
-        analyzePage.clickOnAnalysisType(analysisType);
-        analyzePage.clickOnNextButton();
-        analyzePage.clickOnDataPods(metricName);
-        analyzePage.clickOnCreateButton();
+        analyzePage.goToView('card');
+        analyzePage.clickOnAnalysisLink(pivotName);
+
+        const executePage = new ExecutePage();
+        executePage.clickOnEditLink();
 
         const chartDesignerPage = new ChartDesignerPage();
         chartDesignerPage.searchInputPresent();
+        chartDesignerPage.clearAttributeSelection();
         chartDesignerPage.clickOnAttribute(dateFieldName, 'Row');
         chartDesignerPage.clickOnAttribute(numberFieldName, 'Data');
-        chartDesignerPage.clickOnDataOptionsTab();
-        chartDesignerPage.clickOnDataOptions(dataOption);
-        chartDesignerPage.clickOnSelectAndChooseAggregate(selectedAggregate); // Open the aggregate-chooser component.
-        chartDesignerPage.clickOnSelectAndChooseAggregate(data.aggregate.value); // Select the aggregate form the list.
-
         // Save the analysis
+        const updatedName = pivotName + ' updated';
+        const updatedDescription = pivotDescription + 'updated';
         chartDesignerPage.clickOnSave();
-        chartDesignerPage.enterAnalysisName(pivotName);
-        chartDesignerPage.enterAnalysisDescription(pivotDescription);
+        chartDesignerPage.enterAnalysisName(updatedName);
+        chartDesignerPage.enterAnalysisDescription(updatedDescription);
         chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
 
         // Verify analysis displayed in list and card view
         analyzePage.goToView('list');
         analyzePage.verifyElementPresent(
-          analyzePage._analysisTitleLink(pivotName),
+          analyzePage._analysisTitleLink(updatedName),
           true,
-          'analysis should be present in list/card view'
+          'report should be present in list/card view'
         );
         analyzePage.goToView('card');
         // Go to detail page and very details
-        analyzePage.clickOnAnalysisLink(pivotName);
+        analyzePage.clickOnAnalysisLink(updatedName);
 
-        const executePage = new ExecutePage();
-        executePage.verifyTitle(pivotName);
+        executePage.verifyTitle(updatedName);
         executePage.getAnalysisId().then(id => {
-          analysisId = id;
+          analysesDetails.push({ analysisId: id });
         });
-        executePage.clickOnEditLink();
-
-        // Verify the selected aggregate.
-        chartDesignerPage.validateSelectedAggregate(
-          numberFieldName,
-          data.aggregate.designerLabel,
-          data.aggregate.value
-        );
-        chartDesignerPage.clickOnSave();
-        chartDesignerPage.clickOnSaveAndCloseDialogButton(/analyze/);
-        // Delete the analysis
+        executePage.clickOnActionLink();
+        executePage.clickOnDetails();
+        executePage.verifyDescription(updatedDescription);
+        executePage.closeActionMenu();
+        // Delete the report
         executePage.clickOnActionLink();
         executePage.clickOnDelete();
         executePage.confirmDelete();
@@ -123,8 +135,8 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
       }).result.testInfo = {
         testId: id,
         data: data,
-        feature: 'AGGREGATE_PIVOTS',
-        dataProvider: 'aggr_pivots'
+        feature: 'UPDATE_PIVOT',
+        dataProvider: 'updatePivot'
       };
     }
   );

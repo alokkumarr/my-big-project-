@@ -41,7 +41,7 @@ export class DesignerChartComponent implements AfterViewInit, OnInit {
   @Select(DesignerState.isDataTooMuchForChart)
   isDataTooMuchForChart$: Observable<Boolean>;
 
-  @ViewChild('chartContainer') chartContainer: ElementRef;
+  @ViewChild('chartContainer', { static: true }) chartContainer: ElementRef;
   chartHgt = {
     height: 500
   };

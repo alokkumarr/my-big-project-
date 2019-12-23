@@ -9,8 +9,8 @@ const dummyPassword = '**********';
 })
 export class PasswordToggleComponent implements OnInit {
   // @ViewChild('passwords') passwords;
-  @ViewChild('passwordHide') passwordHide: ElementRef;
-  @ViewChild('passwordShow') passwordShow: ElementRef;
+  @ViewChild('passwordHide', { static: false }) passwordHide: ElementRef;
+  @ViewChild('passwordShow', { static: false }) passwordShow: ElementRef;
   public showPassword: boolean;
   public userPassword: String;
   public placeHolder: String;
