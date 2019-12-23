@@ -1,14 +1,9 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.controller.ServerResponseMessages;
-import com.sncr.saw.security.app.model.DskEligibleFields;
-import com.sncr.saw.security.app.model.DskField;
-import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

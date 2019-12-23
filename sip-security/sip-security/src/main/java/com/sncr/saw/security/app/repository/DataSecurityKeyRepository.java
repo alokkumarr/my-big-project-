@@ -1,8 +1,5 @@
 package com.sncr.saw.security.app.repository;
 
-import com.sncr.saw.security.app.model.DskEligibleFields;
-import com.sncr.saw.security.app.model.DskField;
-import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 
