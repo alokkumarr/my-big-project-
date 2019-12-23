@@ -84,11 +84,10 @@ public class DskEligibleFieldService {
   public Valid deleteDskEligibleFields(
       String semanticId, HttpServletRequest request, HttpServletResponse response) {
     Valid valid = new Valid();
-    String jwtToken = JWTUtils.getToken(request);
-    String[] valuesFromToken = JWTUtils.parseToken(jwtToken, nssoProperties.getJwtSecretKey());
-    Long custId = Long.valueOf(valuesFromToken[1]);
-    Long prodId = Long.valueOf(valuesFromToken[4]);
+      Ticket ticket = SipCommonUtils.getTicket(request);
 
+    Long customerSysId = Long.valueOf(ticket.getCustID());
+    Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
     if (StringUtils.isEmpty(semanticId)) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
       valid.setValid(Boolean.FALSE);
@@ -96,7 +95,8 @@ public class DskEligibleFieldService {
       logger.error("semantic Id can't be null or empty");
       return valid;
     }
-    return dskEligibleFieldsRepository.deleteDskEligibleFields(custId, prodId, semanticId);
+    return dskEligibleFieldsRepository
+        .deleteDskEligibleFields(customerSysId, defaultProdID, semanticId);
   }
 
   public Valid updateDskEligibleFields(HttpServletRequest request, HttpServletResponse response,

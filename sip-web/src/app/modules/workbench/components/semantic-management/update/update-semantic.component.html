@@ -37,7 +37,7 @@
           [showColumnLines]="false"
           [hoverStateEnabled]="true"
           (onSelectionChanged)="
-            onDPSelectionChanged($event.currentSelectedRowKeys[0])
+            onDPSelectionChanged($event.currentSelectedRowKeys[0].id)
           "
         >
           <dxo-selection mode="single"></dxo-selection>
@@ -121,6 +121,12 @@
                 [width]="80"
                 caption="KPI Eligible"
                 dataField="kpiEligible"
+                dataType="boolean"
+              ></dxi-column>
+              <dxi-column
+                [width]="80"
+                caption="DSK Eligible"
+                dataField="dskEligible"
                 dataType="boolean"
               ></dxi-column>
               <dxi-column

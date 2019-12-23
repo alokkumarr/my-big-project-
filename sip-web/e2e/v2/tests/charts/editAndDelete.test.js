@@ -52,7 +52,13 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
       }
       analyses.forEach(id => {
         logger.warn('deleting analysis with id: ' + id);
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.CHART);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          id,
+          Constants.CHART
+        );
       });
 
       commonFunctions.clearLocalStorage();
@@ -145,8 +151,9 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
         analyzePage.clickOnAnalysisLink(updatedName);
 
         executePage.verifyTitle(updatedName);
-        editedAnalysisId = executePage.getAnalysisId();
-
+        executePage.getAnalysisId().then(id => {
+          editedAnalysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(updatedDescription);

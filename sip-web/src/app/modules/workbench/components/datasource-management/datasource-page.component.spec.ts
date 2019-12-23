@@ -17,7 +17,8 @@ import { Observable } from 'rxjs';
 const DatasourceServiceStub = {
   getSourceList: () => {
     return new Observable();
-  }
+  },
+  testChannel: () => {}
 };
 const ToastServiceStub: Partial<ToastService> = {};
 
@@ -41,6 +42,10 @@ describe('DatasourcePageComponent', () => {
       ],
       declarations: [DatasourceComponent],
       providers: [
+        {
+          provide: HeaderProgressService,
+          useValue: new HeaderProgressServiceStub()
+        },
         { provide: DatasourceService, useValue: DatasourceServiceStub },
         { provide: ToastService, useValue: ToastServiceStub },
         { provide: Router, useClass: RouterServiceStub },
@@ -77,6 +82,17 @@ describe('DatasourcePageComponent', () => {
     it('should select channel based on id', () => {
       component.selectChannel({ bisChannelSysId: 1 });
       expect(component.selectedSourceData.channelName).toEqual('abc');
+    });
+  });
+
+  describe('test connectivity', () => {
+    it('should call service for channel', () => {
+      const spy = spyOn(
+        TestBed.get(DatasourceService),
+        'testChannel'
+      ).and.returnValue({ subscribe: () => {} });
+      component.testChannel(1);
+      expect(spy).toHaveBeenCalled();
     });
   });
 });

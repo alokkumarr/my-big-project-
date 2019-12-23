@@ -42,8 +42,8 @@ public class User implements Serializable {
 	private Long validMins;
 	private Long customerId;
 	private String password;
-	
-	
+
+
 	public String getPassword() {
 		return password;
 	}
@@ -226,6 +226,6 @@ public class User implements Serializable {
 		this.validMins = validMins;
 	}
 
-	
-	
+
+
 }

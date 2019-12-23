@@ -190,5 +190,14 @@ class AnalyzePage extends CreateAnalysisModel {
   clickOnForkButtonFromCardView(name) {
     commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
   }
+
+  goToDesignerPage(view, analysisType, dataPods) {
+    this.goToView(view);
+    this.clickOnAddAnalysisButton();
+    this.clickOnAnalysisType(analysisType);
+    this.clickOnNextButton();
+    this.clickOnDataPods(dataPods);
+    this.clickOnCreateButton();
+  }
 }
 module.exports = AnalyzePage;

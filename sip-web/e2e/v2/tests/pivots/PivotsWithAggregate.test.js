@@ -41,7 +41,12 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -96,7 +101,9 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(pivotName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
 
         // Verify the selected aggregate.
