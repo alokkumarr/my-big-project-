@@ -82,18 +82,18 @@ public class SecurityService {
       return userDetailsResponse;
     }
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
-    if (customerSysId != loginCustomerId) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
-      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
-      return userDetailsResponse;
-    }
     if (customerSysId == null) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
       logger.debug(String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
+      return userDetailsResponse;
+    }
+    if (customerSysId != loginCustomerId) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
+      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
       return userDetailsResponse;
     }
     String securityGroupName = userDetails.getSecurityGroupName();
