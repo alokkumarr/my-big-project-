@@ -154,7 +154,7 @@ export class DesignerService {
 
     let aggregates = [];
 
-    if (NUMBER_TYPES.includes(column.type)) {
+    if (NUMBER_TYPES.includes(column.type) || column.type === 'string') {
       aggregates = AggregateChooserComponent.isAggregateEligible(analysisType);
     }
 
@@ -178,7 +178,10 @@ export class DesignerService {
     analysisType: string,
     analysisSubtype: string
   ) {
-    if (!NUMBER_TYPES.includes(column.type) || !!column.expression) {
+    const notNumberType = !NUMBER_TYPES.includes(column.type);
+    const notStringType = column.type !== 'string';
+    const hasExpression = Boolean(column.expression);
+    if ((notNumberType && notStringType) || hasExpression) {
       return !some(columns, col => col.columnName === column.columnName);
     }
     return (
