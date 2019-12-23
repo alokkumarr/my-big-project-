@@ -118,6 +118,14 @@ public class ExternalSecurityController {
       response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
       return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
+      boolean emptyCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName() == null || category.getCategoryName().isEmpty());
+      if (emptyCategoryName) {
+        httpResponse.setStatus(HttpStatus.OK.value());
+        response.setValid(false);
+        response.setMessage("Category name can't be blank or empty.");
+        return response;
+      }
+
       boolean invalidCategoryName = categoryList.stream().anyMatch(category -> category.isAutoCreate() && securityService.validateName(category.getCategoryName().trim()));
       if (invalidCategoryName) {
         httpResponse.setStatus(HttpStatus.OK.value());
@@ -128,6 +136,13 @@ public class ExternalSecurityController {
         boolean[] invalidSubCatName = {false};
         for (CategoryDetails categoryDetails : categoryList) {
           subCategoryList = categoryDetails.getSubCategories();
+          boolean emptySubCategoryName = subCategoryList.stream().anyMatch(category -> category.getSubCategoryName() == null || category.getSubCategoryName().isEmpty());
+          if (emptySubCategoryName) {
+            httpResponse.setStatus(HttpStatus.OK.value());
+            response.setValid(false);
+            response.setMessage("Sub Category name can't be blank or empty.");
+            return response;
+          }
           invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName().trim()));
         }
         if (invalidSubCatName[0]) {

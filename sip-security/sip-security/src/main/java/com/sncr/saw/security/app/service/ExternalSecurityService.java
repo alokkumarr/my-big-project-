@@ -71,9 +71,10 @@ public class ExternalSecurityService {
     RoleDetails roleDetails;
     Role responseRole = new Role();
 
-    if (inputRole.isAutoCreate()) {
-      roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
-      if (roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty()) {
+    roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
+    boolean hasRole = roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty();
+    if (inputRole.isAutoCreate() || !hasRole) {
+      if (hasRole) {
         // build role details bean from input
         RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
         try {
@@ -121,7 +122,7 @@ public class ExternalSecurityService {
       }
     } else {
       response.setValid(false);
-      responseRole.setMessage("Role can't be add for flag false.");
+      responseRole.setMessage("Role already exist in the system for Customer Product Module Combination of flag false.");
     }
     response.setRole(responseRole);
 
