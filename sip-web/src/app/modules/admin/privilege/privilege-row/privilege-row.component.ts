@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import * as toUpper from 'lodash/toUpper';
 
 import {
   PRIVILEGE_NAMES,
@@ -39,7 +40,7 @@ export class PrivilegeRowComponent {
     }
     this.isDraftsSubCategory =
       this.categoryName === 'My Analysis' &&
-      subCategory.subCategoryName === 'DRAFTS';
+      toUpper(subCategory.subCategoryName) === 'DRAFTS';
     this.subCategory = subCategory;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
