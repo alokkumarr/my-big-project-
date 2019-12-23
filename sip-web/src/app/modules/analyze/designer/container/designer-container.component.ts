@@ -353,7 +353,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (
         !filtr.isRuntimeFilter &&
         !filtr.isGlobalFilter &&
-        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+        filtr.type === 'date' && filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value, 'MM-DD-YYYY').format(
           'YYYY-MM-DD'
@@ -501,10 +501,13 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     if ((this.analysisStarter || this.analysis).type !== 'chart') {
       return;
     }
-
+    const fields = get(
+      <AnalysisDSL>this.analysis,
+      'sipQuery.artifacts[0].fields'
+    );
     const dimensionGroupFields = fpFilter(({ area }) => {
       return area !== 'y';
-    })((<AnalysisDSL>this.analysis).sipQuery.artifacts[0].fields);
+    })(fields);
     forEach(dimensionGroupFields, node => {
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
@@ -815,9 +818,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>(
-          analysisForPreview
-        ));
+        this._analyzeDialogService.openPreviewDialog(
+          <Analysis | AnalysisDSL>analysisForPreview
+        );
         break;
       case 'description':
         this._analyzeDialogService

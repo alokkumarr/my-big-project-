@@ -141,7 +141,7 @@ export function getStringFieldsFromDSLArtifact(
   fields: ArtifactColumnDSL[]
 ): string[] {
   return fields
-    .filter(field => field.type === 'string')
+    .filter(field => field.type === 'string' && !field.aggregate)
     .map(field => field.columnName.replace('.keyword', ''));
 }
 
@@ -213,7 +213,10 @@ export function alterDateInData(data, sipQuery) {
     fpPipe(
       fpMap(fpPick(['columnName', 'type', 'aggregate'])),
       fpFilter(({ type, columnName, aggregate }) => {
-        if (type === 'date' && !['count', 'distinctCount', 'distinctcount'].includes(aggregate)) {
+        if (
+          type === 'date' &&
+          !['count', 'distinctCount', 'distinctcount'].includes(aggregate)
+        ) {
           dateFields.push(columnName);
         }
       })
@@ -225,7 +228,9 @@ export function alterDateInData(data, sipQuery) {
       value = value === null ? 'null' : value;
       if (dateFields.includes(key)) {
         value = value.includes('Z')
-          ? moment(value).utc().format('YYYY-MM-DD HH:mm:ss')
+          ? moment(value)
+              .utc()
+              .format('YYYY-MM-DD HH:mm:ss')
           : value;
       }
       return value;
