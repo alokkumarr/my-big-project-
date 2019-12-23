@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.sncr.saw.security.app.model.DskField;
-import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -49,16 +47,13 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.bean.repo.dsk.AttributeValues;
-import com.sncr.saw.security.common.bean.repo.dsk.DskDetails;
 import com.sncr.saw.security.common.bean.repo.dsk.DskValidity;
 import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
-import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -1055,38 +1050,6 @@ public class SecurityController {
             response.setStatus(400);
             return dskValidity;
         }
-    }
-
-    /**
-     * Fetching all Dsk attribute values.
-     * @param securityGroupId
-     * @return List of Attribute-values
-     */
-    @RequestMapping ( value = "/auth/admin/security-groups/{securityGroupId}/dsk-attribute-values", method = RequestMethod.GET)
-    public List<DskDetails> fetchDskAllAttributeValues(@PathVariable(name = "securityGroupId", required = true) Long securityGroupId)    {
-        return dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupId);
-    }
-
-    @RequestMapping ( value = "/auth/admin/security-groups/dsk-eligible-fields", method = RequestMethod.GET)
-    public Object getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
-        Ticket ticket = SipCommonUtils.getTicket(request);
-
-        String customerSysId = ticket.getCustID();
-        String defaultProdID = ticket.getDefaultProdID();
-        RoleType roleType = ticket.getRoleType();
-        if (roleType != RoleType.ADMIN) {
-            Valid valid = new Valid();
-            response.setStatus(400);
-            valid.setValid(false);
-            valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
-            valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
-            return valid;
-        }
-
-        DskFieldsInfo dskEligibleFields = dataSecurityKeyRepository
-            .fetchAllDskEligibleFields(customerSysId, defaultProdID);
-
-        return dskEligibleFields;
     }
 
     /**

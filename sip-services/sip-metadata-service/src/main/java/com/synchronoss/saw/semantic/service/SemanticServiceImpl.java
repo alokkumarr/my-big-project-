@@ -21,14 +21,19 @@ import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.RestUtil;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
@@ -66,9 +71,16 @@ public class SemanticServiceImpl implements SemanticService {
   @NotNull
   private String migrationMetadataHome;
 
-  @Autowired private RestUtil restUtil;
+  @Value("${security.dsk-url}")
+  @NotNull
+  private String securityDskUrl;
+
+  @Autowired  private RestUtil restUtil;
 
   private RestTemplate restTemplate = null;
+
+  private static final String COLUMN_NAME = "columnName";
+  private static final String DISPLAY_NAME = "displayName";
 
   /**
    * This method provides an entry point to migration service.
@@ -117,6 +129,90 @@ public class SemanticServiceImpl implements SemanticService {
     }
     logger.trace("Response : " + node.toString());
     return newSemanticNode;
+  }
+
+  @Override
+  public Boolean addDskToSipSecurity(SemanticNode node, HttpServletRequest request) {
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    // Call the create DSK sip security API
+    String semanticId = node.get_id();
+
+    List<Object> artifacts = node.getArtifacts();
+
+    ArrayNode dskFields = prepareDskFields(mapper, artifacts);
+
+    logger.info("DSK Fields: " + dskFields);
+
+    // Call sip-security create DSK api here
+
+    String url = securityDskUrl + "/fields?"
+        + "semanticId=" + semanticId;
+
+    String authToken = request.getHeader("Authorization");
+
+
+    logger.info("Save DSK eligible keys in sip security :" + url);
+
+    HttpHeaders header = new HttpHeaders();
+    header.set("Authorization", authToken);
+    HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
+
+    Boolean status = true;
+    restUtil.restTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+    return status;
+  }
+
+  @Override
+  public Boolean updateDskInSipSecurity(SemanticNode node, HttpServletRequest request) {
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    // Call the update DSK sip security API
+    String semanticId = node.get_id();
+
+    List<Object> artifacts = node.getArtifacts();
+
+    ArrayNode dskFields = prepareDskFields(mapper, artifacts);
+
+    logger.info("DSK Fields: " + dskFields);
+
+    String url = securityDskUrl + "/fields?" + "semanticId=" + semanticId;
+
+    String authToken = request.getHeader("Authorization");
+
+    logger.info("Update DSK eligible keys in sip security :" + url);
+
+    HttpHeaders header = new HttpHeaders();
+    header.set("Authorization", authToken);
+    HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
+
+    Boolean status = true;
+    restUtil.restTemplate().exchange(url, HttpMethod.PUT, requestEntity, String.class);
+
+    return status;
+  }
+
+  @Override
+  public Boolean deleteDskInSipSecurity(String semanticId, HttpServletRequest request) {
+    // Call sip-security delete DSK api here
+
+    String url = securityDskUrl + "/fields?" + "semanticId=" + semanticId;
+
+    String authToken = request.getHeader("Authorization");
+
+    logger.info("Update DSK eligible keys in sip security :" + url);
+
+    HttpHeaders header = new HttpHeaders();
+    header.set("Authorization", authToken);
+    HttpEntity<?> requestEntity = new HttpEntity<>(header);
+
+    Boolean status = true;
+    restUtil.restTemplate().exchange(url, HttpMethod.DELETE, requestEntity, String.class);
+
+    return status;
   }
 
   /**
@@ -206,6 +302,7 @@ public class SemanticServiceImpl implements SemanticService {
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
+    ObjectMapper objectMapper = new ObjectMapper();
     if (headers.get("x-userName") != null) {
       node.setUpdatedBy(headers.get("x-userName"));
       logger.trace(headers.get("x-userName"));
@@ -247,6 +344,11 @@ public class SemanticServiceImpl implements SemanticService {
     } catch (Exception ex) {
       throw new SipUpdateEntityException("Problem on the storage while updating an entity", ex);
     }
+
+    String semanticId = node.get_id();
+
+    // Call delete DSK sip-security API
+
     return newSemanticNode;
   }
 
@@ -467,5 +569,35 @@ public class SemanticServiceImpl implements SemanticService {
           "While retrieving it has been found that Entity does not exist");
     }
     return structure;
+  }
+
+  ArrayNode prepareDskFields(ObjectMapper objectMapper, List<Object> artifacts) {
+    ArrayNode dskFields = objectMapper.createArrayNode();
+
+    for (Object artifactObj : artifacts) {
+      logger.info("Artifact Obj = " + artifactObj);
+
+      LinkedHashMap<String, Object> artifact = (LinkedHashMap<String, Object>) artifactObj;
+      //      SemanticNodeArtifact artifact = (SemanticNodeArtifact) artifactObj;
+      logger.info("Artifact = " + artifact);
+
+      List<LinkedHashMap<String, Object>> columnsList =
+          (List<LinkedHashMap<String, Object>>) artifact.get("columns");
+
+      for (LinkedHashMap<String, Object> column : columnsList) {
+        Boolean dskEligible = (Boolean)(column.get("dskEligible"));
+
+        if (dskEligible != null && dskEligible == true) {
+          ObjectNode dskField = dskFields.addObject();
+          String columnName = column.get(COLUMN_NAME).toString();
+          String displayName =
+              column.get(DISPLAY_NAME) == null ? "" : column.get(DISPLAY_NAME).toString();
+          dskField.put(COLUMN_NAME, columnName);
+          dskField.put(DISPLAY_NAME, displayName);
+        }
+      }
+    }
+
+    return dskFields;
   }
 }

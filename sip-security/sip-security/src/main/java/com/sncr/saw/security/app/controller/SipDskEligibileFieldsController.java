@@ -2,9 +2,11 @@ package com.sncr.saw.security.app.controller;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
 import com.sncr.saw.security.app.model.DskField;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.service.DskEligibleFieldService;
 import com.sncr.saw.security.common.bean.Valid;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
@@ -17,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,4 +103,31 @@ public class SipDskEligibileFieldsController {
     return dskEligibleFieldService.updateDskEligibleFields(
         request, response, semanticId, dskEligibleFields);
   }
+
+    @ApiOperation(
+        value = " Update DSK Eligible Fields ",
+        nickname = "UpdateDskFields",
+        notes = "Admin can only use this API to update DSK Eligible Fields",
+        response = Valid.class)
+    @RequestMapping(value = "/fields", method = RequestMethod.GET)
+    public Object getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
+        Ticket ticket = SipCommonUtils.getTicket(request);
+
+        Long customerSysId = Long.valueOf(ticket.getCustID());
+        Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
+        RoleType roleType = ticket.getRoleType();
+        if (roleType != RoleType.ADMIN) {
+            Valid valid = new Valid();
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
+            return valid;
+        }
+
+        DskFieldsInfo dskEligibleFields = dskEligibleFieldService
+            .fetchAllDskEligibleFields(customerSysId, defaultProdID);
+
+        return dskEligibleFields;
+    }
 }

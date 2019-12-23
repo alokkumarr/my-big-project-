@@ -2,9 +2,13 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.model.DskEligibleFields;
 import com.sncr.saw.security.app.model.DskField;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.repository.DskEligibleFieldsRepository;
 import com.sncr.saw.security.common.bean.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +123,64 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
 
         return valid;
     }
+
+  @Override
+  public DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID) {
+    String tableName = "dsk_eligible_fields";
+
+    String fetchQuery =
+        "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME,"
+            + " DISPLAY_NAME FROM "
+            + tableName
+            + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=?";
+
+    DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
+
+    Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleFields =
+        jdbcTemplate.query(
+            fetchQuery,
+            ps -> {
+              ps.setLong(1, customerSysId);
+              ps.setLong(2, defaultProdID);
+              ps.setBoolean(3, true);
+            },
+            resultSet -> {
+              Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleData =
+                  dskFieldsInfo.getDskEligibleData();
+              while (resultSet.next()) {
+                String semanticId = resultSet.getString("SEMANTIC_ID");
+
+                String columnName = resultSet.getString("COLUMN_NAME");
+                String displayName = resultSet.getString("DISPLAY_NAME");
+
+                logger.info("" + semanticId + " " + columnName + " " + displayName);
+
+                Map<Long, Map<String, List<DskField>>> customerDskFields =
+                    dskEligibleData.getOrDefault(customerSysId, new HashMap<>());
+
+                Map<String, List<DskField>> projectDskData =
+                    customerDskFields.getOrDefault(defaultProdID, new HashMap<>());
+
+                List<DskField> semanticDskFields =
+                    projectDskData.getOrDefault(semanticId, new ArrayList<>());
+
+                DskField dskField = new DskField();
+                dskField.setColumnName(columnName);
+                dskField.setDisplayName(displayName);
+
+                semanticDskFields.add(dskField);
+
+                logger.debug("" + semanticDskFields);
+                projectDskData.put(semanticId, semanticDskFields);
+
+                customerDskFields.put(defaultProdID, projectDskData);
+
+                dskEligibleData.put(customerSysId, customerDskFields);
+              }
+              return dskEligibleData;
+            });
+    return dskFieldsInfo;
+  }
 
   @Override
   public Valid deleteDskEligibleFields(Long custId, Long prodId, String semanticId) {

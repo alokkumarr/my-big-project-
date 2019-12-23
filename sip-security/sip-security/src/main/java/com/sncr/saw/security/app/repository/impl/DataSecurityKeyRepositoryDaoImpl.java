@@ -676,59 +676,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
     }
 
-    public DskFieldsInfo fetchAllDskEligibleFields(String customerSysId, String productId) {
-        String tableName = "dsk_eligible_fields";
-
-        String fetchQuery = "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME,"
-            + " DISPLAY_NAME FROM " + tableName + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=?";
-
-        DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
-
-
-        Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleFields = jdbcTemplate.query(fetchQuery, ps -> {
-            ps.setString(1, customerSysId);
-            ps.setString(2, productId);
-            ps.setBoolean(3, true);
-        }, resultSet -> {
-            Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData =
-                dskFieldsInfo.getDskEligibleData();
-            while(resultSet.next()) {
-                String semanticId = resultSet.getString("SEMANTIC_ID");
-
-                String columnName = resultSet.getString("COLUMN_NAME");
-                String displayName = resultSet.getString("DISPLAY_NAME");
-
-                logger.info("" + semanticId + " " + columnName + " " + displayName);
-
-                Map<String, Map<String, List<DskField>>> customerDskFields
-                    = dskEligibleData.getOrDefault(customerSysId, new HashMap<>());
-
-                Map<String, List<DskField>> projectDskData
-                    = customerDskFields.getOrDefault(productId, new HashMap<>());
-
-                List<DskField> semanticDskFields
-                    = projectDskData.getOrDefault(semanticId, new ArrayList<>());
-
-                DskField dskField = new DskField();
-                dskField.setColumnName(columnName);
-                dskField.setDisplayName(displayName);
-
-                semanticDskFields.add(dskField);
-
-                logger.debug("" + semanticDskFields);
-                projectDskData.put(semanticId, semanticDskFields);
-
-                customerDskFields.put(productId, projectDskData);
-
-                dskEligibleData.put(customerSysId, customerDskFields);
-            }
-            return dskEligibleData;
-        });
-        return dskFieldsInfo;
-    }
-
-
-
     @Override
     public Valid updateUser(String securityGroupName, Long userSysId, Long custId) {
         Valid valid = new Valid();

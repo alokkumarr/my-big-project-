@@ -1,7 +1,9 @@
 package com.sncr.saw.security.app.service;
 
+import com.sncr.saw.security.app.controller.ServerResponseMessages;
 import com.sncr.saw.security.app.model.DskEligibleFields;
 import com.sncr.saw.security.app.model.DskField;
+import com.sncr.saw.security.app.model.DskFieldsInfo;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DskEligibleFieldsRepository;
 import com.sncr.saw.security.common.bean.Valid;
@@ -109,5 +111,12 @@ public class DskEligibleFieldService {
 
     return dskEligibleFieldsRepository.updateDskFields(customerSysId,
         defaultProdID, semanticId, dskFields);
+  }
+
+  public DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID) {
+    DskFieldsInfo dskEligibleFields =
+        dskEligibleFieldsRepository.fetchAllDskEligibleFields(customerSysId, defaultProdID);
+
+    return dskEligibleFields;
   }
 }

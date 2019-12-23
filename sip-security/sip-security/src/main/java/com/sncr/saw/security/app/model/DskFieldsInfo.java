@@ -16,7 +16,7 @@ public class DskFieldsInfo {
   private String message;
 
   @JsonProperty("dskEligibleData")
-  Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData = new HashMap<>();
+  Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleData = new HashMap<>();
 
   @JsonProperty("valid")
   public Boolean getValid() {
@@ -39,13 +39,13 @@ public class DskFieldsInfo {
   }
 
   @JsonProperty("dskEligibleData")
-  public Map<String, Map<String, Map<String, List<DskField>>>> getDskEligibleData() {
+  public Map<Long, Map<Long, Map<String, List<DskField>>>> getDskEligibleData() {
     return dskEligibleData;
   }
 
   @JsonProperty("dskEligibleData")
   public void setDskEligibleData(
-      Map<String, Map<String, Map<String, List<DskField>>>> dskEligibleData) {
+      Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleData) {
     this.dskEligibleData = dskEligibleData;
   }
 }
