@@ -112,6 +112,7 @@ describe('BIS API PULL tests: APIPullRouteSchedule.test.js', () => {
           data.channelInfo.channelName,
           data.routeInfo
         );
+        dataSourcesPage.clickOnCreatedChannelName(data.channelInfo.channelName);
         dataSourcesPage.clickOnRouteAction(data.routeInfo.routeName);
         dataSourcesPage.clickOnDeleteRoute();
         dataSourcesPage.clickOnConfirmYesButton();

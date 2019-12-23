@@ -50,8 +50,8 @@ export class ObserveViewComponent implements OnDestroy {
     edit: false,
     download: false
   };
-  @ViewChild('filterSidenav') sidenav: MatSidenav;
-  @ViewChild('downloadContainer') downloadContainer: ElementRef;
+  @ViewChild('filterSidenav', { static: true }) sidenav: MatSidenav;
+  @ViewChild('downloadContainer', { static: true }) downloadContainer: ElementRef;
   hasKPIs = false;
 
   constructor(
@@ -197,24 +197,30 @@ export class ObserveViewComponent implements OnDestroy {
     });
   }
 
-  deleteDashboard(): void {
+  async deleteDashboard(): Promise<void> {
     const dashboardId = this.dashboard.entityId;
-    this.configService
-      .deleteConfig(
-        [
-          {
-            key: PREFERENCES.DEFAULT_DASHBOARD,
-            value: dashboardId
-          }
-        ],
-        true
-      )
-      .toPromise()
-      .then(() => {
-        this.observe.deleteDashboard(this.dashboard).subscribe(() => {
-          this.guard.redirectToFirstDash();
-        });
-      });
+    const favouriteDashboardId = this.configService.getPreference(
+      PREFERENCES.DEFAULT_DASHBOARD
+    );
+
+    if (dashboardId === favouriteDashboardId) {
+      await this.configService
+        .deleteConfig(
+          [
+            {
+              key: PREFERENCES.DEFAULT_DASHBOARD,
+              value: dashboardId
+            }
+          ],
+          true
+        )
+        .toPromise();
+    }
+
+    await this.observe.deleteDashboard(this.dashboard).toPromise();
+    const menu = await this.observe.reloadMenu().toPromise();
+    this.observe.updateSidebar(menu);
+    this.guard.redirectToFavoriteOrFirstDashboard();
   }
 
   downloadDashboard() {

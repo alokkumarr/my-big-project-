@@ -99,7 +99,7 @@ class DataSourcesPage extends DeleteModel {
     this._jobLogFileStatus = value =>
       element(by.css(`[e2e='job-log-mflFileStatus-${value}']`));
 
-    this._backBtn = element(by.css(`[class='mat-icon-button']`));
+    this._backBtn = element(by.css(`[e2e='e2e-back-btn']`));
     this._recFileName = name =>
       element(by.xpath(`//*[contains(@e2e,'job-log-recdFileName-${name}')]`));
   }
@@ -198,6 +198,7 @@ class DataSourcesPage extends DeleteModel {
   }
 
   clickOnAddRoute() {
+    browser.sleep(2000); // to test if this solves intermittent failures
     commonFunctions.clickOnElement(this._addRouteBtn);
   }
 
@@ -261,7 +262,8 @@ class DataSourcesPage extends DeleteModel {
 
   verifyRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
-    let attempts = 15;
+    let attempts = 16;
+    let skip = true; // this is added to give time to process the file
     (function process(index) {
       if (index >= attempts) {
         return;
@@ -277,12 +279,27 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              logger.info('Element found...');
-              _self.clickOnJobIdByRouteName(routeInfo.routeName);
-              _self.scheduleVerification(routeInfo);
-              // go to channel management
-              _self.clickOnBackButton();
-              _self.clickOnBackButton();
+              if (skip) {
+                // skipping first occurance to give time for scheduler to process the file
+                // Added as part of SIP-9320
+                _self.clickOnBackButton();
+                logger.info(
+                  `Element found but skipping it as this is first occurrence`
+                );
+                logger.info(`waiting for 20 seconds and check again`);
+                browser.sleep(20000);
+                skip = false; // set the skip false
+                process(index + 1);
+              } else {
+                logger.info(
+                  `Element found... and this is second occurrence. Validating the data`
+                );
+                _self.clickOnJobIdByRouteName(routeInfo.routeName);
+                _self.scheduleVerification(routeInfo);
+                // go to channel management
+                _self.clickOnBackButton();
+                _self.clickOnBackButton();
+              }
             } else {
               // go to channel management
               _self.clickOnBackButton();
@@ -354,7 +371,8 @@ class DataSourcesPage extends DeleteModel {
 
   verifyApiRouteScheduleInformation(channelName, routeInfo) {
     let _self = this;
-    let attempts = 15;
+    let attempts = 16;
+    let skip = true;
     (function process(index) {
       if (index >= attempts) {
         return;
@@ -370,12 +388,27 @@ class DataSourcesPage extends DeleteModel {
           .isPresent()
           .then(present => {
             if (present) {
-              logger.info('Element found...');
-              _self.clickOnJobIdByRouteName(routeInfo.routeName);
-              _self.scheduleAPiLogVerification(routeInfo);
-              // go to channel management
-              _self.clickOnBackButton();
-              _self.clickOnBackButton();
+              if (skip) {
+                // skipping first occurance to give time for scheduler to process the file
+                // Added as part of SIP-9320
+                _self.clickOnBackButton();
+                logger.info(
+                  `Element found but skipping it as this is first occurrence`
+                );
+                logger.info(`waiting for 20 seconds and check again`);
+                browser.sleep(20000);
+                skip = false; // set the skip false
+                process(index + 1);
+              } else {
+                logger.info(
+                  `Element found... and this is second occurrence. Validating the data`
+                );
+                _self.clickOnJobIdByRouteName(routeInfo.routeName);
+                _self.scheduleAPiLogVerification(routeInfo);
+                // go to channel management
+                _self.clickOnBackButton();
+                _self.clickOnBackButton();
+              }
             } else {
               // go to channel management
               _self.clickOnBackButton();

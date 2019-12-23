@@ -28,7 +28,7 @@ import { JwtService } from '../../../../common/services';
   styleUrls: ['./analyze-list-view.component.scss']
 })
 export class AnalyzeListViewComponent implements OnInit {
-  @ViewChild('analysesGrid') analysesGrid: DxDataGridComponent;
+  @ViewChild('analysesGrid', { static: true }) analysesGrid: DxDataGridComponent;
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input('analyses')
   set setAnalyses(analyses: Array<Analysis | AnalysisDSL>) {

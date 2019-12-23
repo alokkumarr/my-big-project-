@@ -53,7 +53,7 @@ export class SelectRawdataComponent
     };
   }
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
   @Output() onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {

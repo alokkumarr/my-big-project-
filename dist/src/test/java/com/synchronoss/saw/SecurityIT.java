@@ -326,4 +326,118 @@ public class SecurityIT extends BaseIT {
   public OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
   }
+
+  @Test
+  public void testAddUsersWithDsk() {
+    ObjectNode secGroup = mapper.createObjectNode();
+    secGroup.put("description", "TestDesc");
+    secGroup.put("securityGroupName", "TestForSecGrp");
+    addSecurityGroup(secGroup);
+    ObjectNode users = mapper.createObjectNode();
+    users.put("firstName", "Anil");
+    users.put("middleName", "A");
+    users.put("lastName", "Deshagani");
+    users.put("masterLoginId", "Anil.Deshagani");
+    users.put("password", "Sawsyncnewuser1!");
+    users.put("email", "sawadminq@synchronoss.com");
+    users.put("activeStatusInd", 1);
+    users.put("customerCode", "synchronoss");
+    users.put("roleName", "ADMIN");
+    users.put("securityGroupName", "TestForSecGrp");
+    Response userRes =
+        given(authSpec)
+            .contentType(ContentType.JSON)
+            .body(users)
+            .when()
+            .post("/security/auth/admin/cust/manage/external/users/create")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+    JsonNode userNode = userRes.as(JsonNode.class);
+    Response secGroupResponse =
+        given(authSpec)
+            .when()
+            .get("/security/auth/admin/security-groups")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+    ArrayNode groupNode = secGroupResponse.as(ArrayNode.class);
+    Long gid = null;
+    for (int i = 0; i < groupNode.size(); i++) {
+      if (groupNode.get(i).path("securityGroupName").asText().equals("TestForSecGrp")) {
+        gid = groupNode.get(i).path("secGroupSysId").asLong();
+        break;
+      }
+    }
+    deleteSecurityGroup(gid);
+    int userId = userNode.path("user").path("userId").asInt();
+    int custId = userNode.path("user").path("customerId").asInt();
+    String masterLoginId = userNode.path("user").path("masterLoginId").asText();
+    ObjectNode deleteUser = mapper.createObjectNode();
+    deleteUser.put("userId", userId);
+    deleteUser.put("customerId", custId);
+    deleteUser.put("masterLoginId", masterLoginId);
+    deleteUser(deleteUser);
+  }
+
+  /**
+   * Adds security group.
+   *
+   * @param secGroup securitygroup
+   */
+  public void addSecurityGroup(ObjectNode secGroup) {
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(secGroup)
+        .when()
+        .post("/security/auth/admin/security-groups")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+  }
+
+  /**
+   * delete security group.
+   *
+   * @param groupId groupId
+   */
+  public void deleteSecurityGroup(Long groupId) {
+    given(authSpec)
+        .when()
+        .delete("/security/auth/admin/security-groups/" + groupId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
+
+  @Test
+  public void fetchUsers() {
+    given(authSpec)
+        .when()
+        .get("/security/auth/admin/cust/manage/external/users/fetch")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+  }
+
+  /**
+   * delete user group.
+   *
+   * @param user user
+   */
+  public void deleteUser(ObjectNode user) {
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(user)
+        .when()
+        .post("/security/auth/admin/cust/manage/users/delete")
+        .then()
+        .assertThat()
+        .statusCode(200);
+  }
 }
