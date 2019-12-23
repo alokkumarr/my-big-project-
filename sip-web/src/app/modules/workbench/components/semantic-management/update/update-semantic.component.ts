@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
+import { CommonLoadUpdatedMetrics } from '../../../../../common/actions/common.actions';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -36,7 +38,8 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   constructor(
     public router: Router,
     public workBench: WorkbenchService,
-    public notify: ToastService
+    public notify: ToastService,
+    public store: Store
   ) {
     // Below is used when navigating from Datapod view
     this.dpID = this.workBench.getDataFromLS('dpID');
@@ -91,17 +94,24 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
               dp.columns.push(obj);
             }
           });
-
-          /**
-           * Checking here if dskEligible property for all the columns are available. If not add it and set the default value to false.
-           * Added as a fix for SIP-9483.
-           */
-          forEach(dp.columns, col => {
-            if (!has(col, 'dskEligible')) {
-              set(col, 'dskEligible', false);
-            }
-          });
         }
+        /**
+         * Checking here if dskEligible property for all the columns are available. If not add it and set the default value to false.
+         * For existing datapods issue SIP-9483 is reproducible. So adding properties for all the dp if it doesn't have.
+         */
+        forEach(dp.columns, col => {
+          if (!has(col, 'dskEligible')) {
+            set(col, 'dskEligible', false);
+          }
+
+          if (!has(col, 'kpiEligible')) {
+            set(col, 'kpiEligible', false);
+          }
+
+          if (!has(col, 'include')) {
+            set(col, 'include', false);
+          }
+        });
       });
     });
   }
@@ -150,10 +160,12 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
     });
     this.workBench
       .updateSemanticDetails(this.selectedDPDetails)
-      .subscribe((data: any[]) => {
+      .subscribe(() => {
         this.notify.info('Datapod Updated successfully', 'Datapod', {
           hideDelay: 9000
         });
+        // When any datapod is updated, make it available in Analyze module without page refresh. Added as a part of SIP-9482.
+        this.store.dispatch(new CommonLoadUpdatedMetrics());
         this.router.navigate(['workbench', 'dataobjects']);
       });
   }
