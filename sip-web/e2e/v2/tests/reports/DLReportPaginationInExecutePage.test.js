@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing pagination in execute page for reports from reports/DLReportPaginationInExecutePage.test.js', () => {
   let analysisId;
@@ -20,7 +21,11 @@ describe('Executing pagination in execute page for reports from reports/DLReport
   beforeAll(() => {
     logger.info('Starting reports/DLReportPaginationInExecutePage tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -53,8 +58,9 @@ describe('Executing pagination in execute page for reports from reports/DLReport
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const reportName = `e2e dl report ${new Date().toString()}`;
-        const reportDescription = `e2e dl report description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const reportName = `e2e ${now}`;
+        const reportDescription = `e2e dl report description ${now}`;
         const analysisType = 'table:report';
         const tables = data.tables;
         const loginPage = new LoginPage();

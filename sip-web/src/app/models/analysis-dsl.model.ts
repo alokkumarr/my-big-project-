@@ -84,21 +84,22 @@ export interface AnalysisBaseDSL {
   scheduleHuman?: string; // todo
   semanticId: string;
   type: AnalysisType;
-
+  userId?: number;
   sipQuery: QueryDSL;
 }
 
+export interface ChartOptions {
+  chartType: string;
+  chartTitle: string;
+  isInverted: boolean;
+  legend?: Legend;
+  labelOptions?: LabelOptions;
+  xAxis?: Axis;
+  yAxis?: Axis;
+}
 export interface AnalysisChartDSL extends AnalysisBaseDSL {
   chartType: string;
-  chartOptions: {
-    chartType: string;
-    chartTitle: string;
-    isInverted: boolean;
-    legend?: Legend;
-    labelOptions?: LabelOptions;
-    xAxis?: Axis;
-    yAxis?: Axis;
-  };
+  chartOptions: ChartOptions;
 }
 
 export type AnalysisPivotDSL = AnalysisBaseDSL;

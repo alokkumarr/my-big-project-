@@ -13,6 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const moment = require('moment');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.test.js', () => {
   let analysisId;
@@ -28,7 +29,11 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
   beforeAll(() => {
     logger.info('Starting charts/AggregateWithCharts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -60,8 +65,8 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const now = moment().format();
-        const chartName = `e2e chart ${now}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
         const chartDescription = `e2e chart description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);

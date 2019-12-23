@@ -10,9 +10,7 @@ import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.synchronoss.bda.sip.jwt.TokenParser;
-import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
-import com.synchronoss.bda.sip.jwt.token.ProductModules;
-import com.synchronoss.bda.sip.jwt.token.Products;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
@@ -67,11 +65,16 @@ public class StorageProxyUtil {
    */
   public static JsonNode buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter) {
     GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
-    JsonNode jsonNode1 = jsonNode.get("global_filter_values");
-    Map<String, Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+    JsonNode childNode = jsonNode.get("global_filter_values");
+    Map<String, Object> result = null;
+    if (childNode != null) {
+      result = globalFilterResultParser.jsonNodeParser(childNode);
+    } else {
+      result = globalFilterResultParser.jsonNodeParser(jsonNode);
+    }
     result.put("esRepository", globalFilter.getEsRepository());
     ObjectMapper mapper = new ObjectMapper();
-      return mapper.valueToTree(result);
+    return mapper.valueToTree(result);
   }
 
   /**
@@ -99,17 +102,38 @@ public class StorageProxyUtil {
    * @return {@link List} of {@link DataSecurityKeyDef}
    */
   public static List<DataSecurityKeyDef> getDsks(List<TicketDSKDetails> dskList) {
-    DataSecurityKeyDef dataSecurityKeyDef;
     List<DataSecurityKeyDef> dskDefList = new ArrayList<>();
     if (dskList != null && !dskList.isEmpty()) {
-      for (TicketDSKDetails dsk : dskList) {
-        dataSecurityKeyDef = new DataSecurityKeyDef();
-        dataSecurityKeyDef.setName(dsk.getName());
-        dataSecurityKeyDef.setValues(dsk.getValues());
-        dskDefList.add(dataSecurityKeyDef);
-      }
+      dskList.forEach(dsk -> {
+        DataSecurityKeyDef dskDef = new DataSecurityKeyDef();
+        dskDef.setName(dsk.getName());
+        dskDef.setValues(dsk.getValues());
+        dskDefList.add(dskDef);
+      });
     }
     return dskDefList;
+  }
+
+  /**
+   * Fetch the DSK details by master login Id
+   *
+   * @param securityServiceUrl
+   * @param masterLoginId
+   * @param restUtil
+   * @return list of dsk details
+   */
+  public static DataSecurityKeys getDSKDetailsByUser(String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
+		DataSecurityKeys dataSecurityKeys = null;
+  	try {
+      RestTemplate restTemplate = restUtil.restTemplate();
+      String url = securityServiceUrl.concat("/dsk?userId=").concat(masterLoginId);
+      logger.trace("SIP security url to fetch DSK details :", url);
+
+			dataSecurityKeys = restTemplate.getForObject(url, DataSecurityKeys.class);
+    } catch (Exception ex) {
+      logger.error("Error while fetching DSK details by user", ex.getMessage());
+    }
+    return dataSecurityKeys;
   }
 
   /**
@@ -131,7 +155,7 @@ public class StorageProxyUtil {
     SipQuery semanticSipQuery = new SipQuery();
     if (semanticId != null) {
       try {
-         SemanticNode semanticNode = fetchSemantic(semanticId,metaDataServiceExport,restUtil);
+        SemanticNode semanticNode = fetchSemantic(semanticId, metaDataServiceExport, restUtil);
         List<Object> artifactList = semanticNode.getArtifacts();
         logger.info("artifact List: " + artifactList);
 
@@ -244,7 +268,6 @@ public class StorageProxyUtil {
   }
 
   /**
-   *
    * @param mainNode
    * @param updateNode
    * @return
@@ -289,7 +312,7 @@ public class StorageProxyUtil {
    * @throws Exception when unable to create directory path.
    */
   public static void createDirIfNotExists(String path, int retries) throws Exception {
-    try {
+   try {
         if (!HFileOperations.exists(path))
       HFileOperations.createDir(path);
     } catch (Exception e) {
@@ -301,43 +324,12 @@ public class StorageProxyUtil {
     }
   }
 
-  public static List<String> getArtsNames(SipQuery sipQuery) {
+  public static List<String> getArtifactsNames(SipQuery sipQuery) {
     List<String> artifactNames = new ArrayList<>();
     List<Artifact> artifactList = sipQuery.getArtifacts();
-    for (Artifact artifact : artifactList) {
-      artifactNames.add(artifact.getArtifactsName().toUpperCase());
+    if (artifactList != null && !artifactList.isEmpty()) {
+      artifactList.stream().forEach(artifact -> artifactNames.add(artifact.getArtifactsName().toUpperCase()));
     }
     return artifactNames;
   }
-
-  /**
-   * checks for Private Category.
-   *
-   * @param ticket Ticket
-   * @param categoryId String
-   * @return Long Category Id for User.
-   */
-  public static Long checkForPrivateCategory(Ticket ticket) {
-    Long privCategoryForUser = null;
-    for (Products product : ticket.getProducts()) {
-      List<ProductModules> productModules = product.getProductModules();
-      for (ProductModules prodMod : productModules) {
-        List<ProductModuleFeature> productModuleFeature = prodMod.getProdModFeature();
-        for (ProductModuleFeature prodModFeat : productModuleFeature) {
-          if (prodModFeat.getProdModFeatureName().equalsIgnoreCase("My Analysis")) {
-            List<ProductModuleFeature> productModuleSubfeatures =
-                prodModFeat.getProductModuleSubFeatures();
-            for (ProductModuleFeature prodModSubFeat : productModuleSubfeatures) {
-              if (prodModSubFeat.getProdModFeatureName().equalsIgnoreCase("Drafts")) {
-                privCategoryForUser = prodModSubFeat.getProdModFeatureID();
-                return privCategoryForUser;
-              }
-            }
-          }
-        }
-      }
-    }
-        return privCategoryForUser;
-    }
-
 }

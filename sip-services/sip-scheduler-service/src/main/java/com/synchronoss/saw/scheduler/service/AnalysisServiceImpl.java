@@ -137,47 +137,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
   }
 
-  private ExecutionBean[] fetchExecutionID(String analysisId) {
-    String url = analysisUrl + "/{analysisId}/executions";
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return restTemplate.getForObject(url, ExecutionResponse.class, analysisId).executions();
-  }
-
-  private String[] findLatestExecution(ExecutionBean[] executionBeans) {
-    String latestExecutionID = null;
-    String latestFinish = null;
-
-    /**
-     * TO DO : pivot Analysis does not contains execution status , It may bug in system consider
-     * status by-default as success if execution doesn't contains status
-     */
-    if (executionBeans.length > 0) {
-      // Initialize latestExecution.
-      latestExecutionID = executionBeans[0].id();
-      latestFinish = executionBeans[0].finished();
-      for (ExecutionBean executionBean : executionBeans) {
-        if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
-            && (executionBean.status() == null
-                || executionBean.status().equalsIgnoreCase("Success"))) {
-          latestExecutionID = executionBean.id();
-          latestFinish = executionBean.finished();
-        }
-      }
-    }
-    String[] val = new String[2];
-    val[0] = latestExecutionID;
-    val[1] = latestFinish;
-    return val;
-  }
-
   private String prepareStringFromList(List<String> source) {
     return String.join(",", source);
   }
 
   private String[] fetchLatestFinishedTime(String analysisId) {
     logger.debug("New dsl analysis start here..");
-    String url = proxyAnalysisUrl + "/{analysisId}/executions";
+    String url = proxyAnalysisUrl + "/{analysisId}/executions?internalCall=true";
     logger.debug("proxyAnalysisUrl :" + proxyAnalysisUrl);
     try {
       HttpHeaders headers = new HttpHeaders();
@@ -216,27 +182,24 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void executeDslAnalysis(String analysisId,String auth) {
-    String dslUrl = metadataAnalysisUrl + "/" + analysisId;
-    logger.info("URL for request body :" + dslUrl);
+  public void executeDslAnalysis(String analysisId, String userId) {
+    String dslUrl = metadataAnalysisUrl + "/" + analysisId +"?internalCall=true";
+    logger.trace("URL for request body : ", dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
     Analysis analysis = analysisResponse.getAnalysis();
-    logger.info("Analysis request body :" + analysisResponse.getAnalysis());
-    HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", auth);
-    headers.set("Content-Type","application/json");
-    logger.info("header auth for execute api : "+auth);
+    logger.trace("Analysis request body : ", analysisResponse.getAnalysis());
 
     String url = proxyAnalysisUrl
           + "/execute?id="
           + analysisId
           + "&size="
           + dispatchRowLimit
-          + "&executionType=scheduled";
+          + "&executionType=scheduled"
+          + "&userId="+ userId;
 
     logger.info("Execute URL for dispatch :" + url);
-    HttpEntity<?> requestEntity = new HttpEntity<>(analysis,headers);
+    HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
 
     restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
   }

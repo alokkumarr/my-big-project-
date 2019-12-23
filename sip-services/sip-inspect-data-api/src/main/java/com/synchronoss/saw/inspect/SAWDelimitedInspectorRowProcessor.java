@@ -1,12 +1,5 @@
 package com.synchronoss.saw.inspect;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,6 +9,7 @@ import com.synchronoss.saw.store.base.TemporalDateStructure;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.processor.ObjectRowProcessor;
 import com.univocity.parsers.csv.CsvParserSettings;
+import java.util.*;
 
 public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
 
@@ -50,7 +44,6 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
 
 
     String[] dateFmt;
-    private DateFormat fmt;
 
     public SAWDelimitedInspectorRowProcessor(long headerSize, long fieldDefRowNumber, String[] dateFmt, long sampleSize, CsvParserSettings settings){
         this.rowCounter = 0;
@@ -75,9 +68,7 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         this.settings = settings;
         if(dateFmt!=null && dateFmt.length > 0) {
             this.dateFmt = dateFmt;
-            this.fmt = new SimpleDateFormat(dateFmt[0]);
         } else{
-            this.fmt = null;
             this.dateFmt = null;
         }
     }
@@ -137,10 +128,29 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     }
 
     private void processFieldNames(Object[] names){
-        for(Object o : names){
+        int fieldNo = 1;
+        for(Object o : names) {
+            String fieldName = null;
             if(o!=null) {
-            fieldNames.add(o.toString());}
+                fieldName = sanitizeFieldName(o.toString());
+            }
+            if(fieldName == null || fieldName.isEmpty()) {
+                fieldName="FIELD_" + fieldNo;
+            }
+            fieldNames.add(fieldName);
+            fieldNo++;
         }
+    }
+
+    private String sanitizeFieldName(String fieldName) {
+        logger.debug("sanitizeFieldName - FieldName :"+ fieldName);
+        String invalidCharRegex = "[^a-zA-Z0-9_ ]";
+        if(fieldName != null && !fieldName.trim().isEmpty()){
+            fieldName = fieldName.replaceAll(invalidCharRegex, "").trim()
+                .replaceAll("\\s+", "_").toUpperCase();
+            logger.debug("Converted to :"+fieldName);
+        }
+        return fieldName;
     }
 
     private void processDataRow(Object[] fields){
@@ -252,41 +262,34 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
       dateFormatter = new HashSet<>();
       dateFormatterMap.put(columnNo, dateFormatter);
     }
-    if (fmt != null) {
-      try {
-        fmt.parse(value);
-        dateFormatter.add(dateFmt[0]);
-        return T_DATETIME;
-      } catch (final ParseException e) {
-        DateTemporalExtractor extractor = new DateTemporalExtractor();
-        List<TemporalDateStructure> dates = extractor.parse(value);
-        if (dates != null && dates.size() > 0) {
-          for (int i = 0; i < dates.size(); i++) {
-            dateFormatter.add(dates.get(i).getIdentifiedDateFormat());
-          }
-          if (dateFormatter != null & dateFormatter.size() > 1) {
-            return T_STRING;
-          } else {
-            return T_DATETIME;
-          }
-        } else {
-          return confirmLong(value);
+
+    DateTemporalExtractor extractor = new DateTemporalExtractor();
+    if(dateFmt != null && dateFmt.length > 0){
+        for(String format : dateFmt){
+            if(format != null && !format.trim().isEmpty()
+                && extractor.isCorrectFormat(value, format.trim())){
+                    dateFormatter.add(format.trim());
+                    if (dateFormatter.size() > 1) {
+                        return T_STRING;
+                    } else {
+                        return T_DATETIME;
+                    }
+            }
         }
-      }
-    } else {
-      DateTemporalExtractor extractor = new DateTemporalExtractor();
-      List<TemporalDateStructure> dates = extractor.parse(value);
-      if (dates != null && dates.size() > 0) {
+    }
+
+    List<TemporalDateStructure> dates = extractor.parse(value);
+    if (dates != null && dates.size() > 0) {
         for (int i = 0; i < dates.size(); i++) {
-          dateFormatter.add(dates.get(i).getIdentifiedDateFormat());
+            dateFormatter.add(dates.get(i).getIdentifiedDateFormat());
         }
         if (dateFormatter != null & dateFormatter.size() > 1) {
-          return T_STRING;
+            return T_STRING;
         } else {
-          return T_DATETIME;
+            return T_DATETIME;
         }
-      }
-      return confirmLong(value);
+    } else {
+        return confirmLong(value);
     }
   }
 
@@ -351,6 +354,12 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         result.add("fields", fields);
         result.add("info", info);
         result.add("samplesParsed", samplesParsed);
+        result.addProperty("lineSeparator", new String(settings.getFormat().getLineSeparator()));
+        result.addProperty("delimiter", String.valueOf(settings.getFormat().getDelimiter()));
+        result.addProperty("quoteChar", String.valueOf(settings.getFormat().getQuote()));
+        result.addProperty("quoteEscapeChar", String.valueOf(settings.getFormat().getQuoteEscape()));
+        result.addProperty("headerSize", headerSize);
+        result.addProperty("fieldNamesLine", fieldDefRowNumber);
         return result;
     }
 

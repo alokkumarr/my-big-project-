@@ -12,7 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
-const moment = require('moment');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.test.js', () => {
   let analysisId;
@@ -28,7 +28,11 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
   beforeAll(() => {
     logger.info('Starting pivots/PivotsWithAggregate.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -60,8 +64,8 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const now = moment().format();
-        const pivotName = `e2e pivot ${now}`;
+        const now = new Date().getTime();
+        const pivotName = `e2e ${now}`;
         const pivotDescription = `e2e pivot description ${now}`;
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);

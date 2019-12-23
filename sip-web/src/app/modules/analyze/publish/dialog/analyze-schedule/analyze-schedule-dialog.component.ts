@@ -220,16 +220,17 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   removeSchedule() {
     const analysis = this.data.analysis;
     this.scheduleState = 'delete';
-    analysis.schedule = {
+    const schedule = {
       categoryId: isDSLAnalysis(analysis)
         ? +analysis.category
         : analysis.categoryId,
       groupName: this.token.ticket.custCode,
       jobName: analysis.id,
       scheduleState: this.scheduleState,
-      zip: this.zipFormatFlag
+      zip: this.zipFormatFlag,
+      userId: this.token.ticket.masterLoginId
     };
-    this.triggerSchedule();
+    this._dialogRef.close(schedule);
   }
 
   publish() {
@@ -245,7 +246,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           .local()
           .format();
       }
-      analysis.schedule = {
+
+      const schedule = {
         scheduleState: this.scheduleState,
         activeRadio: crondetails.activeRadio,
         activeTab: crondetails.activeTab,
@@ -263,6 +265,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         metricName: analysis.metricName,
         type: analysis.type,
         userFullName: analysis.userFullName || analysis.createdBy,
+        userId: this.token.ticket.masterLoginId,
         jobScheduleTime: crondetails.startDate,
         timezone: crondetails.timezone,
         categoryID: isDSLAnalysis(analysis)
@@ -270,12 +273,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           : analysis.categoryId,
         jobGroup: this.token.ticket.custCode
       };
-      this.triggerSchedule();
+      this._dialogRef.close(schedule);
     }
-  }
-
-  triggerSchedule() {
-    this._dialogRef.close(this.data.analysis);
   }
 
   validateForm() {

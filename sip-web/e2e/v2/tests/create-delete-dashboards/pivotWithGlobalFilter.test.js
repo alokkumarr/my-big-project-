@@ -17,6 +17,7 @@ const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 const DashboardHeader = require('../../pages/DashboardHeader');
+const users = require('../../helpers/data-generation/users');
 
 describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboardsWithPivotWithGlobalFilter.test.js', () => {
   const subCategoryName =
@@ -35,7 +36,11 @@ describe('Running create and delete dashboards with charts in dashboards/createA
       'Starting dashboards/createAndDeleteDashboardsWithPivotWitGlobalFilter.test.js.....'
     );
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -83,15 +88,8 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           }
 
           const currentTime = new Date().getTime();
-          const name =
-            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          const description =
-            'AT Description:' +
-            PIVOT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
           let dashboardName = 'AT Dashboard Name' + currentTime;
           let dashboardDescription = 'AT Dashboard description ' + currentTime;
 

@@ -16,6 +16,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing fork and edit and delete chart tests from charts/forkEditAndDelete.test.js', () => {
   const categoryName = categories.analyses.name;
@@ -35,7 +36,11 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
   beforeAll(() => {
     logger.info('Starting charts/editAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -73,15 +78,15 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
         const type = data.chartType.split(':')[1];
         if (!token) {
           logger.error('token cannot be null');
           expect(token).toBeTruthy();
           assert.isNotNull(token, 'token cannot be null');
         }
-
         //Create new analysis.
         const analysis = new AnalysisHelper().createNewAnalysis(
           host,

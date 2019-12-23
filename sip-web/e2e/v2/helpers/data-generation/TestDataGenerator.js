@@ -117,6 +117,19 @@ class TestDataGenerator {
       ),
       'generate user for userOne'
     );
+    utils.validApiCall(
+      adminHelper.generateUser(
+        apiUrl,
+        users.userTwoReset,
+        roles.userOne.roleId,
+        token,
+        activeStatusInd,
+        customerId,
+        users.anyUser.email,
+        users.anyUser.password
+      ),
+      'generate user for userOne'
+    );
 
     // Generate categories
     utils.validApiCall(
@@ -253,31 +266,39 @@ class TestDataGenerator {
     let description = `Column Chart created by e2e under sub category: ${new Date()}`;
     let analysisType = Constants.CHART;
     let subType = 'column';
+    let newToken = APICommonHelpers.generateToken(
+      apiUrl,
+      users.admin.loginId,
+      users.anyUser.password
+    );
 
     // Create charts for different sub categories
+    const include = ['all', 'create', 'multiple'];
     for (let [name, subCategory] of Object.entries(subCategories)) {
-      utils.validApiCall(
-        analysisHelper.createAnalysis(
-          apiUrl,
-          token,
-          name,
-          description,
-          analysisType,
-          subType,
-          dataSets.pivotChart,
-          null,
-          subCategory,
-          semanticId
-        ),
-        'createAnalysis: for ' + subCategory
-      );
+      if (include.includes(name)) {
+        utils.validApiCall(
+          analysisHelper.createAnalysis(
+            apiUrl,
+            newToken,
+            name,
+            description,
+            analysisType,
+            subType,
+            dataSets.pivotChart,
+            null,
+            subCategory,
+            semanticId
+          ),
+          'createAnalysis: for ' + subCategory
+        );
+      }
     }
 
     // Generate chart for create analysis sub category
     utils.validApiCall(
       analysisHelper.createAnalysis(
         apiUrl,
-        token,
+        newToken,
         name,
         description,
         analysisType,

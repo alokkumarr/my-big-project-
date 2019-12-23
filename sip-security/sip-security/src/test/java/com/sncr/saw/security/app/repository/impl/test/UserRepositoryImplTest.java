@@ -28,8 +28,10 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.ArrayList;
@@ -46,58 +48,60 @@ public class UserRepositoryImplTest {
 	private static User user1;
 	private static User user2;
 	private static List<User> userList = new ArrayList<User>();
-	
+
 	private static RoleDetails role1;
 	private static RoleDetails role2;
 	private static List<RoleDetails> roleList = new ArrayList<RoleDetails>();
-	
+
+	private static DataSecurityKeys securityKeys;
 	private static PrivilegeDetails privilege1;
 	private static PrivilegeDetails privilege2;
-    private static AddPrivilegeDetails addPrivilege1;
-    private static AddPrivilegeDetails addPrivilege2;
+	private static AddPrivilegeDetails addPrivilege1;
+	private static AddPrivilegeDetails addPrivilege2;
 	private static List<PrivilegeDetails> privilegeList = new ArrayList<PrivilegeDetails>();
-	
+
 	private static CategoryDetails category1;
 	private static CategoryDetails category2;
-	private static CategoryDetails subCategory1;	
+	private static CategoryDetails subCategory1;
 	private static List<CategoryDetails> categoriesList = new ArrayList<CategoryDetails>();
-	
+
 	private static SubCategoryDetails subCategory11;
 	private static SubCategoryDetails subCategory12;
 	private static List<SubCategoryDetails> subCategoriesList = new ArrayList<SubCategoryDetails>();
-	
+
 	private static AnalysisSummary analysisSummary1;
 	private static AnalysisSummary analysisSummary2;
 	private static List<AnalysisSummary> listOfAnalysisSummary = new ArrayList<AnalysisSummary>();
 	private static AnalysisSummaryList analysisSummaryList = new AnalysisSummaryList();
-	
+
 	private static Role roleDD1;
 	private static Role roleDD2;
 	private static List<Role> roleDDList = new ArrayList<Role>();
-	
+
 	private static Role roleType1;
 	private static Role roleType2;
 	private static List<Role> roleTypeList = new ArrayList<Role>();
-	
+
 	private static Product product1;
 	private static Product product2;
 	private static List<Product> productsList = new ArrayList<Product>();
-	
+
 	private static Module module1;
 	private static Module module2;
 	private static List<Module> modulesList = new ArrayList<Module>();
-	
+
 	private static Category category11;
 	private static Category category12;
 	private static List<Category> categoryList = new ArrayList<Category>();
-	
+  private static String createdBy="sawadmin@synchronoss.com";
+
 	@BeforeClass
 	public static void setUp() {
-		
+
 		// Create Mock
 		userRepositoryDAO = mock(UserRepository.class);
-				
-		
+
+
 		// ****************User Management*************************
 		user1 = new User();
 		user1.setActiveStatusInd("Active");
@@ -123,7 +127,7 @@ public class UserRepositoryImplTest {
 		user2.setLastName("S");
 		user2.setUserId(2l);
 		// End of ****************User Management*************************
-		
+
 		// ****************Role Management*************************
 		role1 = new RoleDetails();
 		role1.setRoleSysId(1l);
@@ -135,7 +139,7 @@ public class UserRepositoryImplTest {
 		role1.setRoleSysId(1l);
 		role1.setCustSysId(1l);
 		role1.setMyAnalysis(true);
-		
+
 		role2 = new RoleDetails();
 		role2.setRoleSysId(2l);
 		role2.setRoleName("REPORT USER");
@@ -147,7 +151,7 @@ public class UserRepositoryImplTest {
 		role2.setCustSysId(1l);
 		role2.setMyAnalysis(true);
 		// End of ****************Role Management*************************
-	    
+
 		// ****************Privilege Management*************************
 		privilege1 = new PrivilegeDetails();
 		privilege1.setCustomerId(1l);
@@ -165,7 +169,7 @@ public class UserRepositoryImplTest {
 		subCategoriesPrivilege.setPrivilegeCode(128l);
 		subCategoriesPrivilege.setPrivilegeDesc("All");
 		subCategoriesPrivilege.setPrivilegeId(11L);
-		List <SubCategoriesPrivilege > list = new ArrayList<>();
+		List<SubCategoriesPrivilege> list = new ArrayList<>();
 		list.add(subCategoriesPrivilege);
 		addPrivilege1.setCustomerId(1l);
 		addPrivilege1.setProductId(1l);
@@ -176,7 +180,7 @@ public class UserRepositoryImplTest {
 		addPrivilege1.setMasterLoginId("1");
 		addPrivilege1.setSubCategoriesPrivilege(list);
 
-        privilege2 = new PrivilegeDetails();
+		privilege2 = new PrivilegeDetails();
 		privilege2.setCustomerId(1l);
 		privilege2.setProductId(1l);
 		privilege2.setRoleId(1l);
@@ -193,7 +197,7 @@ public class UserRepositoryImplTest {
 		subCategoriesPrivilege.setPrivilegeCode(128l);
 		subCategoriesPrivilege.setPrivilegeDesc("All");
 		subCategoriesPrivilege.setPrivilegeId(11L);
-		List <SubCategoriesPrivilege > list2 = new ArrayList<>();
+		List<SubCategoriesPrivilege> list2 = new ArrayList<>();
 		list.add(subCategoriesPrivilege2);
 		addPrivilege2.setCustomerId(1l);
 		addPrivilege2.setProductId(1l);
@@ -204,7 +208,7 @@ public class UserRepositoryImplTest {
 		addPrivilege2.setMasterLoginId("1");
 		addPrivilege2.setSubCategoriesPrivilege(list);
 		// End of ****************Privilege Management*************************
-		
+
 		// ****************Categories Management*************************
 		category1 = new CategoryDetails();
 		category1.setCategoryId(1l);
@@ -219,7 +223,7 @@ public class UserRepositoryImplTest {
 		category1.setProductId(1l);
 		category1.setSubCategoryInd(false);
 		category1.setMasterLoginId("1l");
-		
+
 		category2 = new CategoryDetails();
 		category2.setCategoryId(2l);
 		category2.setCategoryName("Canned Analysis");
@@ -234,8 +238,8 @@ public class UserRepositoryImplTest {
 		category2.setSubCategoryInd(false);
 		category2.setMasterLoginId("1l");
 		// End of ****************Categories Management*************************
-		
-				
+
+
 		analysisSummary1 = new AnalysisSummary();
 		analysisSummary1.setAnalysisId(1l);
 		analysisSummary1.setAnalysisName("My Analysis");
@@ -243,7 +247,7 @@ public class UserRepositoryImplTest {
 		analysisSummary1.setFeatureId(1l);
 		analysisSummary1.setCreatedBy("sawadmin@synchronoss.com");
 		analysisSummary1.setCreatedDate(DateUtil.convertStringToDate(new Date().toString(), "yyyy-MM-dd HH:mm:ss"));
-		
+
 		analysisSummary2 = new AnalysisSummary();
 		analysisSummary2.setAnalysisId(2l);
 		analysisSummary2.setAnalysisName("Canned Analysiss");
@@ -251,74 +255,83 @@ public class UserRepositoryImplTest {
 		analysisSummary2.setFeatureId(1l);
 		analysisSummary2.setCreatedBy("sawadmin@synchronoss.com");
 		analysisSummary2.setCreatedDate(DateUtil.convertStringToDate(new Date().toString(), "yyyy-MM-dd HH:mm:ss"));
-		
+
 		listOfAnalysisSummary.add(analysisSummary1);
 		listOfAnalysisSummary.add(analysisSummary2);
 		analysisSummaryList.setValid(true);
 		analysisSummaryList.setValidityMessage("Artifacts List Successfully Populated.");
 		analysisSummaryList.setArtifactSummaryList(listOfAnalysisSummary);
-		
+
 		roleDD1 = new Role();
 		roleDD1.setRoleId(1l);
 		roleDD1.setRoleName("ANALYST");
-		
+
 		roleDD2 = new Role();
 		roleDD2.setRoleId(1l);
-		roleDD2.setRoleName("ANALYST");		
-		
+		roleDD2.setRoleName("ANALYST");
+
 		roleType1 = new Role();
 		roleType1.setRoleId(1l);
 		roleType1.setRoleName("ADMIN");
-		
+
 		roleType2 = new Role();
 		roleType2.setRoleId(1l);
-		roleType2.setRoleName("USER");	
-		
+		roleType2.setRoleName("USER");
+
 		product1 = new Product();
 		product1.setProductId(1l);
 		product1.setProductName("ATT");
-		
+
 		product2 = new Product();
 		product2.setProductId(1l);
 		product2.setProductName("ATT");
-		
 
+		List<String> valuesList = Arrays.asList("string 5");
+		TicketDSKDetails details = new TicketDSKDetails();
+		details.setValues(valuesList);
+		details.setName("string");
+		List<TicketDSKDetails> dskDetails = new ArrayList<>();
+		dskDetails.add(details);
+
+		securityKeys = new DataSecurityKeys();
+		securityKeys.setDataSecurityKeys(dskDetails);
+		securityKeys.setMessage("success");
 	}
-	
+
 	@Test
 	public void testAuthenticateUser() {
 		String masterLoginId = "SAWADMIN@Synchronoss.com";
 		String password = "Sawsyncnewuser1!";
 		boolean isAuthenticated = true;
 		boolean isPasswordActive = true;
-		boolean[] valid = { isAuthenticated, isPasswordActive };
-		
+		boolean[] valid = {isAuthenticated, isPasswordActive};
+
 		when(userRepositoryDAO.authenticateUser(masterLoginId, password)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
 		boolean[] isValid = userRepositoryDAO.authenticateUser(masterLoginId, password);
 		assertEquals(true, isValid[0]);
-		assertEquals(true, isValid[1]);		
+		assertEquals(true, isValid[1]);
 	}
 
 	@Test
 	public void testSSOAuthentication() {
-	    String masterLoginId = "SAWADMIN@Synchronoss.com";
-        RefreshToken rToken = new RefreshToken();
-        rToken.setValid(true);
-        rToken.setMasterLoginId(masterLoginId);
-        rToken.setValidUpto(System.currentTimeMillis() + (20 * 60 * 1000));
+		String masterLoginId = "SAWADMIN@Synchronoss.com";
+		RefreshToken rToken = new RefreshToken();
+		rToken.setValid(true);
+		rToken.setMasterLoginId(masterLoginId);
+		rToken.setValidUpto(System.currentTimeMillis() + (20 * 60 * 1000));
 		String token =
-		Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=").compact();
-        NSSOProperties nssoProperties = new NSSOProperties();
-        nssoProperties.setRefreshTokenValidityMins("20");
-        nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
-        nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
-        nssoProperties.setValidityMins("10");
-        TicketHelper ticketHelper = new TicketHelperImpl(userRepositoryDAO);
-        SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties,ticketHelper);
-        SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
-		assertNotNull("Valid access Token not found, Authentication failed ",ssoResponse.getaToken());
-		assertNotNull("Valid refresh Token not found, Authentication failed",ssoResponse.getrToken());
+				Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
+						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=").compact();
+		NSSOProperties nssoProperties = new NSSOProperties();
+		nssoProperties.setRefreshTokenValidityMins("20");
+		nssoProperties.setSsoSecretKey("M/des589Lu5h60l01dtZP+9Mw5J3hBrRrpCxb0VG1j0=");
+		nssoProperties.setJwtSecretKey("nsU7HaMHVylzf+v1tclfEVVyui7595L3/4zdhcBz/K4=");
+		nssoProperties.setValidityMins("10");
+		TicketHelper ticketHelper = new TicketHelperImpl(userRepositoryDAO);
+		SSORequestHandler ssoRequestHandler = new SSORequestHandler(nssoProperties, ticketHelper);
+		SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
+		assertNotNull("Valid access Token not found, Authentication failed ", ssoResponse.getaToken());
+		assertNotNull("Valid refresh Token not found, Authentication failed", ssoResponse.getrToken());
 	}
 
 	@Test
@@ -326,37 +339,37 @@ public class UserRepositoryImplTest {
 		String masterLoginId = "SAWADMIN@Synchronoss.com";
 		String newPassword = "Sawsyncnewuser2!";
 		String valid = "Valid";
-        String randomHash = "vnXS2paowBBL2ATl68qeHQyoPCM3kyaMco6IYbCRwaZRSVpP19qrwTNHrmS3FG2eViy4CcggXFTifJEVl9o7qh.i.BP3Nb6F5eun03BucEExuzIDevg4yaWMhnaEFuWVC.Dy1xHn9opMBWy79KDiRm3MKgSP9wFA";
+		String randomHash = "vnXS2paowBBL2ATl68qeHQyoPCM3kyaMco6IYbCRwaZRSVpP19qrwTNHrmS3FG2eViy4CcggXFTifJEVl9o7qh.i.BP3Nb6F5eun03BucEExuzIDevg4yaWMhnaEFuWVC.Dy1xHn9opMBWy79KDiRm3MKgSP9wFA";
 
-        when(userRepositoryDAO.rstchangePassword(masterLoginId, newPassword,randomHash)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
-		String isValid = userRepositoryDAO.rstchangePassword(masterLoginId, newPassword,randomHash);
+		when(userRepositoryDAO.rstchangePassword(masterLoginId, newPassword, randomHash)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
+		String isValid = userRepositoryDAO.rstchangePassword(masterLoginId, newPassword, randomHash);
 		assertEquals(isValid, valid);
 	}
-	
+
 	@Test
 	public void TestChangePassword() {
 		String masterLoginId = "SAWADMIN@Synchronoss.com";
 		String newPassword = "Sawsyncnewuser3!";
 		String oldPassowrd = "Sawsyncnewuser2!";
 		String valid = "Password Successfully Changed";
-		
+
 		when(userRepositoryDAO.changePassword(masterLoginId, newPassword, oldPassowrd)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
 		String isValid = userRepositoryDAO.changePassword(masterLoginId, newPassword, oldPassowrd);
-		assertEquals(isValid, valid);		
+		assertEquals(isValid, valid);
 	}
-	
+
 	@Test
 	public void TestValidateResetPasswordDtls() {
 		ResetValid resetValid = new ResetValid();
 		resetValid.setValid(true);
 		resetValid.setMasterLoginID("1");
 		String randomHash = "W1uLrs.eovTyXWzJz823fotuwGVKvIOMlEyPcCpd9swmpNLo2OgKVbwetvJFO4bi1BIcIKNiRi5_9RXJ1FoblMaOToNvEjwCrs2ccdwv1ckDMKqT1s53U_xPOxuXug_GNB0sjlfq_a7CkGrjpDbVrmCJK7W6afnH";
-		
+
 		when(userRepositoryDAO.validateResetPasswordDtls(randomHash)).thenReturn(resetValid); // Stubbing the methods of mocked userRepo with mocked data.
 		ResetValid isResetValid = userRepositoryDAO.validateResetPasswordDtls(randomHash);
-		assertEquals(true, isResetValid.getValid());	
+		assertEquals(true, isResetValid.getValid());
 	}
-	
+
 	@Test
 	public void TestGetTicketDetails() {
 		Ticket ticket = new Ticket();
@@ -366,39 +379,39 @@ public class UserRepositoryImplTest {
 		ticket.setUserFullName("SAW ADMIN");
 		ticket.setWindowId("1");
 		String ticketId = "1";
-		
+
 		when(userRepositoryDAO.getTicketDetails(ticketId)).thenReturn(ticket); // Stubbing the methods of mocked userRepo with mocked data.
 		Ticket ticket2 = userRepositoryDAO.getTicketDetails(ticketId);
-		assertEquals("1", ticket2.getWindowId());	
+		assertEquals("1", ticket2.getWindowId());
 	}
-	
+
 	@Test
 	public void TestGetUserEmailId() {
 		String userID = "1";
 		String emailID = "shwetha.somayaji@synchronoss.com";
-		
+
 		when(userRepositoryDAO.getUserEmailId(userID)).thenReturn(emailID); // Stubbing the methods of mocked userRepo with mocked data.
 		String email = userRepositoryDAO.getUserEmailId(userID);
-		assertEquals(email, emailID);	
+		assertEquals(email, emailID);
 	}
-	
+
 	@Test
-	public void TestCreateAnalysis() {		
+	public void TestCreateAnalysis() {
 		Boolean valid = true;
-		
+
 		when(userRepositoryDAO.createAnalysis(analysisSummary1)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
 		Boolean isValid = userRepositoryDAO.createAnalysis(analysisSummary1);
-		assertEquals(isValid, valid);	
-		
+		assertEquals(isValid, valid);
+
 	}
-	
+
 	@Test
-	public void TestGetAnalysisByFeatureID() {		
+	public void TestGetAnalysisByFeatureID() {
 		long featureId = 1;
-		
+
 		when(userRepositoryDAO.getAnalysisByFeatureID(featureId)).thenReturn(analysisSummaryList); // Stubbing the methods of mocked userRepo with mocked data.
 		AnalysisSummaryList analysisList = userRepositoryDAO.getAnalysisByFeatureID(featureId);
-		assertEquals("My Analysis", analysisList.getArtifactSummaryList().get(0).getAnalysisName());	
+		assertEquals("My Analysis", analysisList.getArtifactSummaryList().get(0).getAnalysisName());
 	}
 
 	@Test
@@ -409,41 +422,42 @@ public class UserRepositoryImplTest {
 		when(userRepositoryDAO.updateAnalysis(analysisSummary1)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
 		Boolean isValid = userRepositoryDAO.updateAnalysis(analysisSummary1);
 		assertEquals(valid, isValid);
-		
+
 		when(userRepositoryDAO.getAnalysisByFeatureID(featureId)).thenReturn(analysisSummaryList); // Stubbing the methods of mocked userRepo with mocked data.
 		AnalysisSummaryList analysisList = userRepositoryDAO.getAnalysisByFeatureID(featureId);
 		assertEquals("Public Folder", analysisList.getArtifactSummaryList().get(0).getAnalysisName());
 	}
-	
+
 	@Test
 	public void TestDeleteAnalysis() {
-		analysisSummary1.setActiveStatusInd(0);;
+		analysisSummary1.setActiveStatusInd(0);
+		;
 		Boolean valid = true;
 		long featureId = 1;
 		when(userRepositoryDAO.deleteAnalysis(analysisSummary1)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
 		Boolean isValid = userRepositoryDAO.deleteAnalysis(analysisSummary1);
 		assertEquals(valid, isValid);
-		
+
 		when(userRepositoryDAO.getAnalysisByFeatureID(featureId)).thenReturn(analysisSummaryList); // Stubbing the methods of mocked userRepo with mocked data.
 		AnalysisSummaryList analysisList = userRepositoryDAO.getAnalysisByFeatureID(featureId);
-		assertEquals(new Integer(0) , analysisList.getArtifactSummaryList().get(0).getActiveStatusInd());
+		assertEquals(new Integer(0), analysisList.getArtifactSummaryList().get(0).getActiveStatusInd());
 	}
-	
+
 	@Test
 	public void TestGetRolesDropDownList() {
 		long customerId = 1;
-		when(userRepositoryDAO.getRolesDropDownList(customerId)).thenReturn(Arrays.asList(roleDD1,roleDD2)); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.getRolesDropDownList(customerId)).thenReturn(Arrays.asList(roleDD1, roleDD2)); // Stubbing the methods of mocked userRepo with mocked data.
 		roleDDList = userRepositoryDAO.getRolesDropDownList(customerId);
 		assertEquals(2, roleDDList.size());
 	}
-	
+
 	@Test
 	public void TestGetRoletypesDropDownList() {
-		when(userRepositoryDAO.getRoletypesDropDownList()).thenReturn(Arrays.asList(roleType1,roleType2)); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.getRoletypesDropDownList()).thenReturn(Arrays.asList(roleType1, roleType2)); // Stubbing the methods of mocked userRepo with mocked data.
 		roleTypeList = userRepositoryDAO.getRoletypesDropDownList();
 		assertEquals(2, roleTypeList.size());
 	}
-	
+
 	@Test
 	public void TestCheckUserExists() {
 		long roleId = 1;
@@ -452,7 +466,7 @@ public class UserRepositoryImplTest {
 		boolean exists = userRepositoryDAO.checkUserExists(roleId);
 		assertEquals(exists, valid);
 	}
-	
+
 	@Test
 	public void TestCheckPrivExists() {
 		long roleId = 1;
@@ -461,34 +475,34 @@ public class UserRepositoryImplTest {
 		boolean exists = userRepositoryDAO.checkPrivExists(roleId);
 		assertEquals(exists, valid);
 	}
-	
-	
+
+
 	@Test
 	public void TestGetProductsDropDownList() {
 		long customerId = 1;
-		when(userRepositoryDAO.getProductsDropDownList(customerId)).thenReturn(Arrays.asList(product1,product2)); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.getProductsDropDownList(customerId)).thenReturn(Arrays.asList(product1, product2)); // Stubbing the methods of mocked userRepo with mocked data.
 		productsList = userRepositoryDAO.getProductsDropDownList(customerId);
 		assertEquals(2, productsList.size());
 	}
-	
+
 	@Test
 	public void TestGetModulesDropDownList() {
 		long customerId = 1;
 		long productId = 1;
-		when(userRepositoryDAO.getModulesDropDownList(customerId, productId)).thenReturn(Arrays.asList(module1,module2)); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.getModulesDropDownList(customerId, productId)).thenReturn(Arrays.asList(module1, module2)); // Stubbing the methods of mocked userRepo with mocked data.
 		modulesList = userRepositoryDAO.getModulesDropDownList(customerId, productId);
 		assertEquals(2, modulesList.size());
 	}
-	
+
 	@Test
 	public void TestGetCategoriesDropDownList() {
 		long customerId = 1;
 		long moduleId = 1;
-		when(userRepositoryDAO.getCategoriesDropDownList(customerId, moduleId, true)).thenReturn(Arrays.asList(category11,category12)); // Stubbing the methods of mocked userRepo with mocked data.
+		when(userRepositoryDAO.getCategoriesDropDownList(customerId, moduleId, true)).thenReturn(Arrays.asList(category11, category12)); // Stubbing the methods of mocked userRepo with mocked data.
 		categoryList = userRepositoryDAO.getCategoriesDropDownList(customerId, moduleId, true);
 		assertEquals(2, categoryList.size());
 	}
-	
+
 	@Test
 	public void TestCheckCatExists() {
 		boolean valid = true;
@@ -496,7 +510,7 @@ public class UserRepositoryImplTest {
 		boolean exists = userRepositoryDAO.checkCatExists(category1);
 		assertEquals(exists, valid);
 	}
-	
+
 	@Test
 	public void TestCheckSubCatExists() {
 		boolean valid = true;
@@ -504,43 +518,43 @@ public class UserRepositoryImplTest {
 		boolean exists = userRepositoryDAO.checkSubCatExists(subCategory1);
 		assertEquals(exists, valid);
 	}
-	
+
 	@Test
 	public void TestGetSubCategories() {
 		long categoryId = 1;
 		String categoryCode = "F00000001";
-		when(userRepositoryDAO.getSubCategories(categoryId,categoryCode)).thenReturn(Arrays.asList(subCategory11,subCategory12)); // Stubbing the methods of mocked userRepo with mocked data.
-		subCategoriesList = userRepositoryDAO.getSubCategories(categoryId,categoryCode);
+		when(userRepositoryDAO.getSubCategories(categoryId, categoryCode)).thenReturn(Arrays.asList(subCategory11, subCategory12)); // Stubbing the methods of mocked userRepo with mocked data.
+		subCategoriesList = userRepositoryDAO.getSubCategories(categoryId, categoryCode);
 		assertEquals(2, subCategoriesList.size());
 	}
-	
+
 	@Test
 	public void testAddUser() {
 		Valid validUser1 = new Valid();
 		validUser1.setValid(true);
-		when(userRepositoryDAO.addUser(user1)).thenReturn(validUser1); // Stubbing the methods of mocked userRepo with mocked data.
-		
-		Valid isbn = userRepositoryDAO.addUser(user1);
+		when(userRepositoryDAO.addUser(user1,createdBy)).thenReturn(validUser1); // Stubbing the methods of mocked userRepo with mocked data.
+
+		Valid isbn = userRepositoryDAO.addUser(user1,createdBy);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			userList.add(user1);
 		}
-		
+
 		when(userRepositoryDAO.getUsers(1l)).thenReturn(userList);
 		List<User> allUsers = userRepositoryDAO.getUsers(1l);
 		assertEquals(1, allUsers.size());
-		
+
 		Valid validUser2 = new Valid();
 		validUser2.setValid(true);
-		when(userRepositoryDAO.addUser(user2)).thenReturn(validUser2); // Stubbing the methods of mocked userRepo with mocked data.
-		isbn = userRepositoryDAO.addUser(user2);
+		when(userRepositoryDAO.addUser(user2,createdBy)).thenReturn(validUser2); // Stubbing the methods of mocked userRepo with mocked data.
+		isbn = userRepositoryDAO.addUser(user2,createdBy);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			userList.add(user2);
 		}
-		
+
 		when(userRepositoryDAO.getUsers(1l)).thenReturn(userList);
 		allUsers = userRepositoryDAO.getUsers(1l);
 		assertEquals(2, allUsers.size());
@@ -548,8 +562,8 @@ public class UserRepositoryImplTest {
 
 	@Test
 	public void testGetUser() {
-		when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1,user2)); // Stubbing the methods of mocked userRepo with mocked data.
-		
+		when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1, user2)); // Stubbing the methods of mocked userRepo with mocked data.
+
 		List<User> allUsers = userRepositoryDAO.getUsers(1l);
 		assertEquals(2, allUsers.size());
 		User user1 = allUsers.get(0);
@@ -557,75 +571,75 @@ public class UserRepositoryImplTest {
 		assertEquals("Shwetha", user1.getFirstName());
 		assertEquals("Karthik", user2.getFirstName());
 	}
-	
+
 	@Test
-	public void testUpdateUser(){
+	public void testUpdateUser() {
 		Valid validUpdateUser = new Valid();
 		validUpdateUser.setValid(true);
 		when(userRepositoryDAO.updateUser(user2)).thenReturn(validUpdateUser); // Stubbing the methods of mocked userRepo with mocked data.
-		
+
 		user2.setActiveStatusInd("inactivate");
 		Valid isbn = userRepositoryDAO.updateUser(user2);
-		if(isbn.getValid()){
-			when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1,user2)); // Stubbing the methods of mocked userRepo with mocked data.
+		if (isbn.getValid()) {
+			when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1, user2)); // Stubbing the methods of mocked userRepo with mocked data.
 		}
-		
+
 		List<User> allUsers = userRepositoryDAO.getUsers(1l);
 		User user2 = allUsers.get(1);
 		assertEquals("Karthik", user2.getFirstName());
 		assertEquals("inactivate", user2.getActiveStatusInd());
 	}
-	
+
 	@Test
-	public void testDeleteUser(){
-		
+	public void testDeleteUser() {
+
 		when(userRepositoryDAO.deleteUser(user2.getUserId(), user2.getMasterLoginId())).thenReturn(true); // Stubbing the methods of mocked userRepo with mocked data.
-		
+
 		boolean flag = userRepositoryDAO.deleteUser(2l, "2");
 		assertEquals(true, flag);
-		if(flag){
+		if (flag) {
 			when(userRepositoryDAO.getUsers(1l)).thenReturn(Arrays.asList(user1)); // Stubbing the methods of mocked userRepo with mocked data.
 		}
-		
+
 		List<User> allUsers = userRepositoryDAO.getUsers(1l);
 		assertEquals(1, allUsers.size());
 		assertEquals(new Long(1), allUsers.get(0).getUserId());
 	}
-	
+
 	@Test
 	public void testAddRole() {
 		Valid validRole1 = new Valid();
-		validRole1.setValid(true);		
+		validRole1.setValid(true);
 		when(userRepositoryDAO.addRole(role1)).thenReturn(validRole1); // Stubbing the methods of mocked RoleuserRepo with mocked data.
 		Valid isbn = userRepositoryDAO.addRole(role1);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			roleList.add(role1);
 		}
 		when(userRepositoryDAO.getRoles(1l)).thenReturn(roleList); // Stubbing the methods of mocked RoleuserRepo with mocked data.
 		List<RoleDetails> allRoles = userRepositoryDAO.getRoles(1l);
 		assertEquals(1, allRoles.size());
-		
+
 		Valid validRole2 = new Valid();
 		validRole2.setValid(true);
 		when(userRepositoryDAO.addRole(role2)).thenReturn(validRole2); // Stubbing the methods of mocked RoleuserRepo with mocked data.
 		isbn = userRepositoryDAO.addRole(role2);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			roleList.add(role2);
 		}
 		when(userRepositoryDAO.getRoles(1l)).thenReturn(roleList); // Stubbing the methods of mocked RoleuserRepo with mocked data.
 		allRoles = userRepositoryDAO.getRoles(1l);
 		assertEquals(2, allRoles.size());
-		
+
 	}
 
 	@Test
 	public void testGetRole() {
-		when(userRepositoryDAO.getRoles(1l)).thenReturn(Arrays.asList(role1,role2)); // Stubbing the methods of mocked RoleuserRepo with mocked data.
-		
+		when(userRepositoryDAO.getRoles(1l)).thenReturn(Arrays.asList(role1, role2)); // Stubbing the methods of mocked RoleuserRepo with mocked data.
+
 		List<RoleDetails> allRoles = userRepositoryDAO.getRoles(1l);
 		assertEquals(2, allRoles.size());
 		RoleDetails role1 = allRoles.get(0);
@@ -633,62 +647,62 @@ public class UserRepositoryImplTest {
 		assertEquals("ANALYST", role1.getRoleName());
 		assertEquals("REPORT USER", role2.getRoleName());
 	}
-	
+
 	@Test
-	public void testUpdateRole(){
+	public void testUpdateRole() {
 		Valid validUpdatedRole = new Valid();
-		validUpdatedRole.setValid(true);			
+		validUpdatedRole.setValid(true);
 		when(userRepositoryDAO.updateRole(role2)).thenReturn(validUpdatedRole);
-		
+
 		role2.setActiveStatusInd("inactivate");
 		Valid isbn = userRepositoryDAO.updateRole(role2);
-		if(isbn.getValid()){
-			when(userRepositoryDAO.getRoles(1l)).thenReturn(Arrays.asList(role1,role2)); // Stubbing the methods of mocked userRepo with mocked data.
+		if (isbn.getValid()) {
+			when(userRepositoryDAO.getRoles(1l)).thenReturn(Arrays.asList(role1, role2)); // Stubbing the methods of mocked userRepo with mocked data.
 		}
-		
+
 		List<RoleDetails> allRoles = userRepositoryDAO.getRoles(1l);
 		assertEquals(2, allRoles.size());
 		RoleDetails role2 = allRoles.get(1);
 		assertEquals("REPORT USER", role2.getRoleName());
 		assertEquals("inactivate", role2.getActiveStatusInd());
 	}
-	
+
 	@Test
-	public void testDeleteRole(){
+	public void testDeleteRole() {
 		when(userRepositoryDAO.deleteRole(role2.getRoleSysId(), role2.getMasterLoginId())).thenReturn(true); // Stubbing the methods of mocked RoleuserRepo with mocked data.
-		
+
 		boolean flag = userRepositoryDAO.deleteRole(2l, "2");
 		assertEquals(true, flag);
-		if(flag){
+		if (flag) {
 			when(userRepositoryDAO.getRoles(1l)).thenReturn(Arrays.asList(role1)); // Stubbing the methods of mocked userRepo with mocked data.
 		}
 		List<RoleDetails> allRoles = userRepositoryDAO.getRoles(1l);
 		assertEquals(1, allRoles.size());
-		
+
 	}
-	
+
 	@Test
 	public void testAddPrivilege() {
 		Valid validPrivilege1 = new Valid();
-		validPrivilege1.setValid(true);	
+		validPrivilege1.setValid(true);
 		when(userRepositoryDAO.upsertPrivilege(addPrivilege1)).thenReturn(validPrivilege1); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
 		Valid isbn = userRepositoryDAO.upsertPrivilege(addPrivilege1);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			privilegeList.add(privilege1);
 		}
 		when(userRepositoryDAO.getPrivileges(1l)).thenReturn(privilegeList); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
 		List<PrivilegeDetails> allPrivilege = userRepositoryDAO.getPrivileges(1l);
 		assertEquals(1, allPrivilege.size());
-		
+
 		Valid validPrivilege2 = new Valid();
-		validPrivilege2.setValid(true);	
+		validPrivilege2.setValid(true);
 		when(userRepositoryDAO.upsertPrivilege(addPrivilege2)).thenReturn(validPrivilege2); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
 		isbn = userRepositoryDAO.upsertPrivilege(addPrivilege2);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			privilegeList.add(privilege2);
 		}
 		when(userRepositoryDAO.getPrivileges(1l)).thenReturn(privilegeList); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
@@ -699,7 +713,7 @@ public class UserRepositoryImplTest {
 	@Test
 	public void testGetPrivilege() {
 		when(userRepositoryDAO.getPrivileges(1l)).thenReturn(Arrays.asList(privilege1, privilege2)); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
-		
+
 		List<PrivilegeDetails> allPrivilege = userRepositoryDAO.getPrivileges(1l);
 		assertEquals(2, allPrivilege.size());
 		PrivilegeDetails privilege1 = allPrivilege.get(0);
@@ -707,15 +721,15 @@ public class UserRepositoryImplTest {
 		assertEquals(new Long(1), privilege1.getPrivilegeId());
 		assertEquals(new Long(2), privilege2.getPrivilegeId());
 	}
-	
+
 	@Test
-	public void testUpdatePrivilege(){
+	public void testUpdatePrivilege() {
 		Valid validUpdatedPrivilege = new Valid();
 		validUpdatedPrivilege.setValid(true);
 		when(userRepositoryDAO.updatePrivilege(privilege2)).thenReturn(validUpdatedPrivilege);
 		privilege2.setModuleId(2l);
 		Valid isbn = userRepositoryDAO.updatePrivilege(privilege2);
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			when(userRepositoryDAO.getPrivileges(1l)).thenReturn(Arrays.asList(privilege1, privilege2)); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
 		}
 		List<PrivilegeDetails> allPrivilege = userRepositoryDAO.getPrivileges(1l);
@@ -724,43 +738,43 @@ public class UserRepositoryImplTest {
 		assertEquals(new Long(2), privilege2.getPrivilegeId());
 		assertEquals(new Long(2), privilege2.getModuleId());
 	}
-	
+
 	@Test
-	public void testDeletePrivilege(){
+	public void testDeletePrivilege() {
 		when(userRepositoryDAO.deletePrivilege(privilege2.getPrivilegeId())).thenReturn(true);
-		
+
 		boolean flag = userRepositoryDAO.deletePrivilege(2l);
 		assertEquals(true, flag);
-		if(flag){
+		if (flag) {
 			when(userRepositoryDAO.getPrivileges(1l)).thenReturn(Arrays.asList(privilege1)); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
 		}
 		List<PrivilegeDetails> allPrivilege = userRepositoryDAO.getPrivileges(1l);
 		assertEquals(1, allPrivilege.size());
 	}
-	
+
 	@Test
 	public void testAddCategory() {
 		Valid validCategory1 = new Valid();
-		validCategory1.setValid(true);		
+		validCategory1.setValid(true);
 		when(userRepositoryDAO.addCategory(category1)).thenReturn(validCategory1);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		Valid isbn = userRepositoryDAO.addCategory(category1);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			categoriesList.add(category1);
 		}
 		when(userRepositoryDAO.getCategories(1l)).thenReturn(categoriesList);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		List<CategoryDetails> allCategories = userRepositoryDAO.getCategories(1l);
 		assertEquals(1, allCategories.size());
-		
+
 		Valid validCategory2 = new Valid();
-		validCategory2.setValid(true);	
+		validCategory2.setValid(true);
 		when(userRepositoryDAO.addCategory(category2)).thenReturn(validCategory2);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		isbn = userRepositoryDAO.addCategory(category2);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
 		assertEquals(true, isbn.getValid());
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			categoriesList.add(category2);
 		}
 		when(userRepositoryDAO.getCategories(1l)).thenReturn(categoriesList);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
@@ -778,15 +792,15 @@ public class UserRepositoryImplTest {
 		assertEquals(1l, category1.getCategoryId());
 		assertEquals(2l, category2.getCategoryId());
 	}
-	
+
 	@Test
-	public void testUpdateCategory(){
+	public void testUpdateCategory() {
 		Valid validUpdatedCategory = new Valid();
 		validUpdatedCategory.setValid(true);
 		when(userRepositoryDAO.updateCategory(category2)).thenReturn(validUpdatedCategory);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		category2.setModuleId(2l);
 		Valid isbn = userRepositoryDAO.updateCategory(category2);
-		if(isbn.getValid()){
+		if (isbn.getValid()) {
 			when(userRepositoryDAO.getCategories(1l)).thenReturn(Arrays.asList(category1, category2));// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		}
 		List<CategoryDetails> allCategories = userRepositoryDAO.getCategories(1l);
@@ -795,17 +809,25 @@ public class UserRepositoryImplTest {
 		assertEquals(2l, category2.getCategoryId());
 		assertEquals(2l, category2.getModuleId());
 	}
-	
+
 	@Test
-	public void testDeleteCategory(){
+	public void testDeleteCategory() {
 		when(userRepositoryDAO.deleteCategory(category2.getCategoryId())).thenReturn(true);// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
-	
+
 		boolean flag = userRepositoryDAO.deleteCategory(2l);
 		assertEquals(true, flag);
-		if(flag){
+		if (flag) {
 			when(userRepositoryDAO.getCategories(1l)).thenReturn(Arrays.asList(category1));// Stubbing the methods of mocked CategoriesuserRepo with mocked data.
 		}
 		List<CategoryDetails> allCategories = userRepositoryDAO.getCategories(1l);
 		assertEquals(1, allCategories.size());
+	}
+
+	@Test
+	public void testDSKDetailsByUserId() {
+		String userId = "alok.kumarr";
+		when(userRepositoryDAO.fetchDSKDetailByUserId(userId)).thenReturn(securityKeys);
+		DataSecurityKeys dataSecurityKeys = userRepositoryDAO.fetchDSKDetailByUserId(userId);
+		assertEquals(1, dataSecurityKeys.getDataSecurityKeys().size());
 	}
 }

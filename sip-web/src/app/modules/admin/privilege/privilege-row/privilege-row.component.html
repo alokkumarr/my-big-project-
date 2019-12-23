@@ -19,8 +19,10 @@
     >
       <mat-checkbox
         type="checkbox"
+        [hidden]="hasOnlyAccessPrivilege"
         (change)="onAllClicked()"
         [checked]="privilegeCodeList[8]"
+        [disabled]="isDraftsSubCategory"
       >
         <label i18n>All</label>
       </mat-checkbox>
@@ -29,7 +31,7 @@
         type="checkbox"
         [hidden]="!allowedPrivileges[privilegeName.toUpperCase()]"
         (change)="onPrivilegeClicked(i + 1)"
-        [disabled]="privilegeCodeList[8]"
+        [disabled]="privilegeCodeList[8] || isDraftsSubCategory"
         [checked]="privilegeCodeList[i + 1]"
       >
         <label>{{ privilegeName }}</label>

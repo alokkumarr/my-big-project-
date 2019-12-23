@@ -19,6 +19,7 @@ const Header = require('../../pages/components/Header');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
@@ -33,7 +34,11 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
   beforeAll(() => {
     logger.info('Starting chartPromptFilters tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -87,8 +92,7 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
             }
           ];
 
-          let name =
-            Constants.CHART + ' ' + globalVariables.e2eId + '-' + currentTime;
+          let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
             chartType +

@@ -6,6 +6,8 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
+import { validateEntityName
+} from './../../../../common/validators/field-name-rule.validator';
 
 @Component({
   selector: 'toolbar-action-dialog',
@@ -40,10 +42,8 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
     this.progressSub.unsubscribe();
   }
 
-  validateSaving() {
-    const validateState =
-      this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
-    return validateState;
+  validateNameField(name) {
+    return validateEntityName(name);
   }
 
   onBack() {
@@ -85,6 +85,9 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   }
 
   save(action) {
+    if (this.validateNameField(this.data.analysis.name).state) {
+      return;
+    }
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then((response: any) => {

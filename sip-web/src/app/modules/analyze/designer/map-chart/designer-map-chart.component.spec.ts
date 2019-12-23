@@ -21,6 +21,7 @@ class ChartStubComponent {
 class ChartStubService {
   splitToSeries = () => [{ data: [] }];
   analysisLegend2ChartLegend = () => {};
+  addTooltipsAndLegendAsObject = () => {};
 }
 class MapDataStubService {
   getMapData = jasmine.createSpy('getMapData').and.returnValue(of('mapData'));

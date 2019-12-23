@@ -18,8 +18,8 @@ import { ChannelObject } from '../../models/workbench.interface';
 
 import { DatasourceService } from '../../services/datasource.service';
 import { generateSchedule } from '../../../../common/utils/cron2Readable';
-import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
+import { ToastService, HeaderProgressService } from '../../../../common/services';
 import { CreateRouteDialogComponent } from './create-route-dialog/create-route-dialog.component';
 import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 import { ConfirmActionDialogComponent } from './confirm-action-dialog/confirm-action-dialog.component';
@@ -43,17 +43,23 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   show = false;
   channelEditable = false;
   columns: Array<any> = [];
+  isRequestInProgress = false;
 
   @ViewChild('channelsGrid')
   channelsGrid: DxDataGridComponent;
 
   constructor(
-    public dialog: MatDialog,
+    public _headerProgress: HeaderProgressService,
     private datasourceService: DatasourceService,
+    public dialog: MatDialog,
     private notify: ToastService,
     private snackBar: MatSnackBar,
     private _router: Router
-  ) {}
+  ) {
+    _headerProgress.subscribe(showProgress => {
+      this.isRequestInProgress = showProgress;
+    });
+  }
 
   ngOnInit() {
     this.getSources();
@@ -140,7 +146,14 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   selectChannel(channel) {
-    this.selectedSourceData = channel;
+    if (!channel) {
+      this.selectedSourceData = channel;
+      return;
+    }
+
+    this.selectedSourceData = this.unFilteredSourceData.find(
+      source => source.bisChannelSysId === channel.bisChannelSysId
+    );
   }
 
   sourceSelectedType(sourceType, channelCount) {

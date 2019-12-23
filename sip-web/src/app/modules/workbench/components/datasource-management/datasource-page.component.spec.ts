@@ -8,7 +8,10 @@ import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { Router } from '@angular/router';
 import { DatasourceService } from '../../services/datasource.service';
 import { DatasourceComponent } from './datasource-page.component';
-import { ToastService } from '../../../../common/services/toastMessage.service';
+import {
+  ToastService,
+  HeaderProgressService
+} from '../../../../common/services';
 import { Observable } from 'rxjs';
 
 const DatasourceServiceStub = {
@@ -19,6 +22,9 @@ const DatasourceServiceStub = {
 const ToastServiceStub: Partial<ToastService> = {};
 
 class RouterServiceStub {}
+class HeaderProgressServiceStub {
+  subscribe() {}
+}
 
 describe('DatasourcePageComponent', () => {
   let component: DatasourceComponent;
@@ -37,7 +43,8 @@ describe('DatasourcePageComponent', () => {
       providers: [
         { provide: DatasourceService, useValue: DatasourceServiceStub },
         { provide: ToastService, useValue: ToastServiceStub },
-        { provide: Router, useClass: RouterServiceStub }
+        { provide: Router, useClass: RouterServiceStub },
+        { provide: HeaderProgressService, useClass: HeaderProgressServiceStub }
       ]
     }).compileComponents();
   }));
@@ -45,6 +52,9 @@ describe('DatasourcePageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DatasourceComponent);
     component = fixture.componentInstance;
+    component.unFilteredSourceData = [
+      { bisChannelSysId: 1, channelName: 'abc' }
+    ];
     component.show = true;
     fixture.detectChanges();
   });
@@ -60,6 +70,13 @@ describe('DatasourcePageComponent', () => {
 
       component.togglePWD();
       expect(component.show).toBeTruthy();
+    });
+  });
+
+  describe('select channel', () => {
+    it('should select channel based on id', () => {
+      component.selectChannel({ bisChannelSysId: 1 });
+      expect(component.selectedSourceData.channelName).toEqual('abc');
     });
   });
 });

@@ -16,6 +16,7 @@ const LoginPage = require('../../pages/LoginPage');
 const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
+const users = require('../../helpers/data-generation/users');
 
 describe('Running create and delete dashboards with Pivot in create-delete-dashboards/pivot.test.js', () => {
   const subCategoryName =
@@ -32,7 +33,11 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
   beforeAll(() => {
     logger.info('Starting create-delete-dashboards/pivot.test.js');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -81,16 +86,8 @@ describe('Running create and delete dashboards with Pivot in create-delete-dashb
           }
 
           const currentTime = new Date().getTime();
-
-          const name =
-            'AT ' + PIVOT + ' ' + globalVariables.e2eId + '-' + currentTime;
-          const description =
-            'AT Description:' +
-            PIVOT +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
           const dashboardName = 'AT Dashboard Name' + currentTime;
           const dashboardDescription =
             'AT Dashboard description ' + currentTime;

@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.js', () => {
   let analysisId;
@@ -20,7 +21,11 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   beforeAll(() => {
     logger.info('Starting createAndDeleteReport tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -53,8 +58,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
-          const reportName = `e2e dl report ${new Date().toString()}`;
-          const reportDescription = `e2e dl report description ${new Date().toString()}`;
+          const now = new Date().getTime();
+          const reportName = `e2e ${now}`;
+          const reportDescription = `e2e dl report description ${now}`;
           const analysisType = 'table:report';
           const tables = data.tables;
           const loginPage = new LoginPage();
@@ -118,9 +124,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
-          const reportName = `e2e dl report ${new Date().toString()}`;
-          console.log(reportName);
-          const reportDescription = `e2e dl report description ${new Date().toString()}`;
+          const now = new Date().getTime();
+          const reportName = `e2e ${now}`;
+          const reportDescription = `e2e dl report description ${now}`;
           const analysisType = 'table:report';
           const tables = data.tables;
           const loginPage = new LoginPage();

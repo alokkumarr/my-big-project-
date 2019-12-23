@@ -44,10 +44,7 @@ module.exports = {
       );
     },
     textToBePresent: (element, value, wait = null) => {
-      return browser.wait(
-        EC.textToBePresentInElement(element, value),
-        wait ? wait : fluentWait
-      );
+      return browser.wait(EC.textToBePresentInElement(element, value), wait ? wait : fluentWait);
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
@@ -137,9 +134,7 @@ module.exports = {
     }, protractorConf.timeouts.fluentWait);
   },
   hasClass(element, cls) {
-    return element
-      .getAttribute('class')
-      .then(classes => classes.split(' ').includes(cls));
+    return element.getAttribute('class').then(classes => classes.split(' ').includes(cls));
   },
   clickOnElement(el) {
     browser.sleep(200);
@@ -168,15 +163,16 @@ module.exports = {
   elementToBeClickableAndClickByMouseMove(element) {
     this.waitFor.elementToBePresent(element);
     this.waitFor.elementToBeVisible(element);
-    browser.wait(
-      EC.elementToBeClickable(element),
-      fluentWait,
-      'Element "' + element.locator() + '" is not clickable'
-    );
+    browser.wait(EC.elementToBeClickable(element), fluentWait, 'Element "' + element.locator() + '" is not clickable');
     browser
       .actions()
       .mouseMove(element)
       .click()
       .perform();
+  },
+  validateHasText(el) {
+    el.getText().then(text => {
+      expect(text.trim().toLowerCase()).not.toBeNull();
+    });
   }
 };

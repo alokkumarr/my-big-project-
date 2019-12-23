@@ -17,6 +17,7 @@ const ObservePage = require('../../pages/ObservePage');
 const HeaderPage = require('../../pages/components/Header');
 const DashboardDesigner = require('../../pages/DashboardDesigner');
 const DashboardHeader = require('../../pages/DashboardHeader');
+const users = require('../../helpers/data-generation/users');
 
 describe('Running create and delete dashboards with charts in create-delete-dashboards/chartsGlobalFilter.test.js', () => {
   const subCategoryName =
@@ -35,7 +36,11 @@ describe('Running create and delete dashboards with charts in create-delete-dash
       'Starting create-delete-dashboards/chartsGlobalFilter.test.js.'
     );
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -85,20 +90,9 @@ describe('Running create and delete dashboards with charts in create-delete-dash
 
           const currentTime = new Date().getTime();
           const subType = data.chartType.split(':')[1];
-          const name =
-            'AT ' +
-            data.chartType +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
-          const description =
-            'AT Description:' +
-            data.chartType +
-            ' for e2e ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          const name = `e2e ${currentTime}`;
+          const description = `e2e description ${currentTime}`;
+
           const dashboardName = 'AT Dashboard Name' + currentTime;
           const dashboardDescription =
             'AT Dashboard description ' + currentTime;

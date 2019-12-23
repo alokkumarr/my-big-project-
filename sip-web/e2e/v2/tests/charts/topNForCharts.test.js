@@ -17,6 +17,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
+const users = require('../../helpers/data-generation/users');
 /**
  * LIMIT does't work with group by and more than one metric field
  */
@@ -33,7 +34,11 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
   beforeAll(() => {
     logger.info('Starting charts/topNForCharts.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -65,8 +70,9 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         logger.info(`Executing test case with id: ${id}`);
-        const chartName = `e2e chart ${new Date().toString()}`;
-        const chartDescription = `e2e chart description ${new Date().toString()}`;
+        const now = new Date().getTime();
+        const chartName = `e2e ${now}`;
+        const chartDescription = `e2e chart description ${now}`;
 
         const loginPage = new LoginPage();
         loginPage.loginAs(data.user, /analyze/);

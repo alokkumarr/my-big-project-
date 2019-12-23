@@ -225,42 +225,13 @@ class AnalysisHelper {
       logger.error('semanticId can not be null, Please check logs');
       return null;
     }
-    // Create
-    const createPayload = new RequestModel().getAnalysisCreatePayload(
-      semanticId,
-      analysisType,
-      customerCode
-    );
 
-    // Get ID
-    const createAnalysisResponse = new RestClient().post(
-      analysisType === Constants.CHART ||
-        analysisType == Constants.PIVOT ||
-        analysisType == Constants.ES_REPORT ||
-          analysisType == Constants.REPORT
-        ? url + Constants.API_ROUTES.DSL_ANALYSIS
-        : url + Constants.API_ROUTES.ANALYSIS,
-      createPayload,
-      token
-    );
-    if (!createAnalysisResponse) {
-      logger.error('createAnalysis failed, Please check logs');
-      return null;
-    }
-    const id =
-      analysisType === Constants.CHART ||
-      analysisType == Constants.PIVOT ||
-      analysisType == Constants.ES_REPORT ||
-      analysisType == Constants.REPORT
-        ? createAnalysisResponse.analysisId
-        : createAnalysisResponse.contents.analyze[0].id;
-    //Update analysis with fields
     let currentTimeStamp = new Date().getTime();
     let user = users.masterAdmin;
     let updatePayload;
     let executePayload;
     let subCategoryId;
-
+    let id = null;
     if (subCategory) {
       subCategoryId = subCategory.id;
     } else {
@@ -331,8 +302,7 @@ class AnalysisHelper {
         subType,
         filters
       );
-    }
-    else if (analysisType === Constants.REPORT) {
+    } else if (analysisType === Constants.REPORT) {
       updatePayload = new RequestModel().getReportBody(
         customerCode,
         id,
@@ -349,7 +319,6 @@ class AnalysisHelper {
         subType,
         filters
       );
-
     } else {
       logger.info('Invalid analysis type, please check the logs.');
       return null;
@@ -362,8 +331,8 @@ class AnalysisHelper {
       analysisType == Constants.ES_REPORT ||
       analysisType == Constants.REPORT
     ) {
-      const updateResponse = new RestClient().put(
-        url + Constants.API_ROUTES.DSL_ANALYSIS + id,
+      const updateResponse = new RestClient().post(
+        url + Constants.API_ROUTES.DSL_ANALYSIS,
         updatePayload,
         token
       );

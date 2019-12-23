@@ -142,9 +142,12 @@
       <mat-card class="executed-view-analysis">
         <filter-chips-u
           *ngIf="
-          executedAnalysis &&
             executedAnalysis &&
-            !(executedAnalysis.type === 'report' && executedAnalysis.designerEdit) &&
+            executedAnalysis &&
+            !(
+              executedAnalysis.type === 'report' &&
+              executedAnalysis.designerEdit
+            ) &&
             (executedAnalysis.sipQuery || executedAnalysis.sqlBuilder).filters
               .length > 0
           "
@@ -155,6 +158,7 @@
 
         <div *ngIf="!executionId && !hasExecution && noPreviousExecution">
           <div
+            *ngIf="canUserExecute; else elseBlock"
             class="prompt-execution-container"
             fxLayout="column"
             fxLayoutAlign="center center"
@@ -173,6 +177,15 @@
               Execute
             </button>
           </div>
+          <ng-template #elseBlock>
+            <div
+              class="prompt-execution-container"
+              fxLayout="column"
+              fxLayoutAlign="center center"
+            >
+              <span i18n>You are not authorized to execute this</span>
+            </div>
+          </ng-template>
         </div>
 
         <div
@@ -211,6 +224,7 @@
               [analysis]="executedAnalysis"
               [data]="data"
               [updater]="chartUpdater$"
+              [actionBus]="actionBus$"
             >
             </executed-map-view>
           </div>

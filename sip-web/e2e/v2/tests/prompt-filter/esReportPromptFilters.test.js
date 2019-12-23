@@ -19,6 +19,7 @@ const Header = require('../../pages/components/Header');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
@@ -33,7 +34,11 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
   beforeAll(() => {
     logger.info('Starting esReportPromptFilters tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -85,12 +90,7 @@ describe('Executing esReportPromptFilters tests from esReportPromptFilters.test.
               displayedValue: data.displayedValue // This week
             }
           ];
-          let name =
-            Constants.ES_REPORT +
-            ' ' +
-            globalVariables.e2eId +
-            '-' +
-            currentTime;
+          let name = `e2e ${currentTime}`;
           let description =
             'Description:' +
             Constants.ES_REPORT +
