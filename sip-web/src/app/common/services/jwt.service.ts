@@ -5,6 +5,7 @@ import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 import * as lowerCase from 'lodash/lowerCase';
+import * as toUpper from 'lodash/toUpper';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
 import {
@@ -263,7 +264,7 @@ export class JwtService {
       : [];
     const draftsFolder = find(
       subFeatures,
-      ({ prodModFeatureName }) => prodModFeatureName === 'DRAFTS'
+      ({ prodModFeatureName }) => toUpper(prodModFeatureName) === 'DRAFTS'
     );
     if (draftsFolder) {
       const code = draftsFolder.privilegeCode;
