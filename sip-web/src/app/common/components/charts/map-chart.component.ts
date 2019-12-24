@@ -51,7 +51,7 @@ export class MapChartComponent {
     this.setOptions(this._options);
   }
 
-  @ViewChild('container')
+  @ViewChild('container', { static: true })
   container: ElementRef;
 
   public highmaps: any = Highmaps;

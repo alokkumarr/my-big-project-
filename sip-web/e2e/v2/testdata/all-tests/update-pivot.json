@@ -1,0 +1,16 @@
+{
+  "UPDATE_PIVOT": {
+    "updatePivot": {
+      "UPDPIVOT001": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able to update the pivot"
+      },
+      "UPDPIVOT002": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "User should be able to update the pivot"
+      }
+    }
+  }
+}

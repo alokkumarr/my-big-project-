@@ -42,9 +42,9 @@ export class CreateDatasetsComponent implements OnInit {
     public notify: ToastService
   ) {}
 
-  @ViewChild('previewComponent')
+  @ViewChild('previewComponent', { static: false })
   public previewComponent: ParserPreviewComponent;
-  @ViewChild('detailsComponent')
+  @ViewChild('detailsComponent', { static: true })
   public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {

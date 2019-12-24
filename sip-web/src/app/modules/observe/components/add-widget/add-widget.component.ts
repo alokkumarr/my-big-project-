@@ -35,7 +35,7 @@ export class AddWidgetComponent implements OnInit {
 
   @Input() container: MatSidenav;
   @Output() onWidgetAction = new EventEmitter();
-  @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
+  @ViewChild('widgetStepper', { static: true }) widgetStepper: MatHorizontalStepper;
 
   constructor() {}
 
