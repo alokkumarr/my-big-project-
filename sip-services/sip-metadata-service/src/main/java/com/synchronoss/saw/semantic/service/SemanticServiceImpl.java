@@ -133,86 +133,101 @@ public class SemanticServiceImpl implements SemanticService {
 
   @Override
   public Boolean addDskToSipSecurity(SemanticNode node, HttpServletRequest request) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
 
-    ObjectMapper mapper = new ObjectMapper();
+      // Call the create DSK sip security API
+      String semanticId = node.get_id();
 
-    // Call the create DSK sip security API
-    String semanticId = node.get_id();
+      List<Object> artifacts = node.getArtifacts();
 
-    List<Object> artifacts = node.getArtifacts();
+      ArrayNode dskFields = prepareDskFields(mapper, artifacts);
+      logger.info("DSK Fields: " + dskFields);
 
-    ArrayNode dskFields = prepareDskFields(mapper, artifacts);
+      if (dskFields.size() != 0) {
 
-    logger.info("DSK Fields: " + dskFields);
+        String url = securityDskUrl + "/auth/admin/dsk/fields?" + "semanticId=" + semanticId;
 
-    // Call sip-security create DSK api here
+        String authToken = request.getHeader("Authorization");
 
-    String url = securityDskUrl + "/fields?"
-        + "semanticId=" + semanticId;
+        logger.info("Save DSK eligible keys in sip security :" + url);
 
-    String authToken = request.getHeader("Authorization");
+        HttpHeaders header = new HttpHeaders();
+        header.set("Authorization", authToken);
+        HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
 
+        restUtil.restTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-    logger.info("Save DSK eligible keys in sip security :" + url);
+        return true;
+      } else {
+        logger.info("No fields are DSK eligible");
 
-    HttpHeaders header = new HttpHeaders();
-    header.set("Authorization", authToken);
-    HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
-
-    Boolean status = true;
-    restUtil.restTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-    return status;
+        return true;
+      }
+    } catch (Exception ex) {
+      logger.error("Error occurred while adding DSK fields: " + ex.getMessage(), ex);
+      return false;
+    }
   }
 
   @Override
   public Boolean updateDskInSipSecurity(SemanticNode node, HttpServletRequest request) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
 
-    ObjectMapper mapper = new ObjectMapper();
+      // Call the update DSK sip security API
+      String semanticId = node.get_id();
 
-    // Call the update DSK sip security API
-    String semanticId = node.get_id();
+      List<Object> artifacts = node.getArtifacts();
 
-    List<Object> artifacts = node.getArtifacts();
+      ArrayNode dskFields = prepareDskFields(mapper, artifacts);
 
-    ArrayNode dskFields = prepareDskFields(mapper, artifacts);
+      logger.info("DSK Fields: " + dskFields);
 
-    logger.info("DSK Fields: " + dskFields);
+      // Note: In case of update, the API needs to be called even if the list of DSK
+      // eligible fields are empty, becasue if the list of fields is empty, the fields
+      // for that particular semantic id, all the existing fields have to be removed.
 
-    String url = securityDskUrl + "/fields?" + "semanticId=" + semanticId;
+      String url = securityDskUrl + "/auth/admin/dsk/fields?" + "semanticId=" + semanticId;
 
-    String authToken = request.getHeader("Authorization");
+      String authToken = request.getHeader("Authorization");
 
-    logger.info("Update DSK eligible keys in sip security :" + url);
+      logger.info("Update DSK eligible keys in sip security :" + url);
 
-    HttpHeaders header = new HttpHeaders();
-    header.set("Authorization", authToken);
-    HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
+      HttpHeaders header = new HttpHeaders();
+      header.set("Authorization", authToken);
+      HttpEntity<ArrayNode> requestEntity = new HttpEntity<>(dskFields, header);
+      restUtil.restTemplate().exchange(url, HttpMethod.PUT, requestEntity, String.class);
 
-    Boolean status = true;
-    restUtil.restTemplate().exchange(url, HttpMethod.PUT, requestEntity, String.class);
-
-    return status;
+      return true;
+    } catch (Exception ex) {
+      logger.error("Error occurred while updating DSK fields: " + ex.getMessage(), ex);
+      return false;
+    }
   }
 
   @Override
   public Boolean deleteDskInSipSecurity(String semanticId, HttpServletRequest request) {
     // Call sip-security delete DSK api here
+    try {
+      String url = securityDskUrl + "/auth/admin/dsk/fields?" + "semanticId=" + semanticId;
 
-    String url = securityDskUrl + "/fields?" + "semanticId=" + semanticId;
+      String authToken = request.getHeader("Authorization");
 
-    String authToken = request.getHeader("Authorization");
+      logger.info("Update DSK eligible keys in sip security :" + url);
 
-    logger.info("Update DSK eligible keys in sip security :" + url);
+      HttpHeaders header = new HttpHeaders();
+      header.set("Authorization", authToken);
+      HttpEntity<?> requestEntity = new HttpEntity<>(header);
 
-    HttpHeaders header = new HttpHeaders();
-    header.set("Authorization", authToken);
-    HttpEntity<?> requestEntity = new HttpEntity<>(header);
+      Boolean status = true;
+      restUtil.restTemplate().exchange(url, HttpMethod.DELETE, requestEntity, String.class);
 
-    Boolean status = true;
-    restUtil.restTemplate().exchange(url, HttpMethod.DELETE, requestEntity, String.class);
-
-    return status;
+      return status;
+    } catch (Exception ex) {
+      logger.error("Error occurred while deleting DSK fields: " + ex.getMessage(), ex);
+      return false;
+    }
   }
 
   /**

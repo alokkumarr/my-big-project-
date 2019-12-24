@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.junit.Assert;
@@ -439,5 +440,108 @@ public class SecurityIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void testAddDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId1";
+    String createData =
+        "[{"
+            + "\"columnName\": \"STRING\","
+            + "\"displayName\": \"String\""
+            + "}, {"
+            + "\"columnName\": \"INTEGER\","
+            + "\"displayName\": \"Int\""
+            + "}]";
+
+    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(dskFields)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+  }
+
+  @Test
+  public void testUpdateDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId2";
+    String createData =
+        "[{"
+            + "\"columnName\": \"STRING\","
+            + "\"displayName\": \"String\""
+            + "}, {"
+            + "\"columnName\": \"INTEGER\","
+            + "\"displayName\": \"Int\""
+            + "}]";
+
+    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(dskFields)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+
+    String updateData =
+        "[{"
+            + "\"columnName\": \"DOUBLE\","
+            + "\"displayName\": \"Double\""
+            + "}, {"
+            + "\"columnName\": \"BOOLEAN\","
+            + "\"displayName\": \"Bool\""
+            + "}]";
+
+    dskFields = (ObjectNode) mapper.readTree(updateData);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(dskFields)
+        .when()
+        .put("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+  }
+
+  @Test
+  public void testDeleteDskEligibleFields()  throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId3";
+    String createData =
+        "[{"
+            + "\"columnName\": \"STRING\","
+            + "\"displayName\": \"String\""
+            + "}, {"
+            + "\"columnName\": \"INTEGER\","
+            + "\"displayName\": \"Int\""
+            + "}]";
+
+    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(dskFields)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .when()
+        .delete("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
   }
 }

@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
         "The controller provides operations to DskEligible Fields of"
             + "synchronoss insights platform ")
 @RequestMapping("/sip-security/auth/admin/dsk")
-public class SipDskEligibileFieldsController {
+public class SipDskFieldsController {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(SipDskEligibileFieldsController.class);
+      LoggerFactory.getLogger(SipDskFieldsController.class);
 
   @Autowired NSSOProperties nssoProperties;
 

@@ -84,7 +84,7 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
         Valid valid;
         valid = deleteDskEligibleFields(customerSysId, productId, semanticId);
 
-        if (valid.getValid() == true) {
+        if (valid.getValid()) {
             String insertDsk = "INSERT INTO DSK_ELIGIBLE_FIELDS "
                 + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
                 + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY,"
@@ -142,7 +142,7 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
             ps -> {
               ps.setLong(1, customerSysId);
               ps.setLong(2, defaultProdID);
-              ps.setBoolean(3, true);
+              ps.setShort(3, (short)1);
             },
             resultSet -> {
               Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleData =
@@ -192,24 +192,15 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
         ps.setString(1, semanticId);
         ps.setLong(2, prodId);
         ps.setLong(3, custId);
-        valid.setValid(Boolean.TRUE);
-        valid.setValidityMessage("Success");
       });
-
-    } catch (DuplicateKeyException dke) {
-      logger
-          .error("Exception encountered while creating a new user " + dke.getMessage(), null,
-              dke);
-      valid.setValid(Boolean.FALSE);
-      valid.setValidityMessage(dke.getMessage());
+      valid.setValid(Boolean.TRUE);
+      valid.setValidityMessage("Success");
     } catch (DataIntegrityViolationException de) {
-      logger.error("Exception encountered while creating a new user " + de.getMessage(), null,
-          de);
+      logger.error("Exception encountered while deleting dsk " + de.getMessage(), de);
       valid.setValid(Boolean.FALSE);
       valid.setValidityMessage(de.getMessage());
     } catch (Exception e) {
-      logger.error("Exception encountered while creating a new user " + e.getMessage(), null,
-          e);
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), e);
       valid.setValid(Boolean.FALSE);
       valid.setValidityMessage(e.getMessage());
     }

@@ -65,4 +65,4 @@ analysis:
   binary-migration-required: false
 
 security:
-  dsk-url: ${connector}://localhost:9000/sip-security/auth/admin/dsk
+  dsk-url: ${connector}://localhost:9000/sip-security

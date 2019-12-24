@@ -74,7 +74,7 @@ public class SipSemanticController {
 
       Boolean status = semanticService.addDskToSipSecurity(requestBody, request);
 
-      if (status == false) {
+      if (!status) {
         throw new SipCreateEntityException("Adding dsk to sip security failed");
       }
     } catch (SipCreateEntityException | JsonProcessingException ex) {
@@ -134,7 +134,7 @@ public class SipSemanticController {
 
       Boolean status = semanticService.updateDskInSipSecurity(requestBody, request);
 
-      if (status == false) {
+      if (!status) {
         throw new SipCreateEntityException("Updating dsk to sip security failed");
       }
     } catch (SipUpdateEntityException | JsonProcessingException ex) {
