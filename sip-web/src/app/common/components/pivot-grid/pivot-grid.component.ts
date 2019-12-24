@@ -39,8 +39,7 @@ import { displayNameWithoutAggregateFor } from '../../services/tooltipFormatter'
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
-  dataField: 'dataField',
-  aggregate: 'summaryType'
+  dataField: 'dataField'
 };
 
 export interface IPivotGridUpdate {
@@ -356,6 +355,12 @@ export class PivotGridComponent implements OnDestroy {
              on sum */
             cloned.aggregate = 'sum';
           }
+        } else if (cloned.type === 'string') {
+          cloned.dataType = ['count', 'distinctcount'].includes(
+            cloned.aggregate
+          )
+            ? 'number'
+            : 'string';
         } else {
           cloned.dataType = cloned.type;
         }
@@ -369,7 +374,7 @@ export class PivotGridComponent implements OnDestroy {
           cloned.area === 'data' && cloned.dataField
             ? cloned.dataField
             : cloned.columnName;
-
+        cloned.dataField = split(cloned.dataField, '.')[0];
         if (!isUndefined(cloned.alias) && cloned.alias !== '') {
           cloned.displayName = cloned.alias;
         }
@@ -377,6 +382,7 @@ export class PivotGridComponent implements OnDestroy {
           ? 'yyyy-MM-dd'
           : cloned.dateFormat;
         delete cloned.dateFormat;
+        cloned.summaryType = 'sum';
         return cloned;
       }),
       fpMap(

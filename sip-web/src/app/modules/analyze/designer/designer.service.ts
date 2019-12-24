@@ -285,13 +285,15 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
+        if (
+          artifactColumn.area === 'data' &&
+          artifactColumn.type === 'string'
+        ) {
+          artifactColumn.aggregate = 'count';
+        }
         artifactColumn.dataField = DesignerService.dataFieldFor(
           <ArtifactColumnDSL>artifactColumn
         );
-      }
-      if (artifactColumn.area === 'data' && artifactColumn.type === 'string') {
-        artifactColumn.aggregate = 'count';
       }
     };
 
@@ -410,12 +412,11 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
         artifactColumn.dataField = DesignerService.dataFieldFor(
           <ArtifactColumnDSL>artifactColumn
         );
       }
-      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     };
 
     const canAcceptMetricType = canAcceptNumberType;
