@@ -683,7 +683,7 @@ sample response:
 
 Add API [POST]: `https://{hostname}/sip/security/external/createRoleCategoryPrivilege`
 
-This API managed by the admin only. This API contains the Roles, Categories, subCategories and Privileges which allow options for above
+This API managed by the admin only. This API contains the Roles, Categories, subCategories and Privileges which allow options for below
 json hierarchy to create the respective options roles, categories, subCategories and privileges if `"autoCreate": true`.
 
 Below are the few consideration while create/fetch roles, categories, subcategories ans privileges.

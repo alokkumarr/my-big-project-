@@ -167,7 +167,9 @@ public class ExternalSecurityController {
     if (subCategoryList != null && !subCategoryList.isEmpty() && subCategoryList.size() > 0) {
       boolean[] validPrivileges = {false};
       subCategoryList.stream().forEach(subCat -> {
-        validPrivileges[0] = securityService.validPrivileges(subCat.getPrivilege(), request.getModuleName());
+        if (request.getModuleName() != null && !request.getModuleName().isEmpty()) {
+          validPrivileges[0] = securityService.validPrivileges(subCat.getPrivilege(), request.getModuleName());
+        }
       });
 
       if (!validPrivileges[0]) {
