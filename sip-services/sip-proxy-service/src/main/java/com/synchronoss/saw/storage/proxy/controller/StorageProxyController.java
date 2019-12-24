@@ -432,7 +432,9 @@ public class StorageProxyController {
         analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
             : analysis.getCreatedTime());
         analysis.setModifiedTime(Instant.now().toEpochMilli());
-        analysis.setModifiedBy(authTicket != null && !authTicket.getUserFullName().isEmpty() ? authTicket.getUserFullName() : "schedule");
+        analysis.setModifiedBy(
+            authTicket != null && !authTicket.getUserFullName().isEmpty() ? authTicket
+                .getUserFullName() : analysis.getModifiedBy());
         proxyService.updateAnalysis(analysis);
       }
       if (!analysis.getType().equalsIgnoreCase("report")) {
