@@ -44,7 +44,7 @@ export class UserAssignmentService {
     customerId,
     productId
   ): Observable<Array<DskEligibleField>> {
-    const path = 'auth/admin/security-groups/dsk-eligible-fields';
+    const path = 'auth/admin/dsk/fields';
     return this.getRequest(path).pipe(
       first(),
       map(fpGet(`dskEligibleData.${customerId}.${productId}`)),
