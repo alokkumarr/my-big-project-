@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.sncr.saw.security.app.model.DskGroupReq;
 import com.sncr.saw.security.app.model.DskAttribute;
 import com.sncr.saw.security.app.model.DskGroupResp;
+import com.sncr.saw.security.app.model.SipDskAttribute;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -902,20 +903,22 @@ public class SecurityController {
         return resp;
       }
 
-      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
 
-      for(DskAttribute dskAttribute : dsk) {
-        Set<String> values = dskAttribute.getValues();
-
-        for(String value: values) {
-          AttributeValues attributeValues = new AttributeValues();
-          attributeValues.setAttributeName(dskAttribute.getName());
-          attributeValues.setValue(value);
-
-          dataSecurityKeyRepository
-               .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
-        }
-      }
+//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+//
+//      for(DskAttribute dskAttribute : dsk) {
+//        Set<String> values = dskAttribute.getValues();
+//
+//        for(String value: values) {
+//          AttributeValues attributeValues = new AttributeValues();
+//          attributeValues.setAttributeName(dskAttribute.getName());
+//          attributeValues.setValue(value);
+//
+//          dataSecurityKeyRepository
+//               .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
+//        }
+//      }
 
       List<DskDetails> details =
             dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
@@ -944,26 +947,28 @@ public class SecurityController {
         dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
 
 
-      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+//
+//      for(DskAttribute dskAttributes : dsk) {
+//        Set<String> values = dskAttributes.getValues();
+//
+//        for(String value: values) {
+//          AttributeValues attributeValues = new AttributeValues();
+//          attributeValues.setAttributeName(dskAttributes.getName());
+//          attributeValues.setValue(value);
+//
+//          dataSecurityKeyRepository
+//            .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
+//        }
+//      }
 
-      for(DskAttribute dskAttributes : dsk) {
-        Set<String> values = dskAttributes.getValues();
-
-        for(String value: values) {
-          AttributeValues attributeValues = new AttributeValues();
-          attributeValues.setAttributeName(dskAttributes.getName());
-          attributeValues.setValue(value);
-
-          dataSecurityKeyRepository
-            .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
-        }
-      }
+      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
       List<DskDetails> attributes =
             dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
 
       DskGroupResp resp = new DskGroupResp();
       resp.setSecurityGroupSysId(securityGroupSysId);
-      resp.setAttributes(attributes);
+//      resp.setAttributes(attributes);
       resp.setValid(true);
 
       return resp;
