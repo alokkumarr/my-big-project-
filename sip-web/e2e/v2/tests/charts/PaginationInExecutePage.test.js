@@ -116,7 +116,10 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         // Pagination section
         executePage.clickOnGridViewIcon();
         executePage.verifyPagination();

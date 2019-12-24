@@ -13,11 +13,13 @@ import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
 import * as find from 'lodash/find';
-import * as findIndex from 'lodash/findIndex';
+import * as some from 'lodash/some';
 import * as omit from 'lodash/omit';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
-import * as some from 'lodash/some';
+import * as set from 'lodash/set';
+import * as has from 'lodash/has';
+
 @Component({
   selector: 'update-semantic',
   templateUrl: './update-semantic.component.html',
@@ -88,8 +90,18 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           this.isJoinEligible = parentDSData.joinEligible;
           this.injectFieldProperties(parentDSData);
           forEach(parentDSData.schema.fields, obj => {
-            if (findIndex(dp.columns, ['columnName', obj.columnName]) === -1) {
+            if (!some(dp.columns, ['columnName', obj.columnName])) {
               dp.columns.push(obj);
+            }
+          });
+
+          /**
+           * Checking here if dskEligible property for all the columns are available. If not add it and set the default value to false.
+           * Added as a fix for SIP-9483.
+           */
+          forEach(dp.columns, col => {
+            if (!has(col, 'dskEligible')) {
+              set(col, 'dskEligible', false);
             }
           });
         }
@@ -118,6 +130,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         filterEligible: true,
         joinEligible: false,
         kpiEligible: false,
+        dskEligible: false,
         include: false,
         name: value.name,
         table: artifactName,

@@ -126,6 +126,12 @@
               ></dxi-column>
               <dxi-column
                 [width]="80"
+                caption="DSK Eligible"
+                dataField="dskEligible"
+                dataType="boolean"
+              ></dxi-column>
+              <dxi-column
+                [width]="80"
                 *ngIf="isJoinEligible"
                 caption="Join Eligible"
                 dataField="joinEligible"

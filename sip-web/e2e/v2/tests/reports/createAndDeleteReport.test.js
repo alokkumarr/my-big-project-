@@ -33,7 +33,12 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();
@@ -42,7 +47,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   });
 
   using(
-    testDataReader.testData['CREATEREPORT']['dlreport'] ? testDataReader.testData['CREATEREPORT']['dlreport'] : {},
+    testDataReader.testData['CREATEREPORT']['dlreport']
+      ? testDataReader.testData['CREATEREPORT']['dlreport']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
@@ -82,7 +89,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
 
           const executePage = new ExecutePage();
           executePage.verifyTitle(reportName);
-          analysisId = executePage.getAnalysisId();
+          executePage.getAnalysisId().then(id => {
+            analysisId = id;
+          });
           executePage.clickOnActionLink();
           executePage.clickOnDetails();
           executePage.verifyDescription(reportDescription);
@@ -106,7 +115,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   );
 
   using(
-    testDataReader.testData['CREATEREPORT']['esreport'] ? testDataReader.testData['CREATEREPORT']['esreport'] : {},
+    testDataReader.testData['CREATEREPORT']['esreport']
+      ? testDataReader.testData['CREATEREPORT']['esreport']
+      : {},
     (data, id) => {
       it(`${id}:${data.description}`, () => {
         try {
