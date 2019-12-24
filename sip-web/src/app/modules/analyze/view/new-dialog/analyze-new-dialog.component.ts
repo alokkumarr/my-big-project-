@@ -31,7 +31,7 @@ export class AnalyzeNewDialogComponent {
   selectedMetric;
   private _sortOrder = 'asc';
 
-  @ViewChild('newAnalysisStepper') stepper: MatHorizontalStepper;
+  @ViewChild('newAnalysisStepper', { static: true }) stepper: MatHorizontalStepper;
 
   constructor(
     public _analyzeDialogService: AnalyzeDialogService,

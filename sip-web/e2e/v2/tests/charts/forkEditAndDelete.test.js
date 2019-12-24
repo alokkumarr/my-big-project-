@@ -156,8 +156,9 @@ describe('Executing fork and edit and delete chart tests from charts/forkEditAnd
         analyzePage.clickOnAnalysisLink(forkedName);
 
         executePage.verifyTitle(forkedName);
-        forkedAnalysisId = executePage.getAnalysisId();
-
+        executePage.getAnalysisId().then(id => {
+          forkedAnalysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(forkedDescription);

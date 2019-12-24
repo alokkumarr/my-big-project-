@@ -18,7 +18,7 @@ import * as clone from 'lodash/clone';
 export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() afterEdit: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
-  @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterExecute: EventEmitter<AnalysisDSL> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterPublish: EventEmitter<AnalysisDSL> = new EventEmitter();
   @Output() afterSchedule: EventEmitter<AnalysisDSL> = new EventEmitter();
@@ -135,11 +135,13 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   }
 
   execute() {
-    this._analyzeActionsService.execute(this.analysis).then(analysis => {
-      if (analysis) {
-        this.afterExecute.emit(analysis);
-      }
-    });
+    this._analyzeActionsService
+      .execute(this.analysis)
+      .then((analysis: AnalysisDSL) => {
+        if (analysis) {
+          this.afterExecute.emit(analysis);
+        }
+      });
   }
 
   delete() {

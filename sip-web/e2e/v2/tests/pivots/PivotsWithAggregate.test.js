@@ -105,7 +105,9 @@ describe('Executing Aggregate for pivots tests from pivots/PivotsWithAggregate.t
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(pivotName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
 
         // Verify the selected aggregate.

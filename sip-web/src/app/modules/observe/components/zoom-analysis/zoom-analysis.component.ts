@@ -59,7 +59,7 @@ export class ZoomAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   );
 
-  @ViewChild('zoomAnalysisChartContainer') chartContainer: ElementRef;
+  @ViewChild('zoomAnalysisChartContainer', { static: true }) chartContainer: ElementRef;
 
   constructor(
     private _dialogRef: MatDialogRef<ZoomAnalysisComponent>,

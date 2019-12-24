@@ -125,7 +125,9 @@ describe('Executing BottomN chart tests from charts/bottomNForCharts.test.js', (
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
 
         executePage.clickOnActionLink();
         executePage.clickOnDetails();

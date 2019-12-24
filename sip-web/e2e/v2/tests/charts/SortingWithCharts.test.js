@@ -123,7 +123,10 @@ describe('Executing Sorting for charts tests from charts/SortingWithCharts.test.
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
         chartDesignerPage.clickOnSortButton();
         // Verify sort options are applied

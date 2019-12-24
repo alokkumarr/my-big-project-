@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { LocalStorageService } from 'angular-2-local-storage';
 import { Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as reduce from 'lodash/reduce';
@@ -67,7 +66,6 @@ export class AnalyzeViewComponent implements OnInit {
     public _analyzeService: AnalyzeService,
     public _router: Router,
     public _route: ActivatedRoute,
-    public _localStorage: LocalStorageService,
     public _jwt: JwtService,
     public _localSearch: LocalSearchService,
     public _toastMessage: ToastService,
@@ -94,7 +92,7 @@ export class AnalyzeViewComponent implements OnInit {
     this._route.params.subscribe(params => {
       this.onParamsChange(params);
     });
-    const savedView = <string>this._localStorage.get(VIEW_KEY);
+    const savedView = <string>localStorage.getItem(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView)
       ? savedView
       : this.LIST_VIEW;
@@ -165,7 +163,7 @@ export class AnalyzeViewComponent implements OnInit {
 
   onViewChange(view) {
     this.viewMode = view;
-    this._localStorage.set(VIEW_KEY, view);
+    localStorage.setItem(VIEW_KEY, view);
   }
 
   onAnalysisTypeChange(type) {

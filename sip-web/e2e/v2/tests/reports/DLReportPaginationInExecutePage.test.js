@@ -94,7 +94,9 @@ describe('Executing pagination in execute page for reports from reports/DLReport
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(reportName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         // Pagination section
         executePage.verifyPagination();
         executePage.verifyItemPerPage();

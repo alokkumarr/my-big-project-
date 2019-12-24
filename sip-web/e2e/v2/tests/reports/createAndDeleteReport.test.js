@@ -94,7 +94,9 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
 
           const executePage = new ExecutePage();
           executePage.verifyTitle(reportName);
-          analysisId = executePage.getAnalysisId();
+          executePage.getAnalysisId().then(id => {
+            analysisId = id;
+          });
           executePage.clickOnActionLink();
           executePage.clickOnDetails();
           executePage.verifyDescription(reportDescription);

@@ -1,6 +1,11 @@
 <mat-toolbar>
   <mat-toolbar-row fxLayoutGap="5px">
-    <button (click)="goBack()" mat-icon-button style="margin-right: 10px;">
+    <button
+      e2e="e2e-back-btn"
+      (click)="goBack()"
+      mat-icon-button
+      style="margin-right: 10px;"
+    >
       <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
     </button>
     <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center">

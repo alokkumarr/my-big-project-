@@ -57,7 +57,9 @@ const CRITICAL = [
   'bis/APIPullChannelUpdateDelete.test.js',
   'bis/APIPullChannelActivateDeActivate.test.js',
   'bis/APIPullRouteCreateDelete.test.js',
-  'bis/APIPullRouteUpdateDelete.test.js'
+  'bis/APIPullRouteUpdateDelete.test.js',
+  'reports/DLReportQuery.test.js',
+  'pivots/UpdateAndDeletePivot.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

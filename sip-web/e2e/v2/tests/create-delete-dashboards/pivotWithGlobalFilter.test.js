@@ -131,8 +131,9 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
 
-          dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
-
+          commonFunctions.getDashboardId().then(id => {
+            dashboardId = id;
+          });
           observePage.verifyDashboardTitle(name);
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyAddedAnalysisName(name);

@@ -114,7 +114,9 @@ describe('Running create and delete dashboards with ActualVSTarget KPIS in creat
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
 
-          dashboardId = commonFunctions.getDashboardId();
+          commonFunctions.getDashboardId().then(id => {
+            dashboardId = id;
+          });
 
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyKpiByName(kpiName);

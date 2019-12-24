@@ -86,8 +86,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   actionBus$: Subject<Object> = new Subject<Object>();
   public filters: Filter[] = [];
 
-  @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
-  @ViewChild('mapView') mapView: ElementRef;
+  @ViewChild('detailsSidenav', { static: true }) detailsSidenav: MatSidenav;
+  @ViewChild('mapView', { static: false }) mapView: ElementRef;
 
   constructor(
     public _executeService: ExecuteService,

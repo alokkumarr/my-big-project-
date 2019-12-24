@@ -14,12 +14,12 @@ const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const users = require('../../helpers/data-generation/users');
 
-describe('Executing pagination in execute page for reports from reports/DLReportPaginationInExecutePage.test.js', () => {
+describe('Executing pagination in execute page for reports from DLReportPaginationInPreviewPage.test', () => {
   let analysisId;
   let host;
   let token;
   beforeAll(() => {
-    logger.info('Starting reports/DLReportPaginationInExecutePage tests...');
+    logger.info('Starting reports/DLReportPaginationInPreviewPage tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(
       host,
@@ -81,7 +81,6 @@ describe('Executing pagination in execute page for reports from reports/DLReport
         reportDesignerPage.verifyDisplayedColumns(tables);
         reportDesignerPage.clickOnPreviewButton();
         const executePage = new ExecutePage();
-        // Pagination section
         executePage.verifyPagination();
         executePage.verifyItemPerPage();
       }).result.testInfo = {

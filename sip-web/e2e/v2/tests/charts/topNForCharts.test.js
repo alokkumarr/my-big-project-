@@ -125,8 +125,10 @@ describe('Executing topN chart tests from charts/topNForCharts.test.js', () => {
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
 
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnActionLink();
         executePage.clickOnDetails();
         executePage.verifyDescription(chartDescription);

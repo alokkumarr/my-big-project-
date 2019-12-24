@@ -116,7 +116,9 @@ describe('Executing Aggregate for charts tests from charts/AggregateWithCharts.t
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         executePage.clickOnEditLink();
 
         // Verify the selected aggregate.

@@ -111,8 +111,9 @@ describe('Running create and delete dashboards with Snapshot KPIS in create-dele
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
 
-          dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
-
+          commonFunctions.getDashboardId().then(id => {
+            dashboardId = id;
+          });
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyKpiByName(kpiName);
           observePage.verifyFilterByName(data.kpiInfo.filter);
