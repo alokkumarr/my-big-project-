@@ -53,7 +53,6 @@ const CRITICAL = [
   TEST_BASE_DIR + 'charts/forkFromCardViewDelete.test.js',
   TEST_BASE_DIR + 'charts/SortingWithChartsDesc.test.js',
   TEST_BASE_DIR + 'schedule/scheduleDLReports.test.js',
-  TEST_BASE_DIR + 'schedule/scheduleESReports.test.js'
 ];
 // All tests which were executed in critical with larger data set
 const REGRESSION = [...CRITICAL];

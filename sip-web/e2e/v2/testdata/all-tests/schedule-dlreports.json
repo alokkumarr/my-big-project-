@@ -2,14 +2,14 @@
   "SCHEDULE-REPORT": {
     "dlreport": {
       "positiveTest": {
-        "SCHEDULE-REPORT001": {
-          "suites": ["smoke"],
+        "SCHEDULE001": {
+          "suites": ["critical", "regression"],
           "user": "admin",
           "userEmail": "admin@xyz.com",
           "Execution_Successful_Message": "Tap this message to reload data.",
           "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
           "Analysis_Deleted_Message": "Analysis deleted.",
-          "description": "UserOne should be able create DL report and schedule",
+          "description": "admin should be able create DL report and schedule Immediately",
           "tables": [
             {
               "name": "SALES",
@@ -19,7 +19,84 @@
                 "Date"
               ]
             }
-            ]
+          ],
+          "scheduleType": "Immediate",
+          "scheduleName": "Immediate - 001",
+          "scheduleFrom": "details",
+          "scheduleTimings": "No Schedule Set"
+        },
+        "SCHEDULE002": {
+          "suites": ["critical", "regression"],
+          "user": "admin",
+          "userEmail": "admin@xyz.com",
+          "Execution_Successful_Message": "Tap this message to reload data.",
+          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
+          "Analysis_Deleted_Message": "Analysis deleted.",
+          "description": "admin should be able create DL report and schedule Immediately",
+          "tables": [
+            {
+              "name": "SALES",
+              "fields": [
+                "Integer",
+                "String",
+                "Date"
+              ]
+            }
+          ],
+          "scheduleType": "Immediate",
+          "scheduleName": "Immediate - 002",
+          "scheduleFrom": "card",
+          "scheduleTimings": "No Schedule Set"
+        },
+        "SCHEDULE003": {
+          "suites": ["critical", "regression"],
+          "user": "admin",
+          "userEmail": "admin@xyz.com",
+          "Execution_Successful_Message": "Tap this message to reload data.",
+          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
+          "Analysis_Deleted_Message": "Analysis deleted.",
+          "description": "admin should be able create DL report and schedule Immediately",
+          "tables": [
+            {
+              "name": "SALES",
+              "fields": [
+                "Integer",
+                "String",
+                "Date"
+              ]
+            }
+          ],
+          "scheduleType": "Hourly",
+          "scheduleName": "Hourly - 001",
+          "scheduleHours": "0",
+          "scheduleMinutes": "1",
+          "scheduleFrom": "card",
+          "scheduleTimings": "Every minute"
+        },
+        "SCHEDULE004": {
+          "suites": ["critical", "regression"],
+          "user": "admin",
+          "userEmail": "admin@xyz.com",
+          "Execution_Successful_Message": "Tap this message to reload data.",
+          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
+          "Analysis_Deleted_Message": "Analysis deleted.",
+          "description": "admin should be able create DL report and schedule Immediately",
+          "tables": [
+            {
+              "name": "SALES",
+              "fields": [
+                "Integer",
+                "String",
+                "Date"
+              ]
+            }
+          ],
+          "scheduleType": "Hourly",
+          "scheduleName": "Hourly - 002",
+          "scheduleHours": "0",
+          "scheduleMinutes": "2",
+          "scheduleFrom": "list",
+          "scheduleTimings": "Every 2 minutes"
         }
       },
       "negativeTest": {
@@ -34,7 +111,7 @@
           "validSchedule_Error_Message": "Please Select a valid Schedule",
           "Email_Error_Message": "Please enter valid Email ids or Select option for Publish",
           "Analysis_Deleted_Message": "Analysis deleted.",
-          "description": "UserOne should be able create DL report with sales table and could not schedule",
+          "description": "admin should be able create DL report with sales table and could not schedule",
           "tables": [
             {
               "name": "SALES",
@@ -43,63 +120,6 @@
                 "String",
                 "Date"
               ]
-            }
-          ]
-        }
-      }
-    },
-    "esreport": {
-      "positiveTest": {
-        "SCHEDULE-REPORT003": {
-          "suites": [
-            "smoke"
-          ],
-          "user": "admin",
-          "userEmail": "admin@xyz.com",
-          "Execution_Successful_Message": "Tap this message to reload data.",
-          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
-          "Analysis_Deleted_Message": "Analysis deleted.",
-          "description": "ADMIN should be able create ES report with sales table, Schedule from Analyze and Execute Page",
-          "tables": [
-            {
-              "name": "sample",
-              "fields": [
-                "Integer",
-                "String",
-                "Date"
-              ]
-            }
-          ]
-        }
-      },
-      "negativeTest": {
-        "SCHEDULE-REPORT011": {
-          "suites": ["smoke"],
-          "user": "admin",
-          "userEmail": "admin@xyz.com",
-          "Execution_Successful_Message": "Tap this message to reload data.",
-          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
-          "Analysis_Deleted_Message": "Analysis deleted.",
-          "description": "ADMIN should be able create ES report with sales table, Schedule from Analyze and Execute Page",
-          "tables": [
-            {
-              "name": "sample",
-              "fields": ["Integer", "String", "Date"]
-            }
-          ]
-        },
-        "SCHEDULE-REPORT012": {
-          "suites": ["smoke"],
-          "user": "userOne",
-          "userEmail": "userOne@xyz.com",
-          "Execution_Successful_Message": "Tap this message to reload data.",
-          "Analysis_Schedule_SuccessMessage": "Analysis schedule changes have been updated.",
-          "Analysis_Deleted_Message": "Analysis deleted.",
-          "description": "UserOne should be able create ES report with sales table, Schedule from Analyze and Execute Page",
-          "tables": [
-            {
-              "name": "sample",
-              "fields": ["Long", "Float", "Double"]
             }
           ]
         }

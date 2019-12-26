@@ -75,9 +75,10 @@ class ExecutePage extends ConfirmationModel {
           `(//div[@class='dx-pages']/descendant::div[contains(@class,'dx-page')])[${number}]`
         )
       );
+    this._navigateBackButton = element(by.css(`[fonticon="icon-arrow-left"]`));
     this._ScheduleButton = element(by.cssContainingText('button','Schedule'));
     this._previousversionTab = element(by.cssContainingText('span','Previous Versions'));
-    this._scheduledInPreviousVersionTab = element(by.cssContainingText('td','scheduled'))
+    this._scheduledInPreviousVersionTab = element(by.cssContainingText('td','scheduled'));
   }
 
   verifyTitle(title) {
@@ -96,12 +97,12 @@ class ExecutePage extends ConfirmationModel {
     );
   }
 
-  clickOnActionLink() {
+  clickActionLink() {
     commonFunctions.clickOnElement(this._actionMenuLink);
     commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
   }
 
-  clickOnDetails() {
+  clickDetails() {
     commonFunctions.clickOnElement(this._actionDetailsLink);
   }
 
@@ -240,16 +241,16 @@ class ExecutePage extends ConfirmationModel {
     });
   }
   /*Method to click on schedule option*/
-  clickOnSchedule() {
+  clickSchedule() {
     commonFunctions.clickOnElement(this._ScheduleButton);
     browser.sleep(2000); //Need to Add Because Schedule Popup Should load
   }
   /*Method to click on previous version tab*/
-  clickOnPreviousVersionTab() {
+  clickPreviousVersions() {
     commonFunctions.clickOnElement(this._previousversionTab);
   }
   /*Method to verify report is scheduled*/
-  verifyScheduledInPreviousVersion() {
+  verifyScheduleDetails() {
     commonFunctions.waitFor.elementToBeVisible(this._scheduledInPreviousVersionTab);
     element(
       this._scheduledInPreviousVersionTab.getText().then(value => {
@@ -265,5 +266,9 @@ class ExecutePage extends ConfirmationModel {
     );
   }
 
+  closeDetails() {
+    commonFunctions.clickOnElement(this._navigateBackButton);
+    commonFunctions.waitFor.elementToBeNotVisible(this._navigateBackButton);
+  }
 }
 module.exports = ExecutePage;

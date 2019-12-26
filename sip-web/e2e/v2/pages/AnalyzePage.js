@@ -78,6 +78,8 @@ class AnalyzePage extends CreateAnalysisModel {
           `//a[contains(text(),'${name}')]/following::button[@e2e='action-fork-btn']`
         )
       );
+    this._scheduledTimingsInCardView = time => element(by.xpath(`//span[contains(text(),'${time}')]`));
+    this._scheduledTimingsInListView = time => element(by.xpath(`//td[contains(text(),'${time}')]`));
   }
 
   goToView(viewName) {
@@ -151,7 +153,7 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.waitFor.pageToBeReady(/executed/);
   }
 
-  verifyToastMessagePresent(message) {
+  verifyToastMessage(message) {
     commonFunctions.waitFor.elementToBeVisible(this._toastMessage(message));
   }
 
@@ -189,6 +191,40 @@ class AnalyzePage extends CreateAnalysisModel {
 
   clickOnForkButtonFromCardView(name) {
     commonFunctions.clickOnElement(this._forkButtonByAnalysis(name));
+  }
+
+  /*Method to verify report is scheduled*/
+  verifyScheduledTimingsInCardView(scheduledTimings) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInCardView(scheduledTimings));
+    element(
+      this._scheduledTimingsInCardView(scheduledTimings).getText().then(value => {
+        if (value) {
+          expect(value.trim()).toEqual(scheduledTimings);
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled Timings did not match'
+          );
+        }
+      })
+    );
+  }
+
+  /*Method to verify report is scheduled*/
+  verifyScheduledTimingsInListView(scheduledTimings) {
+    commonFunctions.waitFor.elementToBeVisible(this._scheduledTimingsInListView(scheduledTimings));
+    element(
+      this._scheduledTimingsInListView(scheduledTimings).getText().then(value => {
+        if (value) {
+          expect(value.trim()).toEqual(scheduledTimings);
+        } else {
+          expect(false).toBe(
+            true,
+            'Scheduled Timings did not match'
+          );
+        }
+      })
+    );
   }
 }
 module.exports = AnalyzePage;
