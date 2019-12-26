@@ -21,23 +21,9 @@ class AnalysisHelper {
    * @returns {Object}
    */
   deleteAnalysis(host, token, customerCode, id, analysisType = null) {
-    if (Constants.REPORT === analysisType) {
-      let deletePayload = new RequestModel().getAnalyzeDeletePayload(
-        customerCode,
-        id
-      );
-      // Make a delete api call, actually it should be DELETE but our api's are like that
-      // they do delete operation in POST call
-      return new RestClient().post(
-        host + Constants.API_ROUTES.ANALYSIS,
-        deletePayload,
-        token
-      );
-    } else {
-      // DSL analysis
-      const url = `${host}${Constants.API_ROUTES.DSL_ANALYSIS}${id}`;
-      return new RestClient().delete(url, token);
-    }
+    // DSL analysis
+    const url = `${host}${Constants.API_ROUTES.DSL_ANALYSIS}${id}`;
+    return new RestClient().delete(url, token);
   }
 
   /**
