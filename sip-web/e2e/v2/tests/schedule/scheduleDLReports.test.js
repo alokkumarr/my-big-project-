@@ -140,7 +140,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           }
 
           //Delete the Report
-          executePage.clickActionLink();
+          executePage.clickOnActionLink();
           executePage.clickOnDelete();
           executePage.confirmDelete();
           analyzePage.verifyToastMessagePresent("Analysis deleted.");
