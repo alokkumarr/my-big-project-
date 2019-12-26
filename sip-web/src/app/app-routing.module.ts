@@ -21,32 +21,32 @@ const routes: Routes = [
   },
   {
     path: 'alerts',
-    loadChildren: './modules/alerts/alerts.module#AlertsModule',
+    loadChildren: () => import('./modules/alerts/alerts.module').then(m => m.AlertsModule),
     data: { preload: true }
   },
   {
     path: 'workbench',
-    loadChildren: './modules/workbench/workbench.module#WorkbenchModule',
+    loadChildren: () => import('./modules/workbench/workbench.module').then(m => m.WorkbenchModule),
     data: { preload: true }
   },
   {
     path: 'admin',
-    loadChildren: './modules/admin/admin.module#AdminModule',
+    loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
     data: { preload: true }
   },
   {
     path: 'observe',
-    loadChildren: './modules/observe/observe.module#ObserveUpgradeModule',
+    loadChildren: () => import('./modules/observe/observe.module').then(m => m.ObserveUpgradeModule),
     data: { preload: true }
   },
   {
     path: 'analyze',
-    loadChildren: './modules/analyze/analyze.module#AnalyzeModule',
+    loadChildren: () => import('./modules/analyze/analyze.module').then(m => m.AnalyzeModule),
     data: { preload: true }
   },
   {
     path: 'login',
-    loadChildren: './login/login.module#LoginModule',
+    loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
     data: { preload: true }
   },
 

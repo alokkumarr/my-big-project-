@@ -6,7 +6,7 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
 import { WorkbenchService } from '../../services/workbench.service';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 
-import * as isUndefined from 'lodash/isUndefined';
+import { isUndefined, forEach} from 'lodash';
 
 @Component({
   selector: 'dataset-detail-view',
@@ -30,7 +30,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
   }
 
-  @ViewChild('dpGrid') dataGrid: DxDataGridComponent;
+  @ViewChild('dpGrid', { static: false }) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     if (this.dsMetadata.asOfNow.status === 'SUCCESS') {
@@ -103,5 +103,18 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
     if (event.index === 1 && this.previewStatus === 'success') {
       this.dataGrid.instance.refresh();
     }
+  }
+
+  /**
+   * Sets the grid column caption same as dataField for the grid.
+   * Columns were not aligned properly. So Making sure that columns are aligned to left.
+   * Added as part of SIP-9094.
+   * @param columns
+   */
+  onCustomizeColumns(columns) {
+    forEach(columns, col => {
+      col.caption = col.dataField;
+      col.alignment = 'left';
+    });
   }
 }

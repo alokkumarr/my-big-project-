@@ -19,9 +19,11 @@ const DashboardDesigner = require('../../pages/DashboardDesigner');
 const DashboardHeader = require('../../pages/DashboardHeader');
 
 describe('Running create and delete dashboards with charts in dashboards/createAndDeleteDashboardsWithPivotWithGlobalFilter.test.js', () => {
-  const subCategoryName = subCategories.createSubCategories.observeSubCategory.name;
+  const subCategoryName =
+    subCategories.createSubCategories.observeSubCategory.name;
   const analysisCategoryName = categories.analyses.name;
-  const analysisSubCategoryName = subCategories.createSubCategories.createAnalysis.name;
+  const analysisSubCategoryName =
+    subCategories.createSubCategories.createAnalysis.name;
 
   let host;
   let token;
@@ -29,7 +31,9 @@ describe('Running create and delete dashboards with charts in dashboards/createA
   let dashboardId;
 
   beforeAll(() => {
-    logger.info('Starting dashboards/createAndDeleteDashboardsWithPivotWitGlobalFilter.test.js.....');
+    logger.info(
+      'Starting dashboards/createAndDeleteDashboardsWithPivotWitGlobalFilter.test.js.....'
+    );
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
     token = APICommonHelpers.generateToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
@@ -110,7 +114,9 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           dashboardDesigner.clickOnAddWidgetButton();
           dashboardDesigner.clickOnExistingAnalysisLink();
           dashboardDesigner.clickOnCategoryOrMetricName(analysisCategoryName);
-          dashboardDesigner.clickOnCategoryOrMetricName(analysisSubCategoryName);
+          dashboardDesigner.clickOnCategoryOrMetricName(
+            analysisSubCategoryName
+          );
           dashboardDesigner.addRemoveAnalysisById(analysesDetails);
           dashboardDesigner.clickonSaveButton();
           dashboardDesigner.setDashboardName(dashboardName);
@@ -120,8 +126,9 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           dashboardDesigner.clickOnSaveDialogButton();
           dashboardDesigner.verifySaveButton();
 
-          dashboardId = commonFunctions.getDashboardId(); //get dashboard id from current url
-
+          commonFunctions.getDashboardId().then(id => {
+            dashboardId = id;
+          });
           observePage.verifyDashboardTitle(name);
           observePage.verifyDashboardTitle(dashboardName);
           observePage.verifyAddedAnalysisName(name);
@@ -137,11 +144,15 @@ describe('Running create and delete dashboards with charts in dashboards/createA
           dashboardHeader.clickOnOpenGlobalFilterButton();
 
           headerPage.hideProgressBar();
-          dashboardHeader.applyAndVerifyGlobalFilters(data.dashboardGlobalFilters);
+          dashboardHeader.applyAndVerifyGlobalFilters(
+            data.dashboardGlobalFilters
+          );
 
           browser.sleep(2000); // Some time browser is not able to load the global filter button
           dashboardHeader.clickOnOpenGlobalFilterButton();
-          dashboardHeader.verifyAppliedGlobalFilters(data.dashboardGlobalFilters);
+          dashboardHeader.verifyAppliedGlobalFilters(
+            data.dashboardGlobalFilters
+          );
           browser.refresh();
 
           observePage.clickOnDeleteDashboardButton();

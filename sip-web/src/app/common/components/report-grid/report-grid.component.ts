@@ -83,7 +83,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public data;
   private listeners: Array<Subscription> = [];
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
   @Input() query: string;
   @Input() isInQueryMode;
   @Input() analysis;

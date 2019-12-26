@@ -1,4 +1,4 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
 
 .choose-analysis {
   color: $primary-grey-g5;
@@ -21,6 +21,13 @@
       text-overflow: unset;
       overflow: visible;
     }
+  }
+
+  .analysis-name {
+    white-space: nowrap;
+    overflow-x: hidden;
+    display: block;
+    text-overflow: ellipsis;
   }
 
   mat-icon {

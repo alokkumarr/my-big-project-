@@ -46,7 +46,12 @@ describe('Executing BottomN chart tests from charts/bottomNForCharts.test.js', (
   afterEach(function(done) {
     setTimeout(function() {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       commonFunctions.clearLocalStorage();
       done();
@@ -115,7 +120,9 @@ describe('Executing BottomN chart tests from charts/bottomNForCharts.test.js', (
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
 
         executePage.clickOnActionLink();
         executePage.clickOnDetails();

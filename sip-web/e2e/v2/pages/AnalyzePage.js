@@ -153,7 +153,7 @@ class AnalyzePage extends CreateAnalysisModel {
     commonFunctions.waitFor.pageToBeReady(/executed/);
   }
 
-  verifyToastMessage(message) {
+  verifyToastMessagePresent(message) {
     commonFunctions.waitFor.elementToBeVisible(this._toastMessage(message));
   }
 
@@ -225,6 +225,15 @@ class AnalyzePage extends CreateAnalysisModel {
         }
       })
     );
+  }
+
+  goToDesignerPage(view, analysisType, dataPods) {
+    this.goToView(view);
+    this.clickOnAddAnalysisButton();
+    this.clickOnAnalysisType(analysisType);
+    this.clickOnNextButton();
+    this.clickOnDataPods(dataPods);
+    this.clickOnCreateButton();
   }
 }
 module.exports = AnalyzePage;

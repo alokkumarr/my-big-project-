@@ -28,7 +28,7 @@ const baseUrl = 'workbench/datasource/jobs?channelTypeId=';
 export class JobsPageComponent implements OnInit {
   @Select(WorkbenchState.jobFilters) jobFilters$: Observable<string[]>;
   @Select(WorkbenchState.jobsPath) jobsPath$: Observable<string>;
-  @ViewChild('sidenav') sidenav: MatSidenav;
+  @ViewChild('sidenav', { static: true }) sidenav: MatSidenav;
 
   public pager = {
     showNavigationButtons: true,

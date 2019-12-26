@@ -84,8 +84,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           analyzePage.clickOnAnalysisLink(ReportName);
           executePage.verifyTitle(ReportName);
           analysisId = executePage.getAnalysisId();
-          executePage.clickActionLink();
-          executePage.clickDetails();
+          executePage.clickOnActionLink();
+          executePage.clickOnDetails();
           executePage.verifyDescription(ReportDescription);
           executePage.closeActionMenu();
           executePage.closeDetails();
@@ -94,14 +94,14 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           //Select page need to schedule report
           if(data.scheduleFrom === 'details') {
             analyzePage.clickOnAnalysisLink(ReportName);
-            executePage.clickActionLink();
+            executePage.clickOnActionLink();
             executePage.clickSchedule();
           }else if (data.scheduleFrom === 'list'){
             analyzePage.goToView('list');
-            executePage.clickActionLink();
+            executePage.clickOnActionLink();
             executePage.clickSchedule();
           }else if (data.scheduleFrom === 'card'){
-            executePage.clickActionLink();
+            executePage.clickOnActionLink();
             executePage.clickSchedule();
           }
 
@@ -132,8 +132,8 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           } else {
             analyzePage.clickOnAnalysisLink(ReportName);
             schedulePage.handleToastMessage();
-            executePage.clickActionLink();
-            executePage.clickDetails();
+            executePage.clickOnActionLink();
+            executePage.clickOnDetails();
             executePage.clickPreviousVersions();
             executePage.verifyScheduleDetails();
             executePage.closeActionMenu();
@@ -143,7 +143,7 @@ describe('Executing Schedule tests from scheduleDLReports.test.js', () => {
           executePage.clickActionLink();
           executePage.clickOnDelete();
           executePage.confirmDelete();
-          analyzePage.verifyToastMessage("Analysis deleted.");
+          analyzePage.verifyToastMessagePresent("Analysis deleted.");
           analyzePage.verifyAnalysisDeleted();
         } catch (e) {
           console.log(e);

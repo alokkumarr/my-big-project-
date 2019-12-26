@@ -97,15 +97,13 @@ class ExecutePage extends ConfirmationModel {
     );
   }
 
-  clickActionLink() {
+  clickOnActionLink() {
     commonFunctions.clickOnElement(this._actionMenuLink);
     commonFunctions.waitFor.elementToBeVisible(this._actionMenuContents);
   }
-
-  clickDetails() {
+  clickOnDetails() {
     commonFunctions.clickOnElement(this._actionDetailsLink);
   }
-
   verifyDescription(description) {
     commonFunctions.waitFor.elementToBeVisible(this._description(description));
   }
@@ -130,7 +128,7 @@ class ExecutePage extends ConfirmationModel {
 
   getAnalysisId() {
     //get analysis id from current url
-    browser.getCurrentUrl().then(url => {
+    return browser.getCurrentUrl().then(url => {
       return commonFunctions.getAnalysisIdFromUrl(url);
     });
   }
@@ -240,10 +238,10 @@ class ExecutePage extends ConfirmationModel {
       })();
     });
   }
+
   /*Method to click on schedule option*/
   clickSchedule() {
     commonFunctions.clickOnElement(this._ScheduleButton);
-    browser.sleep(2000); //Need to Add Because Schedule Popup Should load
   }
   /*Method to click on previous version tab*/
   clickPreviousVersions() {
@@ -269,6 +267,18 @@ class ExecutePage extends ConfirmationModel {
   closeDetails() {
     commonFunctions.clickOnElement(this._navigateBackButton);
     commonFunctions.waitFor.elementToBeNotVisible(this._navigateBackButton);
+  }
+
+  verifyAnalysisDetailsAndDelete(reportName, reportDescription){
+    this.verifyTitle(reportName);
+    this.clickOnActionLink();
+    this.clickOnDetails();
+    this.verifyDescription(reportDescription);
+    this.closeActionMenu();
+    // Delete the report
+    this.clickOnActionLink();
+    this.clickOnDelete();
+    this.confirmDelete();
   }
 }
 module.exports = ExecutePage;
