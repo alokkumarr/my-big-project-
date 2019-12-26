@@ -264,17 +264,13 @@ export class DesignerState {
       return patchState({});
     }
 
-    const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field => {
-        const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
-        return (
-          toLower(field[fieldName]) === toLower(artifactColumn[fieldName]) &&
-          /* If a field is added to more than one area (say, x axis and group by),
-             then we need to know exactly which area the user removed the field from.
-          */
-          (fieldArea ? field.area === fieldArea : true)
-        );
-      }
+    const artifactColumnIndex = findIndex(
+      artifacts[artifactIndex].fields,
+      ({ columnName, dataField, area }) =>
+        dataField
+          ? dataField === artifactColumn.dataField
+          : columnName === artifactColumn.columnName &&
+          (fieldArea ? area === fieldArea : true)
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -287,7 +283,6 @@ export class DesignerState {
     const sorts = filter(sipQuery.sorts, sort =>
       sort.columnName !== artifactColumn.columnName
     );
-
     patchState({
       analysis: {
         ...analysis,
