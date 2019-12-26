@@ -8,6 +8,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.DskGroupReq;
+import com.sncr.saw.security.app.model.DskAttribute;
+import com.sncr.saw.security.app.model.DskGroupResp;
+import com.sncr.saw.security.app.model.SipDskAttribute;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
@@ -72,6 +76,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -84,8 +89,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -873,6 +876,111 @@ public class SecurityController {
             // Here we are sending two different Objects, one in case of Success and another object is returned in case of
             // Error. This change has to be retained else all other REST API has to unified since we are following this convention.
         }
+    }
+
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
+    public DskGroupResp addDskGroup(HttpServletRequest request, HttpServletResponse response,
+        @RequestBody DskGroupReq dskGroupReq) {
+      String jwtToken = JWTUtils.getToken(request);
+      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+
+      Long custId = Long.valueOf(extractValuesFromToken[1]);
+      String createdBy = extractValuesFromToken[2];
+
+
+      String securityGroupName = dskGroupReq.getGroupName();
+      String securityGroupDescription = dskGroupReq.getGroupDescription();
+
+      SecurityGroups securityGroup = new SecurityGroups();
+      securityGroup.setSecurityGroupName(securityGroupName);
+      securityGroup.setDescription(securityGroupDescription);
+
+      DskValidity dskValidity =
+          dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,custId);
+
+      Long securityGroupSysId = dskValidity.getGroupId();
+
+      DskGroupResp resp = new DskGroupResp();
+
+      if (securityGroupSysId == null) {
+        logger.error("Error occurred: " + dskValidity.getError());
+        response.setStatus(400);
+        resp.setValid(false);
+        resp.setMessage(dskValidity.getError());
+
+        return resp;
+      }
+
+      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
+
+//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+//
+//      for(DskAttribute dskAttribute : dsk) {
+//        Set<String> values = dskAttribute.getValues();
+//
+//        for(String value: values) {
+//          AttributeValues attributeValues = new AttributeValues();
+//          attributeValues.setAttributeName(dskAttribute.getName());
+//          attributeValues.setValue(value);
+//
+//          dataSecurityKeyRepository
+//               .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
+//        }
+//      }
+
+      List<DskDetails> details =
+            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
+
+      resp.setSecurityGroupSysId(securityGroupSysId);
+      resp.setAttributes(details);
+      resp.setValid(true);
+
+      return resp;
+    }
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
+    public DskGroupResp updateDatasecurityGroup(HttpServletRequest request, HttpServletResponse response,
+        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
+        @RequestBody DskGroupReq dskGroupReq) {
+      String jwtToken = JWTUtils.getToken(request);
+      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+
+      Long custId = Long.valueOf(extractValuesFromToken[1]);
+      String createdBy = extractValuesFromToken[2];
+
+      List<String> securityGroupAttributes = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupSysId);
+      securityGroupAttributes.add(0, String.valueOf(securityGroupSysId));
+
+      if (securityGroupAttributes != null && securityGroupAttributes.size() != 0)
+        dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
+
+
+//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
+//
+//      for(DskAttribute dskAttributes : dsk) {
+//        Set<String> values = dskAttributes.getValues();
+//
+//        for(String value: values) {
+//          AttributeValues attributeValues = new AttributeValues();
+//          attributeValues.setAttributeName(dskAttributes.getName());
+//          attributeValues.setValue(value);
+//
+//          dataSecurityKeyRepository
+//            .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
+//        }
+//      }
+
+      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
+      List<DskDetails> attributes =
+            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
+
+      DskGroupResp resp = new DskGroupResp();
+      resp.setSecurityGroupSysId(securityGroupSysId);
+//      resp.setAttributes(attributes);
+      resp.setValid(true);
+
+      return resp;
     }
 
     /**
