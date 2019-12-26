@@ -99,7 +99,7 @@ public class ExternalSecurityController {
       return response;
     }
 
-    if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
+    if (role.getRoleName() == null || role.getRoleName().trim().isEmpty()) {
       httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
       response.setMessage("Role Name can't be blank or empty.");
       response.setValid(false);
@@ -121,13 +121,13 @@ public class ExternalSecurityController {
     List<CategoryDetails> categoryList = request.getCategories();
     List<SubCategoryDetails> subCategoryList = null;
     boolean validateRoleName = role != null && role.isAutoCreate() && role.getRoleName() != null && securityService.validateName(role.getRoleName().trim());
-    if (validateRoleName) {
+    if (validateRoleName || role.getRoleName().trim().contains(" ")) {
       httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
       response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
       return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
-      boolean emptyCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName() == null || category.getCategoryName().isEmpty());
+      boolean emptyCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName() == null || category.getCategoryName().trim().isEmpty());
       if (emptyCategoryName) {
         httpResponse.setStatus(HttpStatus.OK.value());
         response.setValid(false);
@@ -144,15 +144,17 @@ public class ExternalSecurityController {
       } else {
         boolean[] invalidSubCatName = {false};
         for (CategoryDetails categoryDetails : categoryList) {
-          subCategoryList = categoryDetails.getSubCategories();
-          boolean emptySubCategoryName = subCategoryList.stream().anyMatch(category -> category.getSubCategoryName() == null || category.getSubCategoryName().isEmpty());
-          if (emptySubCategoryName) {
-            httpResponse.setStatus(HttpStatus.OK.value());
-            response.setValid(false);
-            response.setMessage("Sub Category name can't be blank or empty.");
-            return response;
+          subCategoryList = categoryDetails.isAutoCreate() && categoryDetails.getSubCategories() != null ? categoryDetails.getSubCategories() : null;
+          if (subCategoryList != null && !subCategoryList.isEmpty()) {
+            boolean emptySubCategoryName = subCategoryList.stream().anyMatch(category -> category.getSubCategoryName() == null || category.getSubCategoryName().trim().isEmpty());
+            if (emptySubCategoryName) {
+              httpResponse.setStatus(HttpStatus.OK.value());
+              response.setValid(false);
+              response.setMessage("Sub Category name can't be blank or empty.");
+              return response;
+            }
+            invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName().trim()));
           }
-          invalidSubCatName[0] = subCategoryList.stream().anyMatch(subCategory -> subCategory.isAutoCreate() && securityService.validateName(subCategory.getSubCategoryName().trim()));
         }
         if (invalidSubCatName[0]) {
           httpResponse.setStatus(HttpStatus.OK.value());
@@ -165,20 +167,17 @@ public class ExternalSecurityController {
 
     // validate privileges names
     if (subCategoryList != null && !subCategoryList.isEmpty() && subCategoryList.size() > 0) {
-      boolean[] validPrivileges = {false};
-      subCategoryList.stream().forEach(subCat -> {
-        if (request.getModuleName() != null && !request.getModuleName().isEmpty()) {
-          validPrivileges[0] = securityService.validPrivileges(subCat.getPrivilege(), request.getModuleName());
+      for (SubCategoryDetails details : subCategoryList) {
+        if (request.getModuleName() != null && !request.getModuleName().isEmpty() && details.isAutoCreate()
+            && !securityService.validPrivileges(details.getPrivilege(), request.getModuleName())) {
+          httpResponse.setStatus(HttpStatus.OK.value());
+          response.setValid(false);
+          response.setMessage("Please provide the valid module privileges for category/subcategory.");
+          return response;
         }
-      });
-
-      if (!validPrivileges[0]) {
-        httpResponse.setStatus(HttpStatus.OK.value());
-        response.setValid(false);
-        response.setMessage("Please provide the valid module privileges for category/subcategory.");
-        return response;
       }
     }
+
 
     if (!role.getCustomerCode().equalsIgnoreCase(moduleDetails.getCustomerCode())) {
       httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());

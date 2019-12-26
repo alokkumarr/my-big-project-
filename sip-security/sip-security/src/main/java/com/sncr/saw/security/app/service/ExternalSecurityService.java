@@ -49,7 +49,7 @@ public class ExternalSecurityService {
   @Autowired
   private ModulePrivilegeRepository privilegeRepository;
 
-  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?\\s+\\[\\]\\\\]";
+  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?+\\[\\]\\\\]";
 
   private boolean haveCategoryCheck = false;
   private boolean haveSubCategoryFlag = false;
@@ -76,9 +76,9 @@ public class ExternalSecurityService {
     Role responseRole = new Role();
 
     roleDetails = roleRepository.fetchRoleByIdAndCustomerCode(customerId, inputRole);
-    boolean hasRole = roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty();
-    if (inputRole.isAutoCreate() || !hasRole) {
-      if (hasRole) {
+    boolean hasNoRole = roleDetails.getRoleSysId() == 0 || roleDetails.getRoleName() == null || roleDetails.getRoleName().isEmpty();
+    if (inputRole.isAutoCreate()) {
+      if (hasNoRole) {
         // build role details bean from input
         RoleDetails role = buildRoleDetails(masterLoginId, moduleDetails, inputRole);
         try {
@@ -124,9 +124,19 @@ public class ExternalSecurityService {
         responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
         responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
       }
+    } else if (hasNoRole){
+      response.setValid(false);
+      responseRole.setRoleSysId(roleDetails.getRoleSysId());
+      responseRole.setRoleName(roleDetails.getRoleName());
+      responseRole.setRoleDesc(inputRole.getRoleDesc());
+      responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
+      responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
+      responseRole.setCustomerCode(moduleDetails.getCustomerCode());
+      responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
+      responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
     } else {
       response.setValid(false);
-      responseRole.setMessage("Role already exist in the system for Customer Product Module Combination of flag false.");
+      responseRole.setMessage("Role can't be add/fetch for flag false.");
     }
     response.setRole(responseRole);
 
@@ -681,6 +691,7 @@ public class ExternalSecurityService {
         if (modulePrivileges != null && !modulePrivileges.isEmpty()) {
           List<String> list = modulePrivileges.stream().filter(module -> module.getModuleName().equalsIgnoreCase(moduleName))
               .map(modName -> modName.getPrivilegeCodeName()).collect(Collectors.toList());
+          list.add("ALL");
           haveValidPrivileges = privileges.stream().allMatch(privilege -> list.contains(privilege));
         }
       }
