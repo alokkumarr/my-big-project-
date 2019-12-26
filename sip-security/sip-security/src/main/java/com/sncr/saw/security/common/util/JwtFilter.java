@@ -10,6 +10,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
+
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,18 +23,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.GenericFilterBean;
+
 @Service
 public class JwtFilter extends GenericFilterBean {
 
   private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
+  private static String SIP_AUTH = "/sip-security/auth";
+
   private final String jwtSecretKey;
-  private final  TicketHelper ticketHelper;
+  private final TicketHelper ticketHelper;
   private static final ObjectMapper mapper = new ObjectMapper();
 
-  public JwtFilter(String jwtSecretKey , TicketHelper ticketHelper) {
+  public JwtFilter(String jwtSecretKey, TicketHelper ticketHelper) {
     this.jwtSecretKey = jwtSecretKey;
-    this.ticketHelper=ticketHelper;
+    this.ticketHelper = ticketHelper;
   }
 
   @SuppressWarnings("unchecked")
@@ -71,21 +75,18 @@ public class JwtFilter extends GenericFilterBean {
       // the token to be active.
       String requestURI = request.getRequestURI();
       logger.trace("Request Header URI : " + requestURI);
-      if (!requestURI.equals("/sip-security/auth/doLogout")) {
+      if (!requestURI.equals(SIP_AUTH + "/doLogout")) {
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         Ticket ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
           haveInValidFlow = true;
           errorMessage = "Token has expired. Please re-login.";
-        } else if (requestURI.startsWith("/sip-security/auth/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
+        } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
           haveInValidFlow = true;
           errorMessage = "You are not authorized to perform this operation.";
         } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
           haveInValidFlow = true;
           errorMessage = "Token is not valid.";
-        } else if (!(ticket.getTicketId() != null
-            && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
-          response.sendError(401, "Token is not valid ");
         }
       }
     }
