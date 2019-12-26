@@ -686,7 +686,7 @@ public class ExternalSecurityService {
   public boolean validPrivileges(List<String> privileges, String moduleName) {
     boolean haveValidPrivileges = false;
     try {
-      if (privileges != null && !privileges.isEmpty()) {
+      if (privileges != null) {
         List<ModulePrivileges> modulePrivileges = privilegeRepository.getModulePrivileges();
         if (modulePrivileges != null && !modulePrivileges.isEmpty()) {
           List<String> list = modulePrivileges.stream().filter(module -> module.getModuleName().equalsIgnoreCase(moduleName))

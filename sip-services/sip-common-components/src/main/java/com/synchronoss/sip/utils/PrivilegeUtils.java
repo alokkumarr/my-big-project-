@@ -85,8 +85,14 @@ public class PrivilegeUtils {
   public static Long getPrivilegeCode(List<String> accessNames) {
     long privilegeCode = 0L;
     try {
+
+      boolean hasAllPermission = accessNames.stream().anyMatch(s -> "ALL".equalsIgnoreCase(s));
+      if (hasAllPermission) {
+        return 128L;
+      }
+
       StringBuilder builder = new StringBuilder();
-      Integer[] privilege = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+      Integer[] privilege = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
       for (String accessName : accessNames) {
         int value = privilegeCodes.get(PrivilegeNames.fromValue(accessName));
         privilege[value] = 1;
