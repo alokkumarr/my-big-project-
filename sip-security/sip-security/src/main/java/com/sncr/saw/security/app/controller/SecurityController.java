@@ -1015,7 +1015,7 @@ public class SecurityController {
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
         HttpServletResponse response,
-        @ApiParam(value="New attribtues for the security group")
+        @ApiParam(value="New attributes for the security group")
         @RequestBody SipDskAttribute sipDskAttributes) {
         DskGroupPayload payload = null;
 
