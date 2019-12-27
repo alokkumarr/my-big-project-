@@ -445,96 +445,80 @@ public class SecurityIT extends BaseIT {
   @Test
   public void testAddDskEligibleFields() throws IOException, InterruptedException {
     String semanticId = "workbench::semanticId1";
-    String createData =
-        "[{"
-            + "\"columnName\": \"STRING\","
-            + "\"displayName\": \"String\""
-            + "}, {"
-            + "\"columnName\": \"INTEGER\","
-            + "\"displayName\": \"Int\""
-            + "}]";
-
-    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
 
     given(authSpec)
         .contentType(ContentType.JSON)
-        .body(dskFields)
+        .body(createDskEligibleData)
         .when()
         .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
   }
 
   @Test
   public void testUpdateDskEligibleFields() throws IOException, InterruptedException {
     String semanticId = "workbench::semanticId2";
-    String createData =
-        "[{"
-            + "\"columnName\": \"STRING\","
-            + "\"displayName\": \"String\""
-            + "}, {"
-            + "\"columnName\": \"INTEGER\","
-            + "\"displayName\": \"Int\""
-            + "}]";
 
-    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
 
     given(authSpec)
         .contentType(ContentType.JSON)
-        .body(dskFields)
+        .body(createDskEligibleData)
         .when()
         .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
         .then()
         .assertThat()
         .statusCode(200);
 
-    String updateData =
-        "[{"
-            + "\"columnName\": \"DOUBLE\","
-            + "\"displayName\": \"Double\""
-            + "}, {"
-            + "\"columnName\": \"BOOLEAN\","
-            + "\"displayName\": \"Bool\""
-            + "}]";
-
-    dskFields = (ObjectNode) mapper.readTree(updateData);
+    ArrayNode updateDskEligibleData = prepareUpdateDskEligibleData();
 
     given(authSpec)
         .contentType(ContentType.JSON)
-        .body(dskFields)
+        .body(updateDskEligibleData)
         .when()
         .put("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
   }
 
-  @Test
-  public void testDeleteDskEligibleFields()  throws IOException, InterruptedException {
-    String semanticId = "workbench::semanticId3";
-    String createData =
-        "[{"
-            + "\"columnName\": \"STRING\","
-            + "\"displayName\": \"String\""
-            + "}, {"
-            + "\"columnName\": \"INTEGER\","
-            + "\"displayName\": \"Int\""
-            + "}]";
+  private ArrayNode prepareCreateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
 
-    ObjectNode dskFields = (ObjectNode) mapper.readTree(createData);
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "STRING");
+    field1.put("displayName", "String");
 
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(dskFields)
-        .when()
-        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
-        .then()
-        .assertThat()
-        .statusCode(200);
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "INTEGER");
+    field2.put("displayName", "Int");
 
+    return dskEligibleData;
+  }
+
+  private ArrayNode prepareUpdateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
+
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "DOUBLE");
+    field1.put("displayName", "Double");
+
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "BOOLEAN");
+    field2.put("displayName", "Bool");
+
+    return dskEligibleData;
+  }
+
+  private void deleteDskEligibleFields(String semanticId) {
     given(authSpec)
         .contentType(ContentType.JSON)
         .when()

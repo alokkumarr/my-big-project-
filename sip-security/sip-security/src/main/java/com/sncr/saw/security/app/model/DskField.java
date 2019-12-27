@@ -2,16 +2,22 @@ package com.sncr.saw.security.app.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel
 public class DskField {
   @JsonProperty("columnName")
+  @ApiModelProperty(notes = "Name of the column", name = "columnName")
   private String columnName;
 
   @JsonProperty("displayName")
+  @ApiModelProperty(notes = "Display name fo the column", name = "displayName")
   private String displayName;
 
   @JsonProperty("columnName")
