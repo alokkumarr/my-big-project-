@@ -1185,7 +1185,6 @@ public class SecurityController {
 	public UsersList deleteUser(HttpServletRequest request, @RequestBody DeleteUser deleteUser) {
 		UsersList userList = new UsersList();
 		try {
-			Ticket ticket = SipCommonUtils.getTicket(request);
       if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null
           && securityService.haveValidCustomerId(ticket, deleteUser.getCustomerId())) {
 				if (userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
