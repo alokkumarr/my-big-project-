@@ -204,6 +204,11 @@ public class AnalysisController {
     }
     Ticket authTicket = getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
+    if (analysis == null) {
+      response.sendError(HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.getReasonPhrase());
+      analysisResponse.setMessage(HttpStatus.NOT_FOUND.getReasonPhrase());
+      return analysisResponse;
+    }
     response = validateTicket(authTicket, PrivilegeNames.DELETE, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
@@ -249,6 +254,11 @@ public class AnalysisController {
     }
     Ticket authTicket = schduledAnalysis ? null : getTicket(request);
     Analysis analysis = analysisService.getAnalysis(id, authTicket);
+    if (analysis == null) {
+      response.sendError(HttpStatus.NOT_FOUND.value(),HttpStatus.NOT_FOUND.getReasonPhrase());
+      analysisResponse.setMessage(HttpStatus.NOT_FOUND.getReasonPhrase());
+      return analysisResponse;
+    }
     response = schduledAnalysis ? null
         : validateTicket(authTicket, PrivilegeNames.ACCESS, analysis, response);
     if (response != null && response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
