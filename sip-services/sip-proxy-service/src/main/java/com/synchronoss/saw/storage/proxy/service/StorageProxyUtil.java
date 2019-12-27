@@ -351,7 +351,8 @@ public class StorageProxyUtil {
           if (flag && field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName())) {
             return true;
           }
-          flag = field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName());
+          flag =
+              !flag ? field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName()) : flag;
         }
       }
     }
