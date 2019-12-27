@@ -3362,4 +3362,32 @@ public class UserRepositoryImpl implements UserRepository {
     }
     return false;
   }
+
+  @Override
+  public UserDetails getUserById(String masterLoginId) {
+    UserDetails userDetails = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
+            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,S.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
+            + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
+            + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? ";
+    try {
+      userDetails =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, masterLoginId);
+              },
+              new UserDetailsExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+    return userDetails;
+  }
 }
