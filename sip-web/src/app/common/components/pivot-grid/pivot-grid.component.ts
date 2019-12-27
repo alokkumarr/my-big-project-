@@ -85,7 +85,6 @@ export class PivotGridComponent implements OnDestroy {
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public pivotFields: any[];
   public data: any[];
-  public _sorts: Array<Sort> = [];
   public artifactColumns;
   public pivotGridOptions: any;
   public dataFields: any[];
@@ -311,7 +310,7 @@ export class PivotGridComponent implements OnDestroy {
 
   artifactColumn2PivotField(): any {
     const sortsMap = reduce(
-      this._sorts,
+      this.sorts,
       (acc, sort) => {
         const { columnName, type, order } = sort;
         const dataField =
