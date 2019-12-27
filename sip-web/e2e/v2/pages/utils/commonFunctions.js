@@ -119,8 +119,8 @@ module.exports = {
     stream.end();
   },
   getAnalysisIdFromUrl(url) {
-    let ulrParts = url.split('analyze/analysis/')[1];
-    return ulrParts.split('/')[0];
+    let urlParts = url.split('analyze/analysis/')[1];
+    return urlParts.split('/')[0];
   },
   slideHorizontally(element, x_axis) {
     browser
@@ -161,7 +161,7 @@ module.exports = {
     });
   },
   getDashboardId() {
-    browser.getCurrentUrl().then(url => {
+    return browser.getCurrentUrl().then(url => {
       return url.split('=')[1];
     });
   },
@@ -178,5 +178,10 @@ module.exports = {
       .mouseMove(element)
       .click()
       .perform();
+  },
+  validateHasText(el) {
+    el.getText().then(text => {
+      expect(text.trim().toLowerCase()).not.toBeNull();
+    });
   }
 };

@@ -25,7 +25,7 @@ export class TestConnectivityComponent implements OnInit {
     @Inject(MAT_SNACK_BAR_DATA) public logData: any
   ) {}
 
-  @ViewChild('screen')
+  @ViewChild('screen', { static: true })
   private screen;
 
   ngOnInit() {

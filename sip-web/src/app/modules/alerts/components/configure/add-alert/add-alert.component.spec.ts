@@ -135,6 +135,7 @@ describe('AddAlertComponent', () => {
     ).toEqual('');
   });
 
+
   it('should create alert payload', () => {
     component.selectedDatapod = {
       artifacts: [{ artifactName: 'sample', fields: [] }],

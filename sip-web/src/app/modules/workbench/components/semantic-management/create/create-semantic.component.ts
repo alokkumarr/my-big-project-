@@ -23,7 +23,7 @@ export class CreateSemanticComponent implements OnInit {
 
   constructor(public router: Router, public workBench: WorkbenchService) {}
 
-  @ViewChild('dsGrid') dataGrid: DxDataGridComponent;
+  @ViewChild('dsGrid', { static: true }) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.workBench.getDatasets().subscribe((data: any[]) => {

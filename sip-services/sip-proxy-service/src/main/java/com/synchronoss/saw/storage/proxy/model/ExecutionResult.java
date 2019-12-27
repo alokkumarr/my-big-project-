@@ -1,6 +1,8 @@
 package com.synchronoss.saw.storage.proxy.model;
 
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.model.DataSecurityKeyDef;
+import java.util.List;
 
 public class ExecutionResult {
 
@@ -14,6 +16,7 @@ public class ExecutionResult {
   String executedBy;
   Object data;
   Integer recordCount;
+  List<DataSecurityKeyDef> dataSecurityKey;
 
   /**
    * Gets dslQueryId.
@@ -153,5 +156,13 @@ public class ExecutionResult {
   /** Sets recordCount */
   public void setRecordCount(Integer recordCount) {
     this.recordCount = recordCount;
+  }
+
+  public List<DataSecurityKeyDef> getDataSecurityKey() {
+    return dataSecurityKey;
+  }
+
+  public void setDataSecurityKey(List<DataSecurityKeyDef> dataSecurityKey) {
+    this.dataSecurityKey = dataSecurityKey;
   }
 }
