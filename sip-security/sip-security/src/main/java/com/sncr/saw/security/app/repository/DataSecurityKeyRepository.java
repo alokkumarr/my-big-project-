@@ -1,10 +1,10 @@
 package com.sncr.saw.security.app.repository;
 
-import com.sncr.saw.security.app.model.DskGroupPayload;
-import com.sncr.saw.security.app.model.SipDskAttribute;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
 
+import com.synchronoss.bda.sip.dsk.DskGroupPayload;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import java.util.List;
 
 public interface DataSecurityKeyRepository {

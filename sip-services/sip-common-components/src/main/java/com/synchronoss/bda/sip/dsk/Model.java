@@ -1,4 +1,4 @@
-package com.sncr.saw.security.app.model;
+package com.synchronoss.bda.sip.dsk;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

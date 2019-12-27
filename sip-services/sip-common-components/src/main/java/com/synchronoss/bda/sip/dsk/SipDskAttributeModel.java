@@ -1,4 +1,4 @@
-package com.sncr.saw.security.app.model;
+package com.synchronoss.bda.sip.dsk;
 
 import java.util.List;
 
