@@ -58,17 +58,17 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
             valid.setValidityMessage("Success");
           } catch (DuplicateKeyException dke) {
             logger
-                .error("Exception encountered while creating a new user " + dke.getMessage(), null,
+                .error("Exception encountered while adding dsk eligible fields " + dke.getMessage(), null,
                     dke);
             valid.setValid(Boolean.FALSE);
             valid.setValidityMessage(dke.getMessage());
           } catch (DataIntegrityViolationException de) {
-            logger.error("Exception encountered while creating a new user " + de.getMessage(), null,
+            logger.error("Exception encountered while adding dsk eligible fields " + de.getMessage(), null,
                 de);
             valid.setValid(Boolean.FALSE);
             valid.setValidityMessage(de.getMessage());
           } catch (Exception e) {
-            logger.error("Exception encountered while creating a new user " + e.getMessage(), null,
+            logger.error("Exception encountered while adding dsk eligible fields " + e.getMessage(), null,
                 e);
             valid.setValid(Boolean.FALSE);
             valid.setValidityMessage(e.getMessage());

@@ -71,7 +71,7 @@ public class SemanticServiceImpl implements SemanticService {
   @NotNull
   private String migrationMetadataHome;
 
-  @Value("${security.dsk-url}")
+  @Value("${sip-security.dsk-url}")
   @NotNull
   private String securityDskUrl;
 

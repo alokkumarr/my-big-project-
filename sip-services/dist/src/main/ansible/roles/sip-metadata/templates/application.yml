@@ -95,5 +95,5 @@ semantic:
 analysis:
   binary-migration-required: true
 
-security:
+sip-security:
   dsk-url: ${connector}://localhost:9000/sip-security
