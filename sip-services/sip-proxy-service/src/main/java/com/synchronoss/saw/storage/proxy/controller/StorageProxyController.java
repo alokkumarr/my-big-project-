@@ -586,8 +586,7 @@ public class StorageProxyController {
         authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
     logger.trace("DSK List = " + dskList);
 
-    if (dskList != null && dskList.size() != 0 && executionType != null && !executionType
-        .equals(ExecutionType.onetime)) {
+    if (dskList != null && dskList.size() != 0) {
       return new ExecutionResponse();
     }
     if (analysisType != null && analysisType.equals("report")) {
