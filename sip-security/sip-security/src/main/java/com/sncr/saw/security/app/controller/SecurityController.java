@@ -1840,7 +1840,6 @@ public class SecurityController {
 	}
 
     /**
-     *
      * @return
      */
 	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
