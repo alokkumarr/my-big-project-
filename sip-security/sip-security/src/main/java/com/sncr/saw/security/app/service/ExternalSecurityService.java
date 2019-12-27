@@ -121,10 +121,10 @@ public class ExternalSecurityService {
         responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
         responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
         responseRole.setCustomerCode(moduleDetails.getCustomerCode());
-        responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
+        responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType().toUpperCase()));
         responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
       }
-    } else if (hasNoRole){
+    } else if (!hasNoRole){
       response.setValid(false);
       responseRole.setRoleSysId(roleDetails.getRoleSysId());
       responseRole.setRoleName(roleDetails.getRoleName());
@@ -132,7 +132,7 @@ public class ExternalSecurityService {
       responseRole.setActiveStatusInd(roleDetails.getActiveStatusInd());
       responseRole.setCustomerSysId(moduleDetails.getCustomerSysId());
       responseRole.setCustomerCode(moduleDetails.getCustomerCode());
-      responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType()));
+      responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType().toUpperCase()));
       responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
     } else {
       response.setValid(false);
