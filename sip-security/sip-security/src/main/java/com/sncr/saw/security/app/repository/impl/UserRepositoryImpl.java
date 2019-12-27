@@ -597,7 +597,7 @@ public class UserRepositoryImpl implements UserRepository {
 							  + "CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE, "
 							  + "'0' AS PRIVILEGE_CODE, "
 							  + " P.PRODUCT_CODE,M.MODULE_CODE,CPMF.FEATURE_NAME,CPMF.FEATURE_DESC "
-							  + " ,CPMF.FEATURE_CODE,CPMF.DEFAULT_URL,CPMF.DEFAULT "
+							  + " ,CPMF.FEATURE_CODE,CPMF.DEFAULT_URL,CPMF.DEFAULT,CPMF.SYSTEM_CATEGORY "
 							  + "FROM USERS U "
 							  + "INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) "
 							  + "INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) "
@@ -641,7 +641,8 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "   CPMF.FEATURE_DESC, "
 				+ "   CPMF.FEATURE_CODE, "
 				+ "   CPMF.DEFAULT_URL, "
-				+ "   CPMF.DEFAULT  "
+				+ "   CPMF.DEFAULT,"
+				+	"   CPMF.SYSTEM_CATEGORY  "
 				+ "FROM "
 				+ "   USERS U  "
 				+ "   INNER JOIN "
@@ -2610,7 +2611,7 @@ public class UserRepositoryImpl implements UserRepository {
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
 				+ "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,CPMF.FEATURE_CODE,"
-				+ " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND FROM USERS U "
+				+ " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND, CPMF.SYSTEM_CATEGORY FROM USERS U "
 				+ " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
 				+ " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
 				+ " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
@@ -2650,6 +2651,7 @@ public class UserRepositoryImpl implements UserRepository {
 						subCategories.setSubCategoryId(catCDetails.getCategoryId());
 						subCategories.setSubCategoryName(catCDetails.getCategoryName());
 						subCategories.setSubCategoryDesc(catCDetails.getCategoryDesc());
+						subCategories.setSystemCategory(catCDetails.isSystemCategory());
 						subCategories.setActivestatusInd(catCDetails.getActiveStatusInd());
 						subCategory.add(subCategories);
 					}
@@ -2691,6 +2693,7 @@ public class UserRepositoryImpl implements UserRepository {
 				category.setCategoryType(rs.getString("FEATURE_TYPE"));
 				category.setCategoryDesc(rs.getString("FEATURE_DESC"));
 				category.setActiveStatusInd(rs.getLong("ACTIVE_STATUS_IND"));
+				category.setSystemCategory(rs.getBoolean("SYSTEM_CATEGORY"));
 				catList.add(category);
 			}
 			return catList;
