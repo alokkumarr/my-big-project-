@@ -1,6 +1,7 @@
 package com.synchronoss.saw.storage.proxy.service;
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.SipQuery;
@@ -48,4 +49,6 @@ public interface StorageProxyService {
         throws Exception;
 
   List<Object> pagingData(Integer page, Integer pageSize, List<Object> dataObj);
+
+  Boolean updateAnalysis(Analysis analysis);
 }
