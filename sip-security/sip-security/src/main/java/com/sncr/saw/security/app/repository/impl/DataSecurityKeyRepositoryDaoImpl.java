@@ -809,7 +809,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
             dskGroupPayload.setGroupName(groupName);
             dskGroupPayload.setGroupDescription(groupDescription);
-            dskGroupPayload.setDskAttributes(dskAttributeList.get(0));
+
+            if (!dskAttributeList.isEmpty()) {
+                dskGroupPayload.setDskAttributes(dskAttributeList.get(0));
+            }
         }
 
 
@@ -904,7 +907,43 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
     }
 
+    @Override
+    public List<DskGroupPayload> fetchAllDskGroupForCustomer(Long customerId) {
+        List<DskGroupPayload> dskGroupPayloadList = new LinkedList<>();
 
+        String secGroupIdSql =
+            "SELECT SEC_GROUP_SYS_ID, SEC_GROUP_NAME, DESCRIPTION "
+            + "FROM SEC_GROUP "
+            + "WHERE CUSTOMER_SYS_ID=? AND ACTIVE_STATUS_IND=1";
+
+        try {
+            dskGroupPayloadList = jdbcTemplate.query(secGroupIdSql, ps -> {
+                ps.setLong(1, customerId);
+            }, resultSet -> {
+                List<DskGroupPayload> list = new ArrayList<>();
+
+                while(resultSet.next()) {
+                    Long securityGroupId = resultSet.getLong("SEC_GROUP_SYS_ID");
+                    String securityGroupName = resultSet.getString("SEC_GROUP_NAME");
+                    String description = resultSet.getString("DESCRIPTION");
+
+                    DskGroupPayload payload =
+                        fetchDskGroupAttributeModel(securityGroupId, customerId);
+
+                    if (payload != null) {
+                        list.add(payload);
+                    }
+                }
+
+                return list;
+            });
+        } catch (Exception ex) {
+            logger.error("Error occurred while fetching security group details: "
+                + ex.getMessage(), ex);
+        }
+
+        return dskGroupPayloadList;
+    }
 
     @Override
     public Valid updateUser(String securityGroupName, Long userSysId, Long custId) {
