@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.scheduler.entities.QrtzTriggers;
 import com.synchronoss.saw.scheduler.modal.BisSchedulerJobDetails;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
@@ -601,6 +602,11 @@ public class BisJobServiceImpl implements JobService<BisSchedulerJobDetails> {
       logger.error("SchedulerException while stopping job. error message :" + e.getMessage());
     }
     return false;
+  }
+
+  @Override
+  public Analysis getAnalysis(String analysisId) {
+    return null;
   }
 
   /*
