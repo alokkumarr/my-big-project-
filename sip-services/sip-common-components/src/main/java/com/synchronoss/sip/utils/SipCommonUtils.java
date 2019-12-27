@@ -71,16 +71,4 @@ public class SipCommonUtils {
               name));
     }
   }
-
-  /**
-   * Validate customerId to avoid direct reference.
-   *
-   * @param customerId customer id from customer
-   * @param request HttpServletRequest request from SIP token
-   * @return true if id matched.
-   */
-  public static boolean haveValidCustomerId(Long customerId, HttpServletRequest request) {
-    Ticket ticket = getTicket(request);
-    return !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId);
-  }
 }
