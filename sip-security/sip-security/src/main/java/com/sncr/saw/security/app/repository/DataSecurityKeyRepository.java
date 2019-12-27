@@ -7,21 +7,21 @@ import com.sncr.saw.security.common.bean.repo.dsk.*;
 
 import java.util.List;
 
- interface DataSecurityKeyRepository {
-    DskValidity addSecurityGroups(SecurityGroups securityGroups, String createdBy, Long custId);
-    DskValidity updateSecurityGroups(Long securityGroupId,List<String> groupNames,Long custId);
-    Valid deleteSecurityGroups(Long securityGroupId);
-    List<SecurityGroups> fetchSecurityGroupNames(Long custId);
+public interface DataSecurityKeyRepository {
+    public DskValidity addSecurityGroups(SecurityGroups securityGroups, String createdBy, Long custId);
+    public DskValidity updateSecurityGroups(Long securityGroupId,List<String> groupNames,Long custId);
+    public Valid deleteSecurityGroups(Long securityGroupId);
+    public List<SecurityGroups> fetchSecurityGroupNames(Long custId);
 
-    Valid addDskGroupAttributeModelAndValues(Long securityGroupId, SipDskAttribute dskAttribute);
-    Valid deleteDskGroupAttributeModel(Long securityGroupId, Long customerId);
+    public Valid addDskGroupAttributeModelAndValues(Long securityGroupId, SipDskAttribute dskAttribute);
+    public Valid deleteDskGroupAttributeModel(Long securityGroupId, Long customerId);
 
-    Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
-    List<String> fetchSecurityGroupDskAttributes(Long securityGroupId);
-     Valid deleteSecurityGroupDskAttributeValues(List<String> dskList);
-     List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
-    DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId);
-     Valid updateUser(String securityGroupName,Long userSysId, Long custId);
-     List<UserAssignment> getAllUserAssignments(Long custId);
-     Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
+    public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
+    public List<String> fetchSecurityGroupDskAttributes(Long securityGroupId);
+    public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList);
+    public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
+    public DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId);
+    public Valid updateUser(String securityGroupName,Long userSysId, Long custId);
+    public List<UserAssignment> getAllUserAssignments(Long custId);
+    public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
 }

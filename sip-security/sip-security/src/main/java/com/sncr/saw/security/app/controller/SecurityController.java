@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.model.DskGroupPayload;
-import com.sncr.saw.security.app.model.DskGroupResp;
 import com.sncr.saw.security.app.model.SipDskAttribute;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
@@ -63,6 +62,8 @@ import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -99,6 +100,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/sip-security")
+@Api(value="sip-security", description = "SIP Security APIs")
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
@@ -871,6 +873,7 @@ public class SecurityController {
 
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
+    @ApiOperation(value="Add DSK security group")
     public DskGroupPayload addDskGroup(HttpServletRequest request, HttpServletResponse response,
         @RequestBody DskGroupPayload dskGroupPayload) {
       Ticket ticket = SipCommonUtils.getTicket(request);
@@ -930,6 +933,7 @@ public class SecurityController {
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.GET)
+    @ApiOperation(value="Fetch security group details for a given security group id")
     public DskGroupPayload getSecurityGroupDetails (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -965,6 +969,7 @@ public class SecurityController {
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete security group attributes")
     public Valid deleteSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
@@ -994,6 +999,7 @@ public class SecurityController {
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
+    @ApiOperation(value="Update security group attributes")
     public DskGroupPayload updateSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,

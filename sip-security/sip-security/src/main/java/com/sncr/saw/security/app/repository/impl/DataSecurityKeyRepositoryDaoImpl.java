@@ -641,9 +641,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
          * In future this could be solved directly by adding constraint in Table definition and also here am keeping in my that the DB needs to Altered to add Customer relationship with DSK's.
          */
 
-//        String addValueSql = "INSERT INTO `sec_group_dsk_value` " +
-//            "(`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`,`DSK_VALUE`) "
-//            + "VALUES (?,?)";
         if (groupAttrSysId == null) {
             if(securityGroupId != null)  {
                 String addSql = "INSERT INTO `sec_group_dsk_attribute` " +
@@ -659,14 +656,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
                     Long attributeSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
                     if ( attributeSysId != null)    {
-//                        int addValResult = jdbcTemplate.update(addValueSql, ps -> {
-//                            ps.setLong(1,attributeSysId);
-//                            ps.setString(2,attributeValues.getValue());
-//                        });
-//                        logger.trace(addValResult + ServerResponseMessages.ATTRIBUTE_VALUE_ADDED + " to  SEC_GROUP_DSK_VALUE.");
-//                        valid.setValid(true);
-//                        valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
-//                        return valid;
                         return addDatasecurityKeyValue(attributeSysId, attributeValues.getValue());
                     }
                     else { logger.error(ServerResponseMessages.ATTRIBUTE_ID_NULL); }
