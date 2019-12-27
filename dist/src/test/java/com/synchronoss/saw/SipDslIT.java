@@ -1629,7 +1629,7 @@ public class SipDslIT extends BaseIT {
         .delete("/sip/services/dslanalysis/" + analysisId)
         .then()
         .assertThat()
-        .statusCode(HttpStatus.UNAUTHORIZED.value());
+        .statusCode(HttpStatus.NOT_FOUND.value());
   }
 
   @Test
