@@ -6,7 +6,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddSecurityDialogComponent } from './../add-security-dialog/add-security-dialog.component';
 import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import { UserAssignmentService } from './../userassignment.service';
+import { DataSecurityService } from './../datasecurity.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
@@ -17,7 +17,6 @@ import * as isEmpty from 'lodash/isEmpty';
   templateUrl: './security-group.component.html',
   styleUrls: ['./security-group.component.scss']
 })
-
 export class SecurityGroupComponent implements OnInit {
   listeners: Subscription[] = [];
   ticket: { custID: string; custCode: string; masterLoginId?: string };
@@ -39,7 +38,7 @@ export class SecurityGroupComponent implements OnInit {
     private _jwtService: JwtService,
     private _dialog: MatDialog,
     private _dxDataGridService: DxDataGridService,
-    private _userAssignmentService: UserAssignmentService,
+    private _userAssignmentService: DataSecurityService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService
   ) {
@@ -72,9 +71,11 @@ export class SecurityGroupComponent implements OnInit {
         this.emptyState = true;
       } else {
         this.emptyState = false;
-        this.groupSelected =  (isEmpty(groupSelected)) ? this.data[0] : groupSelected;
+        this.groupSelected = isEmpty(groupSelected)
+          ? this.data[0]
+          : groupSelected;
       }
-      this.addAttribute = (this.data.length === 0);
+      this.addAttribute = this.data.length === 0;
     });
   }
 
@@ -89,24 +90,26 @@ export class SecurityGroupComponent implements OnInit {
       ...this.columnData
     };
     const component = this.getModalComponent(property) as any;
-    return this._dialog.open(component, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig)
-    .afterClosed().subscribe((result) => {
-      if (result) {
-        if (property === 'securityGroup') {
-          this.groupSelected = {
-            secGroupSysId: result.groupId,
-            securityGroupName: result.groupName,
-            description: result.description
-          };
+    return this._dialog
+      .open(component, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          if (property === 'securityGroup') {
+            this.groupSelected = {
+              secGroupSysId: result.groupId,
+              securityGroupName: result.groupName,
+              description: result.description
+            };
+          }
+          this.loadGroupGridWithData(this.groupSelected);
         }
-        this.loadGroupGridWithData(this.groupSelected);
-      }
-    });
+      });
   }
 
   editGroupData(data) {
@@ -121,28 +124,32 @@ export class SecurityGroupComponent implements OnInit {
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
     };
-    return this._dialog.open(DeleteDialogComponent, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig)
-    .afterClosed().subscribe((result) => {
-      const path = `auth/admin/security-groups/${cellData.secGroupSysId}`;
-      if (result) {
-        this._userAssignmentService.deleteGroupOrAttribute(path).then(response => {
-          this.loadGroupGridWithData(this.groupSelected);
-        });
-      }
-    });
+    return this._dialog
+      .open(DeleteDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        const path = `auth/admin/security-groups/${cellData.secGroupSysId}`;
+        if (result) {
+          this._userAssignmentService
+            .deleteGroupOrAttribute(path)
+            .then(response => {
+              this.loadGroupGridWithData(this.groupSelected);
+            });
+        }
+      });
   }
 
   getModalComponent(property) {
     switch (property) {
-    case 'securityGroup' :
-      return AddSecurityDialogComponent;
-    case 'attribute' :
-      return AddAttributeDialogComponent;
+      case 'securityGroup':
+        return AddSecurityDialogComponent;
+      case 'attribute':
+        return AddAttributeDialogComponent;
     }
   }
 
@@ -168,24 +175,28 @@ export class SecurityGroupComponent implements OnInit {
   }
 
   getConfig() {
-    const columns = [{
-      caption: 'Group Name',
-      dataField: 'securityGroupName',
-      cellTemplate: 'toolTipCellTemplate',
-      allowSorting: true,
-      alignment: 'left',
-      width: '60%'
-    }, {
-      caption: 'ID',
-      dataField: 'secGroupSysId',
-      width: '0%'
-    }, {
-      caption: '',
-      allowSorting: true,
-      alignment: 'left',
-      width: '30%',
-      cellTemplate: 'actionCellTemplate'
-    }];
+    const columns = [
+      {
+        caption: 'Group Name',
+        dataField: 'securityGroupName',
+        cellTemplate: 'toolTipCellTemplate',
+        allowSorting: true,
+        alignment: 'left',
+        width: '60%'
+      },
+      {
+        caption: 'ID',
+        dataField: 'secGroupSysId',
+        width: '0%'
+      },
+      {
+        caption: '',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%',
+        cellTemplate: 'actionCellTemplate'
+      }
+    ];
     return this._dxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
         this.groupSelected = row.data;

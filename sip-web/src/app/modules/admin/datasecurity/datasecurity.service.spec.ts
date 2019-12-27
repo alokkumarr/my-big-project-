@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { UserAssignmentService } from './userassignment.service';
+import { DataSecurityService } from './datasecurity.service';
 import { JwtService } from '../../../common/services/jwt.service';
 import { Observable } from 'rxjs';
 
@@ -15,14 +15,14 @@ describe('User Assignment Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        UserAssignmentService,
+        DataSecurityService,
         { provide: JwtService, useValue: mockService },
         { provide: Router, useValue: mockService },
         { provide: ActivatedRoute, useValue: mockService }
       ]
     }).compileComponents();
 
-    userAssignmentService = TestBed.get(UserAssignmentService);
+    userAssignmentService = TestBed.get(DataSecurityService);
     done();
   });
 
@@ -35,8 +35,8 @@ describe('User Assignment Service', () => {
   });
 
   it('addSecurityGroup should exist and return an Observable', inject(
-    [UserAssignmentService],
-    (observe: UserAssignmentService) => {
+    [DataSecurityService],
+    (observe: DataSecurityService) => {
       expect(observe.addSecurityGroup({}) instanceof Observable).toEqual(false);
     }
   ));

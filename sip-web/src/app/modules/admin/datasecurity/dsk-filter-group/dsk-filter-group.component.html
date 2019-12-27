@@ -1,0 +1,56 @@
+<mat-chip-list>
+  <mat-chip color="primary" selected>{{
+    filterGroup.booleanCriteria
+  }}</mat-chip>
+
+  <mat-chip
+    [popper]="newDSKChild"
+    popperApplyClass="new-child-popper"
+    popperTrigger="click"
+    [popperHideOnClickOutside]="true"
+    popperPlacement="right"
+  >
+    +
+  </mat-chip>
+  <popper-content #newDSKChild>
+    <button mat-button (click)="addField(newDSKChild)">Field</button>
+    <button mat-button (click)="addGroup(newDSKChild)">Group</button>
+  </popper-content>
+</mat-chip-list>
+
+<div
+  class="dsk-query-child"
+  *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+>
+  <dsk-filter-group
+    [filterGroup]="child"
+    *ngIf="child['booleanCriteria']; else attributeFields"
+  ></dsk-filter-group>
+
+  <ng-template #attributeFields>
+    <div fxLayout="row" fxLayoutGap="10px">
+      <mat-form-field>
+        <input matInput [ngModel]="child['columnName']" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-chip-list #chipList>
+          <mat-chip
+            *ngFor="let item of child['model'].value"
+            [removable]="true"
+          >
+            {{ item }}
+            <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
+          </mat-chip>
+          <input
+            placeholder="Add new value"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            [matChipInputAddOnBlur]="true"
+            (matChipInputTokenEnd)="addValue(childId, $event)"
+          />
+        </mat-chip-list>
+      </mat-form-field>
+    </div>
+  </ng-template>
+</div>

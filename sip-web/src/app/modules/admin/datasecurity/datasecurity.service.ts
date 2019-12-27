@@ -2,15 +2,65 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
 import * as isUndefined from 'lodash/isUndefined';
+import { Observable, of } from 'rxjs';
+import {
+  DSKFilterGroup,
+  DSKFilterBooleanCriteria,
+  DSKFilterOperator
+} from './dsk-filter.model';
 
 const loginUrl = AppConfig.login.url;
 
 @Injectable()
-export class UserAssignmentService {
+export class DataSecurityService {
   constructor(private _http: HttpClient) {}
 
   getList(customerId) {
     return this.getRequest('auth/admin/user-assignments');
+  }
+
+  getFiltersFor(group: string): Observable<DSKFilterGroup> {
+    if (!group) {
+      return of(null);
+    }
+    return of({
+      booleanCriteria: DSKFilterBooleanCriteria.AND,
+      booleanQuery: [
+        {
+          columnName: 'Field1',
+          model: {
+            operator: DSKFilterOperator.ISIN,
+            value: ['abc']
+          }
+        },
+        {
+          columnName: 'Field2',
+          model: {
+            operator: DSKFilterOperator.ISIN,
+            value: ['pqr']
+          }
+        },
+        {
+          booleanCriteria: DSKFilterBooleanCriteria.OR,
+          booleanQuery: [
+            {
+              columnName: 'Field3',
+              model: {
+                operator: DSKFilterOperator.ISIN,
+                value: ['456']
+              }
+            },
+            {
+              columnName: 'Field4',
+              model: {
+                operator: DSKFilterOperator.ISIN,
+                value: ['123']
+              }
+            }
+          ]
+        }
+      ]
+    });
   }
 
   addSecurityGroup(data) {

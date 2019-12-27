@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep .new-child-popper {
+  background: white;
+}
+
+.dsk-query-child {
+  margin-left: 20px;
+
+  mat-icon {
+    $font-size: 12px;
+
+    font-size: $font-size;
+    line-height: $font-size;
+    width: $font-size;
+    height: $font-size;
+  }
+}
