@@ -18,7 +18,8 @@ public class CategoryDetails {
 	private String _default;
 	private Long activeStatusInd;
 	private String masterLoginId;
-	private boolean subCategoryInd;	
+	private boolean subCategoryInd;
+	private boolean systemCategory;
 	private List<SubCategoryDetails> subCategories;
 	
 		
@@ -76,7 +77,12 @@ public class CategoryDetails {
 	public void setCategoryType(String categoryType) {
 		this.categoryType = categoryType;
 	}
-	
+	public boolean isSystemCategory() {
+		return systemCategory;
+	}
+	public void setSystemCategory(boolean systemCategory) {
+		this.systemCategory = systemCategory;
+	}
 	public long getCustomerId() {
 		return customerId;
 	}

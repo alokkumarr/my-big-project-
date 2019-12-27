@@ -5,7 +5,7 @@ public class SubCategoryDetails {
 	private String subCategoryName;
 	private String subCategoryDesc;
 	private long activestatusInd;
-	
+	private boolean systemCategory;
 	
 	public String getSubCategoryDesc() {
 		return subCategoryDesc;
@@ -31,6 +31,10 @@ public class SubCategoryDetails {
 	public void setSubCategoryName(String subCategoryName) {
 		this.subCategoryName = subCategoryName;
 	}
-	
-	
+	public boolean isSystemCategory() {
+		return systemCategory;
+	}
+	public void setSystemCategory(boolean systemCategory) {
+		this.systemCategory = systemCategory;
+	}
 }
