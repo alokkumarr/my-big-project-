@@ -58,7 +58,7 @@ describe('User Assignment Service', () => {
         });
 
       const req = httpTestingController.expectOne(
-        `${APP_CONFIG.login.url}/auth/admin/security-groups/dsk-eligible-fields`
+        `${APP_CONFIG.login.url}/auth/admin/dsk/fields`
       );
       expect(req.request.method).toEqual('GET');
 
