@@ -12,6 +12,7 @@ const LoginPage = require('../../pages/LoginPage');
 const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.js', () => {
   let analysisId;
@@ -20,7 +21,11 @@ describe('Executing createAndDeleteReport tests from createAndDeleteReport.test.
   beforeAll(() => {
     logger.info('Starting createAndDeleteReport tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 

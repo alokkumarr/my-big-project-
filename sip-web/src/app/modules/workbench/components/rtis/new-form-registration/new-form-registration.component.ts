@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { RtisService } from './../../../services/rtis.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
@@ -18,8 +14,8 @@ import * as isEmpty from 'lodash/isEmpty';
 export class NewRegistrationComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   public primaryStream: {
-    topic: '',
-    queue: ''
+    topic: '';
+    queue: '';
   };
   public showEventUrl: boolean;
   public model: any;
@@ -48,22 +44,26 @@ export class NewRegistrationComponent implements OnInit {
     });
   }
 
-  gotoRTISPage(){
+  gotoRTISPage() {
     this._location.back();
   }
 
   createRegistration(data) {
     const requestBody = {
       id: this.model,
-      app_key: Math.random().toString(36).substring(7),
-      streams_1: [{
-         topic: data.streamTopic,
-         queue: data. streamQueue
-       }],
-       eventUrl: data.eventUrl,
-       batchSize: parseInt(data.batchSize),
-       blockOnBufferFull: data.bufferFullSize,
-       timeoutMs: data.timeout
+      app_key: Math.random()
+        .toString(36)
+        .substring(7),
+      streams_1: [
+        {
+          topic: data.streamTopic,
+          queue: data.streamQueue
+        }
+      ],
+      eventUrl: data.eventUrl,
+      batchSize: parseInt(data.batchSize, 10),
+      blockOnBufferFull: data.bufferFullSize,
+      timeoutMs: data.timeout
     };
     const changeSchedule = this._rtisService.createRegistration(requestBody);
     changeSchedule.then(response => {
@@ -72,6 +72,5 @@ export class NewRegistrationComponent implements OnInit {
       });
       this.router.navigate(['workbench', 'rtis', 'appkeys']);
     });
-
   }
 }
