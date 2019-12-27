@@ -8,8 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.sncr.saw.security.app.model.DskGroupReq;
-import com.sncr.saw.security.app.model.DskAttribute;
+import com.sncr.saw.security.app.model.DskGroupPayload;
 import com.sncr.saw.security.app.model.DskGroupResp;
 import com.sncr.saw.security.app.model.SipDskAttribute;
 import com.sncr.saw.security.app.properties.NSSOProperties;
@@ -58,7 +57,9 @@ import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.TokenParser;
+import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -70,7 +71,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -871,107 +871,186 @@ public class SecurityController {
 
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.POST)
-    public DskGroupResp addDskGroup(HttpServletRequest request, HttpServletResponse response,
-        @RequestBody DskGroupReq dskGroupReq) {
-      String jwtToken = JWTUtils.getToken(request);
-      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+    public DskGroupPayload addDskGroup(HttpServletRequest request, HttpServletResponse response,
+        @RequestBody DskGroupPayload dskGroupPayload) {
+      Ticket ticket = SipCommonUtils.getTicket(request);
 
-      Long custId = Long.valueOf(extractValuesFromToken[1]);
-      String createdBy = extractValuesFromToken[2];
+      Long customerId = Long.valueOf(ticket.getCustID());
+      String createdBy = ticket.getUserFullName();
+      RoleType roleType = ticket.getRoleType();
 
+      if (roleType != RoleType.ADMIN) {
+          DskGroupPayload payload = new DskGroupPayload();
+          logger.error("Invalid user");
+          response.setStatus(400);
+          payload.setValid(false);
+          payload.setMessage(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
 
-      String securityGroupName = dskGroupReq.getGroupName();
-      String securityGroupDescription = dskGroupReq.getGroupDescription();
-
-      SecurityGroups securityGroup = new SecurityGroups();
-      securityGroup.setSecurityGroupName(securityGroupName);
-      securityGroup.setDescription(securityGroupDescription);
-
-      DskValidity dskValidity =
-          dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,custId);
-
-      Long securityGroupSysId = dskValidity.getGroupId();
-
-      DskGroupResp resp = new DskGroupResp();
-
-      if (securityGroupSysId == null) {
-        logger.error("Error occurred: " + dskValidity.getError());
-        response.setStatus(400);
-        resp.setValid(false);
-        resp.setMessage(dskValidity.getError());
-
-        return resp;
+          return payload;
       }
 
-      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
+      DskGroupPayload payload = null;
+      try {
+          String securityGroupName = dskGroupPayload.getGroupName();
+          String securityGroupDescription = dskGroupPayload.getGroupDescription();
 
-//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
-//
-//      for(DskAttribute dskAttribute : dsk) {
-//        Set<String> values = dskAttribute.getValues();
-//
-//        for(String value: values) {
-//          AttributeValues attributeValues = new AttributeValues();
-//          attributeValues.setAttributeName(dskAttribute.getName());
-//          attributeValues.setValue(value);
-//
-//          dataSecurityKeyRepository
-//               .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
-//        }
-//      }
+          SecurityGroups securityGroup = new SecurityGroups();
+          securityGroup.setSecurityGroupName(securityGroupName);
+          securityGroup.setDescription(securityGroupDescription);
 
-      List<DskDetails> details =
-            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
+          DskValidity dskValidity =
+              dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,customerId);
 
-      resp.setSecurityGroupSysId(securityGroupSysId);
-      resp.setAttributes(details);
-      resp.setValid(true);
+          Long securityGroupSysId = dskValidity.getGroupId();
 
-      return resp;
+          if (securityGroupSysId == null) {
+              payload = new DskGroupPayload();
+              logger.error("Error occurred: " + dskValidity.getError());
+              response.setStatus(400);
+              payload.setValid(false);
+              payload.setMessage(dskValidity.getError());
+
+              return payload;
+          }
+
+          SipDskAttribute dskAttributes = dskGroupPayload.getDskAttributes();
+          dataSecurityKeyRepository.addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributes);
+
+          payload =
+              dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+
+          payload.setValid(true);
+      } catch (Exception ex) {
+          payload = new DskGroupPayload();
+          payload.setValid(false);
+          payload.setMessage("Error occurred: " + ex.getMessage());
+      }
+
+      return payload;
+    }
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.GET)
+    public DskGroupPayload getSecurityGroupDetails (
+        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
+        HttpServletRequest request,
+        HttpServletResponse response) {
+        DskGroupPayload payload = null;
+
+        Ticket ticket = SipCommonUtils.getTicket(request);
+
+        RoleType roleType = ticket.getRoleType();
+
+        if (roleType != RoleType.ADMIN) {
+            payload = new DskGroupPayload();
+            logger.error("Invalid user");
+            response.setStatus(400);
+            payload.setValid(false);
+            payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
+
+            return payload;
+        }
+
+
+        try {
+          Long customerId = Long.valueOf(ticket.getCustID());
+          payload = dataSecurityKeyRepository
+              .fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+        } catch (Exception ex) {
+          payload = new DskGroupPayload();
+          payload.setValid(false);
+          payload.setMessage("Error occurred: " + ex.getMessage());
+        }
+
+        return payload;
+    }
+
+    @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
+    public Valid deleteSecurityGroupAttributeModel (
+        @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
+        HttpServletRequest request,
+        HttpServletResponse response) {
+
+        Valid valid = null;
+
+        Ticket ticket = SipCommonUtils.getTicket(request);
+
+        RoleType roleType = ticket.getRoleType();
+
+        if (roleType != RoleType.ADMIN) {
+            valid = new Valid();
+            logger.error("Invalid user");
+            response.setStatus(400);
+            valid.setValid(false);
+            valid.setValidityMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
+
+            return valid;
+        }
+
+        Long customerId = Long.valueOf(ticket.getCustID());
+
+        valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
+
+        return valid;
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.PUT)
-    public DskGroupResp updateDatasecurityGroup(HttpServletRequest request, HttpServletResponse response,
+    public DskGroupPayload updateSecurityGroupAttributeModel (
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
-        @RequestBody DskGroupReq dskGroupReq) {
-      String jwtToken = JWTUtils.getToken(request);
-      String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
+        HttpServletRequest request,
+        HttpServletResponse response,
+        @RequestBody SipDskAttribute sipDskAttributes) {
+        DskGroupPayload payload = null;
 
-      Long custId = Long.valueOf(extractValuesFromToken[1]);
-      String createdBy = extractValuesFromToken[2];
+        Ticket ticket = SipCommonUtils.getTicket(request);
+        Long customerId = Long.valueOf(ticket.getCustID());
 
-      List<String> securityGroupAttributes = dataSecurityKeyRepository.fetchSecurityGroupDskAttributes(securityGroupSysId);
-      securityGroupAttributes.add(0, String.valueOf(securityGroupSysId));
+        RoleType roleType = ticket.getRoleType();
 
-      if (securityGroupAttributes != null && securityGroupAttributes.size() != 0)
-        dataSecurityKeyRepository.deleteSecurityGroupDskAttributeValues(securityGroupAttributes);
+        if (roleType != RoleType.ADMIN) {
+            payload = new DskGroupPayload();
+            logger.error("Invalid user");
+            response.setStatus(400);
+            payload.setValid(false);
+            payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
 
+            return payload;
+        }
 
-//      List<DskAttribute> dsk = dskGroupReq.getDskAttributes();
-//
-//      for(DskAttribute dskAttributes : dsk) {
-//        Set<String> values = dskAttributes.getValues();
-//
-//        for(String value: values) {
-//          AttributeValues attributeValues = new AttributeValues();
-//          attributeValues.setAttributeName(dskAttributes.getName());
-//          attributeValues.setValue(value);
-//
-//          dataSecurityKeyRepository
-//            .addSecurityGroupDskAttributeValues(securityGroupSysId,attributeValues);
-//        }
-//      }
+        try {
+            // Delete the existing security group attributes
+            Valid valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 
-      SipDskAttribute dskAttributes = dskGroupReq.getDskAttributes();
-      List<DskDetails> attributes =
-            dataSecurityKeyRepository.fetchDskAllAttributeValues(securityGroupSysId);
+            if (valid.getValid()) {
+                // Add the new security group attributes
+                logger.info("Deleted existing DSK attributes");
+                valid = dataSecurityKeyRepository
+                    .addDskGroupAttributeModelAndValues(securityGroupSysId, sipDskAttributes);
 
-      DskGroupResp resp = new DskGroupResp();
-      resp.setSecurityGroupSysId(securityGroupSysId);
-//      resp.setAttributes(attributes);
-      resp.setValid(true);
+                if (valid.getValid()) {
+                    logger.info("DSK attributes updated successsfully");
 
-      return resp;
+                    payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+                } else {
+                    logger.error("Error occurred: " + valid.getError());
+                    payload = new DskGroupPayload();
+
+                    payload.setValid(false);
+                    payload.setMessage("Unable to update the dsk attributes");
+                }
+
+            } else {
+                logger.error("Error occurred: " + valid.getError());
+                payload = new DskGroupPayload();
+
+                payload.setValid(false);
+                payload.setMessage("Unable to update the dsk attributes");
+            }
+            // Fetch the attributes and return
+        } catch (Exception ex) {
+            logger.error("Error occurred while updating the security group attributes: " + ex.getMessage(), ex);
+        }
+
+        return payload;
     }
 
     /**

@@ -5,7 +5,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class DskGroupReq {
+public class DskGroupPayload {
+  @JsonProperty("securityGroupSysId")
+  @ApiModelProperty(notes = "Security group ID", name = "securityGroupSysId")
+  private Long securityGroupSysId;
+
   @JsonProperty("groupName")
   @ApiModelProperty(notes = "Security group Name", name = "groupName", required = true)
   private String groupName;
@@ -18,18 +22,23 @@ public class DskGroupReq {
   @ApiModelProperty(notes = "Security group attribute model", name = "dskAttributes")
   private SipDskAttribute dskAttributes;
 
-  //  @JsonProperty("dskAttributes")
-  //  @ApiModelProperty(
-  //      notes = "Security group attributes",
-  //      name = "dskAttributes",
-  //      required = true)
-  //  private List<DskAttribute> dskAttributes;
-  //
-  //  @JsonProperty("conjunction")
-  //  @ApiModelProperty(
-  //      notes = "Conjunction value (AND/OR). By default, the value is AND",
-  //      name = "conjunction")
-  //  private Conjunction conjunction = Conjunction.AND;
+  @JsonProperty("valid")
+  @ApiModelProperty(notes = "Status of the operation", name = "valid", required = true)
+  private Boolean valid;
+
+  @JsonProperty("message")
+  @ApiModelProperty(notes = "Reason for failure if any", name = "message")
+  private String message;
+
+  @JsonProperty("securityGroupSysId")
+  public Long getSecurityGroupSysId() {
+    return securityGroupSysId;
+  }
+
+  @JsonProperty("securityGroupSysId")
+  public void setSecurityGroupSysId(Long securityGroupSysId) {
+    this.securityGroupSysId = securityGroupSysId;
+  }
 
   @JsonProperty("groupName")
   public String getGroupName() {
@@ -41,39 +50,43 @@ public class DskGroupReq {
     this.groupName = groupName;
   }
 
+  @JsonProperty("description")
   public String getGroupDescription() {
     return groupDescription;
   }
 
+  @JsonProperty("description")
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
   }
 
+  @JsonProperty("attributes")
   public SipDskAttribute getDskAttributes() {
     return dskAttributes;
   }
 
+  @JsonProperty("attributes")
   public void setDskAttributes(SipDskAttribute dskAttributes) {
     this.dskAttributes = dskAttributes;
   }
 
-  //  @JsonProperty("dskAttributes")
-  //  public List<DskAttribute> getDskAttributes() {
-  //    return dskAttributes;
-  //  }
-  //
-  //  @JsonProperty("dskAttributes")
-  //  public void setDskAttributes(List<DskAttribute> dskAttributes) {
-  //    this.dskAttributes = dskAttributes;
-  //  }
-  //
-  //  @JsonProperty("conjunction")
-  //  public Conjunction getConjunction() {
-  //    return conjunction;
-  //  }
-  //
-  //  @JsonProperty("conjunction")
-  //  public void setConjunction(Conjunction conjunction) {
-  //    this.conjunction = conjunction;
-  //  }
+  @JsonProperty("valid")
+  public Boolean getValid() {
+    return valid;
+  }
+
+  @JsonProperty("valid")
+  public void setValid(Boolean valid) {
+    this.valid = valid;
+  }
+
+  @JsonProperty("message")
+  public String getMessage() {
+    return message;
+  }
+
+  @JsonProperty("message")
+  public void setMessage(String message) {
+    this.message = message;
+  }
 }

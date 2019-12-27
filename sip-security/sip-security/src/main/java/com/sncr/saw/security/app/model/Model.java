@@ -1,13 +1,21 @@
 package com.sncr.saw.security.app.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
+@JsonInclude(Include.NON_NULL)
+@ApiModel
 public class Model {
   @JsonProperty("operator")
+  @ApiModelProperty(notes = "Boolean operator", name = "operator")
   private Operator operator;
 
   @JsonProperty("values")
+  @ApiModelProperty(notes = "List of values for the attribute", name = "values")
   private List<String> values;
 
   @JsonProperty("operator")

@@ -3,23 +3,42 @@ package com.sncr.saw.security.app.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 @JsonInclude(Include.NON_NULL)
+@ApiModel
 public class SipDskAttribute {
+  @JsonProperty("attributeId")
+  @ApiModelProperty(notes = "Attribute ID", name = "attributeId")
+  private String attributeId;
+
   @JsonProperty("columnName")
+  @ApiModelProperty(notes = "Column name/Attribute Name", name = "columnName")
   private String columnName;
 
   @JsonProperty("model")
+  @ApiModelProperty(notes = "Attribute Model", name = "model")
   private Model model;
 
   @JsonProperty("booleanCriteria")
+  @ApiModelProperty(notes = "Conjunction used", name = "booleanCriteria")
   private BooleanCriteria booleanCriteria;
 
   @JsonProperty("booleanQuery")
+  @ApiModelProperty(
+      notes = "List of attributes on which boolean criteria has to be applied",
+      name = "booleanQuery")
   private List<SipDskAttribute> booleanQuery;
+
+  public String getAttributeId() {
+    return attributeId;
+  }
+
+  public void setAttributeId(String attributeId) {
+    this.attributeId = attributeId;
+  }
 
   public String getColumnName() {
     return columnName;
@@ -51,60 +70,5 @@ public class SipDskAttribute {
 
   public void setBooleanQuery(List<SipDskAttribute> booleanQuery) {
     this.booleanQuery = booleanQuery;
-  }
-
-  public static void main(String[] args) throws IOException {
-      String json = "{\n"
-          + "  \"booleanCriteria\": \"AND\",\n"
-          + "  \"booleanQuery\": [\n"
-          + "    {\n"
-          + "      \"columnName\": \"Field1\",\n"
-          + "      \"model\": {\n"
-          + "        \"operator\": \"ISIN\",\n"
-          + "        \"values\": [\n"
-          + "          \"abc\"\n"
-          + "        ]\n"
-          + "      }\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"columnName\": \"Field2\",\n"
-          + "      \"model\": {\n"
-          + "        \"operator\": \"ISIN\",\n"
-          + "        \"values\": [\n"
-          + "          \"pqr\"\n"
-          + "        ]\n"
-          + "      }\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"booleanCriteria\": \"OR\",\n"
-          + "      \"booleanQuery\": [\n"
-          + "        {\n"
-          + "          \"columnName\": \"Field3\",\n"
-          + "          \"model\": {\n"
-          + "            \"operator\": \"ISIN\",\n"
-          + "            \"values\": [\n"
-          + "              \"456\"\n"
-          + "            ]\n"
-          + "          }\n"
-          + "        },\n"
-          + "        {\n"
-          + "          \"columnName\": \"Field4\",\n"
-          + "          \"model\": {\n"
-          + "            \"operator\": \"ISIN\",\n"
-          + "            \"values\": [\n"
-          + "              \"123\"\n"
-          + "            ]\n"
-          + "          }\n"
-          + "        }\n"
-          + "      ]\n"
-          + "    }\n"
-          + "  ]\n"
-          + "}";
-
-      ObjectMapper mapper = new ObjectMapper();
-
-      SipDskAttribute dskModel = mapper.readValue(json, SipDskAttribute.class);
-
-    System.out.println(dskModel);
   }
 }
