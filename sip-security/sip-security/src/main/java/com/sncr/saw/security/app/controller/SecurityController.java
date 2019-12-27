@@ -1076,6 +1076,7 @@ public class SecurityController {
                     logger.info("DSK attributes updated successsfully");
 
                     payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+                    payload.setValid(true);
                 } else {
                     logger.error("Error occurred: " + valid.getError());
                     payload = new DskGroupPayload();
