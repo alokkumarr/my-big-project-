@@ -99,6 +99,62 @@
           }
         ]
       }
+    },
+    "dlreportquery": {
+      "REPOR009": {
+        "suites": ["critical", "regression"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report using query mode",
+        "query": "select * from SALES limit 5",
+        "recordCount": 5,
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR010": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able create dl report using query mode",
+        "query": "select * from SALES limit 5",
+        "recordCount": 5,
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR012": {
+        "suites": ["regression"],
+        "user": "admin",
+        "description": "Admin should be able create dl report using query mode and should get TenantA customer data",
+        "query": "select * from SALES where customerCode='TenantA' limit 5",
+        "recordCount": 5,
+        "columnData": "TenantA",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      },
+      "REPOR013": {
+        "suites": ["regression"],
+        "user": "userOne",
+        "description": "userOne should be able create dl report using query mode and should get data for TenantB customer data",
+        "query": "select * from SALES where string='string 2'",
+        "recordCount": 1,
+        "columnData": "TenantB",
+        "tables": [
+          {
+            "name": "SALES",
+            "fields": ["Integer", "String", "Date"]
+          }
+        ]
+      }
     }
   }
 }

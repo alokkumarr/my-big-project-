@@ -32,7 +32,12 @@ describe('Executing pagination in preview page for reports from reports/EsReport
   afterEach(done => {
     setTimeout(() => {
       if (analysisId) {
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          analysisId
+        );
       }
       // Logout by clearing the storage
       commonFunctions.clearLocalStorage();

@@ -29,7 +29,7 @@ export class AlertsViewComponent implements OnInit {
   allAlertCountChartData$: Observable<AlertChartData>;
   @Select(AlertsState.getAllAlertsSeverityChartData)
   allAlertSeverityChartData$: Observable<AlertChartData>;
-  @ViewChild('alertViewSidenav') alertViewSidenav;
+  @ViewChild('alertViewSidenav', { static: true }) alertViewSidenav;
 
   public additionalCountChartOptions = {
     chart: {
