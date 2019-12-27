@@ -70,6 +70,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private String basePath;
     private String batchPrefix;
     private String outputType;
+    private static final String fileNamePrefix = "part";
 
     public ProcessRecords(
         JavaInputDStream<ConsumerRecord<String, String>> inStream,
@@ -189,7 +190,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             // Save data as TEMP
             stringRdd.saveAsTextFile(strTmpPath);
             // Rename and cleanup
-            finalizeBatch(strTmpPath, path);
+            finalizeBatch(strTmpPath, path, true, sdf.format(batchDt));
         }
     }
 
@@ -244,7 +245,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                 logger.error("Invalid output type :" + outputType);
             }
             // Done with writing - safe to rename batch directory
-            finalizeBatch(strTmpPath, path);
+            finalizeBatch(strTmpPath, path, false, sdf.format(batchDt));
         } //<-- if(basePath != null && !basePath.isEmpty())
 
         /* Alert metrics collection */
@@ -255,7 +256,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         return 0;
     }
 
-    private int finalizeBatch(String strTmpPath, String finalPath){
+    private int finalizeBatch(String strTmpPath, String finalPath, boolean isSimple, String batchDate){
         // Done with writing - safe to rename batch directory
         try {
             String defaultFS = "maprfs:///";
@@ -277,6 +278,23 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             // Results are ready - make it final
             // !!!!!!!!!!!Should use another technique for rename
             fs.rename(tmpPath, new Path(finalPath));
+            
+            /**
+             * Simple scenario's no suffix such as UUID
+             * is not added. Hence renaming file to maintian
+             * uniqueness with timestamp as suffix
+             */
+            if(isSimple) {
+            	String fileName = fs.globStatus(new Path(finalPath+ 
+            			Path.SEPARATOR +"part*"))[0].getPath().getName();
+                
+                logger.debug("******** part file name renaming for simple.... ********"+ fileName);
+                
+                fs.rename(new Path(finalPath+ Path.SEPARATOR + fileName), new Path(finalPath+ 
+                		Path.SEPARATOR + fileNamePrefix + batchDate));
+               
+                logger.info("******** rename completed ********");
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
