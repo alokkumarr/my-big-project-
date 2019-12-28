@@ -126,13 +126,12 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
 
   @Override
   public DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID) {
-    String tableName = "dsk_eligible_fields";
+    String tableName = "DSK_ELIGIBLE_FIELDS";
 
     String fetchQuery =
         "SELECT CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME,"
-            + " DISPLAY_NAME FROM "
-            + tableName
-            + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=?";
+            + " DISPLAY_NAME FROM " + tableName
+            + " WHERE CUSTOMER_SYS_ID=? AND PRODUCT_ID=? AND ACTIVE_STATUS_IND=1";
 
     DskFieldsInfo dskFieldsInfo = new DskFieldsInfo();
 
@@ -142,7 +141,6 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
             ps -> {
               ps.setLong(1, customerSysId);
               ps.setLong(2, defaultProdID);
-              ps.setShort(3, (short)1);
             },
             resultSet -> {
               Map<Long, Map<Long, Map<String, List<DskField>>>> dskEligibleData =
