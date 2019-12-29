@@ -7,6 +7,9 @@ const DEFAULT_ROUTE = '/analyze';
 import { JwtService } from './../../common/services/jwt.service';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPipe from 'lodash/fp/pipe';
 
 @Injectable()
 export class DefaultModuleGuard implements CanActivate {
@@ -24,7 +27,7 @@ export class DefaultModuleGuard implements CanActivate {
 
     try {
       const pref = JSON.parse(config);
-      const isObservePrivileged = this.checkObservePrivilege();
+
 
       if (!Array.isArray(pref.preferences)) {
         this.router.navigate([DEFAULT_ROUTE]);
@@ -38,6 +41,9 @@ export class DefaultModuleGuard implements CanActivate {
         p => p.preferenceName === PREFERENCES.DEFAULT_DASHBOARD_CAT
       )[0];
 
+      const isObservePrivileged = this.checkObservePrivilege(
+        defaultDashboardCat.preferenceValue
+      );
       if (
         !defaultDashboard ||
         !defaultDashboardCat ||
@@ -61,7 +67,7 @@ export class DefaultModuleGuard implements CanActivate {
     }
   }
 
-  checkObservePrivilege() {
+  checkObservePrivilege(categoryId) {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
     const modules = [
@@ -69,6 +75,14 @@ export class DefaultModuleGuard implements CanActivate {
         return productModName;
       })
     ];
-    return modules.includes('OBSERVE');
+
+    const checkPermissionForSubCat = fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID) == parseInt(categoryId)
+      })
+    )(product.productModules);
+    return modules.includes('OBSERVE') && checkPermissionForSubCat.length > 0;
   }
 }
