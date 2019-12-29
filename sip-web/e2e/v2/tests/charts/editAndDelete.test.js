@@ -16,7 +16,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Header = require('../../pages/components/Header');
-
+const users = require('../../helpers/data-generation/users');
 describe('Executing create and delete chart tests from charts/editAndDelete.test.js', () => {
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createSubCategories.createAnalysis.name;
@@ -35,7 +35,11 @@ describe('Executing create and delete chart tests from charts/editAndDelete.test
   beforeAll(() => {
     logger.info('Starting charts/editAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 

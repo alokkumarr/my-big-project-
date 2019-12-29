@@ -35,11 +35,12 @@ export class AnalyzeListViewComponent implements OnInit {
     this.analyses = analyses;
     if (!isEmpty(analyses)) {
       const firstAnalysis = analyses[0];
-      this.canUserFork = this._jwt.hasPrivilege('FORK', {
-        subCategoryId: isDSLAnalysis(firstAnalysis)
-          ? firstAnalysis.category
-          : firstAnalysis.categoryId
-      });
+      const subCategoryId = isDSLAnalysis(firstAnalysis)
+        ? firstAnalysis.category
+        : firstAnalysis.categoryId;
+      this.canUserFork =
+        this._jwt.hasPrivilege('FORK', { subCategoryId }) &&
+        this._jwt.hasPrivilegeForDraftsFolder('FORK');
     }
   }
   @Input() analysisType: string;
