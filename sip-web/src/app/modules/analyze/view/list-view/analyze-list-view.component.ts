@@ -28,18 +28,19 @@ import { JwtService } from '../../../../common/services';
   styleUrls: ['./analyze-list-view.component.scss']
 })
 export class AnalyzeListViewComponent implements OnInit {
-  @ViewChild('analysesGrid') analysesGrid: DxDataGridComponent;
+  @ViewChild('analysesGrid', { static: true }) analysesGrid: DxDataGridComponent;
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input('analyses')
   set setAnalyses(analyses: Array<Analysis | AnalysisDSL>) {
     this.analyses = analyses;
     if (!isEmpty(analyses)) {
       const firstAnalysis = analyses[0];
-      this.canUserFork = this._jwt.hasPrivilege('FORK', {
-        subCategoryId: isDSLAnalysis(firstAnalysis)
-          ? firstAnalysis.category
-          : firstAnalysis.categoryId
-      });
+      const subCategoryId = isDSLAnalysis(firstAnalysis)
+        ? firstAnalysis.category
+        : firstAnalysis.categoryId;
+      this.canUserFork =
+        this._jwt.hasPrivilege('FORK', { subCategoryId }) &&
+        this._jwt.hasPrivilegeForDraftsFolder('FORK');
     }
   }
   @Input() analysisType: string;

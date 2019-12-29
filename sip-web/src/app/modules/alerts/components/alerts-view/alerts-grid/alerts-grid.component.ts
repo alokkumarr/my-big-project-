@@ -22,7 +22,7 @@ export class AlertsGridComponent implements OnInit {
   public DEFAULT_PAGE_SIZE = DEFAULT_PAGE_SIZE;
   public enablePaging = false;
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
 
   constructor() {}
 

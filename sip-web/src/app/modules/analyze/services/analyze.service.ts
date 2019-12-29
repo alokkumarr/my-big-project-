@@ -163,9 +163,11 @@ export class AnalyzeService {
     ).pipe(
       // Sort all the analyses based on their create time in descending order (newest first).
       // Uses correct time field based on if analysis is new dsl type or not
-      map(<FPSort<AnalysisDSL>>(
-        fpSortBy([analysis => -(analysis.createdTime || 0)])
-      ))
+      map(
+        <FPSort<AnalysisDSL>>(
+          fpSortBy([analysis => -(analysis.createdTime || 0)])
+        )
+      )
     );
   }
 
@@ -345,8 +347,7 @@ export class AnalyzeService {
     return promise;
   }
 
-  changeSchedule(analysis) {
-    const schedule = analysis.schedule;
+  changeSchedule(schedule) {
     const scheduleState = schedule.scheduleState;
     switch (scheduleState) {
       case 'new':
@@ -656,12 +657,14 @@ export class AnalyzeService {
     semanticId: string,
     type: AnalysisType
   ): Promise<Partial<AnalysisDSL>> {
+    const userId = parseInt(this._jwtService.getUserId(), 10);
     let model: Partial<AnalysisDSL> = {
       type,
       semanticId,
       name: 'Untitled Analysis',
       description: '',
       createdBy: this._jwtService.getLoginId(),
+      userId,
       customerCode: this._jwtService.customerCode,
       projectCode: PROJECT_CODE,
       module: ANALYZE_MODULE_NAME,
@@ -682,9 +685,7 @@ export class AnalyzeService {
       model = { ...model, ...this.newAnalysisChartModel(model) };
     }
 
-    return (<Observable<Analysis | AnalysisDSL>>this.getSemanticObject(
-      semanticId
-    ).pipe(
+    return (<Observable<AnalysisDSL>>this.getSemanticObject(semanticId).pipe(
       map(semanticData => {
         const repo = semanticData.esRepository;
         if (repo) {

@@ -86,8 +86,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   actionBus$: Subject<Object> = new Subject<Object>();
   public filters: Filter[] = [];
 
-  @ViewChild('detailsSidenav') detailsSidenav: MatSidenav;
-  @ViewChild('mapView') mapView: ElementRef;
+  @ViewChild('detailsSidenav', { static: true }) detailsSidenav: MatSidenav;
+  @ViewChild('mapView', { static: false }) mapView: ElementRef;
 
   constructor(
     public _executeService: ExecuteService,
@@ -106,15 +106,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.canAutoRefresh = this._jwt.hasCustomConfig(
+      CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
+    );
     combineLatest(this._route.params, this._route.queryParams)
       .pipe(debounce(() => timer(100)))
       .subscribe(([params, queryParams]) => {
         this.onParamsChange(params, queryParams);
       });
-
-    this.canAutoRefresh = this._jwt.hasCustomConfig(
-      CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
-    );
   }
 
   fetchFilters(analysis) {
@@ -131,7 +130,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       if (
         !filtr.isRuntimeFilter &&
         !filtr.isGlobalFilter &&
-        filtr.type === 'date' && filtr.model.operator === 'BTW'
+        filtr.type === 'date' &&
+        filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value).format('YYYY-MM-DD');
         filtr.model.lte = moment(filtr.model.otherValue).format('YYYY-MM-DD');
@@ -194,7 +194,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       executionId ||
       loadLastExecution ||
       isDataLakeReport ||
-      !this.canAutoRefresh
+      !this.canAutoRefresh ||
+      !this.canUserExecute
     ) {
       this.loadExecutedAnalysesAndExecutionData(
         analysis.id,
@@ -654,15 +655,15 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     const categoryId = isDSLAnalysis(analysis)
       ? analysis.category
       : analysis.categoryId;
-    const userId = isDSLAnalysis(analysis)
-      ? analysis.createdBy
-      : analysis.userId;
+    const userId = analysis.userId;
     this.canUserPublish = this._jwt.hasPrivilege('PUBLISH', {
       subCategoryId: categoryId
     });
-    this.canUserFork = this._jwt.hasPrivilege('FORK', {
+    const canForkInCurrentFolder = this._jwt.hasPrivilege('FORK', {
       subCategoryId: categoryId
     });
+    const canForkInDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder('FORK');
+    this.canUserFork = canForkInCurrentFolder && canForkInDraftsFolder;
     this.canUserExecute = this._jwt.hasPrivilege('EXECUTE', {
       subCategoryId: categoryId
     });

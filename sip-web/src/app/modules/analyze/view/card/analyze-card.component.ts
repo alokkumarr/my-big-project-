@@ -56,12 +56,13 @@ export class AnalyzeCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.canUserFork = this._jwt.hasPrivilege('FORK', {
-      subCategoryId: isDSLAnalysis(this.analysis)
-        ? this.analysis.category
-        : this.analysis.categoryId
-    });
     const { type, id } = this.analysis;
+    const subCategoryId = isDSLAnalysis(this.analysis)
+      ? this.analysis.category
+      : this.analysis.categoryId;
+    this.canUserFork =
+      this._jwt.hasPrivilege('FORK', { subCategoryId }) &&
+      this._jwt.hasPrivilegeForDraftsFolder('FORK');
     const subTypePaths = {
       map: 'mapOptions.mapType',
       chart: 'chartOptions.chartType'

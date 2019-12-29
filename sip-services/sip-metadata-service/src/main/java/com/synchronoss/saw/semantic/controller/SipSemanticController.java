@@ -109,7 +109,7 @@ public class SipSemanticController {
   @ResponseStatus(HttpStatus.OK)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
-      @PathVariable(name = "Id", required = true) String id, @RequestBody SemanticNode requestBody,
+      @PathVariable(name = "id", required = true) String id, @RequestBody SemanticNode requestBody,
       @RequestHeader Map<String, String> headers) throws SipJsonMissingException {
     logger.trace("Request Body to update a semantic node:{}", id);
     SemanticNode responseObjectFuture = null;

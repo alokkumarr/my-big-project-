@@ -140,7 +140,8 @@ public class ExportServiceImpl implements ExportService {
               + "&analysisType="
               + analysisType
               + "&executionType="
-              + executionType;
+              + executionType
+              + "&internalCall=true";
 
     } else if (executionId == null) {
       url =
@@ -150,7 +151,8 @@ public class ExportServiceImpl implements ExportService {
               + "/lastExecutions/data?page=1&pageSize="
               + sizOfExport
               + "&analysisType="
-              + analysisType;
+              + analysisType
+              + "&internalCall=true";
     } else {
       url =
           storageProxyUrl
@@ -159,7 +161,8 @@ public class ExportServiceImpl implements ExportService {
               + "/executions/data?page=1&pageSize="
               + sizOfExport
               + "&analysisType="
-              + analysisType;
+              + analysisType
+              + "&internalCall=true";
     }
     HttpEntity<?> requestEntity = new HttpEntity<>(ExportUtils.setRequestHeader(request));
     /**
@@ -399,7 +402,7 @@ public class ExportServiceImpl implements ExportService {
                                     ExportBean exportBean,
                                     RestTemplate restTemplate) throws IOException {
 
-    String proxyEndPoint = "/internal/proxy/storage/%s/executions/data?page=%s&pageSize=%s&executionType=scheduled&analysisType=%s";
+    String proxyEndPoint = "/internal/proxy/storage/%s/executions/data?page=%s&pageSize=%s&executionType=scheduled&analysisType=%s&internalCall=true";
 
     File xlsxFile = new File(exportBean.getFileName());
     xlsxFile.getParentFile().mkdir();
@@ -519,7 +522,7 @@ public class ExportServiceImpl implements ExportService {
             storageProxyUrl
                 + "/internal/proxy/storage/"
                 + executionId
-                + "/executions/data";
+                + "/executions/data?internalCall=true";
 
         ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
             asyncRestTemplate.getForEntity(url, JsonNode.class);
@@ -627,7 +630,7 @@ public class ExportServiceImpl implements ExportService {
               + "/internal/proxy/storage/"
               + executionId
               + "/executions/data?page=1&pageSize="
-              + ftpExportSize;
+              + ftpExportSize+"&internalCall=true";
       ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture =
           asyncRestTemplate.getForEntity(url, JsonNode.class);
 
@@ -860,7 +863,7 @@ public class ExportServiceImpl implements ExportService {
                               RestTemplate restTemplate,
                               String userFileName) {
 
-    String endPoint = "/internal/proxy/storage/%s/executions/data?page=1&pageSize=%s&executionType=scheduled&analysisType=%s";
+    String endPoint = "/internal/proxy/storage/%s/executions/data?page=1&pageSize=%s&executionType=scheduled&analysisType=%s&internalCall=true";
     String url = storageProxyUrl.concat(String.format(endPoint, executionId, emailExportSize, analysisType));
     ResponseEntity<DataResponse> entity = restTemplate.getForEntity(url, DataResponse.class);
 
@@ -1105,7 +1108,8 @@ public class ExportServiceImpl implements ExportService {
                 + "&analysisType="
                 + analysisType
                 + "&analysisId="
-                + analysisId;
+                + analysisId
+                + "&internalCall=true";
 
         logger.debug("URL = " + url);
 
@@ -1149,7 +1153,8 @@ public class ExportServiceImpl implements ExportService {
                 + "&analysisType="
                 + analysisType
                 + "&analysisId="
-                + analysisId;
+                + analysisId
+                + "&internalCall=true";
 
         // we directly get response and start processing this.
         ResponseEntity<DataResponse> entity =
@@ -1293,7 +1298,7 @@ public class ExportServiceImpl implements ExportService {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
+    String url = metaDataServiceExport + "/dslanalysis/" + analysisId + "?internalCall=true";
     logger.debug("SIP query url for analysis fetch : " + url);
     AnalysisResponse analysisResponse = restTemplate.getForObject(url, AnalysisResponse.class);
     SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();

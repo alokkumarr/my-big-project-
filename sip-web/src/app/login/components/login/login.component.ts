@@ -13,7 +13,7 @@ import {
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  @ViewChild('username') username: ElementRef;
+  @ViewChild('username', { static: true }) username: ElementRef;
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
