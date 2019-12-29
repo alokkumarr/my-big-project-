@@ -10,6 +10,8 @@ import { AnalysisDSL } from '../../../models';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { DesignerSaveEvent, isDSLAnalysis } from '../designer/types';
 import * as clone from 'lodash/clone';
+import * as get from 'lodash/get';
+import { SYSTEM_CATEGORY_OPERATIONS } from './../../../common/consts';
 
 @Component({
   selector: 'analyze-actions-menu-u',
@@ -25,6 +27,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
   @Input() analysis: Analysis | AnalysisDSL;
   @Input() exclude: string;
+  @Input() category;
   @Input('actionsToDisable')
   set disabledActions(actionsToDisable: string) {
     this.actionsToDisable = fpPipe(
@@ -66,12 +69,12 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     {
       label: 'Publish',
       value: 'publish',
-      fn: this.publish.bind(this, 'publish')
+      fn: this.publish.bind(this)
     },
     {
       label: 'Schedule',
       value: 'publish',
-      fn: this.publish.bind(this, 'schedule')
+      fn: this.schedule.bind(this)
     },
     {
       label: 'Export',
@@ -92,21 +95,44 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const categoryDetails = this._jwt.fetchCategoryDetails(this.category)[0];
     const privilegeMap = { print: 'export', details: 'access' };
     const actionsToExclude = isString(this.exclude)
       ? this.exclude.split('-')
       : [];
-    this.actions = filter(this.actions, ({ value }) => {
+    this.actions = filter(this.actions, ({ value, label }) => {
+      if (get(categoryDetails, 'systemCategory')) {
+        if (SYSTEM_CATEGORY_OPERATIONS.includes(label)) {
+          return true;
+        }
+      }
       const notExcluded = !actionsToExclude.includes(value);
       const privilegeName = upperCase(privilegeMap[value] || value);
-      const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
-        subCategoryId: isDSLAnalysis(this.analysis)
-          ? this.analysis.category
-          : this.analysis.categoryId
-      });
-
+      const subCategoryId = isDSLAnalysis(this.analysis)
+        ? this.analysis.category
+        : this.analysis.categoryId;
+      const hasPriviledge = this.doesUserHavePrivilege(
+        privilegeName,
+        subCategoryId
+      );
       return notExcluded && hasPriviledge;
     });
+  }
+
+  doesUserHavePrivilege(privilegeName, subCategoryId) {
+    const hasPrivilegeForCurrentFolder = this._jwt.hasPrivilege(privilegeName, {
+      subCategoryId
+    });
+    const needsPrivilegeForDraftsFolder = ['EDIT', 'FORK', 'CREATE'].includes(
+      privilegeName
+    );
+    const hasPrivilegeForDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder(
+      privilegeName
+    );
+    return (
+      hasPrivilegeForCurrentFolder &&
+      (!needsPrivilegeForDraftsFolder || hasPrivilegeForDraftsFolder)
+    );
   }
 
   edit() {
@@ -135,14 +161,20 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     });
   }
 
-  publish(type) {
+  publish() {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService
-      .publish(analysis, type)
-      .then(publishedAnalysis => {
-        this.analysis = publishedAnalysis;
-        this.afterPublish.emit(publishedAnalysis);
-      });
+    this._analyzeActionsService.publish(analysis).then(publishedAnalysis => {
+      this.analysis = publishedAnalysis;
+      this.afterPublish.emit(publishedAnalysis);
+    });
+  }
+
+  schedule() {
+    const analysis = clone(this.analysis);
+    this._analyzeActionsService.schedule(analysis).then(scheduledAnalysis => {
+      this.analysis = scheduledAnalysis;
+      this.afterPublish.emit(scheduledAnalysis);
+    });
   }
 
   export() {
