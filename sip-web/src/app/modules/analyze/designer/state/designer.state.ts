@@ -269,8 +269,7 @@ export class DesignerState {
       ({ columnName, dataField, area }) =>
         dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName &&
-          (fieldArea ? area === fieldArea : true)
+          : columnName === artifactColumn.columnName
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
