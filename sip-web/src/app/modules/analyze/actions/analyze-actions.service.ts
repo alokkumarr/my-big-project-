@@ -45,8 +45,12 @@ export class AnalyzeActionsService {
     return this.openEditModal(analysis, 'edit');
   }
 
-  publish(analysis, type) {
-    return this.openPublishModal(clone(analysis), type);
+  publish(analysis) {
+    return this.openPublishModal(clone(analysis));
+  }
+
+  schedule(analysis) {
+    return this.openScheduleModal(clone(analysis));
   }
 
   delete(analysis) {
@@ -120,14 +124,9 @@ export class AnalyzeActionsService {
     });
   }
 
-  publishAnalysis(
-    analysis: AnalysisDSL,
-    execute,
-    type,
-    lastCategoryId: number | string
-  ) {
+  publishAnalysis(analysis: AnalysisDSL, lastCategoryId: number | string) {
     const publish = (a = analysis) =>
-      this._publishService.publishAnalysis(a, execute, type, lastCategoryId);
+      this._publishService.publishAnalysis(a, lastCategoryId);
 
     const overwriteParent = (parent, child) => {
       /* Update parent analysis with child's changes, then delete child. */
@@ -189,80 +188,61 @@ export class AnalyzeActionsService {
       );
   }
 
-  openPublishModal(analysis: AnalysisDSL, type) {
-    switch (type) {
-      case 'publish':
-        return new Promise<AnalysisDSL>((resolve, reject) => {
-          this.dialog
-            .open(AnalyzePublishDialogComponent, {
-              width: 'auto',
-              height: 'auto',
-              data: { analysis: clone(analysis) }
-            } as MatDialogConfig)
-            .afterClosed()
-            .subscribe(modifiedAnalysis => {
-              if (modifiedAnalysis) {
-                const execute = true;
-                this.publishAnalysis(
-                  modifiedAnalysis,
-                  execute,
-                  type,
-                  analysis.category
-                ).then(
-                  publishedAnalysis => {
-                    if (!publishedAnalysis) {
-                      return reject();
-                    }
-                    this._toastMessage.info(
-                      execute
-                        ? 'Analysis has been updated.'
-                        : 'Analysis schedule changes have been updated.'
-                    );
-                    resolve(publishedAnalysis);
-                  },
-                  () => {
-                    reject();
-                  }
-                );
+  openPublishModal(analysis: AnalysisDSL) {
+    return new Promise<AnalysisDSL>((resolve, reject) => {
+      this.dialog
+        .open(AnalyzePublishDialogComponent, {
+          width: 'auto',
+          height: 'auto',
+          data: { analysis: clone(analysis) }
+        } as MatDialogConfig)
+        .afterClosed()
+        .subscribe(modifiedAnalysis => {
+          if (modifiedAnalysis) {
+            this.publishAnalysis(modifiedAnalysis, analysis.category).then(
+              publishedAnalysis => {
+                if (!publishedAnalysis) {
+                  return reject();
+                }
+                this._toastMessage.info('Analysis has been updated.');
+                resolve(publishedAnalysis);
+              },
+              () => {
+                reject();
               }
-            });
+            );
+          }
         });
-        break;
+    });
+  }
 
-      case 'schedule':
-        return new Promise<AnalysisDSL>((resolve, reject) => {
-          this.dialog
-            .open(AnalyzeScheduleDialogComponent, {
-              width: 'auto',
-              height: 'auto',
-              minWidth: '750px',
-              autoFocus: false,
-              data: { analysis }
-            } as MatDialogConfig)
-            .afterClosed()
-            .subscribe(scheduledAnalysis => {
-              if (scheduledAnalysis) {
-                const execute = false;
-                this._publishService
-                  .publishAnalysis(scheduledAnalysis, execute, type)
-                  .then(
-                    updatedAnalysis => {
-                      this._toastMessage.info(
-                        execute
-                          ? 'Analysis has been updated.'
-                          : 'Analysis schedule changes have been updated.'
-                      );
-                      resolve(updatedAnalysis);
-                    },
-                    () => {
-                      reject();
-                    }
-                  );
+  openScheduleModal(analysis: AnalysisDSL) {
+    return new Promise<AnalysisDSL>((resolve, reject) => {
+      this.dialog
+        .open(AnalyzeScheduleDialogComponent, {
+          width: 'auto',
+          height: 'auto',
+          minWidth: '750px',
+          autoFocus: false,
+          data: { analysis }
+        } as MatDialogConfig)
+        .afterClosed()
+        .subscribe(schedule => {
+          if (schedule) {
+            this._publishService.scheduleAnalysis(schedule).then(
+              () => {
+                this._toastMessage.info(
+                  'Analysis schedule changes have been updated.'
+                );
+                resolve(analysis);
+              },
+              () => {
+                reject();
               }
-            });
+            );
+          }
         });
-        break;
-    }
+    });
   }
 
   removeAnalysis(analysis) {
@@ -273,10 +253,9 @@ export class AnalyzeActionsService {
         scheduleState: 'delete',
         jobName: analysis.id,
         groupName: analysis.customerCode,
-        categoryId: analysis.categoryId
+        categoryId: analysis.category
       };
-      analysis.schedule = deleteScheduleBody;
-      this._analyzeService.changeSchedule(analysis);
+      this._analyzeService.changeSchedule(deleteScheduleBody);
     }
     return this._analyzeService.deleteAnalysis(analysis).then(
       () => {

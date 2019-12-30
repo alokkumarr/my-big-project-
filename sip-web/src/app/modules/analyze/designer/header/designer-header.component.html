@@ -77,11 +77,7 @@
         !isInQueryMode
       "
       [disabled]="!areMinRequirmentsMet"
-      [color]="
-        designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA
-          ? 'primary'
-          : ''
-      "
+      [color]="areMinRequirmentsMet ? 'primary' : ''"
       (click)="requestAction.emit('refresh')"
     >
       <span i18n>Refresh Data</span>
