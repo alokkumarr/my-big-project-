@@ -393,19 +393,17 @@ public class SecurityIT extends BaseIT {
     ObjectNode categoryDetail = mapper.createObjectNode();
     categoryDetail.put("autoCreate", true);
     categoryDetail.put("categoryDesc", "Category Description");
-    categoryDetail.put("categoryName", "NewCategory01");
+    categoryDetail.put("categoryName", "NewCategory");
     categoryDetail.put("categoryType", "000121");
 
     ObjectNode subCategoryDetail = mapper.createObjectNode();
     subCategoryDetail.put("autoCreate", true);
 
     ArrayNode privileges = subCategoryDetail.putArray("privilege");
-    privileges.add("CREATE");
-    privileges.add("PUBLISH");
-    privileges.add("DELETE");
+    privileges.add("ALL");
 
     subCategoryDetail.put("subCategoryDesc", "Sub Category Description");
-    subCategoryDetail.put("subCategoryName", "New_Sub_Category01");
+    subCategoryDetail.put("subCategoryName", "New_Sub_Category");
 
     ArrayNode subCategory = categoryDetail.putArray("subCategories");
     subCategory.add(subCategoryDetail);
