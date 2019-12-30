@@ -146,15 +146,15 @@ describe('Analyze Service', () => {
     });
 
     const newSchedule = { scheduleState: 'new' };
-    service.changeSchedule({ schedule: newSchedule });
+    service.changeSchedule(newSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/schedule', newSchedule);
 
     const updateSchedule = { scheduleState: 'exist' };
-    service.changeSchedule({ schedule: updateSchedule });
+    service.changeSchedule(updateSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/update', updateSchedule);
 
     const deleteSchedule = { scheduleState: 'delete' };
-    service.changeSchedule({ schedule: deleteSchedule });
+    service.changeSchedule(deleteSchedule);
     expect(spy).toHaveBeenCalledWith('scheduler/delete', deleteSchedule);
   });
 

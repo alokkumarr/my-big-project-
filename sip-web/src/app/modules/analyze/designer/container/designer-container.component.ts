@@ -20,6 +20,7 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as forOwn from 'lodash/forOwn';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as omit from 'lodash/omit';
 import * as includes from 'lodash/includes';
 import * as keys from 'lodash/keys';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -353,7 +354,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       if (
         !filtr.isRuntimeFilter &&
         !filtr.isGlobalFilter &&
-        (filtr.type === 'date' && filtr.model.operator === 'BTW')
+        filtr.type === 'date' &&
+        filtr.model.operator === 'BTW'
       ) {
         filtr.model.gte = moment(filtr.model.value, 'MM-DD-YYYY').format(
           'YYYY-MM-DD'
@@ -552,16 +554,16 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
       .createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis | AnalysisDSL) => {
         this.analysis = {
-          ...analysis,
-          ...{
-            id: newAnalysis.id
-          },
+          ...omit(analysis, 'category'),
+          id: newAnalysis.id,
           ...(isDSLAnalysis(newAnalysis)
             ? {
                 id: newAnalysis.id,
                 semanticId: newAnalysis.semanticId,
                 createdTime: newAnalysis.createdTime,
-                createdBy: newAnalysis.createdBy
+                createdBy: newAnalysis.createdBy,
+                userId: newAnalysis.userId,
+                parentAnalysisId: analysis.id
               }
             : {
                 metric: newAnalysis.metric,
@@ -815,9 +817,9 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         const analysisForPreview = isDSLAnalysis(this.analysis)
           ? this._store.selectSnapshot(state => state.designerState.analysis)
           : this.analysis;
-        this._analyzeDialogService.openPreviewDialog(<Analysis | AnalysisDSL>(
-          analysisForPreview
-        ));
+        this._analyzeDialogService.openPreviewDialog(
+          <Analysis | AnalysisDSL>analysisForPreview
+        );
         break;
       case 'description':
         this._analyzeDialogService

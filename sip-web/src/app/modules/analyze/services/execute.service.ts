@@ -53,6 +53,21 @@ export class ExecuteService {
       });
   }
 
+  executeAnalysisAndReturnAfterDone(
+    analysis,
+    mode = EXECUTION_MODES.LIVE,
+    navigateBack: string = null
+  ) {
+    return this._filterService
+      .getRuntimeFilterValues(analysis, navigateBack)
+      .then(model => {
+        if (model) {
+          return this.doExecute(model, mode);
+        }
+        return Promise.resolve(null);
+      });
+  }
+
   doExecute(analysis, mode = EXECUTION_MODES.PUBLISH) {
     const id = analysis.id;
     const exec$ = new BehaviorSubject<IExecuteEvent>({
@@ -62,19 +77,21 @@ export class ExecuteService {
       id,
       subject: exec$
     });
-    this._analyzeService.applyAnalysis(analysis, mode, { take: 25 }).then(
-      response => {
-        exec$.next({
-          state: EXECUTION_STATES.SUCCESS,
-          response
-        });
-        exec$.complete();
-      },
-      () => {
-        exec$.next({ state: EXECUTION_STATES.ERROR });
-        exec$.complete();
-      }
-    );
+    return this._analyzeService
+      .applyAnalysis(analysis, mode, { take: 25 })
+      .then(
+        response => {
+          exec$.next({
+            state: EXECUTION_STATES.SUCCESS,
+            response
+          });
+          exec$.complete();
+        },
+        () => {
+          exec$.next({ state: EXECUTION_STATES.ERROR });
+          exec$.complete();
+        }
+      );
   }
 
   subscribe(analysisId: string, callback: (IExecuteEvent) => void) {
@@ -90,8 +107,8 @@ export class ExecuteService {
     return this.execs$
       .pipe(
         filter(({ subject }) => !subject.isStopped),
-        mergeMap<IExecuteEventEmitter, any>(
-          ({ id, subject }) => subject.pipe(map(({ state }) => ({ id, state })))
+        mergeMap<IExecuteEventEmitter, any>(({ id, subject }) =>
+          subject.pipe(map(({ state }) => ({ id, state })))
         ),
         scan<IExecuteAggregateEvent, Object>((acc, e) => {
           acc[e.id] = e.state;
