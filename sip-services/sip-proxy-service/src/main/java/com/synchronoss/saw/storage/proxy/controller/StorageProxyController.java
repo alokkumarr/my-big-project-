@@ -629,7 +629,8 @@ public class StorageProxyController {
     logger.trace("DSK List = " + dskList);
 
     // If user is associated with any datasecurity key, return empty data
-    if (dskList != null && dskList.size() != 0) {
+    if (dskList != null && dskList.size() != 0 && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
       return new ExecutionResponse();
     }
 
