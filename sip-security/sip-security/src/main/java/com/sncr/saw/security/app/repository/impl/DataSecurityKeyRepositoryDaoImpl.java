@@ -1,13 +1,27 @@
 package com.sncr.saw.security.app.repository.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sncr.saw.security.app.controller.ServerResponseMessages;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.dsk.*;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.bda.sip.dsk.DskGroupPayload;
+import com.synchronoss.bda.sip.dsk.Model;
+import com.synchronoss.bda.sip.dsk.Operator;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -174,6 +188,32 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             });
 
         return groupNames;
+    }
+
+    private ObjectNode getGroupDetails (Long securityGroupId, Long customerId) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        String getGroupDetails = "SELECT SEC_GROUP_NAME, DESCRIPTION "
+            + "FROM SEC_GROUP "
+            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
+
+        ObjectNode groupDetails = jdbcTemplate.query(getGroupDetails, ps -> {
+            ps.setLong(1, securityGroupId);
+            ps.setLong(2, customerId);
+        }, resultSet -> {
+            ObjectNode node = mapper.createObjectNode();
+            if (resultSet.next()) {
+                String groupName = resultSet.getString("SEC_GROUP_NAME");
+                String groupDescription = resultSet.getString("DESCRIPTION");
+
+                node.put("groupName", groupName);
+                node.put("groupDescription", groupDescription);
+
+            }
+            return node;
+        });
+
+        return groupDetails;
     }
 
     @Override
@@ -427,6 +467,120 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return attributeSysId;
     }
 
+    @Override
+    public Valid addDskGroupAttributeModelAndValues(Long securityGroupId,
+        SipDskAttribute dskAttribute) {
+        Valid valid = new Valid();
+        // Process all dsk attributes and insert them in batch
+
+        try {
+            List<SipDskAttributeModel> attributeModelList = prepareDskAttributeModelList(securityGroupId, dskAttribute, null);
+
+            String insertDskAtributeModel = "INSERT INTO SEC_GROUP_DSK_ATTRIBUTE_MODEL"
+                + " (SEC_GROUP_DSK_ATTRIBUTE_SYS_ID, SEC_GROUP_SYS_ID, SEC_GROUP_DSK_PARENT_ID, BOOLEAN_CRITERIA, COLUMN_NAME, OPERATOR, ATTRIBUTE_VALUES)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+
+            jdbcTemplate.batchUpdate(insertDskAtributeModel, attributeModelList, attributeModelList.size(), new ParameterizedPreparedStatementSetter<SipDskAttributeModel>(){
+                public void setValues(PreparedStatement ps, SipDskAttributeModel dskAttributeModel)
+                    throws SQLException {
+                    ps.setString(1, dskAttributeModel.getDskAttributeSysId());
+                    ps.setLong(2, dskAttributeModel.getSecGroupSysId());
+                    ps.setString(3, dskAttributeModel.getDskAttributeParentId());
+                    ps.setString(4, dskAttributeModel.getBooleanCriteria());
+                    ps.setString(5, dskAttributeModel.getColumnName());
+                    ps.setString(6, dskAttributeModel.getOperator());
+
+                    if (dskAttributeModel.getValues() == null) {
+                        ps.setString(7, null);
+                    } else {
+                        ps.setString(7, String.join(",", dskAttributeModel.getValues()));
+                    }
+                }
+            });
+
+            valid.setValid(true);
+            valid.setValidityMessage("Attributes added successfully");
+        } catch (Exception ex) {
+            logger.error("Error occurred while inserting attributes: " + ex.getMessage(), ex);
+            valid.setValid(false);
+            valid.setValidityMessage("Error occurred while adding attributes");
+            valid.setError(ex.getMessage());
+        }
+
+        return valid;
+    }
+
+    @Override
+    public Valid deleteDskGroupAttributeModel(Long securityGroupId, Long customerId) {
+        Valid valid = new Valid();
+
+        try {
+            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL"
+                + " WHERE SEC_GROUP_SYS_ID=?";
+
+            int count = jdbcTemplate.update(deleteDskAttributeModelSql, ps -> {
+                ps.setLong(1, securityGroupId);
+            });
+
+            valid.setValid(true);
+            if (count > 0) {
+                logger.info("DSK attributes deleted successfully");
+                valid.setValidityMessage("DSK attributes deleted successfully");
+            } else {
+                logger.info("No attributes to delete");
+                valid.setValidityMessage("No attributes to delete");
+            }
+        } catch (Exception ex) {
+            logger.error("Error occurred: " + ex.getMessage(), ex);
+            valid.setValid(false);
+            valid.setValidityMessage("Error occurred while deleting security group attributes");
+            valid.setError(ex.getMessage());
+        }
+
+        return valid;
+    }
+
+    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId, SipDskAttribute dskAttribute, String parentId) {
+        List <SipDskAttributeModel> list = new ArrayList<>();
+
+        if (dskAttribute != null) {
+            BooleanCriteria booleanCriteria = dskAttribute.getBooleanCriteria();
+            String dskAttributeId = UUID.randomUUID().toString();
+            if (booleanCriteria == null) {
+                // Boolean criteria is null means its a leaf node and doesn't have any children
+                SipDskAttributeModel model = new SipDskAttributeModel();
+                model.setDskAttributeSysId(dskAttributeId);
+                model.setSecGroupSysId(securityGroupId);
+                model.setDskAttributeParentId(parentId);
+                model.setColumnName(dskAttribute.getColumnName());
+                model.setOperator(dskAttribute.getModel().getOperator().toString());
+                model.setValues(dskAttribute.getModel().getValues());
+
+                list.add(model);
+            } else {
+                // Boolean criteria is present means it contains children
+                SipDskAttributeModel model = new SipDskAttributeModel();
+                model.setDskAttributeSysId(dskAttributeId);
+                model.setSecGroupSysId(securityGroupId);
+                model.setDskAttributeParentId(parentId);
+                model.setBooleanCriteria(booleanCriteria.toString());
+
+                list.add(model);
+
+                // Get children and add them
+                List<SipDskAttribute> dskAttributeList = dskAttribute.getBooleanQuery();
+
+                for(SipDskAttribute childAttribute: dskAttributeList) {
+                    list.addAll(
+                        prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
+                }
+
+            }
+        }
+
+        return list;
+    }
 
     @Override
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
@@ -487,9 +641,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
          * In future this could be solved directly by adding constraint in Table definition and also here am keeping in my that the DB needs to Altered to add Customer relationship with DSK's.
          */
 
-//        String addValueSql = "INSERT INTO `sec_group_dsk_value` " +
-//            "(`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`,`DSK_VALUE`) "
-//            + "VALUES (?,?)";
         if (groupAttrSysId == null) {
             if(securityGroupId != null)  {
                 String addSql = "INSERT INTO `sec_group_dsk_attribute` " +
@@ -505,14 +656,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
                     Long attributeSysId = this.getSecurityGroupDskAttributeSysId(securityGroupId,attributeValues.getAttributeName());
                     if ( attributeSysId != null)    {
-//                        int addValResult = jdbcTemplate.update(addValueSql, ps -> {
-//                            ps.setLong(1,attributeSysId);
-//                            ps.setString(2,attributeValues.getValue());
-//                        });
-//                        logger.trace(addValResult + ServerResponseMessages.ATTRIBUTE_VALUE_ADDED + " to  SEC_GROUP_DSK_VALUE.");
-//                        valid.setValid(true);
-//                        valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
-//                        return valid;
                         return addDatasecurityKeyValue(attributeSysId, attributeValues.getValue());
                     }
                     else { logger.error(ServerResponseMessages.ATTRIBUTE_ID_NULL); }
@@ -650,6 +793,83 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError("Error in deleting Attribute");
             return valid;
         }
+    }
+
+    public DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId) {
+        DskGroupPayload dskGroupPayload = new DskGroupPayload();
+
+        List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributeForSecGroup(securityGroupId, null);
+
+        ObjectNode groupDetails = getGroupDetails(securityGroupId, customerId);
+
+        if (groupDetails.size() != 0) {
+            String groupName = groupDetails.get("groupName").asText();
+            String groupDescription = groupDetails.get("groupDescription").asText();
+            dskGroupPayload.setSecurityGroupSysId(securityGroupId);
+
+            dskGroupPayload.setGroupName(groupName);
+            dskGroupPayload.setGroupDescription(groupDescription);
+            dskGroupPayload.setDskAttributes(dskAttributeList.get(0));
+        }
+
+
+        return dskGroupPayload;
+    }
+
+    public List<SipDskAttribute> fetchDskGroupAttributeForSecGroup (Long secGroupId, String parentId) {
+        List<SipDskAttribute> dskAttributeList = new LinkedList<>();
+
+        String fetchDskAttributeSql = "SELECT SEC_GROUP_DSK_ATTRIBUTE_SYS_ID,SEC_GROUP_SYS_ID,"
+            + " SEC_GROUP_DSK_PARENT_ID,  BOOLEAN_CRITERIA, COLUMN_NAME, OPERATOR, ATTRIBUTE_VALUES"
+            + " FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL"
+            + " WHERE SEC_GROUP_SYS_ID=? AND SEC_GROUP_DSK_PARENT_ID "
+            + ((parentId == null) ? "IS NULL" : "=?");
+
+        try {
+            dskAttributeList = jdbcTemplate.query(fetchDskAttributeSql, ps -> {
+                ps.setLong(1, secGroupId);
+                if (parentId != null) {
+                    ps.setString(2, parentId);
+                }
+            }, resultSet -> {
+                List<SipDskAttribute> list = new LinkedList<>();
+                while(resultSet.next()) {
+                    String attributeId = resultSet.getString("SEC_GROUP_DSK_ATTRIBUTE_SYS_ID");
+                    String booleanCriteriaStr = resultSet.getString("BOOLEAN_CRITERIA");
+
+                    SipDskAttribute attribute = new SipDskAttribute();
+                    attribute.setAttributeId(attributeId);
+
+                    if (booleanCriteriaStr == null) {
+                        // Add leaf node to the list
+                        String columnName = resultSet.getString("COLUMN_NAME");
+                        String operatorStr = resultSet.getString("OPERATOR");
+
+                        Model model = new Model();
+                        Operator operator = Operator.valueOf(operatorStr);
+                        String values = resultSet.getString("ATTRIBUTE_VALUES");
+                        model.setOperator(operator);
+                        model.setValues(Arrays.asList(values.split(",")));
+
+                        attribute.setColumnName(columnName);
+                        attribute.setModel(model);
+
+                    } else {
+                        BooleanCriteria booleanCriteria = BooleanCriteria.valueOf(booleanCriteriaStr);
+                        attribute.setBooleanCriteria(booleanCriteria);
+                        List<SipDskAttribute> booleanQuery =
+                            fetchDskGroupAttributeForSecGroup(secGroupId, attributeId);
+                        attribute.setBooleanQuery(booleanQuery);
+                    }
+                    list.add(attribute);
+                }
+                return list;
+            });
+        } catch (Exception ex) {
+            logger.error("Error occurred: " + ex.getMessage(), ex);
+        }
+
+        return dskAttributeList;
     }
 
     @Override
