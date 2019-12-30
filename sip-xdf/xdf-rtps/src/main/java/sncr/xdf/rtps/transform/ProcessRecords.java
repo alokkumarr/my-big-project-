@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
@@ -48,6 +49,8 @@ import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import com.esotericsoftware.minlog.Log;
 
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -262,6 +265,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
             Date batchDt = new Date(tm.milliseconds());
+            
+            
             String batchName = batchPrefix + sdf.format(batchDt);
             String path = basePath  + File.separator + batchName ;
             String strTmpPath = basePath + File.separator + "__TMP-" + 
@@ -276,7 +281,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				logger.error(e.getLocalizedMessage());
 			}
             // Rename and cleanup
-            finalizeBatch(strTmpPath, path, true, sdf.format(batchDt));
+            finalizeBatch(strTmpPath, path, true);
             
         }
     }
@@ -510,7 +515,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 							logger.error("Invalid output type :" + outputType);
 						}
 						// Done with writing - safe to rename batch directory
-						finalizeBatch(strTmpPath, path, false, sdf.format(batchDt));
+						finalizeBatch(strTmpPath, path, false);
 						logger.debug("Writing to datalake compled");
 					} else {
 						logger.debug("base path not found or empty. Hence not writing to data lake");
@@ -537,7 +542,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 }
     
 
-    private int finalizeBatch(String strTmpPath, String finalPath, boolean isSimple, String batchDate){
+    private int finalizeBatch(String strTmpPath, String finalPath, boolean isSimple){
         // Done with writing - safe to rename batch directory
         try {
             String defaultFS = "maprfs:///";
@@ -556,7 +561,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                     fs.delete(pathToDelete, true);
                 }
             }*/
-            // !!!!!!!!!!!Should use another technique for rename
+            // !!!!!!!!!!!Should use another technique for renameh
             logger.debug("renaming "+ tmpPath + " to "+ finalPath);
             fs.rename(tmpPath, new Path(finalPath));
             logger.debug("Is simple??"+ isSimple);
@@ -565,16 +570,27 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
              * is not added. Hence renaming file to maintian
              * uniqueness with timestamp as suffix
              */
-            if(isSimple) {
-            	String fileName = fs.globStatus(new Path(finalPath+ 
-            			Path.SEPARATOR + fileNamePrefix + "*"))[0].getPath().getName();
-                
-                logger.debug("******** part file name renaming for simple.... ********"+ fileName);
-                
-                fs.rename(new Path(finalPath+ Path.SEPARATOR + fileName), new Path(finalPath+ 
-                		Path.SEPARATOR + fileNamePrefix + batchDate));
+            if(isSimple ) {
+            	FileStatus[] files = fs.globStatus(new Path(finalPath+ 
+            			Path.SEPARATOR + fileNamePrefix+ "*"));
+            	 String timeStamp = "";
+            	 SimpleDateFormat suffixFmt = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
+            	 Date date = new Date();
+            	
+            	
+            	 for(FileStatus fileStatus: files) {
+            		 logger.debug("******** part file name renaming for simple.... ********"+ fileStatus.getPath().getName());
+            		 
+            		 
+            		fs.rename(new Path(finalPath+ Path.SEPARATOR + fileStatus.getPath().getName()), new Path(finalPath+ 
+                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffixFmt.format(date)));
+            		
+            		logger.info("******** rename completed ********");
+            	}
+            	
+            	
                
-                logger.info("******** rename completed ********");
+                
             }
         } catch (Exception e) {
         	logger.error(e.getLocalizedMessage());
