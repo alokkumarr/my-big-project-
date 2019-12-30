@@ -1034,6 +1034,12 @@ public class SecurityController {
 
         valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 
+        if (valid.getValid()) {
+            // If the deletion of security group attributes is successful, delete the security group
+            // also
+            valid = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
+        }
+
         return valid;
     }
 
