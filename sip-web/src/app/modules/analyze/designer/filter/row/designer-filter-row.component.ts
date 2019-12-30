@@ -31,7 +31,7 @@ export class DesignerFilterRowComponent implements OnInit {
   @Input() public supportsGlobalFilters: boolean;
   @Input() public showFilterOptions: boolean;
 
-  @ViewChild('auto', { read: ViewContainerRef })
+  @ViewChild('auto', { read: ViewContainerRef, static: true })
   _autoComplete: ViewContainerRef;
   artifactColumns: ArtifactColumn[];
   public TYPE_MAP = TYPE_MAP;

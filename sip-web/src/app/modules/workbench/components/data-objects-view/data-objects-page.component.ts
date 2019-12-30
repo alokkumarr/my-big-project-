@@ -34,7 +34,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   public poll = false;
   public interval = 20000;
 
-  @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
+  @ViewChild(SearchBoxComponent, { static: true }) searchBox: SearchBoxComponent;
 
   constructor(
     public router: Router,

@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { LocalStorageModule } from 'angular-2-local-storage';
 import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
@@ -33,10 +32,6 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   imports: [
     NgxsModule.forFeature([AnalyzeState]),
     CommonModuleAngular4,
-    LocalStorageModule.withConfig({
-      prefix: 'symmetra',
-      storageType: 'localStorage'
-    }),
     AnalyzeDesignerModule,
     AnalyzeModuleGlobal.forRoot(),
     RouterModule.forChild(routes),

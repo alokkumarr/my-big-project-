@@ -13,6 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Constants = require('../../helpers/Constants');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing create and delete geolocation analysis tests from geolocation/createAndDelete.test.js', () => {
   let analysisId;
@@ -29,7 +30,11 @@ describe('Executing create and delete geolocation analysis tests from geolocatio
   beforeAll(() => {
     logger.info('Starting geolocation/createAndDelete.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -112,7 +117,9 @@ describe('Executing create and delete geolocation analysis tests from geolocatio
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
 
         executePage.clickOnActionLink();
         executePage.clickOnDetails();

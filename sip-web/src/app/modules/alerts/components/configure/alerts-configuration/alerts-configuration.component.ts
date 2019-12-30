@@ -52,7 +52,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
     this.subscriptions.push(breakpointObserverSub);
   }
 
-  @ViewChild('alertSidenav') sidenav: MatSidenav;
+  @ViewChild('alertSidenav', { static: true }) sidenav: MatSidenav;
 
   ngOnInit() {
     this.setAlertLoaderForGrid();

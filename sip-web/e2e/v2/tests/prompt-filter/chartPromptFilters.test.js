@@ -4,7 +4,8 @@ const protractorConf = require('../../conf/protractor.conf');
 const logger = require('../../conf/logger')(__filename);
 const dataSets = require('../../helpers/data-generation/datasets');
 const categories = require('../../helpers/data-generation/categories');
-const subCategories = require('../../helpers/data-generation/subCategories').createSubCategories;
+const subCategories = require('../../helpers/data-generation/subCategories')
+  .createSubCategories;
 const Constants = require('../../helpers/Constants');
 const globalVariables = require('../../helpers/data-generation/globalVariables');
 const commonFunctions = require('../../pages/utils/commonFunctions');
@@ -18,6 +19,7 @@ const Header = require('../../pages/components/Header');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', () => {
   const categoryName = categories.analyses.name;
@@ -32,7 +34,11 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
   beforeAll(() => {
     logger.info('Starting chartPromptFilters tests...');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -49,7 +55,13 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
       }
       analyses.forEach(id => {
         logger.warn('delete ' + id);
-        new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, id, Constants.CHART);
+        new AnalysisHelper().deleteAnalysis(
+          host,
+          token,
+          protractorConf.config.customerCode,
+          id,
+          Constants.CHART
+        );
       });
 
       // Logout by clearing the storage
@@ -81,7 +93,13 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           ];
 
           let name = `e2e ${currentTime}`;
-          let description = 'Description:' + chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
+          let description =
+            'Description:' +
+            chartType +
+            ' for e2e ' +
+            globalVariables.e2eId +
+            '-' +
+            currentTime;
           let analysisType = Constants.CHART;
           //Create new analysis.
           let analysis = new AnalysisHelper().createNewAnalysis(
@@ -117,7 +135,9 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           chartDesignerPage.clickOnColumnDropDown(data.fieldName);
           chartDesignerPage.clickOnPromptCheckBox();
           chartDesignerPage.clickOnApplyFilterButton();
-          chartDesignerPage.validateAppliedFilters(analysisType, [data.fieldName]);
+          chartDesignerPage.validateAppliedFilters(analysisType, [
+            data.fieldName
+          ]);
           chartDesignerPage.clickOnSave();
           chartDesignerPage.clickOnSaveAndCloseDialogButton();
 
@@ -135,7 +155,11 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
 
-          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
+          chartDesignerPage.fillFilterOptions(
+            data.fieldType,
+            data.operator,
+            data.value
+          );
 
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
@@ -154,7 +178,11 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
+          chartDesignerPage.fillFilterOptions(
+            data.fieldType,
+            data.operator,
+            data.value
+          );
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
           // executePage.verifyAppliedFilter(filters);
@@ -168,7 +196,11 @@ describe('Executing chartPromptFilters tests from chartPromptFilters.test.js', (
           analysisPage.clickOnExecuteButtonAnalyzePage();
           chartDesignerPage.shouldFilterDialogPresent();
           chartDesignerPage.verifySelectFieldValue(data.fieldName);
-          chartDesignerPage.fillFilterOptions(data.fieldType, data.operator, data.value);
+          chartDesignerPage.fillFilterOptions(
+            data.fieldType,
+            data.operator,
+            data.value
+          );
           chartDesignerPage.clickOnApplyFilterButton();
           // commented below code because of SIP-7804
           //executePage.verifyAppliedFilter(filters);

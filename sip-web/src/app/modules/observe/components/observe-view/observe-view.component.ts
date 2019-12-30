@@ -50,8 +50,8 @@ export class ObserveViewComponent implements OnDestroy {
     edit: false,
     download: false
   };
-  @ViewChild('filterSidenav') sidenav: MatSidenav;
-  @ViewChild('downloadContainer') downloadContainer: ElementRef;
+  @ViewChild('filterSidenav', { static: true }) sidenav: MatSidenav;
+  @ViewChild('downloadContainer', { static: true }) downloadContainer: ElementRef;
   hasKPIs = false;
 
   constructor(

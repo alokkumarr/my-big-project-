@@ -3,6 +3,9 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.repository.result.extract.LongExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserDetailsExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserDetailsListExtractor;
 import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
@@ -11,6 +14,7 @@ import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.CustomerProductModuleFeature;
 import com.sncr.saw.security.common.bean.repo.PasswordDetails;
@@ -1386,7 +1390,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public Valid addUser(User user) {
+	public Valid addUser(User user,String createdBy) {
 		Valid valid = new Valid();
 		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
 				+ "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
@@ -1403,7 +1407,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(7, user.getMiddleName());
 					preparedStatement.setString(8, user.getLastName());
 					preparedStatement.setString(9, user.getActiveStatusInd());
-					preparedStatement.setString(10, user.getMasterLoginId());
+					preparedStatement.setString(10, createdBy);
 				}
 			});
 		} catch (DuplicateKeyException e) {
@@ -1506,11 +1510,15 @@ public class UserRepositoryImpl implements UserRepository {
 	public boolean deleteUser(Long userId, String masterLoginId) {
 		String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ?";
 		try {
-			jdbcTemplate.update(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, userId);
-				}
-			});
+			int valid = jdbcTemplate.update(sql, preparedStatement -> preparedStatement.setLong(1, userId));
+			// if user deleted successfully then invalidate ticket
+			if (valid > 0) {
+				String updateSql = "UPDATE TICKET SET VALID_INDICATOR=0,INACTIVATED_DATE=sysdate(),DESCRIPTION=? where MASTER_LOGIN_ID = ?";
+				jdbcTemplate.update(updateSql, preparedStatement -> {
+					preparedStatement.setString(1, "User has been deleted.");
+					preparedStatement.setString(2, masterLoginId);
+				});
+			}
 		} catch (Exception e) {
 			logger.error("Exception encountered while deleting user " + e.getMessage(), null, e);
 			return false;
@@ -3170,6 +3178,187 @@ public class UserRepositoryImpl implements UserRepository {
               preparedStatement -> preparedStatement.setLong(1, moduleId),
               new UserRepositoryImpl.StringExtractor("MODULE_NAME"));
       if (moduleName.equalsIgnoreCase(modName)) {
+        return true;
+      }
+    } catch (Exception e) {
+      logger.error("Exception encountered while ", e);
+    }
+    return false;
+  }
+
+  @Override
+  public Long getCustomerSysid(String customerCode) {
+    String sql = "select C.CUSTOMER_SYS_ID from CUSTOMERS C where C.CUSTOMER_CODE =?";
+    Long customerSysId = null;
+    try {
+      customerSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> preparedStatement.setString(1, customerCode),
+              new LongExtractor("CUSTOMER_SYS_ID"));
+    } catch (Exception e) {
+      logger.error("Exception encountered while ", e);
+    }
+    return customerSysId;
+  }
+
+
+  @Override
+  public Long getSecurityGroupSysid(String dskGroup,Long customerSysid) {
+      String sql = "select S.SEC_GROUP_SYS_ID  from SEC_GROUP S where S.SEC_GROUP_NAME =? AND S.CUSTOMER_SYS_ID=?";
+      Long secGroupSysId = null;
+      try {
+      secGroupSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, dskGroup);
+                preparedStatement.setLong(2, customerSysid);
+              },
+              new LongExtractor("SEC_GROUP_SYS_ID"));
+      } catch (Exception e) {
+          logger.error("Exception encountered while ", e);
+      }
+      return secGroupSysId;
+  }
+
+
+  @Override
+  public Long getRoleSysId(String roleName,Long customerSysid) {
+      String sql = "select R.ROLE_SYS_ID from ROLES R where R.ROLE_NAME =? AND R.CUSTOMER_SYS_ID=?";
+      Long roleSysId = null;
+      try {
+      roleSysId =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, roleName);
+                preparedStatement.setLong(2, customerSysid);
+              },
+              new LongExtractor("ROLE_SYS_ID"));
+      } catch (Exception e) {
+          logger.error("Exception encountered while ", e);
+      }
+      return roleSysId;
+  }
+
+  @Override
+  public Valid addUserDetails(UserDetails userDetails, String createdBy) {
+    Valid valid = new Valid();
+    String sql =
+        "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID,SEC_GROUP_SYS_ID, ENCRYPTED_PASSWORD, "
+            + "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
+            + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?,?, SYSDATE(), ? ); ";
+    try {
+      jdbcTemplate.update(
+          sql,
+          preparedStatement -> {
+            preparedStatement.setString(1, userDetails.getMasterLoginId());
+            preparedStatement.setString(2, userDetails.getEmail());
+            preparedStatement.setLong(3, userDetails.getRoleId());
+            preparedStatement.setLong(4, userDetails.getCustomerId());
+            if (userDetails.getSecGroupSysId() != null) {
+              preparedStatement.setLong(5, userDetails.getSecGroupSysId());
+            } else {
+              preparedStatement.setNull(5, Types.BIGINT);
+            }
+            preparedStatement.setString(6, Ccode.cencode(userDetails.getPassword()).trim());
+            preparedStatement.setString(7, userDetails.getFirstName());
+            preparedStatement.setString(8, userDetails.getMiddleName());
+            preparedStatement.setString(9, userDetails.getLastName());
+            preparedStatement.setString(10, getActiveStatusInd(userDetails.getActiveStatusInd()));
+            preparedStatement.setString(11, createdBy);
+          });
+    } catch (DuplicateKeyException e) {
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+      valid.setValid(false);
+      valid.setError("User cannot be added. Login ID already Exists!");
+      return valid;
+    } catch (DataIntegrityViolationException de) {
+      logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+      valid.setValid(false);
+      valid.setError("Please enter valid input in the field(s)");
+      return valid;
+    } catch (Exception e) {
+      logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+      valid.setValid(false);
+      valid.setError(e.getMessage());
+      return valid;
+    }
+    valid.setValid(true);
+    return valid;
+  }
+
+  private String getActiveStatusInd(Boolean activeStatusInd) {
+    return activeStatusInd ? "1" : "0";
+  }
+
+  @Override
+  public UserDetails getUser(String masterLoginId, Long customerSysId) {
+    UserDetails userDetails = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
+            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
+            + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
+            + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? AND U.CUSTOMER_SYS_ID=?";
+    try {
+      userDetails =
+          jdbcTemplate.query(
+              sql,
+              preparedStatement -> {
+                preparedStatement.setString(1, masterLoginId);
+                preparedStatement.setLong(2, customerSysId);
+              },
+              new UserDetailsExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+
+    return userDetails;
+  }
+
+  @Override
+  public ArrayList<UserDetails> getUsersDetailList(Long customerId) {
+    ArrayList<UserDetails> userDetailsList = null;
+    String sql =
+        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME,"
+            + " U.LAST_NAME, U.ACTIVE_STATUS_IND ,U.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME,C.CUSTOMER_CODE FROM USERS U  left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID "
+            + "inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID  inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.CUSTOMER_SYS_ID=?";
+    try {
+      userDetailsList =
+          jdbcTemplate.query(
+              sql,
+              new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                  preparedStatement.setLong(1, customerId);
+                }
+              },
+              new UserDetailsListExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+
+    return userDetailsList;
+  }
+
+  @Override
+  public boolean getRoleStatus(Long roleId) {
+    String sql = "select R.ACTIVE_STATUS_IND from ROLES R where R.ROLE_SYS_ID =?";
+    try {
+      int roleStatus = jdbcTemplate.queryForObject(sql, new Object[] {roleId}, Integer.class);
+      if (roleStatus == 1) {
         return true;
       }
     } catch (Exception e) {

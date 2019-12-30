@@ -35,7 +35,7 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   @Input() index: number;
   @Input() plumbInstance: any;
 
-  @ViewChild('target', { read: ViewContainerRef })
+  @ViewChild('target', { read: ViewContainerRef, static: true })
   _container: ViewContainerRef;
 
   public _connection: any;

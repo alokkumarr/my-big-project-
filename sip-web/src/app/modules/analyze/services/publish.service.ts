@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
+import * as find from 'lodash/find';
 
-import { AnalysisDSL } from '../../../models';
+import { AnalysisDSL, Schedule } from '../../../models';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import { ExecuteService } from './execute.service';
 import { JwtService } from 'src/app/common/services';
-
-import * as find from 'lodash/find';
 
 @Injectable()
 export class PublishService {
@@ -17,25 +16,18 @@ export class PublishService {
 
   async publishAnalysis(
     analysis: AnalysisDSL,
-    execute = false,
-    type,
     lastCategoryId: number | string = null
   ): Promise<AnalysisDSL> {
-    if (execute) {
-      this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-    }
-    if (type === 'schedule') {
-      return this._analyzeService.changeSchedule(analysis).then(() => analysis);
-    } else {
-      try {
-        await this.updateScheduleBeforePublishing(analysis, lastCategoryId);
-        return <Promise<AnalysisDSL>>(
-          this._analyzeService.updateAnalysis(analysis)
-        );
-      } catch (error) {
-        throw new Error(`Cannot publish analysis. Error: ${error.message}`);
-      }
-    }
+    await this.updateScheduleBeforePublishing(analysis, lastCategoryId);
+    await this._executeService.executeAnalysisAndReturnAfterDone(
+      analysis,
+      EXECUTION_MODES.PUBLISH
+    );
+    return analysis;
+  }
+
+  async scheduleAnalysis(schedule: Schedule): Promise<AnalysisDSL> {
+    return this._analyzeService.changeSchedule(schedule);
   }
 
   async updateScheduleBeforePublishing(
@@ -55,8 +47,8 @@ export class PublishService {
 
     job.jobDetails.scheduleState = 'exist';
     job.jobDetails.categoryID = analysis.category;
-    analysis.schedule = job.jobDetails;
+    const schedule = job.jobDetails;
 
-    return this._analyzeService.changeSchedule(analysis);
+    return this._analyzeService.changeSchedule(schedule);
   }
 }
