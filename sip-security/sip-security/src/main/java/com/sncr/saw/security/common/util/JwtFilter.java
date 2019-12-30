@@ -31,6 +31,10 @@ public class JwtFilter extends GenericFilterBean {
 
   private static String SIP_AUTH = "/sip-security/auth";
 
+  private final String INVALID_TOKEN = "Token is not valid.";
+  private final String TOKEN_EXPIRED = "Token has expired. Please re-login.";
+  private final String UNAUTHORISED_USER = "You are not authorized to perform this operation.";
+
   private final String jwtSecretKey;
   private final TicketHelper ticketHelper;
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -64,11 +68,11 @@ public class JwtFilter extends GenericFilterBean {
                 .getBody();
         request.setAttribute("claims", claims);
       } catch (final SignatureException e) {
-        throw new ServletException("Invalid token.");
+        throw new ServletException(INVALID_TOKEN);
       } catch (MalformedJwtException ex) {
-        throw new ServletException("Invalid token");
+        throw new ServletException(INVALID_TOKEN);
       } catch (ExpiredJwtException expired) {
-        throw new ServletException("token has expired");
+        throw new ServletException(TOKEN_EXPIRED);
       }
 
       // This checks the validity of the token. logging out does not need
@@ -80,13 +84,13 @@ public class JwtFilter extends GenericFilterBean {
         Ticket ticket = mapper.convertValue(claims.get("ticket"), Ticket.class);
         if (!ticket.isValid()) {
           haveInValidFlow = true;
-          errorMessage = "Token has expired. Please re-login.";
+          errorMessage = TOKEN_EXPIRED;
         } else if (requestURI.startsWith(SIP_AUTH + "/admin") && !ticket.getRoleType().equals(RoleType.ADMIN)) {
           haveInValidFlow = true;
-          errorMessage = "You are not authorized to perform this operation.";
+          errorMessage = UNAUTHORISED_USER;
         } else if (!(ticket.getTicketId() != null && ticketHelper.checkTicketValid(ticket.getTicketId(), ticket.getMasterLoginId()))) {
           haveInValidFlow = true;
-          errorMessage = "Token is not valid.";
+          errorMessage = INVALID_TOKEN;
         }
       }
     }
