@@ -124,9 +124,9 @@ public class SecurityController {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-    private final String AdminRole = "ADMIN";
-
-    private final String ALERTS = "ALERTS";
+  private final String AdminRole = "ADMIN";
+  private final String ALERTS = "ALERTS";
+  private final String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -370,7 +370,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
-	public Valid changePassword(@RequestBody ChangePasswordDetails changePasswordDetails) {
+	public Valid changePassword(HttpServletRequest request, @RequestBody ChangePasswordDetails changePasswordDetails) {
 		Valid valid = new Valid();
 		valid.setValid(false);
 		String oldPass = changePasswordDetails.getOldPassword();
@@ -378,7 +378,13 @@ public class SecurityController {
 		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
 		String loginId = changePasswordDetails.getMasterLoginId();
 		String message = null;
-		if (!cnfNewPass.equals(newPass)) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket != null && !ticket.getMasterLoginId().equalsIgnoreCase(loginId)) {
+      valid.setValidityMessage(UNAUTHORIZED_USER);
+      return valid;
+    }
+
+    if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
 			valid.setValidityMessage(message);
 			valid.setValid(false);
