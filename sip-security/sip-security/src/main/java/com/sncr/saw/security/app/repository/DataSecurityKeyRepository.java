@@ -21,6 +21,7 @@ public interface DataSecurityKeyRepository {
     public Valid deleteSecurityGroupDskAttributeValues(List<String> dskList);
     public List<DskDetails> fetchDskAllAttributeValues(Long securityGroupId);
     public DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId);
+    public List<DskGroupPayload> fetchAllDskGroupForCustomer(Long customerId);
     public Valid updateUser(String securityGroupName,Long userSysId, Long custId);
     public List<UserAssignment> getAllUserAssignments(Long custId);
     public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
