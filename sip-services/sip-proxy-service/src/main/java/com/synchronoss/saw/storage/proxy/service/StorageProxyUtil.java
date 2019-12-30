@@ -332,5 +332,4 @@ public class StorageProxyUtil {
     }
     return artifactNames;
   }
-
 }
