@@ -286,7 +286,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
              */
             if(isSimple) {
             	String fileName = fs.globStatus(new Path(finalPath+ 
-            			Path.SEPARATOR +"part*"))[0].getPath().getName();
+            			Path.SEPARATOR + fileNamePrefix+ "*"))[0].getPath().getName();
                 
                 logger.debug("******** part file name renaming for simple.... ********"+ fileName);
                 
