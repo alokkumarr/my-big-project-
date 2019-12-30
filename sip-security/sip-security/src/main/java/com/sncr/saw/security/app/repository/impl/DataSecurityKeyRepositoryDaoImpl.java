@@ -195,7 +195,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
         String getGroupDetails = "SELECT SEC_GROUP_NAME, DESCRIPTION "
             + "FROM SEC_GROUP "
-            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
+            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=? AND ACTIVE_STATUS_IND=1";
 
         ObjectNode groupDetails = jdbcTemplate.query(getGroupDetails, ps -> {
             ps.setLong(1, securityGroupId);
