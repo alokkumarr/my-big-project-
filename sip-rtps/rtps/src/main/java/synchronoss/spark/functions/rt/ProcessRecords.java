@@ -185,8 +185,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm){
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
-            SimpleDateFormat suffixFmt = new SimpleDateFormat("yyyyMMdd-HHmmss:SSS");
-            
             Date batchDt = new Date(tm.milliseconds());
             
             String batchName = batchPrefix + sdf.format(batchDt);
