@@ -1,4 +1,29 @@
 import { Directive, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+/*
+  This is the new version of show/hide password functionality, and should be used
+  in favor of older password-toggle component. Since this is a directive, this
+  applies directly to the field, and doesn't create a standalone password field.
+
+  This makes is suitable for any form / non-form scenario. There are a few requirements:
+  1. Input should be inside a mat-form-field
+  2. There should be a matSuffix element with icon-show inside it.
+  3. Add directive 'showPassword' to your <input> element.
+
+  Example:
+  <mat-form-field>
+    <input
+      matInput
+      showPassword
+    />
+    <mat-icon
+      matSuffix
+      fontIcon="icon-show"
+    ></mat-icon>
+  </mat-form-field>
+
+  This directive will automatically get the suffix element and attach toggle functionality
+  to it. All other attributes of material library can be used normally.
+*/
 
 @Directive({
   selector: '[showPassword]'

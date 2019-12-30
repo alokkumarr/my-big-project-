@@ -1,4 +1,23 @@
-import { Component, OnInit, Output, EventEmitter, Input, ViewChild, ElementRef } from '@angular/core';
+/*
+  This is a legacy component. A new version in form of a directive exists at
+  src/app/common/directives/show-password.directive.ts
+  Visit that file for details and examples on how to use it.
+
+  This is marked legacy, because it removes the flexibility of form field.
+  If the password field is to be inside a reactive form, it becomes impossible to do so
+  using this component. Another example is add appearance="outline" to password field in some forms,
+  and keeping normal appearance in others. All attributes have to be taken as inputs, making it
+  more effort than it's worth.
+*/
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 
 const dummyPassword = '**********';
 
