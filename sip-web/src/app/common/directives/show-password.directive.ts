@@ -40,7 +40,10 @@ export class ShowPasswordDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.toggleSuffix.removeEventListener('click', this.onToggleClick);
+    this.toggleSuffix.removeEventListener(
+      'click',
+      this.onToggleClick.bind(this)
+    );
   }
 
   onToggleClick() {
@@ -57,7 +60,10 @@ export class ShowPasswordDirective implements AfterViewInit, OnDestroy {
       }
 
       this.toggleSuffix.style.cursor = 'pointer';
-      this.toggleSuffix.addEventListener('click', this.onToggleClick);
+      this.toggleSuffix.addEventListener(
+        'click',
+        this.onToggleClick.bind(this)
+      );
     } catch (err) {
       // do nothing;
     }

@@ -350,14 +350,14 @@
     <form
       fxFlex
       fxLayout="row"
-      fxLayoutAlign="start start"
+      fxLayoutAlign="center start"
       fxLayoutGap="5px"
       class="parameters authorization"
       novalidate
       [formGroup]="authorizationForm"
       autocomplete="false"
     >
-      <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
+      <div fxFlex="30" fxLayout="column" fxLayoutAlign="start stretch">
         <mat-form-field appearance="outline" fxFlex="35">
           <mat-label>Authorization Type</mat-label>
           <mat-select formControlName="type">
@@ -381,7 +381,7 @@
       </div>
       <mat-divider [vertical]="true"></mat-divider>
       <div
-        fxFlex="50"
+        fxFlex="40"
         style="height: 62px; text-align: center; line-height: 62px;"
         [style.display]="
           authType.value === authorizationTypes.NONE ? 'block' : 'none'
@@ -390,7 +390,7 @@
         Please choose an Authorization scheme.
       </div>
       <div
-        fxFlex="50"
+        fxFlex="40"
         fxLayout="column"
         fxLayoutAlign="start stretch"
         [style.display]="
