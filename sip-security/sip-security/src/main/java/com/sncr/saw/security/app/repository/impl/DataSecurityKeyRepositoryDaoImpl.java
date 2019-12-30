@@ -201,8 +201,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             ps.setLong(1, securityGroupId);
             ps.setLong(2, customerId);
         }, resultSet -> {
-            ObjectNode node = mapper.createObjectNode();
+            ObjectNode node = null;
             if (resultSet.next()) {
+                node = mapper.createObjectNode();
                 String groupName = resultSet.getString("SEC_GROUP_NAME");
                 String groupDescription = resultSet.getString("DESCRIPTION");
 
@@ -797,10 +798,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     public DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId) {
         DskGroupPayload dskGroupPayload = new DskGroupPayload();
+        ObjectNode groupDetails = getGroupDetails(securityGroupId, customerId);
+
+        if (groupDetails == null || groupDetails.size() == 0) {
+            dskGroupPayload.setValid(false);
+            dskGroupPayload.setMessage(ServerResponseMessages.GROUP_DOESNT_EXIST);
+
+            return dskGroupPayload;
+        }
 
         List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributeForSecGroup(securityGroupId, null);
-
-        ObjectNode groupDetails = getGroupDetails(securityGroupId, customerId);
 
         if (groupDetails.size() != 0) {
             String groupName = groupDetails.get("groupName").asText();
