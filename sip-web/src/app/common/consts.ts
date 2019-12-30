@@ -36,7 +36,7 @@ export const GEO_TYPES = fpPipe(
 
 export const BACKEND_TIMEZONE = 'America/New_York';
 
-export const SYSTEM_CATEGORY_OPERATIONS = ['Delete', 'Schedule'];
+export const SYSTEM_CATEGORY_OPERATIONS = ['delete'];
 
 export const DATE_INTERVALS = [
   {

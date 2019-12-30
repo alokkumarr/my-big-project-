@@ -31,6 +31,7 @@ export class PrivilegeRowComponent {
   privilegeCodeList: Boolean[];
   subCategory;
   isDraftsSubCategory = false;
+  systemCategory;
 
   @Input() categoryName: string;
 
@@ -44,6 +45,15 @@ export class PrivilegeRowComponent {
     this.subCategory = subCategory;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
+    // set all privilege based on syster folder category settings.
+    this.systemCategory = subCategory.systemCategory;
+    if (!this.systemCategory) {
+      return;
+    }
+    if (this.privilegeCodeList[0]) {
+      this.privilegeCodeList[8] = !this.systemCategory;
+      this.privilegeCodeList[7] = !this.systemCategory;
+    }
   }
 
   allowedPrivileges: {
@@ -83,12 +93,16 @@ export class PrivilegeRowComponent {
   }
 
   onAllClicked() {
-    this.privilegeCodeList[8] = !this.privilegeCodeList[8];
-    if (this.privilegeCodeList[8]) {
-      this.privilegeCodeList = binaryString2BoolArray(ALL_PRIVILEGES_STR);
+    if (this.systemCategory) {
+      this.privilegeCodeList[8] = !this.systemCategory;
+    } else {
+      this.privilegeCodeList[8] = !this.privilegeCodeList[8];
+      if (this.privilegeCodeList[8]) {
+        this.privilegeCodeList = binaryString2BoolArray(ALL_PRIVILEGES_STR);
+      }
+      const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
+      this.categoryChange.emit(privilege);
     }
-    const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
-    this.categoryChange.emit(privilege);
   }
 
   onAccessClicked() {

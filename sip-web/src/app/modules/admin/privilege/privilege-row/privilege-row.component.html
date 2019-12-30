@@ -17,7 +17,7 @@
       fxLayoutAlign="space-between center"
       class="privilege-options-row-container"
     >
-      <mat-checkbox
+      <mat-checkbox *ngIf="!systemCategory"
         type="checkbox"
         [hidden]="hasOnlyAccessPrivilege"
         (change)="onAllClicked()"
@@ -34,7 +34,7 @@
         [disabled]="privilegeCodeList[8] || isDraftsSubCategory"
         [checked]="privilegeCodeList[i + 1]"
       >
-        <label>{{ privilegeName }}</label>
+    <label>{{ privilegeName }}</label>
       </mat-checkbox>
     </div>
   </span>
