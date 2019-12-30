@@ -714,4 +714,91 @@ public class SecurityIT extends BaseIT {
         .assertThat()
         .statusCode(200);
   }
+
+  @Test
+  public void testAddDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId1";
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(createDskEligibleData)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
+  }
+
+  @Test
+  public void testUpdateDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId2";
+
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(createDskEligibleData)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+
+    ArrayNode updateDskEligibleData = prepareUpdateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(updateDskEligibleData)
+        .when()
+        .put("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
+  }
+
+  private ArrayNode prepareCreateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
+
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "STRING");
+    field1.put("displayName", "String");
+
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "INTEGER");
+    field2.put("displayName", "Int");
+
+    return dskEligibleData;
+  }
+
+  private ArrayNode prepareUpdateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
+
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "DOUBLE");
+    field1.put("displayName", "Double");
+
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "BOOLEAN");
+    field2.put("displayName", "Bool");
+
+    return dskEligibleData;
+  }
+
+  private void deleteDskEligibleFields(String semanticId) {
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .when()
+        .delete("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+  }
 }

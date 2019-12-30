@@ -14,29 +14,63 @@
       <span [innerHtml]="errorMessage"></span>
     </div>
     <mat-form-field>
-      <input matInput placeholder="Security Group Name" [(ngModel)]="data.groupSelected.securityGroupName" disabled required/>
+      <input
+        matInput
+        placeholder="Security Group Name"
+        [(ngModel)]="data.groupSelected.securityGroupName"
+        disabled
+        required
+      />
     </mat-form-field>
     <div fxLayout="row" fxLayoutAlign="center start">
       <mat-form-field>
-        <input matInput [(ngModel)]="data.attributeName" placeholder="Field Name" maxlength="50" [disabled]="data.mode === 'edit'" required/>
+        <input
+          matInput
+          [(ngModel)]="data.attributeName"
+          placeholder="Field Name"
+          [matAutocomplete]="fieldAutocomplete"
+          maxlength="50"
+          (keyup)="filterAutocompleteFields()"
+          [disabled]="data.mode === 'edit'"
+          required
+        />
       </mat-form-field>
+      <mat-autocomplete #fieldAutocomplete="matAutocomplete">
+        <mat-option
+          *ngFor="let field of filteredEligibleFields"
+          [value]="field.columnName"
+        >
+          {{ field.displayName }}
+        </mat-option>
+      </mat-autocomplete>
 
       <span class="seperator">=</span>
 
       <mat-form-field>
-        <input matInput [(ngModel)]="data.value" maxlength="45" placeholder="Value" required/>
+        <input
+          matInput
+          [(ngModel)]="data.value"
+          maxlength="45"
+          placeholder="Value"
+          required
+        />
       </mat-form-field>
     </div>
   </div>
 </div>
 
-<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
-  <button (click)="submit()"
-          e2e="create-analysis-btn"
-          color="primary"
-          [ngSwitch]="data.mode"
-          [disabled]="!data.attributeName || !data.value"
-          mat-raised-button
+<div
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+  class="base-dialog__actions"
+>
+  <button
+    (click)="submit()"
+    e2e="create-analysis-btn"
+    color="primary"
+    [ngSwitch]="data.mode"
+    [disabled]="!data.attributeName || !data.value"
+    mat-raised-button
   >
     <ng-container *ngSwitchCase="'create'" i18n>
       Create Attribute
@@ -45,7 +79,5 @@
       Save
     </ng-container>
   </button>
-  <button mat-button
-          mat-dialog-close i18n
-  >Cancel</button>
+  <button mat-button mat-dialog-close i18n>Cancel</button>
 </div>
