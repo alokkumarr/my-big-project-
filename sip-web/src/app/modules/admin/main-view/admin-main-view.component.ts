@@ -7,6 +7,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { UserEditDialogComponent, UserService } from '../user';
 import { RoleEditDialogComponent } from '../role';
 import { PrivilegeEditDialogComponent } from '../privilege';
+import * as findIndex from 'lodash/findIndex';
 import {
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
@@ -246,7 +247,14 @@ export class AdminMainViewComponent implements OnDestroy {
       case 'privilege':
         // for some reason, the backend doesn't return the new array of privileges
         // so we have to delete it manually
-        const index = this.filteredData.indexOf(row);
+        const index = findIndex(
+          this.filteredData,
+          ({ moduleName, categoryName, privilegeId, privilegeCode }) =>
+            moduleName === row.moduleName
+            && categoryName === row.categoryName
+            && privilegeId === row.privilegeId
+            && privilegeCode === row.privilegeCode
+        );
         this.filteredData.splice(index, 1);
         break;
       default:
