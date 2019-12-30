@@ -307,15 +307,20 @@ export class AdminMainViewComponent implements OnDestroy {
 
   modifyRowForDeletion(row) {
     /* prettier-ignore */
+    const customerId = parseInt(this.ticket.custID, 10);
     switch (this.section) {
     case 'role':
-      const customerId = parseInt(this.ticket.custID, 10);
       const { masterLoginId } = this.ticket as any;
       return {
         ...row,
         roleId: row.roleSysId,
         customerId,
         masterLoginId
+      };
+    case 'privilege':
+      return {
+        ...row,
+        customerId
       };
     default:
       return row;
