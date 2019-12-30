@@ -1,19 +1,24 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { DataSecurityService } from '../datasecurity.service';
+import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
+import { DSKFilterGroup } from '../dsk-filter.model';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'add-attribute-dialog',
-  templateUrl: './add-attribute-dialog.component.html',
-  styleUrls: ['./add-attribute-dialog.component.scss']
+  templateUrl: './dsk-filter-dialog.component.html',
+  styleUrls: ['./dsk-filter-dialog.component.scss']
 })
-export class AddAttributeDialogComponent {
+export class DskFilterDialogComponent {
   public attribute = {};
+  dskFilters$: Observable<DSKFilterGroup>;
+  dskFilterObject: DSKFilterGroup;
   errorState: boolean;
   errorMessage;
   constructor(
-    private _dialogRef: MatDialogRef<AddAttributeDialogComponent>,
+    private _dialogRef: MatDialogRef<DskFilterDialogComponent>,
     private datasecurityService: DataSecurityService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
@@ -22,10 +27,23 @@ export class AddAttributeDialogComponent {
       value;
       groupSelected;
     }
-  ) {}
+  ) {
+    this.dskFilters$ = this.datasecurityService
+      .getFiltersFor(data.groupSelected.secGroupSysId)
+      .pipe(
+        tap(filters => {
+          this.dskFilterObject = filters;
+        })
+      );
+  }
 
   hasWhiteSpace(field) {
     return /\s/g.test(field);
+  }
+
+  updateFilter(filter: DSKFilterGroup) {
+    this.dskFilterObject = filter;
+    console.log(this.dskFilterObject);
   }
 
   submit() {

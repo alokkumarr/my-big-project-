@@ -60,6 +60,7 @@ import {
 } from '../../common/services';
 import { IsAdminGuard, GoToDefaultAdminPageGuard } from './guards';
 import { DskFilterGroupComponent } from './datasecurity/dsk-filter-group/dsk-filter-group.component';
+import { DskFilterDialogComponent } from './datasecurity/dsk-filter-dialog/dsk-filter-dialog.component';
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -71,6 +72,7 @@ const COMPONENTS = [
   PrivilegeEditorComponent,
   PrivilegeRowComponent,
   SecurityGroupComponent,
+  DskFilterDialogComponent,
   DskFilterGroupComponent,
   AddSecurityDialogComponent,
   DeleteDialogComponent,

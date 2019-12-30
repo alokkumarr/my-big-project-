@@ -1,4 +1,10 @@
-@import "src/themes/base/colors";
+@import 'src/themes/base/colors';
+
+:host {
+  display: block;
+  min-width: 300px;
+  min-height: 200px;
+}
 
 ::ng-deep add-attribute-dialog {
   max-width: 860px;
@@ -10,13 +16,14 @@
 
     strong {
       font-size: 20px;
-      color: #5C6670;
+      color: #5c6670;
     }
   }
 
   .base-dialog__content {
     padding: 10px !important;
     max-height: 450px;
+    overflow: auto;
 
     .mat-form-field {
       width: 100%;
@@ -45,6 +52,6 @@
   }
 
   .red {
-    color: #E53935;
+    color: #e53935;
   }
 }

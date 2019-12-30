@@ -11,6 +11,7 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
+import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
 
 @Component({
   selector: 'security-group',
@@ -107,6 +108,25 @@ export class SecurityGroupComponent implements OnInit {
               description: result.description
             };
           }
+          this.loadGroupGridWithData(this.groupSelected);
+        }
+      });
+  }
+
+  updateDskFilters() {
+    const data = {
+      groupSelected: this.groupSelected
+    };
+    return this._dialog
+      .open(DskFilterDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
           this.loadGroupGridWithData(this.groupSelected);
         }
       });
