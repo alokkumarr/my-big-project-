@@ -49,7 +49,7 @@ public class ExternalSecurityService {
   @Autowired
   private ModulePrivilegeRepository privilegeRepository;
 
-  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?+\\[\\]\\\\]";
+  private final static String NAME_REGEX = "[`~!@#$%^&*()+={}|\"':;?/>.<,*:/?+\\d\\[\\]\\\\]";
 
   private boolean haveCategoryCheck = false;
   private boolean haveSubCategoryFlag = false;

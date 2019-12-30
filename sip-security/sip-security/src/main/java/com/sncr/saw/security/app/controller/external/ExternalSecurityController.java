@@ -131,7 +131,7 @@ public class ExternalSecurityController {
     if (validateRoleName || role.getRoleName().trim().contains(" ")) {
       httpResponse.setStatus(HttpStatus.OK.value());
       response.setValid(false);
-      response.setMessage("Special symbol not allowed except underscore(_) and hyphen(-) for role name.");
+      response.setMessage("Special symbol and numeric not allowed except underscore(_) and hyphen(-) for role name.");
       return response;
     } else if (categoryList != null && !categoryList.isEmpty()) {
       boolean emptyCategoryName = categoryList.stream().anyMatch(category -> category.getCategoryName() == null || category.getCategoryName().trim().isEmpty());
@@ -232,6 +232,13 @@ public class ExternalSecurityController {
 
     String productName = request.getProductName();
     String moduleName = request.getModuleName();
+    if ("ALERTS".equalsIgnoreCase(moduleName) || "WORKBENCH".equalsIgnoreCase(moduleName)){
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setValid(false);
+      response.setMessage("ALERTS and WORKBENCH module are not allowed.");
+      return response;
+    }
+
     ProductModuleDetails moduleDetails = productModuleRepository.fetchModuleProductDetail(masterLoginId, productName, moduleName);
     final Long customerSysId = moduleDetails != null ? moduleDetails.getCustomerSysId() : null;
     if (customerSysId == null || customerSysId == 0) {
