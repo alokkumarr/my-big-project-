@@ -1,13 +1,18 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.sip.utils.RestUtil;
+import javax.annotation.PostConstruct;
 import org.quartz.*;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
@@ -16,6 +21,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.web.client.RestTemplate;
 
 @Primary
 @Service
@@ -29,6 +35,20 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
 
 	@Autowired
 	private ApplicationContext context;
+
+	@Value("${sip-metadata-service-url}")
+	private String metadataAnalysisUrl;
+
+
+	@Autowired
+	private RestUtil restUtil;
+
+	private RestTemplate restTemplate;
+
+	@PostConstruct
+	public void init() throws Exception {
+		restTemplate = restUtil.restTemplate();
+	}
 
 	/**
 	 * Schedule a job by jobName at given date.
@@ -529,5 +549,15 @@ public class JobServiceImpl implements JobService<SchedulerJobDetail>{
             return true;
         }
     }
+
+    @Override
+    public Analysis getAnalysis(String analysisId) {
+			String dslUrl = metadataAnalysisUrl + "/" + analysisId +"?internalCall=true";
+			logger.trace("URL for request body : ", dslUrl);
+			AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
+
+			Analysis analysis = analysisResponse.getAnalysis();
+			return analysis;
+		}
 }
 

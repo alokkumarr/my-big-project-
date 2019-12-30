@@ -66,12 +66,12 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     {
       label: 'Publish',
       value: 'publish',
-      fn: this.publish.bind(this, 'publish')
+      fn: this.publish.bind(this)
     },
     {
       label: 'Schedule',
       value: 'publish',
-      fn: this.publish.bind(this, 'schedule')
+      fn: this.schedule.bind(this)
     },
     {
       label: 'Export',
@@ -99,14 +99,31 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     this.actions = filter(this.actions, ({ value }) => {
       const notExcluded = !actionsToExclude.includes(value);
       const privilegeName = upperCase(privilegeMap[value] || value);
-      const hasPriviledge = this._jwt.hasPrivilege(privilegeName, {
-        subCategoryId: isDSLAnalysis(this.analysis)
-          ? this.analysis.category
-          : this.analysis.categoryId
-      });
-
+      const subCategoryId = isDSLAnalysis(this.analysis)
+        ? this.analysis.category
+        : this.analysis.categoryId;
+      const hasPriviledge = this.doesUserHavePrivilege(
+        privilegeName,
+        subCategoryId
+      );
       return notExcluded && hasPriviledge;
     });
+  }
+
+  doesUserHavePrivilege(privilegeName, subCategoryId) {
+    const hasPrivilegeForCurrentFolder = this._jwt.hasPrivilege(privilegeName, {
+      subCategoryId
+    });
+    const needsPrivilegeForDraftsFolder = ['EDIT', 'FORK', 'CREATE'].includes(
+      privilegeName
+    );
+    const hasPrivilegeForDraftsFolder = this._jwt.hasPrivilegeForDraftsFolder(
+      privilegeName
+    );
+    return (
+      hasPrivilegeForCurrentFolder &&
+      (!needsPrivilegeForDraftsFolder || hasPrivilegeForDraftsFolder)
+    );
   }
 
   edit() {
@@ -135,14 +152,20 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     });
   }
 
-  publish(type) {
+  publish() {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService
-      .publish(analysis, type)
-      .then(publishedAnalysis => {
-        this.analysis = publishedAnalysis;
-        this.afterPublish.emit(publishedAnalysis);
-      });
+    this._analyzeActionsService.publish(analysis).then(publishedAnalysis => {
+      this.analysis = publishedAnalysis;
+      this.afterPublish.emit(publishedAnalysis);
+    });
+  }
+
+  schedule() {
+    const analysis = clone(this.analysis);
+    this._analyzeActionsService.schedule(analysis).then(scheduledAnalysis => {
+      this.analysis = scheduledAnalysis;
+      this.afterPublish.emit(scheduledAnalysis);
+    });
   }
 
   export() {

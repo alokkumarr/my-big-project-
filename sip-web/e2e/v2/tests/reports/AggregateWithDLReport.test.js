@@ -13,6 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ReportDesignerPage = require('../../pages/ReportDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const moment = require('moment');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing Aggregate for es report tests from reports/AggregateWithDLReport.test.js', () => {
   let analysisId;
@@ -21,7 +22,11 @@ describe('Executing Aggregate for es report tests from reports/AggregateWithDLRe
   beforeAll(() => {
     logger.info('Starting reports/AggregateWithDLReport.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
