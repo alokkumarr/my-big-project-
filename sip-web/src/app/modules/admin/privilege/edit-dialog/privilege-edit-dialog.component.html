@@ -12,7 +12,7 @@
       <mat-label i18n>Product</mat-label>
       <mat-select class="form-field" required formControlName="productId">
         <mat-option
-          *ngFor="let product of (products$ | async)"
+          *ngFor="let product of products$ | async"
           [value]="product.productId"
         >
           {{ product.productName }}
@@ -23,7 +23,7 @@
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label i18n>Role</mat-label>
       <mat-select required formControlName="roleId">
-        <mat-option *ngFor="let role of (roles$ | async)" [value]="role.roleId">
+        <mat-option *ngFor="let role of roles$ | async" [value]="role.roleId">
           {{ role.roleName }}
         </mat-option>
       </mat-select>
@@ -33,7 +33,7 @@
       <mat-label i18n>Module</mat-label>
       <mat-select class="form-field" required formControlName="moduleId">
         <mat-option
-          *ngFor="let module of (modules$ | async)"
+          *ngFor="let module of modules$ | async"
           [value]="module.moduleId"
         >
           {{ module.moduleName }}
@@ -59,6 +59,7 @@
     (privilegeChange)="onPrivilegeChange($event)"
     [allowedPrivileges]="allowedPrivileges"
     [subCategories]="subCategories"
+    [categoryName]="selectedCategoryName"
     [activePrivilegeId]="privilegeId"
   >
   </privilege-editor>
