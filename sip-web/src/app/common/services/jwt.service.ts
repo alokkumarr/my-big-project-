@@ -12,6 +12,7 @@ import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../consts';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -35,6 +36,11 @@ export const CUSTOM_JWT_CONFIG = {
 
 @Injectable()
 export class JwtService {
+
+  constructor(
+    public _http: HttpClient
+  ) {}
+
   _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
 
   set(accessToken, refreshToken) {
@@ -329,5 +335,20 @@ export class JwtService {
     }
     // No privilege
     return 0;
+  }
+
+  validateToken() {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.get()}`
+      })
+    };
+
+    return this._http
+    .post(AppConfig.login.url + '/auth/validateToken', httpOptions).toPromise()
+    .then(res => {
+      return res;
+    });
   }
 }
