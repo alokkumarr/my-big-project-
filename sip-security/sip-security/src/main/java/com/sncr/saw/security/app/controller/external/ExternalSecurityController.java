@@ -67,6 +67,13 @@ public class ExternalSecurityController {
       return response;
     }
 
+    if ("ALERTS".equalsIgnoreCase(request.getModuleName()) || "WORKBENCH".equalsIgnoreCase(request.getModuleName())){
+      httpResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+      response.setValid(false);
+      response.setMessage("ALERTS and WORKBENCH module are not allowed.");
+      return response;
+    }
+
     Ticket ticket = SipCommonUtils.getTicket(httpRequest);
     RoleType roleType = ticket.getRoleType();
     String masterLoginId = ticket.getMasterLoginId();
