@@ -32,7 +32,8 @@ import {
   DxTextBoxModule,
   DxButtonModule,
   DxSliderModule,
-  DxTooltipModule
+  DxTooltipModule,
+  DxCheckBoxModule
 } from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
@@ -120,6 +121,7 @@ const MODULES = [
   DxButtonModule,
   DxSliderModule,
   DxTooltipModule,
+  DxCheckBoxModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,

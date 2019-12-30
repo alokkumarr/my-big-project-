@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkSameColumnAcrossTables;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
@@ -16,6 +17,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -339,8 +342,22 @@ public class StorageProxyController {
     DataSecurityKey dataSecurityKey = new DataSecurityKey();
     dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     List<String> sipQueryArts = getArtifactsNames(analysis.getSipQuery());
-    DataSecurityKey dataSecurityKeyNode =
-        QueryBuilderUtil.checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
+    String analysisType = analysis.getType();
+    Boolean designerEdit =
+        analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
+    boolean queryMode = analysisType.equalsIgnoreCase("report") && designerEdit;
+    String query = queryMode ? analysis.getSipQuery().getQuery().toUpperCase().concat(" ") : null;
+    if (checkSameColumnAcrossTables(savedQuery,dataSecurityKey)) {
+      response.sendError(HttpStatus.BAD_REQUEST.value(),
+          "Column ambiguity error!!"
+              + " DSK name should use TableName.columnName if same column present across tables!!");
+      return executeResponse;
+    }
+    DataSecurityKey dataSecurityKeyNode = queryMode ? QueryBuilderUtil
+        .checkDSKApplicableAnalysis(getArtifactsNames(savedQuery), query, dataSecurityKey,
+        savedQuery) :
+        QueryBuilderUtil
+            .checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
 
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
@@ -355,18 +372,13 @@ public class StorageProxyController {
             && dataSecurityKeys.getIsJvCustomer() != 1
             && dataSecurityKeys.getFilterByCustomerCode() == 1;
     if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
-      String analysisType = analysis.getType();
       DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
       List<String> artsName = getArtifactsNames(savedQuery);
       List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
-      Boolean designerEdit =
-          analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
-      String customerCode =
-          dataSecurityKeys != null ? dataSecurityKeys.getCustomerCode() : authTicket.getCustCode();
+      String customerCode = dataSecurityKeys!= null ? dataSecurityKeys.getCustomerCode() : authTicket.getCustCode();
       if (analysisType.equalsIgnoreCase("report") && designerEdit) {
         logger.trace("Artifact Name : " + artsName);
         for (String artifact : artsName) {
-          String query = analysis.getSipQuery().getQuery().toUpperCase().concat(" ");
           if (query.contains(artifact)) {
             dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
             dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
@@ -629,7 +641,8 @@ public class StorageProxyController {
     logger.trace("DSK List = " + dskList);
 
     // If user is associated with any datasecurity key, return empty data
-    if (dskList != null && dskList.size() != 0) {
+    if (dskList != null && dskList.size() != 0 && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
       return new ExecutionResponse();
     }
 
