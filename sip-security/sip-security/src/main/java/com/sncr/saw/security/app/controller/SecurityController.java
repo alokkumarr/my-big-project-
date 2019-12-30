@@ -370,7 +370,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
-	public Valid changePassword(HttpServletRequest request, @RequestBody ChangePasswordDetails changePasswordDetails) {
+	public Valid changePassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ChangePasswordDetails changePasswordDetails) {
 		Valid valid = new Valid();
 		valid.setValid(false);
 		String oldPass = changePasswordDetails.getOldPassword();
@@ -381,6 +381,7 @@ public class SecurityController {
     Ticket ticket = SipCommonUtils.getTicket(request);
     if (ticket != null && !ticket.getMasterLoginId().equalsIgnoreCase(loginId)) {
       valid.setValidityMessage(UNAUTHORIZED_USER);
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return valid;
     }
 
