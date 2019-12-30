@@ -23,6 +23,7 @@
   .base-dialog__content {
     padding: 10px !important;
     max-height: 450px;
+    overflow: auto;
 
     .mat-form-field {
       width: 100%;

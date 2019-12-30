@@ -1,22 +1,43 @@
-<mat-chip-list>
-  <mat-chip color="primary" selected>{{
-    filterGroup.booleanCriteria
-  }}</mat-chip>
+<div
+  class="boolean-criteria-header"
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+>
+  <div>
+    <button
+      mat-raised-button
+      color="primary"
+      matTooltip="Toggle Boolean Criteria"
+      (click)="toggleCriteria()"
+    >
+      {{ filterGroup.booleanCriteria }}
+    </button>
 
-  <mat-chip
-    [popper]="newDSKChild"
-    popperApplyClass="new-child-popper"
-    popperTrigger="click"
-    [popperHideOnClickOutside]="true"
-    popperPlacement="right"
+    <button
+      mat-icon-button
+      [popper]="newDSKChild"
+      popperApplyClass="new-child-popper"
+      popperTrigger="click"
+      [popperHideOnClickOutside]="true"
+      popperPlacement="right"
+    >
+      <mat-icon fontIcon="icon-plus2"></mat-icon>
+    </button>
+    <popper-content #newDSKChild>
+      <button mat-button (click)="addField(newDSKChild)">Field</button>
+      <button mat-button (click)="addGroup(newDSKChild)">Group</button>
+    </popper-content>
+  </div>
+  <button
+    mat-icon-button
+    *ngIf="selfIndex >= 0"
+    aria-label="Remove dsk field attribute"
+    matTooltip="Remove Group"
+    (click)="onRemoveGroup.emit(selfIndex)"
   >
-    +
-  </mat-chip>
-  <popper-content #newDSKChild>
-    <button mat-button (click)="addField(newDSKChild)">Field</button>
-    <button mat-button (click)="addGroup(newDSKChild)">Group</button>
-  </popper-content>
-</mat-chip-list>
+    <mat-icon fontIcon="icon-close"></mat-icon>
+  </button>
+</div>
 
 <div
   class="dsk-query-child"
@@ -24,20 +45,30 @@
 >
   <dsk-filter-group
     [filterGroup]="child"
+    [selfIndex]="childId"
+    (onRemoveGroup)="removeGroup($event)"
+    (onChange)="onChange.emit(this.filterGroup)"
     *ngIf="child['booleanCriteria']; else attributeFields"
   ></dsk-filter-group>
 
   <ng-template #attributeFields>
-    <div fxLayout="row" fxLayoutGap="10px">
-      <mat-form-field>
-        <input matInput [ngModel]="child['columnName']" />
+    <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
+      <mat-form-field appearance="outline" fxFlex="30">
+        <mat-label>Attribute</mat-label>
+        <input
+          matInput
+          placeholder="Attribute"
+          [ngModel]="child['columnName']"
+          (ngModelChange)="updateAttributeName(childId, $event)"
+        />
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-chip-list #chipList>
+      <mat-form-field appearance="outline">
+        <mat-chip-list #chipList (change)="onChange.emit(filterGroup)">
           <mat-chip
-            *ngFor="let item of child['model'].value"
+            *ngFor="let item of child['model'].value; let valueId = index"
             [removable]="true"
+            (removed)="removeValue(childId, valueId)"
           >
             {{ item }}
             <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
@@ -51,6 +82,14 @@
           />
         </mat-chip-list>
       </mat-form-field>
+      <button
+        mat-icon-button
+        aria-label="Remove dsk field attribute"
+        matTooltip="Remove Field"
+        (click)="removeField(childId)"
+      >
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
     </div>
   </ng-template>
 </div>

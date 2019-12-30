@@ -4,6 +4,7 @@ import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
 import { DSKFilterGroup } from '../dsk-filter.model';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'add-attribute-dialog',
@@ -13,6 +14,7 @@ import { Observable } from 'rxjs';
 export class AddAttributeDialogComponent {
   public attribute = {};
   dskFilters$: Observable<DSKFilterGroup>;
+  dskFilterObject: DSKFilterGroup;
   errorState: boolean;
   errorMessage;
   constructor(
@@ -26,13 +28,22 @@ export class AddAttributeDialogComponent {
       groupSelected;
     }
   ) {
-    this.dskFilters$ = this.datasecurityService.getFiltersFor(
-      data.groupSelected.secGroupSysId
-    );
+    this.dskFilters$ = this.datasecurityService
+      .getFiltersFor(data.groupSelected.secGroupSysId)
+      .pipe(
+        tap(filters => {
+          this.dskFilterObject = filters;
+        })
+      );
   }
 
   hasWhiteSpace(field) {
     return /\s/g.test(field);
+  }
+
+  updateFilter(filter: DSKFilterGroup) {
+    this.dskFilterObject = filter;
+    console.log(this.dskFilterObject);
   }
 
   submit() {

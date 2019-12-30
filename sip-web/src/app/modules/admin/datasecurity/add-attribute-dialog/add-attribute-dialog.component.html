@@ -8,7 +8,10 @@
     <div class="errors" *ngIf="errorState">
       <span [innerHtml]="errorMessage"></span>
     </div>
-    <dsk-filter-group [filterGroup]="dskFilters$ | async"></dsk-filter-group>
+    <dsk-filter-group
+      [filterGroup]="dskFilters$ | async"
+      (onChange)="updateFilter($event)"
+    ></dsk-filter-group>
   </div>
 </div>
 
