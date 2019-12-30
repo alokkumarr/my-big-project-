@@ -2,12 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
 import * as isUndefined from 'lodash/isUndefined';
-import { Observable, of } from 'rxjs';
-import {
-  DSKFilterGroup,
-  DSKFilterBooleanCriteria,
-  DSKFilterOperator
-} from './dsk-filter.model';
+import { Observable } from 'rxjs';
+import { DSKFilterGroup } from './dsk-filter.model';
+import { map } from 'rxjs/operators';
 
 const loginUrl = AppConfig.login.url;
 
@@ -16,51 +13,18 @@ export class DataSecurityService {
   constructor(private _http: HttpClient) {}
 
   getList(customerId) {
-    return this.getRequest('auth/admin/user-assignments');
+    return this.getRequest('auth/admin/user-assignments').toPromise();
   }
 
   getFiltersFor(group: string): Observable<DSKFilterGroup> {
-    if (!group) {
-      return of(null);
-    }
-    return of({
-      booleanCriteria: DSKFilterBooleanCriteria.AND,
-      booleanQuery: [
-        {
-          columnName: 'Field1',
-          model: {
-            operator: DSKFilterOperator.ISIN,
-            value: ['abc']
-          }
-        },
-        {
-          columnName: 'Field2',
-          model: {
-            operator: DSKFilterOperator.ISIN,
-            value: ['pqr']
-          }
-        },
-        {
-          booleanCriteria: DSKFilterBooleanCriteria.OR,
-          booleanQuery: [
-            {
-              columnName: 'Field3',
-              model: {
-                operator: DSKFilterOperator.ISIN,
-                value: ['456']
-              }
-            },
-            {
-              columnName: 'Field4',
-              model: {
-                operator: DSKFilterOperator.ISIN,
-                value: ['123']
-              }
-            }
-          ]
-        }
-      ]
-    });
+    return <Observable<DSKFilterGroup>>this.getRequest(
+      `auth/admin/dsk-security-groups/${group}`
+    ).pipe(
+      map(data => {
+        console.log(data);
+        return data;
+      })
+    );
   }
 
   addSecurityGroup(data) {
@@ -97,11 +61,11 @@ export class DataSecurityService {
   getSecurityAttributes(request) {
     return this.getRequest(
       `auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`
-    );
+    ).toPromise();
   }
 
   getSecurityGroups() {
-    return this.getRequest('auth/admin/security-groups');
+    return this.getRequest('auth/admin/security-groups').toPromise();
   }
 
   deleteGroupOrAttribute(path) {
@@ -114,7 +78,7 @@ export class DataSecurityService {
   }
 
   getRequest(path) {
-    return this._http.get(`${loginUrl}/${path}`).toPromise();
+    return this._http.get(`${loginUrl}/${path}`);
   }
 
   putrequest(path, requestBody) {

@@ -8,6 +8,7 @@ export enum DSKFilterBooleanCriteria {
 }
 
 export interface DSKFilterField {
+  attributeId?: string;
   columnName: string;
   model: {
     operator: DSKFilterOperator;
@@ -16,6 +17,14 @@ export interface DSKFilterField {
 }
 
 export interface DSKFilterGroup {
+  attributeId?: string;
   booleanCriteria: DSKFilterBooleanCriteria;
   booleanQuery: Array<DSKFilterField | DSKFilterGroup>;
+}
+
+export interface DSKSecurityGroup {
+  securityGroupSysId: number;
+  groupName: string;
+  groupDescription?: string;
+  dskAttributes: DSKFilterGroup;
 }
