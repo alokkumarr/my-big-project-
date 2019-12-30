@@ -140,7 +140,7 @@ describe('HttpMetadataComponent', () => {
     it('should replace header if correct type is selected and valid values are provided', () => {
       component.provisionalHeaders = [];
       component.updateProvisionalHeaders({
-        type: AUTHORIZATION_TYPES.USER,
+        type: AUTHORIZATION_TYPES.BASIC,
         userName: 'abc',
         password: 'def'
       });

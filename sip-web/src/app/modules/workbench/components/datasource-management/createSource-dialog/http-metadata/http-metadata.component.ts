@@ -115,7 +115,7 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
     this.provisionalHeaders = [userAuth];
     const [userName, password] = atob(userAuth.value.split(' ')[1]).split(':');
     this.authorizationForm.patchValue({
-      type: AUTHORIZATION_TYPES.USER,
+      type: AUTHORIZATION_TYPES.BASIC,
       userName,
       password
     });
@@ -132,11 +132,11 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
       type: [AUTHORIZATION_TYPES[Object.keys(AUTHORIZATION_TYPES)[0]]],
       userName: [
         '',
-        [requireIf('type', val => val === AUTHORIZATION_TYPES.USER)]
+        [requireIf('type', val => val === AUTHORIZATION_TYPES.BASIC)]
       ],
       password: [
         '',
-        [requireIf('type', val => val === AUTHORIZATION_TYPES.USER)]
+        [requireIf('type', val => val === AUTHORIZATION_TYPES.BASIC)]
       ]
     });
 
@@ -163,7 +163,7 @@ export class HttpMetadataComponent implements OnInit, OnDestroy {
    */
   updateProvisionalHeaders({ type, userName, password }) {
     switch (type) {
-      case AUTHORIZATION_TYPES.USER:
+      case AUTHORIZATION_TYPES.BASIC:
         this.addUserAuthHeader(userName, password);
         break;
       case AUTHORIZATION_TYPES.NONE:

@@ -350,14 +350,14 @@
     <form
       fxFlex
       fxLayout="row"
-      fxLayoutAlign="start center"
+      fxLayoutAlign="start start"
       fxLayoutGap="5px"
       class="parameters authorization"
       novalidate
       [formGroup]="authorizationForm"
       autocomplete="false"
     >
-      <div fxFlex="50" fxLayout="row" fxLayoutAlign="end center">
+      <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
         <mat-form-field appearance="outline" fxFlex="35">
           <mat-label>Authorization Type</mat-label>
           <mat-select formControlName="type">
@@ -369,23 +369,32 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <p
+          style="margin: 0"
+          [style.display]="
+            authType.value === authorizationTypes.NONE ? 'none' : 'block'
+          "
+        >
+          The authorization header will be automatically generated when you test
+          connectivity or save.
+        </p>
       </div>
       <mat-divider [vertical]="true"></mat-divider>
       <div
-        fxFlex="25"
+        fxFlex="50"
+        style="height: 62px; text-align: center; line-height: 62px;"
         [style.display]="
           authType.value === authorizationTypes.NONE ? 'block' : 'none'
         "
       >
-        Please choose an Authorization scheme. The headers will be automatically
-        calculated and appended to the request.
+        Please choose an Authorization scheme.
       </div>
       <div
         fxFlex="50"
         fxLayout="column"
-        fxLayoutAlign="center start"
+        fxLayoutAlign="start stretch"
         [style.display]="
-          authType.value === authorizationTypes.USER ? 'flex' : 'none'
+          authType.value === authorizationTypes.BASIC ? 'flex' : 'none'
         "
       >
         <mat-form-field fxFlex appearance="outline">
@@ -395,7 +404,7 @@
             name="auth-username"
             e2e="auth-username"
             formControlName="userName"
-            [required]="authType.value === authorizationTypes.USER"
+            [required]="authType.value === authorizationTypes.BASIC"
             autocomplete="off"
           />
           <mat-error *ngIf="!!authUsername.hasError('required')" i18n>
@@ -411,7 +420,7 @@
             name="auth-password"
             e2e="auth-password"
             formControlName="password"
-            [required]="authType.value === authorizationTypes.USER"
+            [required]="authType.value === authorizationTypes.BASIC"
             autocomplete="off"
           />
           <mat-error *ngIf="!!authPassword.hasError('required')" i18n>

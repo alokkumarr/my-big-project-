@@ -31,7 +31,7 @@ export enum HTTP_METHODS {
 
 export enum AUTHORIZATION_TYPES {
   NONE = 'None',
-  USER = 'User'
+  BASIC = 'Basic Auth'
 }
 
 export interface ChannelObject {
