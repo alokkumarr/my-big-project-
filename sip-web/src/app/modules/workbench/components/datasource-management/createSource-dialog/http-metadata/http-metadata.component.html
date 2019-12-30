@@ -419,10 +419,17 @@
             matInput
             name="auth-password"
             e2e="auth-password"
+            showPassword
             formControlName="password"
             [required]="authType.value === authorizationTypes.BASIC"
             autocomplete="off"
           />
+          <mat-icon
+            matTooltip="Toggle Password"
+            matSuffix
+            fontIcon="icon-show"
+            e2e="show-password"
+          ></mat-icon>
           <mat-error *ngIf="!!authPassword.hasError('required')" i18n>
             Password is
             <strong>required</strong>
