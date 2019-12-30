@@ -1512,11 +1512,15 @@ public class UserRepositoryImpl implements UserRepository {
 	public boolean deleteUser(Long userId, String masterLoginId) {
 		String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ?";
 		try {
-			jdbcTemplate.update(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, userId);
-				}
-			});
+			int valid = jdbcTemplate.update(sql, preparedStatement -> preparedStatement.setLong(1, userId));
+			// if user deleted successfully then invalidate ticket
+			if (valid > 0) {
+				String updateSql = "UPDATE TICKET SET VALID_INDICATOR=0,INACTIVATED_DATE=sysdate(),DESCRIPTION=? where MASTER_LOGIN_ID = ?";
+				jdbcTemplate.update(updateSql, preparedStatement -> {
+					preparedStatement.setString(1, "User has been deleted.");
+					preparedStatement.setString(2, masterLoginId);
+				});
+			}
 		} catch (Exception e) {
 			logger.error("Exception encountered while deleting user " + e.getMessage(), null, e);
 			return false;
@@ -2341,7 +2345,7 @@ public class UserRepositoryImpl implements UserRepository {
 					 + "   CPMF.FEATURE_NAME, "
 					 + "   IFNULL(PV.PRIVILEGE_CODE,0) PRIVILEGE_CODE, "
 					 + "   IFNULL(PV.PRIVILEGE_SYS_ID,0) PRIVILEGE_SYS_ID, "
-					 + "   CPMF.FEATURE_CODE  "
+					 + "   CPMF.FEATURE_CODE, CPMF.SYSTEM_CATEGORY  "
 					 + "FROM    "
 					 + "   USERS U  "
 					 + "   INNER JOIN "
@@ -2410,7 +2414,8 @@ public class UserRepositoryImpl implements UserRepository {
 				subCategory.setSubCategoryName(rs.getString("FEATURE_NAME"));
 				subCategory.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));
 				subCategory.setPrivilegeId(rs.getLong("PRIVILEGE_SYS_ID"));
-				subCategory.setSubCategoryCode("FEATURE_CODE");
+				subCategory.setSubCategoryCode(rs.getString("FEATURE_CODE"));
+				subCategory.setSystemCategory(rs.getBoolean("SYSTEM_CATEGORY"));
 				subCatList.add(subCategory);
 			}
 			return subCatList;

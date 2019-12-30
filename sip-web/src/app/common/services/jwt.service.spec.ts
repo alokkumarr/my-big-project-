@@ -1,10 +1,12 @@
 import { TestBed, async } from '@angular/core/testing';
 import { JwtService } from './jwt.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('JWT Service', () => {
   let jwtService: JwtService;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [JwtService]
     }).compileComponents();
   }));
