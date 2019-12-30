@@ -40,7 +40,7 @@
         [removable]="true"
         (removed)="removeFromGroup(col, adapter)"
       >
-        <ng-container *ngIf="col.aggregate; else defaultTemplate">
+        <ng-container *ngIf="col.area === 'data' || col.area === 'y'; else defaultTemplate">
           <span
             [matTooltip]="AGGREGATE_TYPES_OBJ[col.aggregate | lowercase].label"
             [innerHtml]="
