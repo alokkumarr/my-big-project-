@@ -341,17 +341,7 @@ public class SecurityIT extends BaseIT {
 
     ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
 
-    System.out.println(secGroup);
-
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(secGroup)
-        .when()
-        .post("/security/auth/admin/dsk-security-groups")
-        .then()
-        .assertThat()
-        .statusCode(200)
-        .body("valid", equalTo(true));
+    createSecurityGroup(secGroup);
   }
 
   @Test
@@ -411,9 +401,15 @@ public class SecurityIT extends BaseIT {
 
     ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
 
-    System.out.println(secGroup);
-
     // Adding security group once will be successful
+    createSecurityGroup(secGroup);
+
+    // Trying to add the security group with same name should result in failure
+    // This will return a status code of 400 and validity is false
+    createSecurityGroup(secGroup);
+  }
+
+  private void createSecurityGroup(ObjectNode secGroup) {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(secGroup)
@@ -423,18 +419,6 @@ public class SecurityIT extends BaseIT {
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
-    // Trying to add the security group with same name should result in failure
-    // This will return a status code of 400 and validity is false
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(secGroup)
-        .when()
-        .post("/security/auth/admin/dsk-security-groups")
-        .then()
-        .assertThat()
-        .statusCode(400)
-        .body("valid", equalTo(false));
   }
 
   @Test
