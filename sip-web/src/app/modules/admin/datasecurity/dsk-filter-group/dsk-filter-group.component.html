@@ -3,7 +3,7 @@
   fxLayout="row"
   fxLayoutAlign="space-between center"
 >
-  <div>
+  <div fxFlex>
     <button
       mat-raised-button
       color="primary"
@@ -27,6 +27,11 @@
       <button mat-button (click)="addField(newDSKChild)">Field</button>
       <button mat-button (click)="addGroup(newDSKChild)">Group</button>
     </popper-content>
+    <mat-error
+      style="display: inline-block;"
+      *ngIf="filterGroup.booleanQuery.length < 2"
+      >Add <strong>at least 2 </strong> fields or groups.</mat-error
+    >
   </div>
   <button
     mat-icon-button
@@ -53,35 +58,51 @@
 
   <ng-template #attributeFields>
     <div fxLayout="row" fxLayoutGap="10px" flexLayoutAlign="start center">
-      <mat-form-field appearance="outline" fxFlex="30">
-        <mat-label>Attribute</mat-label>
-        <input
-          matInput
-          placeholder="Attribute"
-          [ngModel]="child['columnName']"
-          (ngModelChange)="updateAttributeName(childId, $event)"
-        />
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-chip-list #chipList (change)="onChange.emit(filterGroup)">
-          <mat-chip
-            *ngFor="let item of child['model'].values; let valueId = index"
-            [removable]="true"
-            (removed)="removeValue(childId, valueId)"
-          >
-            {{ item }}
-            <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
-          </mat-chip>
+      <div fxLayout="column" fxFlex="30" fxLayoutAlign="start stretch">
+        <mat-form-field appearance="outline">
+          <mat-label>Attribute</mat-label>
           <input
-            placeholder="Add new value"
-            [matChipInputFor]="chipList"
-            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-            [matChipInputAddOnBlur]="true"
-            (matChipInputTokenEnd)="addValue(childId, $event)"
+            matInput
+            required
+            placeholder="Attribute"
+            (keydown)="preventSpace($event)"
+            [ngModel]="child['columnName']"
+            (ngModelChange)="updateAttributeName(childId, $event)"
           />
-        </mat-chip-list>
-      </mat-form-field>
+        </mat-form-field>
+        <mat-error *ngIf="!child['columnName']"
+          >Field Name is <strong>required</strong>.</mat-error
+        >
+      </div>
+
+      <div fxLayout="column" fxFlex fxLayoutAlign="start stretch">
+        <mat-form-field>
+          <mat-chip-list
+            #chipList
+            (change)="onChange.emit(filterGroup)"
+            required
+          >
+            <mat-chip
+              *ngFor="let item of child['model'].values; let valueId = index"
+              [removable]="true"
+              (removed)="removeValue(childId, valueId)"
+            >
+              {{ item }}
+              <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
+            </mat-chip>
+            <input
+              placeholder="Add new value"
+              [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              [matChipInputAddOnBlur]="true"
+              (matChipInputTokenEnd)="addValue(childId, $event)"
+            />
+          </mat-chip-list>
+        </mat-form-field>
+        <mat-error *ngIf="child['model'].values.length === 0"
+          >At least 1 value is <strong>required</strong>.</mat-error
+        >
+      </div>
       <button
         mat-icon-button
         aria-label="Remove dsk field attribute"

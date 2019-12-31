@@ -91,6 +91,13 @@ export class DskFilterGroupComponent implements OnInit {
     this.onChange.emit(this.filterGroup);
   }
 
+  preventSpace(event: KeyboardEvent) {
+    if (event.code === 'Space') {
+      return false;
+    }
+    return true;
+  }
+
   updateAttributeName(childId: number, value: string) {
     (<DSKFilterField>this.filterGroup.booleanQuery[childId]).columnName = value;
     this.onChange.emit(this.filterGroup);

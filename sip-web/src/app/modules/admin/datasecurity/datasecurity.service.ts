@@ -7,7 +7,12 @@ import * as fpGet from 'lodash/fp/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
 import { Observable } from 'rxjs';
-import { DSKFilterGroup, DSKSecurityGroup } from './dsk-filter.model';
+import {
+  DSKFilterGroup,
+  DSKSecurityGroup,
+  DSKFilterBooleanCriteria,
+  DSKFilterField
+} from './dsk-filter.model';
 
 const loginUrl = AppConfig.login.url;
 
@@ -58,6 +63,38 @@ export class DataSecurityService {
       map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
         flatten(values(data))
       )
+    );
+  }
+
+  isDSKFilterValid(filter: DSKFilterGroup) {
+    let condition;
+    if (
+      filter.booleanCriteria === DSKFilterBooleanCriteria.AND ||
+      filter.booleanCriteria === DSKFilterBooleanCriteria.OR
+    ) {
+      // AND and OR need to have 2 or more operands
+      condition = filter.booleanQuery && filter.booleanQuery.length >= 2;
+    } else {
+      // NOT needs a single operand
+      condition = filter.booleanQuery && filter.booleanQuery.length === 1;
+    }
+
+    return (
+      filter.booleanCriteria &&
+      condition &&
+      filter.booleanQuery.every(child => {
+        if ((<DSKFilterGroup>child).booleanCriteria) {
+          return this.isDSKFilterValid(<DSKFilterGroup>child);
+        }
+
+        const field = <DSKFilterField>child;
+        return (
+          field.columnName &&
+          field.model &&
+          field.model.values &&
+          field.model.values.length > 0
+        );
+      })
     );
   }
 
