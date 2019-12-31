@@ -98,10 +98,23 @@ public class SipDskFieldsController {
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(name = "semanticId") String semanticId,
-      @RequestBody List<DskField> dskEligibleFields)
+      @RequestBody List<DskField> dskFields)
       throws IOException {
-    return dskEligibleFieldService.updateDskEligibleFields(
-        request, response, semanticId, dskEligibleFields);
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    Long customerSysId = Long.valueOf(ticket.getCustID());
+    Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
+    String createdBy = ticket.getUserFullName();
+
+    DskEligibleFields dskEligibleFields = new DskEligibleFields();
+    dskEligibleFields.setCustomerSysId(customerSysId);
+    dskEligibleFields.setProductSysId(defaultProdID);
+    dskEligibleFields.setSemanticId(semanticId);
+    dskEligibleFields.setCreatedBy(createdBy);
+    dskEligibleFields.setFields(dskFields);
+
+
+    return dskEligibleFieldService.updateDskEligibleFields(dskEligibleFields, request, response);
   }
 
     @ApiOperation(
