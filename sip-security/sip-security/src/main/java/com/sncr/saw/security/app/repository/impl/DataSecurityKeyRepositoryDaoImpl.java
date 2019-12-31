@@ -517,8 +517,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid = new Valid();
 
         try {
-            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL"
-                + " WHERE SEC_GROUP_SYS_ID=?";
+            Valid validCustomer = validateCustomerForSecGroup(securityGroupId, customerId);
+
+            if (!validCustomer.getValid()) {
+                throw new Exception(validCustomer.getValidityMessage());
+            }
+
+            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL AM"
+                + " WHERE AM.SEC_GROUP_SYS_ID=? ";
 
             int count = jdbcTemplate.update(deleteDskAttributeModelSql, ps -> {
                 ps.setLong(1, securityGroupId);
@@ -572,11 +578,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 // Get children and add them
                 List<SipDskAttribute> dskAttributeList = dskAttribute.getBooleanQuery();
 
-                for(SipDskAttribute childAttribute: dskAttributeList) {
+                dskAttributeList.forEach(childAttribute -> {
                     list.addAll(
-                        prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
-                }
-
+                       prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
+                });
             }
         }
 
@@ -688,11 +693,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
                 return valid;
             }
-//            logger.error(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            valid.setValid(false);
-//            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            valid.setError(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            return valid;
         }
     }
 
@@ -1136,6 +1136,27 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " to  SEC_GROUP_DSK_VALUE.");
         valid.setValid(true);
         valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
+
+        return valid;
+    }
+
+    private Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId) {
+        String customerSql = "SELECT * FROM SEC_GROUP "
+            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
+
+        Valid valid = jdbcTemplate.query(customerSql, ps -> {
+            ps.setLong(1, securityGroupSysId);
+            ps.setLong(2, customerId);
+        }, resultSet -> {
+            Valid v = new Valid();
+            if (resultSet.next()) {
+                v.setValid(true);
+            } else {
+                v.setValid(false);
+                v.setValidityMessage("Security group for customer doesn't exist");
+            }
+            return v;
+        });
 
         return valid;
     }
