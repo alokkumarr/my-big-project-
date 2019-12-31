@@ -8,6 +8,7 @@ public class SubCategoryWithPrivilegeDetails {
     private String subCategoryName;
     private Long privilegeCode;
     private Long privilegeId;
+    private String privilegeDesc;
     private String subCategoryCode;
 
     /**
@@ -88,5 +89,13 @@ public class SubCategoryWithPrivilegeDetails {
      */
     public void setSubCategoryCode(String subCategoryCode) {
         this.subCategoryCode = subCategoryCode;
+    }
+
+    public String getPrivilegeDesc() {
+        return privilegeDesc;
+    }
+
+    public void setPrivilegeDesc(String privilegeDesc) {
+        this.privilegeDesc = privilegeDesc;
     }
 }
