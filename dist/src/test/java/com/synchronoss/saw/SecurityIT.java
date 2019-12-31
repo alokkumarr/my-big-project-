@@ -316,6 +316,50 @@ public class SecurityIT extends BaseIT {
     return response;
   }
 
+  @Test
+  public void createRolePrivilegesCategory() {
+
+    Response response = given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(roleCategoryPrivilege())
+        .when()
+        .post("/security/auth/external/createRoleCategoryPrivilege")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode apiResponse = response.getBody().as(ObjectNode.class);
+    String moduleName = apiResponse.get("moduleName").asText();
+    Assert.assertEquals("OBSERVE", moduleName);
+    String productName = apiResponse.get("productName").asText();
+    Assert.assertEquals("SAW Demo", productName);
+  }
+
+  @Test
+  public void fetchRolePrivilegesCategory() {
+
+    Response response = given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(roleCategoryPrivilege())
+        .when()
+        .get("/security/auth/external/fetchRoleCategoryPrivilege")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode apiResponse = response.getBody().as(ObjectNode.class);
+    String moduleName = apiResponse.get("moduleName").asText();
+    Assert.assertEquals("OBSERVE", moduleName);
+    String productName = apiResponse.get("productName").asText();
+    Assert.assertEquals("SAW Demo", productName);
+  }
+
   /**
    * preprocessReplace Util for String.
    *
@@ -325,6 +369,48 @@ public class SecurityIT extends BaseIT {
    */
   public OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
+  }
+
+  /**
+   * Build node of role, category, privileges.
+   *
+   * @return object Node
+   */
+  private ObjectNode roleCategoryPrivilege() {
+    ObjectNode objectNode = mapper.createObjectNode();
+    objectNode.put("moduleName", "OBSERVE");
+    objectNode.put("productName", "SAW Demo");
+
+    ObjectNode roleDetails = mapper.createObjectNode();
+    roleDetails.put("activeStatusInd", false);
+    roleDetails.put("autoCreate", true);
+    roleDetails.put("customerCode", "SYNCHRONOSS");
+    roleDetails.put("roleDesc", "Admin User");
+    roleDetails.put("roleName", "ROLENAME");
+    roleDetails.put("roleType", "ADMIN");
+    objectNode.set("role", roleDetails);
+
+    ObjectNode categoryDetail = mapper.createObjectNode();
+    categoryDetail.put("autoCreate", true);
+    categoryDetail.put("categoryDesc", "Category Description");
+    categoryDetail.put("categoryName", "NewCategory");
+    categoryDetail.put("categoryType", "000121");
+
+    ObjectNode subCategoryDetail = mapper.createObjectNode();
+    subCategoryDetail.put("autoCreate", true);
+
+    ArrayNode privileges = subCategoryDetail.putArray("privilege");
+    privileges.add("ALL");
+
+    subCategoryDetail.put("subCategoryDesc", "Sub Category Description");
+    subCategoryDetail.put("subCategoryName", "New_Sub_Category");
+
+    ArrayNode subCategory = categoryDetail.putArray("subCategories");
+    subCategory.add(subCategoryDetail);
+
+    ArrayNode category = objectNode.putArray("categories");
+    category.add(categoryDetail);
+    return objectNode;
   }
 
   @Test
