@@ -69,9 +69,19 @@
             placeholder="Attribute"
             (keydown)="preventSpace($event)"
             [ngModel]="child['columnName']"
+            [matAutocomplete]="fieldAutocomplete"
             (ngModelChange)="updateAttributeName(childId, $event)"
           />
         </mat-form-field>
+
+        <mat-autocomplete #fieldAutocomplete="matAutocomplete">
+          <mat-option
+            *ngFor="let field of filterAutocompleteFields(child['columnName'])"
+            [value]="field.columnName"
+          >
+            {{ field.displayName }}
+          </mat-option>
+        </mat-autocomplete>
         <mat-error *ngIf="!child['columnName']"
           >Field Name is <strong>required</strong>.</mat-error
         >

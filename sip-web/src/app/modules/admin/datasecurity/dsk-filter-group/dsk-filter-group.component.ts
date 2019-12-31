@@ -9,6 +9,10 @@ import {
 
 import { PopperContent } from 'ngx-popper';
 import { MatChipInputEvent } from '@angular/material';
+import { JwtService } from 'src/app/common/services';
+import { DataSecurityService, DskEligibleField } from '../datasecurity.service';
+
+import * as toString from 'lodash/toString';
 
 const defaultFilters: DSKFilterGroup = {
   booleanCriteria: DSKFilterBooleanCriteria.AND,
@@ -22,6 +26,9 @@ const defaultFilters: DSKFilterGroup = {
 })
 export class DskFilterGroupComponent implements OnInit {
   filterGroup: DSKFilterGroup = { ...defaultFilters };
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  dskEligibleFields: Array<DskEligibleField> = [];
+
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || { ...defaultFilters };
     this.onChange.emit(this.filterGroup);
@@ -30,11 +37,26 @@ export class DskFilterGroupComponent implements OnInit {
   @Output() onRemoveGroup = new EventEmitter();
   @Output() onChange = new EventEmitter();
 
-  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-  constructor() {}
+  constructor(
+    jwtService: JwtService,
+    datasecurityService: DataSecurityService
+  ) {
+    datasecurityService
+      .getEligibleDSKFieldsFor(jwtService.customerId, jwtService.productId)
+      .subscribe(fields => {
+        this.dskEligibleFields = fields;
+      });
+  }
 
   ngOnInit() {
     this.onChange.emit(this.filterGroup);
+  }
+
+  filterAutocompleteFields(value) {
+    const filterValue = toString(value).toLowerCase();
+    return this.dskEligibleFields.filter(option =>
+      option.displayName.toLowerCase().includes(filterValue)
+    );
   }
 
   toggleCriteria() {

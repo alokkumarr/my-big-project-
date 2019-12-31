@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
-import { first, map } from 'rxjs/operators';
+import { first, map, tap } from 'rxjs/operators';
 import * as isUndefined from 'lodash/isUndefined';
 import * as fpGet from 'lodash/fp/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
   DSKSecurityGroup,
@@ -23,6 +23,8 @@ export interface DskEligibleField {
 
 @Injectable()
 export class DataSecurityService {
+  private dskEligibleFields: Array<DskEligibleField>;
+
   constructor(private _http: HttpClient) {}
 
   getList() {
@@ -56,13 +58,19 @@ export class DataSecurityService {
     customerId,
     productId
   ): Observable<Array<DskEligibleField>> {
+    if (this.dskEligibleFields) {
+      return of(this.dskEligibleFields);
+    }
     const path = 'auth/admin/dsk/fields';
     return this.getRequest(path).pipe(
       first(),
       map(fpGet(`dskEligibleData.${customerId}.${productId}`)),
       map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
         flatten(values(data))
-      )
+      ),
+      tap(eligibleFields => {
+        this.dskEligibleFields = eligibleFields;
+      })
     );
   }
 
