@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class AnalysisPrivileges {
 
   @JsonProperty("_id")
-  private String _id;
+  private String analysisId;
 
   @JsonProperty("category")
   private String category;
@@ -19,12 +19,12 @@ public class AnalysisPrivileges {
   @JsonProperty("message")
   private String message;
 
-  public String get_id() {
-    return _id;
+  public String getAnalysisId() {
+    return analysisId;
   }
 
-  public void set_id(String _id) {
-    this._id = _id;
+  public void setAnalysisId(String analysisId) {
+    this.analysisId = analysisId;
   }
 
   public String getCategory() {
@@ -51,7 +51,7 @@ public class AnalysisPrivileges {
     this.executePermission = executePermission;
   }
 
-  public String isMessage() {
+  public String getMessage() {
     return message;
   }
 

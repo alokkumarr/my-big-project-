@@ -189,36 +189,7 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     return objDocs;
   }
-
-//  @Override
-//  public List<AnalysisPrivileges> getAnalysisListWithPrivilege(
-//      @NotNull(message = "Analysis list cannot be null") @Valid List<String> analysisList,
-//      @Valid Ticket ticket) {
-//    MaprConnection maprConnection = new MaprConnection(basePath, tableName);
-//    List<AnalysisPrivileges> analysisPrivilegesList = null;
-//    try {
-//      if (maprConnection == null) {
-//        maprConnection = new MaprConnection(basePath, executionResultTable);
-//      }
-//
-//      ObjectNode innerNode = objectMapper.createObjectNode();
-//      ArrayNode betweenValues = innerNode.putArray("_id");
-//      analysisList.forEach(item -> {
-//        betweenValues.add(item);
-//      });
-//      ObjectNode outerNode = objectMapper.createObjectNode();
-//      outerNode.set("$in", innerNode);
-//
-//      analysisPrivilegesList =
-//          maprConnection.runMapDbQueryForCategories(outerNode.toString(),AnalysisPrivileges.class);
-//      logger.info(analysisList.toString());
-//
-//    } catch (Exception e) {
-//      logger.error("Error occurred while fetching the execution result data", e);
-//    }
-//    return analysisPrivilegesList;
-//  }
-
+  
   /**
    * forms the dl query from analysis.
    *

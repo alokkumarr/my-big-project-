@@ -34,8 +34,4 @@ public interface AnalysisService {
       @NotNull(message = "categoryID cannot be null") @NotNull String categoryID,
       @NotNull(message = "userId cannot be null") @NotNull Long userId,
       @Valid Ticket ticket);
-
-//  List<AnalysisPrivileges> getAnalysisListWithPrivilege(
-//      @NotNull(message = "Analysis list cannot be null") @Valid List<String> analysisList,
-//      @Valid Ticket ticket);
 }

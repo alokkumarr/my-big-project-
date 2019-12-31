@@ -323,11 +323,11 @@ public class AnalysisController {
   /**
    * Fetch Analysis list with Privilege.
    *
-   * @param request
-   * @param response
-   * @param analysisList
-   * @return
-   * @throws Exception
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param analysisList List of analysis id
+   * @return AnalysisPrivilege list
+   * @throws Exception exception
    */
   @ApiOperation(
       value = "Fetch Analysis With privileges API",
@@ -354,13 +354,13 @@ public class AnalysisController {
       Analysis analysis = analysisService.getAnalysis(analysisId, authTicket);
       AnalysisPrivileges analysisPrivileges = new AnalysisPrivileges();
       if (analysis == null) {
-        analysisPrivileges.set_id(analysisId);
+        analysisPrivileges.setAnalysisId(analysisId);
         analysisPrivileges.setAccessPermission(false);
         analysisPrivileges.setExecutePermission(false);
         analysisPrivileges.setMessage("Analysis is not present in the store");
         analysisPrivilegesList.add(analysisPrivileges);
       } else {
-        analysisPrivileges.set_id(analysisId);
+        analysisPrivileges.setAnalysisId(analysisId);
         analysisPrivileges.setCategory(analysis.getCategory());
         analysisPrivileges.setAccessPermission(
             validatePrivilege(authTicket.getProducts(), Long.parseLong(analysis.getCategory()),
