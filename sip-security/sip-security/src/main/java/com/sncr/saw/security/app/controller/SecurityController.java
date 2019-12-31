@@ -903,45 +903,72 @@ public class SecurityController {
           return payload;
       }
 
-      DskGroupPayload payload = null;
+      DskGroupPayload responsePayload = null;
+      Long securityGroupSysId = null;
       try {
           String securityGroupName = dskGroupPayload.getGroupName();
           String securityGroupDescription = dskGroupPayload.getGroupDescription();
+          SipDskAttribute dskAttribute = dskGroupPayload.getDskAttributes();
 
           SecurityGroups securityGroup = new SecurityGroups();
+
+          if (securityGroupName == null || securityGroupName.length() == 0) {
+              responsePayload = new DskGroupPayload();
+
+              responsePayload.setValid(false);
+              responsePayload.setMessage("Group name is mandatory");
+              response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+              return responsePayload;
+          }
+
+          if (dskAttribute == null) {
+              responsePayload = new DskGroupPayload();
+
+              responsePayload.setValid(false);
+              responsePayload.setMessage("DSK attributes are mandatory");
+
+              response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+              return responsePayload;
+          }
           securityGroup.setSecurityGroupName(securityGroupName);
           securityGroup.setDescription(securityGroupDescription);
 
           DskValidity dskValidity =
               dataSecurityKeyRepository.addSecurityGroups(securityGroup,createdBy,customerId);
 
-          Long securityGroupSysId = dskValidity.getGroupId();
+          securityGroupSysId = dskValidity.getGroupId();
 
           if (securityGroupSysId == null) {
-              payload = new DskGroupPayload();
+              responsePayload = new DskGroupPayload();
               logger.error("Error occurred: " + dskValidity.getError());
-              response.setStatus(400);
-              payload.setValid(false);
-              payload.setMessage(dskValidity.getError());
+              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+              responsePayload.setValid(false);
+              responsePayload.setMessage(dskValidity.getError());
 
-              return payload;
+              return responsePayload;
           }
 
           SipDskAttribute dskAttributes = dskGroupPayload.getDskAttributes();
           dataSecurityKeyRepository.addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributes);
 
-          payload =
+          responsePayload =
               dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
 
-          payload.setValid(true);
+          responsePayload.setValid(true);
       } catch (Exception ex) {
-          payload = new DskGroupPayload();
-          payload.setValid(false);
+
+          if (securityGroupSysId != null) {
+              dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
+          }
+          responsePayload = new DskGroupPayload();
+          responsePayload.setValid(false);
           response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-          payload.setMessage("Error occurred: " + ex.getMessage());
+          responsePayload.setMessage("Error occurred: " + ex.getMessage());
       }
 
-      return payload;
+      return responsePayload;
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups",method = RequestMethod.GET)
@@ -1090,6 +1117,14 @@ public class SecurityController {
         }
 
         try {
+
+            if (sipDskAttributes == null) {
+                payload = new DskGroupPayload();
+
+                payload.setValid(false);
+                payload.setMessage("Invalid request");
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
             // Delete the existing security group attributes
             Valid valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 

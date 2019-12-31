@@ -45,7 +45,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskValidity addSecurityGroups(SecurityGroups securityGroups,String createdBy,Long custId) {
         DskValidity valid = new DskValidity();
         String addSql = "INSERT INTO `SEC_GROUP` " +
-            "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
+            "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`DESCRIPTION`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
         securityGroups.setDescription(securityGroups.getDescription().trim());
@@ -79,7 +79,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
-        else if ( securityGroups.getDescription().length() > 255 )  {
+        else if ( securityGroups.getDescription() != null
+            && securityGroups.getDescription().length() > 255 )  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.DESCRIPTION_NAME_LONG);
             return valid;
@@ -89,7 +90,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 int insertResult = jdbcTemplate.update(addSql,ps -> {
                     ps.setLong(1,custId);
                     ps.setString(2,securityGroups.getSecurityGroupName());
-                    ps.setString(3,securityGroups.getDescription());
+
+                    if (securityGroups.getDescription() != null) {
+                        ps.setString(3,securityGroups.getDescription());
+                    }
                     ps.setString(4,createdBy);
                 });
 
@@ -482,7 +486,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 + " VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 
-            jdbcTemplate.batchUpdate(insertDskAtributeModel, attributeModelList, attributeModelList.size(), new ParameterizedPreparedStatementSetter<SipDskAttributeModel>(){
+            jdbcTemplate.batchUpdate(insertDskAtributeModel, attributeModelList,
+                attributeModelList.size(),
+                new ParameterizedPreparedStatementSetter<SipDskAttributeModel>(){
                 public void setValues(PreparedStatement ps, SipDskAttributeModel dskAttributeModel)
                     throws SQLException {
                     ps.setString(1, dskAttributeModel.getDskAttributeSysId());
@@ -523,8 +529,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 throw new Exception(validCustomer.getValidityMessage());
             }
 
-            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL AM"
-                + " WHERE AM.SEC_GROUP_SYS_ID=? ";
+            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL "
+                + " WHERE SEC_GROUP_SYS_ID=? ";
 
             int count = jdbcTemplate.update(deleteDskAttributeModelSql, ps -> {
                 ps.setLong(1, securityGroupId);
@@ -553,7 +559,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
         if (dskAttribute != null) {
             BooleanCriteria booleanCriteria = dskAttribute.getBooleanCriteria();
+            String columnName = dskAttribute.getColumnName();
             String dskAttributeId = UUID.randomUUID().toString();
+
+            if (booleanCriteria == null && columnName == null) {
+                throw new RuntimeException("Invalid DSK attributes");
+            }
+
             if (booleanCriteria == null) {
                 // Boolean criteria is null means its a leaf node and doesn't have any children
                 SipDskAttributeModel model = new SipDskAttributeModel();
