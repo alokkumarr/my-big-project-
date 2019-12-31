@@ -39,7 +39,7 @@ export class SecurityGroupComponent implements OnInit {
     private _jwtService: JwtService,
     private _dialog: MatDialog,
     private _dxDataGridService: DxDataGridService,
-    private _userAssignmentService: DataSecurityService,
+    private datasecurityService: DataSecurityService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService
   ) {
@@ -66,7 +66,7 @@ export class SecurityGroupComponent implements OnInit {
   loadGroupGridWithData(groupSelected) {
     this.groupSelected = {};
     this.addAttribute = true;
-    this._userAssignmentService.getSecurityGroups().then(response => {
+    this.datasecurityService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
         this.emptyState = true;
@@ -155,7 +155,7 @@ export class SecurityGroupComponent implements OnInit {
       .subscribe(result => {
         const path = `auth/admin/security-groups/${cellData.secGroupSysId}`;
         if (result) {
-          this._userAssignmentService
+          this.datasecurityService
             .deleteGroupOrAttribute(path)
             .then(response => {
               this.loadGroupGridWithData(this.groupSelected);
