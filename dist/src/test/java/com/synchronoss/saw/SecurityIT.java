@@ -406,7 +406,7 @@ public class SecurityIT extends BaseIT {
 
     // Trying to add the security group with same name should result in failure
     // This will return a status code of 400 and validity is false
-    createSecurityGroup(secGroup, 400, false);
+    createSecurityGroup(secGroup, 500, false);
   }
 
   private void createSecurityGroup(ObjectNode secGroup, int expectedReturnCode, Boolean validity) {
