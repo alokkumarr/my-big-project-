@@ -10,13 +10,21 @@ import {
 import { PopperContent } from 'ngx-popper';
 import { MatChipInputEvent } from '@angular/material';
 
+const defaultFilters: DSKFilterGroup = {
+  booleanCriteria: DSKFilterBooleanCriteria.AND,
+  booleanQuery: []
+};
+
 @Component({
   selector: 'dsk-filter-group',
   templateUrl: './dsk-filter-group.component.html',
   styleUrls: ['./dsk-filter-group.component.scss']
 })
 export class DskFilterGroupComponent implements OnInit {
-  @Input() filterGroup: DSKFilterGroup;
+  filterGroup: DSKFilterGroup = { ...defaultFilters };
+  @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
+    this.filterGroup = filters || { ...defaultFilters };
+  }
   @Input() selfIndex: number; // stores the position inside parent (for removal)
   @Output() onRemoveGroup = new EventEmitter();
   @Output() onChange = new EventEmitter();
@@ -24,12 +32,7 @@ export class DskFilterGroupComponent implements OnInit {
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   constructor() {}
 
-  ngOnInit() {
-    this.filterGroup = this.filterGroup || {
-      booleanCriteria: DSKFilterBooleanCriteria.AND,
-      booleanQuery: []
-    };
-  }
+  ngOnInit() {}
 
   toggleCriteria() {
     if (this.filterGroup.booleanCriteria === DSKFilterBooleanCriteria.AND) {

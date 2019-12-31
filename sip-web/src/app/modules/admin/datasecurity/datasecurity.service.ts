@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
 import * as isUndefined from 'lodash/isUndefined';
 import { Observable } from 'rxjs';
-import { DSKFilterGroup } from './dsk-filter.model';
+import { DSKFilterGroup, DSKSecurityGroup } from './dsk-filter.model';
 import { map } from 'rxjs/operators';
 
 const loginUrl = AppConfig.login.url;
@@ -17,14 +17,9 @@ export class DataSecurityService {
   }
 
   getFiltersFor(group: string): Observable<DSKFilterGroup> {
-    return <Observable<DSKFilterGroup>>this.getRequest(
-      `auth/admin/dsk-security-groups/${group}`
-    ).pipe(
-      map(data => {
-        console.log(data);
-        return data;
-      })
-    );
+    return (<Observable<DSKSecurityGroup>>(
+      this.getRequest(`auth/admin/dsk-security-groups/${group}`)
+    )).pipe(map(data => data.dskAttributes));
   }
 
   addSecurityGroup(data) {
