@@ -13,6 +13,7 @@ import {
   DSKFilterBooleanCriteria,
   DSKFilterField
 } from './dsk-filter.model';
+import * as uniqWith from 'lodash/uniqWith';
 
 const loginUrl = AppConfig.login.url;
 
@@ -67,6 +68,14 @@ export class DataSecurityService {
       map(fpGet(`dskEligibleData.${customerId}.${productId}`)),
       map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
         flatten(values(data))
+      ),
+      map(fields =>
+        uniqWith(
+          fields,
+          (field1, field2) =>
+            field1.columnName === field2.columnName &&
+            field1.displayName === field2.displayName
+        )
       ),
       tap(eligibleFields => {
         this.dskEligibleFields = eligibleFields;

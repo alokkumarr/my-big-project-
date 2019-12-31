@@ -40,7 +40,7 @@
           *ngFor="let field of filteredEligibleFields"
           [value]="field.columnName"
         >
-          {{ field.displayName }}
+          {{ field.displayName || field.columnName }} ({{ field.columnName }})
         </mat-option>
       </mat-autocomplete>
 
