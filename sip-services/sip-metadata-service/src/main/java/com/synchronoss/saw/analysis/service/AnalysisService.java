@@ -2,6 +2,7 @@ package com.synchronoss.saw.analysis.service;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.modal.AnalysisPrivileges;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -33,4 +34,8 @@ public interface AnalysisService {
       @NotNull(message = "categoryID cannot be null") @NotNull String categoryID,
       @NotNull(message = "userId cannot be null") @NotNull Long userId,
       @Valid Ticket ticket);
+
+//  List<AnalysisPrivileges> getAnalysisListWithPrivilege(
+//      @NotNull(message = "Analysis list cannot be null") @Valid List<String> analysisList,
+//      @Valid Ticket ticket);
 }

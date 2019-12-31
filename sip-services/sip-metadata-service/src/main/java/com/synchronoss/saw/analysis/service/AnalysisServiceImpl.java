@@ -1,12 +1,15 @@
 package com.synchronoss.saw.analysis.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonElement;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.metadata.AnalysisMetadata;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.modal.AnalysisPrivileges;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
 import com.synchronoss.saw.exceptions.SipCreateEntityException;
 import com.synchronoss.saw.exceptions.SipDeleteEntityException;
@@ -20,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.ojai.Document;
@@ -184,6 +189,35 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
     return objDocs;
   }
+
+//  @Override
+//  public List<AnalysisPrivileges> getAnalysisListWithPrivilege(
+//      @NotNull(message = "Analysis list cannot be null") @Valid List<String> analysisList,
+//      @Valid Ticket ticket) {
+//    MaprConnection maprConnection = new MaprConnection(basePath, tableName);
+//    List<AnalysisPrivileges> analysisPrivilegesList = null;
+//    try {
+//      if (maprConnection == null) {
+//        maprConnection = new MaprConnection(basePath, executionResultTable);
+//      }
+//
+//      ObjectNode innerNode = objectMapper.createObjectNode();
+//      ArrayNode betweenValues = innerNode.putArray("_id");
+//      analysisList.forEach(item -> {
+//        betweenValues.add(item);
+//      });
+//      ObjectNode outerNode = objectMapper.createObjectNode();
+//      outerNode.set("$in", innerNode);
+//
+//      analysisPrivilegesList =
+//          maprConnection.runMapDbQueryForCategories(outerNode.toString(),AnalysisPrivileges.class);
+//      logger.info(analysisList.toString());
+//
+//    } catch (Exception e) {
+//      logger.error("Error occurred while fetching the execution result data", e);
+//    }
+//    return analysisPrivilegesList;
+//  }
 
   /**
    * forms the dl query from analysis.
