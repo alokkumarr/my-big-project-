@@ -30,7 +30,9 @@
     <mat-error
       style="display: inline-block;"
       *ngIf="filterGroup.booleanQuery.length < 2"
-      >Add <strong>at least 2 </strong> fields or groups.</mat-error
+      >Add
+      <strong>{{ 2 - filterGroup.booleanQuery.length }} or more </strong> fields
+      or groups.</mat-error
     >
   </div>
   <button
