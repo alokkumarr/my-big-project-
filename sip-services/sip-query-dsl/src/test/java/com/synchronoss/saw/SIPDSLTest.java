@@ -254,7 +254,7 @@ public class SIPDSLTest {
 
     String assertQuerytFilter = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String queryWithFilter =
-        "SELECT SALES.string, SALES.integer FROM SALES WHERE SALES.double >= 1.0";
+        "SELECT SALES.string, SALES.integer FROM SALES WHERE (SALES.double >= 1.0)";
     Assert.assertEquals(queryWithFilter, assertQuerytFilter);
   }
 
@@ -264,7 +264,7 @@ public class SIPDSLTest {
     DLSparkQueryBuilder dlSparkQueryBuilder = new DLSparkQueryBuilder();
     String query = dlSparkQueryBuilder.buildDataQuery(sipdsl.getSipQuery());
     String assertion =
-        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE SALES.long = 1000.0 AND SALES.Double = 2000.0 GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
+        "SELECT SALES.string, avg(SALES.integer), avg(SALES.long), SALES.date, avg(SALES.double), count(distinct SALES.float) as `distinctCount(float)` FROM SALES INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND SALES.Double = 2000.0) GROUP BY SALES.string, SALES.date ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query, assertion);
 
     sipdsl.getSipQuery().setFilters(new ArrayList<Filter>());
@@ -304,8 +304,8 @@ public class SIPDSLTest {
         + "avg(SALES.double), "
         + "count(distinct SALES.float) as `distinctCount(float)` "
         + "FROM SALES "
-        + "INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE SALES.long = 1000.0 AND "
-        + "SALES.Double = 2000.0 AND SALES.string in ('String 1', 'str') AND "
+        + "INNER JOIN PRODUCT ON SALES.string = PRODUCT.string_2 WHERE (SALES.long = 1000.0 AND "
+        + "SALES.Double = 2000.0) AND SALES.string in ('String 1', 'str') AND "
         + "SALES.string in ('String 123', 'string 456') GROUP BY SALES.string, SALES.date "
         + "ORDER BY sum(SALES.long) asc, avg(SALES.double) desc";
     Assert.assertEquals(query,assertQuery);

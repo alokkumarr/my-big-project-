@@ -4,6 +4,7 @@ import java.util.List;
 
 public class CategoryDetails {
 
+	private boolean autoCreate;
 	private long customerId;
 	private long productId;
 	private String productName;
@@ -21,8 +22,13 @@ public class CategoryDetails {
 	private boolean subCategoryInd;
 	private boolean systemCategory;
 	private List<SubCategoryDetails> subCategories;
-	
-		
+
+	public boolean isAutoCreate() {
+		return autoCreate;
+	}
+	public void setAutoCreate(boolean autoCreate) {
+		this.autoCreate = autoCreate;
+	}
 	public boolean isIscatNameChanged() {
 		return iscatNameChanged;
 	}
@@ -77,6 +83,7 @@ public class CategoryDetails {
 	public void setCategoryType(String categoryType) {
 		this.categoryType = categoryType;
 	}
+
 	public boolean isSystemCategory() {
 		return systemCategory;
 	}
@@ -125,6 +132,4 @@ public class CategoryDetails {
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
 	}
-	
-	
 }
