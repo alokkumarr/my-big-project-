@@ -6,6 +6,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as fpGet from 'lodash/fp/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
+import * as uniqWith from 'lodash/uniqWith';
 import { Observable } from 'rxjs';
 
 const loginUrl = AppConfig.login.url;
@@ -50,6 +51,14 @@ export class UserAssignmentService {
       map(fpGet(`dskEligibleData.${customerId}.${productId}`)),
       map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
         flatten(values(data))
+      ),
+      map(fields =>
+        uniqWith(
+          fields,
+          (field1, field2) =>
+            field1.columnName === field2.columnName &&
+            field1.displayName === field2.displayName
+        )
       )
     );
   }
