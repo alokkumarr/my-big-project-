@@ -697,7 +697,7 @@ export class DesignerState {
 
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
-    if (get(artifactColumn, 'area') !== 'data') {
+    if (get(artifactColumn, 'area') !== 'data' && analysis.type === 'pivot') {
       delete artifactColumn.aggregate;
     }
     patchState({ groupAdapters: [...groupAdapters] });
