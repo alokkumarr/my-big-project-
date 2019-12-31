@@ -7,6 +7,7 @@ import * as fpGet from 'lodash/fp/get';
 import * as values from 'lodash/values';
 import * as flatten from 'lodash/flatten';
 import { Observable } from 'rxjs';
+import { DSKFilterGroup, DSKSecurityGroup } from './dsk-filter.model';
 
 const loginUrl = AppConfig.login.url;
 
@@ -16,11 +17,17 @@ export interface DskEligibleField {
 }
 
 @Injectable()
-export class UserAssignmentService {
+export class DataSecurityService {
   constructor(private _http: HttpClient) {}
 
   getList() {
     return this.getRequest('auth/admin/user-assignments').toPromise();
+  }
+
+  getFiltersFor(group: string): Observable<DSKFilterGroup> {
+    return (<Observable<DSKSecurityGroup>>(
+      this.getRequest(`auth/admin/dsk-security-groups/${group}`)
+    )).pipe(map(data => data.dskAttributes));
   }
 
   addSecurityGroup(data) {
@@ -52,6 +59,11 @@ export class UserAssignmentService {
         flatten(values(data))
       )
     );
+  }
+
+  updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
+    const path = `auth/admin/dsk-security-groups/${groupId}`;
+    return this.putrequest(path, filters);
   }
 
   attributetoGroup(data) {

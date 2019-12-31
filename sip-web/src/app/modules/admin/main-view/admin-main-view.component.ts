@@ -14,7 +14,7 @@ import {
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
 import { PrivilegeService } from '../privilege/privilege.service';
-import { UserAssignmentService } from '../datasecurity/userassignment.service';
+import { DataSecurityService } from '../datasecurity/datasecurity.service';
 import { JwtService } from '../../../common/services';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -94,7 +94,7 @@ export class AdminMainViewComponent implements OnDestroy {
     public _roleService: RoleService,
     public _jwtService: JwtService,
     public _localSearch: LocalSearchService,
-    private _userassignmentsService: UserAssignmentService,
+    private _userassignmentsService: DataSecurityService,
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
     public _router: Router,

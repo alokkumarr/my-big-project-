@@ -1,13 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import {
-  UserAssignmentService,
-  DskEligibleField
-} from './../userassignment.service';
-import { JwtService } from 'src/app/common/services';
-
+import { DataSecurityService, DskEligibleField } from '../datasecurity.service';
 import * as get from 'lodash/get';
 import * as toString from 'lodash/toString';
+import { JwtService } from 'src/app/common/services';
 
 @Component({
   selector: 'add-attribute-dialog',
@@ -22,7 +18,7 @@ export class AddAttributeDialogComponent {
   errorMessage;
   constructor(
     private _dialogRef: MatDialogRef<AddAttributeDialogComponent>,
-    private _userAssignmentService: UserAssignmentService,
+    private datasecurityService: DataSecurityService,
     private jwtService: JwtService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
@@ -36,7 +32,7 @@ export class AddAttributeDialogComponent {
   }
 
   loadAutocompletions() {
-    this._userAssignmentService
+    this.datasecurityService
       .getEligibleDSKFieldsFor(
         this.jwtService.customerId,
         this.jwtService.productId
@@ -64,7 +60,7 @@ export class AddAttributeDialogComponent {
       this.errorMessage = 'Field Name cannot contain spaces';
       return false;
     }
-    this._userAssignmentService
+    this.datasecurityService
       .attributetoGroup(this.data)
       .then(response => {
         if (get(response, 'valid')) {

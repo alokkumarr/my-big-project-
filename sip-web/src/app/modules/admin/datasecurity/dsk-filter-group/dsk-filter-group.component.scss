@@ -1,0 +1,43 @@
+$icon-font-size: 12px;
+
+:host {
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  display: block;
+  padding: 5px;
+  width: 100%;
+}
+
+::ng-deep {
+  .mat-form-field-wrapper {
+    padding: 0;
+  }
+
+  .new-child-popper {
+    background: white;
+    z-index: 1;
+  }
+}
+
+.boolean-criteria-header {
+  padding: 10px 0 10px 10px;
+}
+
+.dsk-query-child {
+  margin-left: 20px;
+
+  mat-icon {
+    font-size: $icon-font-size;
+    line-height: $icon-font-size !important;
+    width: $icon-font-size;
+    height: $icon-font-size;
+  }
+}
+
+mat-icon {
+  font-size: $icon-font-size;
+  line-height: $icon-font-size !important;
+  width: $icon-font-size;
+  height: $icon-font-size;
+}
