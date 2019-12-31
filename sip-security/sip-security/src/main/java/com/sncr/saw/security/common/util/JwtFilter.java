@@ -68,11 +68,14 @@ public class JwtFilter extends GenericFilterBean {
                 .getBody();
         request.setAttribute("claims", claims);
       } catch (final SignatureException e) {
-        throw new ServletException(INVALID_TOKEN);
+        haveInValidFlow = true;
+        errorMessage = TOKEN_EXPIRED;
       } catch (MalformedJwtException ex) {
-        throw new ServletException(INVALID_TOKEN);
+        haveInValidFlow = true;
+        errorMessage = TOKEN_EXPIRED;
       } catch (ExpiredJwtException expired) {
-        throw new ServletException(TOKEN_EXPIRED);
+        haveInValidFlow = true;
+        errorMessage = TOKEN_EXPIRED;
       }
 
       // This checks the validity of the token. logging out does not need
