@@ -38,7 +38,7 @@ public class Valid implements Serializable {
 	public void setValidityMessage(String validityMessage) {
 		this.validityMessage = validityMessage;
 	}
-	
-	
+
+
 
 }
