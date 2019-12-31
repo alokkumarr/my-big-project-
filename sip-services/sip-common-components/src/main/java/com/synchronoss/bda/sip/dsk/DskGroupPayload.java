@@ -63,12 +63,12 @@ public class DskGroupPayload {
     this.groupDescription = groupDescription;
   }
 
-  @JsonProperty("attributes")
+  @JsonProperty("dskAttributes")
   public SipDskAttribute getDskAttributes() {
     return dskAttributes;
   }
 
-  @JsonProperty("attributes")
+  @JsonProperty("dskAttributes")
   public void setDskAttributes(SipDskAttribute dskAttributes) {
     this.dskAttributes = dskAttributes;
   }

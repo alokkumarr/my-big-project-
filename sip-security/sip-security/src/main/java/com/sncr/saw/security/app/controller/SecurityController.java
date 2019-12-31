@@ -896,7 +896,7 @@ public class SecurityController {
       if (roleType != RoleType.ADMIN) {
           DskGroupPayload payload = new DskGroupPayload();
           logger.error("Invalid user");
-          response.setStatus(400);
+          response.setStatus(HttpStatus.UNAUTHORIZED.value());
           payload.setValid(false);
           payload.setMessage(ServerResponseMessages.ADD_GROUPS_WITH_NON_ADMIN_ROLE);
 
@@ -937,6 +937,7 @@ public class SecurityController {
       } catch (Exception ex) {
           payload = new DskGroupPayload();
           payload.setValid(false);
+          response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
           payload.setMessage("Error occurred: " + ex.getMessage());
       }
 
@@ -959,13 +960,24 @@ public class SecurityController {
         if (roleType != RoleType.ADMIN) {
             Valid valid = new Valid();
             logger.error("Invalid user");
-            response.setStatus(400);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
             return valid;
         }
 
-        payload = dataSecurityKeyRepository.fetchAllDskGroupForCustomer(customerId);
+        try {
+            payload = dataSecurityKeyRepository.fetchAllDskGroupForCustomer(customerId);
+        } catch (Exception ex) {
+            logger.error("Error occurred while fetching security group details: "
+                + ex.getMessage(), ex);
+
+            Valid valid = new Valid();
+            valid.setValidityMessage(ex.getMessage());
+            valid.setValid(false);
+
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
 
         return payload;
     }
@@ -977,7 +989,7 @@ public class SecurityController {
         @PathVariable(name = "securityGroupId", required = true) Long securityGroupSysId,
         HttpServletRequest request,
         HttpServletResponse response) {
-        DskGroupPayload payload = null;
+        DskGroupPayload payload;
 
         Ticket ticket = SipCommonUtils.getTicket(request);
 
@@ -986,7 +998,7 @@ public class SecurityController {
         if (roleType != RoleType.ADMIN) {
             payload = new DskGroupPayload();
             logger.error("Invalid user");
-            response.setStatus(400);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             payload.setValid(false);
             payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
 
@@ -995,16 +1007,19 @@ public class SecurityController {
 
 
         try {
-          Long customerId = Long.valueOf(ticket.getCustID());
-          payload = dataSecurityKeyRepository
-              .fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+            Long customerId = Long.valueOf(ticket.getCustID());
+            payload = dataSecurityKeyRepository
+                .fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+            return payload;
         } catch (Exception ex) {
-          payload = new DskGroupPayload();
-          payload.setValid(false);
-          payload.setMessage("Error occurred: " + ex.getMessage());
+            payload = new DskGroupPayload();
+            payload.setValid(false);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            payload.setMessage("Error occurred: " + ex.getMessage());
+
+            return payload;
         }
 
-        return payload;
     }
 
     @RequestMapping(value = "/auth/admin/dsk-security-groups/{securityGroupId}",method = RequestMethod.DELETE)
@@ -1014,30 +1029,36 @@ public class SecurityController {
         HttpServletRequest request,
         HttpServletResponse response) {
 
-        Valid valid = null;
-
         Ticket ticket = SipCommonUtils.getTicket(request);
-
         RoleType roleType = ticket.getRoleType();
 
+        Valid valid;
         if (roleType != RoleType.ADMIN) {
             valid = new Valid();
             logger.error("Invalid user");
-            response.setStatus(400);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
 
             return valid;
         }
 
-        Long customerId = Long.valueOf(ticket.getCustID());
+        try {
 
-        valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
+            Long customerId = Long.valueOf(ticket.getCustID());
 
-        if (valid.getValid()) {
-            // If the deletion of security group attributes is successful, delete the security group
-            // also
-            valid = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
+            valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
+
+            if (valid.getValid()) {
+                // If the deletion of security group attributes is successful, delete the security group
+                // also
+                valid = dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
+            }
+        } catch (Exception ex) {
+            valid = new Valid();
+            valid.setValid(false);
+            valid.setError(ex.getMessage());
+            valid.setValidityMessage("Error occurred while deleting security group");
         }
 
         return valid;
@@ -1061,7 +1082,7 @@ public class SecurityController {
         if (roleType != RoleType.ADMIN) {
             payload = new DskGroupPayload();
             logger.error("Invalid user");
-            response.setStatus(400);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             payload.setValid(false);
             payload.setMessage(ServerResponseMessages.WITH_NON_ADMIN_ROLE);
 
@@ -1079,7 +1100,7 @@ public class SecurityController {
                     .addDskGroupAttributeModelAndValues(securityGroupSysId, sipDskAttributes);
 
                 if (valid.getValid()) {
-                    logger.info("DSK attributes updated successsfully");
+                    logger.info("DSK attributes updated successfully");
 
                     payload = dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
                     payload.setValid(true);
@@ -1101,6 +1122,11 @@ public class SecurityController {
             // Fetch the attributes and return
         } catch (Exception ex) {
             logger.error("Error occurred while updating the security group attributes: " + ex.getMessage(), ex);
+
+            payload = new DskGroupPayload();
+            payload.setValid(false);
+            payload.setMessage(ex.getMessage());
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
 
         return payload;
