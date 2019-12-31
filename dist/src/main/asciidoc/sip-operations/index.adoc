@@ -340,6 +340,16 @@ XDF-NG batch pipeline can be configured as below.
 	
 ==== Configuring XDF-RTPS
 
+  XDF-RTA can be run as a systemctl service as it continuously listens
+  to messages. Follow below steps to create systemctl service
+
+  1. Create a systemctl service by referring to 
+  'sip-xdf/xdf/bin/templates/xdf-rta.service.template'.
+  
+  2. Add execute-component command with arguments in the service.
+  
+  3. Use systemctl commands to start/stop/restart or check status of rta service.
+
   RTPS gets installed as part of XDF-NG. If RTPS is configured as one of the
   component in pipeline, then RTA service gets started when pipeline is
   triggered. RTA service starts listening to real time data and executes
