@@ -14,7 +14,7 @@ public interface DskEligibleFieldsRepository {
 
   Valid deleteDskEligibleFields(Long custId, Long prodId, String semanticId);
 
-  Valid updateDskFields(Long customerSysId, Long productId, String semanticId, List<DskField> dskFields);
+  Valid updateDskFields(DskEligibleFields dskEligibleFields);
 
   DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID);
 }

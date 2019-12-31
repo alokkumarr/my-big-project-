@@ -34,95 +34,69 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
 
   @Override
   public Valid createDskEligibleFields(DskEligibleFields dskEligibleFields) {
-    String sql = "INSERT INTO DSK_ELIGIBLE_FIELDS "
-        + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
-        + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY)"
-        + " VALUES (?,?,?,?,?,?,sysdate(),?)";
+    String sql =
+        "INSERT INTO DSK_ELIGIBLE_FIELDS "
+            + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
+            + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY)"
+            + " VALUES (?,?,?,?,?,?,sysdate(),?)";
     Valid valid = new Valid();
 
-    dskEligibleFields.getFields().forEach(
-        dskField -> {
-          try {
-            jdbcTemplate.update(
-                sql,
-                ps -> {
-                  ps.setLong(1, dskEligibleFields.getCustomerSysId());
-                  ps.setLong(2, dskEligibleFields.getProductSysId());
-                  ps.setString(3, dskEligibleFields.getSemanticId());
-                  ps.setString(4, dskField.getColumnName());
-                  ps.setString(5, dskField.getDisplayName());
-                  ps.setInt(6, ACTIVE_STATUS);
-                  ps.setString(7, dskEligibleFields.getCreatedBy());
-                });
-            valid.setValid(Boolean.TRUE);
-            valid.setValidityMessage("Success");
-          } catch (DuplicateKeyException dke) {
-            logger
-                .error("Exception encountered while adding dsk eligible fields " + dke.getMessage(), null,
-                    dke);
-            valid.setValid(Boolean.FALSE);
-            valid.setValidityMessage(dke.getMessage());
-          } catch (DataIntegrityViolationException de) {
-            logger.error("Exception encountered while adding dsk eligible fields " + de.getMessage(), null,
-                de);
-            valid.setValid(Boolean.FALSE);
-            valid.setValidityMessage(de.getMessage());
-          } catch (Exception e) {
-            logger.error("Exception encountered while adding dsk eligible fields " + e.getMessage(), null,
-                e);
-            valid.setValid(Boolean.FALSE);
-            valid.setValidityMessage(e.getMessage());
-          }
-        }
-    );
+    try {
+      dskEligibleFields
+          .getFields()
+          .forEach(
+              dskField -> {
+                jdbcTemplate.update(
+                    sql,
+                    ps -> {
+                      String columnName = dskField.getColumnName();
+
+                      if (columnName == null || columnName.length() == 0) {
+                        throw new DataIntegrityViolationException("Column name cannot be empty");
+                      }
+
+                      ps.setLong(1, dskEligibleFields.getCustomerSysId());
+                      ps.setLong(2, dskEligibleFields.getProductSysId());
+                      ps.setString(3, dskEligibleFields.getSemanticId());
+                      ps.setString(4, dskField.getColumnName());
+                      ps.setString(5, dskField.getDisplayName());
+                      ps.setInt(6, ACTIVE_STATUS);
+                      ps.setString(7, dskEligibleFields.getCreatedBy());
+                    });
+                valid.setValid(Boolean.TRUE);
+                valid.setValidityMessage("Success");
+              });
+    } catch (DuplicateKeyException dke) {
+      logger.error(
+          "Exception encountered while adding dsk eligible fields " + dke.getMessage(), dke);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(dke.getMessage());
+    } catch (DataIntegrityViolationException de) {
+      logger.error("Exception encountered while adding dsk eligible fields " + de.getMessage(), de);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(de.getMessage());
+    } catch (Exception e) {
+      logger.error("Exception encountered while adding dsk eligible fields " + e.getMessage(), e);
+      valid.setValid(Boolean.FALSE);
+      valid.setValidityMessage(e.getMessage());
+    }
     return valid;
   }
 
-    public Valid updateDskFields(Long customerSysId, Long productId,
-        String semanticId, List<DskField> dskFields)
-    {
-        Valid valid;
-        valid = deleteDskEligibleFields(customerSysId, productId, semanticId);
+  @Override
+  public Valid updateDskFields(DskEligibleFields dskEligibleFields) {
+    Valid valid;
+    Long customerSysId = dskEligibleFields.getCustomerSysId();
+    Long productId = dskEligibleFields.getProductSysId();
+    String semanticId = dskEligibleFields.getSemanticId();
 
-        if (valid.getValid()) {
-            String insertDsk = "INSERT INTO DSK_ELIGIBLE_FIELDS "
-                + "(CUSTOMER_SYS_ID, PRODUCT_ID, SEMANTIC_ID, COLUMN_NAME, "
-                + "DISPLAY_NAME , ACTIVE_STATUS_IND , CREATED_TIME , CREATED_BY,"
-                + " MODIFIED_TIME, MODIFIED_BY)"
-                + " VALUES (?,?,?,?,?,?,sysdate(),?, sysdate(), ?)";
+    valid = deleteDskEligibleFields(customerSysId, productId, semanticId);
 
-            dskFields.forEach(
-                dskField -> {
-                    try {
-                        jdbcTemplate.update(
-                            insertDsk,
-                            ps -> {
-                                ps.setLong(1, customerSysId);
-                                ps.setLong(2, productId);
-                                ps.setString(3, semanticId);
-                                ps.setString(4, dskField.getColumnName());
-                                ps.setString(5, dskField.getDisplayName());
-                                ps.setInt(6, ACTIVE_STATUS);
-                                //TODO: Change default user to valid user
-                                ps.setString(7, "default user");
-                                ps.setString(8, "default user");
-                            });
-                        valid.setValid(Boolean.TRUE);
-                        valid.setValidityMessage("Success");
-                    } catch (Exception e) {
-                        logger.error("Exception encountered while update DSK " + e.getMessage(), null,
-                            e);
-                        valid.setValid(Boolean.FALSE);
-                        valid.setValidityMessage(e.getMessage());
-                    }
-                }
-            );
-            return valid;
-        }
-
-
-        return valid;
+    if (valid.getValid()) {
+      valid = createDskEligibleFields(dskEligibleFields);
     }
+    return valid;
+  }
 
   @Override
   public DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID) {

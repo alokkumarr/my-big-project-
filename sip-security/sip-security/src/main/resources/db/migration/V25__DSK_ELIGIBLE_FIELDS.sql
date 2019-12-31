@@ -12,7 +12,7 @@ CREATE TABLE DSK_ELIGIBLE_FIELDS
    PRODUCT_ID bigint(20) NOT NULL COMMENT 'PRODUCT_ID refers to the product to which the fields will belong to which product',
    SEMANTIC_ID varchar(100) NOT NULL COMMENT 'SEMANTIC_ID refers to the id of the semantic node for which these fields are added',
    COLUMN_NAME varchar(100) NOT NULL COMMENT 'COLUMN_NAME gives the details of the column',
-   DISPLAY_NAME varchar(100) NOT NULL COMMENT 'DISPLAY_NAME is the value which gets displayed in the UI',
+   DISPLAY_NAME varchar(100) COMMENT 'DISPLAY_NAME is the value which gets displayed in the UI',
    ACTIVE_STATUS_IND tinyint(4) NOT NULL COMMENT 'ACTIVE_STATUS_IND indicates if the field is deleted or not',
    CREATED_TIME datetime NOT NULL COMMENT 'CREATED_TIME specifies the time at which the entry is created',
    CREATED_BY varchar(255) NOT NULL COMMENT 'CREATED_BY specifies the user who created this entry',
