@@ -674,6 +674,7 @@ export class DesignerState {
       adapterIndex
     }: DesignerAddColumnToGroupAdapter
   ) {
+
     const groupAdapters = getState().groupAdapters;
     const analysis = getState().analysis;
     const adapter = groupAdapters[adapterIndex];
@@ -696,6 +697,9 @@ export class DesignerState {
 
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
+    if (get(artifactColumn, 'area') !== 'data') {
+      delete artifactColumn.aggregate;
+    }
     patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerAddArtifactColumn(artifactColumn));
   }
@@ -786,7 +790,6 @@ export class DesignerState {
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
-
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });
