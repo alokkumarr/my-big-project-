@@ -4,10 +4,28 @@
   </strong>
 </header>
 <div class="base-dialog__content">
-  <div fxLayout="column" fxLayoutAlign="center start">
+  <div fxLayout="column" fxLayoutAlign="center stretch">
     <div class="errors" *ngIf="errorState">
       <span [innerHtml]="errorMessage"></span>
     </div>
+
+    <mat-accordion style="margin-bottom: 10px;">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Preview Expression
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <code
+          [innerHTML]="
+            previewString ||
+            'The expression might not be valid. Please check for errors.'
+          "
+          >{{
+        </code>
+      </mat-expansion-panel>
+    </mat-accordion>
     <dsk-filter-group
       [filterGroup]="dskFilters$ | async"
       (onChange)="updateFilter($event)"

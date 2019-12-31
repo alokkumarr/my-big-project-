@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
-import { DSKFilterGroup } from '../dsk-filter.model';
+import { DSKFilterGroup, DSKFilterField } from '../dsk-filter.model';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -17,6 +17,7 @@ export class DskFilterDialogComponent {
   dskFilters$: Observable<DSKFilterGroup>;
   dskFilterObject: DSKFilterGroup;
   errorState = true;
+  previewString = '';
   errorMessage;
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
   constructor(
@@ -40,6 +41,34 @@ export class DskFilterDialogComponent {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
       this.dskFilterObject
     );
+
+    if (this.errorState) {
+      this.previewString = '';
+    } else {
+      this.previewString = this.generatePreview(this.dskFilterObject);
+    }
+  }
+
+  generatePreview(filterGroup: DSKFilterGroup): string {
+    const pStart = '<strong class="parens">(</strong>';
+    const pEnd = '<strong class="parens">)</strong>';
+    return filterGroup.booleanQuery
+      .map(query => {
+        if (query['booleanCriteria']) {
+          return `${pStart}${this.generatePreview(
+            query as DSKFilterGroup
+          )}${pEnd}`;
+        }
+
+        const field = <DSKFilterField>query;
+
+        return `${field.columnName} ${
+          field.model.operator
+        } [${field.model.values.join(', ')}]`;
+      })
+      .join(
+        ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
+      );
   }
 
   hasWhiteSpace(field) {

@@ -6,6 +6,12 @@
   min-height: 200px;
 }
 
+::ng-deep code {
+  .bool-op {
+    color: red;
+  }
+}
+
 ::ng-deep add-attribute-dialog {
   max-width: 860px;
   width: 860px;
