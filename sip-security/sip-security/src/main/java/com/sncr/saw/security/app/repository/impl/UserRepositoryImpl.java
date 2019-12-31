@@ -2578,7 +2578,6 @@ public class UserRepositoryImpl implements UserRepository {
 		logger.info(""+category.getCustomerId());
 		featureCode.append(category.getCustomerId());
 		featureCode.append(category.getProductId());
-		featureCode.append(category.getProductId());
 
     if (category.isSubCategoryInd()) {
       String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES WHERE FEATURE_NAME = ? AND FEATURE_CODE = ?";
