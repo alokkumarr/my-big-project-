@@ -24,6 +24,7 @@ export class DskFilterGroupComponent implements OnInit {
   filterGroup: DSKFilterGroup = { ...defaultFilters };
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
     this.filterGroup = filters || { ...defaultFilters };
+    this.onChange.emit(this.filterGroup);
   }
   @Input() selfIndex: number; // stores the position inside parent (for removal)
   @Output() onRemoveGroup = new EventEmitter();
@@ -32,7 +33,9 @@ export class DskFilterGroupComponent implements OnInit {
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.onChange.emit(this.filterGroup);
+  }
 
   toggleCriteria() {
     if (this.filterGroup.booleanCriteria === DSKFilterBooleanCriteria.AND) {
@@ -49,7 +52,7 @@ export class DskFilterGroupComponent implements OnInit {
       columnName: '',
       model: {
         operator: DSKFilterOperator.ISIN,
-        value: []
+        values: []
       }
     });
     this.onChange.emit(this.filterGroup);
@@ -97,9 +100,9 @@ export class DskFilterGroupComponent implements OnInit {
     const input = event.input;
     const value = event.value;
     if ((value || '').trim()) {
-      (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model.value.push(
-        value
-      );
+      (<DSKFilterField>(
+        this.filterGroup.booleanQuery[childId]
+      )).model.values.push(value);
       this.onChange.emit(this.filterGroup);
     }
 
@@ -109,10 +112,9 @@ export class DskFilterGroupComponent implements OnInit {
   }
 
   removeValue(childId: number, valueId: number) {
-    (<DSKFilterField>this.filterGroup.booleanQuery[childId]).model.value.splice(
-      valueId,
-      1
-    );
+    (<DSKFilterField>(
+      this.filterGroup.booleanQuery[childId]
+    )).model.values.splice(valueId, 1);
     this.onChange.emit(this.filterGroup);
   }
 }

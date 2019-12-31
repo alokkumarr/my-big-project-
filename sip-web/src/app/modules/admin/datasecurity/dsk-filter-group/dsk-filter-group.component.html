@@ -63,10 +63,10 @@
         />
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field>
         <mat-chip-list #chipList (change)="onChange.emit(filterGroup)">
           <mat-chip
-            *ngFor="let item of child['model'].value; let valueId = index"
+            *ngFor="let item of child['model'].values; let valueId = index"
             [removable]="true"
             (removed)="removeValue(childId, valueId)"
           >

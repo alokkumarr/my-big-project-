@@ -43,17 +43,14 @@ export class DskFilterDialogComponent {
 
   updateFilter(filter: DSKFilterGroup) {
     this.dskFilterObject = filter;
-    console.log(this.dskFilterObject);
   }
 
   submit() {
-    if (this.hasWhiteSpace(this.data.attributeName)) {
-      this.errorState = true;
-      this.errorMessage = 'Field Name cannot contain spaces';
-      return false;
-    }
     this.datasecurityService
-      .attributetoGroup(this.data)
+      .updateDskFiltersForGroup(
+        this.data.groupSelected.secGroupSysId,
+        this.dskFilterObject
+      )
       .then(response => {
         if (get(response, 'valid')) {
           this.errorState = false;

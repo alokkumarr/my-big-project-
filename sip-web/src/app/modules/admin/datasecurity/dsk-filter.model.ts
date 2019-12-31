@@ -12,7 +12,7 @@ export interface DSKFilterField {
   columnName: string;
   model: {
     operator: DSKFilterOperator;
-    value: Array<String>;
+    values: Array<String>;
   };
 }
 

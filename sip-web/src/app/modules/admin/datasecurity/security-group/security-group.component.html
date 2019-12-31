@@ -36,7 +36,7 @@
       + <span i18n>Attribute</span>
     </button>
 
-    <button (click)="updateDskFilters()" mat-raised-button color="primary">
+    <button (click)="updateDskFilters()" [disabled]="addAttribute" mat-raised-button color="primary">
       <span i18n>Edit Filters (beta)</span>
     </button>
   </div>

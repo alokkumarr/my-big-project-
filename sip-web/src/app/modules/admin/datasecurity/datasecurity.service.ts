@@ -39,6 +39,11 @@ export class DataSecurityService {
     }
   }
 
+  updateDskFiltersForGroup(groupId: string, filters: DSKFilterGroup) {
+    const path = `auth/admin/dsk-security-groups/${groupId}`;
+    return this.putrequest(path, filters);
+  }
+
   attributetoGroup(data) {
     const requestBody = {
       attributeName: data.attributeName.trim(),
