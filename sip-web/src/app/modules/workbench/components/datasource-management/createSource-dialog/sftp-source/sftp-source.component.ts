@@ -17,7 +17,6 @@ import {
 })
 export class SftpSourceComponent implements OnInit, DetailForm {
   public detailsFormGroup: FormGroup;
-  show = false;
   accessTypes = CHANNEL_ACCESS;
 
   @Input() channelData: any;
@@ -80,9 +79,5 @@ export class SftpSourceComponent implements OnInit, DetailForm {
       portNo: val.portNo,
       userName: val.userName
     };
-  }
-
-  togglePWD() {
-    this.show = !this.show;
   }
 }

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { ApiSourceComponent } from './api-source.component';
@@ -12,19 +12,26 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 describe('ApiSourceComponent', () => {
   let component: ApiSourceComponent;
   let fixture: ComponentFixture<ApiSourceComponent>;
+  let formBuilder: FormBuilder;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, MaterialModule, NoopAnimationsModule],
+      imports: [ReactiveFormsModule, MaterialModule, NoopAnimationsModule],
       declarations: [ApiSourceComponent, HttpMetadataComponent, E2eDirective],
-      providers: [{ provide: DatasourceService, useValue: {} }]
+      providers: [
+        {
+          provide: DatasourceService,
+          useValue: { isDuplicateChannel: () => {} }
+        }
+      ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ApiSourceComponent);
+    formBuilder = TestBed.get(FormBuilder);
     component = fixture.componentInstance;
-    component.channelData = {};
+    component.channelData = { headerParameters: [] };
     component.opType = CHANNEL_OPERATION.CREATE;
     fixture.detectChanges();
   });
@@ -55,5 +62,32 @@ describe('ApiSourceComponent', () => {
       port.setValue('1234');
       expect(port.valid).toEqual(true);
     });
+  });
+
+  it('should return provisional headers inside normal headers', () => {
+    const array = formBuilder.array([
+      formBuilder.group({
+        key: ['123'],
+        value: ['abc']
+      })
+    ]);
+    component.detailsFormGroup.setControl('provisionalHeaders', array);
+
+    const value = component.value;
+    expect(value.headerParameters.length).toEqual(1);
+    expect(value['provisionalHeaders']).toBeUndefined();
+  });
+
+  it('should not validate for old value for channelName when updating', () => {
+    const dataSourceService = TestBed.get(DatasourceService);
+    const spy = spyOn(dataSourceService, 'isDuplicateChannel').and.returnValue(
+      null
+    );
+    component.opType = CHANNEL_OPERATION.UPDATE;
+    component.channelData.channelName = 'oldName';
+    component.createForm();
+    component.detailsFormGroup.get('channelName').setValue('oldName');
+    component.detailsFormGroup.get('channelName').updateValueAndValidity();
+    expect(spy).not.toHaveBeenCalled();
   });
 });

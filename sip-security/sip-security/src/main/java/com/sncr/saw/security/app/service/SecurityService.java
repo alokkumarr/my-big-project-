@@ -10,6 +10,8 @@ import com.sncr.saw.security.common.constants.ErrorMessages;
 import com.sncr.saw.security.common.util.PasswordValidation;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.synchronoss.bda.sip.jwt.token.Ticket;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,7 +37,7 @@ public class SecurityService {
    * @param userDetails UserDetails
    * @param masterLoginId masterLoginId
    * @param loginCustomerId
-   * @param response HttpServletResponse
+   * @param response        HttpServletResponse
    * @return Returns UserDetailsResponse
    */
   public UserDetailsResponse addUserDetails(UserDetails userDetails, String masterLoginId,
@@ -57,7 +59,7 @@ public class SecurityService {
       logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
       return userDetailsResponse;
     }
-    String middleName=userDetails.getMiddleName();
+    String middleName = userDetails.getMiddleName();
     if (middleName != null) {
       if (!middleName.matches(namePattern)) {
         userDetailsResponse.setValid(false);
@@ -82,18 +84,18 @@ public class SecurityService {
       return userDetailsResponse;
     }
     Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
-    if (customerSysId != loginCustomerId) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      userDetailsResponse.setValid(false);
-      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
-      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
-      return userDetailsResponse;
-    }
     if (customerSysId == null) {
       userDetailsResponse.setValid(false);
       userDetailsResponse.setValidityMessage(
           String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
       logger.debug(String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
+      return userDetailsResponse;
+    }
+    if (customerSysId != loginCustomerId) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
+      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
       return userDetailsResponse;
     }
     String securityGroupName = userDetails.getSecurityGroupName();
@@ -226,5 +228,16 @@ public class SecurityService {
         .append(specialChar)
         .append(totalChars)
         .toString();
+  }
+
+  /**
+   * Validate customerId to avoid direct reference.
+   *
+   * @param ticket ticket from customer
+   * @param customerId customer id from body
+   * @return true if id matched.
+   */
+  public boolean haveValidCustomerId(Ticket ticket, Long customerId) {
+    return !ticket.getCustID().isEmpty() && Long.valueOf(ticket.getCustID()).equals(customerId);
   }
 }

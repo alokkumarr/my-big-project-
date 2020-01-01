@@ -52,6 +52,15 @@ export class UserAssignmentService {
       map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
         flatten(values(data))
       ),
+      /* Remove keyword */
+      map(fields =>
+        (fields || []).map(field => ({
+          ...field,
+          columnName: (field.columnName || '').replace('.keyword', '')
+        }))
+      ),
+      /* Take only unique fields. If two fields match in both -
+      display and column names, no need to take both */
       map(fields =>
         uniqWith(
           fields,

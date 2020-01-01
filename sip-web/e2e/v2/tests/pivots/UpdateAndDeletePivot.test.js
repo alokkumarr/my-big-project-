@@ -16,6 +16,7 @@ const Constants = require('../../helpers/Constants');
 const categories = require('../../helpers/data-generation/categories');
 const subCategories = require('../../helpers/data-generation/subCategories');
 const Header = require('../../pages/components/Header');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing update and delete tests for pivots from pivots/UpdateAndDeletePivot.test.js', () => {
   let analysesDetails = [];
@@ -28,7 +29,12 @@ describe('Executing update and delete tests for pivots from pivots/UpdateAndDele
   beforeAll(() => {
     logger.info('Starting pivots/UpdateAndDeletePivot.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    //token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
