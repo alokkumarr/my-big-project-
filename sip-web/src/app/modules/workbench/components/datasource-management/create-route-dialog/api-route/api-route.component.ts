@@ -11,11 +11,13 @@ import { isUnique } from 'src/app/common/validators';
 
 import * as isUndefined from 'lodash/isUndefined';
 import * as trim from 'lodash/trim';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import { CHANNEL_UID } from 'src/app/modules/workbench/wb-comp-configs';
 import { SourceFolderDialogComponent } from '../../select-folder-dialog';
 import { MatDialog } from '@angular/material';
+import { HttpMetadataComponent } from '../../createSource-dialog/http-metadata/http-metadata.component';
 
 @Component({
   selector: 'api-route',
@@ -39,8 +41,17 @@ export class ApiRouteComponent implements OnInit, DetailForm {
     if (isUndefined(this.routeData.routeMetadata.length)) {
       const routeMetadata = <APIRouteMetadata>this.routeData.routeMetadata;
 
+      /* Extracts priovisional auth headers from normal headers array */
+      const {
+        provisionalHeaders,
+        headers
+      } = HttpMetadataComponent.getInitialProvisionalHeaders(
+        routeMetadata.headerParameters
+      );
+      routeMetadata.headerParameters = headers;
       this.patchFormArray(routeMetadata.headerParameters, 'headerParameters');
       this.patchFormArray(routeMetadata.queryParameters, 'queryParameters');
+      this.patchFormArray(provisionalHeaders, 'provisionalHeaders');
 
       this.detailsFormGroup.patchValue(this.routeData.routeMetadata);
     }
@@ -94,7 +105,8 @@ export class ApiRouteComponent implements OnInit, DetailForm {
       }),
       headerParameters: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),
-      urlParameters: this.formBuilder.array([])
+      urlParameters: this.formBuilder.array([]),
+      provisionalHeaders: this.formBuilder.array([])
     });
 
     this.detailsFormGroup.get('destinationLocation').valueChanges.pipe(
@@ -122,7 +134,12 @@ export class ApiRouteComponent implements OnInit, DetailForm {
   }
 
   get value(): APIRouteMetadata {
-    return this.detailsFormGroup.value;
+    const formValue = cloneDeep(this.detailsFormGroup.value);
+    formValue.headerParameters = formValue.headerParameters.concat(
+      cloneDeep(formValue.provisionalHeaders)
+    );
+    delete formValue.provisionalHeaders;
+    return formValue;
   }
 
   get valid(): boolean {

@@ -1,16 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
+import { first, map } from 'rxjs/operators';
 import * as isUndefined from 'lodash/isUndefined';
+import * as fpGet from 'lodash/fp/get';
+import * as values from 'lodash/values';
+import * as flatten from 'lodash/flatten';
+import * as uniqWith from 'lodash/uniqWith';
+import { Observable } from 'rxjs';
 
 const loginUrl = AppConfig.login.url;
+
+export interface DskEligibleField {
+  columnName: string;
+  displayName: string;
+}
 
 @Injectable()
 export class UserAssignmentService {
   constructor(private _http: HttpClient) {}
 
-  getList(customerId) {
-    return this.getRequest('auth/admin/user-assignments');
+  getList() {
+    return this.getRequest('auth/admin/user-assignments').toPromise();
   }
 
   addSecurityGroup(data) {
@@ -30,6 +41,37 @@ export class UserAssignmentService {
     }
   }
 
+  getEligibleDSKFieldsFor(
+    customerId,
+    productId
+  ): Observable<Array<DskEligibleField>> {
+    const path = 'auth/admin/dsk/fields';
+    return this.getRequest(path).pipe(
+      first(),
+      map(fpGet(`dskEligibleData.${customerId}.${productId}`)),
+      map((data: { [semanticId: string]: Array<DskEligibleField> }) =>
+        flatten(values(data))
+      ),
+      /* Remove keyword */
+      map(fields =>
+        (fields || []).map(field => ({
+          ...field,
+          columnName: (field.columnName || '').replace('.keyword', '')
+        }))
+      ),
+      /* Take only unique fields. If two fields match in both -
+      display and column names, no need to take both */
+      map(fields =>
+        uniqWith(
+          fields,
+          (field1, field2) =>
+            field1.columnName === field2.columnName &&
+            field1.displayName === field2.displayName
+        )
+      )
+    );
+  }
+
   attributetoGroup(data) {
     const requestBody = {
       attributeName: data.attributeName.trim(),
@@ -47,11 +89,11 @@ export class UserAssignmentService {
   getSecurityAttributes(request) {
     return this.getRequest(
       `auth/admin/security-groups/${request.secGroupSysId}/dsk-attribute-values`
-    );
+    ).toPromise();
   }
 
   getSecurityGroups() {
-    return this.getRequest('auth/admin/security-groups');
+    return this.getRequest('auth/admin/security-groups').toPromise();
   }
 
   deleteGroupOrAttribute(path) {
@@ -64,7 +106,7 @@ export class UserAssignmentService {
   }
 
   getRequest(path) {
-    return this._http.get(`${loginUrl}/${path}`).toPromise();
+    return this._http.get(`${loginUrl}/${path}`);
   }
 
   putrequest(path, requestBody) {
