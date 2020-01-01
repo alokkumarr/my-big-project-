@@ -8,7 +8,6 @@ import {
   decimal2BoolArray,
   getPrivilegeFromBoolArray
 } from '../privilege-code-transformer';
-import { SYSTEM_CATEGORY_OPERATIONS } from './../../../../common/consts';
 
 /** privilegeCode privilegeDesc
  * 0 => No access
