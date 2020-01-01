@@ -56,7 +56,9 @@ export class DskFilterGroupComponent implements OnInit {
   filterAutocompleteFields(value) {
     const filterValue = toString(value).toLowerCase();
     return this.dskEligibleFields.filter(option =>
-      option.displayName.toLowerCase().includes(filterValue)
+      (option.displayName || option.columnName)
+        .toLowerCase()
+        .includes(filterValue)
     );
   }
 
