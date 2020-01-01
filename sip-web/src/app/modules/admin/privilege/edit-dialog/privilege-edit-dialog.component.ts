@@ -5,6 +5,7 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as every from 'lodash/every';
 import * as isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
 import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
@@ -27,6 +28,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   modules$;
   categories;
   subCategories;
+  selectedCategoryName;
 
   constructor(
     public _privilegeService: PrivilegeService,
@@ -41,6 +43,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   ) {
     super();
     const { customerId } = this.data.formDeps;
+    this.selectedCategoryName = get(this.data, 'model.categoryName');
 
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
@@ -179,12 +182,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       // we have to use a manual validation because disabling a form control disables it's validation,
       // and the form can't be validated properly
       const isValid = every(this.formGroup.getRawValue(), Boolean);
-
-      if (isValid) {
-        this.formIsValid = true;
-      } else {
-        this.formIsValid = false;
-      }
+      this.formIsValid = isValid;
     });
 
     productIdControl.valueChanges.subscribe(pId => {
@@ -218,6 +216,13 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     categoryCodeControl.valueChanges.subscribe(cCode => {
       const f = this.formGroup.value;
       this.loadSubCategories(f.moduleId, f.roleId, f.productId, cCode);
+      const targetCategory = find(
+        this.categories,
+        category => cCode === category.categoryCode
+      );
+      if (targetCategory) {
+        this.selectedCategoryName = targetCategory.categoryName;
+      }
     });
   }
 
