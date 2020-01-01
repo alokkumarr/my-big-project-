@@ -111,7 +111,7 @@ export class PrivilegeRowComponent {
 
 
   checkPermissions(privilegeName) {
-    if (this.systemCategory && SYSTEM_CATEGORY_OPERATIONS.includes(privilegeName)) {
+    if (this.systemCategory && ['Delete'].includes(privilegeName)) {
       return true;
     }
     return false;
