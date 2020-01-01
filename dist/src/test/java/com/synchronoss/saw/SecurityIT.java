@@ -9,14 +9,17 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,6 +283,276 @@ public class SecurityIT extends BaseIT {
         "User successfully authenticated = validity : {}, message : {}",
         validity1,
         userAuthenticatedMsg);
+  }
+
+  @Test
+  public void testCreateSecurityGroup() throws IOException, InterruptedException {
+    log.info("Testing create security group");
+
+    String createSecurityGroupData =
+        "{"
+            + "  \"groupName\": \"secgroup1\","
+            + "  \"groupDescription\": \"sample sec group\","
+            + "  \"dskAttributes\": {"
+            + "    \"booleanCriteria\": \"AND\","
+            + "    \"booleanQuery\": [{"
+            + "        \"columnName\": \"Field1\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"abc\", \"123\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"columnName\": \"Field2\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"pqr\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"booleanCriteria\": \"OR\","
+            + "    \"booleanQuery\": [{"
+            + "      \"columnName\": \"Field3\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"456\""
+            + "       ]"
+            + "      }"
+            + "     },"
+            + "     {"
+            + "      \"columnName\": \"Field4\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"123\""
+            + "       ]"
+            + "      }"
+            + "     }"
+            + "    ]"
+            + "   }"
+            + "  ]"
+            + " }"
+            + "}";
+
+    ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
+
+    createSecurityGroup(secGroup, 200, true);
+  }
+
+  @Test
+  public void testCreateSecurityGroupTwice() throws IOException, InterruptedException {
+    // Testing negative scenario
+    log.info("Testing create security group");
+
+    String createSecurityGroupData =
+        "{"
+            + "  \"groupName\": \"secgroup10\","
+            + "  \"groupDescription\": \"sample sec group\","
+            + "  \"dskAttributes\": {"
+            + "    \"booleanCriteria\": \"AND\","
+            + "    \"booleanQuery\": [{"
+            + "        \"columnName\": \"Field1\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"abc\", \"123\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"columnName\": \"Field2\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"pqr\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"booleanCriteria\": \"OR\","
+            + "    \"booleanQuery\": [{"
+            + "      \"columnName\": \"Field3\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"456\""
+            + "       ]"
+            + "      }"
+            + "     },"
+            + "     {"
+            + "      \"columnName\": \"Field4\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"123\""
+            + "       ]"
+            + "      }"
+            + "     }"
+            + "    ]"
+            + "   }"
+            + "  ]"
+            + " }"
+            + "}";
+
+    ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
+
+    // Adding security group once will be successful
+    createSecurityGroup(secGroup, 200, true);
+
+    // Trying to add the security group with same name should result in failure
+    // This will return a status code of 400 and validity is false
+    createSecurityGroup(secGroup, 500, false);
+  }
+
+  private void createSecurityGroup(ObjectNode secGroup, int expectedReturnCode, Boolean validity) {
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(secGroup)
+        .when()
+        .post("/security/auth/admin/dsk-security-groups")
+        .then()
+        .assertThat()
+        .statusCode(expectedReturnCode)
+        .body("valid", equalTo(validity));
+  }
+
+  @Test
+  public void testUpdateSecurityGroup() throws IOException, InterruptedException {
+    log.info("Testing update security group");
+
+    log.info("Creating security group");
+    String createSecurityGroupData =
+        "{"
+            + "  \"groupName\": \"secgroup2\","
+            + "  \"groupDescription\": \"sample sec group\","
+            + "  \"dskAttributes\": {"
+            + "    \"booleanCriteria\": \"AND\","
+            + "    \"booleanQuery\": [{"
+            + "        \"columnName\": \"Field1\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"abc\", \"123\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"columnName\": \"Field2\","
+            + "    \"model\": {"
+            + "     \"operator\": \"ISIN\","
+            + "     \"values\": ["
+            + "      \"pqr\""
+            + "     ]"
+            + "    }"
+            + "   },"
+            + "   {"
+            + "    \"booleanCriteria\": \"OR\","
+            + "    \"booleanQuery\": [{"
+            + "      \"columnName\": \"Field3\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"456\""
+            + "       ]"
+            + "      }"
+            + "     },"
+            + "     {"
+            + "      \"columnName\": \"Field4\","
+            + "      \"model\": {"
+            + "       \"operator\": \"ISIN\","
+            + "       \"values\": ["
+            + "        \"123\""
+            + "       ]"
+            + "      }"
+            + "     }"
+            + "    ]"
+            + "   }"
+            + "  ]"
+            + " }"
+            + "}";
+
+    ObjectNode createSecGroupNode = (ObjectNode) mapper.readTree(createSecurityGroupData);
+
+    ExtractableResponse response =
+        given(authSpec)
+            .contentType(ContentType.JSON)
+            .body(createSecGroupNode)
+            .when()
+            .post("/security/auth/admin/dsk-security-groups")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract();
+    JsonNode responseNode = response.as(JsonNode.class);
+
+    Long securityGroupId = responseNode.path("securityGroupSysId").asLong();
+
+    log.info("Created security group with ID = " + securityGroupId);
+
+    String updateSecurityGroupData =
+        "{"
+            + "  \"booleanCriteria\": \"AND\","
+            + "  \"booleanQuery\": ["
+            + "    {"
+            + "      \"columnName\": \"Field1\","
+            + "      \"model\": {"
+            + "        \"operator\": \"ISIN\","
+            + "        \"values\": ["
+            + "          \"abc\""
+            + "        ]"
+            + "      }"
+            + "    },"
+            + "    {"
+            + "      \"columnName\": \"Field2\","
+            + "      \"model\": {"
+            + "        \"operator\": \"ISIN\","
+            + "        \"values\": ["
+            + "          \"pqr\""
+            + "        ]"
+            + "      }"
+            + "    },"
+            + "    {"
+            + "      \"booleanCriteria\": \"OR\","
+            + "      \"booleanQuery\": ["
+            + "        {"
+            + "          \"columnName\": \"Field3\","
+            + "          \"model\": {"
+            + "            \"operator\": \"ISIN\","
+            + "            \"values\": ["
+            + "              \"456\""
+            + "            ]"
+            + "          }"
+            + "        },"
+            + "        {"
+            + "          \"columnName\": \"Field4\","
+            + "          \"model\": {"
+            + "            \"operator\": \"ISIN\","
+            + "            \"values\": ["
+            + "              \"123\""
+            + "            ]"
+            + "          }"
+            + "        }"
+            + "      ]"
+            + "    }"
+            + "  ]"
+            + "}";
+
+    ObjectNode updateSecGroupNode = (ObjectNode) mapper.readTree(updateSecurityGroupData);
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(updateSecGroupNode)
+        .when()
+        .put("/security/auth/admin/dsk-security-groups/" + securityGroupId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
   }
 
   /**
