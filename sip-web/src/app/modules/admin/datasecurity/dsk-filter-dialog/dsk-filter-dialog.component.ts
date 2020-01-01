@@ -39,7 +39,8 @@ export class DskFilterDialogComponent {
 
   validateFilterGroup() {
     this.errorState = !this.datasecurityService.isDSKFilterValid(
-      this.dskFilterObject
+      this.dskFilterObject,
+      true
     );
 
     if (this.errorState) {

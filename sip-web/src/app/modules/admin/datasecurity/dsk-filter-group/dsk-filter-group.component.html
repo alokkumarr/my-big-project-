@@ -29,10 +29,8 @@
     </popper-content>
     <mat-error
       style="display: inline-block;"
-      *ngIf="filterGroup.booleanQuery.length < 2"
-      >Add
-      <strong>{{ 2 - filterGroup.booleanQuery.length }} or more </strong> fields
-      or groups.</mat-error
+      *ngIf="filterGroup.booleanQuery.length < 1"
+      >Add <strong>1 or more </strong> fields or groups.</mat-error
     >
   </div>
   <button

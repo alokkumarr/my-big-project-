@@ -207,7 +207,7 @@ export class SecurityGroupComponent implements OnInit {
       {
         caption: 'ID',
         dataField: 'secGroupSysId',
-        width: '0%'
+        width: '10%'
       },
       {
         caption: '',
@@ -222,6 +222,7 @@ export class SecurityGroupComponent implements OnInit {
         this.groupSelected = row.data;
       },
       columns,
+      columnMinWidth: 50,
       width: '100%',
       height: '100%',
       paging: {
