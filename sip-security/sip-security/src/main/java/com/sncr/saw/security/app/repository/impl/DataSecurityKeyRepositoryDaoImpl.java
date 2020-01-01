@@ -48,7 +48,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`DESCRIPTION`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
-        securityGroups.setDescription(securityGroups.getDescription().trim());
+
+        String groupDescription = securityGroups.getDescription();
+        if (groupDescription != null) {
+            securityGroups.setDescription(groupDescription.trim());
+        }
 
         if (custId == null || custId == 0)  {
             valid.setValid(false);
@@ -91,9 +95,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     ps.setLong(1,custId);
                     ps.setString(2,securityGroups.getSecurityGroupName());
 
-                    if (securityGroups.getDescription() != null) {
-                        ps.setString(3,securityGroups.getDescription());
-                    }
+                    ps.setString(3,securityGroups.getDescription());
                     ps.setString(4,createdBy);
                 });
 
@@ -572,6 +574,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 model.setDskAttributeSysId(dskAttributeId);
                 model.setSecGroupSysId(securityGroupId);
                 model.setDskAttributeParentId(parentId);
+
+                if (dskAttribute.getColumnName() == null) {
+                    throw new RuntimeException("Column name cannot be empty");
+                }
+                if (dskAttribute.getModel().getValues() == null
+                    || dskAttribute.getModel().getValues().isEmpty()) {
+                    throw new RuntimeException("Values cannot be empty");
+                }
+
                 model.setColumnName(dskAttribute.getColumnName());
                 model.setOperator(dskAttribute.getModel().getOperator().toString());
                 model.setValues(dskAttribute.getModel().getValues());
