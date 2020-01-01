@@ -956,12 +956,27 @@ public class SecurityController {
           }
 
           SipDskAttribute dskAttributes = dskGroupPayload.getDskAttributes();
-          dataSecurityKeyRepository.addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributes);
+          Valid valid = dataSecurityKeyRepository
+              .addDskGroupAttributeModelAndValues(securityGroupSysId, dskAttributes);
 
-          responsePayload =
-              dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
+          if (valid.getValid() == true) {
+              responsePayload =
+                  dataSecurityKeyRepository.fetchDskGroupAttributeModel(securityGroupSysId, customerId);
 
-          responsePayload.setValid(true);
+              responsePayload.setValid(true);
+          } else {
+              responsePayload = new DskGroupPayload();
+
+              responsePayload.setValid(false);
+              responsePayload.setMessage(valid.getError());
+
+              if (securityGroupSysId != null) {
+                  dataSecurityKeyRepository.deleteSecurityGroups(securityGroupSysId);
+              }
+
+              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+          }
+
       } catch (Exception ex) {
 
           if (securityGroupSysId != null) {
