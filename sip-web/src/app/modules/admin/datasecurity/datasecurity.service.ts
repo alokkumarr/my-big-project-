@@ -10,7 +10,6 @@ import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
   DSKSecurityGroup,
-  DSKFilterBooleanCriteria,
   DSKFilterField
 } from './dsk-filter.model';
 import * as uniqWith from 'lodash/uniqWith';
@@ -83,25 +82,16 @@ export class DataSecurityService {
     );
   }
 
-  isDSKFilterValid(filter: DSKFilterGroup) {
+  isDSKFilterValid(filter: DSKFilterGroup, isTopLevel = false) {
     let condition;
-    if (
-      filter.booleanCriteria === DSKFilterBooleanCriteria.AND ||
-      filter.booleanCriteria === DSKFilterBooleanCriteria.OR
-    ) {
-      // AND and OR need to have 2 or more operands
-      condition = filter.booleanQuery && filter.booleanQuery.length >= 2;
-    } else {
-      // NOT needs a single operand
-      condition = filter.booleanQuery && filter.booleanQuery.length === 1;
-    }
+    condition = filter.booleanQuery.length > 0;
 
     return (
       filter.booleanCriteria &&
       condition &&
       filter.booleanQuery.every(child => {
         if ((<DSKFilterGroup>child).booleanCriteria) {
-          return this.isDSKFilterValid(<DSKFilterGroup>child);
+          return this.isDSKFilterValid(<DSKFilterGroup>child, false);
         }
 
         const field = <DSKFilterField>child;
