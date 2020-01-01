@@ -372,8 +372,8 @@ public class AnalysisController {
       }
 
     });
-//    List<AnalysisPrivileges> analysisPriv = analysisService
-//        .getAnalysisListWithPrivilege(analysisList, authTicket);
+    // List<AnalysisPrivileges> analysisPriv = analysisService
+    //     .getAnalysisListWithPrivilege(analysisList, authTicket);
 
     return analysisPrivilegesList;
   }
