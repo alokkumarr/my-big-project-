@@ -13,6 +13,7 @@ import { JwtService } from 'src/app/common/services';
 import { DataSecurityService, DskEligibleField } from '../datasecurity.service';
 
 import * as toString from 'lodash/toString';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 const defaultFilters: DSKFilterGroup = {
   booleanCriteria: DSKFilterBooleanCriteria.AND,
@@ -25,12 +26,12 @@ const defaultFilters: DSKFilterGroup = {
   styleUrls: ['./dsk-filter-group.component.scss']
 })
 export class DskFilterGroupComponent implements OnInit {
-  filterGroup: DSKFilterGroup = { ...defaultFilters };
+  filterGroup: DSKFilterGroup = cloneDeep(defaultFilters);
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   dskEligibleFields: Array<DskEligibleField> = [];
 
   @Input('filterGroup') set _filterGroup(filters: DSKFilterGroup) {
-    this.filterGroup = filters || { ...defaultFilters };
+    this.filterGroup = filters || cloneDeep(defaultFilters);
     this.onChange.emit(this.filterGroup);
   }
   @Input() selfIndex: number; // stores the position inside parent (for removal)
