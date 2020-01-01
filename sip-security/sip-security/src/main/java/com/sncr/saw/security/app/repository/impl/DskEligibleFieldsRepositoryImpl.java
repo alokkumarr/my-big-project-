@@ -53,14 +53,14 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
 
                       if (columnName == null
                           || columnName.length() == 0
-                          || columnName.contains("")) {
+                          || columnName.trim().contains(" ")) {
                         throw new DataIntegrityViolationException("Column name cannot be empty");
                       }
 
                       ps.setLong(1, dskEligibleFields.getCustomerSysId());
                       ps.setLong(2, dskEligibleFields.getProductSysId());
                       ps.setString(3, dskEligibleFields.getSemanticId());
-                      ps.setString(4, dskField.getColumnName());
+                      ps.setString(4, dskField.getColumnName().trim());
                       ps.setString(5, dskField.getDisplayName());
                       ps.setInt(6, ACTIVE_STATUS);
                       ps.setString(7, dskEligibleFields.getCreatedBy());
