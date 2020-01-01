@@ -99,18 +99,11 @@ public class DskEligibleFieldService {
         .deleteDskEligibleFields(customerSysId, defaultProdID, semanticId);
   }
 
-  public Valid updateDskEligibleFields(HttpServletRequest request, HttpServletResponse response,
-      String semanticId, List<DskField> dskFields)
+  public Valid updateDskEligibleFields(
+      DskEligibleFields dskEligibleFields, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    Valid valid = new Valid();
-    Ticket ticket = SipCommonUtils.getTicket(request);
 
-    Long customerSysId = Long.valueOf(ticket.getCustID());
-    Long defaultProdID = Long.valueOf(ticket.getDefaultProdID());
-    RoleType roleType = ticket.getRoleType();
-
-    return dskEligibleFieldsRepository.updateDskFields(customerSysId,
-        defaultProdID, semanticId, dskFields);
+    return dskEligibleFieldsRepository.updateDskFields(dskEligibleFields);
   }
 
   public DskFieldsInfo fetchAllDskEligibleFields(Long customerSysId, Long defaultProdID) {

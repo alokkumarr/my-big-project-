@@ -1,0 +1,20 @@
+[Unit]
+Description=SIP XDF Real-time Processing Service
+
+[Service]
+Type=notify
+NotifyAccess=all
+
+ExecStart=/bin/bash -c '<execute-component command with arguments>'
+
+#Example:
+#ExecStart=/bin/bash -c '/opt/sip/SIP-0000-Master/bin/execute-component.sh -r 
+#hdfs:///var/sip -a tc703-PROJ -b B191125T152834.293 -m pipeline -c 
+#file:///dfs/opt/bda/apps/xng-test-aks-fullset-1.0.0_dev/tcs/tc703/tc703_pipeline_steps.jconf'
+
+SyslogIdentifier=xdf-rtps
+User=mapr
+Restart=on-failure
+# Consider Java exiting from SIGTERM using exit status 143 to be
+# successful
+SuccessExitStatus=143

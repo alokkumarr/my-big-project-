@@ -169,6 +169,9 @@ api:
         -   location: ${metadata.service.host}
             method: PUT
             path: '[/]internal/semantic.*'
+        -   location: ${metadata.service.host}
+            method: DELETE
+            path: '[/]internal/semantic.*'
         -   location: ${batch.service.host}
             method: PUT
             path: '[/]ingestion/batch.*'
