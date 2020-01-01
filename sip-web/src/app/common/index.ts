@@ -111,6 +111,7 @@ import {
   DndPubsubService,
   CommonSemanticService
 } from './services';
+import { ShowPasswordDirective } from './directives/show-password.directive';
 
 const MODULES = [
   CommonModuleAngular4,
@@ -177,7 +178,8 @@ const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
 const DIRECTIVES = [
   ClickToCopyDirective,
   E2eDirective,
-  JsPlumbEndpointDirective
+  JsPlumbEndpointDirective,
+  ShowPasswordDirective
 ];
 
 const SERVICES = [
