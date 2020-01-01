@@ -103,10 +103,10 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     const actionsToExclude = isString(this.exclude)
       ? this.exclude.split('-')
       : [];
-    this.actions = filter(this.actions, ({ value }) => {
+    this.actions = filter(this.actions, ({ value, label }) => {
       if (get(this.categoryDetails, 'systemCategory')) {
-        if (SYSTEM_CATEGORY_OPERATIONS.includes(value)) {
-          return true;
+        if (SYSTEM_CATEGORY_OPERATIONS.includes(label)) {
+          return false;
         }
       }
       const notExcluded = !actionsToExclude.includes(value);

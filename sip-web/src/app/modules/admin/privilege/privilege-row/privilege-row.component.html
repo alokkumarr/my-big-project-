@@ -31,7 +31,9 @@
         type="checkbox"
         [hidden]="!allowedPrivileges[privilegeName.toUpperCase()]"
         (change)="onPrivilegeClicked(i + 1)"
-        [disabled]="privilegeCodeList[8] || isDraftsSubCategory"
+        [disabled]="privilegeCodeList[8] ||
+        isDraftsSubCategory ||
+        checkPermissions(privilegeName)"
         [checked]="privilegeCodeList[i + 1]"
       >
     <label>{{ privilegeName }}</label>

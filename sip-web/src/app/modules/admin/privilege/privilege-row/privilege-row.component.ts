@@ -8,6 +8,7 @@ import {
   decimal2BoolArray,
   getPrivilegeFromBoolArray
 } from '../privilege-code-transformer';
+import { SYSTEM_CATEGORY_OPERATIONS } from './../../../../common/consts';
 
 /** privilegeCode privilegeDesc
  * 0 => No access
@@ -47,13 +48,6 @@ export class PrivilegeRowComponent {
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
     // set all privilege based on syster folder category settings.
     this.systemCategory = subCategory.systemCategory;
-    if (!this.systemCategory) {
-      return;
-    }
-    if (this.privilegeCodeList[0]) {
-      this.privilegeCodeList[8] = !this.systemCategory;
-      this.privilegeCodeList[7] = !this.systemCategory;
-    }
   }
 
   allowedPrivileges: {
@@ -93,16 +87,12 @@ export class PrivilegeRowComponent {
   }
 
   onAllClicked() {
-    if (this.systemCategory) {
-      this.privilegeCodeList[8] = !this.systemCategory;
-    } else {
-      this.privilegeCodeList[8] = !this.privilegeCodeList[8];
-      if (this.privilegeCodeList[8]) {
-        this.privilegeCodeList = binaryString2BoolArray(ALL_PRIVILEGES_STR);
-      }
-      const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
-      this.categoryChange.emit(privilege);
+    this.privilegeCodeList[8] = !this.privilegeCodeList[8];
+    if (this.privilegeCodeList[8]) {
+      this.privilegeCodeList = binaryString2BoolArray(ALL_PRIVILEGES_STR);
     }
+    const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
+    this.categoryChange.emit(privilege);
   }
 
   onAccessClicked() {
@@ -117,5 +107,13 @@ export class PrivilegeRowComponent {
     }
     const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
     this.categoryChange.emit(privilege);
+  }
+
+
+  checkPermissions(privilegeName) {
+    if (this.systemCategory && SYSTEM_CATEGORY_OPERATIONS.includes(privilegeName)) {
+      return true;
+    }
+    return false;
   }
 }
