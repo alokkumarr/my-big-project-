@@ -1,6 +1,5 @@
 {
   "s3List": [
-    {"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******ZY4AECBVQ", "secretKey": "Q4QP2V********J9BtDS+QRmq*****0OcYNXDIz", "type": "s3"},
-    {"customerCode":"SYNCHRONOSS", "alias" : "xdftest2", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "tempDir", "accessKey": "AKIAJ******ZY4AECBVQ", "secretKey": "Q4QP2V********J9BtDS+QRmq*****0OcYNXDIz", "type": "s3"}
+    {"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-west-2", "outputLocation": "Analysis", "accessKey": "AKIAJ******ZY4AECBVQ", "secretKey": "Q4QP2V********J9BtDS+QRmq*****0OcYNXDIz", "cannedAcl": "BucketOwnerFullControl", "type": "s3"}
   ]
 }

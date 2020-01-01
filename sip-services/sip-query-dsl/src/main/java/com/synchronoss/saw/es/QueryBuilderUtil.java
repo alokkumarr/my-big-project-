@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.util.CollectionUtil;
+import org.elasticsearch.common.util.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -471,7 +474,7 @@ public class QueryBuilderUtil {
    * @return
    */
   public static DataSecurityKey checkDSKApplicableAnalysis(
-      SipQuery sipQuery, DataSecurityKey dataSecurityKey, List<String> artifactFromAnalysis) {
+      SipQuery sipQuery, DataSecurityKey dataSecurityKey, List<String> artifactFromAnalysis ) {
     List<DataSecurityKeyDef> dataSecurityKeyDefList =
         dataSecurityKey.getDataSecuritykey() != null ? dataSecurityKey.getDataSecuritykey() : null;
     List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
@@ -485,10 +488,51 @@ public class QueryBuilderUtil {
           List<Field> fieldList = artifact.getFields();
           for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
             if (checkDSKApplicableAnalysis(artifactName, fieldList, dataSecurityKeyDef)) {
-              String dskColName = dataSecurityKeyDef.getName();
-              dataSecurityKeyDef.setName(artifactName + "." + dskColName);
+              String[] dskColName = dataSecurityKeyDef.getName().split("\\.");
+              String colName = dskColName.length > 1 ? dskColName[1] : dskColName[0];
+              dataSecurityKeyDef.setName(artifactName + "." + colName);
               dataSecurityKeyDefs.add(dataSecurityKeyDef);
             }
+          }
+        }
+      }
+    }
+    DataSecurityKey dataSecurityKeyNew = new DataSecurityKey();
+    dataSecurityKeyNew.setDataSecuritykey(dataSecurityKeyDefs);
+    return dataSecurityKeyNew;
+  }
+
+  /**
+   * This method will validate whether Data security keys will be applicable for the * analysis and
+   * return the list of Key which all are applicable.
+   *
+   * @param artsName
+   * @param query
+   * @param dsk
+   * @param savedQuery
+   * @return
+   */
+  public static DataSecurityKey checkDSKApplicableAnalysis(List<String> artsName, String query,
+      DataSecurityKey dsk, SipQuery savedQuery) {
+    List<DataSecurityKeyDef> dataSecurityKeyDefList =
+        dsk.getDataSecuritykey() != null ? dsk.getDataSecuritykey() : null;
+    List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
+    if (!StringUtils.isEmpty(query) && dsk != null && dsk.getDataSecuritykey().size() != 0) {
+      for (String artifact : artsName) {
+        for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+          List<Field> fields = new ArrayList<>();
+          savedQuery.getArtifacts().forEach(artifact1 -> {
+            if (!StringUtils.isEmpty(artifact1.getArtifactsName()) && artifact1.getArtifactsName()
+                .equalsIgnoreCase(artifact)) {
+              fields.addAll(artifact1.getFields());
+            }
+          });
+          if (query.contains(artifact) && isColumnPresentInSemantic(artifact, fields,
+              dataSecurityKeyDef)) {
+            String[] dskColName = dataSecurityKeyDef.getName().split("\\.");
+            String colName = dskColName.length > 1 ? dskColName[1] : dskColName[0];
+            dataSecurityKeyDef.setName(artifact + "." + colName);
+            dataSecurityKeyDefs.add(dataSecurityKeyDef);
           }
         }
       }
@@ -563,5 +607,26 @@ public class QueryBuilderUtil {
       data.add(row);
     }
     return data;
+  }
+
+  /**
+   * Check if column present in semantic.
+   *
+   * @param artifactName
+   * @param fieldList
+   * @param dataSecurityKeyDef
+   * @return
+   */
+  public static boolean isColumnPresentInSemantic(String artifactName, List<Field> fieldList,
+      DataSecurityKeyDef dataSecurityKeyDef) {
+    String colName = dataSecurityKeyDef.getName();
+    for (Field field : fieldList) {
+      String col = field.getColumnName();
+      if (colName.equalsIgnoreCase(col)
+          || colName.equalsIgnoreCase(artifactName + "." + col)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
