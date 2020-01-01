@@ -671,8 +671,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         }
     }
 
-
-
     @Override
     public Valid updateUser(String securityGroupName, Long userSysId, Long custId) {
         Valid valid = new Valid();
