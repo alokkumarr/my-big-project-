@@ -50,7 +50,9 @@ export class AddAttributeDialogComponent {
   filterAutocompleteFields() {
     const filterValue = toString(this.data.attributeName).toLowerCase();
     this.filteredEligibleFields = this.dskEligibleFields.filter(option =>
-      option.displayName.toLowerCase().includes(filterValue)
+      (option.displayName || option.columnName)
+        .toLowerCase()
+        .includes(filterValue)
     );
   }
 
