@@ -29,6 +29,10 @@ mat-form-field {
 
 .parameters {
   margin-bottom: 10px;
+
+  &.authorization {
+    min-height: 180px;
+  }
 }
 
 ::ng-deep mat-tab-body {
@@ -49,6 +53,11 @@ mat-form-field {
   .dot {
     background-color: $primary-red;
   }
+}
+
+mat-expansion-panel {
+  box-shadow: none !important;
+  border: 1px solid $material-grey-border;
 }
 
 ::ng-deep .mat-tab-labels .mat-tab-label.mat-tab-label-active {
