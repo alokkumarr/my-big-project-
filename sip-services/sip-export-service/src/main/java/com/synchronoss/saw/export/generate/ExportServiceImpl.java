@@ -992,8 +992,8 @@ public class ExportServiceImpl implements ExportService {
       logger.trace("AliasTemp : " + aliasTemp);
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
-        S3Customer obj = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
-        for (S3Details alias : obj.getS3List()) {
+        S3Customer s3Customer = jsonMapper.readValue(new File(s3DetailsFile), S3Customer.class);
+        for (S3Details alias : s3Customer.getS3List()) {
           if (alias.getCustomerCode().equals(finalJobGroup) && aliasTemp.equals(alias.getAlias())) {
             logger.trace("BucketName : " + alias.getBucketName() + ", Region : " + alias.getRegion()
                 + ", Output Location :" + alias.getOutputLocation());
@@ -1003,7 +1003,8 @@ public class ExportServiceImpl implements ExportService {
                     alias.getAccessKey(),
                     alias.getSecretKey(),
                     alias.getRegion(),
-                    alias.getOutputLocation());
+                    alias.getOutputLocation(),
+                    alias.getCannedAcl());
 
             AmazonS3Handler s3Handler = new AmazonS3Handler(s3Config);
             s3Handler.uploadObject(file.getAbsoluteFile());

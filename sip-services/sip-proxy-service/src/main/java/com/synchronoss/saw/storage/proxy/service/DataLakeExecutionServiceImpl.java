@@ -318,7 +318,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
               if (!dskFilter.contains("WHERE")) {
                 dskFilter = dskFilter.concat(" WHERE upper(" + dsk.getName() + ") in (");
               } else {
-                dskFilter = dskFilter.concat(" AND " + dsk.getName() + " in (");
+                dskFilter = dskFilter.concat(" AND upper(" + dsk.getName() + ") in (");
               }
               List<String> values = dsk.getValues();
               int initFlag = 0;

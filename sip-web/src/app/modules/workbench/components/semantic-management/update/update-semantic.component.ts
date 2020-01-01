@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import CheckBox from 'devextreme/ui/check_box';
 
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
+import { NUMBER_TYPES, DATE_TYPES } from '../../../../../../app/common/consts';
 
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -32,6 +34,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   public isJoinEligible = false;
   public selectedDPDetails: any = [];
   public dpID = '';
+  public isDateTypeMatched = true;
 
   constructor(
     public router: Router,
@@ -102,6 +105,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
             }
           });
         }
+        this.isDateTypeMatched = some(this.selectedDPData[0].columns, obj => {
+          return DATE_TYPES.includes(obj.type);
+        });
       });
     });
   }
@@ -136,11 +142,15 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Updates the saemantic definition with user changes.
+   * Updates the semantic definition with user changes.
    *
    * @memberof UpdateSemanticComponent
    */
   updateSemantic() {
+    const msg =
+      'Please select atleast one entry from <strong>KPI Eligible</strong> column which has <strong>date or timestamp</strong> data type.';
+    const title = 'Date data type is missing.';
+
     this.selectedDPDetails.artifacts = [];
     forEach(this.selectedDPData, ds => {
       this.selectedDPDetails.artifacts.push({
@@ -148,13 +158,62 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         columns: filter(ds.columns, 'include')
       });
     });
-    this.workBench
-      .updateSemanticDetails(this.selectedDPDetails)
-      .subscribe((data: any[]) => {
-        this.notify.info('Datapod Updated successfully', 'Datapod', {
-          hideDelay: 9000
-        });
-        this.router.navigate(['workbench', 'dataobjects']);
+
+    /**
+     * Checking in KPI Eligible column
+     * 1.) If no entry selected then update dp.
+     * 2.) If any one field other than date type is selected then ask user to select at least one date type field and then update dp.
+     * 3.) If no field with date type is present then update dp
+     *
+     * Added as a part of SIP-9373.
+     */
+
+    const { columns } = this.selectedDPDetails.artifacts[0];
+    const anyColSelected = some(columns, obj => {
+      return !DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+    });
+
+    const dateColAvailable = some(columns, obj => {
+      return DATE_TYPES.includes(obj.type);
+    });
+
+    const dateAndKpiSelected = some(columns, obj => {
+      return DATE_TYPES.includes(obj.type) && obj.kpiEligible;
+    });
+
+    if (anyColSelected && dateColAvailable && !dateAndKpiSelected) {
+      this.notify.warn(msg, title, {
+        hideDelay: 9000
       });
+    } else {
+      this.workBench
+        .updateSemanticDetails(this.selectedDPDetails)
+        .subscribe(() => {
+          this.notify.info('Datapod Updated successfully', 'Datapod', {
+            hideDelay: 9000
+          });
+          this.router.navigate(['workbench', 'dataobjects']);
+        });
+    }
+  }
+
+  /**
+   *
+   * @param e
+   * Disable checkbox of non numeric and date type fields in KPI Eligible column.
+   * Added as part of SIP-9373
+   */
+  cellPrepared(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
+      if (
+        (!NUMBER_TYPES.includes(e.data.type) &&
+          !DATE_TYPES.includes(e.data.type)) ||
+        !this.isDateTypeMatched
+      ) {
+        CheckBox.getInstance(
+          e.cellElement.querySelector('.dx-checkbox')
+        ).option('disabled', true);
+      }
+    }
   }
 }

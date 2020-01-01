@@ -340,6 +340,16 @@ XDF-NG batch pipeline can be configured as below.
 	
 ==== Configuring XDF-RTPS
 
+  XDF-RTA can be run as a systemctl service as it continuously listens
+  to messages. Follow below steps to create systemctl service
+
+  1. Create a systemctl service by referring to 
+  'sip-xdf/xdf/bin/templates/xdf-rta.service.template'.
+  
+  2. Add execute-component command with arguments in the service.
+  
+  3. Use systemctl commands to start/stop/restart or check status of rta service.
+
   RTPS gets installed as part of XDF-NG. If RTPS is configured as one of the
   component in pipeline, then RTA service gets started when pipeline is
   triggered. RTA service starts listening to real time data and executes
@@ -1273,6 +1283,7 @@ SIP supports *exporting* reports and pivots:
 . from UI
 . to email
 . to ftp/sftp servers
+. to S3 Bucket
 
 In sip-config, we can configure how many number of rows we want to
 extract for all the reports / pivots:
@@ -1283,6 +1294,7 @@ extract for all the reports / pivots:
 saw_ui_export_size=10000
 saw_email_export_size=50000
 saw_ftp_export_size=1000000
+saw_s3_export_size=1000000
 ----
 
 SIP reports are exported chunks of rows, we can configure how many
@@ -1363,3 +1375,66 @@ server entry per customer is required to have a unique alias entry
 which gets presented in front end.
 
 NOTE: Please make sure to put minified JSON in configuration file.
+
+=== S3 Bucket configuration for the
+
+SIP supports exporting of pivots and reports to S3 Bucket.
+By default an empty configuration is installed in
+`/opt/bda/saw-export-service/conf/S3-details.json` file on SIP nodes.
+
+The contents of this configuration can be changed using `sip-config`.
+An example configuration has been included in config file.
+
+.sip-config
+----
+# S3 JSON config
+# (Do not split this into multiple lines)
+# s3_json_config='{"s3List":[{"customerCode":"SYNCHRONOSS", "alias" : "xdftest1", "bucketName": "xdftest","region":"us-east-1", "outputLocation": "Analysis", "accessKey": "AKIAJ******4AECBVQ", "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz", "type": "s3"}]}'
+----
+
+Example contents (in pretty format):
+
+.S3-details.json
+[source, json]
+----
+{
+  "s3List": [
+    {
+      "customerCode": "SYNCHRONOSS",
+      "alias": "xdftest1",
+      "bucketName": "xdftest",
+      "region": "us-east-1",
+      "outputLocation": "Analysis",
+      "accessKey": "AKIAJ******4AECBVQ",
+      "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz",
+      "type": "s3"
+    },
+    {
+      "customerCode": "TenantA",
+      "alias": "test1",
+      "bucketName": "test1",
+      "region": "us-east-1",
+      "outputLocation": "Analysis",
+      "accessKey": "AKIAJ******4AECBVQ",
+      "secretKey": "Q4QP2V*****moyJ9BtDS+QRmqgR****0OcYNXDIz",
+      "cannedAcl": "BucketOwnerFullControl",
+      "type": "s3"
+    }
+  ]
+}
+----
+
+In above example, `customerName` is the unique identifier given at
+the time of onboarding customer. Note that based on this unique
+identifier, customers are differentiated. Each S3 bucket
+is required to have unique entry which gets presented to front
+end, this is maintained by means of `alias` entry. *Note* that each
+Bucket entry per customer is required to have a unique alias entry
+which gets presented in front end.
+
+S3 canned ACLs supported with write permission can be
+configured in S3-details.json file , SIP Supported List of canned ACLs List
+
+   1) "cannedAcl": "BucketOwnerFullControl"
+   2) "cannedAcl": "PublicReadWrite",
+   3) "cannedAcl": "LogDeliveryWrite"
