@@ -51,7 +51,9 @@ public class DskEligibleFieldsRepositoryImpl implements DskEligibleFieldsReposit
                     ps -> {
                       String columnName = dskField.getColumnName();
 
-                      if (columnName == null || columnName.length() == 0) {
+                      if (columnName == null
+                          || columnName.length() == 0
+                          || columnName.contains("")) {
                         throw new DataIntegrityViolationException("Column name cannot be empty");
                       }
 

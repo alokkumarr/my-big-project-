@@ -121,8 +121,9 @@
     <mat-form-field appearance="outline">
       <mat-label i18n>Password</mat-label>
       <input
-        [type]="show ? 'text' : 'password'"
+        type="password"
         matInput
+        showPassword
         placeholder="Password"
         name="user-password"
         e2e="user-password"
@@ -131,28 +132,15 @@
         autocomplete="new-password"
       />
       <button
-        matTooltip="Show Password"
+        matTooltip="Toggle Password"
+        type="button"
         e2e="show-password-sc"
-        *ngIf="!show"
         mat-button
         matSuffix
         mat-icon-button
         aria-label="show"
-        (click)="togglePWD()"
       >
         <mat-icon fontIcon="icon-show"></mat-icon>
-      </button>
-      <button
-        matTooltip="Hide Password"
-        e2e="hide-password-cs"
-        *ngIf="show"
-        mat-button
-        matSuffix
-        mat-icon-button
-        aria-label="show"
-        (click)="togglePWD()"
-      >
-        <mat-icon fontIcon="icon-hide"></mat-icon>
       </button>
       <mat-error
         e2e="pwd-validation-msg"

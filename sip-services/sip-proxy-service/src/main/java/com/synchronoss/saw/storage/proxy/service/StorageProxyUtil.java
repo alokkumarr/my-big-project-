@@ -15,6 +15,7 @@ import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
+import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
@@ -332,4 +333,30 @@ public class StorageProxyUtil {
     }
     return artifactNames;
   }
+
+  /**
+   * Validate for same column name present in two tables within a semantic and dsk applied.
+   *
+   * @param sipQuery Sematic Artifacts definition
+   * @param dsk DataSecurityKey
+   * @return
+   */
+  public static boolean checkSameColumnAcrossTables(SipQuery sipQuery, DataSecurityKey dsk) {
+    List<DataSecurityKeyDef> dataSecurityKeyDefList =
+        dsk.getDataSecuritykey() != null ? dsk.getDataSecuritykey() : null;
+    boolean flag = false;
+    for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
+      for (Artifact artifact : sipQuery.getArtifacts()) {
+        for (Field field : artifact.getFields()) {
+          if (flag && field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName())) {
+            return true;
+          }
+          flag =
+              !flag ? field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName()) : flag;
+        }
+      }
+    }
+    return false;
+  }
+
 }

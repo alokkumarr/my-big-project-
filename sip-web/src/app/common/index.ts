@@ -32,7 +32,8 @@ import {
   DxTextBoxModule,
   DxButtonModule,
   DxSliderModule,
-  DxTooltipModule
+  DxTooltipModule,
+  DxCheckBoxModule
 } from 'devextreme-angular';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
@@ -110,6 +111,7 @@ import {
   DndPubsubService,
   CommonSemanticService
 } from './services';
+import { ShowPasswordDirective } from './directives/show-password.directive';
 
 const MODULES = [
   CommonModuleAngular4,
@@ -120,6 +122,7 @@ const MODULES = [
   DxButtonModule,
   DxSliderModule,
   DxTooltipModule,
+  DxCheckBoxModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,
@@ -175,7 +178,8 @@ const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
 const DIRECTIVES = [
   ClickToCopyDirective,
   E2eDirective,
-  JsPlumbEndpointDirective
+  JsPlumbEndpointDirective,
+  ShowPasswordDirective
 ];
 
 const SERVICES = [
