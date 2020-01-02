@@ -9,7 +9,8 @@ public class SubCategoryDetails {
 	private String subCategoryName;
 	private String subCategoryDesc;
 	private long activestatusInd;
-	private List<String> privilege;
+  private boolean systemCategory;
+  private List<String> privilege;
 
 	public boolean isAutoCreate() {
 		return autoCreate;
@@ -17,6 +18,7 @@ public class SubCategoryDetails {
 	public void setAutoCreate(boolean autoCreate) {
 		this.autoCreate = autoCreate;
 	}
+
 	public String getSubCategoryDesc() {
 		return subCategoryDesc;
 	}
@@ -40,6 +42,12 @@ public class SubCategoryDetails {
 	}
 	public void setSubCategoryName(String subCategoryName) {
 		this.subCategoryName = subCategoryName;
+	}
+	public boolean isSystemCategory() {
+		return systemCategory;
+	}
+	public void setSystemCategory(boolean systemCategory) {
+		this.systemCategory = systemCategory;
 	}
 	public List<String> getPrivilege() {
 		return privilege;

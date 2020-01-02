@@ -409,6 +409,7 @@ export class AdminMainViewComponent implements OnDestroy {
       customerId,
       masterLoginId
     };
+
     return this._dialog.open(CategoryDeleteDialogComponent, {
       width: 'auto',
       height: 'auto',

@@ -272,14 +272,14 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				});
 				message = null;
-				  sql =
-				 "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
-				 + "AND RS.VALID=1";
-				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
-                      public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                           preparedStatement.setString(1, loginId);
-                      }
-                  });
+				sql =
+						"UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
+								+ "AND RS.VALID=1";
+				jdbcTemplate.update(sql,new PreparedStatementSetter() {
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, loginId);
+					}
+				});
 			}
 
 		} catch (DataAccessException de) {
@@ -468,7 +468,6 @@ public class UserRepositoryImpl implements UserRepository {
 			logger.error("Exception encountered while invalidating the ticket" + e.getMessage(), null, e);
 			throw e;
 		}
-
   }
 
 	private class PwdDetailExtractor implements ResultSetExtractor<PasswordDetails> {
@@ -563,7 +562,7 @@ public class UserRepositoryImpl implements UserRepository {
 							  + "CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE, "
 							  + "'0' AS PRIVILEGE_CODE, "
 							  + " P.PRODUCT_CODE,M.MODULE_CODE,CPMF.FEATURE_NAME,CPMF.FEATURE_DESC "
-							  + " ,CPMF.FEATURE_CODE,CPMF.DEFAULT_URL,CPMF.DEFAULT "
+							  + " ,CPMF.FEATURE_CODE,CPMF.DEFAULT_URL,CPMF.DEFAULT,CPMF.SYSTEM_CATEGORY "
 							  + "FROM USERS U "
 							  + "INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) "
 							  + "INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) "
@@ -605,7 +604,8 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "   CPMF.FEATURE_DESC, "
 				+ "   CPMF.FEATURE_CODE, "
 				+ "   CPMF.DEFAULT_URL, "
-				+ "   CPMF.DEFAULT  "
+				+ "   CPMF.DEFAULT,"
+				+	"   CPMF.SYSTEM_CATEGORY  "
 				+ "FROM "
 				+ "   USERS U  "
 				+ "   INNER JOIN "
@@ -709,8 +709,7 @@ public class UserRepositoryImpl implements UserRepository {
 									}
 
 								}
-                                prodModFeatrParentsCopy.get(y)
-										.setProductModuleSubFeatures(prodModFeatrChildSorted);
+								prodModFeatrParentsCopy.get(y).setProductModuleSubFeatures(prodModFeatrChildSorted);
 							}
 
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
@@ -718,14 +717,14 @@ public class UserRepositoryImpl implements UserRepository {
 								if (ticketDetails.getProducts().get(i).getProductCode()
 										.equals(prodModFeatrParentsCopy.get(y).getProdCode())
 										&& prodModFeatrParentsCopy.get(y).getProdModCode()
-												.equals(prodMods.get(x).getProductModCode())
+										.equals(prodMods.get(x).getProductModCode())
 										&& prodModFeatrParentsCopy.get(y).getProductModuleSubFeatures().size()>0 ) {
 									prodModFeatrSorted.add(prodModFeatrParentsCopy.get(y));
 								}
 
 							}
-                            prodMods.get(x).setProdModFeature(prodModFeatrSorted);
-                            prodModSorted.add(prodMods.get(x));
+							prodMods.get(x).setProdModFeature(prodModFeatrSorted);
+							prodModSorted.add(prodMods.get(x));
 
 						}
 					}
@@ -813,12 +812,12 @@ public class UserRepositoryImpl implements UserRepository {
     Map<String, String> jvDetails = jdbcTemplate.query(fetchJVDetails, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.JVDetailExtractor());
 
 		DataSecurityKeys securityKeys = new DataSecurityKeys();
-    securityKeys.setDataSecurityKeys(dskList);
-    securityKeys.setCustomerCode(jvDetails.get("customerCode"));
+		securityKeys.setDataSecurityKeys(dskList);
+		securityKeys.setCustomerCode(jvDetails.get("customerCode"));
 		securityKeys.setIsJvCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
 		securityKeys.setFilterByCustomerCode(Integer.parseInt(jvDetails.get("filterByCustomerCode")));
-    return securityKeys;
-  }
+		return securityKeys;
+	}
 
   @Override
 	public Ticket getTicketDetails(String ticketId) {
@@ -991,6 +990,7 @@ public class UserRepositoryImpl implements UserRepository {
 				productModulesFeatr.setPrivilegeCode(rs.getLong("privilege_code"));
 				productModulesFeatr.setProdModFeatureID(rs.getLong("cust_prod_mod_feature_sys_id"));
 				productModulesFeatr.setProdModFeatureType(rs.getString("feature_type"));
+				productModulesFeatr.setSystemCategory(rs.getBoolean("system_category"));
 				prodModFeaList.add(productModulesFeatr);
 			}
 			return prodModFeaList;
@@ -1021,6 +1021,7 @@ public class UserRepositoryImpl implements UserRepository {
 				productModulesFeatr.setDefaultFeature(rs.getString("default"));
 				productModulesFeatr.setProdModFeatureID(rs.getLong("cust_prod_mod_feature_sys_id"));
 				productModulesFeatr.setProdModFeatureType(rs.getString("feature_type"));
+				productModulesFeatr.setSystemCategory(rs.getBoolean("system_category"));
 				productModulesFeatr.setRoleId(rs.getLong("role_sys_id"));
 				prodModFeaList.add(productModulesFeatr);
 			}
@@ -1713,11 +1714,11 @@ public class UserRepositoryImpl implements UserRepository {
 				// if yes check if My Analysis priv exists, if not create
 
 				String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
-							  + "FROM "
-							  + "( SELECT  FEATURE_CODE from customer_product_module_features "
-							  + "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis') CPMF INNER JOIN "
-							  + "                    customer_product_module_features CPMF1"
-							  + "                    ON (CPMF.FEATURE_CODE = REPLACE(CPMF1.FEATURE_TYPE, 'CHILD_', ''));";
+						+ "FROM "
+						+ "( SELECT  FEATURE_CODE from customer_product_module_features "
+						+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis') CPMF INNER JOIN "
+						+ "                    customer_product_module_features CPMF1"
+						+ "                    ON (CPMF.FEATURE_CODE = REPLACE(CPMF1.FEATURE_TYPE, 'CHILD_', ''));";
 
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
@@ -1755,7 +1756,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	private void insertMyAnalysisPrivileges(RoleDetails role, Long roleId, Long custProdMod, Long custProd,
-			Long custProdModFeatr) {
+																					Long custProdModFeatr) {
 
 		insertPMFAccessPrivilege(role.getMasterLoginId(), roleId, custProdMod, custProd);
 		String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
@@ -2167,7 +2168,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public List<Category> getCategoriesDropDownList(Long customerId, Long moduleId, boolean catOnly) {
 		ArrayList<Category> categoriesList = null;
 		StringBuffer sql = new StringBuffer();
-				sql.append("SELECT DISTINCT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE,CPMF.FEATURE_NAME,CPMF.FEATURE_CODE FROM USERS U "
+		sql.append("SELECT DISTINCT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE,CPMF.FEATURE_NAME,CPMF.FEATURE_CODE FROM USERS U "
 				+ "INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
 				+ "(CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
 				+ "(CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
@@ -2207,7 +2208,8 @@ public class UserRepositoryImpl implements UserRepository {
 					 + "   IFNULL(PV.PRIVILEGE_CODE,0) PRIVILEGE_CODE, "
 					 + "   IFNULL(PV.PRIVILEGE_SYS_ID,0) PRIVILEGE_SYS_ID, "
            + "   PV.PRIVILEGE_DESC, "
-					 + "   CPMF.FEATURE_CODE  "
+					 + "   CPMF.FEATURE_CODE,"
+           + "   CPMF.SYSTEM_CATEGORY  "
 					 + "FROM    "
 					 + "   USERS U  "
 					 + "   INNER JOIN "
@@ -2275,7 +2277,8 @@ public class UserRepositoryImpl implements UserRepository {
 				subCategory.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));
 				subCategory.setPrivilegeId(rs.getLong("PRIVILEGE_SYS_ID"));
         subCategory.setPrivilegeDesc(rs.getString("PRIVILEGE_DESC"));
-				subCategory.setSubCategoryCode("FEATURE_CODE");
+				subCategory.setSubCategoryCode(rs.getString("FEATURE_CODE"));
+				subCategory.setSystemCategory(rs.getBoolean("SYSTEM_CATEGORY"));
 				subCatList.add(subCategory);
 			}
 			return subCatList;
@@ -2469,7 +2472,7 @@ public class UserRepositoryImpl implements UserRepository {
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
 				+ "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,CPMF.FEATURE_CODE,"
-				+ " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND FROM USERS U "
+				+ " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND, CPMF.SYSTEM_CATEGORY FROM USERS U "
 				+ " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
 				+ " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
 				+ " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
@@ -2491,11 +2494,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 			for(CategoryDetails catDetails : categoryList){
 
-					if (catDetails.getCategoryType().split("_")[0].equals("PARENT")) {
-						categoryParentSorted.add(catDetails);
-					} else if (catDetails.getCategoryType().split("_")[0].equals("CHILD")) {
-						categoryChildSorted.add(catDetails);
-					}
+				if (catDetails.getCategoryType().split("_")[0].equals("PARENT")) {
+					categoryParentSorted.add(catDetails);
+				} else if (catDetails.getCategoryType().split("_")[0].equals("CHILD")) {
+					categoryChildSorted.add(catDetails);
+				}
 			}
 
 			for(CategoryDetails catPDetails : categoryParentSorted){
@@ -2506,6 +2509,7 @@ public class UserRepositoryImpl implements UserRepository {
 						subCategories.setSubCategoryId(catCDetails.getCategoryId());
 						subCategories.setSubCategoryName(catCDetails.getCategoryName());
 						subCategories.setSubCategoryDesc(catCDetails.getCategoryDesc());
+						subCategories.setSystemCategory(catCDetails.isSystemCategory());
 						subCategories.setActivestatusInd(catCDetails.getActiveStatusInd());
 						subCategory.add(subCategories);
 					}
@@ -2547,6 +2551,7 @@ public class UserRepositoryImpl implements UserRepository {
 				category.setCategoryType(rs.getString("FEATURE_TYPE"));
 				category.setCategoryDesc(rs.getString("FEATURE_DESC"));
 				category.setActiveStatusInd(rs.getLong("ACTIVE_STATUS_IND"));
+				category.setSystemCategory(rs.getBoolean("SYSTEM_CATEGORY"));
 				catList.add(category);
 			}
 			return catList;
@@ -2557,8 +2562,8 @@ public class UserRepositoryImpl implements UserRepository {
 	public Valid addCategory(CategoryDetails category) {
 		Valid valid = new Valid();
 		String sql = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID,DEFAULT_URL,`DEFAULT`,"
-				+ "FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY)"
-				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)"
+				+ "FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,ACTIVE_STATUS_IND,SYSTEM_CATEGORY,CREATED_DATE,CREATED_BY)"
+				+ " VALUES (?,?,0,?,?,?,?,?,0,sysdate(),?)"
 				+ " ON DUPLICATE KEY UPDATE DEFAULT_URL=DEFAULT_URL";
 
 		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
@@ -2655,8 +2660,8 @@ public class UserRepositoryImpl implements UserRepository {
 			catExists = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setLong(1, category.getCustomerId());
-                    preparedStatement.setLong(2, category.getModuleId());
-                    preparedStatement.setLong(3, category.getProductId());
+					preparedStatement.setLong(2, category.getModuleId());
+					preparedStatement.setLong(3, category.getProductId());
 					preparedStatement.setString(4, category.getCategoryName());
 
 				}

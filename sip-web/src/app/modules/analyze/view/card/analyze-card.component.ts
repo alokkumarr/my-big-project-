@@ -28,6 +28,7 @@ export class AnalyzeCardComponent implements OnInit {
   @Input() analysis: Analysis | AnalysisDSL;
   @Input() analysisType: string;
   @Input() highlightTerm: string;
+  @Input() category;
   @Input()
   set cronJobs(cronJobs: any) {
     const cron = isUndefined(cronJobs) ? '' : cronJobs[this.analysis.id];

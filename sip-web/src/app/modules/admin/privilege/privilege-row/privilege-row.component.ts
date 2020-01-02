@@ -31,6 +31,7 @@ export class PrivilegeRowComponent {
   privilegeCodeList: Boolean[];
   subCategory;
   isDraftsSubCategory = false;
+  systemCategory;
 
   @Input() categoryName: string;
 
@@ -44,6 +45,8 @@ export class PrivilegeRowComponent {
     this.subCategory = subCategory;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
+    // set all privilege based on syster folder category settings.
+    this.systemCategory = subCategory.systemCategory;
   }
 
   allowedPrivileges: {
@@ -103,5 +106,13 @@ export class PrivilegeRowComponent {
     }
     const privilege = getPrivilegeFromBoolArray(this.privilegeCodeList);
     this.categoryChange.emit(privilege);
+  }
+
+
+  checkPermissions(privilegeName) {
+    if (this.systemCategory && ['Delete'].includes(privilegeName)) {
+      return true;
+    }
+    return false;
   }
 }

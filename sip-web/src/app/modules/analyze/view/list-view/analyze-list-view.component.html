@@ -81,6 +81,7 @@
           [actionsToDisable]="
             executions[cell.data.id] === executingState ? 'execute' : ''
           "
+          [category]="category"
           exclude="fork-export-details"
           (afterDelete)="afterDelete($event)"
           (afterExecute)="afterExecute($event)"

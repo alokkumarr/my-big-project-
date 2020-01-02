@@ -8,6 +8,9 @@ import * as lowerCase from 'lodash/lowerCase';
 import * as toUpper from 'lodash/toUpper';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPipe from 'lodash/fp/pipe';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
@@ -368,5 +371,17 @@ export class JwtService {
     .then(res => {
       return res;
     });
+  }
+
+  fetchCategoryDetails(categoryId) {
+    const token = this.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    return fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID) == parseInt(categoryId)
+      })
+    )(product.productModules);
   }
 }

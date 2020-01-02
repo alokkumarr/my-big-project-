@@ -1,7 +1,6 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
-import static com.synchronoss.saw.util.SipMetadataUtils.getToken;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
@@ -14,9 +13,9 @@ import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.modal.AnalysisPrivileges;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
-import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -216,6 +215,14 @@ public class AnalysisController {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
+
+    Long categoryId = analysis.getCategory() != null ? Long.valueOf(analysis.getCategory()) : 0L;
+    if (response != null && response.getStatus() != HttpStatus.UNAUTHORIZED.value()
+        && SipCommonUtils.haveSystemCategory(authTicket.getProducts(), categoryId)) {
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
+
     analysisService.deleteAnalysis(id, authTicket);
     analysisResponse.setMessage("Analysis deleted successfully");
     analysisResponse.setAnalysisId(id);
