@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -564,7 +565,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             String columnName = dskAttribute.getColumnName();
             String dskAttributeId = UUID.randomUUID().toString();
 
-            if (booleanCriteria == null && columnName == null) {
+            if (booleanCriteria == null && StringUtils.isEmpty(columnName)) {
                 throw new RuntimeException("Invalid DSK attributes");
             }
 
@@ -575,12 +576,25 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 model.setSecGroupSysId(securityGroupId);
                 model.setDskAttributeParentId(parentId);
 
-                if (dskAttribute.getColumnName() == null) {
+                if (StringUtils.isEmpty(dskAttribute.getColumnName())) {
                     throw new RuntimeException("Column name cannot be empty");
+                }
+                if (dskAttribute.getColumnName().length() > 20) {
+                    throw new RuntimeException("Column name cannot be longer than 20 characters");
+                }
+
+                if (dskAttribute.getModel().getOperator() == null) {
+                    throw new RuntimeException("Operator cannot be empty");
                 }
                 if (dskAttribute.getModel().getValues() == null
                     || dskAttribute.getModel().getValues().isEmpty()) {
-                    throw new RuntimeException("Values cannot be empty");
+                    throw new RuntimeException("Values field cannot be empty");
+                }
+
+                for(String value : dskAttribute.getModel().getValues()) {
+                    if (StringUtils.isEmpty(value)) {
+                        throw new RuntimeException("Value cannot be empty");
+                    }
                 }
 
                 model.setColumnName(dskAttribute.getColumnName());
