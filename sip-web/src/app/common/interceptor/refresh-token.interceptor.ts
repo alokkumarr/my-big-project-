@@ -32,36 +32,40 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let refreshRequest = null;
     // Clone the request to add the new header.
     // const authReq = req.clone({ headers: req.headers.set('Authorization', `Bearer ${this.jwt.getAccessToken()}`) });
 
     // send the newly created request
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse, caught) => {
-        const errorMessage = get(error, 'error.message', '');
-        const refreshRegexp = new RegExp(UserService.refreshTokenEndpoint);
-
-        const tokenMessageRegex = /token has expired|invalid token/i;
-
-        if (!(error.status === 401 && tokenMessageRegex.test(errorMessage))) {
+        /* This interceptor is only meant for 401 failures */
+        if (error.status !== 401) {
           return throwError(error);
         }
 
-        if (refreshRegexp.test(get(error, 'url', ''))) {
+        const refreshRegexp = new RegExp(UserService.refreshTokenEndpoint);
+        const validateRegexp = new RegExp('validateToken');
+
+        /* If refresh or validate request is failing, don't bother refreshing itself */
+        if (
+          refreshRegexp.test(get(error, 'url', '')) ||
+          validateRegexp.test(get(error, 'url', ''))
+        ) {
           // response.config._hideError = true;
           return throwError(error);
         }
 
-        if (!refreshRequest) {
-          refreshRequest = this.user.refreshAccessToken();
-        }
         return new Observable(observer => {
-          refreshRequest
-            .then(() => {
-              refreshRequest = null;
-              return this.jwt.validateToken();
-            })
+          this.jwt
+            .validateToken()
+            .then(
+              () => {
+                observer.error(error);
+              },
+              () => {
+                return this.user.refreshAccessToken();
+              }
+            )
             .then(
               () => {
                 observer.next(true);
@@ -69,8 +73,8 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
               },
               err => {
                 /* If token wasn't refreshed successfully, delete the token and navigate to login */
-                observer.error(new Error('Session expired.'));
                 this.logout();
+                observer.error(new Error('Session expired.'));
               }
             );
 
