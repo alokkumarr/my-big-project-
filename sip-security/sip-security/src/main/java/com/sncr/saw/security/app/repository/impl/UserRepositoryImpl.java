@@ -2539,7 +2539,6 @@ public class UserRepositoryImpl implements UserRepository {
 			ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
 			while (rs.next()) {
 				category = new CategoryDetails();
-
 				category.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
 				category.setProductName(rs.getString("PRODUCT_NAME"));
 				category.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
