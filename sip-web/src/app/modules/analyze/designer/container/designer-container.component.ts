@@ -1058,6 +1058,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         break;
       case 'filterRemove':
+        break;
       case 'joins':
         this._store.dispatch(new DesignerJoinsArray(event.data));
         this.areMinRequirmentsMet = this.canRequestData();
