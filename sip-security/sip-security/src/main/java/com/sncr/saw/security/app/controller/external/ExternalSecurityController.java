@@ -43,7 +43,7 @@ import java.util.List;
  */
 @Api(value = "The controller provides to perform external admin security operation in synchronoss insight platform ")
 @RestController
-@RequestMapping("/sip-security/auth/external")
+@RequestMapping("/sip-security/auth/admin/external")
 public class ExternalSecurityController {
 
   @Autowired
