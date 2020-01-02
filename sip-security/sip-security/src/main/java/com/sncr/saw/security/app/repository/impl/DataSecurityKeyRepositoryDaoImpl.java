@@ -36,6 +36,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         .getLogger(CustomerProductModuleFeatureRepositoryDaoImpl.class);
     private final JdbcTemplate jdbcTemplate;
 
+    private static final String VALUE_DELIMITER = "~:";
+
     @Autowired
     public DataSecurityKeyRepositoryDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -504,7 +506,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                     if (dskAttributeModel.getValues() == null) {
                         ps.setString(7, null);
                     } else {
-                        ps.setString(7, String.join(",", dskAttributeModel.getValues()));
+                        ps.setString(7, String.join(VALUE_DELIMITER, dskAttributeModel.getValues()));
                     }
                 }
             });
@@ -896,7 +898,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                         Operator operator = Operator.valueOf(operatorStr);
                         String values = resultSet.getString("ATTRIBUTE_VALUES");
                         model.setOperator(operator);
-                        model.setValues(Arrays.asList(values.split(",")));
+                        model.setValues(Arrays.asList(values.split(VALUE_DELIMITER)));
 
                         attribute.setColumnName(columnName);
                         attribute.setModel(model);
