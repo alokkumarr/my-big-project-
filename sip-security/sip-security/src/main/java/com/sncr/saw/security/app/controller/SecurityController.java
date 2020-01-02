@@ -261,7 +261,6 @@ public class SecurityController {
 			User user = null;
 			ticket = new Ticket();
 			ticket.setMasterLoginId(masterLoginId);
-			ticket.setValid(false);
 			RefreshToken newRToken = null;
 			try {
 				user = new User();
@@ -278,6 +277,7 @@ public class SecurityController {
 			} catch (DataAccessException de) {
 				logger.error("Exception occured creating ticket ", de, null);
 				ticket.setValidityReason("Database error. Please contact server Administrator.");
+				ticket.setValid(false);
 				ticket.setError(de.getMessage());
 				return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
 						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact());
@@ -286,6 +286,7 @@ public class SecurityController {
 				return null;
 			}
 
+			ticket.setValid(true);
 			return new LoginResponse(
 					Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
 							.signWith(SignatureAlgorithm.HS256, nSSOProperties.getJwtSecretKey()).compact(),
