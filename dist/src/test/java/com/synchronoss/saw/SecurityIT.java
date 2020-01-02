@@ -709,7 +709,7 @@ public class SecurityIT extends BaseIT {
             .contentType(ContentType.JSON)
             .body(users)
             .when()
-            .post("/security/auth/admin/cust/manage/external/users/create")
+            .post("/security/auth/external/users/create")
             .then()
             .assertThat()
             .statusCode(200)
@@ -778,7 +778,7 @@ public class SecurityIT extends BaseIT {
   public void fetchUsers() {
     given(authSpec)
         .when()
-        .get("/security/auth/admin/cust/manage/external/users/fetch")
+        .get("/security/auth/external/users/fetch")
         .then()
         .assertThat()
         .statusCode(200)
