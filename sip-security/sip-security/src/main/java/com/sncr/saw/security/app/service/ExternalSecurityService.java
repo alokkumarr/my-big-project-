@@ -166,8 +166,8 @@ public class ExternalSecurityService {
   }
 
   private void buildCategorySubCategory(RoleCategoryPrivilege roleCategoryPrivilege, String masterLoginId, ProductModuleDetails moduleDetails, RoleCatPrivilegeResponse response, Long customerId, Role responseRole, CategoryList catList, CategoryDetails category, CategoryDetails categoryDetails) {
-    // add category
-    addCategory(catList, categoryDetails, roleCategoryPrivilege, response);
+    // build category
+    buildCategory(catList, categoryDetails, roleCategoryPrivilege, response);
     response.setCategoryList(catList);
 
     if (catList.getValid() || haveCategoryCheck) {
@@ -254,7 +254,7 @@ public class ExternalSecurityService {
    * @param request
    * @param response
    */
-  private void addCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
+  private void buildCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
     try {
       if (categoryDetails != null) {
         if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
