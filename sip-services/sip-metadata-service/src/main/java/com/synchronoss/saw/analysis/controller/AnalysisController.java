@@ -214,7 +214,7 @@ public class AnalysisController {
       return analysisResponse;
     }
 
-    Long categoryId = analysis.getCategory() != null ? Long.valueOf(analysis.getCategory()) : 0l;
+    Long categoryId = analysis.getCategory() != null ? Long.valueOf(analysis.getCategory()) : 0L;
     if (response != null && response.getStatus() != HttpStatus.UNAUTHORIZED.value()
         && SipCommonUtils.haveSystemCategory(authTicket.getProducts(), categoryId)) {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
