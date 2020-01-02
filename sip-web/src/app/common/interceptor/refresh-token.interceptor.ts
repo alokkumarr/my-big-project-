@@ -16,9 +16,17 @@ import { JwtService, UserService } from '../../common/services';
 
 @Injectable()
 export class RefreshTokenInterceptor implements HttpInterceptor {
-  constructor(private jwt: JwtService,
+  constructor(
+    private jwt: JwtService,
     public user: UserService,
-    public _router: Router) {}
+    public _router: Router
+  ) {}
+
+  logout() {
+    this.jwt.destroy();
+    this._router.navigate(['/#/login']);
+    return throwError(new Error(`Token can't be refreshed`));
+  }
 
   intercept(
     req: HttpRequest<any>,
@@ -29,9 +37,8 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
     // const authReq = req.clone({ headers: req.headers.set('Authorization', `Bearer ${this.jwt.getAccessToken()}`) });
 
     // send the newly created request
-    return next
-      .handle(req)
-      .pipe(catchError((error: HttpErrorResponse, caught) => {
+    return next.handle(req).pipe(
+      catchError((error: HttpErrorResponse, caught) => {
         const errorMessage = get(error, 'error.message', '');
         const refreshRegexp = new RegExp(UserService.refreshTokenEndpoint);
 
@@ -49,45 +56,41 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         if (!refreshRequest) {
           refreshRequest = this.user.refreshAccessToken();
         }
-        return Observable.create(observer => {
-          refreshRequest.then(
-            data => {
+        return new Observable(observer => {
+          refreshRequest
+            .then(() => {
               refreshRequest = null;
-              observer.next(data);
-              observer.complete();
-            },
-            err => {
-              observer.error(err);
-            }
-          );
+              return this.jwt.validateToken();
+            })
+            .then(
+              () => {
+                observer.next(true);
+                observer.complete();
+              },
+              err => {
+                /* If token wasn't refreshed successfully, delete the token and navigate to login */
+                observer.error(new Error('Session expired.'));
+                this.logout();
+              }
+            );
 
           return observer;
         }).pipe(
           flatMap(() => {
-          let state;
-          this.jwt.validateToken()
-          .then((response: any) => {
-            state = true;
-          })
-          .catch((res: any) => {
-            if (res.error.status === '401') {
-              state = false;
+            const token = this.jwt.getTokenObj();
+            if (token && this.jwt.isValid(token)) {
+              const bearer = `Bearer ${this.jwt.getAccessToken()}`;
+              const newRequest: HttpRequest<any> = req.clone({
+                headers: req.headers.set('Authorization', bearer)
+              });
+              return next.handle(newRequest);
+            } else {
+              /* If token wasn't refreshed successfully, delete the token and navigate to login */
+              return this.logout();
             }
-          });
-
-          if (state) {
-            const bearer = `Bearer ${this.jwt.getAccessToken()}`;
-            const newRequest: HttpRequest<any> = req.clone({
-              headers: req.headers.set('Authorization', bearer)
-            });
-            return next.handle(newRequest);
-          } else {
-            /* If token wasn't refreshed successfully, delete the token and navigate to login */
-            this.jwt.destroy();
-            this._router.navigate(['/#/login']);
-            return throwError(new Error(`Token can't be refreshed`));
-          }
-        }));
-      }) as any);
+          })
+        );
+      }) as any
+    );
   }
 }
