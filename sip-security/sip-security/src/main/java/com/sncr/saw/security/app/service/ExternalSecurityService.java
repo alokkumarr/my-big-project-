@@ -124,7 +124,7 @@ public class ExternalSecurityService {
         responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType().toUpperCase()));
         responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
       }
-    } else if (!hasNoRole){
+    } else if (!hasNoRole) {
       response.setValid(false);
       responseRole.setRoleSysId(roleDetails.getRoleSysId());
       responseRole.setRoleName(roleDetails.getRoleName());
@@ -219,23 +219,17 @@ public class ExternalSecurityService {
         .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
         .findAny().get();
 
+    List<String> privilege = subCategoryDetails.getPrivilege();
     // add privilege for the subcategory
     if (subCategoryDetails.getPrivilege() != null && !subCategoryDetails.getPrivilege().isEmpty() && catList.getCategories() != null && subCategoryDetails.isAutoCreate()) {
       if (responseRole.getRoleSysId() > 0) {
-        List<String> privilege = subCategoryDetails.getPrivilege();
         String subCategoryName = subCategoryDetails.getSubCategoryName();
         AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, privilege, subCategoryName);
         if (privilegeDetails.getSubCategoriesPrivilege() != null && privilegeDetails.getSubCategoriesPrivilege().size() > 0) {
           Valid valid = userRepository.upsertPrivilege(privilegeDetails);
           if (valid.getValid()) {
             String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
-            detailsCategory.getSubCategory().forEach(subCat -> {
-              List<Privilege> privilegeList = new ArrayList<>();
-              Privilege privileges = new Privilege();
-              privileges.setPrivilegeDesc(String.join(",", privilege));
-              privilegeList.add(privileges);
-              subCat.setPrivileges(privilegeList);
-            });
+            buildPrivilegesResponse(detailsCategory, privilege);
             response.setMessage(pMessage);
           }
         }
@@ -243,7 +237,19 @@ public class ExternalSecurityService {
         response.getCategoryList().setValid(false);
         response.getCategoryList().setMessage("Privileges can't be added without role Id.");
       }
+    } else if (detailsCategory != null && privilege != null && privilege.size() > 0) {
+      buildPrivilegesResponse(detailsCategory, privilege);
     }
+  }
+
+  private void buildPrivilegesResponse(com.sncr.saw.security.common.bean.external.response.CategoryDetails detailsCategory, List<String> privilege) {
+    detailsCategory.getSubCategory().forEach(subCat -> {
+      List<Privilege> privilegeList = new ArrayList<>();
+      Privilege privileges = new Privilege();
+      privileges.setPrivilegeDesc(String.join(",", privilege));
+      privilegeList.add(privileges);
+      subCat.setPrivileges(privilegeList);
+    });
   }
 
   /**
