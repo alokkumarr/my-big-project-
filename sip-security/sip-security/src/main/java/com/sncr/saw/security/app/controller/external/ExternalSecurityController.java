@@ -5,9 +5,12 @@ import com.sncr.saw.security.app.repository.ProductModuleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.service.ExternalSecurityService;
 import com.sncr.saw.security.common.bean.Role;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.external.response.RoleCatPrivilegeResponse;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
+import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
+import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
@@ -16,13 +19,17 @@ import com.synchronoss.sip.utils.PrivilegeUtils;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +43,7 @@ import java.util.List;
  */
 @Api(value = "The controller provides to perform external admin security operation in synchronoss insight platform ")
 @RestController
-@RequestMapping("/sip-security/auth/external")
+@RequestMapping("/sip-security/auth/admin/v1")
 public class ExternalSecurityController {
 
   @Autowired
@@ -45,6 +52,8 @@ public class ExternalSecurityController {
   private UserRepository userRepository;
   @Autowired
   private ProductModuleRepository productModuleRepository;
+
+  private static final Logger logger = LoggerFactory.getLogger(ExternalSecurityController.class);
 
   @ApiOperation(value = "Create all the Role-Category-Privileges list", nickname = "createRoleCategoryPrivilege", notes = "",
       response = RoleCatPrivilegeResponse.class)
@@ -261,5 +270,73 @@ public class ExternalSecurityController {
 
     response = securityService.fetchRoleCategoryPrivilege(request, productName, moduleName, moduleDetails, customerSysId);
     return response;
+  }
+
+  /**
+   * Create user with dsk.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param userDetails UserDetails
+   * @return Returns UserDetailsResponse
+   */
+  @ApiOperation(
+      value = " create User API ",
+      nickname = "CreateUserWithDsk",
+      notes = "Admin can only use this API to create the user",
+      response = UserDetailsResponse.class)
+  @RequestMapping(
+      value = "/users/create",
+      method = RequestMethod.POST)
+  @ResponseBody
+  public UserDetailsResponse createUser(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @ApiParam(value = "User details to store", required = true) @RequestBody
+          UserDetails userDetails) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    RoleType roleType = ticket.getRoleType();
+    String masterLoginId = ticket.getMasterLoginId();
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+    if (roleType!=RoleType.ADMIN) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      logger.error("user is not admin");
+      userDetailsResponse.setValidityMessage("You are not authorized to perform this operation");
+      return userDetailsResponse;
+    }
+    Long customerId = Long.valueOf(ticket.getCustID());
+    return securityService.addUserDetails(userDetails, masterLoginId, customerId, response);
+  }
+
+  /**
+   * gets all users.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @return Returns UsersDetailsList
+   */
+  @ApiOperation(
+      value = " Fetch Users API ",
+      nickname = "FetchUsers",
+      notes = "Admin can only use this API to fetch the users",
+      response = UsersDetailsList.class)
+  @RequestMapping(
+      value = "/users/fetch",
+      method = RequestMethod.GET)
+  public UsersDetailsList getUserList(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    RoleType roleType = ticket.getRoleType();
+    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+    if (roleType!=RoleType.ADMIN) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      usersDetailsListResponse.setValid(false);
+      usersDetailsListResponse.setValidityMessage(
+          "You are not authorized to perform this operation");
+      logger.error("user is not admin");
+      return usersDetailsListResponse;
+    }
+    Long customerId = Long.valueOf(ticket.getCustID());
+    return securityService.getUsersDetailList(customerId);
   }
 }
