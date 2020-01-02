@@ -101,17 +101,28 @@ export class UserService {
         Authorization: `Bearer ${token}`
       })
     };
-    return this._http
-      .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
-      .toPromise()
-      .then(() => {
-        this._jwtService.destroy();
-        this.store.dispatch(new CommonResetStateOnLogout());
-        if (path === 'logout') {
-          // TODO do something here for logout
-          // this._state.reload();
-        }
-      });
+
+    return new Promise((resolve, reject) => {
+      this._http
+        .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
+        .toPromise()
+        .then(
+          () => {
+            this._jwtService.destroy();
+            this.store.dispatch(new CommonResetStateOnLogout());
+            if (path === 'logout') {
+              // TODO do something here for logout
+              // this._state.reload();
+            }
+            resolve();
+          },
+          () => {
+            this._jwtService.destroy();
+            this.store.dispatch(new CommonResetStateOnLogout());
+            resolve();
+          }
+        );
+    });
   }
 
   changePwd(credentials) {
