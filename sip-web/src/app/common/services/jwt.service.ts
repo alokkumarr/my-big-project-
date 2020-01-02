@@ -5,12 +5,17 @@ import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 import * as lowerCase from 'lodash/lowerCase';
+import * as toUpper from 'lodash/toUpper';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPipe from 'lodash/fp/pipe';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
 } from '../consts';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -34,6 +39,11 @@ export const CUSTOM_JWT_CONFIG = {
 
 @Injectable()
 export class JwtService {
+
+  constructor(
+    public _http: HttpClient
+  ) {}
+
   _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
 
   set(accessToken, refreshToken) {
@@ -149,6 +159,24 @@ export class JwtService {
     return get(token, 'ticket.custCode', 'Synchronoss');
   }
 
+  get customerId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.custID', '');
+  }
+
+  get productId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.defaultProdID', '');
+  }
+
   isValid(token) {
     return (
       get(token, 'ticket.valid', false) &&
@@ -243,33 +271,59 @@ export class JwtService {
 
     const code = this.getCode(opts, targetModule);
 
-    /* prettier-ignore */
-    switch (name) {
-    case 'ACCESS':
-      return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
-    case 'CREATE':
-      return this._isSet(code, PRIVILEGE_INDEX.CREATE);
-    case 'EXECUTE':
-      return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
-    case 'PUBLISH':
-      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
-    case 'SCHEDULE':
-      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
-    case 'FORK':
-      return this._isSet(code, PRIVILEGE_INDEX.FORK);
-    case 'EDIT':
-      return (
-        this._isSet(code, PRIVILEGE_INDEX.EDIT)
-      );
-    case 'EXPORT':
-      return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
-    case 'DELETE':
-      return (
-        this._isSet(code, PRIVILEGE_INDEX.DELETE)
-      );
-    default:
-      return false;
+    return this.isPrivilegeSet(name, code);
+  }
+
+  hasPrivilegeForDraftsFolder(privilege) {
+    const token = this.getTokenObj();
+    const modules = get(token, 'ticket.products[0].productModules');
+    const analyzeModule = find(
+      modules,
+      ({ productModName }) => productModName === 'ANALYZE'
+    );
+    const features = analyzeModule ? analyzeModule.prodModFeature : [];
+    const myAnallysisFolder = find(
+      features,
+      ({ prodModFeatureName }) => prodModFeatureName === 'My Analysis'
+    );
+    const subFeatures = myAnallysisFolder
+      ? myAnallysisFolder.productModuleSubFeatures
+      : [];
+    const draftsFolder = find(
+      subFeatures,
+      ({ prodModFeatureName }) => toUpper(prodModFeatureName) === 'DRAFTS'
+    );
+    if (draftsFolder) {
+      const code = draftsFolder.privilegeCode;
+      return this.isPrivilegeSet(privilege, code);
     }
+    return false;
+  }
+
+  isPrivilegeSet(privilege, code) {
+    /* prettier-ignore */
+    switch (privilege) {
+      case 'ACCESS':
+        return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
+      case 'CREATE':
+        return this._isSet(code, PRIVILEGE_INDEX.CREATE);
+      case 'EXECUTE':
+        return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
+      case 'PUBLISH':
+        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+      case 'SCHEDULE':
+        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+      case 'FORK':
+        return this._isSet(code, PRIVILEGE_INDEX.FORK);
+      case 'EDIT':
+        return this._isSet(code, PRIVILEGE_INDEX.EDIT);
+      case 'EXPORT':
+        return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
+      case 'DELETE':
+        return this._isSet(code, PRIVILEGE_INDEX.DELETE);
+      default:
+        return false;
+      }
     /* eslint-enable */
   }
 
@@ -302,5 +356,32 @@ export class JwtService {
     }
     // No privilege
     return 0;
+  }
+
+  validateToken() {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.get()}`
+      })
+    };
+
+    return this._http
+    .post(AppConfig.login.url + '/auth/validateToken', httpOptions).toPromise()
+    .then(res => {
+      return res;
+    });
+  }
+
+  fetchCategoryDetails(categoryId) {
+    const token = this.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    return fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID) == parseInt(categoryId)
+      })
+    )(product.productModules);
   }
 }

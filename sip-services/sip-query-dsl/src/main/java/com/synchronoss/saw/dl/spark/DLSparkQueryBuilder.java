@@ -52,9 +52,12 @@ public class DLSparkQueryBuilder {
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String finalSelect = String.join(", ", selectList);
     select = select.concat(finalSelect);
-    select =
-        select.concat(
-            " FROM " + buildFrom(sipQuery) + buildFilter(sipQuery.getFilters()) + buildGroupBy());
+    select = select.concat(" FROM " + buildFrom(sipQuery));
+    String filter = buildFilter(sipQuery.getFilters());
+    if (filter != null && !StringUtils.isEmpty(filter)) {
+      select = select.concat(" WHERE (").concat(filter).concat(")");
+    }
+    select = select.concat(buildGroupBy());
 
     return select.concat(
         buildSort(sipQuery.getSorts()).trim().isEmpty() == true
@@ -228,12 +231,6 @@ public class DLSparkQueryBuilder {
         }
       }
     }
-    String firstFilter = null;
-    if (whereFilters.size() != 0) {
-      firstFilter = whereFilters.get(0);
-      whereFilters.remove(0);
-      whereFilters.add(0, " WHERE " + firstFilter);
-    }
     return StringUtils.join(whereFilters, " " + booleanCriteria.value() + " ");
   }
 
@@ -250,13 +247,12 @@ public class DLSparkQueryBuilder {
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
     String selectWithJoin = String.join(", ", selectList);
     select = select.concat(selectWithJoin);
-    select =
-        select.concat(
-            " FROM "
-                + buildFrom(sipQuery)
-                + buildFilter(sipQuery.getFilters())
-                + queryDskBuilder(dataSecurityKey, sipQuery)
-                + buildGroupBy());
+    select = select.concat(" FROM " + buildFrom(sipQuery));
+    String filter = buildFilter(sipQuery.getFilters());
+    if (filter != null && !StringUtils.isEmpty(filter)) {
+      select = select.concat(" WHERE (").concat(filter).concat(")");
+    }
+    select = select.concat(queryDskBuilder(dataSecurityKey, sipQuery) + buildGroupBy());
 
     return select.concat(
         buildSort(sipQuery.getSorts()).trim().isEmpty() == true

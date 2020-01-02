@@ -81,15 +81,15 @@ export class ExecutedPivotViewComponent {
         /* Find out if this column has been selected in row, column or data area */
         const isRow = find(
           row,
-          c => c.columnName === artifactColumn.columnName
+          c => c.columnName === artifactColumn.columnName && c.area === artifactColumn.area
         );
         const isColumn = find(
           column,
-          c => c.columnName === artifactColumn.columnName
+          c => c.columnName === artifactColumn.columnName && c.area === artifactColumn.area
         );
         const isData = find(
           data,
-          c => c.columnName === artifactColumn.columnName
+          c => c.columnName === artifactColumn.columnName && c.area === artifactColumn.area
         );
         const tableName =
           artifactColumn.table ||
@@ -117,7 +117,6 @@ export class ExecutedPivotViewComponent {
             areaIndex: null
           };
         }
-
         /* Otherwise, update area related fields accordingly */
         if (isRow) {
           return {

@@ -2,6 +2,7 @@ package com.synchronoss.saw.analysis.service;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.modal.AnalysisPrivileges;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

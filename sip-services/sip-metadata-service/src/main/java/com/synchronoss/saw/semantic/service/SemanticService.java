@@ -10,6 +10,7 @@ import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 
 public interface SemanticService {
@@ -36,6 +37,12 @@ public interface SemanticService {
   BackCompatibleStructure list(SemanticNode node, Map<String, String> headers)
       throws SipJsonValidationException, SipReadEntityException;
 
+  Boolean addDskToSipSecurity(SemanticNode node, HttpServletRequest request);
+
+  Boolean updateDskInSipSecurity(SemanticNode node, HttpServletRequest request);
+
+  Boolean deleteDskInSipSecurity(String semanticId, HttpServletRequest request);
+
   /**
    * This is the method which generates Id & will be used in CRUD operation.
    *
@@ -49,5 +56,4 @@ public interface SemanticService {
     }
     return id;
   }
-
 }

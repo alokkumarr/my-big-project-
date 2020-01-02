@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { isUnique } from 'src/app/common/validators';
 import * as isNil from 'lodash/isNil';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { DatasourceService } from 'src/app/modules/workbench/services/datasource.service';
 import {
   DetailForm,
@@ -9,6 +10,7 @@ import {
   HTTP_METHODS,
   APIChannelMetadata
 } from 'src/app/modules/workbench/models/workbench.interface';
+import { HttpMetadataComponent } from '../http-metadata/http-metadata.component';
 
 @Component({
   selector: 'api-source',
@@ -37,6 +39,13 @@ export class ApiSourceComponent implements OnInit, DetailForm {
     this.createForm();
 
     if (isNil(this.channelData.length)) {
+      const {
+        provisionalHeaders,
+        headers
+      } = HttpMetadataComponent.getInitialProvisionalHeaders(
+        this.channelData.headerParameters
+      );
+      this.channelData.headerParameters = headers;
       this.patchFormArray(
         this.channelData.headerParameters || [],
         'headerParameters'
@@ -45,6 +54,8 @@ export class ApiSourceComponent implements OnInit, DetailForm {
         this.channelData.queryParameters || [],
         'queryParameters'
       );
+
+      this.patchFormArray(provisionalHeaders, 'provisionalHeaders');
 
       this.detailsFormGroup.patchValue(this.channelData);
     }
@@ -91,13 +102,19 @@ export class ApiSourceComponent implements OnInit, DetailForm {
         content: ['']
       }),
       headerParameters: this.formBuilder.array([]),
+      provisionalHeaders: this.formBuilder.array([]),
       queryParameters: this.formBuilder.array([]),
       urlParameters: this.formBuilder.array([])
     });
   }
 
   get value(): APIChannelMetadata {
-    return this.detailsFormGroup.value;
+    const formValue = cloneDeep(this.detailsFormGroup.value);
+    formValue.headerParameters = formValue.headerParameters.concat(
+      cloneDeep(formValue.provisionalHeaders)
+    );
+    delete formValue.provisionalHeaders;
+    return formValue;
   }
 
   get valid(): boolean {
