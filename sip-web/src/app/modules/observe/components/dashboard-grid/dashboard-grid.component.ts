@@ -339,7 +339,7 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (this.tileType(tile) !== 'analysis') {
+      if (this.tileType(tile) !== 'analysis' || !tile.analysis) {
         return;
       }
 
