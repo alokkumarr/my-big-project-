@@ -7,7 +7,6 @@ import static sncr.xdf.rtps.driver.EventProcessingApplicationDriver.DM_COUNTLY;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,23 +20,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.VoidFunction2;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
@@ -45,9 +40,8 @@ import org.apache.spark.streaming.kafka010.CanCommitOffsets;
 import org.apache.spark.streaming.kafka010.HasOffsetRanges;
 import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+
 
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -88,6 +82,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     private InternalContext itcx;
     private NGContext ngctx ;
     private static final Integer DEFAULT_THREAD_CNT = 10;
+    private static final String fileNamePrefix = "part";
     
     private Map<String, StructType> schemaFields = new HashMap<String, StructType>();
 
@@ -261,6 +256,8 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
             Date batchDt = new Date(tm.milliseconds());
+            
+            
             String batchName = batchPrefix + sdf.format(batchDt);
             String path = basePath  + File.separator + batchName ;
             String strTmpPath = basePath + File.separator + "__TMP-" + 
@@ -275,7 +272,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 				logger.error(e.getLocalizedMessage());
 			}
             // Rename and cleanup
-            finalizeBatch(strTmpPath, path);
+            finalizeBatch(strTmpPath, path, true);
             
         }
     }
@@ -509,7 +506,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 							logger.error("Invalid output type :" + outputType);
 						}
 						// Done with writing - safe to rename batch directory
-						finalizeBatch(strTmpPath, path);
+						finalizeBatch(strTmpPath, path, false);
 						logger.debug("Writing to datalake compled");
 					} else {
 						logger.debug("base path not found or empty. Hence not writing to data lake");
@@ -536,7 +533,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 }
     
 
-    private int finalizeBatch(String strTmpPath, String finalPath){
+    private int finalizeBatch(String strTmpPath, String finalPath, boolean isSimple){
         // Done with writing - safe to rename batch directory
         try {
             String defaultFS = "maprfs:///";
@@ -555,10 +552,37 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                     fs.delete(pathToDelete, true);
                 }
             }*/
-            // Results are ready - make it final
-            // !!!!!!!!!!!Should use another technique for rename
+            // !!!!!!!!!!!Should use another technique for renameh
             logger.debug("renaming "+ tmpPath + " to "+ finalPath);
             fs.rename(tmpPath, new Path(finalPath));
+            logger.debug("Is simple??"+ isSimple);
+            /**
+             * Simple scenario's no suffix such as UUID
+             * is not added. Hence renaming file to maintian
+             * uniqueness with timestamp as suffix
+             */
+            if(isSimple ) {
+            	FileStatus[] files = fs.globStatus(new Path(finalPath+ 
+            			Path.SEPARATOR + fileNamePrefix+ "*"));
+            	 String timeStamp = "";
+            	 SimpleDateFormat suffixFmt = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
+            	 Date date = new Date();
+            	
+            	
+            	 for(FileStatus fileStatus: files) {
+            		 logger.debug("******** part file name renaming for simple.... ********"+ fileStatus.getPath().getName());
+            		 
+            		 
+            		fs.rename(new Path(finalPath+ Path.SEPARATOR + fileStatus.getPath().getName()), new Path(finalPath+ 
+                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffixFmt.format(date)));
+            		
+            		logger.info("******** rename completed ********");
+            	}
+            	
+            	
+               
+                
+            }
         } catch (Exception e) {
         	logger.error(e.getLocalizedMessage());
         }
