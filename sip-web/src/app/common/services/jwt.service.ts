@@ -39,10 +39,7 @@ export const CUSTOM_JWT_CONFIG = {
 
 @Injectable()
 export class JwtService {
-
-  constructor(
-    public _http: HttpClient
-  ) {}
+  constructor(public _http: HttpClient) {}
 
   _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
 
@@ -84,6 +81,17 @@ export class JwtService {
 
   getRefreshToken() {
     return window.localStorage[this._refreshTokenKey];
+  }
+
+  get refreshTokenObject() {
+    const rToken = this.getRefreshToken();
+
+    if (!rToken) {
+      return null;
+    }
+    const parsedJwt = this.parseJWT(rToken);
+
+    return parsedJwt;
   }
 
   validity() {
@@ -367,10 +375,8 @@ export class JwtService {
     };
 
     return this._http
-    .post(AppConfig.login.url + '/auth/validateToken', httpOptions).toPromise()
-    .then(res => {
-      return res;
-    });
+      .post(AppConfig.login.url + '/auth/validateToken', httpOptions)
+      .toPromise();
   }
 
   fetchCategoryDetails(categoryId) {
@@ -380,7 +386,7 @@ export class JwtService {
       fpFlatMap(module => module.prodModFeature),
       fpFlatMap(subModule => subModule.productModuleSubFeatures),
       fpFilter(({ prodModFeatureID }) => {
-        return parseInt(prodModFeatureID) == parseInt(categoryId)
+        return parseInt(prodModFeatureID) == parseInt(categoryId);
       })
     )(product.productModules);
   }

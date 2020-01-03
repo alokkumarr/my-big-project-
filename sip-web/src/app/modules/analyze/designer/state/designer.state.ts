@@ -674,7 +674,6 @@ export class DesignerState {
       adapterIndex
     }: DesignerAddColumnToGroupAdapter
   ) {
-
     const groupAdapters = getState().groupAdapters;
     const analysis = getState().analysis;
     const adapter = groupAdapters[adapterIndex];
@@ -711,13 +710,19 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
+    if (analysis.type === 'map' && artifactColumn.expression) {
+      /* For some reason aggregate is getting addded for derived metric only for maps.
+      Quick fix but need to evaluate root cause. This is seen even in
+      previous version */
+      delete artifactColumn.aggregate;
+    }
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
     const fillMissingDataWithZeros =
       analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* If analysis is chart and this is a date field, assign a default
-      groupInterval. For pivots, use dateInterval if available */
+      groupInterval. For pivots, use dateInterval if available .*/
     const groupInterval = { groupInterval: null };
 
     if (artifactColumn.type === 'date') {
@@ -735,7 +740,6 @@ export class DesignerState {
           break;
       }
     }
-
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
 
