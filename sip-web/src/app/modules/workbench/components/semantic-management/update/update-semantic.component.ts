@@ -114,6 +114,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
 
   /**
    * Construct semantic layer field object structure.
+   * When user does not include a column and update datapod, later point of time, same datapod
+   * is updated then filterEligible is selected automatically for not included column.
+   * So changing default value of filterEligible to false
    *
    * @param {*} dsData
    * @returns
@@ -127,7 +130,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         alias: value.name,
         columnName: colName,
         displayName: value.name,
-        filterEligible: true,
+        filterEligible: false,
         joinEligible: false,
         kpiEligible: false,
         dskEligible: false,
@@ -200,20 +203,49 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   /**
    *
    * @param e
-   * Disable checkbox of non numeric and date type fields in KPI Eligible column.
-   * Added as part of SIP-9373
+   * Disable checkbox of non numeric and date type fields in KPI Eligible column. Added as part of SIP-9373.
+   *
+   * When Include checkbox is not selected for a column then
+   * uncheck and disable filterEligible, kpiEligible and dskEligible for same column.
+   * Also when Include column is checked then enable all the checkboxes
+   * for all the eligible columns based on requirement of SIP-9373.
+   * Added as part of SIP-9566
    */
   cellPrepared(e) {
-    if (e.rowType === 'data' && e.column.dataField === 'kpiEligible') {
-      if (
-        (!NUMBER_TYPES.includes(e.data.type) &&
-          !DATE_TYPES.includes(e.data.type)) ||
-        !this.isDateTypeMatched
-      ) {
-        CheckBox.getInstance(
-          e.cellElement.querySelector('.dx-checkbox')
-        ).option('disabled', true);
+    if (
+      e.rowType === 'data' &&
+      (e.column.dataField === 'kpiEligible' ||
+        e.column.dataField === 'filterEligible' ||
+        e.column.dataField === 'dskEligible')
+    ) {
+      const check =
+        !e.row.cells[0].value ||
+        ((e.column.dataField === 'kpiEligible' &&
+          (!NUMBER_TYPES.includes(e.data.type) &&
+            !DATE_TYPES.includes(e.data.type))) ||
+          !this.isDateTypeMatched);
+
+      CheckBox.getInstance(e.cellElement.querySelector('.dx-checkbox')).option(
+        'disabled',
+        check
+      );
+    }
+  }
+
+  cellClicked(e) {
+    if (e.rowType === 'data' && e.column.dataField === 'include') {
+      const { columns } = this.selectedDPData[0];
+      const matchedCol = find(columns, {
+        alias: e.data.alias
+      });
+      if (matchedCol && !matchedCol.include) {
+        set(matchedCol, 'filterEligible', false);
+        set(matchedCol, 'dskEligible', false);
+        set(matchedCol, 'kpiEligible', false);
+      } else {
+        set(matchedCol, 'filterEligible', true);
       }
     }
+    return;
   }
 }

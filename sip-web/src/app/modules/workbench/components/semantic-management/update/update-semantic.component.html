@@ -87,6 +87,7 @@
               [rowAlternationEnabled]="true"
               [showColumnLines]="false"
               style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
+              (onCellClick)="cellClicked($event)"
               (onCellPrepared)="cellPrepared($event)"
             >
               <dxo-editing mode="cell" [allowUpdating]="true"> </dxo-editing>
