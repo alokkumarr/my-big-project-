@@ -1,26 +1,35 @@
 package com.sncr.saw.security.app.service;
 
+import com.google.common.base.Preconditions;
 import com.sncr.saw.security.app.repository.ModulePrivilegeRepository;
 import com.sncr.saw.security.app.repository.RoleRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.external.request.RoleCategoryPrivilege;
 import com.sncr.saw.security.common.bean.external.response.*;
 import com.sncr.saw.security.common.bean.repo.ModulePrivileges;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
+import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
+import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryWithPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
+import com.sncr.saw.security.common.constants.ErrorMessages;
+import com.sncr.saw.security.common.util.PasswordValidation;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.sip.utils.PrivilegeUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -53,6 +62,12 @@ public class ExternalSecurityService {
 
   private boolean haveCategoryCheck = false;
   private boolean haveSubCategoryFlag = false;
+
+  private static final String namePattern = "^[a-zA-Z]*$";
+  private static final String loginIdPattern =
+      "^[A-z\\d_@.#$=!%^)(\\]:\\*;\\?\\/\\,}{'\\|<>\\[&\\+-`~]*$";
+  private static final String emailPattern =
+      "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
 
   /**
    * Create Role , Category, Subcategory and Privilege
@@ -124,7 +139,7 @@ public class ExternalSecurityService {
         responseRole.setRoleType(RoleType.valueOf(inputRole.getRoleType().toUpperCase()));
         responseRole.setMessage("Role already exist in the system for Customer Product Module Combination.");
       }
-    } else if (!hasNoRole){
+    } else if (!hasNoRole) {
       response.setValid(false);
       responseRole.setRoleSysId(roleDetails.getRoleSysId());
       responseRole.setRoleName(roleDetails.getRoleName());
@@ -146,90 +161,110 @@ public class ExternalSecurityService {
     List<CategoryDetails> categoryPrivilegeLis = roleCategoryPrivilege.getCategories();
     if (categoryPrivilegeLis != null && !categoryPrivilegeLis.isEmpty()) {
       for (CategoryDetails category : categoryPrivilegeLis) {
+        CategoryDetails categoryDetails = buildCategoryBean(customerId, category, null);
+        categoryDetails.setProductId(moduleDetails.getProductId());
+        categoryDetails.setModuleId(moduleDetails.getModuleId());
+        categoryDetails.setMasterLoginId(masterLoginId);
+
         if (category.isAutoCreate()) {
-          CategoryDetails categoryDetails = buildCategoryBean(customerId, category, null);
-          categoryDetails.setProductId(moduleDetails.getProductId());
-          categoryDetails.setModuleId(moduleDetails.getModuleId());
-          categoryDetails.setMasterLoginId(masterLoginId);
-          // add category
-          addCategory(catList, categoryDetails, roleCategoryPrivilege, response);
-          response.setCategoryList(catList);
-
-          if (catList.getValid() || haveCategoryCheck) {
-            List<SubCategoryDetails> subCategories = category.getSubCategories();
-            if (subCategories != null && !subCategories.isEmpty()) {
-              for (SubCategoryDetails subCategoryDetails : subCategories) {
-                boolean validPrivileges = subCategoryDetails.getPrivilege().stream().allMatch(s -> PrivilegeUtils.validPrivilege(s));
-                if (subCategoryDetails.isAutoCreate() && validPrivileges) {
-                  CategoryDetails details = buildCategoryBean(customerId, null, subCategoryDetails);
-                  details.setProductId(moduleDetails.getProductId());
-                  details.setModuleId(moduleDetails.getModuleId());
-                  details.setMasterLoginId(masterLoginId);
-                  List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> categoryList = catList.getCategories() != null
-                      ? catList.getCategories() : null;
-                  String categoryCode = categoryList != null && categoryList.size() > 0 ? categoryList.stream().filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
-                      .findAny().get().getCategoryCode() : moduleDetails.getCustomerCode();
-                  details.setCategoryCode(categoryCode);
-
-                  // add sub categories
-                  boolean checkSubCategory = userRepository.checkSubCatExists(details);
-                  if (!checkSubCategory) {
-                    details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
-                    addSubCategory(catList, details, roleCategoryPrivilege, response);
-                    response.setCategoryList(catList);
-
-                    // add privilege for the subcategory
-                    if (subCategoryDetails.getPrivilege() != null && !subCategoryDetails.getPrivilege().isEmpty() && catList.getCategories() != null) {
-                      com.sncr.saw.security.common.bean.external.response.CategoryDetails detailsCategory = catList.getCategories().stream()
-                          .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
-                          .findAny().get();
-
-                      if (responseRole.getRoleSysId() > 0) {
-                        List<String> privilege = subCategoryDetails.getPrivilege();
-                        String subCategoryName = subCategoryDetails.getSubCategoryName();
-                        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, privilege, subCategoryName);
-                        if (privilegeDetails.getSubCategoriesPrivilege() != null && privilegeDetails.getSubCategoriesPrivilege().size() > 0) {
-                          Valid valid = userRepository.upsertPrivilege(privilegeDetails);
-                          if (valid.getValid()) {
-                            String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
-                            detailsCategory.getSubCategory().forEach(subCat -> {
-                              List<Privilege> privilegeList = new ArrayList<>();
-                              Privilege privileges = new Privilege();
-                              privileges.setPrivilegeDesc(String.join(",", privilege));
-                              privilegeList.add(privileges);
-                              subCat.setPrivileges(privilegeList);
-                            });
-                            response.setMessage(pMessage);
-                          }
-                        }
-                      } else {
-                        response.getCategoryList().setValid(false);
-                        response.getCategoryList().setMessage("Privileges can't be added without role Id.");
-                      }
-                    }
-                  } else {
-                    buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false, false);
-                    response.setCategoryList(catList);
-                  }
-                } else {
-                  if (!subCategoryDetails.isAutoCreate()) {
-                    buildMessage(catList, "Sub categories can't be add/fetch for flag false.", false, true);
-                  } else if (!validPrivileges) {
-                    buildMessage(catList, "Please provide the correct privileges for subcategory.", false, true);
-                  }
-                  response.setCategoryList(catList);
-                }
-              }
-            }
-          }
+          buildCategorySubCategory(roleCategoryPrivilege, masterLoginId, moduleDetails, response, customerId, responseRole, catList, category, categoryDetails);
+        } else if (!category.isAutoCreate() && userRepository.checkCatExists(categoryDetails)) {
+          buildCategorySubCategory(roleCategoryPrivilege, masterLoginId, moduleDetails, response, customerId, responseRole, catList, category, categoryDetails);
         } else {
-          buildMessage(catList, "Categories can't be add/fetch for flag false.", true, false);
+          buildMessage(catList, "Categories does not exist for flag false.", true, false);
           response.setCategoryList(catList);
         }
       }
     }
     logger.trace("Role , category, privilege Response : {}", response.toString());
     return response;
+  }
+
+  private void buildCategorySubCategory(RoleCategoryPrivilege roleCategoryPrivilege, String masterLoginId, ProductModuleDetails moduleDetails, RoleCatPrivilegeResponse response, Long customerId, Role responseRole, CategoryList catList, CategoryDetails category, CategoryDetails categoryDetails) {
+    // build category
+    buildCategory(catList, categoryDetails, roleCategoryPrivilege, response);
+    response.setCategoryList(catList);
+
+    if (catList.getValid() || haveCategoryCheck) {
+      List<SubCategoryDetails> subCategories = category.getSubCategories();
+      if (subCategories != null && !subCategories.isEmpty()) {
+        for (SubCategoryDetails subCategoryDetails : subCategories) {
+          boolean validPrivileges = subCategoryDetails.getPrivilege().stream().allMatch(s -> PrivilegeUtils.validPrivilege(s));
+          CategoryDetails details = buildCategoryBean(customerId, null, subCategoryDetails);
+          details.setProductId(moduleDetails.getProductId());
+          details.setModuleId(moduleDetails.getModuleId());
+          details.setMasterLoginId(masterLoginId);
+          List<com.sncr.saw.security.common.bean.external.response.CategoryDetails> categoryList = catList.getCategories() != null
+              ? catList.getCategories() : null;
+          String categoryCode = categoryList != null && categoryList.size() > 0 ? categoryList.stream().filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
+              .findAny().get().getCategoryCode() : moduleDetails.getCustomerCode();
+          details.setCategoryCode(categoryCode);
+
+          // add sub categories
+          boolean checkSubCategory = userRepository.checkSubCatExists(details);
+
+          if (subCategoryDetails.isAutoCreate() && validPrivileges) {
+            if (!checkSubCategory) {
+              buildSubcategories(roleCategoryPrivilege, masterLoginId, response, responseRole, catList, category, subCategoryDetails, details);
+            } else {
+              buildMessage(catList, "Sub Category Name already exists for this Customer Product Module Combination.", false, false);
+              response.setCategoryList(catList);
+            }
+          } else {
+            if (!subCategoryDetails.isAutoCreate() && checkSubCategory) {
+              buildSubcategories(roleCategoryPrivilege, masterLoginId, response, responseRole, catList, category, subCategoryDetails, details);
+            } else if (!validPrivileges) {
+              buildMessage(catList, "Please provide the correct privileges for subcategory.", false, true);
+            } else {
+              buildMessage(catList, "Subcategories does not exist for flag false.", false, true);
+            }
+            response.setCategoryList(catList);
+          }
+        }
+      }
+    }
+  }
+
+  private void buildSubcategories(RoleCategoryPrivilege roleCategoryPrivilege, String masterLoginId, RoleCatPrivilegeResponse response, Role responseRole, CategoryList catList, CategoryDetails category, SubCategoryDetails subCategoryDetails, CategoryDetails details) {
+    details.setSubCategoryInd(subCategoryDetails.isAutoCreate());
+    addSubCategory(catList, details, roleCategoryPrivilege, response);
+    response.setCategoryList(catList);
+
+    com.sncr.saw.security.common.bean.external.response.CategoryDetails detailsCategory = catList.getCategories().stream()
+        .filter(cat -> category.getCategoryName().equalsIgnoreCase(cat.getCategoryName()))
+        .findAny().get();
+
+    List<String> privilege = subCategoryDetails.getPrivilege();
+    // add privilege for the subcategory
+    if (subCategoryDetails.getPrivilege() != null && !subCategoryDetails.getPrivilege().isEmpty() && catList.getCategories() != null && subCategoryDetails.isAutoCreate()) {
+      if (responseRole.getRoleSysId() > 0) {
+        String subCategoryName = subCategoryDetails.getSubCategoryName();
+        AddPrivilegeDetails privilegeDetails = buildPrivilegeBean(masterLoginId, response, responseRole.getRoleSysId(), detailsCategory, privilege, subCategoryName);
+        if (privilegeDetails.getSubCategoriesPrivilege() != null && privilegeDetails.getSubCategoriesPrivilege().size() > 0) {
+          Valid valid = userRepository.upsertPrivilege(privilegeDetails);
+          if (valid.getValid()) {
+            String pMessage = "Privileges added/fetched for sub category: " + String.join(",", privilege);
+            buildPrivilegesResponse(detailsCategory, privilege);
+            response.setMessage(pMessage);
+          }
+        }
+      } else {
+        response.getCategoryList().setValid(false);
+        response.getCategoryList().setMessage("Privileges can't be added without role Id.");
+      }
+    } else if (detailsCategory != null && privilege != null && privilege.size() > 0) {
+      buildPrivilegesResponse(detailsCategory, privilege);
+    }
+  }
+
+  private void buildPrivilegesResponse(com.sncr.saw.security.common.bean.external.response.CategoryDetails detailsCategory, List<String> privilege) {
+    detailsCategory.getSubCategory().forEach(subCat -> {
+      List<Privilege> privilegeList = new ArrayList<>();
+      Privilege privileges = new Privilege();
+      privileges.setPrivilegeDesc(String.join(",", privilege));
+      privilegeList.add(privileges);
+      subCat.setPrivileges(privilegeList);
+    });
   }
 
   /**
@@ -240,7 +275,7 @@ public class ExternalSecurityService {
    * @param request
    * @param response
    */
-  private void addCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
+  private void buildCategory(CategoryList catList, CategoryDetails categoryDetails, RoleCategoryPrivilege request, RoleCatPrivilegeResponse response) {
     try {
       if (categoryDetails != null) {
         if (!userRepository.checkIsModulePresent(categoryDetails.getModuleId(), "ALERTS")) {
@@ -250,7 +285,8 @@ public class ExternalSecurityService {
             addCategorySubcategory(catList, categoryDetails, request, response, true, false);
           } else {
             buildCategoryResponse(catList, categoryDetails, request, response);
-            buildMessage(catList, "Category Name already exists for this Customer Product Module Combination.", false, false);
+            buildMessage(catList, "Category Name already exists for this Customer Product Module Combination.", false, categoryDetails.isSubCategoryInd());
+            catList.setValid(true);
           }
         } else {
           buildMessage(catList, "Adding Categories and Sub Categories for Alert Module is not allowed.", false, false);
@@ -699,5 +735,207 @@ public class ExternalSecurityService {
       haveValidPrivileges = false;
     }
     return haveValidPrivileges;
+  }
+
+  /**
+   * Create user with dsk.
+   *
+   * @param userDetails UserDetails
+   * @param masterLoginId masterLoginId
+   * @param loginCustomerId
+   * @param response HttpServletResponse
+   * @return Returns UserDetailsResponse
+   */
+  public UserDetailsResponse addUserDetails(
+      UserDetails userDetails,
+      String masterLoginId,
+      Long loginCustomerId,
+      HttpServletResponse response) {
+    logger.trace("User details body :{}", userDetails);
+    validateUserDetails(userDetails);
+    UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+    if (!userDetails.getFirstName().matches(namePattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "FirstName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "FirstName"));
+      return userDetailsResponse;
+    }
+    if (!userDetails.getLastName().matches(namePattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "LastName"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "LastName"));
+      return userDetailsResponse;
+    }
+    String middleName = userDetails.getMiddleName();
+    if (middleName != null) {
+      if (!middleName.matches(namePattern)) {
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage(
+            String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        logger.debug(String.format(ErrorMessages.invalidMessage, "MiddleName"));
+        return userDetailsResponse;
+      }
+    }
+    if (!userDetails.getMasterLoginId().matches(loginIdPattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "MasterLoginId"));
+      return userDetailsResponse;
+    }
+
+    if (!userDetails.getEmail().matches(emailPattern)) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(String.format(ErrorMessages.invalidMessage, "Email"));
+      logger.debug(String.format(ErrorMessages.invalidMessage, "Email"));
+      return userDetailsResponse;
+    }
+    Long customerSysId = userRepository.getCustomerSysid(userDetails.getCustomerCode());
+    if (customerSysId == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
+      logger.debug(String.format(ErrorMessages.notExistErrorMessage, "customerCode"));
+      return userDetailsResponse;
+    }
+    if (customerSysId != loginCustomerId) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.unAuthorizedMessage);
+      logger.debug(ErrorMessages.unAuthorizedMessage, "Email");
+      return userDetailsResponse;
+    }
+    String securityGroupName = userDetails.getSecurityGroupName();
+    Long groupSysId = null;
+    if (securityGroupName != null) {
+      groupSysId = userRepository.getSecurityGroupSysid(securityGroupName, customerSysId);
+      if (groupSysId == null) {
+        userDetailsResponse.setValid(false);
+        userDetailsResponse.setValidityMessage(
+            String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
+        logger.debug(String.format(ErrorMessages.notExistErrorMessage, "securityGroupName"));
+        return userDetailsResponse;
+      }
+    }
+    Long roleSysId = userRepository.getRoleSysId(userDetails.getRoleName(), customerSysId);
+    if (roleSysId == null) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(
+          String.format(ErrorMessages.notExistErrorMessage, "roleName"));
+      logger.debug(String.format(ErrorMessages.notExistErrorMessage, "roleName"));
+      return userDetailsResponse;
+    }
+
+    boolean isRoleActive = userRepository.getRoleStatus(roleSysId);
+    if (!isRoleActive) {
+      userDetailsResponse.setValid(false);
+      userDetailsResponse.setValidityMessage(ErrorMessages.roleInActiveMessage);
+      logger.debug(ErrorMessages.roleInActiveMessage);
+      return userDetailsResponse;
+    }
+
+    if (StringUtils.isBlank(userDetails.getPassword())) {
+      logger.debug("setting random password");
+      userDetails.setPassword(generateRandomPassowrd());
+    }
+    Valid valid = null;
+
+    try {
+      Valid validity =
+          PasswordValidation.validatePassword(
+              userDetails.getPassword(), userDetails.getMasterLoginId());
+      userDetailsResponse.setValid(validity.getValid());
+      userDetailsResponse.setValidityMessage(validity.getValidityMessage());
+      userDetails.setCustomerId(customerSysId);
+      userDetails.setRoleId(roleSysId);
+      userDetails.setSecGroupSysId(groupSysId);
+      if (userDetailsResponse.getValid()) {
+        valid = userRepository.addUserDetails(userDetails, masterLoginId);
+        if (valid.getValid()) {
+          userDetailsResponse.setUser(
+              userRepository.getUser(userDetails.getMasterLoginId(), userDetails.getCustomerId()));
+          userDetailsResponse.setValid(true);
+        } else {
+          logger.debug("Error occurred while getting user details:{}", valid.getError());
+          userDetailsResponse.setValid(false);
+          userDetailsResponse.setValidityMessage(valid.getError());
+        }
+      }
+    } catch (Exception e) {
+      userDetailsResponse.setValid(false);
+      logger.debug("Error occurred while adding user details:{}", e);
+      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+      userDetailsResponse.setValidityMessage(message + " Please contact server Administrator");
+      userDetailsResponse.setError(e.getMessage());
+      return userDetailsResponse;
+    }
+    return userDetailsResponse;
+  }
+
+  private void validateUserDetails(UserDetails userDetails) {
+    Preconditions.checkNotNull(
+        userDetails, String.format(ErrorMessages.nullErrorMessage, "Request Body"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getCustomerCode()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "customercode"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getMasterLoginId()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "masterLoginId"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getEmail()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "email"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getFirstName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "firstName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getLastName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "lastName"));
+    Preconditions.checkState(
+        StringUtils.isNotBlank(userDetails.getRoleName()),
+        String.format(ErrorMessages.nullOrEmptyErrorMessage, "roleName"));
+    Preconditions.checkNotNull(
+        userDetails.getActiveStatusInd(),
+        String.format(ErrorMessages.nullErrorMessage, "activeStatusInd"));
+  }
+
+  private String generateRandomPassowrd() {
+    String upperCaseLetters = RandomStringUtils.random(2, 65, 90, true, true);
+    String lowerCaseLetters = RandomStringUtils.random(2, 97, 122, true, true);
+    String numbers = RandomStringUtils.randomNumeric(2);
+    String specialChar = RandomStringUtils.random(2, 33, 47, false, false);
+    String totalChars = RandomStringUtils.randomAlphanumeric(2);
+    return new StringBuilder(upperCaseLetters)
+        .append(lowerCaseLetters)
+        .append(numbers)
+        .append(specialChar)
+        .append(totalChars)
+        .toString();
+  }
+
+  /**
+   * Fetches all users.
+   *
+   * @param customerId customerId
+   * @return Returns UserDetailsResponse
+   */
+  public UsersDetailsList getUsersDetailList(Long customerId) {
+    UsersDetailsList usersDetailsListResponse = new UsersDetailsList();
+    logger.trace("Getting users for customer id :{}", customerId);
+    try {
+      List<UserDetails> userDetailsList = userRepository.getUsersDetailList(customerId);
+      usersDetailsListResponse.setUsers(userDetailsList);
+      usersDetailsListResponse.setRecordCount(userDetailsList.size());
+      usersDetailsListResponse.setValid(true);
+    } catch (Exception e) {
+      usersDetailsListResponse.setValid(false);
+      logger.debug("Error occurred while getting user details:{}", e);
+      String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+      usersDetailsListResponse.setValidityMessage(message + " Please contact server Administrator");
+      usersDetailsListResponse.setError(e.getMessage());
+      return usersDetailsListResponse;
+    }
+    return usersDetailsListResponse;
   }
 }

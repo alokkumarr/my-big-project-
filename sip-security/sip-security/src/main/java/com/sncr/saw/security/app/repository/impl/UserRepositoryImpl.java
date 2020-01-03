@@ -2539,7 +2539,6 @@ public class UserRepositoryImpl implements UserRepository {
 			ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
 			while (rs.next()) {
 				category = new CategoryDetails();
-
 				category.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
 				category.setProductName(rs.getString("PRODUCT_NAME"));
 				category.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
@@ -3036,7 +3035,7 @@ public class UserRepositoryImpl implements UserRepository {
     StringBuffer sql = new StringBuffer();
     sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
         + "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,CPMF.FEATURE_CODE,"
-        + " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND FROM USERS U "
+        + " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND, CPMF.SYSTEM_CATEGORY FROM USERS U "
         + " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
         + " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
         + " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
