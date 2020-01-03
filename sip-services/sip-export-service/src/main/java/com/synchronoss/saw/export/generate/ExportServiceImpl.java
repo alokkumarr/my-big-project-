@@ -985,7 +985,7 @@ public class ExportServiceImpl implements ExportService {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
-      String url = metaDataServiceExport + "/dslanalysis/" + analysisId;
+      String url = metaDataServiceExport + "/dslanalysis/" + analysisId+"&internalCall=true";
       logger.debug("SIP query url for analysis fetch : " + url);
       AnalysisResponse analysisResponse = restTemplate.getForObject(url, AnalysisResponse.class);
       SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
@@ -1244,7 +1244,7 @@ public class ExportServiceImpl implements ExportService {
   private <T> ResponseEntity<T> getExecutionData(
       String executionId, String analysisType, long pageNo, long batchSize, Class<T> classType) {
     String proxyEndPoint =
-        "/internal/proxy/storage/%s/executions/data?page=%s&pageSize=%s&executionType=scheduled&analysisType=%s";
+        "/internal/proxy/storage/%s/executions/data?page=%s&pageSize=%s&executionType=scheduled&analysisType=%s&internalCall=true";
     String url =
         storageProxyUrl.concat(
             String.format(proxyEndPoint, executionId, pageNo, batchSize, analysisType));
