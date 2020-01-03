@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -118,9 +119,9 @@ public class SipDskFieldsController {
   }
 
     @ApiOperation(
-        value = " Update DSK Eligible Fields ",
-        nickname = "UpdateDskFields",
-        notes = "Admin can only use this API to update DSK Eligible Fields",
+        value = " Fetch DSK Eligible Fields ",
+        nickname = "FetchDskFields",
+        notes = "Admin can only use this API to fetch DSK Eligible Fields",
         response = Valid.class)
     @RequestMapping(value = "/fields", method = RequestMethod.GET)
     public Object getDskEligibleKeys(HttpServletRequest request, HttpServletResponse response) {
@@ -131,7 +132,7 @@ public class SipDskFieldsController {
         RoleType roleType = ticket.getRoleType();
         if (roleType != RoleType.ADMIN) {
             Valid valid = new Valid();
-            response.setStatus(400);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
             valid.setError(ServerResponseMessages.MODIFY_USER_GROUPS_WITH_NON_ADMIN_ROLE);
