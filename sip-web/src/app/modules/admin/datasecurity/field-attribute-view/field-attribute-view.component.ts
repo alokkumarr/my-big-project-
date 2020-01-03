@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, OnChanges} from '@angular/core';
+import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import { UserAssignmentService } from './../userassignment.service';
+import { DataSecurityService } from './../datasecurity.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
@@ -11,7 +11,6 @@ import * as isEmpty from 'lodash/isEmpty';
   templateUrl: './field-attribute-view.component.html',
   styleUrls: ['./field-attribute-view.component.scss']
 })
-
 export class FieldAttributeViewComponent implements OnInit, OnChanges {
   config: any;
   data: {};
@@ -20,7 +19,7 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
   @Input() groupSelected;
   constructor(
     private _dxDataGridService: DxDataGridService,
-    private _userAssignmentService: UserAssignmentService,
+    private _userAssignmentService: DataSecurityService,
     private _dialog: MatDialog
   ) {}
 
@@ -36,10 +35,12 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
   }
 
   loadAttributesGrid() {
-    this._userAssignmentService.getSecurityAttributes(this.groupSelected).then(response => {
-      this.data = response;
-      this.emptyState = isEmpty(this.data) ? true : false;
-    });
+    this._userAssignmentService
+      .getSecurityAttributes(this.groupSelected)
+      .then(response => {
+        this.data = response;
+        this.emptyState = isEmpty(this.data) ? true : false;
+      });
   }
 
   editAttribute(cell) {
@@ -51,17 +52,19 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
       value: cell.data.value
     };
     const component = AddAttributeDialogComponent;
-    return this._dialog.open(component, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig)
-    .afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAttributesGrid();
-      }
-    });
+    return this._dialog
+      .open(component, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.loadAttributesGrid();
+        }
+      });
   }
 
   deleteAtttribute(cellData) {
@@ -71,54 +74,64 @@ export class FieldAttributeViewComponent implements OnInit, OnChanges {
       positiveActionLabel: 'Delete',
       negativeActionLabel: 'Cancel'
     };
-    return this._dialog.open(DeleteDialogComponent, {
-      width: 'auto',
-      height: 'auto',
-      autoFocus: false,
-      data
-    } as MatDialogConfig)
-    .afterClosed().subscribe((result) => {
-      if (result) {
-        const path = `auth/admin/security-groups/${this.groupSelected.secGroupSysId}/dsk-attributes/${cellData.attributeName}`;
-        this._userAssignmentService.deleteGroupOrAttribute(path).then(response => {
-          this.loadAttributesGrid();
-        });
-      }
-    });
+    return this._dialog
+      .open(DeleteDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const path = `auth/admin/security-groups/${this.groupSelected.secGroupSysId}/dsk-attributes/${cellData.attributeName}`;
+          this._userAssignmentService
+            .deleteGroupOrAttribute(path)
+            .then(response => {
+              this.loadAttributesGrid();
+            });
+        }
+      });
   }
 
   getConfig() {
-    const columns = [{
-      caption: 'Field Name',
-      dataField: 'attributeName',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: 'Field Value',
-      dataField: 'value',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: 'Created By',
-      dataField: 'created_by',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: 'Created Date',
-      dataField: 'created_date',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: '',
-      allowSorting: true,
-      alignment: 'left',
-      width: '10%',
-      cellTemplate: 'actionCellTemplate'
-    }];
+    const columns = [
+      {
+        caption: 'Field Name',
+        dataField: 'attributeName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: 'Field Value',
+        dataField: 'value',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: 'Created By',
+        dataField: 'created_by',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: 'Created Date',
+        dataField: 'created_date',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: '',
+        allowSorting: true,
+        alignment: 'left',
+        width: '10%',
+        cellTemplate: 'actionCellTemplate'
+      }
+    ];
     return this._dxDataGridService.mergeWithDefaultConfig({
       columns,
       width: '100%',
