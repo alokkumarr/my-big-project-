@@ -718,6 +718,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
 
     this._designerService.getDataForAnalysis(clonedAnalysis).then(
       response => {
+        // need to load newly updated query in query mode even if data is empty
+        if (this.analysis.type === 'report' && response.designerQuery) {
+          if (!this.isInQueryMode) {
+            this._store.dispatch(
+              new DesignerUpdateQuery(response.designerQuery)
+            );
+          }
+        }
         if (
           this.isDataEmpty(
             response.data,
@@ -735,13 +743,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           this._store.dispatch(
             new DesignerSetData(this.flattenData(response.data, this.analysis))
           );
-          if (this.analysis.type === 'report' && response.designerQuery) {
-            if (!this.isInQueryMode) {
-              this._store.dispatch(
-                new DesignerUpdateQuery(response.designerQuery)
-              );
-            }
-          }
         }
       },
       err => {
@@ -1057,6 +1058,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
         break;
       case 'filterRemove':
+        break;
       case 'joins':
         this._store.dispatch(new DesignerJoinsArray(event.data));
         this.areMinRequirmentsMet = this.canRequestData();

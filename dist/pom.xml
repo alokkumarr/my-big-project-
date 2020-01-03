@@ -12,6 +12,8 @@
   <packaging>jar</packaging>
   <name>sip-dist</name>
   <properties>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Name used for Docker Machine.  Should include the username to
          enable identifying the owner of a machine in AWS.  -->

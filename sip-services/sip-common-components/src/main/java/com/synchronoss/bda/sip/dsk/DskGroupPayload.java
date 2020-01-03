@@ -1,10 +1,13 @@
 package com.synchronoss.bda.sip.dsk;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
+@JsonInclude(Include.NON_NULL)
 public class DskGroupPayload {
   @JsonProperty("securityGroupSysId")
   @ApiModelProperty(notes = "Security group ID", name = "securityGroupSysId")
@@ -60,12 +63,12 @@ public class DskGroupPayload {
     this.groupDescription = groupDescription;
   }
 
-  @JsonProperty("attributes")
+  @JsonProperty("dskAttributes")
   public SipDskAttribute getDskAttributes() {
     return dskAttributes;
   }
 
-  @JsonProperty("attributes")
+  @JsonProperty("dskAttributes")
   public void setDskAttributes(SipDskAttribute dskAttributes) {
     this.dskAttributes = dskAttributes;
   }

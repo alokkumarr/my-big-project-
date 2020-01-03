@@ -341,17 +341,7 @@ public class SecurityIT extends BaseIT {
 
     ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
 
-    System.out.println(secGroup);
-
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(secGroup)
-        .when()
-        .post("/security/auth/admin/dsk-security-groups")
-        .then()
-        .assertThat()
-        .statusCode(200)
-        .body("valid", equalTo(true));
+    createSecurityGroup(secGroup, 200, true);
   }
 
   @Test
@@ -411,21 +401,15 @@ public class SecurityIT extends BaseIT {
 
     ObjectNode secGroup = (ObjectNode) mapper.readTree(createSecurityGroupData);
 
-    System.out.println(secGroup);
-
     // Adding security group once will be successful
-    given(authSpec)
-        .contentType(ContentType.JSON)
-        .body(secGroup)
-        .when()
-        .post("/security/auth/admin/dsk-security-groups")
-        .then()
-        .assertThat()
-        .statusCode(200)
-        .body("valid", equalTo(true));
+    createSecurityGroup(secGroup, 200, true);
 
     // Trying to add the security group with same name should result in failure
     // This will return a status code of 400 and validity is false
+    createSecurityGroup(secGroup, 500, false);
+  }
+
+  private void createSecurityGroup(ObjectNode secGroup, int expectedReturnCode, Boolean validity) {
     given(authSpec)
         .contentType(ContentType.JSON)
         .body(secGroup)
@@ -433,8 +417,8 @@ public class SecurityIT extends BaseIT {
         .post("/security/auth/admin/dsk-security-groups")
         .then()
         .assertThat()
-        .statusCode(400)
-        .body("valid", equalTo(false));
+        .statusCode(expectedReturnCode)
+        .body("valid", equalTo(validity));
   }
 
   @Test
@@ -606,6 +590,50 @@ public class SecurityIT extends BaseIT {
     return response;
   }
 
+  @Test
+  public void createRolePrivilegesCategory() {
+
+    Response response = given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(roleCategoryPrivilege())
+        .when()
+        .post("/security/auth/admin/v1/createRoleCategoryPrivilege")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode apiResponse = response.getBody().as(ObjectNode.class);
+    String moduleName = apiResponse.get("moduleName").asText();
+    Assert.assertEquals("OBSERVE", moduleName);
+    String productName = apiResponse.get("productName").asText();
+    Assert.assertEquals("SAW Demo", productName);
+  }
+
+  @Test
+  public void fetchRolePrivilegesCategory() {
+
+    Response response = given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(roleCategoryPrivilege())
+        .when()
+        .get("/security/auth/admin/v1/fetchRoleCategoryPrivilege")
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .extract()
+        .response();
+
+    Assert.assertNotNull(response);
+    ObjectNode apiResponse = response.getBody().as(ObjectNode.class);
+    String moduleName = apiResponse.get("moduleName").asText();
+    Assert.assertEquals("OBSERVE", moduleName);
+    String productName = apiResponse.get("productName").asText();
+    Assert.assertEquals("SAW Demo", productName);
+  }
+
   /**
    * preprocessReplace Util for String.
    *
@@ -615,6 +643,48 @@ public class SecurityIT extends BaseIT {
    */
   public OperationPreprocessor preprocessReplace(String from, String to) {
     return replacePattern(Pattern.compile(Pattern.quote(from)), to);
+  }
+
+  /**
+   * Build node of role, category, privileges.
+   *
+   * @return object Node
+   */
+  private ObjectNode roleCategoryPrivilege() {
+    ObjectNode objectNode = mapper.createObjectNode();
+    objectNode.put("moduleName", "OBSERVE");
+    objectNode.put("productName", "SAW Demo");
+
+    ObjectNode roleDetails = mapper.createObjectNode();
+    roleDetails.put("activeStatusInd", false);
+    roleDetails.put("autoCreate", true);
+    roleDetails.put("customerCode", "SYNCHRONOSS");
+    roleDetails.put("roleDesc", "Admin User");
+    roleDetails.put("roleName", "ROLENAME");
+    roleDetails.put("roleType", "ADMIN");
+    objectNode.set("role", roleDetails);
+
+    ObjectNode categoryDetail = mapper.createObjectNode();
+    categoryDetail.put("autoCreate", true);
+    categoryDetail.put("categoryDesc", "Category Description");
+    categoryDetail.put("categoryName", "NewCategory");
+    categoryDetail.put("categoryType", "000121");
+
+    ObjectNode subCategoryDetail = mapper.createObjectNode();
+    subCategoryDetail.put("autoCreate", true);
+
+    ArrayNode privileges = subCategoryDetail.putArray("privilege");
+    privileges.add("ALL");
+
+    subCategoryDetail.put("subCategoryDesc", "Sub Category Description");
+    subCategoryDetail.put("subCategoryName", "New_Sub_Category");
+
+    ArrayNode subCategory = categoryDetail.putArray("subCategories");
+    subCategory.add(subCategoryDetail);
+
+    ArrayNode category = objectNode.putArray("categories");
+    category.add(categoryDetail);
+    return objectNode;
   }
 
   @Test
@@ -639,7 +709,7 @@ public class SecurityIT extends BaseIT {
             .contentType(ContentType.JSON)
             .body(users)
             .when()
-            .post("/security/auth/admin/cust/manage/external/users/create")
+            .post("/security/auth/admin/v1/users/create")
             .then()
             .assertThat()
             .statusCode(200)
@@ -708,7 +778,7 @@ public class SecurityIT extends BaseIT {
   public void fetchUsers() {
     given(authSpec)
         .when()
-        .get("/security/auth/admin/cust/manage/external/users/fetch")
+        .get("/security/auth/admin/v1/users/fetch")
         .then()
         .assertThat()
         .statusCode(200)
@@ -729,5 +799,92 @@ public class SecurityIT extends BaseIT {
         .then()
         .assertThat()
         .statusCode(200);
+  }
+
+  @Test
+  public void testAddDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId1";
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(createDskEligibleData)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
+  }
+
+  @Test
+  public void testUpdateDskEligibleFields() throws IOException, InterruptedException {
+    String semanticId = "workbench::semanticId2";
+
+    ArrayNode createDskEligibleData = prepareCreateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(createDskEligibleData)
+        .when()
+        .post("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200);
+
+    ArrayNode updateDskEligibleData = prepareUpdateDskEligibleData();
+
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .body(updateDskEligibleData)
+        .when()
+        .put("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
+
+    deleteDskEligibleFields(semanticId);
+  }
+
+  private ArrayNode prepareCreateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
+
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "STRING");
+    field1.put("displayName", "String");
+
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "INTEGER");
+    field2.put("displayName", "Int");
+
+    return dskEligibleData;
+  }
+
+  private ArrayNode prepareUpdateDskEligibleData() {
+    ArrayNode dskEligibleData = mapper.createArrayNode();
+
+    ObjectNode field1 = dskEligibleData.addObject();
+    field1.put("columnName", "DOUBLE");
+    field1.put("displayName", "Double");
+
+    ObjectNode field2 = dskEligibleData.addObject();
+    field2.put("columnName", "BOOLEAN");
+    field2.put("displayName", "Bool");
+
+    return dskEligibleData;
+  }
+
+  private void deleteDskEligibleFields(String semanticId) {
+    given(authSpec)
+        .contentType(ContentType.JSON)
+        .when()
+        .delete("/security/auth/admin/dsk/fields?semanticId=" + semanticId)
+        .then()
+        .assertThat()
+        .statusCode(200)
+        .body("valid", equalTo(true));
   }
 }

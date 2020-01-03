@@ -5,7 +5,7 @@ import { Store } from '@ngxs/store';
 import * as findIndex from 'lodash/findIndex';
 import * as reduce from 'lodash/reduce';
 import * as values from 'lodash/values';
-
+import * as isEmpty from 'lodash/isEmpty';
 import { JwtService } from '../../../common/services';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
@@ -207,6 +207,10 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
+    const metrics = this.store.selectSnapshot(state => state.common.metrics);
+    if (isEmpty(metrics)) {
+      return false;
+    }
     this.store.dispatch(new CommonLoadAllMetrics());
     this.store
       .select(state => state.common.metrics)

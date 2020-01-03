@@ -39,15 +39,15 @@ public class CustomerProductModuleFeatureRepositoryDaoImpl implements
     sqlstatements.put(1,
         "INSERT INTO `CUSTOMER_PRODUCT_MODULE_FEATURES` (`CUST_PROD_MOD_SYS_ID`,`DEFAULT_URL`,"
             + "`FEATURE_NAME`,`FEATURE_DESC`,`FEATURE_CODE`,`FEATURE_TYPE`,`DEFAULT`,`ACTIVE_STATUS_IND`,"
-            + "`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,"
+            + "`SYSTEM_CATEGORY`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,"
             + "`MODIFIED_BY`) VALUES (?,'/','CANNED ANALYSIS','Canned Analysis',?,"
-            + "?,1,1,?,'admin',NULL,'',NULL,'')");
+            + "?,1,1,0,?,'admin',NULL,'',NULL,'')");
     sqlstatements.put(2,
         "INSERT INTO `CUSTOMER_PRODUCT_MODULE_FEATURES` (`CUST_PROD_MOD_SYS_ID`,`DEFAULT_URL`,"
             + "`FEATURE_NAME`,`FEATURE_DESC`,`FEATURE_CODE`,`FEATURE_TYPE`,`DEFAULT`,`ACTIVE_STATUS_IND`,"
-            + "`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,"
-              + "`MODIFIED_BY`) VALUES (?,'/','My Analysis','My Analysis',?,"
-            + "?,0,1,?,'admin',NULL,'',NULL,'')");
+            + "`SYSTEM_CATEGORY`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,"
+            + "`MODIFIED_BY`) VALUES (?,'/','My Analysis','My Analysis',?,"
+            + "?,0,1,0,?,'admin',NULL,'',NULL,'')");
     for (Map.Entry m : sqlstatements.entrySet()) {
 
       // first retrieve the max Id of this table so as to set unique code.

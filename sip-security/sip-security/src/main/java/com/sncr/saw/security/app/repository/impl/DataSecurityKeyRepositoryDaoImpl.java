@@ -45,10 +45,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     public DskValidity addSecurityGroups(SecurityGroups securityGroups,String createdBy,Long custId) {
         DskValidity valid = new DskValidity();
         String addSql = "INSERT INTO `SEC_GROUP` " +
-            "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`Description`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
+            "(`CUSTOMER_SYS_ID`,`SEC_GROUP_NAME`,`DESCRIPTION`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) "
             + "VALUES (?,?,?,1,now(),?)";
         securityGroups.setSecurityGroupName(securityGroups.getSecurityGroupName().trim());
-        securityGroups.setDescription(securityGroups.getDescription().trim());
+
+        String groupDescription = securityGroups.getDescription();
+        if (groupDescription != null) {
+            securityGroups.setDescription(groupDescription.trim());
+        }
 
         if (custId == null || custId == 0)  {
             valid.setValid(false);
@@ -79,7 +83,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             valid.setError(ServerResponseMessages.GROUP_NAME_LONG);
             return valid;
         }
-        else if ( securityGroups.getDescription().length() > 255 )  {
+        else if ( securityGroups.getDescription() != null
+            && securityGroups.getDescription().length() > 255 )  {
             valid.setValid(false);
             valid.setValidityMessage(ServerResponseMessages.DESCRIPTION_NAME_LONG);
             return valid;
@@ -89,6 +94,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 int insertResult = jdbcTemplate.update(addSql,ps -> {
                     ps.setLong(1,custId);
                     ps.setString(2,securityGroups.getSecurityGroupName());
+
                     ps.setString(3,securityGroups.getDescription());
                     ps.setString(4,createdBy);
                 });
@@ -195,14 +201,15 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
         String getGroupDetails = "SELECT SEC_GROUP_NAME, DESCRIPTION "
             + "FROM SEC_GROUP "
-            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
+            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=? AND ACTIVE_STATUS_IND=1";
 
         ObjectNode groupDetails = jdbcTemplate.query(getGroupDetails, ps -> {
             ps.setLong(1, securityGroupId);
             ps.setLong(2, customerId);
         }, resultSet -> {
-            ObjectNode node = mapper.createObjectNode();
+            ObjectNode node = null;
             if (resultSet.next()) {
+                node = mapper.createObjectNode();
                 String groupName = resultSet.getString("SEC_GROUP_NAME");
                 String groupDescription = resultSet.getString("DESCRIPTION");
 
@@ -481,7 +488,9 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 + " VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 
-            jdbcTemplate.batchUpdate(insertDskAtributeModel, attributeModelList, attributeModelList.size(), new ParameterizedPreparedStatementSetter<SipDskAttributeModel>(){
+            jdbcTemplate.batchUpdate(insertDskAtributeModel, attributeModelList,
+                attributeModelList.size(),
+                new ParameterizedPreparedStatementSetter<SipDskAttributeModel>(){
                 public void setValues(PreparedStatement ps, SipDskAttributeModel dskAttributeModel)
                     throws SQLException {
                     ps.setString(1, dskAttributeModel.getDskAttributeSysId());
@@ -516,8 +525,14 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         Valid valid = new Valid();
 
         try {
-            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL"
-                + " WHERE SEC_GROUP_SYS_ID=?";
+            Valid validCustomer = validateCustomerForSecGroup(securityGroupId, customerId);
+
+            if (!validCustomer.getValid()) {
+                throw new Exception(validCustomer.getValidityMessage());
+            }
+
+            String deleteDskAttributeModelSql = "DELETE FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL "
+                + " WHERE SEC_GROUP_SYS_ID=? ";
 
             int count = jdbcTemplate.update(deleteDskAttributeModelSql, ps -> {
                 ps.setLong(1, securityGroupId);
@@ -546,13 +561,28 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
         if (dskAttribute != null) {
             BooleanCriteria booleanCriteria = dskAttribute.getBooleanCriteria();
+            String columnName = dskAttribute.getColumnName();
             String dskAttributeId = UUID.randomUUID().toString();
+
+            if (booleanCriteria == null && columnName == null) {
+                throw new RuntimeException("Invalid DSK attributes");
+            }
+
             if (booleanCriteria == null) {
                 // Boolean criteria is null means its a leaf node and doesn't have any children
                 SipDskAttributeModel model = new SipDskAttributeModel();
                 model.setDskAttributeSysId(dskAttributeId);
                 model.setSecGroupSysId(securityGroupId);
                 model.setDskAttributeParentId(parentId);
+
+                if (dskAttribute.getColumnName() == null) {
+                    throw new RuntimeException("Column name cannot be empty");
+                }
+                if (dskAttribute.getModel().getValues() == null
+                    || dskAttribute.getModel().getValues().isEmpty()) {
+                    throw new RuntimeException("Values cannot be empty");
+                }
+
                 model.setColumnName(dskAttribute.getColumnName());
                 model.setOperator(dskAttribute.getModel().getOperator().toString());
                 model.setValues(dskAttribute.getModel().getValues());
@@ -571,11 +601,10 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 // Get children and add them
                 List<SipDskAttribute> dskAttributeList = dskAttribute.getBooleanQuery();
 
-                for(SipDskAttribute childAttribute: dskAttributeList) {
+                dskAttributeList.forEach(childAttribute -> {
                     list.addAll(
-                        prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
-                }
-
+                       prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
+                });
             }
         }
 
@@ -687,11 +716,6 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NULL_OR_EMPTY);
                 return valid;
             }
-//            logger.error(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            valid.setValid(false);
-//            valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            valid.setError(ServerResponseMessages.ATTRIBUTE_NAME_EXISTS);
-//            return valid;
         }
     }
 
@@ -797,10 +821,16 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     public DskGroupPayload fetchDskGroupAttributeModel (Long securityGroupId, Long customerId) {
         DskGroupPayload dskGroupPayload = new DskGroupPayload();
+        ObjectNode groupDetails = getGroupDetails(securityGroupId, customerId);
+
+        if (groupDetails == null || groupDetails.size() == 0) {
+            dskGroupPayload.setValid(false);
+            dskGroupPayload.setMessage(ServerResponseMessages.GROUP_DOESNT_EXIST);
+
+            return dskGroupPayload;
+        }
 
         List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributeForSecGroup(securityGroupId, null);
-
-        ObjectNode groupDetails = getGroupDetails(securityGroupId, customerId);
 
         if (groupDetails.size() != 0) {
             String groupName = groupDetails.get("groupName").asText();
@@ -1129,6 +1159,27 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             " to  SEC_GROUP_DSK_VALUE.");
         valid.setValid(true);
         valid.setValidityMessage(ServerResponseMessages.ATTRIBUTE_VALUE_ADDED);
+
+        return valid;
+    }
+
+    private Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId) {
+        String customerSql = "SELECT * FROM SEC_GROUP "
+            + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
+
+        Valid valid = jdbcTemplate.query(customerSql, ps -> {
+            ps.setLong(1, securityGroupSysId);
+            ps.setLong(2, customerId);
+        }, resultSet -> {
+            Valid v = new Valid();
+            if (resultSet.next()) {
+                v.setValid(true);
+            } else {
+                v.setValid(false);
+                v.setValidityMessage("Security group for customer doesn't exist");
+            }
+            return v;
+        });
 
         return valid;
     }

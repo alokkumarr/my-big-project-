@@ -63,3 +63,6 @@ sip:
 analysis:
   get-analysis-url:  ${connector}://localhost:9200
   binary-migration-required: false
+
+sip-security:
+  dsk-url: ${connector}://localhost:9000/sip-security
