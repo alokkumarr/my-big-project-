@@ -985,7 +985,7 @@ public class ExportServiceImpl implements ExportService {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
-      String url = metaDataServiceExport + "/dslanalysis/" + analysisId+"&internalCall=true";
+      String url = metaDataServiceExport + "/dslanalysis/" + analysisId+"?internalCall=true";
       logger.debug("SIP query url for analysis fetch : " + url);
       AnalysisResponse analysisResponse = restTemplate.getForObject(url, AnalysisResponse.class);
       SipQuery sipQuery = analysisResponse.getAnalysis().getSipQuery();
@@ -993,7 +993,7 @@ public class ExportServiceImpl implements ExportService {
       logger.debug("Fetched SIP query for analysis : " + sipQuery.toString());
       return sipQuery;
     } catch (Exception e) {
-      logger.error("Exception occurred while fetching sipQuery");
+      logger.error("Exception occurred while fetching sipQuery:{}",e);
       throw new RuntimeException("Exception occurred while fetching sipQuery");
     }
   }
