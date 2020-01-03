@@ -116,7 +116,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * Construct semantic layer field object structure.
    * When user does not include a column and update datapod, later point of time, same datapod
    * is updated then filterEligible is selected automatically for not included column.
-   * So changing default value of filterEligible to false
+   * So changing default value of filterEligible to false. Added as part of SIP-9565.
    *
    * @param {*} dsData
    * @returns
@@ -230,20 +230,24 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         check
       );
     }
+    return;
   }
 
   cellClicked(e) {
     if (e.rowType === 'data' && e.column.dataField === 'include') {
-      const { columns } = this.selectedDPData[0];
-      const matchedCol = find(columns, {
-        alias: e.data.alias
+      const matchedCol = find(this.selectedDPData[0].columns, col => {
+        /**
+         * For new datapod aliasName is changed to alias hence checking for both conditions.
+         */
+        return col.aliasName
+          ? col.aliasName === e.data.aliasName
+          : col.alias === e.data.alias;
       });
-      if (matchedCol && !matchedCol.include) {
-        set(matchedCol, 'filterEligible', false);
-        set(matchedCol, 'dskEligible', false);
-        set(matchedCol, 'kpiEligible', false);
-      } else {
-        set(matchedCol, 'filterEligible', true);
+      const check = matchedCol && !matchedCol.include;
+      set(matchedCol, 'filterEligible', !check);
+      if (check) {
+        set(matchedCol, 'kpiEligible', !check);
+        set(matchedCol, 'dskEligible', !check);
       }
     }
     return;
