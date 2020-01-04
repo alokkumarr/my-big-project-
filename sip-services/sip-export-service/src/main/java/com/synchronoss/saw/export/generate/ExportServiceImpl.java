@@ -1056,11 +1056,6 @@ public class ExportServiceImpl implements ExportService {
     String s3 = null;
     String finalJobGroup = null;
     boolean isZipRequired = false;
-    final SipQuery sipQuery = getSipQuery(analysisId);
-    ExportBean exportBean = setExportBeanProps(dispatchBean);
-    exportBean.setSipQuery(sipQuery);
-    String userFileName = exportBean.getFileName();
-    logger.trace("File name" + userFileName);
     // check beforehand if the request is not null
     if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
       Object recipientsObj = ((LinkedHashMap) dispatchBean).get("emailList");
@@ -1090,46 +1085,61 @@ public class ExportServiceImpl implements ExportService {
     if ((recipients != null && !recipients.equals(""))
         || ((s3 != null && s3 != ""))
         || ((ftp != null && ftp != ""))) {
-
+      final SipQuery sipQuery = getSipQuery(analysisId);
+      ExportBean exportBean = setExportBeanProps(dispatchBean);
+      exportBean.setSipQuery(sipQuery);
+      String userFileName = exportBean.getFileName();
+      logger.trace("File name" + userFileName);
       logger.debug("dispatchBean for Pivot: " + dispatchBean.toString());
+      final String dispatchFileName = filePath(null, userFileName);
+      exportBean.setFileName(dispatchFileName);
+      try {
+        Instant startTime = Instant.now();
+        streamToXlsxPivot(exportBean.getSipQuery(), executionId, exportBean);
+        Instant finishTime = Instant.now();
+        long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+        logger.trace("time taken for Excel preparation for pivot:{}", elapsedTime);
+        if (recipients != null && !recipients.equals("")) {
+          logger.debug("mail dispatch started for pivot: ");
+          Instant start = Instant.now();
+          mailDispatchForPivot(exportBean, recipients, isZipRequired);
+          Instant finish = Instant.now();
+          long timeElapsed = Duration.between(start, finish).toMillis();
+          logger.trace("time taken for mail dispatch for pivot:{}", timeElapsed);
+        }
+        if (ftp != null && ftp != "") {
+          logger.debug("ftp dispatch started for pivot: ");
+          Instant start = Instant.now();
+          ftpDispatchForPivot(exportBean, isZipRequired, finalJobGroup, ftp);
+          Instant finish = Instant.now();
+          long timeElapsed = Duration.between(start, finish).toMillis();
+          logger.trace("time taken for ftp dispatch for pivot:{}", timeElapsed);
+        }
 
-      if (recipients != null && !recipients.equals("")) {
-        logger.debug("mail dispatch started for pivot: ");
-        Instant start = Instant.now();
-        mailDispatchForPivot(exportBean, recipients, isZipRequired, executionId, userFileName);
-        Instant finish = Instant.now();
-        long timeElapsed = Duration.between(start, finish).toMillis();
-        logger.trace("time taken for mail dispatch for pivot:{}", timeElapsed);
-      }
-      if (ftp != null && ftp != "") {
-        logger.debug("ftp dispatch started for pivot: ");
-        Instant start = Instant.now();
-        ftpDispatchForPivot(
-            exportBean, isZipRequired, executionId, userFileName, finalJobGroup, ftp);
-        Instant finish = Instant.now();
-        long timeElapsed = Duration.between(start, finish).toMillis();
-        logger.trace("time taken for ftp dispatch for pivot:{}", timeElapsed);
-      }
-
-      if (s3 != null && s3 != "") {
-        logger.debug("S3 dispatch started for pivot");
-        Instant start = Instant.now();
-        s3DispatchForPivot(exportBean, isZipRequired, executionId, userFileName, finalJobGroup, s3);
-        Instant finish = Instant.now();
-        long timeElapsed = Duration.between(start, finish).toMillis();
-        logger.trace("time taken for s3 dispatch for pivot:{}", timeElapsed);
+        if (s3 != null && s3 != "") {
+          logger.debug("S3 dispatch started for pivot");
+          Instant start = Instant.now();
+          s3DispatchForPivot(exportBean, isZipRequired, finalJobGroup, s3);
+          Instant finish = Instant.now();
+          long timeElapsed = Duration.between(start, finish).toMillis();
+          logger.trace("time taken for s3 dispatch for pivot:{}", timeElapsed);
+        }
+      } catch (Exception e) {
+        logger.error("Exception occured in dispatching pivot:{}", e);
+      } finally {
+        ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
       }
     }
   }
 
   public Boolean streamToXlsxPivot(
-      SipQuery sipQuery, String executionId, long totalExportSize, ExportBean exportBean) {
+      SipQuery sipQuery, String executionId, ExportBean exportBean) {
     long batchSize = exportChunkSize != null ? Long.valueOf(exportChunkSize) : 0l;
-    long totalNumberOfBatch = batchSize > 0 ? totalExportSize / batchSize : 01;
+    long totalNumberOfBatch = 0;
     File file = new File(exportBean.getFileName());
     file.getParentFile().mkdir();
     boolean flag = true;
-    long pageNo, totalRowsCount = 0, rowCount = 1;
+    long pageNo = 1, totalRowsCount = 0, rowCount = 1;
     XlsxExporter xlsxExporter = new XlsxExporter();
     Workbook workBook = new XSSFWorkbook();
     String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
@@ -1138,8 +1148,7 @@ public class ExportServiceImpl implements ExportService {
     ElasticSearchAggregationParser responseParser = new ElasticSearchAggregationParser(fieldList);
     ResponseEntity<JsonNode> entity = null;
     responseParser.setColumnDataType(exportBean);
-    for (pageNo = 1; pageNo <= totalNumberOfBatch; pageNo++) {
-
+    do {
       entity = getExecutionData(executionId, pivotAnalysisType, pageNo, batchSize, JsonNode.class);
       JsonNode jsonDataNode = entity.getBody().get("data");
       if (jsonDataNode == null) {
@@ -1150,31 +1159,17 @@ public class ExportServiceImpl implements ExportService {
       rowCount = flag ? rowCount : rowCount + batchSize;
       logger.trace("Data size = " + dataObj.size());
       totalRowsCount = entity.getBody().get("totalRows").asLong();
-      if (totalRowsCount < totalExportSize && flag) {
-        totalNumberOfBatch = totalRowsCount / batchSize;
+      if (flag) {
+        long count = totalRowsCount / batchSize;
+        totalNumberOfBatch = totalRowsCount % batchSize != 0 ? count + 1 : count;
+        logger.trace("total no of batches:{}", totalNumberOfBatch);
       }
       flag = false;
       xlsxExporter.addxlsxRows(exportBean, workBook, sheet, dataObj, rowCount);
-    }
-    // final rows to process
-    long leftOutRows;
-    if (totalRowsCount > 0 && totalRowsCount <= totalExportSize) {
-      leftOutRows = totalRowsCount - (pageNo - 1) * batchSize;
-    } else {
-      leftOutRows = totalExportSize - (pageNo - 1) * batchSize;
-    }
-    logger.trace("left our rows ={}", leftOutRows);
-    if (leftOutRows > 0 && totalNumberOfBatch >= 0) {
-      entity = getExecutionData(executionId, pivotAnalysisType, pageNo, batchSize, JsonNode.class);
-      JsonNode jsonDataNode = entity.getBody().get("data");
-      List<Object> dataObj = responseParser.parsePivotData(jsonDataNode);
-      List<Object> leftOutRowsToProcess =
-          dataObj.stream().limit(leftOutRows).collect(Collectors.toList());
-      logger.trace("rows to process:{}", leftOutRowsToProcess.size());
-      rowCount = flag ? rowCount : rowCount + batchSize;
-      xlsxExporter.addxlsxRows(exportBean, workBook, sheet, leftOutRowsToProcess, rowCount);
-    }
+      pageNo++;
 
+    } while (pageNo <= totalNumberOfBatch);
+    logger.trace("total no of pages:{}", pageNo);
     logger.debug("Creating pivot table: ");
     CreatePivotTable createPivotTable = new CreatePivotTable();
     createPivotTable.createPivot(workBook, file, fieldList);
@@ -1185,59 +1180,35 @@ public class ExportServiceImpl implements ExportService {
   void mailDispatchForPivot(
       ExportBean exportBean,
       String recipients,
-      boolean zip,
-      String executionId,
-      String userFileName) {
-    exportBean.setFileName(filePath(DispatchType.MAIL.value(), userFileName));
+      boolean zip) {
     try {
-      streamToXlsxPivot(
-          exportBean.getSipQuery(), executionId, Long.valueOf(emailExportSize), exportBean);
       dispatchMail(exportBean, zip, recipients);
     } catch (Exception e) {
       logger.error("Exception occurred while dispatching Email for pivot:{}", e);
-    } finally {
-      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
     }
   }
 
   void ftpDispatchForPivot(
       ExportBean exportBean,
       boolean zip,
-      String executionId,
-      String userFileName,
       String finalJobGroup,
       String finalFtp) {
-    exportBean.setFileName(filePath(DispatchType.FTP.value(), userFileName));
-    exportBean.setColumnHeader(null);
     try {
-      streamToXlsxPivot(
-          exportBean.getSipQuery(), executionId, Long.valueOf(ftpExportSize), exportBean);
       createZipForFtp(finalFtp, exportBean, finalJobGroup, zip);
     } catch (Exception e) {
-      logger.error("Exception ocurred while dispatching FTP for pivot:{}", e);
-    } finally {
-      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
+      logger.error("Exception occurred while dispatching FTP for pivot:{}", e);
     }
   }
 
   void s3DispatchForPivot(
       ExportBean exportBean,
       boolean zip,
-      String executionId,
-      String userFileName,
       String finalJobGroup,
       String finalS3) {
-    exportBean.setFileName(filePath(DispatchType.S3.value(), userFileName));
-    exportBean.setColumnHeader(null);
     try {
-      streamToXlsxPivot(
-          exportBean.getSipQuery(), executionId, Long.valueOf(s3ExportSize), exportBean);
       dispatchFileToS3(exportBean, finalS3, finalJobGroup, zip);
-      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
     } catch (Exception e) {
-      logger.error("Exception ocurred while dispatching S3 for pivot:{}", e);
-    } finally {
-      ExportUtils.deleteDispatchedFile(exportBean.getFileName(), serviceUtils);
+      logger.error("Exception occurred while dispatching S3 for pivot:{}", e);
     }
   }
 
@@ -1250,10 +1221,19 @@ public class ExportServiceImpl implements ExportService {
             String.format(proxyEndPoint, executionId, pageNo, batchSize, analysisType));
     ResponseEntity<T> entity = null;
     try {
-      logger.info("returning Execution data");
-      return restTemplate.getForEntity(url, classType);
+      logger.debug("returning Execution data");
+      Instant startTime = Instant.now();
+      ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, classType);
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("Time taken for getting Executions data:{}", elapsedTime);
+      return responseEntity;
     } catch (Exception e) {
-      System.out.println(e);
+      logger.error(
+          "Exception occured while fetching the execution data for pageNo:{} and batchSize:{} with exception:{}",
+          pageNo,
+          batchSize,
+          e);
     }
     return entity;
   }
