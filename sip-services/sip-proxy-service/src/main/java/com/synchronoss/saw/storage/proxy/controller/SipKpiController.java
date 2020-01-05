@@ -105,7 +105,7 @@ public class SipKpiController {
         return StorageProxyUtil.merge(
             objectMapper.valueToTree(kpiBuilder), objectMapper.valueToTree(semanticNode));
       }
-      SipQuery savedQuery = getSipQuery(semanticId, metaDataServiceUrl, request, restUtil);
+      SipQuery savedQuery = getSipQuery(semanticId, metaDataServiceUrl, restUtil);
       DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
       dataSecurityKey = new DataSecurityKey();
       List<DataSecurityKeyDef> dataSecurityKeyDefList =

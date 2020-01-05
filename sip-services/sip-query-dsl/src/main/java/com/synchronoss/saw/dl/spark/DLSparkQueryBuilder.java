@@ -761,7 +761,7 @@ public class DLSparkQueryBuilder {
         if (!StringUtils.containsIgnoreCase(columnName, arifactName)) {
           columnName = arifactName.concat(".").concat(columnName);
         }
-        dskquery = perpareQueryWithCondition(columnName, model, dskquery);
+        dskquery = prepareQueryWithCondition(columnName, model, dskquery);
         flag = false;
       }
     }
@@ -771,7 +771,7 @@ public class DLSparkQueryBuilder {
     return dskquery.toString();
   }
 
-  private static StringBuilder perpareQueryWithCondition(
+  private static StringBuilder prepareQueryWithCondition(
       String columnName, com.synchronoss.bda.sip.dsk.Model model, StringBuilder dskquery) {
     dskquery.append(UPPER).append("(" + columnName + ")");
     com.synchronoss.bda.sip.dsk.Operator operator = model.getOperator();
@@ -819,6 +819,25 @@ public class DLSparkQueryBuilder {
     return false;
   }
 
+  public static Artifact getArtifactContainColumn(
+      List<String> artifactNameList, SipQuery semanticSipQuery, String colName) {
+    for (Artifact artifact : semanticSipQuery.getArtifacts()) {
+      if (artifactNameList.contains(artifact.getArtifactsName().toUpperCase())) {
+        List<Field> fieldList = artifact.getFields();
+        String artifactName = artifact.getArtifactsName();
+        for (Field field : fieldList) {
+          String[] col = field.getColumnName().split("\\.");
+          if (colName.equalsIgnoreCase(field.getColumnName())
+              || colName.equalsIgnoreCase(artifactName + "." + col[0])
+              || colName.equalsIgnoreCase(col[0])
+              || colName.equalsIgnoreCase(artifactName + "." + col)) {
+            return artifact;
+          }
+        }
+      }
+    }
+    return null;
+  }
   /**
    * Build Actual query to be ran over background (DSK Included).
    *
@@ -866,7 +885,7 @@ public class DLSparkQueryBuilder {
    * @param sipQuery
    * @return
    */
-  public static String queryDskBuilder(
+  public static String queryDskBuilderOld(
       SipDskAttribute sipDskAttribute, SipQuery sipQuery, SipQuery sipQueryFromSemantic) {
     StringBuilder dskFilter = new StringBuilder();
     if (sipDskAttribute != null
@@ -894,5 +913,95 @@ public class DLSparkQueryBuilder {
       }
     }
     return dskFilter.toString();
+  }
+
+  private static List<String> getArtfactsNames(SipQuery sipQuery) {
+    List<String> artifactNames = new ArrayList<>();
+    sipQuery
+        .getArtifacts()
+        .forEach(
+            (artifact) -> {
+              artifactNames.add(artifact.getArtifactsName().toUpperCase());
+            });
+    return artifactNames;
+  }
+
+  /**
+   * @param sipDskAttribute
+   * @param sipQuery
+   * @param sipQuery
+   * @return
+   */
+  public static String queryDskBuilder(
+      SipDskAttribute sipDskAttribute, SipQuery sipQuery, SipQuery sipQueryFromSemantic) {
+    StringBuilder dskFilter = new StringBuilder();
+    if (sipDskAttribute != null
+        && (sipDskAttribute.getBooleanCriteria() != null
+            || sipDskAttribute.getBooleanQuery() != null)) {
+
+      String condition = null;
+      if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
+        condition = AND;
+      } else {
+        condition = WHERE;
+      }
+      List<String> artifactName = getArtfactsNames(sipQuery);
+      String dskFormedQuery =
+          dskQueryForArtifact(sipDskAttribute, artifactName, sipQueryFromSemantic);
+      if (dskFormedQuery != null && !StringUtils.isEmpty(dskFormedQuery)) {
+        dskFilter.append(" ").append(condition).append(" ");
+        dskFilter.append(" ").append(dskFormedQuery);
+      }
+    }
+    return dskFilter.toString();
+  }
+
+  public static String dskQueryForArtifact(
+      SipDskAttribute attribute, List<String> arifactNameList, SipQuery semanticQuery) {
+    boolean flag = true;
+    String booleanCriteria = null;
+    StringBuilder dskquery = new StringBuilder();
+    if (attribute == null) {
+      return dskquery.toString();
+    }
+    if (attribute.getBooleanCriteria() == null && attribute.getBooleanQuery() == null) {
+      logger.error("Invalid dsk object");
+      return dskquery.toString();
+    }
+    if (attribute.getBooleanCriteria() != null) {
+      booleanCriteria = " " + attribute.getBooleanCriteria() + " ";
+    }
+    for (SipDskAttribute dskAttribute : attribute.getBooleanQuery()) {
+      if (dskAttribute.getBooleanQuery() != null) {
+        String childQuery = dskQueryForArtifact(dskAttribute, arifactNameList, semanticQuery);
+        if (childQuery != null && !StringUtils.isEmpty(childQuery)) {
+          if (dskquery != null && dskquery.length() > 0) {
+            dskquery.append(booleanCriteria);
+          }
+          dskquery.append(childQuery);
+          flag = false;
+        }
+      } else {
+        String columnName = dskAttribute.getColumnName();
+        Artifact arifact = getArtifactContainColumn(arifactNameList, semanticQuery, columnName);
+        if (arifact == null) {
+          continue;
+        }
+        String arifactName = arifact.getArtifactsName();
+        com.synchronoss.bda.sip.dsk.Model model = dskAttribute.getModel();
+        if (!flag) {
+          dskquery.append(booleanCriteria);
+        }
+        if (!StringUtils.containsIgnoreCase(columnName, arifactName)) {
+          columnName = arifactName.concat(".").concat(columnName);
+        }
+        dskquery = prepareQueryWithCondition(columnName, model, dskquery);
+        flag = false;
+      }
+    }
+    if (dskquery.length() != 0) {
+      dskquery.insert(0, "(").append(")");
+    }
+    return dskquery.toString();
   }
 }

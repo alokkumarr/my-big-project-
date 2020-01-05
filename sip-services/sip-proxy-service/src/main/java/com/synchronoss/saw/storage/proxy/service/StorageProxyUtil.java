@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -123,18 +124,19 @@ public class StorageProxyUtil {
    * @param restUtil
    * @return list of dsk details
    */
-  public static DataSecurityKeys getDSKDetailsByUser(String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
-		DataSecurityKeys dataSecurityKeys = null;
-  	try {
+  public static DskDetails getDSKDetailsByUser(
+      String securityServiceUrl, String masterLoginId, RestUtil restUtil) {
+    DskDetails dataSecurityObject = null;
+    try {
       RestTemplate restTemplate = restUtil.restTemplate();
-      String url = securityServiceUrl.concat("/dsk?userId=").concat(masterLoginId);
-      logger.trace("SIP security url to fetch DSK details :", url);
+      String url = securityServiceUrl.concat("/dsk/fetch?userId=").concat(masterLoginId);
+      logger.trace("SIP security url to fetch DSK details :{}", url);
 
-			dataSecurityKeys = restTemplate.getForObject(url, DataSecurityKeys.class);
+      dataSecurityObject = restTemplate.getForObject(url, DskDetails.class);
     } catch (Exception ex) {
-      logger.error("Error while fetching DSK details by user", ex.getMessage());
+      logger.error("Error while fetching DSK details by user:{}", ex.getMessage());
     }
-    return dataSecurityKeys;
+    return dataSecurityObject;
   }
 
   /**
@@ -146,7 +148,6 @@ public class StorageProxyUtil {
   public static SipQuery getSipQuery(
       String semanticId,
       String metaDataServiceExport,
-      HttpServletRequest request,
       RestUtil restUtil) {
     logger.info(
         "URI being prepared"

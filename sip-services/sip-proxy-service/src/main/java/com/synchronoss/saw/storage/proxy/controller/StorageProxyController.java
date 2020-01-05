@@ -97,12 +97,6 @@ public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
 
-  @Value("${metadata.service.host}")
-  private String metaDataServiceExport;
-
-  @Value("${sip.security.host}")
-  private String sipSecurityHost;
-
   @Autowired
   private RestUtil restUtil;
   @Autowired
@@ -227,7 +221,7 @@ public class StorageProxyController {
               dataSecurityKey,
               ExecutionType.onetime,
               analysisType,
-              false);
+              false,authTicket);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -328,162 +322,16 @@ public class StorageProxyController {
       setUnAuthResponse(response);
       return executeResponse;
     }
-
-    List<TicketDSKDetails> dskList = new ArrayList<>();
-    DataSecurityKeys dataSecurityKeys = null;
-    // fetch DSK details for scheduled
-    if (isScheduledExecution && userId != null) {
-      dataSecurityKeys = getDSKDetailsByUser(sipSecurityHost, userId, restUtil);
-      dskList = dataSecurityKeys.getDataSecurityKeys();
-    } else {
-      dskList = authTicket == null ? dskList : authTicket.getDataSecurityKey();
-    }
-
-    SipQuery savedQuery =
-        getSipQuery(
-            analysis.getSipQuery().getSemanticId(), metaDataServiceExport, request, restUtil);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    DataSecurityKey dataSecurityKey = new DataSecurityKey();
-    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
-    List<String> sipQueryArts = getArtifactsNames(analysis.getSipQuery());
-    String analysisType = analysis.getType();
-    Boolean designerEdit =
-        analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
-    boolean queryMode = analysisType.equalsIgnoreCase("report") && designerEdit;
-    String query = queryMode ? analysis.getSipQuery().getQuery().toUpperCase().concat(" ") : null;
-    if (checkSameColumnAcrossTables(savedQuery,dataSecurityKey)) {
-      response.sendError(HttpStatus.BAD_REQUEST.value(),
-          "Column ambiguity error!!"
-              + " DSK name should use TableName.columnName if same column present across tables!!");
-      return executeResponse;
-    }
-    DataSecurityKey dataSecurityKeyNode = queryMode ? QueryBuilderUtil
-        .checkDSKApplicableAnalysis(getArtifactsNames(savedQuery), query, dataSecurityKey,
-        savedQuery) :
-        QueryBuilderUtil
-            .checkDSKApplicableAnalysis(savedQuery, dataSecurityKey, sipQueryArts);
-
-    // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
-    // code.
-    boolean filterDSKByCustomerCode =
-        authTicket != null
-            && authTicket.getIsJvCustomer() != 1
-            && authTicket.getFilterByCustomerCode() == 1;
-    boolean scheduledDSKbyCustomerCode =
-        authTicket == null
-            && isScheduledExecution
-            && dataSecurityKeys != null
-            && dataSecurityKeys.getIsJvCustomer() != 1
-            && dataSecurityKeys.getFilterByCustomerCode() == 1;
-    if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
-      DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-      List<String> artsName = getArtifactsNames(savedQuery);
-      List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
-      String customerCode = dataSecurityKeys!= null ? dataSecurityKeys.getCustomerCode() : authTicket.getCustCode();
-      if (analysisType.equalsIgnoreCase("report") && designerEdit) {
-        logger.trace("Artifact Name : " + artsName);
-        for (String artifact : artsName) {
-          if (query.contains(artifact)) {
-            dataSecurityKeyDef.setName(artifact + "." + CUSTOMER_CODE);
-            dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
-            customerFilterDsks.add(dataSecurityKeyDef);
-            dataSecurityKeyDef = new DataSecurityKeyDef();
-          }
-        }
-      } else {
-        for (String artifact : sipQueryArts) {
-          dataSecurityKeyDef.setName(artifact.toUpperCase() + "." + CUSTOMER_CODE);
-          dataSecurityKeyDef.setValues(Collections.singletonList(customerCode));
-          customerFilterDsks.add(dataSecurityKeyDef);
-          dataSecurityKeyDef = new DataSecurityKeyDef();
-        }
-      }
-
-      List<DataSecurityKeyDef> dataSecurityKeyDefList;
-      if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
-        dataSecurityKeyDefList = dataSecurityKeyNode.getDataSecuritykey();
-        dataSecurityKeyDefList.addAll(customerFilterDsks);
-        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
-      } else if (dataSecurityKeyNode.getDataSecuritykey() == null) {
-        dataSecurityKeyDefList = customerFilterDsks;
-        dataSecurityKeyNode.setDataSecuritykey(dataSecurityKeyDefList);
-      }
-    }
-
-    logger.debug("Final DataSecurity Object : ", dataSecurityKeyNode);
     try {
-      Long startTime = new Date().getTime();
       logger.trace(
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
       executeResponse =
           proxyService.executeAnalysis(
-              analysis, size, page, pageSize, dataSecurityKeyNode, executionType);
+              analysis, size, page, pageSize, null, executionType, userId, authTicket, queryId);
 
-      // Execution result will one be stored, if execution type is publish or Scheduled.
-      boolean validExecutionType =
-          executionType.equals(ExecutionType.publish)
-              || executionType.equals(ExecutionType.scheduled);
-
-      boolean tempExecutionType =
-          executionType.equals(ExecutionType.onetime)
-              || executionType.equals(ExecutionType.preview)
-              || executionType.equals(ExecutionType.regularExecution);
-
-      if (validExecutionType) {
-        ExecutionResult executionResult =
-            buildExecutionResult(
-                executeResponse.getExecutionId(),
-                analysis,
-                queryId,
-                startTime,
-                authTicket,
-                executionType,
-                dataSecurityKeyNode,
-                (List<Object>) executeResponse.getData());
-        proxyService.saveDslExecutionResult(executionResult);
-        // For published analysis, update analysis metadata table with the category information.
-        analysis = executionResult.getAnalysis();
-        Long uid = analysis.getUserId() == null ? authTicket.getUserId() : analysis.getUserId();
-        analysis.setUserId(uid);
-        analysis.setCreatedTime(analysis.getCreatedTime() == null ? Instant.now().toEpochMilli()
-            : analysis.getCreatedTime());
-        analysis.setModifiedTime(Instant.now().toEpochMilli());
-        analysis.setModifiedBy(
-            authTicket != null && !authTicket.getUserFullName().isEmpty() ? authTicket
-                .getUserFullName() : analysis.getModifiedBy());
-        proxyService.updateAnalysis(analysis);
-      }
-      if (!analysis.getType().equalsIgnoreCase("report")) {
-        logger.info("analysis ." + "not a DL report");
-        if (tempExecutionType) {
-          ExecutionResult executionResult =
-              buildExecutionResult(
-                  executeResponse.getExecutionId(),
-                  analysis,
-                  queryId,
-                  startTime,
-                  authTicket,
-                  executionType,
-                  dataSecurityKeyNode,
-                  (List<Object>) executeResponse.getData());
-          proxyService.saveTtlExecutionResult(executionResult);
-        }
-        // return only requested data based on page no and page size, only for FE
-        List<Object> pagingData =
-            proxyService.pagingData(page, pageSize, (List<Object>) executeResponse.getData());
-        /* If FE is sending the page no and page size then we are setting only   data that
-         * corresponds to page no and page size in response instead of  total data.
-         * For DL reports skipping this step as response from DL is already paginated.
-         * */
-        executeResponse.setData(
-            pagingData != null && pagingData.size() > 0 ? pagingData : executeResponse.getData());
-        // return user id with data in execution results
-        if (userId != null) {
-          executeResponse.setUserId(userId);
-        }
-      }
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -506,53 +354,12 @@ public class StorageProxyController {
     }
     logger.trace(
         "response data size {}", objectMapper.writeValueAsString(executeResponse.getTotalRows()));
-    /** Sip scheduler doesn't requires holding the execution result data while processing the
-     request, which can be minimized by removing the data section for memory optimization **/
-    if (isScheduledExecution) {
-      executeResponse.setData(null);
-      logger.trace("Response returned back to scheduler {}",
-          objectMapper.writeValueAsString(executeResponse));
-    }
+    /**
+     * Sip scheduler doesn't requires holding the execution result data while processing the
+     * request, which can be minimized by removing the data section for memory optimization *
+     */
     return executeResponse;
   }
-
-  /**
-   * Build execution result bean.
-   *
-   * @param executionId
-   * @param analysis
-   * @param queryId
-   * @param startTime
-   * @param authTicket
-   * @param executionType
-   * @param data
-   * @return execution
-   */
-  private ExecutionResult buildExecutionResult(
-      String executionId,
-      Analysis analysis,
-      String queryId,
-      Long startTime,
-      Ticket authTicket,
-      ExecutionType executionType,
-      DataSecurityKey dataSecurityKeyNode,
-      List<Object> data) {
-    ExecutionResult executionResult = new ExecutionResult();
-    String type = analysis.getType();
-    executionResult.setExecutionId(executionId);
-    executionResult.setDslQueryId(queryId);
-    executionResult.setAnalysis(analysis);
-    executionResult.setStartTime(startTime);
-    executionResult.setFinishedTime(new Date().getTime());
-    executionResult.setExecutionType(executionType);
-    executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
-    executionResult.setStatus("success");
-    executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
-    executionResult.setDataSecurityKey(dataSecurityKeyNode.getDataSecuritykey());
-    executionResult.setRecordCount(data.size());
-    return executionResult;
-  }
-
   /**
    * API to fetch the list of saved executions.
    *
