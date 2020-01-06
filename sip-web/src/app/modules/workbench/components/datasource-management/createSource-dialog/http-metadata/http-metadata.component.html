@@ -98,11 +98,72 @@
         e2e="e2e-headers-tab"
       >
         Headers &nbsp;
-        <ng-container *ngIf="headerParams.controls.length">
+        <ng-container
+          *ngIf="headerParams.controls.length + provisionalHeaders.length"
+        >
           <span class="dot"></span>
         </ng-container>
       </div>
     </ng-template>
+
+    <div
+      class="parameters headers"
+      [style.display]="provisionalHeaders.length ? 'block' : 'none'"
+    >
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Provisional Headers
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div
+            formArrayName="provisionalHeaders"
+            *ngFor="let item of provisionalHeaderParams.controls; let i = index"
+          >
+            <div
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              [formGroupName]="i"
+              fxLayoutGap="10px"
+            >
+              <!-- Header Key -->
+              <mat-form-field
+                fxFlex="1 1 auto"
+                appearance="outline"
+                fxLayoutGap="10px"
+                matTooltip="Use Authorization tab to update"
+              >
+                <mat-label i18n>Header Name</mat-label>
+                <input
+                  matInput
+                  name="name-of-header"
+                  [e2e]="'provisional-header-name-' + i"
+                  formControlName="key"
+                  readonly
+                />
+              </mat-form-field>
+
+              <mat-form-field
+                fxFlex="5 1 auto"
+                appearance="outline"
+                matTooltip="Use Authorization tab to update"
+              >
+                <mat-label i18n>Header Value</mat-label>
+                <input
+                  matInput
+                  name="value-of-header"
+                  [e2e]="'provisional-header-value-' + i"
+                  formControlName="value"
+                  readonly
+                />
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
     <!-- Header Parameters form -->
     <div class="parameters headers" fxLayout="row" fxLayoutAlign="end center">
       <button
@@ -274,5 +335,107 @@
         </button>
       </div>
     </div>
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <div fxLayout="row" fxLayoutAlign="center center">
+        Authorization &nbsp;
+        <ng-container *ngIf="provisionalHeaders.length">
+          <span class="dot"></span>
+        </ng-container>
+      </div>
+    </ng-template>
+    <!-- Query Parameters form -->
+    <form
+      fxFlex
+      fxLayout="row"
+      fxLayoutAlign="center start"
+      fxLayoutGap="5px"
+      class="parameters authorization"
+      novalidate
+      [formGroup]="authorizationForm"
+      autocomplete="false"
+    >
+      <div fxFlex="30" fxLayout="column" fxLayoutAlign="start stretch">
+        <mat-form-field appearance="outline" fxFlex="35">
+          <mat-label>Authorization Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option
+              *ngFor="let type of authorizationTypeValues"
+              [value]="type"
+            >
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <p
+          style="margin: 0"
+          [style.display]="
+            authType.value === authorizationTypes.NONE ? 'none' : 'block'
+          "
+        >
+          The authorization header will be automatically generated when you test
+          connectivity or save.
+        </p>
+      </div>
+      <mat-divider [vertical]="true"></mat-divider>
+      <div
+        fxFlex="40"
+        style="height: 62px; text-align: center; line-height: 62px;"
+        [style.display]="
+          authType.value === authorizationTypes.NONE ? 'block' : 'none'
+        "
+      >
+        Please choose an Authorization scheme.
+      </div>
+      <div
+        fxFlex="40"
+        fxLayout="column"
+        fxLayoutAlign="start stretch"
+        [style.display]="
+          authType.value === authorizationTypes.BASIC ? 'flex' : 'none'
+        "
+      >
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label i18n>Username</mat-label>
+          <input
+            matInput
+            name="auth-username"
+            e2e="auth-username"
+            formControlName="userName"
+            [required]="authType.value === authorizationTypes.BASIC"
+            autocomplete="off"
+          />
+          <mat-error *ngIf="!!authUsername.hasError('required')" i18n>
+            Username is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label i18n>Password</mat-label>
+          <input
+            matInput
+            name="auth-password"
+            e2e="auth-password"
+            showPassword
+            formControlName="password"
+            [required]="authType.value === authorizationTypes.BASIC"
+            autocomplete="off"
+          />
+          <mat-icon
+            matTooltip="Toggle Password"
+            matSuffix
+            fontIcon="icon-show"
+            e2e="show-password"
+          ></mat-icon>
+          <mat-error *ngIf="!!authPassword.hasError('required')" i18n>
+            Password is
+            <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
   </mat-tab>
 </mat-tab-group>

@@ -13,6 +13,7 @@ const AnalyzePage = require('../../pages/AnalyzePage');
 const ChartDesignerPage = require('../../pages/ChartDesignerPage');
 const ExecutePage = require('../../pages/ExecutePage');
 const Constants = require('../../helpers/Constants');
+const users = require('../../helpers/data-generation/users');
 
 describe('Executing pagination test for charts in grid view from charts/PaginationInExecutePage.test.js', () => {
   let analysisId;
@@ -28,7 +29,11 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
   beforeAll(() => {
     logger.info('Starting charts/PaginationInExecutePage.test.js.....');
     host = APICommonHelpers.getApiUrl(browser.baseUrl);
-    token = APICommonHelpers.generateToken(host);
+    token = APICommonHelpers.generateToken(
+      host,
+      users.admin.loginId,
+      users.anyUser.password
+    );
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.timeoutInterval;
   });
 
@@ -116,7 +121,10 @@ describe('Executing pagination test for charts in grid view from charts/Paginati
 
         const executePage = new ExecutePage();
         executePage.verifyTitle(chartName);
-        analysisId = executePage.getAnalysisId();
+
+        executePage.getAnalysisId().then(id => {
+          analysisId = id;
+        });
         // Pagination section
         executePage.clickOnGridViewIcon();
         executePage.verifyPagination();

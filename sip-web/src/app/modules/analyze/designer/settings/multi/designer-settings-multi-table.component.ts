@@ -5,14 +5,13 @@ import * as flatMap from 'lodash/flatMap';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
-import * as toLower from 'lodash/toLower';
 
 import {
   Artifact,
   JsPlumbCanvasChangeEvent,
   DesignerChangeEvent
 } from '../../types';
-import { QueryDSL, Join, ArtifactDSL } from 'src/app/models';
+import { QueryDSL, Join } from 'src/app/models';
 
 /**
  * Reverses the sides of left and right joins if they are incorrect.
@@ -26,28 +25,12 @@ import { QueryDSL, Join, ArtifactDSL } from 'src/app/models';
  */
 function getConditionOnSide(
   joinCondition,
-  artifacts: ArtifactDSL[],
   side: 'left' | 'right'
 ) {
-  const leftSide = joinCondition.left;
-  const rightSide = joinCondition.right;
-  const [leftArtifact] = artifacts
-    .map(a => toLower(a.artifactsName))
-    .filter(name =>
-      [
-        toLower(leftSide.artifactsName),
-        toLower(rightSide.artifactsName)
-      ].includes(name)
-    );
-
   return {
     tableName: joinCondition[side].artifactsName,
     columnName: joinCondition[side].columnName,
-    side: isEmpty(artifacts)
-      ? side
-      : toLower(joinCondition[side].artifactsName) === leftArtifact
-      ? 'right'
-      : 'left'
+    side: side
   };
 }
 
@@ -56,8 +39,8 @@ export function refactorJoins(joins, artifacts) {
     fpFilter(join => !join.type),
     fpMap(join => {
       const criteria = flatMap(join.criteria, ({ joinCondition }) => [
-        getConditionOnSide(joinCondition, artifacts, 'left'),
-        getConditionOnSide(joinCondition, artifacts, 'right')
+        getConditionOnSide(joinCondition, 'left'),
+        getConditionOnSide(joinCondition, 'right')
       ]);
       return {
         type: join.join,

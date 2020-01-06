@@ -7,7 +7,8 @@ export {
   AnalysisChart,
   ArtifactColumnReport,
   SqlBuilderChart,
-  AnalysisChartDSL
+  AnalysisChartDSL,
+  ChartOptions
 } from '../models';
 export interface ConfirmDialogData {
   title: string;

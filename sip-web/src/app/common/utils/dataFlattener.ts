@@ -10,33 +10,17 @@ import * as orderBy from 'lodash/orderBy';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
+import * as some from 'lodash/some';
+import * as set from 'lodash/set';
 import * as isUndefined from 'lodash/isUndefined';
 import * as mapKeys from 'lodash/mapKeys';
 import * as fpMap from 'lodash/fp/map';
 import * as fpSplit from 'lodash/fp/split';
-import { ArtifactColumnDSL } from 'src/app/models';
-import * as forEach from 'lodash/forEach';
-import { NUMBER_TYPES } from './../consts';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpPick from 'lodash/fp/pick';
 import * as moment from 'moment';
-
-// function substituteEmptyValues(data, fields) {
-//   return flatMap(fields, field =>
-//     fpPipe(
-//       fpMap(value => {
-//         // As per AC on 5216, if key is empty show undefined
-//         if (field.area === 'data') {
-//           return value;
-//         }
-//         if (isEmpty(value[field.name])) {
-//           value[field.name] = 'undefined';
-//         }
-//         return value;
-//       })
-//     )(data)
-//   );
-// }
+import { ArtifactColumnDSL, QueryDSL, ChartOptions } from 'src/app/models';
+import { NUMBER_TYPES } from './../consts';
 
 export function substituteEmptyValues(data) {
   return fpPipe(
@@ -305,26 +289,33 @@ function parseLeafChart(node, dataObj) {
  * @returns {chartOptions}
  */
 
-export function setReverseProperty(chartOptions, sipQuery) {
-  const xAxisFields = [
-    find(sipQuery.artifacts[0].fields, field => field.area === 'x')
-  ];
-  if (!NUMBER_TYPES.includes(xAxisFields[0].type)) {
+export function setReverseProperty(
+  chartOptions: ChartOptions,
+  sipQuery: QueryDSL
+) {
+  const xAxisField = find(
+    sipQuery.artifacts[0].fields,
+    field => field.area === 'x'
+  );
+  if (!NUMBER_TYPES.includes(xAxisField.type)) {
     return chartOptions;
   }
-  if (!isEmpty(sipQuery.sorts)) {
-    forEach(sipQuery.sorts, sort => {
-      chartOptions.xAxis = {
-        reversed: false
-      };
-      if (
-        sort.order === 'desc' &&
-        sort.columnName === xAxisFields[0].columnName
-      ) {
-        chartOptions.xAxis.reversed = true;
-        return false;
-      }
-    });
-  }
+  const reversed = shouldReverseChart(sipQuery);
+  set(chartOptions, 'xAxis.reversed', reversed);
   return chartOptions;
+}
+
+export function shouldReverseChart(sipQuery: QueryDSL) {
+  const firstArtifactFields = sipQuery.artifacts[0].fields;
+  const xAxisField = find(firstArtifactFields, ({ area }) => area === 'x');
+  const xAxisColumnName = xAxisField.columnName;
+  const sorts = sipQuery.sorts;
+  if (!isEmpty(sorts)) {
+    return some(
+      sorts,
+      ({ order, columnName }) =>
+        order === 'desc' && columnName === xAxisColumnName
+    );
+  }
+  return false;
 }

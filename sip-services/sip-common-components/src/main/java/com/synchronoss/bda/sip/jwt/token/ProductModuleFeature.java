@@ -18,6 +18,7 @@ public class ProductModuleFeature implements Serializable {
   private String prodModFeatureType;
   private String defaultFeature;
   private String prodModFeatrCode;
+  private boolean systemCategory;
   private Long roleId;
   private ArrayList<ProductModuleFeature> ProductModuleSubFeatures;
 
@@ -116,5 +117,13 @@ public class ProductModuleFeature implements Serializable {
 
   public void setProdModFeatrCode(String prodModFeatrCode) {
     this.prodModFeatrCode = prodModFeatrCode;
+  }
+
+  public boolean isSystemCategory() {
+    return systemCategory;
+  }
+
+  public void setSystemCategory(boolean systemCategory) {
+    this.systemCategory = systemCategory;
   }
 }

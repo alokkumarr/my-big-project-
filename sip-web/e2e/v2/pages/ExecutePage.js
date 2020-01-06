@@ -126,7 +126,7 @@ class ExecutePage extends ConfirmationModel {
 
   getAnalysisId() {
     //get analysis id from current url
-    browser.getCurrentUrl().then(url => {
+    return browser.getCurrentUrl().then(url => {
       return commonFunctions.getAnalysisIdFromUrl(url);
     });
   }
@@ -235,6 +235,18 @@ class ExecutePage extends ConfirmationModel {
         }
       })();
     });
+  }
+
+  verifyAnalysisDetailsAndDelete(reportName, reportDescription) {
+    this.verifyTitle(reportName);
+    this.clickOnActionLink();
+    this.clickOnDetails();
+    this.verifyDescription(reportDescription);
+    this.closeActionMenu();
+    // Delete the report
+    this.clickOnActionLink();
+    this.clickOnDelete();
+    this.confirmDelete();
   }
 }
 module.exports = ExecutePage;

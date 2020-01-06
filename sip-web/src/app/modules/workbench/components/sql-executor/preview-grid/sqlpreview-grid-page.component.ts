@@ -33,7 +33,7 @@ export class SqlpreviewGridPageComponent
 
   constructor(public dxDataGrid: DxDataGridService) {}
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
   @Output() onToggleScreenMode: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {

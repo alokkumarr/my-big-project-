@@ -99,7 +99,7 @@ class DataSourcesPage extends DeleteModel {
     this._jobLogFileStatus = value =>
       element(by.css(`[e2e='job-log-mflFileStatus-${value}']`));
 
-    this._backBtn = element(by.css(`[class='mat-icon-button']`));
+    this._backBtn = element(by.css(`[e2e='e2e-back-btn']`));
     this._recFileName = name =>
       element(by.xpath(`//*[contains(@e2e,'job-log-recdFileName-${name}')]`));
   }

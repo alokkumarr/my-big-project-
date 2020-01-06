@@ -2,17 +2,19 @@ package com.sncr.saw.security.common.bean;
 
 public class Role {
 
+	private Long roleId;
 	private Long custSysId;
 	private String roleName;
 	private String roleCode;
 	private String roleDesc;
 	private String roleType;
+	private String createdBy;
+	private String modifiedBy;
+	private boolean autoCreate;
+	private String customerCode;
+	private String inactivatedBy;
 	private String dataSecurityKey;
 	private String activeStatusInd;
-	private String createdBy;
-	private String inactivatedBy;
-	private String modifiedBy;
-	private Long roleId;
 
 	public Role() {
 	}
@@ -56,6 +58,22 @@ public class Role {
 
 	public String getRoleType() {
 		return roleType;
+	}
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public boolean isAutoCreate() {
+		return autoCreate;
+	}
+
+	public void setAutoCreate(boolean autoCreate) {
+		this.autoCreate = autoCreate;
 	}
 
 	public void setRoleType(String roleType) {

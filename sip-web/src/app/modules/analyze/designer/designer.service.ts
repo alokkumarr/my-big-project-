@@ -16,6 +16,7 @@ import * as unset from 'lodash/unset';
 import * as toLower from 'lodash/toLower';
 import * as toUpper from 'lodash/toUpper';
 import * as some from 'lodash/some';
+import * as split from 'lodash/split';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../services/analyze.service';
@@ -42,6 +43,7 @@ import {
   DATE_TYPES,
   GEO_TYPES,
   DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ,
   DEFAULT_DATE_INTERVAL,
   DEFAULT_PIVOT_DATE_FORMAT,
   CHART_DEFAULT_DATE_FORMAT
@@ -111,9 +113,9 @@ export class DesignerService {
     }
 
     const columnName = column.columnName || column.name;
-
+    const [trimmedColumnName] = split(columnName, '.');
     if (!!column.aggregate) {
-      return `${toLower(column.aggregate)}@@${toLower(columnName)}`;
+      return `${toLower(column.aggregate)}@@${toLower(trimmedColumnName)}`;
     }
 
     return columnName;
@@ -154,8 +156,13 @@ export class DesignerService {
 
     let aggregates = [];
 
-    if (NUMBER_TYPES.includes(column.type) || column.type === 'string') {
+    if (NUMBER_TYPES.includes(column.type)) {
       aggregates = AggregateChooserComponent.isAggregateEligible(analysisType);
+    } else if (column.type === 'string') {
+      aggregates = [
+        AGGREGATE_TYPES_OBJ['count'],
+        AGGREGATE_TYPES_OBJ['distinctcount']
+      ];
     }
 
     return fpPipe(
@@ -285,12 +292,6 @@ export class DesignerService {
           ) || [];
         artifactColumn.aggregate =
           unusedAggregates[0] || DEFAULT_AGGREGATE_TYPE.value;
-        if (
-          artifactColumn.area === 'data' &&
-          artifactColumn.type === 'string'
-        ) {
-          artifactColumn.aggregate = 'count';
-        }
         artifactColumn.dataField = DesignerService.dataFieldFor(
           <ArtifactColumnDSL>artifactColumn
         );
@@ -602,9 +603,6 @@ export class DesignerService {
         artifactColumn.dataField = DesignerService.dataFieldFor(
           <ArtifactColumnDSL>artifactColumn
         );
-      }
-      if (artifactColumn.area === 'y' && artifactColumn.type === 'string') {
-        artifactColumn.aggregate = 'count';
       }
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
