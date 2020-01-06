@@ -5,11 +5,14 @@ import * as fpReduce from 'lodash/fp/reduce';
 import * as isString from 'lodash/isString';
 import * as upperCase from 'lodash/upperCase';
 import { JwtService } from '../../../common/services';
+import { ToastService } from '../../../common/services/toastMessage.service';
 import { Analysis } from '../types';
 import { AnalysisDSL } from '../../../models';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { DesignerSaveEvent, isDSLAnalysis } from '../designer/types';
 import * as clone from 'lodash/clone';
+import * as get from 'lodash/get';
+import { SYSTEM_CATEGORY_OPERATIONS } from './../../../common/consts';
 
 @Component({
   selector: 'analyze-actions-menu-u',
@@ -25,6 +28,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   @Output() detailsRequested: EventEmitter<boolean> = new EventEmitter();
   @Input() analysis: Analysis | AnalysisDSL;
   @Input() exclude: string;
+  @Input() category;
   @Input('actionsToDisable')
   set disabledActions(actionsToDisable: string) {
     this.actionsToDisable = fpPipe(
@@ -39,6 +43,7 @@ export class AnalyzeActionsMenuComponent implements OnInit {
     )(actionsToDisable);
   }
   public actionsToDisable = {};
+  public categoryDetails;
 
   actions = [
     {
@@ -88,15 +93,22 @@ export class AnalyzeActionsMenuComponent implements OnInit {
 
   constructor(
     public _analyzeActionsService: AnalyzeActionsService,
-    public _jwt: JwtService
+    public _jwt: JwtService,
+    public _toastMessage: ToastService
   ) {}
 
   ngOnInit() {
+    this.categoryDetails = this._jwt.fetchCategoryDetails(this.category)[0];
     const privilegeMap = { print: 'export', details: 'access' };
     const actionsToExclude = isString(this.exclude)
       ? this.exclude.split('-')
       : [];
-    this.actions = filter(this.actions, ({ value }) => {
+    this.actions = filter(this.actions, ({ value, label }) => {
+      if (get(this.categoryDetails, 'systemCategory')) {
+        if (SYSTEM_CATEGORY_OPERATIONS.includes(label)) {
+          return false;
+        }
+      }
       const notExcluded = !actionsToExclude.includes(value);
       const privilegeName = upperCase(privilegeMap[value] || value);
       const subCategoryId = isDSLAnalysis(this.analysis)
@@ -145,6 +157,10 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   }
 
   delete() {
+    if (get(this.categoryDetails, 'systemCategory')) {
+      this._toastMessage.error('Cannot Delete From a System Category Folder');
+      return false;
+    }
     this._analyzeActionsService.delete(this.analysis).then(wasSuccessful => {
       if (wasSuccessful) {
         this.afterDelete.emit(<Analysis>this.analysis);
@@ -153,6 +169,10 @@ export class AnalyzeActionsMenuComponent implements OnInit {
   }
 
   publish() {
+    if (get(this.categoryDetails, 'systemCategory')) {
+      this._toastMessage.error('Cannot Publish From a System Category Folder');
+      return false;
+    }
     const analysis = clone(this.analysis);
     this._analyzeActionsService.publish(analysis).then(publishedAnalysis => {
       this.analysis = publishedAnalysis;

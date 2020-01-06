@@ -47,4 +47,13 @@ describe('Observe Service', () => {
       expect(observe.executeKPI({}) instanceof Observable).toEqual(true);
     }
   ));
+
+  it('readAnalysesPrivileges should exist and return a promise', inject(
+    [ObserveService],
+    (observe: ObserveService) => {
+      expect(
+        observe.readAnalysesPrivileges([]) instanceof Promise
+      ).toBeTruthy();
+    }
+  ));
 });

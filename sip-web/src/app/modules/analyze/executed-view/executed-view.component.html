@@ -136,6 +136,7 @@
             (afterDelete)="afterDelete(analysis)"
             (afterPublish)="afterPublish($event)"
             (afterExport)="exportData()"
+            [category]="analysis.category"
           ></analyze-actions-menu-u>
         </div>
       </mat-toolbar>

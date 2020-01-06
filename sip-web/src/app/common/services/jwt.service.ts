@@ -8,6 +8,9 @@ import * as lowerCase from 'lodash/lowerCase';
 import * as toUpper from 'lodash/toUpper';
 import AppConfig from '../../../../appConfig';
 import { Injectable } from '@angular/core';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpPipe from 'lodash/fp/pipe';
 import {
   USER_ANALYSIS_CATEGORY_NAME,
   USER_ANALYSIS_SUBCATEGORY_NAME
@@ -36,10 +39,7 @@ export const CUSTOM_JWT_CONFIG = {
 
 @Injectable()
 export class JwtService {
-
-  constructor(
-    public _http: HttpClient
-  ) {}
+  constructor(public _http: HttpClient) {}
 
   _refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
 
@@ -81,6 +81,17 @@ export class JwtService {
 
   getRefreshToken() {
     return window.localStorage[this._refreshTokenKey];
+  }
+
+  get refreshTokenObject() {
+    const rToken = this.getRefreshToken();
+
+    if (!rToken) {
+      return null;
+    }
+    const parsedJwt = this.parseJWT(rToken);
+
+    return parsedJwt;
   }
 
   validity() {
@@ -154,6 +165,24 @@ export class JwtService {
     }
 
     return get(token, 'ticket.custCode', 'Synchronoss');
+  }
+
+  get customerId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.custID', '');
+  }
+
+  get productId(): string {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.defaultProdID', '');
   }
 
   isValid(token) {
@@ -346,9 +375,19 @@ export class JwtService {
     };
 
     return this._http
-    .post(AppConfig.login.url + '/auth/validateToken', httpOptions).toPromise()
-    .then(res => {
-      return res;
-    });
+      .post(AppConfig.login.url + '/auth/validateToken', httpOptions)
+      .toPromise();
+  }
+
+  fetchCategoryDetails(categoryId) {
+    const token = this.getTokenObj();
+    const product = get(token, 'ticket.products.[0]');
+    return fpPipe(
+      fpFlatMap(module => module.prodModFeature),
+      fpFlatMap(subModule => subModule.productModuleSubFeatures),
+      fpFilter(({ prodModFeatureID }) => {
+        return parseInt(prodModFeatureID) == parseInt(categoryId);
+      })
+    )(product.productModules);
   }
 }

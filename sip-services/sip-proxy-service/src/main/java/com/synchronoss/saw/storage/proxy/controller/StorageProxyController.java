@@ -42,6 +42,7 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
 import com.synchronoss.sip.utils.RestUtil;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -313,6 +314,11 @@ public class StorageProxyController {
     }
     if (isPublishedExecution && !validatePrivilege(productList, category, PrivilegeNames.PUBLISH)) {
       logger.error("UNAUTHORIZED ACCESS : User don't have the PUBLISH privilege!!");
+      setUnAuthResponse(response);
+      return executeResponse;
+    } else if (isPublishedExecution && validatePrivilege(productList, category, PrivilegeNames.PUBLISH)
+        && SipCommonUtils.haveSystemCategory(productList, category)) {
+      logger.error("UNAUTHORIZED ACCESS : System category can't be published.");
       setUnAuthResponse(response);
       return executeResponse;
     } else if (!isScheduledExecution && !isPublishedExecution && !validatePrivilege(productList,

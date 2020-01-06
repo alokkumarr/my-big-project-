@@ -29,4 +29,12 @@ describe('JWT Service', () => {
       jwtService.getValidityReason({ ticket: { validityReason: reason } })
     ).toEqual(reason);
   });
+
+  it('should return product id', () => {
+    expect(jwtService.productId).toEqual('');
+  });
+
+  it('should return customer id', () => {
+    expect(jwtService.customerId).toEqual('');
+  });
 });

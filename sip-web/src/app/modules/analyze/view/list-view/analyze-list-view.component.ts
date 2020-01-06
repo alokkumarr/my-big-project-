@@ -45,6 +45,7 @@ export class AnalyzeListViewComponent implements OnInit {
   }
   @Input() analysisType: string;
   @Input() searchTerm: string;
+  @Input() category;
   @Input('cronJobs') set _cronJobs(value) {
     if (isNil(value)) {
       return;

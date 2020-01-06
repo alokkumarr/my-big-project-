@@ -8,7 +8,9 @@ public class SubCategoryWithPrivilegeDetails {
     private String subCategoryName;
     private Long privilegeCode;
     private Long privilegeId;
+    private String privilegeDesc;
     private String subCategoryCode;
+    private boolean systemCategory;
 
     /**
      * Gets subCategoryId
@@ -88,5 +90,29 @@ public class SubCategoryWithPrivilegeDetails {
      */
     public void setSubCategoryCode(String subCategoryCode) {
         this.subCategoryCode = subCategoryCode;
+    }
+
+    /**
+     * Gets systemCategory
+     *
+     * @return value of systemCategory
+     */
+    public boolean isSystemCategory() {
+        return systemCategory;
+    }
+
+    /**
+     * Sets value of systemCategory
+     */
+    public void setSystemCategory(boolean systemCategory) {
+        this.systemCategory = systemCategory;
+    }
+
+    public String getPrivilegeDesc() {
+        return privilegeDesc;
+    }
+
+    public void setPrivilegeDesc(String privilegeDesc) {
+        this.privilegeDesc = privilegeDesc;
     }
 }

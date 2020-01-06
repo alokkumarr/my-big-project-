@@ -1,20 +1,21 @@
 package com.synchronoss.saw.analysis.controller;
 
 import static com.synchronoss.saw.util.SipMetadataUtils.getTicket;
-import static com.synchronoss.saw.util.SipMetadataUtils.getToken;
 import static com.synchronoss.saw.util.SipMetadataUtils.validateTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
 import static com.synchronoss.sip.utils.SipCommonUtils.setBadRequest;
 import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.saw.analysis.modal.Analysis;
+import com.synchronoss.saw.analysis.modal.AnalysisPrivileges;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
 import com.synchronoss.saw.analysis.service.AnalysisService;
-import com.synchronoss.saw.exceptions.SipAuthorizationException;
 import com.synchronoss.saw.util.SipMetadataUtils;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
+import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -214,6 +215,14 @@ public class AnalysisController {
       analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
       return analysisResponse;
     }
+
+    Long categoryId = analysis.getCategory() != null ? Long.valueOf(analysis.getCategory()) : 0L;
+    if (response != null && response.getStatus() != HttpStatus.UNAUTHORIZED.value()
+        && SipCommonUtils.haveSystemCategory(authTicket.getProducts(), categoryId)) {
+      analysisResponse.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisResponse;
+    }
+
     analysisService.deleteAnalysis(id, authTicket);
     analysisResponse.setMessage("Analysis deleted successfully");
     analysisResponse.setAnalysisId(id);
@@ -316,5 +325,63 @@ public class AnalysisController {
           "You are not authorized to view this Category");
       return new ArrayList<>();
     }
+  }
+
+  /**
+   * Fetch Analysis list with Privilege.
+   *
+   * @param request HttpServletRequest
+   * @param response HttpServletResponse
+   * @param analysisList List of analysis id
+   * @return AnalysisPrivilege list
+   * @throws Exception exception
+   */
+  @ApiOperation(
+      value = "Fetch Analysis With privileges API",
+      nickname = "FetchAnalysis list",
+      notes = "",
+      response = List.class)
+  @RequestMapping(
+      value = "/analysisPrivileges",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public List<AnalysisPrivileges> getAnalysisListWithPrivilege(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestBody List<String> analysisList) throws Exception {
+    String authToken = request.getHeader("Authorization");
+    List<AnalysisPrivileges> analysisPrivilegesList = new ArrayList<>();
+    if (!authValidation(authToken)) {
+      response
+          .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+      return analysisPrivilegesList;
+    }
+    Ticket authTicket = getTicket(request);
+    analysisList.forEach(analysisId -> {
+      Analysis analysis = analysisService.getAnalysis(analysisId, authTicket);
+      AnalysisPrivileges analysisPrivileges = new AnalysisPrivileges();
+      if (analysis == null) {
+        analysisPrivileges.setAnalysisId(analysisId);
+        analysisPrivileges.setAccessPermission(false);
+        analysisPrivileges.setExecutePermission(false);
+        analysisPrivileges.setMessage("Analysis is not present in the store");
+        analysisPrivilegesList.add(analysisPrivileges);
+      } else {
+        analysisPrivileges.setAnalysisId(analysisId);
+        analysisPrivileges.setCategory(analysis.getCategory());
+        analysisPrivileges.setAccessPermission(
+            validatePrivilege(authTicket.getProducts(), Long.parseLong(analysis.getCategory()),
+                PrivilegeNames.ACCESS));
+        analysisPrivileges.setExecutePermission(
+            validatePrivilege(authTicket.getProducts(), Long.parseLong(analysis.getCategory()),
+                PrivilegeNames.EXECUTE));
+        analysisPrivilegesList.add(analysisPrivileges);
+      }
+
+    });
+    // List<AnalysisPrivileges> analysisPriv = analysisService
+    //     .getAnalysisListWithPrivilege(analysisList, authTicket);
+
+    return analysisPrivilegesList;
   }
 }

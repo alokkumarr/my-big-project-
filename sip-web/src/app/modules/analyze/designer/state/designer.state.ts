@@ -264,17 +264,12 @@ export class DesignerState {
       return patchState({});
     }
 
-    const artifactColumnIndex = artifacts[artifactIndex].fields.findIndex(
-      field => {
-        const fieldName = artifactColumn.dataField ? 'dataField' : 'columnName';
-        return (
-          toLower(field[fieldName]) === toLower(artifactColumn[fieldName]) &&
-          /* If a field is added to more than one area (say, x axis and group by),
-             then we need to know exactly which area the user removed the field from.
-          */
-          (fieldArea ? field.area === fieldArea : true)
-        );
-      }
+    const artifactColumnIndex = findIndex(
+      artifacts[artifactIndex].fields,
+      ({ columnName, dataField, area }) =>
+        dataField
+          ? dataField === artifactColumn.dataField
+          : columnName === artifactColumn.columnName
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
@@ -287,7 +282,6 @@ export class DesignerState {
     const sorts = filter(sipQuery.sorts, sort =>
       sort.columnName !== artifactColumn.columnName
     );
-
     patchState({
       analysis: {
         ...analysis,
@@ -702,6 +696,9 @@ export class DesignerState {
 
     adapter.artifactColumns.splice(columnIndex, 0, artifactColumn);
     adapter.onReorder(adapter.artifactColumns);
+    if (get(artifactColumn, 'area') !== 'data' && analysis.type === 'pivot') {
+      delete artifactColumn.aggregate;
+    }
     patchState({ groupAdapters: [...groupAdapters] });
     return dispatch(new DesignerAddArtifactColumn(artifactColumn));
   }
@@ -713,13 +710,19 @@ export class DesignerState {
   ) {
     const analysis = getState().analysis;
     const sipQuery = analysis.sipQuery;
+    if (analysis.type === 'map' && artifactColumn.expression) {
+      /* For some reason aggregate is getting addded for derived metric only for maps.
+      Quick fix but need to evaluate root cause. This is seen even in
+      previous version */
+      delete artifactColumn.aggregate;
+    }
     let artifacts = sipQuery.artifacts;
     const isDateType = DATE_TYPES.includes(artifactColumn.type);
     const fillMissingDataWithZeros =
       analysis.type === 'chart' && artifactColumn.type === 'date';
 
     /* If analysis is chart and this is a date field, assign a default
-      groupInterval. For pivots, use dateInterval if available */
+      groupInterval. For pivots, use dateInterval if available .*/
     const groupInterval = { groupInterval: null };
 
     if (artifactColumn.type === 'date') {
@@ -737,7 +740,6 @@ export class DesignerState {
           break;
       }
     }
-
     const artifactsName =
       artifactColumn.table || (<any>artifactColumn).tableName;
 
@@ -792,7 +794,6 @@ export class DesignerState {
     remove(sipQuery.artifacts, artifact => {
       return isEmpty(artifact.fields);
     });
-
     patchState({
       analysis: { ...analysis, sipQuery: { ...sipQuery, artifacts } }
     });

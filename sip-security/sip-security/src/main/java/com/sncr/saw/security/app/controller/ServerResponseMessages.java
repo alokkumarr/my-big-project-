@@ -23,6 +23,7 @@ public class ServerResponseMessages {
     public static final String GROUP_NAME_EXISTS = "Group Name already exists";
     public static final String ATTRIBUTE_NAME_EXISTS = "Attribute Name already exists";
     public static final String FIELDS_EXISTS = "Fields already exists";
+    public static final String GROUP_DOESNT_EXIST = "Group doesn't exist";
 
     public static final String GROUP_NAME_LONG = "Group Name too Long, Range(1-255)";
     public static final String ATTRIBUTE_NAME_LONG = "Attribute Name too Long, Range(1-100)";

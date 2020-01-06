@@ -237,4 +237,46 @@ public class SipCommonUtils {
         .sendError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase());
     return response;
   }
+
+
+  /**
+   * Validate system level category from the ticket with analysis category.
+   *
+   * @param productList list of products
+   * @param category    analysis category id
+   * @return true if any system level category matched with the analysis category Id
+   */
+  public static boolean haveSystemCategory(ArrayList<Products> productList, Long category) {
+    if (!CollectionUtils.isEmpty(productList)) {
+      for (Products product : productList) {
+        ArrayList<ProductModules> productModulesList =
+            product.getProductModules() != null ? product.getProductModules() : new ArrayList<>();
+        if (!CollectionUtils.isEmpty(productModulesList)) {
+          for (ProductModules productModule : productModulesList) {
+            ArrayList<ProductModuleFeature> prodModFeatureList =
+                productModule.getProdModFeature() != null
+                    ? productModule.getProdModFeature()
+                    : new ArrayList<>();
+            if (!CollectionUtils.isEmpty(prodModFeatureList)) {
+              for (ProductModuleFeature productModuleFeature : prodModFeatureList) {
+                ArrayList<ProductModuleFeature> productModuleSubFeatureList =
+                    productModuleFeature.getProductModuleSubFeatures() != null
+                        ? productModuleFeature.getProductModuleSubFeatures()
+                        : new ArrayList<>();
+                if (!CollectionUtils.isEmpty(productModuleSubFeatureList)) {
+                  for (ProductModuleFeature prodModSubFeature : productModuleSubFeatureList) {
+                    if (category != null && category.equals(prodModSubFeature.getProdModFeatureID())
+                        && prodModSubFeature.isSystemCategory()) {
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
 }
