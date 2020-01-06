@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -297,9 +298,11 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             	
             	for(FileStatus fileStatus: files) {
             		 logger.debug("******** part file name renaming for simple.... ********"+ fileStatus.getPath().getName());
-            		 
+            		 String uuid = UUID.randomUUID().toString();
+                	 String suffix = suffixFmt.format(date) + "-" + uuid;
+                	 
             		fs.rename(new Path(finalPath+ Path.SEPARATOR + fileStatus.getPath().getName()), new Path(finalPath+ 
-                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffixFmt.format(date)));
+                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffix));
             		
             		logger.info("******** rename completed ********");
             	}

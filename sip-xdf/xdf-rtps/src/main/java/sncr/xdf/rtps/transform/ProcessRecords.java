@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -568,13 +569,16 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             	 SimpleDateFormat suffixFmt = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
             	 Date date = new Date();
             	
+            	 String uuid = UUID.randomUUID().toString();
+            	 String suffix = suffixFmt.format(date) + "-" + uuid;
+            	
             	
             	 for(FileStatus fileStatus: files) {
             		 logger.debug("******** part file name renaming for simple.... ********"+ fileStatus.getPath().getName());
             		 
             		 
             		fs.rename(new Path(finalPath+ Path.SEPARATOR + fileStatus.getPath().getName()), new Path(finalPath+ 
-                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffixFmt.format(date)));
+                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffix));
             		
             		logger.info("******** rename completed ********");
             	}
