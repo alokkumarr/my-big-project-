@@ -1,10 +1,12 @@
 import { TestBed, async } from '@angular/core/testing';
 import { JwtService } from './jwt.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('JWT Service', () => {
   let jwtService: JwtService;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [JwtService]
     }).compileComponents();
   }));
@@ -26,5 +28,13 @@ describe('JWT Service', () => {
     expect(
       jwtService.getValidityReason({ ticket: { validityReason: reason } })
     ).toEqual(reason);
+  });
+
+  it('should return product id', () => {
+    expect(jwtService.productId).toEqual('');
+  });
+
+  it('should return customer id', () => {
+    expect(jwtService.customerId).toEqual('');
   });
 });

@@ -53,8 +53,10 @@ export class UserService {
 
   isLoggedIn() {
     const token = this._jwtService.getTokenObj();
+    const refreshToken = this._jwtService.refreshTokenObject;
     const isTokenvalid = this._jwtService.isValid(token);
-    return isTokenvalid;
+    const isRefreshTokenValid = this._jwtService.isValid(refreshToken);
+    return isTokenvalid || isRefreshTokenValid;
   }
 
   /**
@@ -99,17 +101,28 @@ export class UserService {
         Authorization: `Bearer ${token}`
       })
     };
-    return this._http
-      .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
-      .toPromise()
-      .then(() => {
-        this._jwtService.destroy();
-        this.store.dispatch(new CommonResetStateOnLogout());
-        if (path === 'logout') {
-          // TODO do something here for logout
-          // this._state.reload();
-        }
-      });
+
+    return new Promise((resolve, reject) => {
+      this._http
+        .post(loginUrl + route, resp.ticket.ticketId, httpOptions)
+        .toPromise()
+        .then(
+          () => {
+            this._jwtService.destroy();
+            this.store.dispatch(new CommonResetStateOnLogout());
+            if (path === 'logout') {
+              // TODO do something here for logout
+              // this._state.reload();
+            }
+            resolve();
+          },
+          () => {
+            this._jwtService.destroy();
+            this.store.dispatch(new CommonResetStateOnLogout());
+            resolve();
+          }
+        );
+    });
   }
 
   changePwd(credentials) {
@@ -213,25 +226,29 @@ export class UserService {
 
   refreshAccessToken(rtoken = this._jwtService.getRefreshToken()) {
     const route = `/${refreshTokenEndpoint}`;
-    return this._http
-      .post(loginUrl + route, rtoken)
-      .toPromise()
-      .then(
-        response => {
-          const resp = this._jwtService.parseJWT(get(response, 'aToken'));
-          // Store the user's info for easy lookup
-          if (this._jwtService.isValid(resp)) {
-            // this._jwtService.destroy();
-            this._jwtService.set(
-              get(response, 'aToken'),
-              get(response, 'rToken')
-            );
+    return new Promise((resolve, reject) => {
+      this._http
+        .post(loginUrl + route, rtoken)
+        .toPromise()
+        .then(
+          response => {
+            const resp = this._jwtService.parseJWT(get(response, 'aToken'));
+            // Store the user's info for easy lookup
+            if (this._jwtService.isValid(resp)) {
+              // this._jwtService.destroy();
+              this._jwtService.set(
+                get(response, 'aToken'),
+                get(response, 'rToken')
+              );
+              resolve(resp);
+            } else {
+              reject(new Error('Received invalid access token on refresh.'));
+            }
+          },
+          err => {
+            reject(err);
           }
-          return resp;
-        },
-        err => {
-          throw err;
-        }
-      );
+        );
+    });
   }
 }

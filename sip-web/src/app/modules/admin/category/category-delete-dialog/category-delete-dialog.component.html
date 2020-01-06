@@ -21,7 +21,10 @@
       <li *ngFor="let subCategory of data.category.subCategories">
         <div fxLayout="row" fxLayoutAlign="space-between center">
           <label>{{subCategory.subCategoryName}}</label>
-          <button mat-icon-button (click)="deleteSubCategory(subCategory)" matTooltip="Delete Sub Category">
+          <button mat-icon-button
+            (click)="deleteSubCategory(subCategory)"
+            [disabled]="subCategory.systemCategory"
+            matTooltip="Delete Sub Category">
             <mat-icon fontIcon="icon-trash"></mat-icon>
           </button>
         </div>

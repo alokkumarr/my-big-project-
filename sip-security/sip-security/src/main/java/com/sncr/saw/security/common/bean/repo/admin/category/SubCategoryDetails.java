@@ -1,12 +1,24 @@
 package com.sncr.saw.security.common.bean.repo.admin.category;
 
+import java.util.List;
+
 public class SubCategoryDetails {
+
+	private boolean autoCreate;
 	private long subCategoryId;
 	private String subCategoryName;
 	private String subCategoryDesc;
 	private long activestatusInd;
-	
-	
+  private boolean systemCategory;
+  private List<String> privilege;
+
+	public boolean isAutoCreate() {
+		return autoCreate;
+	}
+	public void setAutoCreate(boolean autoCreate) {
+		this.autoCreate = autoCreate;
+	}
+
 	public String getSubCategoryDesc() {
 		return subCategoryDesc;
 	}
@@ -31,6 +43,16 @@ public class SubCategoryDetails {
 	public void setSubCategoryName(String subCategoryName) {
 		this.subCategoryName = subCategoryName;
 	}
-	
-	
+	public boolean isSystemCategory() {
+		return systemCategory;
+	}
+	public void setSystemCategory(boolean systemCategory) {
+		this.systemCategory = systemCategory;
+	}
+	public List<String> getPrivilege() {
+		return privilege;
+	}
+	public void setPrivilege(List<String> privilege) {
+		this.privilege = privilege;
+	}
 }
