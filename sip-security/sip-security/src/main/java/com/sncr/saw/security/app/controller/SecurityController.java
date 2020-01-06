@@ -1150,6 +1150,8 @@ public class SecurityController {
                 payload.setValid(false);
                 payload.setMessage("Invalid request");
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+                return payload;
             }
 
             List<SipDskAttributeModel> dskAttributeModelList =
