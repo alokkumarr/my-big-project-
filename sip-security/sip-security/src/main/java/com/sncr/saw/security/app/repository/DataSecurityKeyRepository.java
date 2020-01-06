@@ -5,6 +5,7 @@ import com.sncr.saw.security.common.bean.repo.dsk.*;
 
 import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import java.util.List;
 
 public interface DataSecurityKeyRepository {
@@ -13,7 +14,8 @@ public interface DataSecurityKeyRepository {
     public Valid deleteSecurityGroups(Long securityGroupId);
     public List<SecurityGroups> fetchSecurityGroupNames(Long custId);
 
-    public Valid addDskGroupAttributeModelAndValues(Long securityGroupId, SipDskAttribute dskAttribute);
+    public Valid addDskGroupAttributeModelAndValues(Long securityGroupId,
+        List<SipDskAttributeModel> attributeModelList);
     public Valid deleteDskGroupAttributeModel(Long securityGroupId, Long customerId);
 
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues);
@@ -25,4 +27,7 @@ public interface DataSecurityKeyRepository {
     public Valid updateUser(String securityGroupName,Long userSysId, Long custId);
     public List<UserAssignment> getAllUserAssignments(Long custId);
     public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
+
+    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId,
+        SipDskAttribute dskAttribute, String parentId);
 }

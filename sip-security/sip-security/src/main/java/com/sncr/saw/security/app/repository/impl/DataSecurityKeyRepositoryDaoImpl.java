@@ -476,13 +476,11 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
     @Override
     public Valid addDskGroupAttributeModelAndValues(Long securityGroupId,
-        SipDskAttribute dskAttribute) {
+        List<SipDskAttributeModel> attributeModelList) {
         Valid valid = new Valid();
         // Process all dsk attributes and insert them in batch
 
         try {
-            List<SipDskAttributeModel> attributeModelList = prepareDskAttributeModelList(securityGroupId, dskAttribute, null);
-
             String insertDskAtributeModel = "INSERT INTO SEC_GROUP_DSK_ATTRIBUTE_MODEL"
                 + " (SEC_GROUP_DSK_ATTRIBUTE_SYS_ID, SEC_GROUP_SYS_ID, SEC_GROUP_DSK_PARENT_ID, BOOLEAN_CRITERIA, COLUMN_NAME, OPERATOR, ATTRIBUTE_VALUES)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -556,60 +554,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return valid;
     }
 
-    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId, SipDskAttribute dskAttribute, String parentId) {
-        List <SipDskAttributeModel> list = new ArrayList<>();
 
-        if (dskAttribute != null) {
-            BooleanCriteria booleanCriteria = dskAttribute.getBooleanCriteria();
-            String columnName = dskAttribute.getColumnName();
-            String dskAttributeId = UUID.randomUUID().toString();
-
-            if (booleanCriteria == null && columnName == null) {
-                throw new RuntimeException("Invalid DSK attributes");
-            }
-
-            if (booleanCriteria == null) {
-                // Boolean criteria is null means its a leaf node and doesn't have any children
-                SipDskAttributeModel model = new SipDskAttributeModel();
-                model.setDskAttributeSysId(dskAttributeId);
-                model.setSecGroupSysId(securityGroupId);
-                model.setDskAttributeParentId(parentId);
-
-                if (dskAttribute.getColumnName() == null) {
-                    throw new RuntimeException("Column name cannot be empty");
-                }
-                if (dskAttribute.getModel().getValues() == null
-                    || dskAttribute.getModel().getValues().isEmpty()) {
-                    throw new RuntimeException("Values cannot be empty");
-                }
-
-                model.setColumnName(dskAttribute.getColumnName());
-                model.setOperator(dskAttribute.getModel().getOperator().toString());
-                model.setValues(dskAttribute.getModel().getValues());
-
-                list.add(model);
-            } else {
-                // Boolean criteria is present means it contains children
-                SipDskAttributeModel model = new SipDskAttributeModel();
-                model.setDskAttributeSysId(dskAttributeId);
-                model.setSecGroupSysId(securityGroupId);
-                model.setDskAttributeParentId(parentId);
-                model.setBooleanCriteria(booleanCriteria.toString());
-
-                list.add(model);
-
-                // Get children and add them
-                List<SipDskAttribute> dskAttributeList = dskAttribute.getBooleanQuery();
-
-                dskAttributeList.forEach(childAttribute -> {
-                    list.addAll(
-                       prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
-                });
-            }
-        }
-
-        return list;
-    }
 
     @Override
     public Valid addSecurityGroupDskAttributeValues(Long securityGroupId, AttributeValues attributeValues) {
@@ -1095,6 +1040,62 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             logger.error(e.getMessage());
         }
         return userAssignmentsList;
+    }
+
+    @Override
+    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId, SipDskAttribute dskAttribute, String parentId) {
+        List <SipDskAttributeModel> list = new ArrayList<>();
+
+        if (dskAttribute != null) {
+            BooleanCriteria booleanCriteria = dskAttribute.getBooleanCriteria();
+            String columnName = dskAttribute.getColumnName();
+            String dskAttributeId = UUID.randomUUID().toString();
+
+            if (booleanCriteria == null && columnName == null) {
+                throw new RuntimeException("Invalid DSK attributes");
+            }
+
+            if (booleanCriteria == null) {
+                // Boolean criteria is null means its a leaf node and doesn't have any children
+                SipDskAttributeModel model = new SipDskAttributeModel();
+                model.setDskAttributeSysId(dskAttributeId);
+                model.setSecGroupSysId(securityGroupId);
+                model.setDskAttributeParentId(parentId);
+
+                if (dskAttribute.getColumnName() == null) {
+                    throw new RuntimeException("Column name cannot be empty");
+                }
+                if (dskAttribute.getModel().getValues() == null
+                    || dskAttribute.getModel().getValues().isEmpty()) {
+                    throw new RuntimeException("Values cannot be empty");
+                }
+
+                model.setColumnName(dskAttribute.getColumnName());
+                model.setOperator(dskAttribute.getModel().getOperator().toString());
+                model.setValues(dskAttribute.getModel().getValues());
+
+                list.add(model);
+            } else {
+                // Boolean criteria is present means it contains children
+                SipDskAttributeModel model = new SipDskAttributeModel();
+                model.setDskAttributeSysId(dskAttributeId);
+                model.setSecGroupSysId(securityGroupId);
+                model.setDskAttributeParentId(parentId);
+                model.setBooleanCriteria(booleanCriteria.toString());
+
+                list.add(model);
+
+                // Get children and add them
+                List<SipDskAttribute> dskAttributeList = dskAttribute.getBooleanQuery();
+
+                dskAttributeList.forEach(childAttribute -> {
+                    list.addAll(
+                        prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
+                });
+            }
+        }
+
+        return list;
     }
 
     @Override
