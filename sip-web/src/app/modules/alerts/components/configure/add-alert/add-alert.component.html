@@ -38,13 +38,23 @@
                 "
                 >This field is required</mat-error
               >
-              <mat-error *ngIf="alertDefFormGroup.value.alertRuleName.length > nameLengthLimit" i18n>
-                <strong> {{displayErrorMessage('nameLength')}}
-                </strong>
+              <mat-error
+                *ngIf="
+                  alertDefFormGroup.value.alertRuleName.length > nameLengthLimit
+                "
+                i18n
+              >
+                <strong> {{ displayErrorMessage('nameLength') }} </strong>
               </mat-error>
-              <mat-error *ngIf="alertDefFormGroup.controls.alertRuleName.hasError('nameIsInValid')" i18n>
-                <strong> {{displayErrorMessage('specialChars')}}
-                </strong>
+              <mat-error
+                *ngIf="
+                  alertDefFormGroup.controls.alertRuleName.hasError(
+                    'nameIsInValid'
+                  )
+                "
+                i18n
+              >
+                <strong> {{ displayErrorMessage('specialChars') }} </strong>
               </mat-error>
             </mat-form-field>
 
@@ -58,6 +68,7 @@
                 <mat-option
                   *ngFor="let sev of alertSeverity"
                   [value]="sev.value"
+                  [attr.e2e]="sev.value"
                   >{{ sev.value | titlecase }}</mat-option
                 >
               </mat-select>
