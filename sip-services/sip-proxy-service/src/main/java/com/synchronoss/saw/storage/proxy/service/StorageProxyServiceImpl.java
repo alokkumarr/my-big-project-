@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkSameColumnAcrossTables;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
@@ -77,7 +78,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import sncr.bda.base.MaprConnection;
 
 @Service
@@ -593,7 +596,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
       dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
     }
-    dskAttribute = updateDskAttribute(dskAttribute, authTicket, sipQueryFromSemantic);
+    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Column ambiguity error!!"
+              + " DSK name should use TableName.columnName if same column present across tables!!");
+    }
+    dskAttribute = updateDskAttribute(dskAttribute, authTicket, sipQueryFromSemantic, dskDetails);
 
     Long startTime = new Date().getTime();
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
@@ -641,33 +650,48 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   private SipDskAttribute updateDskAttribute(
-      SipDskAttribute dskAttribute, Ticket authTicket, SipQuery sipQueryFromSemantic) {
+      SipDskAttribute dskAttribute,
+      Ticket authTicket,
+      SipQuery sipQueryFromSemantic,
+      DskDetails dskDetails) {
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
     boolean filterDSKByCustomerCode =
         authTicket != null
             && authTicket.getIsJvCustomer() != 1
             && authTicket.getFilterByCustomerCode() == 1;
-    if (filterDSKByCustomerCode) {
-      String customerCode = authTicket.getCustCode();
-      SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
-      sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
-      List<SipDskAttribute> attributeList = new ArrayList<>();
-      for (Artifact artifact : sipQueryFromSemantic.getArtifacts()) {
-        SipDskAttribute attribute = new SipDskAttribute();
-        attribute.setColumnName(artifact.getArtifactsName().toUpperCase() + "." + CUSTOMER_CODE);
-        Model model = new Model();
-        model.setOperator(Operator.ISIN);
-        model.setValues(Collections.singletonList(customerCode));
-        attribute.setModel(model);
-        attributeList.add(attribute);
+    boolean scheduledDSKbyCustomerCode =
+        authTicket == null
+            && dskDetails != null
+            && dskDetails.getIsJvCustomer() != 1
+            && dskDetails.getFilterByCustomerCode() == 1;
+    logger.info("sched:{}", scheduledDSKbyCustomerCode);
+    logger.info("sched1:{}", dskDetails);
+    if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
+      try {
+        String customerCode =
+            authTicket == null ? dskDetails.getCustomerCode() : authTicket.getCustCode();
+        SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
+        sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
+        List<SipDskAttribute> attributeList = new ArrayList<>();
+        for (Artifact artifact : sipQueryFromSemantic.getArtifacts()) {
+          SipDskAttribute attribute = new SipDskAttribute();
+          attribute.setColumnName(artifact.getArtifactsName().toUpperCase() + "." + CUSTOMER_CODE);
+          Model model = new Model();
+          model.setOperator(Operator.ISIN);
+          model.setValues(Collections.singletonList(customerCode));
+          attribute.setModel(model);
+          attributeList.add(attribute);
+        }
+        if (dskAttribute != null) {
+          attributeList.add(dskAttribute);
+        }
+        sipDskCustomerFilterAttribute.setBooleanQuery(attributeList);
+        logger.trace("SipDskAttribute with customer  filter is:{}", sipDskCustomerFilterAttribute);
+        return sipDskCustomerFilterAttribute;
+      } catch (Exception e) {
+        logger.error("Exception occured while updatinng attributes");
       }
-      if (dskAttribute != null) {
-        attributeList.add(dskAttribute);
-      }
-      sipDskCustomerFilterAttribute.setBooleanQuery(attributeList);
-      logger.trace("SipDskAttribute with customer  filter is:{}", sipDskCustomerFilterAttribute);
-      return sipDskCustomerFilterAttribute;
     }
     return dskAttribute;
   }

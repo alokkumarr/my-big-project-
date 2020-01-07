@@ -788,38 +788,6 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
   @Override
-  public DataSecurityKeys fetchDSKDetailByUserId(String userId) {
-    String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-        + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-        + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-        + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-        + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-        + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-    Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.DSKValuesExtractor());
-    // DSK values should be array in JSON object hence converting into list.
-    List<TicketDSKDetails> dskList = new ArrayList<>();
-    for (String key : dskValueMapping.keySet()) {
-      TicketDSKDetails dskDetails = new TicketDSKDetails();
-      dskDetails.setName(key);
-      dskDetails.setValues(dskValueMapping.get(key));
-      dskList.add(dskDetails);
-    }
-
-    String fetchJVDetails = "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST," +
-				"USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID " +
-				"AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
-
-    Map<String, String> jvDetails = jdbcTemplate.query(fetchJVDetails, preparedStatement -> preparedStatement.setString(1, userId), new UserRepositoryImpl.JVDetailExtractor());
-
-		DataSecurityKeys securityKeys = new DataSecurityKeys();
-		securityKeys.setDataSecurityKeys(dskList);
-		securityKeys.setCustomerCode(jvDetails.get("customerCode"));
-		securityKeys.setIsJvCustomer(Integer.parseInt(jvDetails.get("isJVCustomer")));
-		securityKeys.setFilterByCustomerCode(Integer.parseInt(jvDetails.get("filterByCustomerCode")));
-		return securityKeys;
-	}
-
-  @Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
 		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
@@ -3302,5 +3270,31 @@ public class UserRepositoryImpl implements UserRepository {
           e);
     }
     return userDetails;
+  }
+
+  @Override
+  public Map<String, String> getCustomerDetails(String masterLoginId) {
+    String fetchJVDetails =
+        "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST,"
+            + "USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID "
+            + "AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
+    Map<String, String> jvDetails = null;
+    try {
+
+      jvDetails =
+          jdbcTemplate.query(
+              fetchJVDetails,
+              preparedStatement -> preparedStatement.setString(1, masterLoginId),
+              new UserRepositoryImpl.JVDetailExtractor());
+    } catch (DataAccessException de) {
+      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+      throw de;
+    } catch (Exception e) {
+      logger.error(
+          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
+          null,
+          e);
+    }
+    return jvDetails;
   }
 }

@@ -72,6 +72,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * This class is used to perform all kind of operation by JSON store
@@ -335,6 +336,8 @@ public class StorageProxyController {
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
+    } catch (ResponseStatusException responseStatusException) {
+      throw responseStatusException;
     } catch (ReadEntitySAWException ex) {
       logger.error("Problem on the storage while reading data from storage.", ex);
       throw new ReadEntitySAWException("Problem on the storage while reading data from storage");

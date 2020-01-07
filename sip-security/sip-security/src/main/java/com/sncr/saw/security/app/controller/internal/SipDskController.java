@@ -8,6 +8,7 @@ import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +27,6 @@ public class SipDskController {
   @Autowired private UserRepository userRepository;
 
   @Autowired DataSecurityKeyRepository dataSecurityKeyRepository;
-
-  /**
-   * Fetch the data security details by the master login id
-   *
-   * @param userId
-   * @return details of dsk
-   */
-  @RequestMapping(value = "", method = RequestMethod.GET)
-  public DataSecurityKeys dskDetailsByUserId(
-      @RequestParam(value = "userId") String userId, HttpServletResponse response) {
-    DataSecurityKeys securityKeys = new DataSecurityKeys();
-    if (userId == null || userId.isEmpty()) {
-      response.setStatus(400);
-      securityKeys.setMessage("User Id can't be null or blank");
-      return securityKeys;
-    }
-    return userRepository.fetchDSKDetailByUserId(userId);
-  }
 
   /**
    * Fetch the data security details by the master login id
@@ -74,6 +57,11 @@ public class SipDskController {
         dskGroupResponse.setMessage("User not found");
         return dskGroupResponse;
       }
+      Map<String, String> customerDetails = userRepository.getCustomerDetails(userId);
+      dskGroupResponse.setCustomerCode(customerDetails.get("customerCode"));
+      dskGroupResponse.setIsJvCustomer(Integer.parseInt(customerDetails.get("isJVCustomer")));
+      dskGroupResponse.setFilterByCustomerCode(
+          Integer.parseInt(customerDetails.get("filterByCustomerCode")));
       Long secGroupSysId = userDetails.getSecGroupSysId();
       if (secGroupSysId != null) {
         dskGroupPayload =

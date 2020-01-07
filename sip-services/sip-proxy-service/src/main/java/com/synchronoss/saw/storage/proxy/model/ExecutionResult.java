@@ -160,14 +160,6 @@ public class ExecutionResult {
     this.recordCount = recordCount;
   }
 
-  public List<DataSecurityKeyDef> getDataSecurityKey() {
-    return dataSecurityKey;
-  }
-
-  public void setDataSecurityKey(List<DataSecurityKeyDef> dataSecurityKey) {
-    this.dataSecurityKey = dataSecurityKey;
-  }
-
   public SipDskAttribute getSipDskAttribute() {
     return sipDskAttribute;
   }
