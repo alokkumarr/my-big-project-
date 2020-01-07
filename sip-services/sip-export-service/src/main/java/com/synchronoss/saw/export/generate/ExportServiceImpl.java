@@ -1220,15 +1220,18 @@ public class ExportServiceImpl implements ExportService {
         storageProxyUrl.concat(
             String.format(proxyEndPoint, executionId, pageNo, batchSize, analysisType));
     ResponseEntity<T> entity = null;
-    try {
-      logger.debug("returning Execution data");
       Instant startTime = Instant.now();
+      try {
+      logger.debug("returning Execution data");
       ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, classType);
       Instant finishTime = Instant.now();
       long elapsedTime = Duration.between(startTime, finishTime).toMillis();
       logger.trace("Time taken for getting Executions data:{}", elapsedTime);
       return responseEntity;
     } catch (Exception e) {
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("Time taken for waiting the response befor exception:{}", elapsedTime);
       logger.error(
           "Exception occured while fetching the execution data for pageNo:{} and batchSize:{} with exception:{}",
           pageNo,
