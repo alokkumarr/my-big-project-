@@ -37,7 +37,7 @@ export class AlertsConfigurationComponent implements OnInit, OnDestroy {
     breakpointObserver: BreakpointObserver,
     public _configureAlertService: ConfigureAlertService,
     public dialog: MatDialog,
-    private _notify: ToastService
+    public _notify: ToastService
   ) {
     const breakpointObserverSub = breakpointObserver
       .observe([Breakpoints.Medium, Breakpoints.Small])

@@ -17,7 +17,8 @@ const API_ROUTES = {
   USERS: '/saw/security/auth/admin/cust/manage/users/add',
   ADD_CATEGORIES: '/saw/security/auth/admin/cust/manage/categories/add',
   PRIVILEGES: '/saw/security/auth/admin/cust/manage/privileges/upsert',
-  DELETE_DASHBOARD: '/saw/services/observe/dashboards'
+  DELETE_DASHBOARD: '/saw/services/observe/dashboards',
+  ALERTS: '/sip/services/alerts'
 };
 
 const LOG_LEVELS = {
