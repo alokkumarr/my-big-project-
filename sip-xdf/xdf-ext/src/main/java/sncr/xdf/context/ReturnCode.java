@@ -53,7 +53,9 @@ public enum ReturnCode {
     MOVE_ERROR(44,"Could not complete move phase! %s"),
     ARCHIVAL_ERROR(45,"Could not complete archive phase! %s"),
     VERIFY_COMPONENT_SERVICES_ERROR(46,"Component %s is not serviceStatus"),
-    UPDATE_STATUS_ERROR(47,"Could not update datasets / could not create Audit log entry. %s");
+    UPDATE_STATUS_ERROR(47,"Could not update datasets / could not create Audit log entry. %s"),
+    INPUT_DATA_EMPTY_ERROR(48,"Input File or Dataset is Empty. Input FilePath/Dataset: %s"),
+    OUTPUT_DATA_EMPTY_ERROR(49,"Output Dataset is empty. All records are rejected. Output Dataset: %s");
 
     private final int code;
     private final String description;

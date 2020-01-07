@@ -915,5 +915,12 @@ public abstract class AbstractComponent implements WithContext{
         logger.info("Component Return Code :" + rc);
         return rc;
     }
+
+    public void validateRecordsCount(long recordsCount, String fileOrDSName, ReturnCode rc){
+        logger.info("Records Count : "+recordsCount);
+        if(recordsCount == 0){
+            throw new XDFException(rc, fileOrDSName);
+        }
+    }
 }
 

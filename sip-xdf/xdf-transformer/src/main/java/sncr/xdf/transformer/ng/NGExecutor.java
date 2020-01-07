@@ -17,6 +17,8 @@ import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.context.ReturnCode;
+import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.*;
 
@@ -161,9 +163,10 @@ public abstract class NGExecutor {
 
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
-
-        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        //logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+        long outputDSCount = outputResult.count();
+        logger.debug("Final DS: " + outputDSCount + " Schema: " + outputResult.schema().prettyJson());
+        //This will throw an error if Dataset is Empty
+        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, outDataSetName, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
 
         writeResults(outputResult, outDataSetName, tempLoc);
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );

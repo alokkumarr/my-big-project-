@@ -10,6 +10,7 @@ import scala.Tuple2;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.TransformWithSchema;
+import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         if(ds == null) {
             throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
         }else{
+            //This will throw an error if Dataset is Empty
+            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, ReturnCode.INPUT_DATA_EMPTY_ERROR);
             prepareRefData(dsMap);
             JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
             Long c = transformationResult.count();
@@ -65,6 +68,8 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         if(ds == null) {
             throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
         }else{
+            //This will throw an error if Dataset is Empty
+            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, ReturnCode.INPUT_DATA_EMPTY_ERROR);
             prepareRefData(dsMap);
             JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
             Long c = transformationResult.count();
