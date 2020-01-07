@@ -223,7 +223,7 @@ export class DesignerPageComponent implements OnInit {
 
       artifactColumn.checked = true;
       artifactColumn.area = field.area;
-      if (field.aggregate) {
+      if (field.aggregate && field.type !== 'string') {
         artifactColumn.aggregate = field.aggregate;
       }
       if (field.dateFormat) {

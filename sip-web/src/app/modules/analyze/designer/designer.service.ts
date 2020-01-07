@@ -259,6 +259,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
     };
 
@@ -379,6 +380,7 @@ export class DesignerService {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'geoRegion');
       unset(artifactColumn, 'aggregate');
     };
@@ -488,6 +490,7 @@ export class DesignerService {
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn['checked'] = false;
       artifactColumn.alias = '';
+      unset(artifactColumn, 'dataField');
       unset(artifactColumn, 'aggregate');
       unset(artifactColumn, 'comboType');
       unset(artifactColumn, 'limitType');
