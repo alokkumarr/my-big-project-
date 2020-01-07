@@ -15,6 +15,7 @@ import sncr.xdf.sql.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import sncr.xdf.context.ReturnCode;
 
 /**
  * Created by srya0001 on 5/8/2016.
@@ -60,7 +61,7 @@ public class NGJobExecutor {
             try {
                 script = HFileOperations.readFile(pathToSQLScript);
             } catch (FileNotFoundException e) {
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Part to SQL script is not correct: " + pathToSQLScript);
+                throw new XDFException(ReturnCode.CONFIG_ERROR, e, "Part to SQL script is not correct: " + pathToSQLScript);
             }
         }
         logger.trace("Script to execute:\n" +  script);
@@ -112,11 +113,15 @@ public class NGJobExecutor {
                         }
                         report.add(descriptor);
 
-                    } catch (Exception e) {
+                    }catch (Exception e) {
                         logger.error("************** Cannot execute SQL: " + descriptor.SQL + " reason: ", e);
                         descriptor.result = "failed";
                         HFileOperations.deleteEnt(tempDir);
-                        return -1;
+                        if (e instanceof XDFException) {
+                            throw ((XDFException)e);
+                        }else {
+                            throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                        }
                     }
                 }
 
@@ -171,18 +176,18 @@ public class NGJobExecutor {
                     ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
                 }
             }
-
-        } catch (IOException e) {
-            throw new XDFException(XDFException.ErrorCodes.EmbeddedException, e, "File System/IO");
-
         } catch (Exception e) {
             logger.error("Workaround exception logging: ", e);
-            throw new XDFException(XDFException.ErrorCodes.EmbeddedException, e, "Internal exception");
+            if (e instanceof XDFException) {
+                throw ((XDFException)e);
+            }else if (e instanceof IOException) {
+                throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "File System/IO");
+            }else {
+                throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "Internal exception");
+            }
         }
         return rc;
     }
 
     public Map<String, SQLDescriptor> getResultDataSets() { return result; }
-
-
 }

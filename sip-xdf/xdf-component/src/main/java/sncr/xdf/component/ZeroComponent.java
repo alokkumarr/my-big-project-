@@ -5,6 +5,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.context.ReturnCode;
 
 import java.util.Map;
 
@@ -85,10 +86,10 @@ public class ZeroComponent extends Component implements WithMovableResult, WithS
 
         logger.trace("Component configuration: " + cfg.toString());
         if (cfg.getInputs() == null || cfg.getInputs().size() != 1 ){
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Zero component must have exactly one input");
+            throw new XDFException(ReturnCode.CONFIG_ERROR, "Zero component must have exactly one input");
         }
         if (cfg.getOutputs() == null || cfg.getOutputs().size() != 1 ){
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Zero component must have exactly one output");
+            throw new XDFException(ReturnCode.CONFIG_ERROR, "Zero component must have exactly one output");
         }
         return cfg;
     }

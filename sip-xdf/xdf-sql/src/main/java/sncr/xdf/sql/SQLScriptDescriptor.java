@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import sncr.xdf.context.ReturnCode;
 
 import static sncr.xdf.sql.StatementType.SELECT;
 
@@ -114,7 +115,7 @@ public class SQLScriptDescriptor {
             while (m.find(position)  ) {
 
                 if(parameterValues == null || parameterValues.isEmpty())
-                    throw new XDFException(XDFException.ErrorCodes.SQLScriptPreProcFailed, "The file has variable entries, but actual parameters are missing.");
+                    throw new XDFException(ReturnCode.SQL_SCRIPT_PRE_PROC_FAILED, "The file has variable entries, but actual parameters are missing.");
 
                 logger.trace( String.format("Found the text \"%s\" starting at index %d and ending at index %d.%n",m.group(),m.start(),m.end()));
                 String varExpression = m.group().trim();
@@ -180,7 +181,7 @@ public class SQLScriptDescriptor {
                         scriptWideTableMap.put(td.tableName, td);
                     } else {
                         if (existingTd.isTargetTable && td.isTargetTable && !existingTd.isInDropStatement && !td.isInDropStatement)
-                            throw new XDFException(XDFException.ErrorCodes.InvalidDataSources, td.tableName);
+                            throw new XDFException(ReturnCode.INVALID_DATA_SOURCES, td.tableName);
                         existingTd.asReference.add(i);
                     }
 
@@ -193,12 +194,12 @@ public class SQLScriptDescriptor {
 
                     case SELECT:
                         logger.error("SELECT statement is not supported anymore, please use CREATE [TEMPORARY] TABLE AS statement");
-                        throw new XDFException(XDFException.ErrorCodes.SQLScriptNotParsable);
+                        throw new XDFException(ReturnCode.SQL_SCRIPT_NOT_PARSABLE);
 
                     case CREATE:
 
                     if (targetTable == null) {
-                        throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, " Target table was not found in table register.");
+                        throw new XDFException(ReturnCode.INCORRECT_SQL, " Target table was not found in table register.");
                     }
                     else {
                         sqlDesc.statementType = StatementType.CREATE;
@@ -220,7 +221,7 @@ public class SQLScriptDescriptor {
                         if(pos < 0)
                             pos = s.indexOf("select");
                         if (pos < 0)
-                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                            throw new XDFException(ReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
                         sqlDesc.SQL = stmt.toString().substring(pos);
                         sqlDesc.tableDescriptor = targetTable;
                     }
@@ -228,7 +229,7 @@ public class SQLScriptDescriptor {
 
                     case DROP_TABLE:
                         if (targetTable == null)
-                            throw new XDFException(XDFException.ErrorCodes.IncorrectSQL, "Could not determine target table for drop statement");
+                            throw new XDFException(ReturnCode.INCORRECT_SQL, "Could not determine target table for drop statement");
                         sqlDesc.statementType = StatementType.DROP_TABLE;
                         sqlDesc.tableDescriptor = targetTable;
                         sqlDesc.targetTableName = targetTable.tableName;
@@ -236,7 +237,7 @@ public class SQLScriptDescriptor {
 
                     break;
                     default:
-                        throw new XDFException(XDFException.ErrorCodes.UnsupportedSQLStatementType);
+                        throw new XDFException(ReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
                 }
                 sqlDesc.index = i;
                 sqlDesc.targetTableName = targetTable.tableName;
@@ -252,7 +253,7 @@ public class SQLScriptDescriptor {
             }
             logger.debug("Table list: \n" + scriptWideTableMap );
         } catch(JSQLParserException e){
-            throw new XDFException(XDFException.ErrorCodes.SQLScriptNotParsable, e);
+            throw new XDFException(ReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
     }
@@ -307,7 +308,7 @@ public class SQLScriptDescriptor {
                 td.mode = (String) doProps.get(DataSetProperties.Mode.name());
                 logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
             } else {
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
+                throw new XDFException(ReturnCode.CONFIG_ERROR, "Could not resolveDataParameters source data object: " + tn);
             }
         }
     }
@@ -348,7 +349,7 @@ public class SQLScriptDescriptor {
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
                         tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
             } else {
-                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters target data object: " + tn);
+                throw new XDFException(ReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
             }
         }
     }

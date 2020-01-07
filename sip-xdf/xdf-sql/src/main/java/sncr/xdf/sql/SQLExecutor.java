@@ -13,6 +13,7 @@ import sncr.xdf.exceptions.XDFException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import sncr.xdf.context.ReturnCode;
 
 
 public class SQLExecutor implements Serializable {
@@ -90,7 +91,7 @@ public class SQLExecutor implements Serializable {
                             DLDataSetOperations.getPartitioningInfo(location);
 
                     if (loc_desc == null)
-                        throw new XDFException(XDFException.ErrorCodes.PartitionCalcError, tn);
+                        throw new XDFException(ReturnCode.PARTITION_CALC_ERROR, tn);
 
                     logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
                     Dataset<Row> df = null;
@@ -118,7 +119,7 @@ public class SQLExecutor implements Serializable {
                             }
                             break;
                         default:
-                            throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
+                            throw new XDFException( ReturnCode.UNSUPPORTED_DATA_FORMAT);
                     }
 
                     if (!loaded || df == null){

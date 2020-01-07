@@ -58,6 +58,10 @@ public class TransformationService {
     }
 
     public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID) throws Exception {
-        ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID);
+        updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID, null, null);
+    }
+
+    public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID, Integer returnCode, String errorDesc) throws Exception {
+        ts.updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID, returnCode, errorDesc);
     }
 }

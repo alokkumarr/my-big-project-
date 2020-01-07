@@ -36,7 +36,10 @@ public class TransformationStore extends MetadataStore implements WithSearchInMe
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
-        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
+        updateStatus(id, status, startTS, finishedTS, aleId, batchSessionId, null, null);
+    }
+    public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId, Integer returnCode, String errorDesc) throws Exception {
+        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId, returnCode, errorDesc);
         _updatePath(id, null, "asOfNow", src);
     }
 

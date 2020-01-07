@@ -43,8 +43,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Arrays;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
+import sncr.xdf.context.ReturnCode;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -86,7 +88,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private JavaRDD<Row> rejectedDataCollector;
     private JavaRDD<Row> acceptedDataCollector;
-    
+
     private boolean isRealTime;
 
     public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
@@ -122,7 +124,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 	@SuppressWarnings("unchecked")
 	@Override
     protected int execute(){
-		
+
 		
 		logger.debug(":::: parser execute   :::"+ ngctx.componentConfiguration.getParser());
         int retval = 0;
@@ -166,17 +168,30 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 					}
 				}
 
-				FileSystem fs = HFileOperations.getFileSystem();
-				FileStatus[] files = fs.globStatus(new Path(sourcePath));
-
-				if (files.length <= 0) {
-					return 0;
-				}
-
-			} catch (Exception e) {
-				logger.error("Error while deletion of outputDataSetLocation " + outputDataSetLocation);
-				logger.error(e.getMessage());
-			} 
+                FileSystem fs = HFileOperations.getFileSystem();
+                logger.debug("Input Source Path = " + sourcePath);
+                Path inputPath = new Path(sourcePath);
+                FileStatus[] files = fs.globStatus(inputPath);
+                if(files != null && files.length == 1 && files[0].isDirectory()){
+                    logger.debug("Files length = 1 and is a directory");
+                    // If so - we have to process all the files inside - create the mask
+                    sourcePath += Path.SEPARATOR + "*";
+                    // ... and query content
+                    files = fs.globStatus(new Path(sourcePath));
+                }
+                if(files == null || files.length == 0){
+                    logger.debug("No files exist. files = " + files);
+                    throw new XDFException(ReturnCode.FILE_NOT_FOUND, "parser input file - " +  sourcePath);
+                }
+            } catch (Exception e) {
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    String error = "Error while deletion of outputDataSetLocation " + outputDataSetLocation;
+                    logger.error(error);
+                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e, error);
+                }
+            }
 		}
 
 		if (this.inputDataFrame == null && parserInputFileFormat.equals(ParserInputFileFormat.CSV)) {
@@ -322,13 +337,13 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                         logger.warn("Unable to write rejected data");
                     }
                 }
-
-            }catch (IOException e){
-                logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
-                retval =  -1;
-            } catch (Exception e) {
-                logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
-                retval =  -1;
+            }catch (Exception e) {
+                logger.error("Exception in parser module: ",e);
+                if (e instanceof XDFException) {
+                    throw ((XDFException)e);
+                }else {
+                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                }
             }
             logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
 
@@ -403,11 +418,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
         sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
-            throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException( ReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
-            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+            throw new XDFException(ReturnCode.INVALID_CONF_FILE);
         }
 
         return compConf;
@@ -926,9 +941,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
 
     public static void main(String[] args) {
-
         NGContextServices ngCtxSvc;
         CliHandler cli = new CliHandler();
+        NGParser component = null;
+        int rc= 0;
+        Exception exception = null;
         try {
             long start_time = System.currentTimeMillis();
 
@@ -938,22 +955,22 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -971,21 +988,18 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 logger.warn(id)
             );
             logger.warn(ngCtxSvc.getNgctx().toString());
-            NGParser component = new NGParser(ngCtxSvc.getNgctx());
-            if (!component.initComponent(null))
-                System.exit(-1);
-            int rc = component.run();
-
-            long end_time = System.currentTimeMillis();
-            long difference = end_time-start_time;
-            logger.info("Parser total time " + difference );
-            System.exit(rc);
-        } catch (Exception e) {
-        	logger.error("Exception is : " + e + "\n");
-            System.exit(-1);
+            component = new NGParser(ngCtxSvc.getNgctx());
+            if (component.initComponent(null)) {
+                rc = component.run();
+                long end_time = System.currentTimeMillis();
+                long difference = end_time - start_time;
+                logger.info("Parser total time " + difference);
+            }
+        }catch (Exception ex) {
+            exception = ex;
         }
+        System.exit(handleErrorIfAny(component, rc, exception));
     }
-    
     
     private static List<Column> createParserOutputFieldList(List<OutputFieldsList> outputs){
 

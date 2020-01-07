@@ -16,6 +16,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.context.ReturnCode;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -81,7 +82,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
-                    throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
+                    throw new XDFException(ReturnCode.CONFIG_ERROR, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
                 }
             }
             logger.trace("Script to execute:\n" +  script);
@@ -279,13 +280,13 @@ public class TransformerComponent extends Component implements WithMovableResult
         ComponentConfiguration compConf = Component.analyzeAndValidate(cfgAsStr);
         Transformer transformerCfg = compConf.getTransformer();
         if (transformerCfg == null)
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "transformer");
+            throw new XDFException(ReturnCode.NO_COMPONENT_DESCRIPTOR, "transformer");
 
         if (transformerCfg.getScript() == null || transformerCfg.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script name.");
+            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script name.");
         }
         if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script location.");
+            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script location.");
         }
 
         boolean valid = false;
@@ -295,7 +296,7 @@ public class TransformerComponent extends Component implements WithMovableResult
             }
         }
 
-        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError,
+        if (!valid) throw new XDFException(ReturnCode.CONFIG_ERROR,
             "Incorrect configuration: dataset parameter with name 'input' does not exist .");
 
         valid = compConf.getOutputs().stream()
@@ -310,7 +311,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                 rvalid = true;
             }*/
         }
-        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejected' does not exist .");
+        if (!valid) throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: dataset parameter with name 'output/rejected' does not exist .");
 
         return compConf;
     }
