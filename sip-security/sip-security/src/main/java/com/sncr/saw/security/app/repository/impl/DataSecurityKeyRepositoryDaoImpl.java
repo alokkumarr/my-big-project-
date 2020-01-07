@@ -1053,7 +1053,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
             String columnName = dskAttribute.getColumnName();
             String dskAttributeId = UUID.randomUUID().toString();
 
-            if (booleanCriteria == null && StringUtils.isEmpty(columnName)) {
+            if (booleanCriteria == null && StringUtils.isBlank(columnName)) {
                 throw new RuntimeException("Invalid DSK attributes");
             }
 
@@ -1064,15 +1064,17 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 model.setSecGroupSysId(securityGroupId);
                 model.setDskAttributeParentId(parentId);
 
-                if (StringUtils.isEmpty(dskAttribute.getColumnName())) {
-                    throw new RuntimeException("Column name cannot be empty");
+                columnName = columnName.trim();
+
+                if (columnName.contains(" ")) {
+                    throw new RuntimeException("Column name cannot contain spaces");
                 }
                 if (dskAttribute.getModel().getValues() == null
                     || dskAttribute.getModel().getValues().isEmpty()) {
                     throw new RuntimeException("Values cannot be empty");
                 }
 
-                model.setColumnName(dskAttribute.getColumnName());
+                model.setColumnName(dskAttribute.getColumnName().trim());
                 model.setOperator(dskAttribute.getModel().getOperator().toString());
                 model.setValues(dskAttribute.getModel().getValues());
 
