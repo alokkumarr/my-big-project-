@@ -1,5 +1,8 @@
 package com.synchronoss.saw.observe.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,14 +19,14 @@ import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveRequestBody;
 import com.synchronoss.saw.observe.model.ObserveResponse;
 import com.synchronoss.saw.observe.service.ObserveService;
+import com.synchronoss.sip.utils.Privileges;
+import com.synchronoss.sip.utils.SipCommonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.synchronoss.sip.utils.Privileges;
-import com.synchronoss.sip.utils.SipCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +39,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
-import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
-
 @RestController
 public class ObserveController {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
+
+  private static String UNAUTHORIZED =
+      "UNAUTHORIZED ACCESS : User don't have the %s dashboard!!";
 
   @Autowired
   private ObserveService observeService;
@@ -55,7 +58,8 @@ public class ObserveController {
    */
   @RequestMapping(value = "/observe/dashboards/create", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
-  public ObserveResponse addDashboard(HttpServletRequest request, HttpServletResponse response, @RequestBody ObserveRequestBody requestBody) {
+  public ObserveResponse addDashboard(HttpServletRequest request, HttpServletResponse response,
+                                      @RequestBody ObserveRequestBody requestBody) {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
@@ -73,8 +77,9 @@ public class ObserveController {
       Long categoryId = Long.valueOf(observe.getCategoryId());
       ArrayList<Products> productList = ticket.getProducts();
       if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.CREATE)) {
-        logger.error("UNAUTHORIZED ACCESS : User don't have the CREATE dashboard!!");
+        logger.error(String.format(UNAUTHORIZED, "CREATE"));
         setUnAuthResponse(response);
+        observeResponse.setMessage(String.format(UNAUTHORIZED, "CREATE"));
         return observeResponse;
       }
 
@@ -110,15 +115,17 @@ public class ObserveController {
       observe.setEntityId(entityId);
       observeResponse = observeService.getDashboardbyCriteria(observe);
 
-      String category = observeResponse.getContents().getObserve().stream().findFirst().get().getCategoryId();
+      String category = observeResponse.getContents().getObserve()
+          .stream().findFirst().get().getCategoryId();
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, Long.valueOf(categoryId), Privileges.PrivilegeNames.ACCESS)) {
+      if (!validatePrivilege(productList, Long.valueOf(categoryId),
+          Privileges.PrivilegeNames.ACCESS)) {
         observeResponse = new ObserveResponse();
-        logger.error("UNAUTHORIZED ACCESS : User don't have the Accees dashboard permission.");
+        logger.error(String.format(UNAUTHORIZED, "ACCESS"));
         setUnAuthResponse(response);
-        observeResponse.setMessage("UNAUTHORIZED ACCESS : User don't have the Accees dashboard permission.");
+        observeResponse.setMessage(String.format(UNAUTHORIZED, "ACCESS"));
         return observeResponse;
       }
     } catch (IOException ex) {
@@ -150,9 +157,11 @@ public class ObserveController {
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, Long.valueOf(categoryId), Privileges.PrivilegeNames.ACCESS)) {
-        logger.error("UNAUTHORIZED ACCESS : User don't have the View dashboard details!!");
+      if (!validatePrivilege(productList, Long.valueOf(categoryId),
+          Privileges.PrivilegeNames.ACCESS)) {
+        logger.error(String.format(UNAUTHORIZED, "ACCESS"));
         setUnAuthResponse(response);
+        observeResponse.setMessage(String.format(UNAUTHORIZED, "ACCESS"));
         return observeResponse;
       }
 
@@ -196,14 +205,18 @@ public class ObserveController {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-      Observe observe = ObserveUtils.getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
+      Observe observe = ObserveUtils
+          .getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
 
-      Long categoryId = !StringUtils.isEmpty(observe.getCategoryId()) ? Long.valueOf(observe.getCategoryId()) : 0L;
+      Long categoryId = !StringUtils.isEmpty(observe.getCategoryId())
+          ? Long.valueOf(observe.getCategoryId()) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, Long.valueOf(categoryId), Privileges.PrivilegeNames.EDIT)) {
-        logger.error("UNAUTHORIZED ACCESS : User don't have the update dashboard permission.");
+      if (!validatePrivilege(productList, Long.valueOf(categoryId),
+          Privileges.PrivilegeNames.EDIT)) {
+        logger.error(String.format(UNAUTHORIZED, "EDIT"));
         setUnAuthResponse(response);
+        observeResponse.setMessage(String.format(UNAUTHORIZED, "EDIT"));
         return observeResponse;
       }
 
@@ -243,10 +256,11 @@ public class ObserveController {
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, Long.valueOf(categoryId), Privileges.PrivilegeNames.DELETE)) {
-        logger.error("UNAUTHORIZED ACCESS : User don't have the delete dashboard permission.");
+      if (!validatePrivilege(productList, Long.valueOf(categoryId),
+          Privileges.PrivilegeNames.DELETE)) {
+        logger.error(String.format(UNAUTHORIZED, "DELETE"));
         setUnAuthResponse(response);
-        responseObjectFuture.setMessage("UNAUTHORIZED ACCESS : User don't have the delete dashboard permission.");
+        responseObjectFuture.setMessage(String.format(UNAUTHORIZED, "DELETE"));
         return responseObjectFuture;
       }
       responseObjectFuture = observeService.deleteDashboard(observe);
