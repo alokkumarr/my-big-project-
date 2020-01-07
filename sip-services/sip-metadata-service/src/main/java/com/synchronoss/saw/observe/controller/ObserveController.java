@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/observe/dashboards")
 public class ObserveController {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
@@ -56,11 +57,11 @@ public class ObserveController {
    * @param requestBody of type object ObserveRequest.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboards/create", method = RequestMethod.POST)
+  @RequestMapping(value = "/create", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   public ObserveResponse addDashboard(HttpServletRequest request, HttpServletResponse response,
                                       @RequestBody ObserveRequestBody requestBody) {
-    logger.debug("Request Body:{}", requestBody);
+    logger.trace("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
@@ -102,7 +103,7 @@ public class ObserveController {
    * @param response is of type object.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboards/{Id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{Id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse getDashboardById(
       @PathVariable(name = "Id", required = true) String entityId,
@@ -143,7 +144,7 @@ public class ObserveController {
    * @param response   of type object.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboards/{categoryId}/{userId}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{categoryId}/{userId}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse getDashboardByCategoryId(
       @PathVariable(name = "categoryId", required = true) String categoryId,
@@ -188,7 +189,7 @@ public class ObserveController {
    * @param requestBody of type object.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboards/update/{Id}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/update/{Id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse updateDashboard(
       HttpServletRequest request,
@@ -238,7 +239,7 @@ public class ObserveController {
    * @param entityId is of type string.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboards/{Id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{Id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse deleteDashboard(
       HttpServletRequest request,
@@ -277,7 +278,7 @@ public class ObserveController {
    * @param response of type object.
    * @return ObserveResponse which will hold the response structure.
    */
-  @RequestMapping(value = "/observe/dashboard/generateId", method = RequestMethod.GET)
+  @RequestMapping(value = "/generateId", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse generateDashboardId(
       HttpServletRequest request, HttpServletResponse response) {
