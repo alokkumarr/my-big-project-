@@ -37,7 +37,7 @@ public class DLBatchReader {
             default:
                 throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
         }
-        inctx.registerDataset(name, ds.cache());
+        inctx.registerDataset(name, ds);
         return ds;
     }
 

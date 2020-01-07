@@ -124,6 +124,8 @@ public class NGSQLExecutor implements Serializable {
                                 
                                 try {
 									df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+									logger.debug("#####Reading dataset via reder #####");
+									df.show();
 								} catch (Exception exception) {
 									logger.error("Could not load data neither in parquet nor in JSON, cancel processing " 
 											+ exception.getMessage() );
