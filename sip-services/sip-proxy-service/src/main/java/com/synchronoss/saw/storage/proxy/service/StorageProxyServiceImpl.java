@@ -543,7 +543,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
       result = (List<Object>) (response.getData());
     } else {
-      result = executeESQueries(sipQuery, size, dataSecurityKey);
+      result = executeESQueries(sipQuery, size, dataSecurityKey, sipDskAttribute,
+          sipQueryFromSemantic);
     }
 
     return result;
@@ -609,7 +610,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
-      List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey);
+      List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey, dskAttribute,
+          sipQueryFromSemantic);
       response.setExecutionId(executionId);
       response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
@@ -792,7 +794,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   private List<Object> executeESQueries(
-      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey) throws Exception {
+      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
+      SipDskAttribute dskAttribute, SipQuery sipQueryFromSemantic) throws Exception {
     List<Object> result = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
@@ -812,7 +815,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             .equalsIgnoreCase(Aggregate.PERCENTAGE.value()));
     if (isPercentage) {
       SearchSourceBuilder searchSourceBuilder =
-          elasticSearchQueryBuilder.percentagePriorQuery(sipQuery ,dataSecurityKey);
+          elasticSearchQueryBuilder
+              .percentagePriorQuery(sipQuery, dataSecurityKey, dskAttribute, sipQueryFromSemantic);
       JsonNode percentageData =
           storageConnectorService.executeESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
@@ -820,7 +824,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           sipQuery.getArtifacts().get(0).getFields(), percentageData);
     }
     String query;
-    query = elasticSearchQueryBuilder.buildDataQuery(sipQuery, size, dataSecurityKey);
+    query = elasticSearchQueryBuilder
+        .buildDataQuery(sipQuery, size, dataSecurityKey, dskAttribute, sipQueryFromSemantic);
     logger.trace("ES -Query {} " + query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     // re-arrange data field based upon sort before flatten
