@@ -1145,6 +1145,8 @@ public class SecurityController {
                 payload.setValid(false);
                 payload.setMessage("Invalid request");
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+                return payload;
             }
             // Delete the existing security group attributes
             Valid valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
