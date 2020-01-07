@@ -292,17 +292,14 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             if(isSimple) {
             	FileStatus[] files = fs.globStatus(new Path(finalPath+ 
             			Path.SEPARATOR + fileNamePrefix+ "*"));
-            	SimpleDateFormat suffixFmt = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
-           	    Date date = new Date();
            	
             	
             	for(FileStatus fileStatus: files) {
             		 logger.debug("******** part file name renaming for simple.... ********"+ fileStatus.getPath().getName());
-            		 String uuid = UUID.randomUUID().toString();
-                	 String suffix = suffixFmt.format(date) + "-" + uuid;
+            		
                 	 
             		fs.rename(new Path(finalPath+ Path.SEPARATOR + fileStatus.getPath().getName()), new Path(finalPath+ 
-                    		Path.SEPARATOR + fileNamePrefix + "-" +  suffix));
+                    		Path.SEPARATOR + fileNamePrefix + "-" +  UUID.randomUUID().toString()));
             		
             		logger.info("******** rename completed ********");
             	}
