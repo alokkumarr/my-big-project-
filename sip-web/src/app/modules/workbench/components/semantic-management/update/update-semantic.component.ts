@@ -20,6 +20,8 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as has from 'lodash/has';
 
+const NUMBER_AND_DATE = [...NUMBER_TYPES, ...DATE_TYPES];
+const ELIGIBLE_COLS = ['kpiEligible', 'filterEligible', 'dskEligible'];
 @Component({
   selector: 'update-semantic',
   templateUrl: './update-semantic.component.html',
@@ -212,19 +214,12 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * Added as part of SIP-9566
    */
   cellPrepared(e) {
-    if (
-      e.rowType === 'data' &&
-      (e.column.dataField === 'kpiEligible' ||
-        e.column.dataField === 'filterEligible' ||
-        e.column.dataField === 'dskEligible')
-    ) {
+    if (e.rowType === 'data' && ELIGIBLE_COLS.includes(e.column.dataField)) {
       const check =
         !e.row.cells[0].value ||
-        ((e.column.dataField === 'kpiEligible' &&
-          (!NUMBER_TYPES.includes(e.data.type) &&
-            !DATE_TYPES.includes(e.data.type))) ||
+        ((['kpiEligible'].includes(e.column.dataField) &&
+          !NUMBER_AND_DATE.includes(e.data.type)) ||
           !this.isDateTypeMatched);
-
       CheckBox.getInstance(e.cellElement.querySelector('.dx-checkbox')).option(
         'disabled',
         check
@@ -236,9 +231,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   cellClicked(e) {
     if (e.rowType === 'data' && e.column.dataField === 'include') {
       const matchedCol = find(this.selectedDPData[0].columns, col => {
-        /**
-         * For new datapod aliasName is changed to alias hence checking for both conditions.
-         */
+        // For new datapod aliasName is changed to alias hence checking for both conditions.
         return col.aliasName
           ? col.aliasName === e.data.aliasName
           : col.alias === e.data.alias;
