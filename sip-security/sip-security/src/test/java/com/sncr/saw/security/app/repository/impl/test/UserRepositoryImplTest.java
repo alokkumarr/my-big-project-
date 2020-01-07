@@ -823,11 +823,4 @@ public class UserRepositoryImplTest {
 		assertEquals(1, allCategories.size());
 	}
 
-	@Test
-	public void testDSKDetailsByUserId() {
-		String userId = "alok.kumarr";
-		when(userRepositoryDAO.fetchDSKDetailByUserId(userId)).thenReturn(securityKeys);
-		DataSecurityKeys dataSecurityKeys = userRepositoryDAO.fetchDSKDetailByUserId(userId);
-		assertEquals(1, dataSecurityKeys.getDataSecurityKeys().size());
-	}
 }
