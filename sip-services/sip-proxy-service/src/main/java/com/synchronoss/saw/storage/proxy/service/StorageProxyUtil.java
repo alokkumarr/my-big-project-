@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -29,8 +30,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -339,25 +342,42 @@ public class StorageProxyUtil {
    * Validate for same column name present in two tables within a semantic and dsk applied.
    *
    * @param sipQuery Sematic Artifacts definition
-   * @param dsk DataSecurityKey
+   * @param dskAttribute SipDskAttribute
    * @return
    */
-  public static boolean checkSameColumnAcrossTables(SipQuery sipQuery, DataSecurityKey dsk) {
-    List<DataSecurityKeyDef> dataSecurityKeyDefList =
-        dsk.getDataSecuritykey() != null ? dsk.getDataSecuritykey() : null;
-    boolean flag = false;
-    for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-      for (Artifact artifact : sipQuery.getArtifacts()) {
-        for (Field field : artifact.getFields()) {
-          if (flag && field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName())) {
-            return true;
-          }
-          flag =
-              !flag ? field.getColumnName().equalsIgnoreCase(dataSecurityKeyDef.getName()) : flag;
-        }
+  public static boolean checkSameColumnAcrossTables(
+      SipQuery sipQuery, SipDskAttribute dskAttribute) {
+    if (dskAttribute != null
+        && (dskAttribute.getBooleanCriteria() != null && dskAttribute.getBooleanQuery() != null)) {
+      Optional<SipDskAttribute> duplicateColumn =
+          dskAttribute.getBooleanQuery().stream()
+              .filter(
+                  sipDskAttribute -> {
+                    String columnName = sipDskAttribute.getColumnName();
+                    if (sipDskAttribute.getBooleanQuery() != null
+                        && (StringUtils.isEmpty(columnName))) {
+                      return checkSameColumnAcrossTables(sipQuery, sipDskAttribute);
+                    }
+                    return checkColumnAcrossTables(sipQuery, columnName);
+                  })
+              .findFirst();
+      if (duplicateColumn.isPresent()) {
+        return true;
       }
     }
     return false;
   }
 
+  private static boolean checkColumnAcrossTables(SipQuery sipQuery, String columnName) {
+    boolean flag = false;
+    for (Artifact artifact : sipQuery.getArtifacts()) {
+      for (Field field : artifact.getFields()) {
+        if (flag && field.getColumnName().equalsIgnoreCase(columnName)) {
+          return true;
+        }
+        flag = !flag ? field.getColumnName().equalsIgnoreCase(columnName) : flag;
+      }
+    }
+    return false;
+  }
 }

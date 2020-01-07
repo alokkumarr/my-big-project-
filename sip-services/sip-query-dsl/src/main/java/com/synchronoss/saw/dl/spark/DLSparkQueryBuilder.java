@@ -879,41 +879,6 @@ public class DLSparkQueryBuilder {
     return select.toString();
   }
 
-  /**
-   * @param sipDskAttribute
-   * @param sipQuery
-   * @param sipQuery
-   * @return
-   */
-  public static String queryDskBuilderOld(
-      SipDskAttribute sipDskAttribute, SipQuery sipQuery, SipQuery sipQueryFromSemantic) {
-    StringBuilder dskFilter = new StringBuilder();
-    if (sipDskAttribute != null
-        && (sipDskAttribute.getBooleanCriteria() != null
-            || sipDskAttribute.getBooleanQuery() != null)) {
-
-      String condition = null;
-      if (sipQuery.getFilters() != null && sipQuery.getFilters().size() > 0) {
-        condition = AND;
-        // dskFilter.append(" ").append(AND).append(" ");
-      } else {
-        condition = WHERE;
-        // dskFilter.append(" ").append(WHERE).append(" ");
-      }
-      List<Artifact> artifacts = sipQueryFromSemantic.getArtifacts();
-      for (Artifact artifact : artifacts) {
-        List<Field> fieldList = artifact.getFields();
-        String artifactName = artifact.getArtifactsName();
-        String dskFormedQuery = dskQueryForArtifact(sipDskAttribute, fieldList, artifactName);
-        if (dskFormedQuery != null && !StringUtils.isEmpty(dskFormedQuery)) {
-          dskFilter.append(" ").append(condition).append(" ");
-          dskFilter.append(" ").append(dskFormedQuery);
-          condition = AND;
-        }
-      }
-    }
-    return dskFilter.toString();
-  }
 
   private static List<String> getArtfactsNames(SipQuery sipQuery) {
     List<String> artifactNames = new ArrayList<>();
