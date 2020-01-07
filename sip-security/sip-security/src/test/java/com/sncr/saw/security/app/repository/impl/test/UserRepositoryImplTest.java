@@ -18,6 +18,7 @@ import com.sncr.saw.security.common.bean.RefreshToken;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
@@ -93,7 +94,8 @@ public class UserRepositoryImplTest {
 	private static Category category11;
 	private static Category category12;
 	private static List<Category> categoryList = new ArrayList<Category>();
-  private static String createdBy="sawadmin@synchronoss.com";
+	private static String createdBy="sawadmin@synchronoss.com";
+  private static UserDetails userDetails;
 
 	@BeforeClass
 	public static void setUp() {
@@ -295,7 +297,15 @@ public class UserRepositoryImplTest {
 
 		securityKeys = new DataSecurityKeys();
 		securityKeys.setDataSecurityKeys(dskDetails);
-		securityKeys.setMessage("success");
+    securityKeys.setMessage("success");
+
+    userDetails = new UserDetails();
+    userDetails.setMasterLoginId("sawadmin@synchronoss.com");
+    userDetails.setUserId(5l);
+    userDetails.setCustomerCode("SYNCHRONOSS");
+    userDetails.setActiveStatusInd(true);
+    userDetails.setEmail("sawadmin@sychronoss.com");
+    userDetails.setRoleName("ADMIN");
 	}
 
 	@Test
@@ -822,5 +832,14 @@ public class UserRepositoryImplTest {
 		List<CategoryDetails> allCategories = userRepositoryDAO.getCategories(1l);
 		assertEquals(1, allCategories.size());
 	}
-
+    @Test
+    public void testDSKDetailsByUserId() {
+        String userId = "sawadmin@synchronoss.com";
+        when(userRepositoryDAO.getUserById(userId)).thenReturn(userDetails);
+        UserDetails details= userRepositoryDAO.getUserById(userId);
+        assertEquals("SYNCHRONOSS", details.getCustomerCode());
+        assertEquals("sawadmin@synchronoss.com", details.getMasterLoginId());
+        assertEquals(true, details.getActiveStatusInd());
+        assertEquals("ADMIN", details.getRoleName());
+    }
 }
