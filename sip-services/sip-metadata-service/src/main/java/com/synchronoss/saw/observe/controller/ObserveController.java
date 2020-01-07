@@ -75,7 +75,7 @@ public class ObserveController {
 
       Ticket ticket = SipCommonUtils.getTicket(request);
       Long categoryId = Long.valueOf(observe.getCategoryId());
-      ArrayList<Products> productList = ticket.getProducts();
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
       if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.CREATE)) {
         logger.error(String.format(UNAUTHORIZED, "CREATE"));
         setUnAuthResponse(response);
@@ -119,7 +119,7 @@ public class ObserveController {
           .stream().findFirst().get().getCategoryId();
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket.getProducts();
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.ACCESS)) {
         observeResponse = new ObserveResponse();
@@ -156,7 +156,7 @@ public class ObserveController {
 
     try {
       Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket.getProducts();
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.ACCESS)) {
         logger.error(String.format(UNAUTHORIZED, "ACCESS"));
@@ -211,7 +211,7 @@ public class ObserveController {
       Long categoryId = !StringUtils.isEmpty(observe.getCategoryId())
           ? Long.valueOf(observe.getCategoryId()) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket.getProducts();
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.EDIT)) {
         logger.error(String.format(UNAUTHORIZED, "EDIT"));
@@ -255,7 +255,7 @@ public class ObserveController {
 
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket.getProducts();
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.DELETE)) {
         logger.error(String.format(UNAUTHORIZED, "DELETE"));
