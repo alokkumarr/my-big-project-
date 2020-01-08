@@ -597,8 +597,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
-          "Column ambiguity error!!"
-              + " DSK name should use TableName.columnName if same column present across tables!!");
+          "DSK column mandatory!!"
+              + " DSK column is missing in the semantic!!");
     }
     dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
 

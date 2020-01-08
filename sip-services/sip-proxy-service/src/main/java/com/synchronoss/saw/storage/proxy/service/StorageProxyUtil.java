@@ -46,6 +46,7 @@ public class StorageProxyUtil {
 
   private static final String METASTORE = "services/metadata";
   private static List<String> dataLakeJunkIds;
+  private static final String KEYWORD = ".keyword";
 
   /**
    * This method to validate jwt token then return the validated ticket for further processing.
@@ -377,7 +378,6 @@ public class StorageProxyUtil {
       artifactNames = getArtifactsNames(analysis.getSipQuery());
     }
     String query = analysis.getSipQuery().getQuery();
-    boolean flag = false;
     outerloop:
     for (Artifact artifact : sipQuery.getArtifacts()) {
       Boolean isArtifactPreset;
@@ -388,7 +388,8 @@ public class StorageProxyUtil {
       }
       if (isArtifactPreset) {
         for (Field field : artifact.getFields()) {
-          if (field.getColumnName().equalsIgnoreCase(columnName)) {
+          if (field.getColumnName().equalsIgnoreCase(columnName) || field.getColumnName()
+              .contentEquals(columnName + KEYWORD)) {
              continue  outerloop;
           }
         }

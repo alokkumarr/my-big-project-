@@ -37,7 +37,7 @@ import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 import com.synchronoss.sip.utils.Privileges.PrivilegeNames;
-import com.synchronoss.sip.utils.RestUtil;
+
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -94,12 +94,10 @@ public class StorageProxyController {
 
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyController.class);
 
-  @Autowired
-  private RestUtil restUtil;
+
   @Autowired
   private StorageProxyService proxyService;
 
-  public static final String CUSTOMER_CODE = "customerCode";
   public static final String AUTHORIZATION = "Authorization";
 
   /**
