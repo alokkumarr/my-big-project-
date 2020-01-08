@@ -63,30 +63,34 @@ public class NGJexlExecutor extends NGExecutor {
     public void execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSetName);
-        logger.debug("Initialize structAccumulator: " );
-        schema = ds.schema();
-        String[] fNames = ds.schema().fieldNames();
-        //TODO:: Add 3 transformation result fields into Accumulator
-        for (int i = 0; i < fNames.length; i++) {
-            structAccumulator.add(new Tuple2<>(fNames[i], ds.schema().apply(i)));
-            logger.debug("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
-        }
-        structAccumulator.add(new Tuple2<>(RECORD_COUNTER, new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty())));
-        structAccumulator.add(new Tuple2<>(TRANSFORMATION_RESULT,  new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty())));
-        structAccumulator.add(new Tuple2<>(TRANSFORMATION_ERRMSG, new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty())));
+        if(ds == null) {
+            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
+        }else {
+            logger.debug("Initialize structAccumulator: ");
+            schema = ds.schema();
+            String[] fNames = ds.schema().fieldNames();
+            //TODO:: Add 3 transformation result fields into Accumulator
+            for (int i = 0; i < fNames.length; i++) {
+                structAccumulator.add(new Tuple2<>(fNames[i], ds.schema().apply(i)));
+                logger.debug("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
+            }
+            structAccumulator.add(new Tuple2<>(RECORD_COUNTER, new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty())));
+            structAccumulator.add(new Tuple2<>(TRANSFORMATION_RESULT, new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty())));
+            structAccumulator.add(new Tuple2<>(TRANSFORMATION_ERRMSG, new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty())));
 
-        prepareRefData(dsMap);
-        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-        Long firstPassTrRes = transformationResult.count();
-        logger.trace("First pass completed: " + firstPassTrRes );
-        //logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
-        StructType newSchema = constructSchema(structAccumulator.value());
-        // Using structAccumulator do second pass to align schema
-        Dataset<Row> alignedDF = schemaRealignment(transformationResult, newSchema);
-        //Long c_adf = alignedDF.count();
-        //String jschema = alignedDF.schema().prettyJson();
-        //logger.debug("Second pass completed: " + c_adf + " Schema: " + jschema);
-        createFinalDS(alignedDF);
+            prepareRefData(dsMap);
+            JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+            Long firstPassTrRes = transformationResult.count();
+            logger.trace("First pass completed: " + firstPassTrRes);
+            //logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
+            StructType newSchema = constructSchema(structAccumulator.value());
+            // Using structAccumulator do second pass to align schema
+            Dataset<Row> alignedDF = schemaRealignment(transformationResult, newSchema);
+            //Long c_adf = alignedDF.count();
+            //String jschema = alignedDF.schema().prettyJson();
+            //logger.debug("Second pass completed: " + c_adf + " Schema: " + jschema);
+            createFinalDS(alignedDF);
+        }
     }
 
 
