@@ -42,6 +42,7 @@ public class AlertsIT extends BaseIT {
 
   private ObjectNode alertData;
   private ObjectNode alertUpdateData;
+
   @Test
   @Before
   public void init() {

@@ -295,7 +295,7 @@ public class SecurityIT extends BaseIT {
   public void testCreateSecurityGroupTwice() throws IOException, InterruptedException {
     // Testing negative scenario
     log.info("Testing create security group");
-    ObjectNode secGroup = getJsonObject("json/security/security-group.json");
+    ObjectNode secGroup = getJsonObject("json/security/security-group2.json");
 
     // Adding security group once will be successful
     createSecurityGroup(secGroup, 200, true);
