@@ -46,13 +46,11 @@ public class SIPDSLTest {
     File file = new File(classLoader.getResource("sample.json").getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     SIPDSL sipdsl = objectMapper.readValue(file, SIPDSL.class);
-    DataSecurityKey dataSecurityKey = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     SipDskAttribute sipDskAttribute = new SipDskAttribute();
     String query =
         elasticSearchQueryBuilder
-            .buildDataQuery(sipdsl.getSipQuery(), 100, dataSecurityKey, sipDskAttribute,
-                sipdsl.getSipQuery());
+            .buildDataQuery(sipdsl.getSipQuery(), 100, sipDskAttribute);
     Assert.assertNotNull(query);
   }
 

@@ -21,6 +21,7 @@ import com.synchronoss.bda.sip.dsk.Model;
 import com.synchronoss.bda.sip.dsk.Operator;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -80,6 +81,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 import sncr.bda.base.MaprConnection;
 
@@ -512,7 +514,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public List<Object> execute(
       SipQuery sipQuery,
       Integer size,
-      DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       String analysisType,
       Boolean designerEdit,
@@ -546,8 +547,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
       result = (List<Object>) (response.getData());
     } else {
-      result = executeESQueries(sipQuery, size, dataSecurityKey, sipDskAttribute,
-          sipQueryFromSemantic);
+      result = executeESQueries(sipQuery, size, sipDskAttribute);
     }
 
     return result;
@@ -558,7 +558,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    *
    * @param analysis Analysis.
    * @param size Integer.
-   * @param dataSecurityKey DataSecurityKey.
    * @param executionType ExecutionType.
    * @param masterLoginId
    * @param authTicket
@@ -571,7 +570,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Integer size,
       Integer page,
       Integer pageSize,
-      DataSecurityKey dataSecurityKey,
       ExecutionType executionType,
       String masterLoginId,
       Ticket authTicket,
@@ -602,7 +600,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           "Column ambiguity error!!"
               + " DSK name should use TableName.columnName if same column present across tables!!");
     }
-    dskAttribute = updateDskAttribute(dskAttribute, authTicket, sipQueryFromSemantic, dskDetails);
+    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
 
     Long startTime = new Date().getTime();
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
@@ -619,8 +617,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               sipQueryFromSemantic);
     } else {
       response = new ExecuteAnalysisResponse();
-      List<Object> objList = executeESQueries(sipQuery, size, dataSecurityKey, dskAttribute,
-          sipQueryFromSemantic);
+      List<Object> objList = executeESQueries(sipQuery, size, dskAttribute);
       response.setExecutionId(executionId);
       response.setData(objList);
       response.setTotalRows(objList != null ? objList.size() : 0L);
@@ -652,7 +649,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private SipDskAttribute updateDskAttribute(
       SipDskAttribute dskAttribute,
       Ticket authTicket,
-      SipQuery sipQueryFromSemantic,
       DskDetails dskDetails) {
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
@@ -663,8 +659,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     boolean scheduledDSKbyCustomerCode =
         authTicket == null
             && dskDetails != null
-            && dskDetails.getIsJvCustomer() != 1
-            && dskDetails.getFilterByCustomerCode() == 1;
+            && dskDetails.getIsJvCustomer() != 1;
+
     logger.info("sched:{}", scheduledDSKbyCustomerCode);
     logger.info("sched1:{}", dskDetails);
     if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
@@ -674,15 +670,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
         sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
         List<SipDskAttribute> attributeList = new ArrayList<>();
-        for (Artifact artifact : sipQueryFromSemantic.getArtifacts()) {
           SipDskAttribute attribute = new SipDskAttribute();
-          attribute.setColumnName(artifact.getArtifactsName().toUpperCase() + "." + CUSTOMER_CODE);
+          attribute.setColumnName(CUSTOMER_CODE);
           Model model = new Model();
           model.setOperator(Operator.ISIN);
           model.setValues(Collections.singletonList(customerCode));
           attribute.setModel(model);
           attributeList.add(attribute);
-        }
         if (dskAttribute != null) {
           attributeList.add(dskAttribute);
         }
@@ -818,16 +812,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   private List<Object> executeESQueries(
-      SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      SipDskAttribute dskAttribute, SipQuery sipQueryFromSemantic) throws Exception {
+      SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) throws Exception {
     List<Object> result = null;
     ElasticSearchQueryBuilder elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
     List<Field> dataFields = sipQuery.getArtifacts().get(0).getFields();
-    if (dataSecurityKey == null) {
-      logger.info("DataSecurity key is not set !!");
-    } else {
-      logger.info("DataSecurityKey : " + dataSecurityKey.toString());
-    }
     boolean isPercentage =
         dataFields.stream()
             .anyMatch(
@@ -840,7 +828,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (isPercentage) {
       SearchSourceBuilder searchSourceBuilder =
           elasticSearchQueryBuilder
-              .percentagePriorQuery(sipQuery, dataSecurityKey, dskAttribute, sipQueryFromSemantic);
+              .percentagePriorQuery(sipQuery, dskAttribute);
       JsonNode percentageData =
           storageConnectorService.executeESQuery(
               searchSourceBuilder.toString(), sipQuery.getStore());
@@ -849,7 +837,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     String query;
     query = elasticSearchQueryBuilder
-        .buildDataQuery(sipQuery, size, dataSecurityKey, dskAttribute, sipQueryFromSemantic);
+        .buildDataQuery(sipQuery, size, dskAttribute);
     logger.trace("ES -Query {} " + query);
     JsonNode response = storageConnectorService.executeESQuery(query, sipQuery.getStore());
     // re-arrange data field based upon sort before flatten
@@ -895,8 +883,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @return boolean
    */
   @Override
-  public List<?> fetchDslExecutionsList(String dslQueryId) {
+  public List<?> fetchDslExecutionsList(String dslQueryId, Ticket authTicket) {
     try {
+      if (isDskApplicableUser(authTicket)) {
+        return new ArrayList<>();
+      }
       // Create executionResult table if doesn't exists.
       new ExecutionResultStore(executionResultTable, basePath);
       MaprConnection maprConnection = new MaprConnection(basePath, executionResultTable);
@@ -933,9 +924,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchExecutionsData(
-      String executionId, ExecutionType executionType, Integer page, Integer pageSize) {
+      String executionId, ExecutionType executionType, Integer page, Integer pageSize,
+      Ticket authTicket) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    ObjectMapper objectMapper = new ObjectMapper();
+    if (isDskApplicableUser(authTicket) && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
+      return executionResponse;
+    }
       ExecutionResult executionResult = null;
     try {
       String tableName =
@@ -1059,8 +1054,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchLastExecutionsData(
-      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize) {
+      String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,
+      Ticket authTicket) {
     ExecutionResponse executionResponse = new ExecutionResponse();
+    if (isDskApplicableUser(authTicket)) {
+      return executionResponse;
+    }
       ExecutionResult executionResult = null;
     try {
       String tableName =
@@ -1123,15 +1122,22 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * This Method will process the global filter request.
    *
    * @param globalFilters globalfilter.
-   * @param dataSecurityKey datasecurity.
    * @return global filter response.
    */
   @Override
-  public Object fetchGlobalFilter(GlobalFilters globalFilters, DataSecurityKey dataSecurityKey)
+  public Object fetchGlobalFilter(GlobalFilters globalFilters, Ticket authTicket)
       throws Exception {
     GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
+    String masterLoginId = authTicket.getMasterLoginId();
+    DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
+    SipDskAttribute dskAttribute = null;
+    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+    }
+    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
+
     List<GlobalFilterExecutionObject> executionList =
-        globalFilterDataQueryBuilder.buildQuery(globalFilters,dataSecurityKey);
+        globalFilterDataQueryBuilder.buildQuery(globalFilters,dskAttribute);
     JsonNode result = null;
     for (GlobalFilterExecutionObject globalFilterExecutionObject : executionList) {
       globalFilterExecutionObject.getEsRepository();
@@ -1158,10 +1164,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   }
 
   @Override
-  public Object processKpi(KPIBuilder kpiBuilder, DataSecurityKey dataSecurityKey)
-      throws Exception {
+  public Object processKpi(KPIBuilder kpiBuilder, Ticket authTicket) throws Exception {
+    String masterLoginId = authTicket.getMasterLoginId();
+    DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
+    SipDskAttribute dskAttribute = null;
+    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+    }
+    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
     KPIExecutionObject kpiExecutionObject =
-        new KPIDataQueryBuilder(dataSecurityKey).buildQuery(kpiBuilder);
+        new KPIDataQueryBuilder(dskAttribute).buildQuery(kpiBuilder);
     Store store = new Store();
     store.setDataStore(
         kpiBuilder.getKpi().getEsRepository().getIndexName()
@@ -1247,9 +1259,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchDataLakeExecutionData(
-      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType) {
-    ExecutionResponse executionResponse;
-
+      String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,
+      Ticket authTicket) {
+    ExecutionResponse executionResponse = new ExecutionResponse();
+    if (isDskApplicableUser(authTicket) && executionType != null && !executionType
+        .equals(ExecutionType.onetime)) {
+      return executionResponse;
+    }
     logger.info("Fetch Execution Data for Data Lake report");
     ExecuteAnalysisResponse excuteResp;
     if ((executionType == ExecutionType.onetime
@@ -1260,7 +1276,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           dataLakeExecutionService.getDataLakeExecutionData(
               executionId, pageNo, pageSize, executionType, null);
     } else {
-      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize);
+      executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize,
+          authTicket);
       /*here for schedule and publish we are reading data from the same location in DL, so directly
       I am sending publish  as Ui is sending information for only oneTimeExecution,we can send
       schedule as well as */
@@ -1275,10 +1292,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchLastExecutionsDataForDL(
-      String analysisId, Integer pageNo, Integer pageSize) {
+      String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket) {
     logger.info("Fetching last execution data for DL report");
-    ExecutionResult result = fetchLastExecutionResult(analysisId, null, false);
     ExecutionResponse executionResponse = new ExecutionResponse();
+    if (isDskApplicableUser(authTicket)) {
+      return executionResponse;
+    }
+
+    ExecutionResult result = fetchLastExecutionResult(analysisId, null, false);
     if (result != null) {
       ExecuteAnalysisResponse executionData =
           dataLakeExecutionService.getDataLakeExecutionData(
@@ -1290,5 +1311,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
 
     return executionResponse;
+  }
+
+  public boolean isDskApplicableUser(Ticket authTicket) {
+    String masterLoginId = authTicket == null ? null : authTicket.getMasterLoginId();
+    DskDetails dskDetails =
+        authTicket == null ? null : getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
+    logger.trace("DSK List = " + dskDetails.toString());
+
+    SipDskAttribute dskAttribute = null;
+    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+      if (dskAttribute != null || !CollectionUtils.isEmpty(dskAttribute.getBooleanQuery()))
+        return true;
+    }
+    return false;
   }
 }

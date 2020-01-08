@@ -1,10 +1,8 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkSameColumnAcrossTables;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
+
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
+
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
@@ -17,26 +15,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
+
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
-import com.synchronoss.saw.es.QueryBuilderUtil;
+
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
+
 import com.synchronoss.saw.model.SIPDSL;
-import com.synchronoss.saw.model.SipQuery;
+
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONProcessingSAWException;
 import com.synchronoss.saw.storage.proxy.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionResponse;
-import com.synchronoss.saw.storage.proxy.model.ExecutionResult;
+
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
@@ -49,10 +45,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
-import java.time.Instant;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,12 +56,12 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -219,7 +215,6 @@ public class StorageProxyController {
           proxyService.execute(
               sipdsl.getSipQuery(),
               size,
-              dataSecurityKey,
               ExecutionType.onetime,
               analysisType,
               false,authTicket);
@@ -331,7 +326,7 @@ public class StorageProxyController {
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
       executeResponse =
           proxyService.executeAnalysis(
-              analysis, size, page, pageSize, null, executionType, userId, authTicket, queryId);
+              analysis, size, page, pageSize,  executionType, userId, authTicket, queryId);
 
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
@@ -383,27 +378,14 @@ public class StorageProxyController {
       String internal) throws IOException {
     String authToken = request.getHeader(AUTHORIZATION);
     boolean schduledAnalysis = Boolean.valueOf(internal);
-
     if (!schduledAnalysis && !authValidation(authToken)) {
       setUnAuthResponse(response);
       return Collections.singletonList(HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-
-      logger.trace("Extracting auth ticket details");
       Ticket authTicket = schduledAnalysis ? null : getTicket(request);
-
-      List<TicketDSKDetails> dskList =
-          authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
-      logger.trace("DSK List size = " + dskList);
-
-      if (dskList == null || dskList.size() == 0) {
-        return proxyService.fetchDslExecutionsList(queryId);
-      } else {
-        return new ArrayList<>();
-      }
-
+      return proxyService.fetchDslExecutionsList(queryId,authTicket);
     } catch (Exception e) {
       logger.error("error occurred while fetching list of executions ", e);
     }
@@ -443,32 +425,20 @@ public class StorageProxyController {
           String internal) throws IOException {
     String authToken = request.getHeader(AUTHORIZATION);
     boolean schduledAnalysis = Boolean.valueOf(internal);
-
     if (!schduledAnalysis && !authValidation(authToken)) {
       ExecutionResponse executeResponse = new ExecutionResponse();
       setUnAuthResponse(response);
       return executeResponse;
     }
-
     Ticket authTicket = schduledAnalysis ? null : getTicket(request);
-
-    List<TicketDSKDetails> dskList =
-        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
-    logger.trace("DSK List = " + dskList);
-
-    // If user is associated with any datasecurity key, return empty data
-    if (dskList != null && dskList.size() != 0 && executionType != null && !executionType
-        .equals(ExecutionType.onetime)) {
-      return new ExecutionResponse();
-    }
-
     if (analysisType != null && analysisType.equals("report")) {
-      return proxyService.fetchDataLakeExecutionData(executionId, page, pageSize, executionType);
+      return proxyService
+          .fetchDataLakeExecutionData(executionId, page, pageSize, executionType, authTicket);
     }
-
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchExecutionsData(executionId, executionType, page, pageSize);
+      return proxyService
+          .fetchExecutionsData(executionId, executionType, page, pageSize, authTicket);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -508,28 +478,19 @@ public class StorageProxyController {
           String internal) throws IOException {
     String authToken = request.getHeader(AUTHORIZATION);
     boolean schduledAnalysis = Boolean.valueOf(internal);
-
     if (!schduledAnalysis && !authValidation(authToken)) {
       ExecutionResponse executeResponse = new ExecutionResponse();
       setUnAuthResponse(response);
       return executeResponse;
     }
-
     Ticket authTicket = schduledAnalysis ? null : getTicket(request);
-
-    List<TicketDSKDetails> dskList =
-        authTicket == null ? new ArrayList<>() : authTicket.getDataSecurityKey();
-    logger.trace("DSK List = " + dskList);
-
-    if (dskList != null && dskList.size() != 0) {
-      return new ExecutionResponse();
-    }
     if (analysisType != null && analysisType.equals("report")) {
-      return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize);
+      return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize,authTicket);
     }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
-      return proxyService.fetchLastExecutionsData(analysisId, executionType, page, pageSize);
+      return proxyService
+          .fetchLastExecutionsData(analysisId, executionType, page, pageSize, authTicket);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

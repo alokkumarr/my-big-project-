@@ -1,8 +1,5 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-import static com.synchronoss.saw.es.QueryBuilderUtil.checkDSKApplicableAnalysis;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 
@@ -12,10 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
-import com.synchronoss.saw.model.Field;
+
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.kpi.KPIBuilder;
 import com.synchronoss.saw.storage.proxy.exceptions.JSONMissingSAWException;
@@ -31,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -86,13 +80,10 @@ public class SipKpiController {
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList = authTicket.getDataSecurityKey();
     Object responseObject = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    DataSecurityKey dataSecurityKey = new DataSecurityKey();
-    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     ArrayList list = (ArrayList) (kpiBuilder.getAdditionalProperties().get("keys"));
     LinkedHashMap hashMap = (LinkedHashMap) (list.get(0));
     String semanticId = hashMap.get("semanticId").toString();
@@ -106,40 +97,8 @@ public class SipKpiController {
             objectMapper.valueToTree(kpiBuilder), objectMapper.valueToTree(semanticNode));
       }
       SipQuery savedQuery = getSipQuery(semanticId, metaDataServiceUrl, restUtil);
-      DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
-      dataSecurityKey = new DataSecurityKey();
-      List<DataSecurityKeyDef> dataSecurityKeyDefList =
-          dataSecurityKeyNode.getDataSecuritykey() != null
-              ? dataSecurityKeyNode.getDataSecuritykey()
-              : null;
-      String artifactName = savedQuery.getArtifacts().get(0).getArtifactsName();
-      List<Field> fields = savedQuery.getArtifacts().get(0).getFields();
-      List<DataSecurityKeyDef> dataSecurityKeyDefs = new ArrayList<>();
-      for (DataSecurityKeyDef dataSecurityKeyDef : dataSecurityKeyDefList) {
-        if (checkDSKApplicableAnalysis(artifactName, fields, dataSecurityKeyDef)) {
-          String dskColName = dataSecurityKeyDef.getName();
-          dataSecurityKeyDef.setName(dskColName);
-          dataSecurityKeyDefs.add(dataSecurityKeyDef);
-        }
-      }
-
-      dataSecurityKey.setDataSecuritykey(dataSecurityKeyDefs);
-        // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
-        // code.
-        if (authTicket.getIsJvCustomer() != 1 && authTicket.getFilterByCustomerCode() == 1) {
-
-            DataSecurityKeyDef dataSecurityKeyDef = new DataSecurityKeyDef();
-            List<String> artsName = getArtifactsNames(savedQuery);
-            List<DataSecurityKeyDef> customerFilterDsks = new ArrayList<>();
-                for (String artifact : artsName) {
-                    dataSecurityKeyDef.setName(CUSTOMER_CODE);
-                    dataSecurityKeyDef.setValues(Collections.singletonList(authTicket.getCustCode()));
-                    customerFilterDsks.add(dataSecurityKeyDef);
-                    dataSecurityKey.getDataSecuritykey().addAll(customerFilterDsks);
-                }
-        }
-      logger.debug("Final DataSecurity Object : " + gson.toJson(dataSecurityKey));
-      responseObject = proxyService.processKpi(kpiBuilder, dataSecurityKey);
+      // TODO: Validate for new DSK and throw if column not exists.!!
+      responseObject = proxyService.processKpi(kpiBuilder, authTicket);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");

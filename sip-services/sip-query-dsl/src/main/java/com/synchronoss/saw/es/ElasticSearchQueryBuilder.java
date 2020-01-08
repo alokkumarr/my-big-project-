@@ -2,7 +2,7 @@ package com.synchronoss.saw.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.DataSecurityKey;
@@ -51,12 +51,9 @@ public class ElasticSearchQueryBuilder {
   private static String appenderForGTLTE = "||/M";
   public static String[] groupByFields;
 
-  public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey,
-      SipDskAttribute dskAttribute, SipQuery sipQueryFromSemantic)
-      throws IOException, ProcessingException {
+  public String buildDataQuery(SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
-    DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
     /*
     ToDo: when size is -1 need to remove the hard coded size as 1lakh and we need to send the total
       data  when the size is -1.
@@ -75,7 +72,7 @@ public class ElasticSearchQueryBuilder {
     if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
         .isEmpty(dskAttribute.getBooleanQuery())) {
       dskBuilder = QueryBuilderUtil
-          .queryDSKBuilder(dataSecurityKeyNode, dskBuilder, dskAttribute, sipQueryFromSemantic,
+          .queryDSKBuilder(dskBuilder, dskAttribute,
               dskAttribute.getBooleanCriteria());
       logger.debug("Print Boolean value : {}", dskAttribute.getBooleanCriteria().toString());
       buildBooleanQuery(
@@ -553,9 +550,7 @@ public class ElasticSearchQueryBuilder {
    * @param sipQuery SIP Query.
    * @return Elasticsearch SearchSourceBuilder
    */
-  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery,
-      DataSecurityKey dataSecurityKey, SipDskAttribute dskAttribute,
-      SipQuery sipQueryFromSemantic) {
+  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery,SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(0);
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
@@ -563,7 +558,7 @@ public class ElasticSearchQueryBuilder {
         .isEmpty(dskAttribute.getBooleanQuery())) {
       List<QueryBuilder> dskBuilder = new ArrayList<>();
       dskBuilder = QueryBuilderUtil
-          .queryDSKBuilder(dataSecurityKey, dskBuilder, dskAttribute, sipQueryFromSemantic,
+          .queryDSKBuilder(dskBuilder, dskAttribute,
               dskAttribute.getBooleanCriteria());
       // The below code to build filters
       BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();

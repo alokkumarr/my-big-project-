@@ -3,10 +3,11 @@ package com.synchronoss.saw.es.kpi;
 import static com.synchronoss.saw.es.ElasticSearchQueryBuilder.buildBooleanQuery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.synchronoss.saw.es.QueryBuilderUtil;
+
 import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.kpi.DataField;
 import com.synchronoss.saw.model.kpi.Filter;
@@ -27,10 +28,11 @@ import java.util.TimeZone;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 public class KPIDataQueryBuilder {
 
@@ -38,11 +40,11 @@ public class KPIDataQueryBuilder {
   private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
 
   String jsonString;
-  DataSecurityKey dataSecurityKeyNode;
+  SipDskAttribute dskAttribute;
 
-  public KPIDataQueryBuilder(DataSecurityKey dataSecurityKeyNode) {
+  public KPIDataQueryBuilder(SipDskAttribute dskAttribute) {
     super();
-    this.dataSecurityKeyNode = dataSecurityKeyNode;
+    this.dskAttribute = dskAttribute;
   }
 
   public String getJsonString() {
@@ -128,18 +130,20 @@ public class KPIDataQueryBuilder {
           }
         }
       }
-      ObjectMapper objectMapper = null;
-        List<QueryBuilder> dskBuilder = new ArrayList<>();
+
+      List<QueryBuilder> dskBuilder = new ArrayList<>();
       BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
-      if (dataSecurityKeyNode != null && dataSecurityKeyNode.getDataSecuritykey() != null) {
-        for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()) {
-          TermsQueryBuilder dataSecurityBuilder =
-              new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
-            dskBuilder.add(dataSecurityBuilder);
-        }
-          buildBooleanQuery(BooleanCriteria.AND, dskBuilder, boolQueryBuilderDsk);
+      if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
+          .isEmpty(dskAttribute.getBooleanQuery())) {
+        dskBuilder = QueryBuilderUtil
+            .queryDSKBuilder(dskBuilder, dskAttribute, dskAttribute.getBooleanCriteria());
+        buildBooleanQuery(
+            BooleanCriteria.AND.toString()
+                .equalsIgnoreCase(dskAttribute.getBooleanCriteria().toString())
+                ? BooleanCriteria.AND
+                : BooleanCriteria.OR, dskBuilder, boolQueryBuilderDsk);
+        boolQueryBuilder.must(boolQueryBuilderDsk);
       }
-      boolQueryBuilder.must(boolQueryBuilderDsk);
       // make the query based on the filter given
       if (item.getType().value().equals(Filter.Type.STRING.value())) {
         builder = KPIQueryBuilderUtil.stringFilterKPI(item, builder);
