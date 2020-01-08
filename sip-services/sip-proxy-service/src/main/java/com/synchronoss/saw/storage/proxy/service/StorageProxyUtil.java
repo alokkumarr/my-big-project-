@@ -12,12 +12,11 @@ import com.mapr.db.Table;
 import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.TokenParser;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
+import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.GlobalFilterResultParser;
 import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
@@ -344,41 +343,58 @@ public class StorageProxyUtil {
    *
    * @param sipQuery Sematic Artifacts definition
    * @param dskAttribute SipDskAttribute
+   * @param analysis
    * @return
    */
   public static boolean checkSameColumnAcrossTables(
-      SipQuery sipQuery, SipDskAttribute dskAttribute) {
+      SipQuery sipQuery, SipDskAttribute dskAttribute, Analysis analysis) {
     if (dskAttribute != null
         && (dskAttribute.getBooleanCriteria() != null && dskAttribute.getBooleanQuery() != null)) {
-      Optional<SipDskAttribute> duplicateColumn =
+      Optional<SipDskAttribute> isColumnNotPresent=
           dskAttribute.getBooleanQuery().stream()
               .filter(
                   sipDskAttribute -> {
                     String columnName = sipDskAttribute.getColumnName();
                     if (sipDskAttribute.getBooleanQuery() != null
                         && (StringUtils.isEmpty(columnName))) {
-                      return checkSameColumnAcrossTables(sipQuery, sipDskAttribute);
+                      return checkSameColumnAcrossTables(sipQuery, sipDskAttribute,analysis);
                     }
-                    return checkColumnAcrossTables(sipQuery, columnName);
+                    return !checkColumnAcrossTables(sipQuery, columnName,analysis);
                   })
               .findFirst();
-      if (duplicateColumn.isPresent()) {
+      if (isColumnNotPresent.isPresent()) {
         return true;
       }
     }
     return false;
   }
 
-  private static boolean checkColumnAcrossTables(SipQuery sipQuery, String columnName) {
+  private static boolean checkColumnAcrossTables(
+      SipQuery sipQuery, String columnName, Analysis analysis) {
+    Boolean designerEdit = analysis.getDesignerEdit();
+    List<String> artifactNames = null;
+    if (designerEdit == null || !designerEdit) {
+      artifactNames = getArtifactsNames(analysis.getSipQuery());
+    }
+    String query = analysis.getSipQuery().getQuery();
     boolean flag = false;
+    outerloop:
     for (Artifact artifact : sipQuery.getArtifacts()) {
-      for (Field field : artifact.getFields()) {
-        if (flag && field.getColumnName().equalsIgnoreCase(columnName)) {
-          return true;
+      Boolean isArtifactPreset;
+      if (designerEdit == null || !designerEdit) {
+        isArtifactPreset = artifactNames.contains(artifact.getArtifactsName().toUpperCase());
+      } else {
+        isArtifactPreset = StringUtils.containsIgnoreCase(query,artifact.getArtifactsName());
+      }
+      if (isArtifactPreset) {
+        for (Field field : artifact.getFields()) {
+          if (field.getColumnName().equalsIgnoreCase(columnName)) {
+             continue  outerloop;
+          }
         }
-        flag = !flag ? field.getColumnName().equalsIgnoreCase(columnName) : flag;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 }

@@ -594,7 +594,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
       dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
     }
-    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute)) {
+    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "Column ambiguity error!!"
