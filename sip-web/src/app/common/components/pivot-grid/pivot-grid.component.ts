@@ -345,14 +345,7 @@ export class PivotGridComponent implements OnDestroy {
             )
           };
           if (cloned.aggregate) {
-            delete cloned.caption;
-            cloned.displayName = `${toUpper(
-              cloned.aggregate
-            )}(${displayNameWithoutAggregateFor(cloned)})`;
-            /* We're aggregating values in backend. Aggregating it again using
-             pivot's aggregate function will lead to bad data. Always keep this
-             on sum */
-            cloned.aggregate = 'sum';
+            this.setDisplayNameAndAggregate(cloned);
           }
         } else if (cloned.type === 'string') {
           cloned.dataType = ['count', 'distinctcount'].includes(
@@ -360,6 +353,7 @@ export class PivotGridComponent implements OnDestroy {
           )
             ? 'number'
             : 'string';
+          this.setDisplayNameAndAggregate(cloned);
         } else {
           cloned.dataType = cloned.type;
         }
@@ -395,5 +389,18 @@ export class PivotGridComponent implements OnDestroy {
         return col;
       })
     );
+  }
+
+  setDisplayNameAndAggregate(column) {
+    delete column.caption;
+    if (column.aggregate) {
+      column.displayName = `${toUpper(
+        column.aggregate
+      )}(${displayNameWithoutAggregateFor(column)})`;
+    }
+    /* We're aggregating values in backend. Aggregating it again using
+      pivot's aggregate function will lead to bad data. Always keep this
+      on sum */
+    column.aggregate = 'sum';
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import * as forEach from 'lodash/forEach';
+import * as groupBy from 'lodash/groupBy';
 
 @Component({
   selector: 'field-details',
@@ -16,21 +16,10 @@ export class FieldDetailsComponent {
     if (!Array.isArray(columns)) {
       return;
     }
-
-    this.dataFields = [];
-    this.columnFields = [];
-    this.rowFields = [];
-
-    forEach(columns, col => {
-      if (col.area === 'data') {
-        this.dataFields = [...this.dataFields, ...col];
-      }
-      if (col.area === 'column') {
-        this.columnFields = [...this.columnFields, ...col];
-      }
-      if (col.area === 'row') {
-        this.rowFields = [...this.rowFields, ...col];
-      }
-    });
+    const groupedColumns = groupBy(columns, 'area');
+    const { data, column, row } = groupedColumns;
+    this.dataFields = data || [];
+    this.columnFields = column || [];
+    this.rowFields = row || [];
   }
 }
