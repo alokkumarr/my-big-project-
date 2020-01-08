@@ -110,10 +110,8 @@ public class SipAlertController {
         return alertResponse;
       }
 
-      Long categoryId = alertRuleDetails.getCategoryId() != null
-          ? Long.valueOf(alertRuleDetails.getCategoryId()) : 0L;
-      ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.ACCESS)) {
+      // validate the alerts access privileges
+      if (!utils.validAlertPrivileges(ticket.getProducts())) {
         logger.error(String.format(UNAUTHORIZED, "Access"));
         setUnAuthResponse(response);
         alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
@@ -162,10 +160,8 @@ public class SipAlertController {
         return alertResponse;
       }
 
-      Long categoryId = !StringUtils.isEmpty(alertRuleDetails.getCategoryId())
-          ? Long.valueOf(alertRuleDetails.getCategoryId()) : 0L;
-      ArrayList<Products> productList = ticket.getProducts();
-      if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.ACCESS)) {
+      // validate the alerts access privileges
+      if (!utils.validAlertPrivileges(ticket.getProducts())) {
         logger.error(String.format(UNAUTHORIZED, "Access"));
         setUnAuthResponse(response);
         alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));

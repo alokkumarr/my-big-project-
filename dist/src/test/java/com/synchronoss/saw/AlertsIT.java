@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hamcrest.text.IsEqualIgnoringCase;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,15 @@ public class AlertsIT extends BaseIT {
   private static final String ALERT_STATES = "states";
   private static final String MONITORINGTYPE = "monitoringtype";
   private static final String ATTRIBUTE_VALUES = "attributevalues";
+
+  private ObjectNode alertData;
+  private ObjectNode alertUpdateData;
+  @Test
+  @Before
+  public void init() {
+    alertData = getJsonObject("json/alerts/alert-dataset.json");
+    alertUpdateData = getJsonObject("json/alerts/alert-update.json");
+  }
 
   @Test
   public void testTriggerAlert() throws JsonProcessingException {
@@ -68,7 +78,7 @@ public class AlertsIT extends BaseIT {
 
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -96,7 +106,7 @@ public class AlertsIT extends BaseIT {
   public void deleteAlert() throws IOException {
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -126,7 +136,7 @@ public class AlertsIT extends BaseIT {
   public void readAlerts() throws IOException {
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -145,7 +155,7 @@ public class AlertsIT extends BaseIT {
     log.debug("alertRulesSysId : " + alertRulesSysId);
 
     given(authSpec)
-        .body(prepareAlertsDataSet())
+        .body(alertData)
         .when()
         .get(ALERT_PATH)
         .then()
@@ -176,7 +186,7 @@ public class AlertsIT extends BaseIT {
   public void updateAlert() throws IOException {
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -199,7 +209,7 @@ public class AlertsIT extends BaseIT {
     log.debug("updateAlerts urlForThetoUpdate : " + urlForThatoUpdate);
     HashMap<?, ?> alertObject1 =
         given(authSpec)
-            .body(prepareUpdateAlertDataSet())
+            .body(alertUpdateData)
             .when()
             .put(urlForThatoUpdate)
             .then()
@@ -234,7 +244,7 @@ public class AlertsIT extends BaseIT {
 
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -281,7 +291,7 @@ public class AlertsIT extends BaseIT {
   public void testListByCategoryId() throws IOException {
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
@@ -319,56 +329,6 @@ public class AlertsIT extends BaseIT {
 
     // delete alert after testing
     this.tearDownAlert(alertRulesSysId);
-  }
-
-  /**
-   * This method is used to in test-case where creation of alerts is required.
-   *
-   * @return object {@link ObjectNode}
-   */
-  private ObjectNode prepareAlertsDataSet() {
-    ObjectNode root = mapper.createObjectNode();
-    root.put("alertRulesSysId", "123456");
-    root.put("activeInd", "false");
-    root.put("aggregation", "AVG");
-    root.put("alertSeverity", "CRITICAL");
-    root.put("categoryId", "12");
-    root.put("product", "MCT");
-    root.put("datapodId", "abc");
-    root.put("datapodName", "ABc");
-    root.put("monitoringEntity", "abc123");
-    root.put("operator", "LT");
-    root.put("attributeName", "testAttribute");
-    root.put("attributeValue", "attribute123");
-    root.put("alertRuleDescription", "Tests");
-    root.put("alertRuleName", "myName");
-    root.put("thresholdValue", "2");
-    return root;
-  }
-
-  /**
-   * This method is used to in test-case where updating of alerts is required.
-   *
-   * @return object {@link ObjectNode}
-   */
-  private ObjectNode prepareUpdateAlertDataSet() {
-    ObjectNode root = mapper.createObjectNode();
-    root.put("alertRulesSysId", "123456");
-    root.put("activeInd", "false");
-    root.put("aggregation", "SUM");
-    root.put("alertSeverity", "CRITICAL");
-    root.put("categoryId", "12");
-    root.put("product", "MCT");
-    root.put("datapodId", "abc");
-    root.put("datapodName", "ABc");
-    root.put("monitoringEntity", "abc123");
-    root.put("operator", "GT");
-    root.put("attributeName", "testAttribute");
-    root.put("attributeValue", "attribute123");
-    root.put("alertRuleDescription", "Tests");
-    root.put("alertRuleName", "myName");
-    root.put("thresholdValue", "2");
-    return root;
   }
 
   /** This test-case is check the alert count. */
@@ -450,7 +410,7 @@ public class AlertsIT extends BaseIT {
   public void testListAttributeValues() throws IOException {
     HashMap<?, ?> alertObject =
         given(authSpec)
-            .body(prepareAlertsDataSet())
+            .body(alertData)
             .when()
             .post(ALERT_PATH)
             .then()
