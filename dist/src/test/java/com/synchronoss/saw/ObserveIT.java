@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.ResponseBody;
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class ObserveIT extends BaseIT {
         .post(PATH + "/create")
         .then()
         .assertThat()
-        .statusCode(201)
+        .statusCode(HttpStatus.SC_CREATED)
         .extract()
         .response()
         .getBody();
@@ -53,7 +54,7 @@ public class ObserveIT extends BaseIT {
         .get(PATH + "/" + entityId)
         .then()
         .assertThat()
-        .statusCode(200)
+        .statusCode(HttpStatus.SC_OK)
         .extract()
         .response()
         .getBody()
@@ -69,7 +70,7 @@ public class ObserveIT extends BaseIT {
         .put(PATH + "/update/" + entityId)
         .then()
         .assertThat()
-        .statusCode(200)
+        .statusCode(HttpStatus.SC_OK)
         .extract()
         .response()
         .getBody()
@@ -83,7 +84,7 @@ public class ObserveIT extends BaseIT {
         .delete("/sip/services/observe/dashboards/" + entityId)
         .then()
         .assertThat()
-        .statusCode(200)
+        .statusCode(HttpStatus.SC_OK)
         .extract()
         .response()
         .getBody()
@@ -104,7 +105,7 @@ public class ObserveIT extends BaseIT {
         .post(PATH + "/create")
         .then()
         .assertThat()
-        .statusCode(401)
+        .statusCode(HttpStatus.SC_UNAUTHORIZED)
         .extract()
         .response()
         .getBody();
@@ -122,7 +123,7 @@ public class ObserveIT extends BaseIT {
         .post(PATH + "/create")
         .then()
         .assertThat()
-        .statusCode(201)
+        .statusCode(HttpStatus.SC_CREATED)
         .extract()
         .response()
         .getBody();
@@ -136,7 +137,7 @@ public class ObserveIT extends BaseIT {
         .get(PATH + "/7/1")
         .then()
         .assertThat()
-        .statusCode(200)
+        .statusCode(HttpStatus.SC_OK)
         .extract()
         .response()
         .getBody()
@@ -150,7 +151,7 @@ public class ObserveIT extends BaseIT {
         .delete(PATH + "/" + entityId)
         .then()
         .assertThat()
-        .statusCode(200)
+        .statusCode(HttpStatus.SC_OK)
         .extract()
         .response()
         .getBody()
