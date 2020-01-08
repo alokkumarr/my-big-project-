@@ -80,8 +80,7 @@
     <dependency>
       <groupId>com.synchronoss.bda.sip</groupId>
       <artifactId>sip-common-components</artifactId>
-      <version>4</version>
-      <scope>compile</scope>
+      <version>${revision}</version>
     </dependency>
   </dependencies>
   <build>
