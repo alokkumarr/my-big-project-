@@ -131,15 +131,13 @@ public abstract class NGExecutor {
 
         logger.debug("Final DS: " + successTransformationsCount.value());
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
-
         writeResults(outputResult, outDataSetName, tempLoc);
-        
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
-        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+            writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        
-
+        //This will throw an error if Dataset is Empty //parent.getNgctx().outputs.get(outDataSetName).get(DataSetProperties.Name.name())
+        ((AbstractComponent)parent).validateRecordsCount(outputResult.count(), parent.getNgctx().componentConfiguration.getOutputs().get(0).getDataSet().toString(), ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 
@@ -165,14 +163,13 @@ public abstract class NGExecutor {
             rejectedRecords = ds.filter( trRes.lt(0));
         long outputDSCount = outputResult.count();
         logger.debug("Final DS: " + outputDSCount + " Schema: " + outputResult.schema().prettyJson());
-        //This will throw an error if Dataset is Empty
-        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, outDataSetName, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
-
         writeResults(outputResult, outDataSetName, tempLoc);
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
-        	writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
+            writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
+        //This will throw an error if Dataset is Empty
+        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, transOutKey, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 }

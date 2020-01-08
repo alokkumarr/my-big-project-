@@ -96,6 +96,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     Map<String, Object> desc = entry.getValue();
                     String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                     String format = (String) desc.get(DataSetProperties.Format.name());
+                    if(HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
+                        validateRecordsCount(0, (String) desc.get(DataSetProperties.Name.name()), ReturnCode.INPUT_DATA_EMPTY_ERROR);
+                    }
                     Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                     logger.trace("Added to DS map: " + entry.getKey());
                     dsMap.put(entry.getKey(), ds);
