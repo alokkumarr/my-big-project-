@@ -1,5 +1,9 @@
 package com.synchronoss.sip.alert.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.alert.modal.AlertCount;
 import com.synchronoss.sip.alert.modal.AlertCountResponse;
@@ -9,21 +13,27 @@ import com.synchronoss.sip.alert.modal.AlertRuleResponse;
 import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.service.AlertService;
+import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,14 +46,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/alerts")
 @ApiResponses(
     value = {
-      @ApiResponse(code = 202, message = "Request has been accepted without any error"),
-      @ApiResponse(code = 400, message = "Bad Request"),
-      @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-      @ApiResponse(
-          code = 403,
-          message = "Accessing the resource you were trying to reach is forbidden"),
-      @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-      @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
+        @ApiResponse(code = 202, message = "Request has been accepted without any error"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse(
+            code = 403,
+            message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+        @ApiResponse(code = 500, message = "Internal server Error. Contact System administrator")
     })
 public class SipAlertController {
 
@@ -52,11 +62,14 @@ public class SipAlertController {
   @Autowired
   AlertService alertService;
 
+  private static String UNAUTHORIZED =
+      "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
+
   /**
    * create Alert API.
    *
-   * @param request HttpServletRequest
-   * @param response HttpServletResponse
+   * @param request          HttpServletRequest
+   * @param response         HttpServletResponse
    * @param alertRuleDetails Alert Rule Details definition
    * @return Alert
    */
@@ -76,27 +89,44 @@ public class SipAlertController {
       @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
     Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
-      if (alertRuleDetails == null) {
-        alertResponse.setMessage("Alert rule definition can't be null for create request");
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return alertResponse;
-      }
-      alertResponse.setAlert(alertService.createAlertRule(alertRuleDetails, ticket));
-      alertResponse.setMessage("Alert rule created successfully");
-    } else {
+
+    if (ticket == null) {
       logger.error("Invalid Token");
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       alertResponse.setMessage("Invalid Token");
+      return alertResponse;
     }
+
+    if (alertRuleDetails == null) {
+      alertResponse.setMessage("Alert rule definition can't be null for create request");
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return alertResponse;
+    }
+
+    try {
+      Long categoryId = alertRuleDetails.getCategoryId() != null
+          ? Long.valueOf(alertRuleDetails.getCategoryId()) : 0L;
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+      if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.ACCESS)) {
+        logger.error(String.format(UNAUTHORIZED, "Access"));
+        setUnAuthResponse(response);
+        alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+        return alertResponse;
+      }
+    } catch (IOException ex) {
+      logger.error(ex.getMessage());
+    }
+
+    alertResponse.setAlert(alertService.createAlertRule(alertRuleDetails, ticket));
+    alertResponse.setMessage("Alert rule created successfully");
     return alertResponse;
   }
 
   /**
    * update Alert API.
    *
-   * @param request HttpServletRequest
-   * @param response HttpServletResponse
+   * @param request          HttpServletRequest
+   * @param response         HttpServletResponse
    * @param alertRuleDetails AlertRuleDetails definition
    * @return Alert
    */
@@ -116,8 +146,27 @@ public class SipAlertController {
       @PathVariable(name = "id") String id,
       @RequestBody AlertRuleDetails alertRuleDetails) {
     AlertResponse alertResponse = new AlertResponse();
-    Ticket ticket = SipCommonUtils.getTicket(request);
-    if (ticket != null) {
+    try {
+      Ticket ticket = SipCommonUtils.getTicket(request);
+
+      if (ticket == null) {
+        logger.error("Invalid Token");
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        alertResponse.setMessage("Invalid Token");
+        return alertResponse;
+      }
+
+      Long categoryId = !StringUtils.isEmpty(alertRuleDetails.getCategoryId())
+          ? Long.valueOf(alertRuleDetails.getCategoryId()) : 0L;
+
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+      if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.ACCESS)) {
+        logger.error(String.format(UNAUTHORIZED, "Access"));
+        setUnAuthResponse(response);
+        alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+        return alertResponse;
+      }
+
       alertResponse.setAlert(alertService.updateAlertRule(alertRuleDetails, id, ticket));
       if (alertRuleDetails == null) {
         alertResponse.setMessage("Alert rule definition can't be null for create request");
@@ -125,10 +174,8 @@ public class SipAlertController {
         return alertResponse;
       }
       alertResponse.setMessage("Alert rule updated successfully");
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      alertResponse.setMessage("Invalid Token");
+    } catch (IOException ex) {
+      logger.error(ex.getMessage());
     }
     return alertResponse;
   }
@@ -153,10 +200,10 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     AlertRuleResponse alertRuleResponse = null;
@@ -228,7 +275,7 @@ public class SipAlertController {
   /**
    * List Alert rule API by category.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert List of alert rle details
    */
@@ -246,21 +293,34 @@ public class SipAlertController {
       HttpServletRequest request,
       HttpServletResponse response,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize,
       @PathVariable(name = "categoryId") String categoryId) {
+    AlertRuleResponse alertRuleResponse = new AlertRuleResponse();
+    try {
+      Ticket ticket = SipCommonUtils.getTicket(request);
 
-    Ticket ticket = SipCommonUtils.getTicket(request);
-    AlertRuleResponse alertRuleResponse = null;
-    if (ticket != null) {
+      if (ticket == null) {
+        logger.error("Invalid Token");
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        return alertRuleResponse;
+      }
+
+      Long category = !StringUtils.isEmpty(categoryId) ? Long.valueOf(categoryId) : 0L;
+      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+      if (!validatePrivilege(productList, category, Privileges.PrivilegeNames.ACCESS)) {
+        logger.error(String.format(UNAUTHORIZED, "Access"));
+        setUnAuthResponse(response);
+        return alertRuleResponse;
+      }
+
       alertRuleResponse =
           alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
-    } else {
-      logger.error("Invalid Token");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    } catch (IOException ex) {
+      logger.error(ex.getMessage());
     }
     return alertRuleResponse;
   }
@@ -268,7 +328,7 @@ public class SipAlertController {
   /**
    * GET Alert rule API for a alert rule id.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert
    */
@@ -302,7 +362,7 @@ public class SipAlertController {
   /**
    * Delete Alert rule API.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return Alert
    */
@@ -341,7 +401,7 @@ public class SipAlertController {
   /**
    * List Alert states API by Alert Id.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -360,10 +420,10 @@ public class SipAlertController {
       HttpServletResponse response,
       @PathVariable(name = "id") String id,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "25")
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     AlertStatesResponse alertStatesResponse = null;
@@ -386,7 +446,7 @@ public class SipAlertController {
   /**
    * List Alert states API.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -405,10 +465,10 @@ public class SipAlertController {
       HttpServletResponse response,
       @RequestBody Optional<AlertStatesFilter> alertStatesFilter,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "25")
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           Integer pageSize) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     AlertStatesResponse alertStatesResponse = null;
@@ -425,7 +485,7 @@ public class SipAlertController {
   /**
    * List of alert count by date or severity based on request payload API.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
@@ -444,13 +504,13 @@ public class SipAlertController {
       HttpServletResponse response,
       @RequestBody AlertCount alertCount,
       @ApiParam(value = "alert rule id", required = false)
-          @RequestParam(name = "alertRuleId", required = false)
+      @RequestParam(name = "alertRuleId", required = false)
           String alertRuleId,
       @ApiParam(value = "page number", required = false, defaultValue = "1")
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "1")
           Integer pageNumber,
       @ApiParam(value = "page size", required = false, defaultValue = "1000")
-          @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+      @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
           Integer pageSize) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     List<AlertCountResponse> alertCountResponse = null;
@@ -467,7 +527,7 @@ public class SipAlertController {
   /**
    * List Attribute Values API.
    *
-   * @param request HttpServletRequest
+   * @param request  HttpServletRequest
    * @param response HttpServletResponse
    * @return AlertStatesResponse alertStatesResponse
    */
