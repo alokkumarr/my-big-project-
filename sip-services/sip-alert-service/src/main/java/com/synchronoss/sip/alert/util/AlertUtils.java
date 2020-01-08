@@ -1,9 +1,16 @@
 package com.synchronoss.sip.alert.util;
 
+import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
+import com.synchronoss.bda.sip.jwt.token.ProductModules;
+import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,9 +36,9 @@ public class AlertUtils {
   /**
    * Continuous Monitoring For All Rows.
    *
-   * @param operator Operator
-   * @param value Value
-   * @param otherValue other value
+   * @param operator    Operator
+   * @param value       Value
+   * @param otherValue  other value
    * @param metricValue metric value
    * @return Boolean
    */
@@ -55,5 +62,30 @@ public class AlertUtils {
       default:
         return false;
     }
+  }
+
+  /**
+   * Check the valid alerts privileges.
+   *
+   * @param productList
+   * @return true if valid else false
+   */
+  public boolean validAlertPrivileges(ArrayList<Products> productList) {
+    boolean[] haveValid = {false};
+    if (productList != null && !productList.isEmpty()) {
+      productList.stream().forEach(products -> {
+        ProductModules productModule = products.getProductModules().stream()
+            .filter(productModules -> "ALERTS".equalsIgnoreCase(productModules.getProductModName()))
+            .collect(Collectors.toList()).get(0);
+
+        ArrayList<ProductModuleFeature> prodModFeature = productModule.getProdModFeature();
+        if (prodModFeature != null && !prodModFeature.isEmpty()) {
+          haveValid[0] = prodModFeature.stream()
+              .anyMatch(productModuleFeature ->
+                  "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()));
+        }
+      });
+    }
+    return haveValid[0];
   }
 }

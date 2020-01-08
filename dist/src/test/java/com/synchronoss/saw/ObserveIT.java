@@ -1,5 +1,7 @@
 package com.synchronoss.saw;
 
+import static io.restassured.RestAssured.given;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.ResponseBody;
 import org.junit.Assert;
@@ -7,14 +9,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.restassured.RestAssured.given;
 
 /**
+ * This is integration test to manage dashboard related CRUD operation
+ * and validate authentication of valid users.
+ *
  * @author alok.kumarr
  * @since 3.5.0
  */
 public class ObserveIT extends BaseIT {
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
+  private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   private static final String PATH = "/sip/services/observe/dashboards";
   private static final String EDIT_MESSAGE = "Entity is updated successfully";
@@ -23,7 +27,7 @@ public class ObserveIT extends BaseIT {
 
   @Test
   public void testDashBoardWithValidPrivileges() {
-    LOGGER.trace("Create temporary dashboard..!");
+    logger.trace("Create temporary dashboard..!");
 
     ObjectNode secGroup = getJsonObject("json/observe/dashboard-content.json");
     ResponseBody response = given(authSpec)
@@ -41,7 +45,7 @@ public class ObserveIT extends BaseIT {
     Assert.assertEquals("Entity is created successfully", dashboardCreated);
 
     String entityId = response.jsonPath().getString("id");
-    LOGGER.trace("Entity retrieved for dashboard integration {}", entityId);
+    logger.trace("Entity retrieved for dashboard integration {}", entityId);
 
     // test get API
     String responseMessage = given(authSpec)
@@ -91,7 +95,7 @@ public class ObserveIT extends BaseIT {
 
   @Test
   public void testCreateDashBoardWithInvalidPrivileges() {
-    LOGGER.info("Create temporary dashboard..!");
+    logger.trace("Create temporary dashboard..!");
 
     ObjectNode secGroup = getJsonObject("json/observe/dashboard-invalid-category.json");
     ResponseBody response = given(authSpec)
@@ -111,7 +115,6 @@ public class ObserveIT extends BaseIT {
 
   @Test
   public void testViewByCategoryDashBoard() {
-
     ObjectNode secGroup = getJsonObject("json/observe/dashboard-content.json");
     ResponseBody response = given(authSpec)
         .body(secGroup)
