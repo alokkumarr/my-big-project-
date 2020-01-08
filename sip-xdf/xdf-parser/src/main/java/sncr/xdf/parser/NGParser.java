@@ -404,10 +404,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             ngctx.datafileDFmap.put(ngctx.dataSetName,inputDataFrame.cache());
         }
 		long outputDSCount = ngctx.datafileDFmap.get(ngctx.dataSetName).count();
-        logger.debug("Count for parser in dataset :: " + ngctx.dataSetName + " - " + outputDSCount);
-        logger.debug("NGParser ==>  dataSetName  & size " + ngctx.dataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
+        logger.debug("Count for parser in dataset :: " + outputDataSetName + " - " + outputDSCount);
+        logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
         //This will throw an error if Dataset is Empty
-        validateRecordsCount(outputDSCount, ngctx.dataSetName, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+        validateRecordsCount(outputDSCount, outputDataSetName, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
         return retval;
     }
 	
