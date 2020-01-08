@@ -1154,11 +1154,24 @@ public class SecurityController {
                 return payload;
             }
 
+            Valid valid = dataSecurityKeyRepository
+                .validateCustomerForSecGroup(securityGroupSysId, customerId);
+
+
+            if (!valid.getValid()) {
+                payload = new DskGroupPayload();
+
+                payload.setValid(false);
+                payload.setMessage(valid.getValidityMessage());
+
+                return payload;
+            }
+
             List<SipDskAttributeModel> dskAttributeModelList =
                 dataSecurityKeyRepository.
                     prepareDskAttributeModelList(securityGroupSysId, sipDskAttributes, null);
             // Delete the existing security group attributes
-            Valid valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
+            valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 
             if (valid.getValid()) {
                 // Add the new security group attributes

@@ -1168,7 +1168,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
         return valid;
     }
 
-    private Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId) {
+    public Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId) {
         String customerSql = "SELECT * FROM SEC_GROUP "
             + "WHERE SEC_GROUP_SYS_ID=? AND CUSTOMER_SYS_ID=?";
 

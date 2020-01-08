@@ -30,4 +30,5 @@ public interface DataSecurityKeyRepository {
 
     public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId,
         SipDskAttribute dskAttribute, String parentId);
+    public Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId);
 }
