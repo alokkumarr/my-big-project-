@@ -678,8 +678,6 @@ public class DLSparkQueryBuilder {
       SipQuery sipQuery, String query, SipDskAttribute attribute) {
     StringBuffer dskFilter13 = new StringBuffer();
     dskFilter13.append(" (").append(SELECT).append(" * ").append(" ").append(FROM).append(" ");
-    boolean flag = false;
-
     if (attribute != null
         && (attribute.getBooleanCriteria() != null || attribute.getBooleanQuery() != null)) {
       logger.info("DSK attribute  :{}", attribute);
@@ -792,47 +790,7 @@ public class DLSparkQueryBuilder {
     }
     return dskquery;
   }
-  /**
-   * Ths method will check whether DSK columns is available in selected artifacts.
-   *
-   * @param artifactName
-   * @param fieldList
-   * @param colName
-   * @return
-   */
-  public static boolean isArtifactContainsColumn(
-      String artifactName, List<Field> fieldList, String colName) {
-    for (Field field : fieldList) {
-      String[] col = field.getColumnName().split("\\.");
-      if (colName.equalsIgnoreCase(field.getColumnName())
-          || colName.equalsIgnoreCase(artifactName + "." + col[0])
-          || colName.equalsIgnoreCase(col[0])
-          || colName.equalsIgnoreCase(artifactName + "." + col)) {
-        return true;
-      }
-    }
-    return false;
-  }
 
-  public static Artifact getArtifactContainColumn(
-      List<String> artifactNameList, SipQuery semanticSipQuery, String colName) {
-    for (Artifact artifact : semanticSipQuery.getArtifacts()) {
-      if (artifactNameList.contains(artifact.getArtifactsName().toUpperCase())) {
-        List<Field> fieldList = artifact.getFields();
-        String artifactName = artifact.getArtifactsName();
-        for (Field field : fieldList) {
-          String[] col = field.getColumnName().split("\\.");
-          if (colName.equalsIgnoreCase(field.getColumnName())
-              || colName.equalsIgnoreCase(artifactName + "." + col[0])
-              || colName.equalsIgnoreCase(col[0])
-              || colName.equalsIgnoreCase(artifactName + "." + col)) {
-            return artifact;
-          }
-        }
-      }
-    }
-    return null;
-  }
   /**
    * Build Actual query to be ran over background (DSK Included).
    *
@@ -872,68 +830,6 @@ public class DLSparkQueryBuilder {
       select.append(SPACE).append(ORDER_BY).append(SPACE).append(sort);
     }
     return select.toString();
-  }
-
-
-  private static List<String> getArtfactsNames(SipQuery sipQuery) {
-    List<String> artifactNames = new ArrayList<>();
-    sipQuery
-        .getArtifacts()
-        .forEach(
-            (artifact) -> {
-              artifactNames.add(artifact.getArtifactsName().toUpperCase());
-            });
-    return artifactNames;
-  }
-
-
-  public static String dskQueryForArtifact(
-      SipDskAttribute attribute, List<String> arifactNameList, SipQuery semanticQuery) {
-    boolean flag = true;
-    String booleanCriteria = null;
-    StringBuilder dskquery = new StringBuilder();
-    if (attribute == null) {
-      return dskquery.toString();
-    }
-    if (attribute.getBooleanCriteria() == null && attribute.getBooleanQuery() == null) {
-      logger.error("Invalid dsk object");
-      return dskquery.toString();
-    }
-    if (attribute.getBooleanCriteria() != null) {
-      booleanCriteria = " " + attribute.getBooleanCriteria() + " ";
-    }
-    for (SipDskAttribute dskAttribute : attribute.getBooleanQuery()) {
-      if (dskAttribute.getBooleanQuery() != null) {
-        String childQuery = dskQueryForArtifact(dskAttribute, arifactNameList, semanticQuery);
-        if (childQuery != null && !StringUtils.isEmpty(childQuery)) {
-          if (dskquery != null && dskquery.length() > 0) {
-            dskquery.append(booleanCriteria);
-          }
-          dskquery.append(childQuery);
-          flag = false;
-        }
-      } else {
-        String columnName = dskAttribute.getColumnName();
-        Artifact arifact = getArtifactContainColumn(arifactNameList, semanticQuery, columnName);
-        if (arifact == null) {
-          continue;
-        }
-        String arifactName = arifact.getArtifactsName();
-        com.synchronoss.bda.sip.dsk.Model model = dskAttribute.getModel();
-        if (!flag) {
-          dskquery.append(booleanCriteria);
-        }
-        if (!StringUtils.containsIgnoreCase(columnName, arifactName)) {
-          columnName = arifactName.concat(".").concat(columnName);
-        }
-        dskquery = prepareQueryWithCondition(columnName, model, dskquery);
-        flag = false;
-      }
-    }
-    if (dskquery.length() != 0) {
-      dskquery.insert(0, "(").append(")");
-    }
-    return dskquery.toString();
   }
 
   /**

@@ -1,9 +1,8 @@
 package com.synchronoss.saw.storage.proxy.service;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkSameColumnAcrossTables;
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getArtifactsNames;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.isDskColumnNotPresent;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +20,6 @@ import com.synchronoss.bda.sip.dsk.Model;
 import com.synchronoss.bda.sip.dsk.Operator;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.es.ESResponseParser;
 import com.synchronoss.saw.es.ElasticSearchQueryBuilder;
@@ -31,9 +29,6 @@ import com.synchronoss.saw.es.SIPAggregationBuilder;
 import com.synchronoss.saw.es.kpi.GlobalFilterDataQueryBuilder;
 import com.synchronoss.saw.es.kpi.KPIDataQueryBuilder;
 import com.synchronoss.saw.model.Aggregate;
-import com.synchronoss.saw.model.Artifact;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.model.Store;
@@ -594,7 +589,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
       dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
     }
-    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute,analysis)) {
+    if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "DSK column mandatory!!"
