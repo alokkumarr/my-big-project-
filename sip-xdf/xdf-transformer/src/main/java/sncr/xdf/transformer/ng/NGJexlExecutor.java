@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import static sncr.xdf.transformer.TransformerComponent.*;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.context.ReturnCode;
 
 
 /**
