@@ -685,16 +685,7 @@ public class DLSparkQueryBuilder {
       for (Artifact artifact : artifacts) {
         String artifactName = artifact.getArtifactsName();
         StringBuffer dskFilter = new StringBuffer();
-        dskFilter
-            .append(" (")
-            .append(SELECT)
-            .append(" * ")
-            .append(FROM)
-            .append(" ")
-            .append(artifactName)
-            .append(" ")
-            .append(WHERE)
-            .append(" ");
+        dskFilter.append(String.format(" (SELECT * FROM %s WHERE ",artifactName));
         if (query.toUpperCase().contains(artifactName)) {
           String dskFormedQuery = dskQueryForArtifact(attribute, artifactName);
           logger.info("dskformed query = " + dskFormedQuery);

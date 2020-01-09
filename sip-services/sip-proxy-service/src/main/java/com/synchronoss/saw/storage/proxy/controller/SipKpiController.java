@@ -97,7 +97,6 @@ public class SipKpiController {
             objectMapper.valueToTree(kpiBuilder), objectMapper.valueToTree(semanticNode));
       }
       SipQuery savedQuery = getSipQuery(semanticId, metaDataServiceUrl, restUtil);
-      // TODO: Validate for new DSK and throw if column not exists.!!
       responseObject = proxyService.processKpi(kpiBuilder, authTicket);
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

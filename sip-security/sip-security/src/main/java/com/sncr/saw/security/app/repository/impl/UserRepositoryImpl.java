@@ -4,8 +4,8 @@ package com.sncr.saw.security.app.repository.impl;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.repository.impl.extract.SubCategoryDetailExtractor;
-import com.sncr.saw.security.app.repository.impl.extract.TicketValidExtractor;
 import com.sncr.saw.security.app.repository.result.extract.LongExtractor;
+import com.sncr.saw.security.app.repository.result.extract.UserCustomerDetailsExtractor;
 import com.sncr.saw.security.app.repository.result.extract.UserDetailsExtractor;
 import com.sncr.saw.security.app.repository.result.extract.UserDetailsListExtractor;
 import com.sncr.saw.security.common.UserUnsuccessfulLoginAttemptBean;
@@ -33,7 +33,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
@@ -3244,21 +3244,20 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public UserDetails getUserById(String masterLoginId) {
-    UserDetails userDetails = null;
+  public DskDetails getUserById(String masterLoginId) {
+    DskDetails details = null;
     String sql =
-        "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,C.CUSTOMER_CODE, U.FIRST_NAME, "
-            + "U.MIDDLE_NAME, U.LAST_NAME,U.CUSTOMER_SYS_ID,U.ACTIVE_STATUS_IND,S.SEC_GROUP_SYS_ID,S.SEC_GROUP_NAME "
-            + "FROM USERS U left join SEC_GROUP S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID inner join  ROLES R  on U.ROLE_SYS_ID = R.ROLE_SYS_ID "
-            + " inner join customers C on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.USER_ID=? ";
+        "SELECT U.USER_ID, C.CUSTOMER_CODE, S.SEC_GROUP_SYS_ID,C.CUSTOMER_SYS_ID,C.IS_JV_CUSTOMER, S.SEC_GROUP_NAME"
+            + " FROM USERS U left outer join (select * from SEC_GROUP where ACTIVE_STATUS_IND = 1 ) S on U.SEC_GROUP_SYS_ID = S.SEC_GROUP_SYS_ID  inner join customers C "
+            + " on  U.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID  WHERE U.ACTIVE_STATUS_IND = 1  AND C.ACTIVE_STATUS_IND = 1 AND U.USER_ID=?;";
     try {
-      userDetails =
+      details =
           jdbcTemplate.query(
               sql,
               preparedStatement -> {
                 preparedStatement.setString(1, masterLoginId);
               },
-              new UserDetailsExtractor());
+              new UserCustomerDetailsExtractor());
     } catch (DataAccessException de) {
       logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
       throw de;
@@ -3268,32 +3267,6 @@ public class UserRepositoryImpl implements UserRepository {
           null,
           e);
     }
-    return userDetails;
-  }
-
-  @Override
-  public Map<String, String> getCustomerDetails(String masterLoginId) {
-    String fetchJVDetails =
-        "SELECT CUST.CUSTOMER_CODE, CUST.IS_JV_CUSTOMER, CV.FILTER_BY_CUSTOMER_CODE FROM CUSTOMERS CUST,"
-            + "USERS U, CONFIG_VAL CV WHERE CUST.CUSTOMER_SYS_ID = U.CUSTOMER_SYS_ID "
-            + "AND CV.CONFIG_VAL_OBJ_GROUP = CUST.CUSTOMER_CODE AND U.USER_ID= ?";
-    Map<String, String> jvDetails = null;
-    try {
-
-      jvDetails =
-          jdbcTemplate.query(
-              fetchJVDetails,
-              preparedStatement -> preparedStatement.setString(1, masterLoginId),
-              new UserRepositoryImpl.JVDetailExtractor());
-    } catch (DataAccessException de) {
-      logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
-      throw de;
-    } catch (Exception e) {
-      logger.error(
-          "Exception encountered while get Ticket Details for ticketId : " + e.getMessage(),
-          null,
-          e);
-    }
-    return jvDetails;
+    return details;
   }
 }

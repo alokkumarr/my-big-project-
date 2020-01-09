@@ -330,6 +330,7 @@ public class StorageProxyController {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (ResponseStatusException responseStatusException) {
+      logger.error("Invalid request body.", responseStatusException);
       throw responseStatusException;
     } catch (ReadEntitySAWException ex) {
       logger.error("Problem on the storage while reading data from storage.", ex);

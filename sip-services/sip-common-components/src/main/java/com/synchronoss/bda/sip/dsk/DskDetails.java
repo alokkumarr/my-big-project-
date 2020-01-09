@@ -16,9 +16,17 @@ public class DskDetails {
   @ApiModelProperty(notes = "dsk group payload", name = "dskGroupPayload")
   private DskGroupPayload dskGroupPayload;
 
+  @JsonProperty("securityGroupSysId")
+  @ApiModelProperty(notes = "securityGroupSysId", name = "securityGroupSysId")
+  private Long securityGroupSysId;
+
   @JsonProperty("customerCode")
   @ApiModelProperty(notes = "customerCode", name = "customerCode")
   private String customerCode;
+
+  @JsonProperty("customerId")
+  @ApiModelProperty(notes = "customerId", name = "customerId")
+  private Long customerId;
 
   @JsonProperty("isJvCustomer")
   @ApiModelProperty(notes = "User is super admin or not ", name = "isJvCustomer")
@@ -46,6 +54,16 @@ public class DskDetails {
   @JsonProperty("dskGroupPayload")
   public void setDskGroupPayload(DskGroupPayload dskGroupPayload) {
     this.dskGroupPayload = dskGroupPayload;
+  }
+
+  @JsonProperty("customerId")
+  public Long getCustomerId() {
+    return customerId;
+  }
+
+  @JsonProperty("customerId")
+  public void setCustomerId(Long customerId) {
+    this.customerId = customerId;
   }
 
   @JsonProperty("customerCode")
@@ -78,6 +96,16 @@ public class DskDetails {
     this.filterByCustomerCode = filterByCustomerCode;
   }
 
+  @JsonProperty("securityGroupSysId")
+  public Long getSecurityGroupSysId() {
+    return securityGroupSysId;
+  }
+
+  @JsonProperty("securityGroupSysId")
+  public void setSecurityGroupSysId(Long securityGroupSysId) {
+    this.securityGroupSysId = securityGroupSysId;
+  }
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -86,6 +114,7 @@ public class DskDetails {
         .append("customerCode", customerCode)
         .append("isJvCustomer", isJvCustomer)
         .append("filterByCustomerCode", filterByCustomerCode)
+        .append("securityGroupSysId", securityGroupSysId)
         .toString();
   }
 }

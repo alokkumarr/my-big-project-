@@ -2,16 +2,15 @@ package com.sncr.saw.security.app.controller.internal;
 
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.common.bean.UserDetails;
 import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.DskDetails;
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,17 +51,13 @@ public class SipDskController {
         dskGroupResponse.setMessage("User Id can't be null or blank");
         return dskGroupResponse;
       }
-      UserDetails userDetails = userRepository.getUserById(userId);
+      DskDetails userDetails = userRepository.getUserById(userId);
       if (userDetails == null) {
         dskGroupResponse.setMessage("User not found");
         return dskGroupResponse;
       }
-      Map<String, String> customerDetails = userRepository.getCustomerDetails(userId);
-      dskGroupResponse.setCustomerCode(customerDetails.get("customerCode"));
-      dskGroupResponse.setIsJvCustomer(Integer.parseInt(customerDetails.get("isJVCustomer")));
-      dskGroupResponse.setFilterByCustomerCode(
-          Integer.parseInt(customerDetails.get("filterByCustomerCode")));
-      Long secGroupSysId = userDetails.getSecGroupSysId();
+      BeanUtils.copyProperties(userDetails,dskGroupResponse);
+      Long secGroupSysId = userDetails.getSecurityGroupSysId();
       if (secGroupSysId != null) {
         dskGroupPayload =
             dataSecurityKeyRepository.fetchDskGroupAttributeModel(
@@ -75,9 +70,13 @@ public class SipDskController {
         dskGroupResponse.setMessage("DSK doesn't exist for the user");
         return dskGroupResponse;
       }
+    } catch (DataAccessException dataAccessException) {
+      logger.error("Exception encountered while accessing database:{}", dataAccessException);
+      dskGroupResponse.setMessage("Exception encountered while accessing database");
+      return dskGroupResponse;
     } catch (Exception e) {
       logger.error("Exception occured while fetching dsk for user:{}", e);
-      dskGroupResponse.setMessage("Exception occured while fetching dsk for user" + e);
+      dskGroupResponse.setMessage("Exception occured while fetching dsk for user");
       return dskGroupResponse;
     }
   }

@@ -10,7 +10,6 @@ import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
-import com.sncr.saw.security.common.bean.repo.ProductModuleDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryWithPrivilegeDetails;
@@ -19,11 +18,9 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
-
-import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import java.util.List;
-import java.util.Map;
 
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
@@ -80,6 +77,5 @@ public interface UserRepository {
   Valid addUserDetails(UserDetails userDetails, String masterLoginId);
   List<UserDetails> getUsersDetailList(Long customerId);
   boolean getRoleStatus(Long roleId);
-  UserDetails getUserById(String masterLoginId);
-  Map<String, String> getCustomerDetails(String masterLoginId);
+  DskDetails getUserById(String masterLoginId);
 }

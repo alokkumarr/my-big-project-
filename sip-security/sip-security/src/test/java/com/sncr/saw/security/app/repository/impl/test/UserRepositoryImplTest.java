@@ -29,6 +29,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -95,7 +96,7 @@ public class UserRepositoryImplTest {
 	private static Category category12;
 	private static List<Category> categoryList = new ArrayList<Category>();
 	private static String createdBy="sawadmin@synchronoss.com";
-  private static UserDetails userDetails;
+  private static DskDetails userDskDetails;
 
 	@BeforeClass
 	public static void setUp() {
@@ -299,13 +300,10 @@ public class UserRepositoryImplTest {
 		securityKeys.setDataSecurityKeys(dskDetails);
     securityKeys.setMessage("success");
 
-    userDetails = new UserDetails();
-    userDetails.setMasterLoginId("sawadmin@synchronoss.com");
-    userDetails.setUserId(5l);
-    userDetails.setCustomerCode("SYNCHRONOSS");
-    userDetails.setActiveStatusInd(true);
-    userDetails.setEmail("sawadmin@sychronoss.com");
-    userDetails.setRoleName("ADMIN");
+    userDskDetails = new DskDetails();
+    userDskDetails.setCustomerCode("SYNCHRONOSS");
+    userDskDetails.setCustomerId(1l);
+    userDskDetails.setIsJvCustomer(1);
 	}
 
 	@Test
@@ -832,14 +830,14 @@ public class UserRepositoryImplTest {
 		List<CategoryDetails> allCategories = userRepositoryDAO.getCategories(1l);
 		assertEquals(1, allCategories.size());
 	}
-    @Test
-    public void testDSKDetailsByUserId() {
-        String userId = "sawadmin@synchronoss.com";
-        when(userRepositoryDAO.getUserById(userId)).thenReturn(userDetails);
-        UserDetails details= userRepositoryDAO.getUserById(userId);
-        assertEquals("SYNCHRONOSS", details.getCustomerCode());
-        assertEquals("sawadmin@synchronoss.com", details.getMasterLoginId());
-        assertEquals(true, details.getActiveStatusInd());
-        assertEquals("ADMIN", details.getRoleName());
-    }
+
+  @Test
+  public void testDSKDetailsByUserId() {
+    String userId = "sawadmin@synchronoss.com";
+    when(userRepositoryDAO.getUserById(userId)).thenReturn(userDskDetails);
+    DskDetails details = userRepositoryDAO.getUserById(userId);
+    assertEquals(1l, (long) details.getCustomerId()); // OK - assertEquals(long, long)
+    assertEquals(1, (int) details.getIsJvCustomer());
+    assertEquals("SYNCHRONOSS", details.getCustomerCode());
+  }
 }
