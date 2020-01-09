@@ -383,7 +383,7 @@ public class StorageProxyController {
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       Ticket authTicket = schduledAnalysis ? null : getTicket(request);
-      return proxyService.fetchDslExecutionsList(queryId,authTicket);
+      return proxyService.fetchDslExecutionsList(queryId,authTicket,schduledAnalysis);
     } catch (Exception e) {
       logger.error("error occurred while fetching list of executions ", e);
     }
@@ -431,12 +431,14 @@ public class StorageProxyController {
     Ticket authTicket = schduledAnalysis ? null : getTicket(request);
     if (analysisType != null && analysisType.equals("report")) {
       return proxyService
-          .fetchDataLakeExecutionData(executionId, page, pageSize, executionType, authTicket);
+          .fetchDataLakeExecutionData(executionId, page, pageSize, executionType, authTicket,
+              schduledAnalysis);
     }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       return proxyService
-          .fetchExecutionsData(executionId, executionType, page, pageSize, authTicket);
+          .fetchExecutionsData(executionId, executionType, page, pageSize, authTicket,
+              schduledAnalysis);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }
@@ -483,12 +485,14 @@ public class StorageProxyController {
     }
     Ticket authTicket = schduledAnalysis ? null : getTicket(request);
     if (analysisType != null && analysisType.equals("report")) {
-      return proxyService.fetchLastExecutionsDataForDL(analysisId, page, pageSize,authTicket);
+      return proxyService
+          .fetchLastExecutionsDataForDL(analysisId, page, pageSize, authTicket, schduledAnalysis);
     }
     try {
       logger.info("Storage Proxy request to fetch list of executions");
       return proxyService
-          .fetchLastExecutionsData(analysisId, executionType, page, pageSize, authTicket);
+          .fetchLastExecutionsData(analysisId, executionType, page, pageSize, authTicket,
+              schduledAnalysis);
     } catch (Exception e) {
       logger.error("error occurred while fetching execution data", e);
     }

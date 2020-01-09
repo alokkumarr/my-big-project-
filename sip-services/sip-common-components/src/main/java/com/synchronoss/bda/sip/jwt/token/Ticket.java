@@ -1,6 +1,8 @@
 /** */
 package com.synchronoss.bda.sip.jwt.token;
 
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,8 @@ public class Ticket implements Serializable {
   private String validityReason;
 
   private Long validMins;
+
+  private List<SipDskAttribute> sipDskAttributes;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -257,5 +261,14 @@ public class Ticket implements Serializable {
   /** @param windowId the windowId to set */
   public void setWindowId(String windowId) {
     this.windowId = windowId;
+  }
+
+  public List<SipDskAttribute> getSipDskAttributes() {
+    return sipDskAttributes;
+  }
+
+  public void setSipDskAttributes(
+      List<SipDskAttribute> sipDskAttributes) {
+    this.sipDskAttributes = sipDskAttributes;
   }
 }

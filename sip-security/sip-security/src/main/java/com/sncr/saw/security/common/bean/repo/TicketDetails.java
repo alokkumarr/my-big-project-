@@ -3,6 +3,8 @@
  */
 package com.sncr.saw.security.common.bean.repo;
 
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
@@ -29,11 +31,12 @@ public class TicketDetails implements Serializable {
 	private String roleCode;
 	private RoleType roleType;
 	private List<TicketDSKDetails> dataSKey;
-    private List<String> CustomConfig;
+  private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
 	private Integer isJvCustomer;
 	private Integer filterByCustomerCode;
+	private List<SipDskAttribute> dskAttributes;
 
 	public Long getUserId() {
 		return userId;
@@ -174,5 +177,13 @@ public class TicketDetails implements Serializable {
 
 	public void setIsJvCustomer(Integer isJvCustomer) {
 		this.isJvCustomer = isJvCustomer;
+	}
+
+	public List<SipDskAttribute> getDskAttributes() {
+		return dskAttributes;
+	}
+
+	public void setDskAttributes(List<SipDskAttribute> dskAttributes) {
+		this.dskAttributes = dskAttributes;
 	}
 }

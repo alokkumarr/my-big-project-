@@ -878,9 +878,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @return boolean
    */
   @Override
-  public List<?> fetchDslExecutionsList(String dslQueryId, Ticket authTicket) {
+  public List<?> fetchDslExecutionsList(String dslQueryId, Ticket authTicket, boolean isScheduled) {
     try {
-      if (isDskApplicableUser(authTicket)) {
+      if (!isScheduled && isDskApplicableUser(authTicket)) {
         return new ArrayList<>();
       }
       // Create executionResult table if doesn't exists.
@@ -920,9 +920,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Override
   public ExecutionResponse fetchExecutionsData(
       String executionId, ExecutionType executionType, Integer page, Integer pageSize,
-      Ticket authTicket) {
+      Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (isDskApplicableUser(authTicket) && executionType != null && !executionType
+    if (!isScheduled && isDskApplicableUser(authTicket) && executionType != null && !executionType
         .equals(ExecutionType.onetime)) {
       return executionResponse;
     }
@@ -1050,9 +1050,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Override
   public ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,
-      Ticket authTicket) {
+      Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (isDskApplicableUser(authTicket)) {
+    if (!isScheduled && isDskApplicableUser(authTicket)) {
       return executionResponse;
     }
       ExecutionResult executionResult = null;
@@ -1266,9 +1266,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Override
   public ExecutionResponse fetchDataLakeExecutionData(
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,
-      Ticket authTicket) {
+      Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (isDskApplicableUser(authTicket) && executionType != null && !executionType
+    if (!isScheduled && isDskApplicableUser(authTicket) && executionType != null && !executionType
         .equals(ExecutionType.onetime)) {
       return executionResponse;
     }
@@ -1283,7 +1283,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               executionId, pageNo, pageSize, executionType, null);
     } else {
       executionResponse = fetchExecutionsData(executionId, executionType, pageNo, pageSize,
-          authTicket);
+          authTicket,isScheduled);
       /*here for schedule and publish we are reading data from the same location in DL, so directly
       I am sending publish  as Ui is sending information for only oneTimeExecution,we can send
       schedule as well as */
@@ -1298,10 +1298,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public ExecutionResponse fetchLastExecutionsDataForDL(
-      String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket) {
+      String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket, boolean isScheduled) {
     logger.info("Fetching last execution data for DL report");
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (isDskApplicableUser(authTicket)) {
+    if (!isScheduled && isDskApplicableUser(authTicket)) {
       return executionResponse;
     }
 
@@ -1323,7 +1323,6 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     String masterLoginId = authTicket == null ? null : authTicket.getMasterLoginId();
     DskDetails dskDetails =
         authTicket == null ? null : getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
-    logger.trace("DSK List = " + dskDetails.toString());
 
     SipDskAttribute dskAttribute = null;
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {

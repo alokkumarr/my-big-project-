@@ -474,11 +474,10 @@ public class QueryBuilderUtil {
         } else if (!StringUtils.isEmpty(dskAttribute.getColumnName())) {
           String[] col = dskAttribute.getColumnName().split("\\.");
           String dskColName = col.length == 1 ? col[0] : col[1];
-          TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX),
-                  dskAttribute.getModel().getValues());
           List<?> modelValues = QueryBuilderUtil
               .buildStringTermsfilter(dskAttribute.getModel().getValues());
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX),modelValues);
           TermsQueryBuilder termsQueryBuilder1 =
               new TermsQueryBuilder(
                   QueryBuilderUtil.buildFilterColumn(dskColName), modelValues);

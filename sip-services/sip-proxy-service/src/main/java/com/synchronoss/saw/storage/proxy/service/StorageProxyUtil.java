@@ -389,7 +389,7 @@ public class StorageProxyUtil {
       if (isArtifactPreset) {
         for (Field field : artifact.getFields()) {
           if (field.getColumnName().equalsIgnoreCase(columnName)
-              || field.getColumnName().contentEquals(columnName + KEYWORD)) {
+              || field.getColumnName().equalsIgnoreCase(columnName + KEYWORD)) {
             continue outerloop;
           }
         }

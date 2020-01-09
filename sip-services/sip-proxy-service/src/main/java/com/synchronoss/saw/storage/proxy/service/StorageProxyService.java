@@ -22,11 +22,11 @@ public interface StorageProxyService {
 
   Boolean saveDslExecutionResult(ExecutionResult executionResult);
 
-  List<?> fetchDslExecutionsList(String dslQueryId,Ticket authTicket);
+  List<?> fetchDslExecutionsList(String dslQueryId,Ticket authTicket, boolean isScheduled);
 
   ExecutionResponse fetchExecutionsData(
       String executionId, ExecutionType executionType, Integer page, Integer pageSize,
-      Ticket authTicket);
+      Ticket authTicket, boolean isScheduled);
 
 
     ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, Integer page,
@@ -35,14 +35,15 @@ public interface StorageProxyService {
 
   ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,
-      Ticket authTicket);
+      Ticket authTicket, boolean isScheduled);
 
   ExecutionResponse fetchDataLakeExecutionData(
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,
-      Ticket authTicket);
+      Ticket authTicket, boolean isScheduled);
 
     ExecutionResponse fetchLastExecutionsDataForDL(
-        String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket);
+        String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket,
+        boolean isScheduled);
   Boolean saveTtlExecutionResult(ExecutionResult executionResult);
 
   Object fetchGlobalFilter(GlobalFilters globalFilters, Ticket authTicket) throws Exception;

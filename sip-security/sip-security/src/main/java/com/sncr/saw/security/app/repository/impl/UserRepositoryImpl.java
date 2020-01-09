@@ -33,6 +33,10 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.dsk.BooleanCriteria;
+import com.synchronoss.bda.sip.dsk.Model;
+import com.synchronoss.bda.sip.dsk.Operator;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
@@ -49,9 +53,11 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -83,6 +89,8 @@ public class UserRepositoryImpl implements UserRepository {
   private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
   private final JdbcTemplate jdbcTemplate;
+
+	private static final String VALUE_DELIMITER = "~:";
 
   @Autowired
   public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -673,6 +681,8 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 				ticketDetails.setDataSKey(dskList);
 
+				List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributes(null, masterLoginId);
+				ticketDetails.setDskAttributes(dskAttributeList);
 
 				ArrayList<ProductModuleFeature> prodModFeatrChildSorted;
 				ArrayList<ProductModules> prodModSorted;
@@ -3296,4 +3306,59 @@ public class UserRepositoryImpl implements UserRepository {
     }
     return jvDetails;
   }
+
+	public List<SipDskAttribute> fetchDskGroupAttributes(String parentId, String masterLoginId) {
+		String dskDetailsSql =
+				"SELECT SAM.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID, SAM.SEC_GROUP_SYS_ID, SAM.SEC_GROUP_DSK_PARENT_ID,  SAM.BOOLEAN_CRITERIA, SAM.COLUMN_NAME, SAM.OPERATOR, SAM.ATTRIBUTE_VALUES "
+						+ " FROM SEC_GROUP_DSK_ATTRIBUTE_MODEL SAM INNER JOIN SEC_GROUP SG ON (SAM.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID) INNER JOIN CUSTOMERS C ON (SG.CUSTOMER_SYS_ID = C.CUSTOMER_SYS_ID) INNER JOIN USERS U ON (U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID) "
+						+ "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1' AND SAM.SEC_GROUP_DSK_PARENT_ID "
+						+ ((parentId == null) ? "IS NULL" : "=?");
+		List<SipDskAttribute> dskAttributeList = new LinkedList<>();
+		try {
+			dskAttributeList = jdbcTemplate.query(dskDetailsSql, ps -> {
+				ps.setString(1,masterLoginId);
+				if (parentId != null) {
+					ps.setString(2, parentId);
+				}
+			}, resultSet -> {
+				List<SipDskAttribute> list = new LinkedList<>();
+				while (resultSet.next()) {
+					String attributeId = resultSet.getString("SEC_GROUP_DSK_ATTRIBUTE_SYS_ID");
+					String booleanCriteriaStr = resultSet.getString("BOOLEAN_CRITERIA");
+
+					SipDskAttribute attribute = new SipDskAttribute();
+					attribute.setAttributeId(attributeId);
+
+					if (booleanCriteriaStr == null) {
+						// Add leaf node to the list
+						String columnName = resultSet.getString("COLUMN_NAME");
+						String operatorStr = resultSet.getString("OPERATOR");
+
+						Model model = new Model();
+						Operator operator = Operator.valueOf(operatorStr);
+						String values = resultSet.getString("ATTRIBUTE_VALUES");
+						model.setOperator(operator);
+						model.setValues(Arrays.asList(values.split(VALUE_DELIMITER)));
+
+						attribute.setColumnName(columnName);
+						attribute.setModel(model);
+
+					} else {
+						BooleanCriteria booleanCriteria = BooleanCriteria.valueOf(booleanCriteriaStr);
+						attribute.setBooleanCriteria(booleanCriteria);
+						List<SipDskAttribute> booleanQuery =
+								fetchDskGroupAttributes(attributeId, masterLoginId);
+						attribute.setBooleanQuery(booleanQuery);
+					}
+					list.add(attribute);
+				}
+				return list;
+			});
+		} catch (Exception ex) {
+			logger.error("Error occurred: " + ex.getMessage(), ex);
+		}
+
+		logger.info("DSK Object : {}",dskAttributeList.toString());
+		return dskAttributeList;
+	}
 }
