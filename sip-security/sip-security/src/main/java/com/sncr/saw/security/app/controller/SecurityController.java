@@ -75,6 +75,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import javax.mail.Message;
@@ -961,7 +962,7 @@ public class SecurityController {
 
           // Prepare the list og attribute models. This will also validate for missing attributes.
           List<SipDskAttributeModel> attributeModelList = dataSecurityKeyRepository.
-              prepareDskAttributeModelList(securityGroupSysId, dskAttribute, null);
+              prepareDskAttributeModelList(securityGroupSysId, dskAttribute, Optional.empty());
           Valid valid = dataSecurityKeyRepository
               .addDskGroupAttributeModelAndValues(securityGroupSysId, attributeModelList);
 
@@ -1167,9 +1168,9 @@ public class SecurityController {
                 return payload;
             }
 
-            List<SipDskAttributeModel> dskAttributeModelList =
-                dataSecurityKeyRepository.
-                    prepareDskAttributeModelList(securityGroupSysId, sipDskAttributes, null);
+      List<SipDskAttributeModel> dskAttributeModelList =
+          dataSecurityKeyRepository.prepareDskAttributeModelList(
+              securityGroupSysId, sipDskAttributes, Optional.empty());
             // Delete the existing security group attributes
             valid = dataSecurityKeyRepository.deleteDskGroupAttributeModel(securityGroupSysId, customerId);
 

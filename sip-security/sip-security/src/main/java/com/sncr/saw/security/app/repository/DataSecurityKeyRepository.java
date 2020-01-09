@@ -7,6 +7,7 @@ import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import java.util.List;
+import java.util.Optional;
 
 public interface DataSecurityKeyRepository {
     public DskValidity addSecurityGroups(SecurityGroups securityGroups, String createdBy, Long custId);
@@ -29,6 +30,6 @@ public interface DataSecurityKeyRepository {
     public Valid updateAttributeValues(Long securityGroupId,AttributeValues attributeValues);
 
     public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId,
-        SipDskAttribute dskAttribute, String parentId);
+        SipDskAttribute dskAttribute, Optional<String> parentId);
     public Valid validateCustomerForSecGroup (Long securityGroupSysId, Long customerId);
 }

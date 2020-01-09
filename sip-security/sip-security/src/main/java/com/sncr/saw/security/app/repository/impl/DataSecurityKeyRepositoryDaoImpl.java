@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -1045,7 +1046,8 @@ public class DataSecurityKeyRepositoryDaoImpl implements
     }
 
     @Override
-    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId, SipDskAttribute dskAttribute, String parentId) {
+    public List<SipDskAttributeModel> prepareDskAttributeModelList (Long securityGroupId,
+        SipDskAttribute dskAttribute, Optional<String> parentId) {
         List <SipDskAttributeModel> list = new ArrayList<>();
 
         if (dskAttribute != null) {
@@ -1062,7 +1064,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 SipDskAttributeModel model = new SipDskAttributeModel();
                 model.setDskAttributeSysId(dskAttributeId);
                 model.setSecGroupSysId(securityGroupId);
-                model.setDskAttributeParentId(parentId);
+
+                if (parentId.isPresent()) {
+                    String parentIdStr = parentId.get();
+                    model.setDskAttributeParentId(parentIdStr);
+                } else {
+                    model.setDskAttributeParentId(null);
+                }
 
                 columnName = columnName.trim();
 
@@ -1084,7 +1092,13 @@ public class DataSecurityKeyRepositoryDaoImpl implements
                 SipDskAttributeModel model = new SipDskAttributeModel();
                 model.setDskAttributeSysId(dskAttributeId);
                 model.setSecGroupSysId(securityGroupId);
-                model.setDskAttributeParentId(parentId);
+
+                if (parentId.isPresent()) {
+                    String parentIdStr = parentId.get();
+                    model.setDskAttributeParentId(parentIdStr);
+                } else {
+                    model.setDskAttributeParentId(null);
+                }
                 model.setBooleanCriteria(booleanCriteria.toString());
 
                 list.add(model);
@@ -1094,7 +1108,7 @@ public class DataSecurityKeyRepositoryDaoImpl implements
 
                 dskAttributeList.forEach(childAttribute -> {
                     list.addAll(
-                        prepareDskAttributeModelList(securityGroupId, childAttribute, dskAttributeId));
+                        prepareDskAttributeModelList(securityGroupId, childAttribute, Optional.of(dskAttributeId)));
                 });
             }
         }
