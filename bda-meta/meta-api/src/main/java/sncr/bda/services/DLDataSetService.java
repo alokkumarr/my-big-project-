@@ -29,6 +29,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.datasets.conf.Dataset;
 import sncr.bda.exceptions.BDAException;
 import sncr.bda.metastore.DataSetStore;
+import java.util.Optional;
 
 
 /**
@@ -296,9 +297,9 @@ public class DLDataSetService {
     }
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
-        return updateDS(id, ctx, ds, schema, recordCount, size, null, null);
+        return updateDS(id, ctx, ds, schema, recordCount, size, Optional.ofNullable(null),Optional.ofNullable(null));
     }
-    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size, Integer returnCode, String errorDesc) throws Exception {
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
 
         /**
          * Commented below code as this block is stopping

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import sncr.bda.datasets.conf.DataSetProperties;
+import java.util.Optional;
 
 
 /**
@@ -168,22 +169,22 @@ public abstract class MetadataStore extends MetadataBase implements DocumentConv
   }
 
   public JsonObject createStatusSection(String status, String startTS, String finishedTS, String aleId, String batchSessionId) {
-     return createStatusSection(status, startTS, finishedTS, aleId, batchSessionId,null,null);
+     return createStatusSection(status, startTS, finishedTS, aleId, batchSessionId,Optional.ofNullable(null),Optional.ofNullable(null));
   }
 
   public JsonObject createStatusSection(
-     String status, String startTS, String finishedTS, String aleId, String batchSessionId, Integer returnCode, String errorDesc) {
+     String status, String startTS, String finishedTS, String aleId, String batchSessionId, Optional<Integer> returnCode, Optional<String> errorDesc) {
       JsonObject src = new JsonObject();
       src.add("status", new JsonPrimitive(status));
       src.add("started", new JsonPrimitive((startTS == null) ? "" : startTS));
       src.add("finished", new JsonPrimitive((finishedTS == null) ? "" : finishedTS));
       src.add("aleId", new JsonPrimitive(aleId));
       src.add("batchId", new JsonPrimitive(batchSessionId));
-      if(returnCode != null){
-          src.add("returnCode", new JsonPrimitive(returnCode));
+      if(returnCode.isPresent()){
+          src.add("returnCode", new JsonPrimitive(returnCode.get()));
       }
-      if(errorDesc != null && !errorDesc.trim().isEmpty()){
-          src.add("error", new JsonPrimitive(errorDesc));
+      if(errorDesc.isPresent()){
+          src.add("error", new JsonPrimitive(errorDesc.get()));
       }
       logger.debug("Status Session Json : " + src.toString());
       return src;

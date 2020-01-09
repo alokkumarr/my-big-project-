@@ -36,6 +36,7 @@ import sncr.bda.CliHandler;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.ReturnCode;
 import sncr.xdf.context.ReturnCodes;
+import java.util.Optional;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
@@ -855,7 +856,7 @@ public abstract class AbstractComponent implements WithContext{
                         //ctx.transformationID = transformationID;
                         ngctx.ale_id = aleId;
                         ngctx.status = status;
-                        services.md.updateDS(id, ngctx, ds, null, 0, 0, ret, errorDesc);
+                        services.md.updateDS(id, ngctx, ds, null, 0, 0, Optional.of(ret), Optional.of(errorDesc));
                     } catch (Exception e) {
                         logger.error("Could not update DS/ write AuditLog entry to DS, id = " + id);
                         logger.error("Native exception: ", e);
@@ -867,7 +868,7 @@ public abstract class AbstractComponent implements WithContext{
                     }
                 });
                 logger.debug("######## AbstractComponent() : ==> Status updating to:::######   " + status);
-                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, aleId, ngctx.batchID, ret, errorDesc);
+                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, aleId, ngctx.batchID, Optional.of(ret), Optional.of(errorDesc));
             }
         } catch (Exception e) {
             logger.error("Could not update error status : ", e);
