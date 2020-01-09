@@ -55,6 +55,8 @@ import com.synchronoss.sip.utils.RestUtil;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -923,12 +925,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String executionId, ExecutionType executionType, Integer page, Integer pageSize,
       Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
+    ExecutionResult executionResult = null;
     if (!isScheduled && isDskApplicableUser(authTicket) && executionType != null && !executionType
         .equals(ExecutionType.onetime)) {
       return executionResponse;
     }
-      ExecutionResult executionResult = null;
-    try {
+    Instant startTime = Instant.now();
+      try {
       String tableName =
           checkTempExecutionType(executionType) ? tempResultTable : executionResultTable;
       MaprConnection maprConnection = new MaprConnection(basePath, tableName);
@@ -957,7 +960,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       }
       executionResponse.setExecutedBy(executionResult.getExecutedBy());
       executionResponse.setAnalysis(executionResult.getAnalysis());
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("time taken for returning excutions data:{}", elapsedTime);
     } catch (Exception e) {
+      Instant finishTime = Instant.now();
+      long elapsedTime = Duration.between(startTime, finishTime).toMillis();
+      logger.trace("Exception occured,time taken before throwing exception:{}", elapsedTime);
       logger.error("Error occurred while fetching the execution result data", e);
     }
 
