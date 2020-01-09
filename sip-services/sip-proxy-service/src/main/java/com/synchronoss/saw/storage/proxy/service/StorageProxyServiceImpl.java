@@ -1168,8 +1168,19 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     String masterLoginId = authTicket.getMasterLoginId();
     DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
     SipDskAttribute dskAttribute = null;
+    SipQuery sipQueryFromSemantic =
+        getSipQuery(kpiBuilder.getKpi().getSemanticId(), metaDataServiceExport, restUtil);
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
       dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+    }
+    Analysis analysis = new Analysis();
+    analysis.setSipQuery(sipQueryFromSemantic);
+    analysis.setSemanticId(kpiBuilder.getKpi().getSemanticId());
+    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute,analysis)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "DSK column mandatory!!"
+              + " DSK column is missing in the semantic!!");
     }
     dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
     KPIExecutionObject kpiExecutionObject =
