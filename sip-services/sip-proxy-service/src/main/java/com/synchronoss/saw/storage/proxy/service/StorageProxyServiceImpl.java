@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkColumnPresentAcrossTables;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.isDskColumnNotPresent;
@@ -1171,7 +1172,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     Analysis analysis = new Analysis();
     analysis.setSipQuery(sipQueryFromSemantic);
     analysis.setSemanticId(kpiBuilder.getKpi().getSemanticId());
-    if (checkSameColumnAcrossTables(sipQueryFromSemantic, dskAttribute,analysis)) {
+    if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "DSK column mandatory!!"
