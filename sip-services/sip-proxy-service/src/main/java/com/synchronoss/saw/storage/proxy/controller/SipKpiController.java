@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Api(value = "This controller will provide the KPI execution")
@@ -101,6 +102,8 @@ public class SipKpiController {
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
+    } catch (ResponseStatusException responseStatusException) {
+      throw responseStatusException;
     } catch (ReadEntitySAWException ex) {
       logger.error("Problem on the storage while reading data from storage.", ex);
       throw new ReadEntitySAWException("Problem on the storage while reading data from storage");

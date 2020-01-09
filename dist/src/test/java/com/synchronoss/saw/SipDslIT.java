@@ -494,8 +494,8 @@ public class SipDslIT extends BaseIT {
   public void testCustomerCodeFilterWithDsk() throws IOException {
     // Add security group for TenantA customer.
     ObjectNode secGroup = mapper.createObjectNode();
-    secGroup.put("description", "TestDesc2");
-    secGroup.put("securityGroupName", "TestGroup2");
+    secGroup.put("description", "TestDesc5");
+    secGroup.put("securityGroupName", "TestGroup5");
     Response secGroupRes =
         given(spec)
             .header("Authorization", "Bearer " + customToken)
@@ -510,34 +510,42 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
-
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    String dskAttValues = "{ \n"
+        + "   \"booleanCriteria\":\"AND\",\n"
+        + "   \"booleanQuery\":[ \n"
+        + "      { \n"
+        + "         \"columnName\":\"string\",\n"
+        + "         \"model\":{ \n"
+        + "            \"operator\":\"ISIN\",\n"
+        + "            \"values\":[ \n"
+        + "               \"string 1\"\n"
+        + "            ]\n"
+        + "         }\n"
+        + "      }\n"
+        + "   ]\n"
+        + "}";
+    ObjectNode dskAttributeValues = (ObjectNode) mapper.readTree(dskAttValues);
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttributeValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     given(spec)
         .header("Authorization", "Bearer " + customToken)
-        .body("TestGroup2")
+        .body("TestGroup5")
         .when()
         .put("/security/auth/admin/users/" + 5 + "/security-group")
         .then()
         .assertThat()
         .statusCode(200)
         .body("valid", equalTo(true));
-
     JsonObject sipDsl = testData;
     sipDsl.addProperty(CUSTOMER_CODE, TENANT_A);
-
     JsonObject field1 = new JsonObject();
     field1.addProperty("dataField", CUSTOMER_CODE);
     field1.addProperty("area", "x-axis");
@@ -547,9 +555,7 @@ public class SipDslIT extends BaseIT {
     field1.addProperty("type", "string");
     JsonArray artifactFields = new JsonArray();
     artifactFields.add(field1);
-
     JsonElement js = new JsonArray();
-
     sipDsl
         .get("sipQuery")
         .getAsJsonObject()
@@ -562,7 +568,6 @@ public class SipDslIT extends BaseIT {
         .set(1, field1);
     sipDsl.get("sipQuery").getAsJsonObject().add("filters", js);
     sipDsl.get("sipQuery").getAsJsonObject().add("sorts", js);
-
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(sipDsl.toString());
     // Update token after applying DSK.
@@ -575,9 +580,8 @@ public class SipDslIT extends BaseIT {
     String validateCustCode = TENANT_A;
     Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
-
     given(authSpec)
-        .body("TestGroup2")
+        .body("TestGroup5")
         .when()
         .delete("/security/auth/admin/security-groups/" + groupSysId)
         .then()
@@ -796,15 +800,27 @@ public class SipDslIT extends BaseIT {
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
 
-    ObjectNode root = mapper.createObjectNode();
-    root.put("attributeName", "string");
-    root.put("value", "string 1");
+    String dskAttValues = "{ \n"
+        + "   \"booleanCriteria\":\"AND\",\n"
+        + "   \"booleanQuery\":[ \n"
+        + "      { \n"
+        + "         \"columnName\":\"string\",\n"
+        + "         \"model\":{ \n"
+        + "            \"operator\":\"ISIN\",\n"
+        + "            \"values\":[ \n"
+        + "               \"string 1\"\n"
+        + "            ]\n"
+        + "         }\n"
+        + "      }\n"
+        + "   ]\n"
+        + "}";
+    ObjectNode dskAttributeValues = (ObjectNode) mapper.readTree(dskAttValues);
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(root)
+        .body(dskAttributeValues)
         .when()
-        .post("/security/auth/admin/security-groups/" + groupSysId + "/dsk-attribute-values")
+        .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
         .assertThat()
         .statusCode(200)

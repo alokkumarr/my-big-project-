@@ -58,7 +58,7 @@ public class ElasticSearchQueryBuilder {
     ToDo: when size is -1 need to remove the hard coded size as 1lakh and we need to send the total
       data  when the size is -1.
      */
-    if (size == -1) size = 100000;
+    if (size == null || size == -1) size = 100000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
       throw new NullPointerException(
