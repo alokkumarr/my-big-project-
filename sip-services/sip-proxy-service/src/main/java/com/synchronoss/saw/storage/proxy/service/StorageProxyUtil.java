@@ -347,7 +347,7 @@ public class StorageProxyUtil {
    * @param analysis
    * @return
    */
-  public static boolean checkSameColumnAcrossTables(
+  public static boolean isDskColumnNotPresent(
       SipQuery sipQuery, SipDskAttribute dskAttribute, Analysis analysis) {
     if (dskAttribute != null
         && (dskAttribute.getBooleanCriteria() != null && dskAttribute.getBooleanQuery() != null)) {
@@ -358,9 +358,9 @@ public class StorageProxyUtil {
                     String columnName = sipDskAttribute.getColumnName();
                     if (sipDskAttribute.getBooleanQuery() != null
                         && (StringUtils.isEmpty(columnName))) {
-                      return checkSameColumnAcrossTables(sipQuery, sipDskAttribute,analysis);
+                      return isDskColumnNotPresent(sipQuery, sipDskAttribute,analysis);
                     }
-                    return !checkColumnAcrossTables(sipQuery, columnName,analysis);
+                    return !checkColumnPresentAcrossTables(sipQuery, columnName,analysis);
                   })
               .findFirst();
       if (isColumnNotPresent.isPresent()) {
@@ -370,7 +370,7 @@ public class StorageProxyUtil {
     return false;
   }
 
-  private static boolean checkColumnAcrossTables(
+  private static boolean checkColumnPresentAcrossTables(
       SipQuery sipQuery, String columnName, Analysis analysis) {
     Boolean designerEdit = analysis.getDesignerEdit();
     List<String> artifactNames = null;
@@ -384,13 +384,13 @@ public class StorageProxyUtil {
       if (designerEdit == null || !designerEdit) {
         isArtifactPreset = artifactNames.contains(artifact.getArtifactsName().toUpperCase());
       } else {
-        isArtifactPreset = StringUtils.containsIgnoreCase(query,artifact.getArtifactsName());
+        isArtifactPreset = StringUtils.containsIgnoreCase(query, artifact.getArtifactsName());
       }
       if (isArtifactPreset) {
         for (Field field : artifact.getFields()) {
-          if (field.getColumnName().equalsIgnoreCase(columnName) || field.getColumnName()
-              .contentEquals(columnName + KEYWORD)) {
-             continue  outerloop;
+          if (field.getColumnName().equalsIgnoreCase(columnName)
+              || field.getColumnName().contentEquals(columnName + KEYWORD)) {
+            continue outerloop;
           }
         }
         return false;

@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
