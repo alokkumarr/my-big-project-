@@ -59,7 +59,7 @@ public class TransformationService {
     }
 
     public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID) throws Exception {
-        updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID, Optional.ofNullable(null),Optional.ofNullable(null));
+        updateStatus(transformationID, status, startTs, finishedTs, ale_id, batchID,Optional.empty(),Optional.empty());
     }
 
     public void updateStatus(String transformationID, String status, String startTs, String finishedTs, String ale_id, String batchID, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
