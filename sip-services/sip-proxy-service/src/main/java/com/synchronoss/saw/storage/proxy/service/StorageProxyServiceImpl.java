@@ -90,6 +90,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private final String analysisMetadataTable = "analysisMetadata";
   private static final String METASTORE = "services/metadata";
   public static final String CUSTOMER_CODE = "customerCode";
+  public static final String REPORT = "REPORT";
 
 
   @Value("${schema.file}")
@@ -619,7 +620,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
     saveExecutionResult(
         executionType, response, analysis, startTime, authTicket, queryId, dskAttribute);
-    if (!analysis.getType().equalsIgnoreCase("report")) {
+    if (!REPORT.equalsIgnoreCase(analysis.getType())) {
 
       // return only requested data based on page no and page size, only for FE
       List<Object> pagingData = pagingData(page, pageSize, (List<Object>) response.getData());
@@ -665,13 +666,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
         sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
         List<SipDskAttribute> attributeList = new ArrayList<>();
-          SipDskAttribute attribute = new SipDskAttribute();
-          attribute.setColumnName(CUSTOMER_CODE);
-          Model model = new Model();
-          model.setOperator(Operator.ISIN);
-          model.setValues(Collections.singletonList(customerCode));
-          attribute.setModel(model);
-          attributeList.add(attribute);
+        SipDskAttribute attribute = new SipDskAttribute();
+        attribute.setColumnName(CUSTOMER_CODE);
+        Model model = new Model();
+        model.setOperator(Operator.ISIN);
+        model.setValues(Collections.singletonList(customerCode));
+        attribute.setModel(model);
+        attributeList.add(attribute);
         if (dskAttribute != null) {
           attributeList.add(dskAttribute);
         }
