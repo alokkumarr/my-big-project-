@@ -39,8 +39,7 @@ import { displayNameWithoutAggregateFor } from '../../services/tooltipFormatter'
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
-  dataField: 'dataField',
-  aggregate: 'summaryType'
+  dataField: 'dataField'
 };
 
 export interface IPivotGridUpdate {
@@ -346,15 +345,15 @@ export class PivotGridComponent implements OnDestroy {
             )
           };
           if (cloned.aggregate) {
-            delete cloned.caption;
-            cloned.displayName = `${toUpper(
-              cloned.aggregate
-            )}(${displayNameWithoutAggregateFor(cloned)})`;
-            /* We're aggregating values in backend. Aggregating it again using
-             pivot's aggregate function will lead to bad data. Always keep this
-             on sum */
-            cloned.aggregate = 'sum';
+            this.setDisplayNameAndAggregate(cloned);
           }
+        } else if (cloned.type === 'string') {
+          cloned.dataType = ['count', 'distinctcount'].includes(
+            cloned.aggregate
+          )
+            ? 'number'
+            : 'string';
+          this.setDisplayNameAndAggregate(cloned);
         } else {
           cloned.dataType = cloned.type;
         }
@@ -368,7 +367,7 @@ export class PivotGridComponent implements OnDestroy {
           cloned.area === 'data' && cloned.dataField
             ? cloned.dataField
             : cloned.columnName;
-
+        cloned.dataField = split(cloned.dataField, '.')[0];
         if (!isUndefined(cloned.alias) && cloned.alias !== '') {
           cloned.displayName = cloned.alias;
         }
@@ -376,6 +375,7 @@ export class PivotGridComponent implements OnDestroy {
           ? 'yyyy-MM-dd'
           : cloned.dateFormat;
         delete cloned.dateFormat;
+        cloned.summaryType = 'sum';
         return cloned;
       }),
       fpMap(
@@ -389,5 +389,18 @@ export class PivotGridComponent implements OnDestroy {
         return col;
       })
     );
+  }
+
+  setDisplayNameAndAggregate(column) {
+    delete column.caption;
+    if (column.aggregate) {
+      column.displayName = `${toUpper(
+        column.aggregate
+      )}(${displayNameWithoutAggregateFor(column)})`;
+    }
+    /* We're aggregating values in backend. Aggregating it again using
+      pivot's aggregate function will lead to bad data. Always keep this
+      on sum */
+    column.aggregate = 'sum';
   }
 }

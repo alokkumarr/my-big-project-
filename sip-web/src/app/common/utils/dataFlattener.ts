@@ -125,7 +125,7 @@ export function getStringFieldsFromDSLArtifact(
   fields: ArtifactColumnDSL[]
 ): string[] {
   return fields
-    .filter(field => field.type === 'string')
+    .filter(field => field.type === 'string' && !field.aggregate)
     .map(field => field.columnName.replace('.keyword', ''));
 }
 

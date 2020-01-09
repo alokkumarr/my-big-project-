@@ -128,19 +128,16 @@ export class DesignerState {
     /* If this is a report, and query is present, we can request data */
     if (analysis.type === 'report' && !!sipQuery.query) {
       return true;
-    } else {
-      /* Else, there should be at least one field selected in artifacts */
-      return (
-        (
-          fpFlatMap(
-            artifact => artifact.fields,
-            get(state, 'analysis.sipQuery.artifacts')
-          ) || []
-        ).length > 0
-      );
     }
-
-    return false;
+    /* Else, there should be at least one field selected in artifacts */
+    return (
+      (
+        fpFlatMap(
+          artifact => artifact.fields,
+          get(state, 'analysis.sipQuery.artifacts')
+        ) || []
+      ).length > 0
+    );
   }
 
   @Selector()
@@ -279,8 +276,9 @@ export class DesignerState {
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
     patchState({
       analysis: {
@@ -803,7 +801,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
