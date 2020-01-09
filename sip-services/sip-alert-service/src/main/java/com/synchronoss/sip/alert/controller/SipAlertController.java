@@ -1,9 +1,7 @@
 package com.synchronoss.sip.alert.controller;
 
 import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
-import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
-import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
 import com.synchronoss.sip.alert.modal.AlertCount;
 import com.synchronoss.sip.alert.modal.AlertCountResponse;
@@ -14,7 +12,6 @@ import com.synchronoss.sip.alert.modal.AlertStatesFilter;
 import com.synchronoss.sip.alert.modal.AlertStatesResponse;
 import com.synchronoss.sip.alert.service.AlertService;
 import com.synchronoss.sip.alert.util.AlertUtils;
-import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
