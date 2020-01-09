@@ -3,6 +3,10 @@ package com.synhronoss.sw.workbench.executor.listener;
 import java.io.File;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -16,17 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
-import sncr.bda.conf.ComponentConfiguration;
-import sncr.xdf.context.ComponentServices;
-import sncr.xdf.context.NGContext;
-import sncr.xdf.ngcomponent.AbstractComponent;
-import sncr.xdf.parser.NGParser;
-import sncr.xdf.services.NGContextServices;
-import sncr.xdf.sql.ng.NGSQLComponent;
-import sncr.xdf.transformer.ng.NGTransformerComponent;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutionType;
+import com.synchronoss.saw.workbench.service.WorkbenchService;
+import com.synchronoss.saw.workbench.service.WorkbenchServiceImpl;
 
 
 public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener{
@@ -103,75 +100,74 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	    long pollTimeout = 60 * 60 * 1000;
 	    while (true) {
 	      ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+	      
 	      records.forEach(
 	          record-> {
-	        	  try {
-					String[] content =   record.value().split(" ", 4);
-					  if(content.length == 4) {
-						  String project= content[0];
-						  String name = content[1];
-						  String component = content[2];
-						  String cfg = content[3];
-						  
-						 // createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
-						    
+	        	  ExecutorService executor = Executors.newFixedThreadPool(10);
+	        	  Future<Long> result = executor.submit(new Callable<Long>() {
+						@Override
+						public Long call() throws Exception {
+							try {
+				        		  String[] content =   record.value().split(" ");
+				        		  
+				        		  WorkbenchExecutionType executionType = WorkbenchExecutionType.valueOf(content[0]);
+				        		  
+				        		  
+				        		  switch(executionType) {
+				        		  case EXECUTE_JOB:
 
-						    ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
+					        		  if(content.length == 5) {
+					        			  	String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
+					        		  
+							        		  String project= content[0];
+							    			  String name = content[1];
+							    			  String component = content[2];
+							    			  String cfg = content[3];
+							    			  WorkbenchService service = new WorkbenchServiceImpl();
+							    			  service.executeJob(root, cfg, project, component, batchID);
+							    			  
+					        		  }
+					        		  break;
+					        		  
+				        		  case SHOW_PREVIEW:
 
+					        		  if(content.length == 6) {
+					        			      String id= content[0];
+					        			      String location= content[1];
+					        			  	  String previewLimit= content[2];
+							        		  String previewsTablePath= content[3];
+							    			  String project = content[4];
+							    			  String name = content[5];
+							    			  WorkbenchService service = new WorkbenchServiceImpl();
+							    			  service.createPreview(id, location, previewLimit, previewsTablePath, project, name);
+							    			  break;
+							    			  
+					        		  }
+					        		  break;
+								default:
+									break;
+				        		  }
+				        		  
+				    			  
+				    			  
+				        	  } catch (JsonSyntaxException exception) {
+								logger.error(exception.getMessage());
+							} catch (Exception exception) {
+								logger.error(exception.getMessage());
+							}
+							return pollTimeout;
+				        	  
+				        	  
+				          }
+	        	  });
+						
+							
+						
 
-						    String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
+					});
 
-						    NGContextServices contextServices = new NGContextServices(root, config, project, component, batchID);
-						    contextServices.initContext();
-
-						    contextServices.registerOutputDataSet();
-
-						    NGContext ngctx = contextServices.getNgctx();
-
-						    ngctx.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-
-						    
-						    logger.info("Start execute job");
-						    AbstractComponent aac = null;
-						    switch (ngctx.componentName) {
-						      case "sql":
-						        aac = new NGSQLComponent(ngctx);
-						        break;
-						      case "parser":
-						        aac = new NGParser(ngctx);
-						        break;
-						      case "transformer":
-						        aac = new NGTransformerComponent(ngctx);
-						        break;
-						      default:
-						        throw new IllegalArgumentException("Unknown component: " + ngctx.componentName);
-						    }
-						    NGContext workBenchcontext = contextServices.getNgctx();
-
-						    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-						    if (!aac.initComponent(null)) {
-						      logger.error("Could not initialize component");
-						      throw new RuntimeException("Could not initialize component:");
-						    }
-						    logger.info("Starting Workbench job");
-						    int rc = aac.run();
-						    logger.info("Workbench job completed, result: " + rc + " error: " + aac.getError());
-
-						    if (rc != 0) {
-						      throw new RuntimeException("XDF returned non-zero status: " + rc);
-						    }
-						    
-						  
-						  
-					  }
-				} catch (JsonSyntaxException exception) {
-					logger.error(exception.getMessage());
-				} catch (Exception exception) {
-					logger.error(exception.getMessage());
-				}
 	        	  
 	        	  
-	          });
 	      consumer.commitAsync();
 	    }
 	  }

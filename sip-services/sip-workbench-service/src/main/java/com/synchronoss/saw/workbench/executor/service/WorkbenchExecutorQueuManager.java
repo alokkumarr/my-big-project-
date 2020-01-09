@@ -87,7 +87,7 @@ public class WorkbenchExecutorQueuManager {
 	    }
 	  }
 
-	  public boolean sendWorkbenchMessageToStream(String project, String name, String component, String cfg) {
+	  public boolean sendWorkbenchMessageToStream(String recordContent) {
 	    Properties properties = new Properties();
 	    properties.setProperty(
 	        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -96,7 +96,7 @@ public class WorkbenchExecutorQueuManager {
 
 	    KafkaProducer<String, String> producer = new KafkaProducer(properties);
 
-	    String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s", project, name,component,cfg);
+	   // String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s", project, name,component,cfg);
 	    logger.debug("Record content = " + recordContent);
 
 	    ProducerRecord<String, String> record = new ProducerRecord<>(this.topic, recordContent);

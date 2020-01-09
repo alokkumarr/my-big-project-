@@ -13,17 +13,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.synchronoss.saw.storage.proxy.model.ExecutionType;
-import com.synchronoss.saw.storage.proxy.service.ExecutorQueueManager;
-import com.synchronoss.saw.workbench.service.WorkbenchClient;
-import com.synchronoss.saw.workbench.service.WorkbenchExecuteJob;
 import com.synchronoss.sip.utils.RestUtil;
+
 import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
-import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.core.file.HFileOperations;
 
 public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 
@@ -99,7 +96,9 @@ public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 
 		workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
 		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
-	    queueManager.sendWorkbenchMessageToStream( project,  name,  component,  cfg);
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.EXECUTE_JOB.toString(), 
+				project, name,component,cfg);
+	    queueManager.sendWorkbenchMessageToStream(recordContent);
 		ObjectNode root = mapper.createObjectNode();
 		ArrayNode ids = root.putArray("outputDatasetIds");
 		for (String id : workBenchcontext.registeredOutputDSIds) {
@@ -134,15 +133,23 @@ public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 	private String metastoreBase;
 
 	@Override
-	public ObjectNode preview(String project, String name) throws Exception {
-		// TODO Auto-generated method stub
+	public ObjectNode preview(String project, String name, String component, String cfg) throws Exception {
+		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
+
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.CREATE_PREVIEW.toString(), project, name,
+				component, cfg);
+	    queueManager.sendWorkbenchMessageToStream(recordContent);
 		return null;
 	}
 
 
 	@Override
-	public ObjectNode getPreview(String previewId) throws Exception {
-		// TODO Auto-generated method stub
+	public ObjectNode getPreview(String previewId, String name, String component, String cfg) throws Exception {
+		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
+
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.SHOW_PREVIEW.toString(), project, name,
+				component, cfg);
+	    queueManager.sendWorkbenchMessageToStream(recordContent);
 		return null;
 	}
 	
