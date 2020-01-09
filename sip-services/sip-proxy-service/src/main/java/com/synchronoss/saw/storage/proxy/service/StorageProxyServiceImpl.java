@@ -1333,7 +1333,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     SipDskAttribute dskAttribute = null;
     if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
       dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
-      if (dskAttribute != null || !CollectionUtils.isEmpty(dskAttribute.getBooleanQuery()))
+      if (dskAttribute != null && !CollectionUtils.isEmpty(dskAttribute.getBooleanQuery()))
         return true;
     }
     return false;
