@@ -66,6 +66,20 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
+  aggregatedFiltersFor(artifactName: string): Filter[] {
+    const allFilters = this.groupedFilters[artifactName];
+    return allFilters
+      ? allFilters.filter((f: Filter) => f.isAggregatedFilter)
+      : [];
+  }
+
+  nonAggregatedFiltersFor(artifactName: string): Filter[] {
+    const allFilters = this.groupedFilters[artifactName];
+    return allFilters
+      ? allFilters.filter((f: Filter) => !f.isAggregatedFilter)
+      : [];
+  }
+
   filterRowTrackBy(index, filterRow) {
     return `${index}:${filterRow.columnName}`;
   }
@@ -77,13 +91,14 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
-  addFilter(tableName, initialAdd = false) {
+  addFilter(tableName, initialAdd = false, isAggregatedFilter = false) {
     const newFilter: Filter = {
       type: null,
       tableName,
       isOptional: false,
       columnName: null,
       isRuntimeFilter: false,
+      isAggregatedFilter,
       isGlobalFilter: false,
       model: null
     };
@@ -108,10 +123,12 @@ export class DesignerFilterDialogComponent implements OnInit {
   }
 
   onFiltersChange() {
-    this.filters = fpPipe(fpToPairs, fpFlatMap(([_, filters]) => filters))(
-      this.groupedFilters
-    );
+    this.filters = fpPipe(
+      fpToPairs,
+      fpFlatMap(([_, filters]) => filters)
+    )(this.groupedFilters);
     this.areFiltersValid = this.validateFilters(this.filters);
+    console.log(this.filters);
   }
 
   artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {

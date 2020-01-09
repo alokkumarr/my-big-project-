@@ -4,6 +4,8 @@ export interface Filter {
   isRuntimeFilter: boolean;
   isOptional: boolean;
   isGlobalFilter?: boolean;
+  isAggregatedFilter?: boolean;
+  aggregate?: string;
   tableName: string;
   artifactsName?: string;
   columnName: string;
