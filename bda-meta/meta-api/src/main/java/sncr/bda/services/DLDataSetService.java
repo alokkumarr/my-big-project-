@@ -297,7 +297,7 @@ public class DLDataSetService {
     }
 
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
-        return updateDS(id, ctx, ds, schema, recordCount, size, Optional.ofNullable(null),Optional.ofNullable(null));
+        return updateDS(id, ctx, ds, schema, recordCount, size,Optional.empty(),Optional.empty());
     }
     public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
 

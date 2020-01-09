@@ -856,7 +856,7 @@ public abstract class AbstractComponent implements WithContext{
                         //ctx.transformationID = transformationID;
                         ngctx.ale_id = aleId;
                         ngctx.status = status;
-                        services.md.updateDS(id, ngctx, ds, null, 0, 0, Optional.of(ret), Optional.of(errorDesc));
+                        services.md.updateDS(id, ngctx, ds, null, 0, 0, Optional.ofNullable(ret), Optional.ofNullable(errorDesc));
                     } catch (Exception e) {
                         logger.error("Could not update DS/ write AuditLog entry to DS, id = " + id);
                         logger.error("Native exception: ", e);
@@ -868,7 +868,7 @@ public abstract class AbstractComponent implements WithContext{
                     }
                 });
                 logger.debug("######## AbstractComponent() : ==> Status updating to:::######   " + status);
-                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, aleId, ngctx.batchID, Optional.of(ret), Optional.of(errorDesc));
+                services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, aleId, ngctx.batchID, Optional.ofNullable(ret), Optional.ofNullable(errorDesc));
             }
         } catch (Exception e) {
             logger.error("Could not update error status : ", e);

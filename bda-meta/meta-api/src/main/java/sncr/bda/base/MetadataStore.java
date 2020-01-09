@@ -169,7 +169,7 @@ public abstract class MetadataStore extends MetadataBase implements DocumentConv
   }
 
   public JsonObject createStatusSection(String status, String startTS, String finishedTS, String aleId, String batchSessionId) {
-     return createStatusSection(status, startTS, finishedTS, aleId, batchSessionId,Optional.ofNullable(null),Optional.ofNullable(null));
+     return createStatusSection(status, startTS, finishedTS, aleId, batchSessionId,Optional.empty(),Optional.empty());
   }
 
   public JsonObject createStatusSection(

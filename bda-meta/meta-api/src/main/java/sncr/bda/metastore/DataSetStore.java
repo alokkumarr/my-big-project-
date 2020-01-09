@@ -78,7 +78,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
-        updateStatus(id, status, startTS, finishedTS, aleId, batchSessionId, Optional.ofNullable(null),Optional.ofNullable(null));
+        updateStatus(id, status, startTS, finishedTS, aleId, batchSessionId,Optional.empty(),Optional.empty());
     }
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId, Optional<Integer> returnCode, Optional<String> errorDesc) throws Exception {
         JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId, returnCode, errorDesc);
