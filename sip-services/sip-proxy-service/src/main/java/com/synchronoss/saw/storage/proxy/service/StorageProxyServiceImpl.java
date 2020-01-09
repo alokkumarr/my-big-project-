@@ -1,6 +1,5 @@
 package com.synchronoss.saw.storage.proxy.service;
 
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.checkColumnPresentAcrossTables;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDSKDetailsByUser;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getSipQuery;
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.isDskColumnNotPresent;
