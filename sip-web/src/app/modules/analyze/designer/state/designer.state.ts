@@ -266,8 +266,8 @@ export class DesignerState {
 
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
-      ({ columnName, dataField, area }) =>
-        dataField
+      ({ columnName, dataField }) =>
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
           : columnName === artifactColumn.columnName
     );
@@ -279,8 +279,9 @@ export class DesignerState {
     );
 
     // if sort is applied for the field that is removed, remove sort from SIPQUERY
-    const sorts = filter(sipQuery.sorts, sort =>
-      sort.columnName !== artifactColumn.columnName
+    const sorts = filter(
+      sipQuery.sorts,
+      sort => sort.columnName !== artifactColumn.columnName
     );
     patchState({
       analysis: {
@@ -803,7 +804,7 @@ export class DesignerState {
   @Action(DesignerClearGroupAdapters)
   clearGroupAdapters(
     { patchState, getState, dispatch }: StateContext<DesignerStateModel>,
-    {  }: DesignerClearGroupAdapters
+    {}: DesignerClearGroupAdapters
   ) {
     const groupAdapters = getState().groupAdapters;
 
