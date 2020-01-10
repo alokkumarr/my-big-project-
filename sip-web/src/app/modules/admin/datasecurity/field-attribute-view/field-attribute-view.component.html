@@ -8,12 +8,22 @@
   fxLayoutAlign="start stretch"
   fxLayoutGap="10px"
 >
-  <code
-    [innerHTML]="
-      previewString ||
-      'Cannot parse expression. Filters are missing or invalid.'
-    "
-  >
-  </code>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Expression String
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <code
+        [innerHTML]="
+          previewString ||
+          'Cannot parse expression. Filters are missing or invalid.'
+        "
+      >
+      </code>
+    </mat-expansion-panel>
+  </mat-accordion>
   <dsk-filter-group-view [filterGroup]="dskFilterGroup"></dsk-filter-group-view>
 </div>
