@@ -78,7 +78,7 @@
             *ngFor="let field of filterAutocompleteFields(child['columnName'])"
             [value]="field.columnName"
           >
-            {{ field.displayName }}
+            {{ field.displayName || field.columnName }} ({{ field.columnName }})
           </mat-option>
         </mat-autocomplete>
         <mat-error *ngIf="!child['columnName']"
