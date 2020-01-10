@@ -1,23 +1,37 @@
 package com.synchronoss.sip.alert.util;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
+
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.saw.model.Model.Operator;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
 
+import com.synchronoss.sip.alert.modal.AlertResponse;
+import com.synchronoss.sip.alert.modal.AlertRuleResponse;
+import com.synchronoss.sip.alert.modal.AlertStatesResponse;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class AlertUtils {
   private static final Logger logger = LoggerFactory.getLogger(AlertUtils.class);
+
+  private static final String INVALID_TOKEN = "Invalid Token";
+  private static String UNAUTHORIZED =
+      "UNAUTHORIZED ACCESS : User don't have the %s permission for alerts!!";
+
 
   /**
    * Return timestamp from the given date.
@@ -87,5 +101,140 @@ public class AlertUtils {
       });
     }
     return haveValid[0];
+  }
+
+
+  /**
+   * No access token for the request.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertResponse
+   */
+  public AlertResponse emptyTicketResponse(HttpServletResponse response,
+                                           AlertResponse alertResponse) {
+    logger.error(INVALID_TOKEN);
+    response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    alertResponse.setMessage(INVALID_TOKEN);
+    return alertResponse;
+  }
+
+  /**
+   * Check valid permission if exist return the Alert response.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertResponse
+   */
+  public AlertResponse validatePermissionResponse(HttpServletResponse response,
+                                                  AlertResponse alertResponse) {
+    try {
+      // validate the alerts access privileges
+      logger.error(String.format(UNAUTHORIZED, "Access"));
+      setUnAuthResponse(response);
+      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+      return alertResponse;
+    } catch (IOException ex) {
+      return alertResponse;
+    }
+  }
+
+  /**
+   * No access token for the request.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertStatesResponse
+   */
+  public AlertStatesResponse emptyTicketResponse(HttpServletResponse response,
+                                                 AlertStatesResponse alertResponse) {
+    logger.error(INVALID_TOKEN);
+    response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    alertResponse.setMessage(INVALID_TOKEN);
+    return alertResponse;
+  }
+
+  /**
+   * Check valid permission if exist return the Alert state response.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertStatesResponse
+   */
+  public AlertStatesResponse validatePermissionResponse(HttpServletResponse response,
+                                                        AlertStatesResponse alertResponse) {
+    try {
+      // validate the alerts access privileges
+      logger.error(String.format(UNAUTHORIZED, "Access"));
+      setUnAuthResponse(response);
+      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+      return alertResponse;
+    } catch (IOException ex) {
+      return alertResponse;
+    }
+  }
+
+  /**
+   * No access token for the request.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertRuleResponse
+   */
+  public AlertRuleResponse emptyTicketResponse(HttpServletResponse response,
+                                               AlertRuleResponse alertResponse) {
+    logger.error(INVALID_TOKEN);
+    response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    alertResponse.setMessage(INVALID_TOKEN);
+    return alertResponse;
+  }
+
+  /**
+   * Check valid permission if exist return the Alert rule response.
+   *
+   * @param response
+   * @param alertResponse
+   * @return AlertRuleResponse
+   */
+  public AlertRuleResponse validatePermissionResponse(HttpServletResponse response,
+                                                      AlertRuleResponse alertResponse) {
+    try {
+      // validate the alerts access privileges
+      logger.error(String.format(UNAUTHORIZED, "Access"));
+      setUnAuthResponse(response);
+      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+      return alertResponse;
+    } catch (IOException ex) {
+      return alertResponse;
+    }
+  }
+
+  /**
+   * No access token for the request.
+   *
+   * @param response
+   * @return String
+   */
+  public String emptyTicketResponse(HttpServletResponse response) {
+    logger.error(INVALID_TOKEN);
+    response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    return String.format(UNAUTHORIZED, "Access");
+  }
+
+  /**
+   * Check valid permission if exist return the Alert response.
+   *
+   * @param response
+   * @return String
+   */
+  public String validatePermissionResponse(HttpServletResponse response) {
+    try {
+      // validate the alerts access privileges
+      logger.error(String.format(UNAUTHORIZED, "Access"));
+      setUnAuthResponse(response);
+      return String.format(UNAUTHORIZED, "Access");
+    } catch (IOException ex) {
+      return String.format(UNAUTHORIZED, "Access");
+    }
   }
 }

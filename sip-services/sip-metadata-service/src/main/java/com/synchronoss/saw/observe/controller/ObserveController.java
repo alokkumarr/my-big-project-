@@ -75,13 +75,11 @@ public class ObserveController {
       logger.trace("Observe request object : {} ", objectMapper.writeValueAsString(observe));
 
       Ticket ticket = SipCommonUtils.getTicket(request);
-      Long categoryId = Long.valueOf(observe.getCategoryId());
       ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+
+      Long categoryId = Long.valueOf(observe.getCategoryId());
       if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.CREATE)) {
-        logger.error(String.format(UNAUTHORIZED, "CREATE"));
-        setUnAuthResponse(response);
-        observeResponse.setMessage(String.format(UNAUTHORIZED, "CREATE"));
-        return observeResponse;
+        return buildPrivilegesResponse("Create", response, observeResponse);
       }
 
       observe.setEntityId(observeService.generateId());
@@ -110,29 +108,24 @@ public class ObserveController {
       HttpServletRequest request,
       HttpServletResponse response) {
     logger.debug("dashboardId {}", entityId);
-    ObserveResponse observeResponse = null;
-    try {
-      Observe observe = new Observe();
-      observe.setEntityId(entityId);
-      observeResponse = observeService.getDashboardbyCriteria(observe);
 
-      String category = observeResponse.getContents().getObserve()
-          .stream().findFirst().get().getCategoryId();
-      Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
-      if (!validatePrivilege(productList, Long.valueOf(categoryId),
-          Privileges.PrivilegeNames.ACCESS)) {
-        observeResponse = new ObserveResponse();
-        logger.error(String.format(UNAUTHORIZED, "ACCESS"));
-        setUnAuthResponse(response);
-        observeResponse.setMessage(String.format(UNAUTHORIZED, "ACCESS"));
-        return observeResponse;
-      }
-    } catch (IOException ex) {
-      throw new SipCreateEntityException("Problem on the storage while creating an entity");
+    Observe observe = new Observe();
+    observe.setEntityId(entityId);
+    ObserveResponse observeResponse = observeService.getDashboardbyCriteria(observe);
+
+    String category = observeResponse.getContents().getObserve()
+        .stream().findFirst().get().getCategoryId();
+    Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
+    Ticket ticket = SipCommonUtils.getTicket(request);
+
+    ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+    if (!validatePrivilege(productList, Long.valueOf(categoryId),
+        Privileges.PrivilegeNames.ACCESS)) {
+      observeResponse = new ObserveResponse();
+      return buildPrivilegesResponse("Access", response, observeResponse);
+    } else {
+      return observeResponse;
     }
-    return observeResponse;
   }
 
   /**
@@ -155,29 +148,22 @@ public class ObserveController {
     logger.debug("userId {}", userId);
     ObserveResponse observeResponse = new ObserveResponse();
 
-    try {
-      Ticket ticket = SipCommonUtils.getTicket(request);
-      ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
-      if (!validatePrivilege(productList, Long.valueOf(categoryId),
-          Privileges.PrivilegeNames.ACCESS)) {
-        logger.error(String.format(UNAUTHORIZED, "ACCESS"));
-        setUnAuthResponse(response);
-        observeResponse.setMessage(String.format(UNAUTHORIZED, "ACCESS"));
-        return observeResponse;
-      }
-
-      Observe observe = new Observe();
-      observe.setCategoryId(categoryId);
-      /**
-       * Ignore the the user Id for now list out all the dashboard for category. TO DO : User Id is
-       * required to handle the My DashBoard (private)feature.
-       */
-      // observe.setCreatedBy(userId);
-      observeResponse = observeService.getDashboardbyCategoryId(observe);
-    } catch (IOException e) {
-      throw new SipCreateEntityException("Problem on the while fetching an entity");
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+    if (!validatePrivilege(productList, Long.valueOf(categoryId),
+        Privileges.PrivilegeNames.ACCESS)) {
+      return buildPrivilegesResponse("Access", response, observeResponse);
     }
-    return observeResponse;
+
+    Observe observe = new Observe();
+    observe.setCategoryId(categoryId);
+    /**
+     * Ignore the the user Id for now list out all the dashboard for category. TO DO : User Id is
+     * required to handle the My DashBoard (private)feature.
+     */
+    // observe.setCreatedBy(userId);
+    return observeService.getDashboardbyCategoryId(observe);
+
   }
 
   /**
@@ -209,16 +195,14 @@ public class ObserveController {
       Observe observe = ObserveUtils
           .getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
 
-      Long categoryId = !StringUtils.isEmpty(observe.getCategoryId())
-          ? Long.valueOf(observe.getCategoryId()) : 0L;
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+
+      Long categoryId = !StringUtils.isEmpty(observe.getCategoryId())
+          ? Long.valueOf(observe.getCategoryId()) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.EDIT)) {
-        logger.error(String.format(UNAUTHORIZED, "EDIT"));
-        setUnAuthResponse(response);
-        observeResponse.setMessage(String.format(UNAUTHORIZED, "EDIT"));
-        return observeResponse;
+        return buildPrivilegesResponse("Edit", response, observeResponse);
       }
 
       observe.setEntityId(entityId);
@@ -252,17 +236,17 @@ public class ObserveController {
       observe.setEntityId(entityId);
       ObserveResponse observeResponse = observeService.getDashboardbyCriteria(observe);
       Content content = observeResponse.getContents();
-      String category = content.getObserve().stream().findFirst().get().getCategoryId();
+      String category = content != null
+          ? content.getObserve().stream().findFirst().get().getCategoryId() : null;
 
-      Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
+
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
+
+      Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
           Privileges.PrivilegeNames.DELETE)) {
-        logger.error(String.format(UNAUTHORIZED, "DELETE"));
-        setUnAuthResponse(response);
-        responseObjectFuture.setMessage(String.format(UNAUTHORIZED, "DELETE"));
-        return responseObjectFuture;
+        return buildPrivilegesResponse("Delete", response, responseObjectFuture);
       }
       responseObjectFuture = observeService.deleteDashboard(observe);
     } catch (Exception ex) {
@@ -271,17 +255,35 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
+
+  /**
+   * Check valid permission if exist return the Alert rule response.
+   *
+   * @param response        HttpServletResponse
+   * @param observeResponse ObserveResponse
+   * @return AlertRuleResponse
+   */
+  public ObserveResponse buildPrivilegesResponse(String privileges,
+                                                 HttpServletResponse response,
+                                                 ObserveResponse observeResponse) {
+    try {
+      logger.error(String.format(UNAUTHORIZED, privileges));
+      setUnAuthResponse(response);
+      observeResponse.setMessage(String.format(UNAUTHORIZED, privileges));
+      return observeResponse;
+    } catch (IOException ex) {
+      return observeResponse;
+    }
+  }
+
   /**
    * This method generates unique Id.
    *
-   * @param request  of type object.
-   * @param response of type object.
    * @return ObserveResponse which will hold the response structure.
    */
   @RequestMapping(value = "/generateId", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
-  public ObserveResponse generateDashboardId(
-      HttpServletRequest request, HttpServletResponse response) {
+  public ObserveResponse generateDashboardId() {
     ObserveResponse observeResponse = new ObserveResponse();
     observeResponse.setId(observeService.generateId());
     return observeResponse;
