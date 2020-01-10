@@ -170,4 +170,26 @@ export class DataSecurityService {
       .post(`${loginUrl}/${path}`, params, httpOptions)
       .toPromise();
   }
+
+  generatePreview(filterGroup: DSKFilterGroup): string {
+    const pStart = '<strong class="parens">(</strong>';
+    const pEnd = '<strong class="parens">)</strong>';
+    return filterGroup.booleanQuery
+      .map(query => {
+        if (query['booleanCriteria']) {
+          return `${pStart}${this.generatePreview(
+            query as DSKFilterGroup
+          )}${pEnd}`;
+        }
+
+        const field = <DSKFilterField>query;
+
+        return `${field.columnName} <span class="operator">${
+          field.model.operator
+        }</span> [${field.model.values.join(', ')}]`;
+      })
+      .join(
+        ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
+      );
+  }
 }

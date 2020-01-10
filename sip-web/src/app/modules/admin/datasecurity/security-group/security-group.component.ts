@@ -4,12 +4,9 @@ import { Router, NavigationEnd } from '@angular/router';
 import { JwtService } from '../../../../common/services/jwt.service';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { AddSecurityDialogComponent } from './../add-security-dialog/add-security-dialog.component';
-import { AddAttributeDialogComponent } from './../add-attribute-dialog/add-attribute-dialog.component';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { DataSecurityService } from './../datasecurity.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
-import { LocalSearchService } from '../../../../common/services/local-search.service';
-import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
 import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
 import { DSKFilterGroup } from '../dsk-filter.model';
@@ -22,11 +19,6 @@ import { DSKFilterGroup } from '../dsk-filter.model';
 export class SecurityGroupComponent implements OnInit {
   listeners: Subscription[] = [];
   ticket: { custID: string; custCode: string; masterLoginId?: string };
-  filterObj = {
-    searchTerm: '',
-    searchTermValue: ''
-  };
-
   config: any;
   data: any;
   groupSelected: any;
@@ -34,16 +26,14 @@ export class SecurityGroupComponent implements OnInit {
   groupFilters: DSKFilterGroup;
   columnData: {};
   emptyState: boolean;
-  addAttribute: boolean;
+  dskFiltersLoading = true;
 
   constructor(
     private _router: Router,
     private _jwtService: JwtService,
     private _dialog: MatDialog,
     private _dxDataGridService: DxDataGridService,
-    private datasecurityService: DataSecurityService,
-    private _localSearch: LocalSearchService,
-    private _toastMessage: ToastService
+    private datasecurityService: DataSecurityService
   ) {
     const navigationListener = this._router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -66,18 +56,21 @@ export class SecurityGroupComponent implements OnInit {
   }
 
   async onGroupSelected(group) {
+    this.dskFiltersLoading = true;
     this.groupSelected = group;
     try {
       this.groupFilters = await this.datasecurityService
         .getFiltersFor(this.groupSelected.secGroupSysId)
         .toPromise();
+      this.dskFiltersLoading = false;
     } catch {
       this.groupFilters = null;
+      this.dskFiltersLoading = false;
     }
   }
 
   loadGroupGridWithData(groupSelected) {
-    this.addAttribute = true;
+    this.dskFiltersLoading = true;
     this.datasecurityService.getSecurityGroups().then(response => {
       this.data = response;
       if (this.data.length === 0) {
@@ -88,11 +81,10 @@ export class SecurityGroupComponent implements OnInit {
           ? this.onGroupSelected(this.data[0])
           : this.onGroupSelected(groupSelected);
       }
-      this.addAttribute = this.data.length === 0;
     });
   }
 
-  addPropperty(property, mode: 'edit' | 'create') {
+  openSecurityGroupDialog(property, mode: 'edit' | 'create') {
     if (mode === 'create') {
       this.columnData = {};
     }
@@ -102,9 +94,8 @@ export class SecurityGroupComponent implements OnInit {
       groupSelected: this.groupSelected,
       ...this.columnData
     };
-    const component = this.getModalComponent(property) as any;
     return this._dialog
-      .open(component, {
+      .open(AddSecurityDialogComponent, {
         width: 'auto',
         height: 'auto',
         autoFocus: false,
@@ -113,14 +104,11 @@ export class SecurityGroupComponent implements OnInit {
       .afterClosed()
       .subscribe(result => {
         if (result) {
-          if (property === 'securityGroup') {
-            this.groupSelected = {
-              secGroupSysId: result.groupId,
-              securityGroupName: result.groupName,
-              description: result.description
-            };
-          }
-          this.loadGroupGridWithData(this.groupSelected);
+          this.loadGroupGridWithData({
+            secGroupSysId: result.groupId,
+            securityGroupName: result.groupName,
+            description: result.description
+          });
         }
       });
   }
@@ -146,7 +134,7 @@ export class SecurityGroupComponent implements OnInit {
 
   editGroupData(data) {
     this.columnData = data;
-    this.addPropperty('securityGroup', 'edit');
+    this.openSecurityGroupDialog('securityGroup', 'edit');
   }
 
   deleteGroup(cellData) {
@@ -174,36 +162,6 @@ export class SecurityGroupComponent implements OnInit {
             });
         }
       });
-  }
-
-  getModalComponent(property) {
-    switch (property) {
-      case 'securityGroup':
-        return AddSecurityDialogComponent;
-      case 'attribute':
-        return AddAttributeDialogComponent;
-    }
-  }
-
-  applySearchFilter(value) {
-    const USERGROUP_SEARCH_CONFIG = [
-      { keyword: 'Group Name', fieldName: 'securityGroupName' }
-    ];
-    this.filterObj.searchTerm = value;
-    const searchCriteria = this._localSearch.parseSearchTerm(
-      this.filterObj.searchTerm
-    ) as any;
-    this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
-    this._localSearch
-      .doSearch(searchCriteria, this.data, USERGROUP_SEARCH_CONFIG)
-      .then(
-        (data: any[]) => {
-          this.data = data;
-        },
-        err => {
-          this._toastMessage.error(err.message);
-        }
-      );
   }
 
   getConfig() {
