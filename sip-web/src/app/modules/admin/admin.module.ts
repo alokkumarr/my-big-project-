@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
 import { TreeModule } from 'angular-tree-component';
 import { RouterModule } from '@angular/router';
@@ -12,9 +12,11 @@ import { PrivilegeService } from './privilege/privilege.service';
 import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
 import { UserAssignmentService } from './datasecurity/userassignment.service';
+import { AdminBrandingComponent } from './branding/branding.component';
 import { routes } from './routes';
 import { FormsModule } from '@angular/forms';
 import { AnalyzeService } from '../analyze/services/analyze.service';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { AdminState } from './state/admin.state';
 
@@ -70,6 +72,7 @@ const COMPONENTS = [
   PrivilegeEditorComponent,
   PrivilegeRowComponent,
   SecurityGroupComponent,
+  AdminBrandingComponent,
   AddSecurityDialogComponent,
   DeleteDialogComponent,
   AddAttributeDialogComponent,
@@ -109,11 +112,13 @@ const SERVICES = [
     CommonModuleTs,
     FormsModule,
     TreeModule,
+    ColorPickerModule,
     NgxsModule.forFeature([AdminState, ExportPageState, AdminImportPageState])
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   providers: [...SERVICES, ...GUARDS],
-  exports: [AdminPageComponent]
+  exports: [AdminPageComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AdminModule {}

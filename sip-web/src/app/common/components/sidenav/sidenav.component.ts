@@ -23,6 +23,7 @@ export class SidenavComponent implements OnInit {
 
   update(data, moduleName = '') {
     this._moduleName = moduleName;
+    console.log(data);
     this.menu = data;
   }
 

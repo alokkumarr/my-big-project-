@@ -43,7 +43,7 @@
     }
 
     &.selected {
-      background-color: $primary-blue-b2;
+      background-color: $primary-blue-b2 !important;
       color: rgb(255, 255, 255);
 
       mat-icon {
