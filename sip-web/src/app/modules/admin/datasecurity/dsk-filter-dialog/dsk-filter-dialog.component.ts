@@ -28,6 +28,7 @@ export class DskFilterDialogComponent {
       groupSelected;
     }
   ) {
+    this.datasecurityService.clearDSKEligibleFields();
     this.dskFilters$ = this.datasecurityService
       .getFiltersFor(data.groupSelected.secGroupSysId)
       .pipe(
