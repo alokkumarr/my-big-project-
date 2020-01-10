@@ -1,4 +1,4 @@
-$icon-font-size: 12px;
+@import 'src/themes/base/colors';
 
 :host {
   border-radius: 5px;
@@ -9,14 +9,16 @@ $icon-font-size: 12px;
   width: 100%;
 }
 
-::ng-deep {
-  .mat-form-field-wrapper {
-    padding: 0;
+.filter-field {
+  margin-bottom: 10px;
+
+  &__name {
+    font-size: 14px;
   }
 
-  .new-child-popper {
-    background: white;
-    z-index: 1;
+  &__operator {
+    color: $secondary-orange;
+    font-size: 14px;
   }
 }
 
@@ -34,24 +36,10 @@ $icon-font-size: 12px;
     }
   }
 
-  mat-icon {
-    font-size: $icon-font-size;
-    line-height: $icon-font-size !important;
-    width: $icon-font-size;
-    height: $icon-font-size;
-  }
-
   mat-chip {
     padding-top: 2px;
     padding-bottom: 2px;
     font-size: 12px;
     min-height: 26px;
   }
-}
-
-mat-icon {
-  font-size: $icon-font-size;
-  line-height: $icon-font-size !important;
-  width: $icon-font-size;
-  height: $icon-font-size;
 }
