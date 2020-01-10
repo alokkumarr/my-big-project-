@@ -76,6 +76,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 /**
  * This class is used to do CRUD operations on the Mariadb data base having nsso
@@ -664,26 +665,10 @@ public class UserRepositoryImpl implements UserRepository {
           preparedStatement.setString(2, ticketDetails.getRoleCode());
         }, new UserRepositoryImpl.PrepareProdModFeatureChildExtractor());
 
-              String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-								   + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-								   + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-								   + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-								   + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-								   + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-
-        Map<String, List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, preparedStatement -> preparedStatement.setString(1, masterLoginId), new UserRepositoryImpl.DSKValuesExtractor());
-         // DSK values should be array in JSON object hence converting into list.
-        List<TicketDSKDetails> dskList = new ArrayList<>();
-				for (String key : dskValueMapping.keySet()) {
-					TicketDSKDetails dskDetails = new TicketDSKDetails();
-					dskDetails.setName(key);
-					dskDetails.setValues(dskValueMapping.get(key));
-					dskList.add(dskDetails);
-				}
-				ticketDetails.setDataSKey(dskList);
-
 				List<SipDskAttribute> dskAttributeList = fetchDskGroupAttributes(null, masterLoginId);
-				ticketDetails.setDskAttributes(dskAttributeList);
+				SipDskAttribute sipDskAttribute =
+						CollectionUtils.isEmpty(dskAttributeList) ? null : dskAttributeList.get(0);
+				ticketDetails.setDskAttribute(sipDskAttribute);
 
 				ArrayList<ProductModuleFeature> prodModFeatrChildSorted;
 				ArrayList<ProductModules> prodModSorted;

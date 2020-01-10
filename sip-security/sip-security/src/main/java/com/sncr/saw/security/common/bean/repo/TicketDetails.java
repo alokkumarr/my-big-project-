@@ -30,13 +30,12 @@ public class TicketDetails implements Serializable {
 	private String compName;
 	private String roleCode;
 	private RoleType roleType;
-	private List<TicketDSKDetails> dataSKey;
   private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
 	private Integer isJvCustomer;
 	private Integer filterByCustomerCode;
-	private List<SipDskAttribute> dskAttributes;
+	private SipDskAttribute dskAttribute;
 
 	public Long getUserId() {
 		return userId;
@@ -69,14 +68,6 @@ public class TicketDetails implements Serializable {
 
 	public void setCustID(String custID) {
 		this.custID = custID;
-	}
-
-	public List<TicketDSKDetails> getDataSKey() {
-		return dataSKey;
-	}
-
-	public void setDataSKey(List<TicketDSKDetails> dataSKey) {
-		this.dataSKey = dataSKey;
 	}
 
     /**
@@ -179,11 +170,11 @@ public class TicketDetails implements Serializable {
 		this.isJvCustomer = isJvCustomer;
 	}
 
-	public List<SipDskAttribute> getDskAttributes() {
-		return dskAttributes;
+	public SipDskAttribute getDskAttribute() {
+		return dskAttribute;
 	}
 
-	public void setDskAttributes(List<SipDskAttribute> dskAttributes) {
-		this.dskAttributes = dskAttributes;
+	public void setDskAttribute(SipDskAttribute dskAttribute) {
+		this.dskAttribute = dskAttribute;
 	}
 }

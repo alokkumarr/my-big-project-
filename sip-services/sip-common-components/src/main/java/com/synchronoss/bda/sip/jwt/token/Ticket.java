@@ -24,7 +24,6 @@ public class Ticket implements Serializable {
   private String roleCode;
   private RoleType roleType;
   private Long createdTime;
-  private List<TicketDSKDetails> dataSecurityKey;
 
   /** CustomConfig provides feature for additional configurable properties for the SAW. */
   private List<String> CustomConfig;
@@ -45,7 +44,7 @@ public class Ticket implements Serializable {
 
   private Long validMins;
 
-  private List<SipDskAttribute> sipDskAttributes;
+  private SipDskAttribute sipDskAttribute;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -113,14 +112,6 @@ public class Ticket implements Serializable {
 
   public void setFilterByCustomerCode(Integer filterByCustomerCode) {
     this.filterByCustomerCode = filterByCustomerCode;
-  }
-
-  public List<TicketDSKDetails> getDataSecurityKey() {
-    return dataSecurityKey;
-  }
-
-  public void setDataSecurityKey(List<TicketDSKDetails> dataSecurityKey) {
-    this.dataSecurityKey = dataSecurityKey;
   }
 
   /**
@@ -263,12 +254,11 @@ public class Ticket implements Serializable {
     this.windowId = windowId;
   }
 
-  public List<SipDskAttribute> getSipDskAttributes() {
-    return sipDskAttributes;
+  public SipDskAttribute getSipDskAttribute() {
+    return sipDskAttribute;
   }
 
-  public void setSipDskAttributes(
-      List<SipDskAttribute> sipDskAttributes) {
-    this.sipDskAttributes = sipDskAttributes;
+  public void setSipDskAttribute(SipDskAttribute sipDskAttribute) {
+    this.sipDskAttribute = sipDskAttribute;
   }
 }

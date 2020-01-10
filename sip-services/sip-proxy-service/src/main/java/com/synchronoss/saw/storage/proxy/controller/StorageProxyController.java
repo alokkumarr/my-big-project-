@@ -1,8 +1,5 @@
 package com.synchronoss.saw.storage.proxy.controller;
 
-
-import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getDsks;
-
 import static com.synchronoss.saw.storage.proxy.service.StorageProxyUtil.getTicket;
 import static com.synchronoss.sip.utils.SipCommonUtils.authValidation;
 import static com.synchronoss.sip.utils.SipCommonUtils.checkForPrivateCategory;
@@ -18,11 +15,9 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 import com.synchronoss.bda.sip.jwt.token.Products;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
-import com.synchronoss.bda.sip.jwt.token.TicketDSKDetails;
 import com.synchronoss.saw.analysis.modal.Analysis;
 
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
-import com.synchronoss.saw.model.DataSecurityKey;
 
 import com.synchronoss.saw.model.SIPDSL;
 
@@ -194,14 +189,10 @@ public class StorageProxyController {
       logger.error("Invalid authentication token");
       return Collections.singletonList("Invalid authentication token");
     }
-    List<TicketDSKDetails> dskList =
-        authTicket != null ? authTicket.getDataSecurityKey() : new ArrayList<>();
     List<Object> responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    DataSecurityKey dataSecurityKey = new DataSecurityKey();
-    dataSecurityKey.setDataSecuritykey(getDsks(dskList));
     String analysisType = sipdsl.getType();
 
     try {
