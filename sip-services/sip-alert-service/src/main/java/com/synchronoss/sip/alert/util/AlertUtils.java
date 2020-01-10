@@ -1,7 +1,5 @@
 package com.synchronoss.sip.alert.util;
 
-import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
-
 import com.synchronoss.bda.sip.jwt.token.ProductModuleFeature;
 import com.synchronoss.bda.sip.jwt.token.ProductModules;
 import com.synchronoss.bda.sip.jwt.token.Products;
@@ -127,14 +125,15 @@ public class AlertUtils {
    * @return AlertResponse
    */
   public AlertResponse validatePermissionResponse(HttpServletResponse response,
-                                                  AlertResponse alertResponse) {
+                                                  AlertResponse alertResponse,
+                                                  String privileges) {
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, "Access"));
-      setUnAuthResponse(response);
+      logger.error(String.format(UNAUTHORIZED, privileges));
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpStatus.SC_UNAUTHORIZED,
-          String.format(UNAUTHORIZED, "Access"));
-      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+          String.format(UNAUTHORIZED, privileges));
+      alertResponse.setMessage(String.format(UNAUTHORIZED, privileges));
       return alertResponse;
     } catch (IOException ex) {
       return alertResponse;
@@ -164,12 +163,13 @@ public class AlertUtils {
    * @return AlertStatesResponse
    */
   public AlertStatesResponse validatePermissionResponse(HttpServletResponse response,
-                                                        AlertStatesResponse alertResponse) {
+                                                        AlertStatesResponse alertResponse,
+                                                        String privileges) {
     try {
       // validate the alerts access privileges
-      String errorMessage = String.format(UNAUTHORIZED, "Access");
+      String errorMessage = String.format(UNAUTHORIZED, privileges);
       logger.error(errorMessage);
-      setUnAuthResponse(response);
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
       alertResponse.setMessage(errorMessage);
       return alertResponse;
@@ -197,21 +197,22 @@ public class AlertUtils {
    * Check valid permission if exist return the Alert rule response.
    *
    * @param response
-   * @param alertResponse
-   * @return AlertRuleResponse
+   * @param ruleResponse
+   * @return ruleResponse
    */
   public AlertRuleResponse validatePermissionResponse(HttpServletResponse response,
-                                                      AlertRuleResponse alertResponse) {
+                                                      AlertRuleResponse ruleResponse,
+                                                      String privileges) {
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, "Access"));
+      logger.error(String.format(UNAUTHORIZED, privileges));
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       response.sendError(HttpStatus.SC_UNAUTHORIZED,
           String.format(UNAUTHORIZED, "Access"));
-      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
-      return alertResponse;
+      ruleResponse.setMessage(String.format(UNAUTHORIZED, privileges));
+      return ruleResponse;
     } catch (IOException ex) {
-      return alertResponse;
+      return ruleResponse;
     }
   }
 
@@ -233,16 +234,17 @@ public class AlertUtils {
    * @param response
    * @return String
    */
-  public String validatePermissionResponse(HttpServletResponse response) {
+  public String validatePermissionResponse(HttpServletResponse response,
+                                           String privileges) {
+    String errorMessage = String.format(UNAUTHORIZED, privileges);
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, "Access"));
+      logger.error(errorMessage);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      response.sendError(HttpStatus.SC_UNAUTHORIZED,
-          String.format(UNAUTHORIZED, "Access"));
-      return String.format(UNAUTHORIZED, "Access");
+      response.sendError(HttpStatus.SC_UNAUTHORIZED,errorMessage);
+      return errorMessage;
     } catch (IOException ex) {
-      return String.format(UNAUTHORIZED, "Access");
+      return errorMessage;
     }
   }
 }

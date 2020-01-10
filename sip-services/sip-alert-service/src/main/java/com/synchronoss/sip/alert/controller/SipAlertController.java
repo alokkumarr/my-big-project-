@@ -98,7 +98,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertResponse);
+      return utils.validatePermissionResponse(response, alertResponse, "Create");
     }
 
     if (alertRuleDetails == null) {
@@ -144,7 +144,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertResponse);
+      return utils.validatePermissionResponse(response, alertResponse, "Edit");
     }
 
     alertResponse.setAlert(alertService.updateAlertRule(alertRuleDetails, id, ticket));
@@ -190,7 +190,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertRuleResponse);
+      return utils.validatePermissionResponse(response, alertRuleResponse, "Access");
     }
 
     return alertService.retrieveAllAlerts(pageNumber, pageSize, ticket);
@@ -212,7 +212,8 @@ public class SipAlertController {
       method = RequestMethod.GET,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseBody
-  public String listAlertOperators(HttpServletRequest request, HttpServletResponse response) {
+  public String listAlertOperators(HttpServletRequest request,
+                                   HttpServletResponse response) {
     Ticket ticket = SipCommonUtils.getTicket(request);
     if (ticket == null) {
       return utils.emptyTicketResponse(response);
@@ -220,7 +221,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response);
+      return utils.validatePermissionResponse(response, "Access");
     }
     return alertService.retrieveOperatorsDetails(ticket);
   }
@@ -249,7 +250,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response);
+      return utils.validatePermissionResponse(response, "View");
     }
     return alertService.retrieveAggregations(ticket);
   }
@@ -291,7 +292,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertRuleResponse);
+      return utils.validatePermissionResponse(response, alertRuleResponse, "Access");
     }
 
     return alertService.getAlertRulesByCategory(categoryId, pageNumber, pageSize, ticket);
@@ -327,7 +328,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertResponse);
+      return utils.validatePermissionResponse(response, alertResponse, "Access");
     }
 
     alertResponse.setAlert(alertService.getAlertRule(id, ticket));
@@ -365,7 +366,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertResponse);
+      return utils.validatePermissionResponse(response, alertResponse, "Delete");
     }
 
     Boolean isAlertDeleted = alertService.deleteAlertRule(id, ticket);
@@ -415,7 +416,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertStatesResponse);
+      return utils.validatePermissionResponse(response, alertStatesResponse, "Access");
     }
 
     alertStatesResponse = alertService.getAlertStates(id, pageNumber, pageSize, ticket);
@@ -464,7 +465,7 @@ public class SipAlertController {
 
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response, alertStatesResponse);
+      return utils.validatePermissionResponse(response, alertStatesResponse, "Access");
     }
 
     return
@@ -592,7 +593,7 @@ public class SipAlertController {
     }
     // validate the alerts access privileges
     if (!utils.validAlertPrivileges(ticket.getProducts())) {
-      return utils.validatePermissionResponse(response);
+      return utils.validatePermissionResponse(response, "Access");
     }
     return alertService.retrieveMonitoringType(ticket);
   }
