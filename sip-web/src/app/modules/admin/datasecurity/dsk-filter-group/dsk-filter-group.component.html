@@ -47,6 +47,7 @@
 <div
   class="dsk-query-child"
   *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+  [ngClass]="{ 'dsk-query-child__group': child['booleanCriteria'] }"
 >
   <dsk-filter-group
     [filterGroup]="child"

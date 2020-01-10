@@ -12,6 +12,7 @@ import { LocalSearchService } from '../../../../common/services/local-search.ser
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import * as isEmpty from 'lodash/isEmpty';
 import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
+import { DSKFilterGroup } from '../dsk-filter.model';
 
 @Component({
   selector: 'security-group',
@@ -30,6 +31,7 @@ export class SecurityGroupComponent implements OnInit {
   data: any;
   groupSelected: any;
   groupName: any;
+  groupFilters: DSKFilterGroup;
   columnData: {};
   emptyState: boolean;
   addAttribute: boolean;
@@ -63,8 +65,18 @@ export class SecurityGroupComponent implements OnInit {
     this.ticket = token.ticket;
   }
 
+  async onGroupSelected(group) {
+    this.groupSelected = group;
+    try {
+      this.groupFilters = await this.datasecurityService
+        .getFiltersFor(this.groupSelected.secGroupSysId)
+        .toPromise();
+    } catch {
+      this.groupFilters = null;
+    }
+  }
+
   loadGroupGridWithData(groupSelected) {
-    this.groupSelected = {};
     this.addAttribute = true;
     this.datasecurityService.getSecurityGroups().then(response => {
       this.data = response;
@@ -72,9 +84,9 @@ export class SecurityGroupComponent implements OnInit {
         this.emptyState = true;
       } else {
         this.emptyState = false;
-        this.groupSelected = isEmpty(groupSelected)
-          ? this.data[0]
-          : groupSelected;
+        isEmpty(groupSelected)
+          ? this.onGroupSelected(this.data[0])
+          : this.onGroupSelected(groupSelected);
       }
       this.addAttribute = this.data.length === 0;
     });
@@ -158,7 +170,7 @@ export class SecurityGroupComponent implements OnInit {
           this.datasecurityService
             .deleteGroupOrAttribute(path)
             .then(response => {
-              this.loadGroupGridWithData(this.groupSelected);
+              this.loadGroupGridWithData({});
             });
         }
       });
@@ -219,10 +231,11 @@ export class SecurityGroupComponent implements OnInit {
     ];
     return this._dxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
-        this.groupSelected = row.data;
+        this.onGroupSelected(row.data);
       },
       columns,
       columnMinWidth: 50,
+      rowAlternationEnabled: false,
       width: '100%',
       height: '100%',
       paging: {

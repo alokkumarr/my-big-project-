@@ -7,7 +7,6 @@ $icon-font-size: 12px;
   display: block;
   padding: 5px;
   width: 100%;
-  margin-bottom: 16px;
 }
 
 ::ng-deep {
@@ -27,6 +26,13 @@ $icon-font-size: 12px;
 
 .dsk-query-child {
   margin-left: 20px;
+
+  &__group {
+    margin-bottom: 16px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 
   mat-icon {
     font-size: $icon-font-size;
