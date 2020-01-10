@@ -25,10 +25,19 @@
     <button
       (click)="updateDskFilters()"
       [disabled]="dskFiltersLoading"
-      mat-raised-button
+      mat-button
       color="primary"
     >
       <span i18n>Edit Filters</span>
+    </button>
+    <button
+      (click)="deleteDskFilters()"
+      *ngIf="groupFilters"
+      [disabled]="dskFiltersLoading"
+      mat-button
+      color="warn"
+    >
+      <span i18n>Delete Filters</span>
     </button>
   </div>
 </mat-toolbar>

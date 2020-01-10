@@ -10,6 +10,7 @@ import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.componen
 import * as isEmpty from 'lodash/isEmpty';
 import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
 import { DSKFilterGroup } from '../dsk-filter.model';
+import { ConfirmDialogComponent } from 'src/app/common/components/confirm-dialog';
 
 @Component({
   selector: 'security-group',
@@ -59,9 +60,13 @@ export class SecurityGroupComponent implements OnInit {
     this.dskFiltersLoading = true;
     this.groupSelected = group;
     try {
-      this.groupFilters = await this.datasecurityService
+      const filters = await this.datasecurityService
         .getFiltersFor(this.groupSelected.secGroupSysId)
         .toPromise();
+
+      this.groupFilters =
+        filters && !isEmpty(filters.booleanQuery) ? filters : null;
+
       this.dskFiltersLoading = false;
     } catch {
       this.groupFilters = null;
@@ -128,6 +133,29 @@ export class SecurityGroupComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.loadGroupGridWithData(this.groupSelected);
+        }
+      });
+  }
+
+  deleteDskFilters() {
+    this._dialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          positiveActionLabel: 'Delete',
+          negativeActionLabel: 'Cancel',
+          primaryColor: 'warn',
+          title: 'Delete Filters',
+          content: `Are you sure you want to delete all filters from group: ${this.groupSelected.securityGroupName}?`
+        }
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.datasecurityService
+            .deleteDskFiltersForGroup(this.groupSelected.secGroupSysId)
+            .then(() => {
+              this.onGroupSelected(this.groupSelected);
+            });
         }
       });
   }

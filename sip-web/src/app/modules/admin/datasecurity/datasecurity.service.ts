@@ -10,7 +10,8 @@ import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
   DSKSecurityGroup,
-  DSKFilterField
+  DSKFilterField,
+  DSKFilterBooleanCriteria
 } from './dsk-filter.model';
 import * as uniqWith from 'lodash/uniqWith';
 
@@ -119,6 +120,13 @@ export class DataSecurityService {
     return this.putrequest(path, filters);
   }
 
+  deleteDskFiltersForGroup(groupId: string): Promise<any> {
+    return this.updateDskFiltersForGroup(groupId, {
+      booleanCriteria: DSKFilterBooleanCriteria.AND,
+      booleanQuery: []
+    });
+  }
+
   attributetoGroup(data) {
     const requestBody = {
       attributeName: data.attributeName.trim(),
@@ -158,6 +166,10 @@ export class DataSecurityService {
 
   putrequest(path, requestBody) {
     return this._http.put(`${loginUrl}/${path}`, requestBody).toPromise();
+  }
+
+  deleteRequest(path) {
+    return this._http.delete(`${loginUrl}/${path}`);
   }
 
   postRequest(path: string, params: Object) {
