@@ -60,7 +60,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    */
   private WorkbenchClient cachedClient;
 
-  @PostConstruct
+  //@PostConstruct
   private void init() throws Exception {
       /* Workaround: If the "/apps/spark" directory does not exist in
        * the data lake, Apache Livy will fail with a file not found

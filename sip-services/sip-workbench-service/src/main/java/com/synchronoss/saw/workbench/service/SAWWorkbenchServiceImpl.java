@@ -109,7 +109,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   private RestUtil restUtil;
 
   
-  @PostConstruct
+  //@PostConstruct
   private void init() throws Exception {
     if (defaultProjectRoot.startsWith(prefix)) {
       if (!HFileOperations.exists(defaultProjectRoot)) {

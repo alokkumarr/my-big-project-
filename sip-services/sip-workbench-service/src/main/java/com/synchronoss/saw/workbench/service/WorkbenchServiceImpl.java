@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.ojai.DocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
@@ -32,6 +33,8 @@ public class WorkbenchServiceImpl implements WorkbenchService {
 
 	  private static final Logger logger = LoggerFactory.getLogger(SAWWorkbenchServiceImpl.class);
 	  
+	  @Autowired
+	  private SparkSession sparkSession;
 	  
 	@Override
 	public Object executeJob(String root, String cfg, String project, String component, String batchID) {

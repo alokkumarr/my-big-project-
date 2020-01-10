@@ -36,7 +36,7 @@ connector: http
 workbench:
         project-key: "workbench"
         project-path: "/Desktop" 
-        project-root: "/var/sip"
+        project-root: "/Users/nareshgangishetty/workbench-data"
         preview-limit: 10000
         livy-uri: http://localhost:8998
         storage-url: ${connector}://localhost:9800

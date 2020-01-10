@@ -15,9 +15,11 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.sql.SparkSession;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.google.gson.JsonSyntaxException;
@@ -40,8 +42,7 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 	  private String streamPath = null;
 	  private String evaluatorstream = null;
 	  private String workbenchTopics= null;
-	  
-	  
+
 	  /**
 	   * Init method for listener.
 	   *
