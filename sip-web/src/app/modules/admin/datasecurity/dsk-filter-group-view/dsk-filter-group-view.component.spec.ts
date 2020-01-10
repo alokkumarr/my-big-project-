@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DskFilterGroupViewComponent } from './dsk-filter-group-view.component';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('DskFilterGroupViewComponent', () => {
   let component: DskFilterGroupViewComponent;
@@ -8,9 +9,9 @@ describe('DskFilterGroupViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DskFilterGroupViewComponent ]
-    })
-    .compileComponents();
+      declarations: [DskFilterGroupViewComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

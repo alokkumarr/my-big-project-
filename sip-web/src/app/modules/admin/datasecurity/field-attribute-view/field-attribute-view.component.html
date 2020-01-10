@@ -8,7 +8,12 @@
   fxLayoutAlign="start stretch"
   fxLayoutGap="10px"
 >
-  <code [innerHTML]="previewString || 'Cannot parse invalid expression.'">
+  <code
+    [innerHTML]="
+      previewString ||
+      'Cannot parse expression. Filters are missing or invalid.'
+    "
+  >
   </code>
   <dsk-filter-group-view [filterGroup]="dskFilterGroup"></dsk-filter-group-view>
 </div>

@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
-import { DSKFilterGroup, DSKFilterField } from '../dsk-filter.model';
+import { DSKFilterGroup } from '../dsk-filter.model';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 

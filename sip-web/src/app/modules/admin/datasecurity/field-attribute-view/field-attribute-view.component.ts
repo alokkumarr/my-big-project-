@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import { DSKFilterGroup, DSKFilterField } from '../dsk-filter.model';
+import { DSKFilterGroup } from '../dsk-filter.model';
 import { DataSecurityService } from '../datasecurity.service';
 
 @Component({
