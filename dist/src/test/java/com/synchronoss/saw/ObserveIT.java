@@ -111,7 +111,8 @@ public class ObserveIT extends BaseIT {
         .getBody();
 
     String dashboardCreated = response.jsonPath().getString("message");
-    Assert.assertEquals("Unauthorized", dashboardCreated);
+    Assert.assertEquals(
+        "UNAUTHORIZED ACCESS : User don't have the Create privileges for dashboard!!", dashboardCreated);
   }
 
   @Test
