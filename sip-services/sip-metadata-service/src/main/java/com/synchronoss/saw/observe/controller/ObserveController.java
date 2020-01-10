@@ -46,7 +46,7 @@ public class ObserveController {
   private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
 
   private static String UNAUTHORIZED =
-      "UNAUTHORIZED ACCESS : User don't have the %s dashboard!!";
+      "UNAUTHORIZED ACCESS : User don't have the %s privileges for dashboard!!";
 
   @Autowired
   private ObserveService observeService;

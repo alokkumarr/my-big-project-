@@ -74,7 +74,7 @@ public class ObserveControllerRestTest {
     String expected =
         getObserveResponseString(
             ObserveUtils.prepareResponse(observe,
-                "UNAUTHORIZED ACCESS : User don't have the Access dashboard!!"));
+                "UNAUTHORIZED ACCESS : User don't have the Access privileges for dashboard!!"));
     JSONAssert.assertEquals(result.getResponse().getContentAsString(), expected, false);
   }
 
