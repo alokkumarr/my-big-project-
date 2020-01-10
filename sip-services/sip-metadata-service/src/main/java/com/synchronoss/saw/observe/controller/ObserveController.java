@@ -1,6 +1,5 @@
 package com.synchronoss.saw.observe.controller;
 
-import static com.synchronoss.sip.utils.SipCommonUtils.setUnAuthResponse;
 import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -268,7 +267,9 @@ public class ObserveController {
                                                  ObserveResponse observeResponse) {
     try {
       logger.error(String.format(UNAUTHORIZED, privileges));
-      setUnAuthResponse(response);
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.sendError(HttpStatus.UNAUTHORIZED.value(),
+          String.format(UNAUTHORIZED, privileges));
       observeResponse.setMessage(String.format(UNAUTHORIZED, privileges));
       return observeResponse;
     } catch (IOException ex) {

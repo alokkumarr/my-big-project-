@@ -132,6 +132,8 @@ public class AlertUtils {
       // validate the alerts access privileges
       logger.error(String.format(UNAUTHORIZED, "Access"));
       setUnAuthResponse(response);
+      response.sendError(HttpStatus.SC_UNAUTHORIZED,
+          String.format(UNAUTHORIZED, "Access"));
       alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
       return alertResponse;
     } catch (IOException ex) {
@@ -165,9 +167,11 @@ public class AlertUtils {
                                                         AlertStatesResponse alertResponse) {
     try {
       // validate the alerts access privileges
-      logger.error(String.format(UNAUTHORIZED, "Access"));
+      String errorMessage = String.format(UNAUTHORIZED, "Access");
+      logger.error(errorMessage);
       setUnAuthResponse(response);
-      alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
+      alertResponse.setMessage(errorMessage);
       return alertResponse;
     } catch (IOException ex) {
       return alertResponse;
@@ -201,7 +205,9 @@ public class AlertUtils {
     try {
       // validate the alerts access privileges
       logger.error(String.format(UNAUTHORIZED, "Access"));
-      setUnAuthResponse(response);
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      response.sendError(HttpStatus.SC_UNAUTHORIZED,
+          String.format(UNAUTHORIZED, "Access"));
       alertResponse.setMessage(String.format(UNAUTHORIZED, "Access"));
       return alertResponse;
     } catch (IOException ex) {
@@ -231,7 +237,9 @@ public class AlertUtils {
     try {
       // validate the alerts access privileges
       logger.error(String.format(UNAUTHORIZED, "Access"));
-      setUnAuthResponse(response);
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      response.sendError(HttpStatus.SC_UNAUTHORIZED,
+          String.format(UNAUTHORIZED, "Access"));
       return String.format(UNAUTHORIZED, "Access");
     } catch (IOException ex) {
       return String.format(UNAUTHORIZED, "Access");
