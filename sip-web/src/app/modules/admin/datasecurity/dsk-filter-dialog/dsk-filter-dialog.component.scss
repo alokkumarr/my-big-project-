@@ -8,7 +8,11 @@
 
 ::ng-deep code {
   .bool-op {
-    color: red;
+    color: $primary-blue-b2;
+  }
+
+  .operator {
+    color: $secondary-orange;
   }
 }
 

@@ -10,7 +10,8 @@ import { Observable, of } from 'rxjs';
 import {
   DSKFilterGroup,
   DSKSecurityGroup,
-  DSKFilterField
+  DSKFilterField,
+  DSKFilterBooleanCriteria
 } from './dsk-filter.model';
 import * as uniqWith from 'lodash/uniqWith';
 
@@ -119,6 +120,13 @@ export class DataSecurityService {
     return this.putrequest(path, filters);
   }
 
+  deleteDskFiltersForGroup(groupId: string): Promise<any> {
+    return this.updateDskFiltersForGroup(groupId, {
+      booleanCriteria: DSKFilterBooleanCriteria.AND,
+      booleanQuery: []
+    });
+  }
+
   attributetoGroup(data) {
     const requestBody = {
       attributeName: data.attributeName.trim(),
@@ -160,6 +168,10 @@ export class DataSecurityService {
     return this._http.put(`${loginUrl}/${path}`, requestBody).toPromise();
   }
 
+  deleteRequest(path) {
+    return this._http.delete(`${loginUrl}/${path}`);
+  }
+
   postRequest(path: string, params: Object) {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -169,5 +181,27 @@ export class DataSecurityService {
     return this._http
       .post(`${loginUrl}/${path}`, params, httpOptions)
       .toPromise();
+  }
+
+  generatePreview(filterGroup: DSKFilterGroup): string {
+    const pStart = '<strong class="parens">(</strong>';
+    const pEnd = '<strong class="parens">)</strong>';
+    return filterGroup.booleanQuery
+      .map(query => {
+        if (query['booleanCriteria']) {
+          return `${pStart}${this.generatePreview(
+            query as DSKFilterGroup
+          )}${pEnd}`;
+        }
+
+        const field = <DSKFilterField>query;
+
+        return `${field.columnName} <span class="operator">${
+          field.model.operator
+        }</span> [${field.model.values.join(', ')}]`;
+      })
+      .join(
+        ` <strong class="bool-op">${filterGroup.booleanCriteria}</strong> `
+      );
   }
 }

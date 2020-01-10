@@ -13,6 +13,7 @@ export {
 export interface ConfirmDialogData {
   title: string;
   content: string;
+  primaryColor?: string;
   positiveActionLabel: string;
   negativeActionLabel: string;
 }

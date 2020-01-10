@@ -15,7 +15,6 @@ import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { Observable, of } from 'rxjs';
-import { AddAttributeDialogComponent } from '../add-attribute-dialog/add-attribute-dialog.component';
 
 /* Stubs */
 const DataSecurityServiceStub = {
@@ -82,12 +81,6 @@ describe('security-group component', () => {
 
   it('should exist', () => {
     expect(fixture.componentInstance).not.toBeNull();
-  });
-
-  it('should give correct modal component', () => {
-    expect(component.getModalComponent('attribute')).toEqual(
-      AddAttributeDialogComponent
-    );
   });
 
   it('should open dsk dialog', () => {

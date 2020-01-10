@@ -47,6 +47,7 @@
 <div
   class="dsk-query-child"
   *ngFor="let child of filterGroup.booleanQuery; let childId = index"
+  [ngClass]="{ 'dsk-query-child__group': child['booleanCriteria'] }"
 >
   <dsk-filter-group
     [filterGroup]="child"
@@ -101,6 +102,7 @@
               <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
             </mat-chip>
             <input
+              autocomplete="new-password"
               placeholder="Add new value"
               [matChipInputFor]="chipList"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"

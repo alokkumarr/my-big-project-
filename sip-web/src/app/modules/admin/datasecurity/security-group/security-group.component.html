@@ -3,11 +3,6 @@
     <div class="admin-title" e2e="security-group-title">
       Manage Security Groups
     </div>
-    <!-- <search-box placeholder="Search"
-                [value]="filterObj.searchTerm"
-                (searchTermChange)="applySearchFilter($event)"
-                [delay]="1000">
-    </search-box> -->
   </div>
 
   <div
@@ -20,7 +15,7 @@
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="35" fxLayoutGap="10px">
     <button
-      (click)="addPropperty('securityGroup', 'create')"
+      (click)="openSecurityGroupDialog('securityGroup', 'create')"
       mat-raised-button
       color="primary"
     >
@@ -28,16 +23,21 @@
     </button>
 
     <button
-      (click)="addPropperty('attribute', 'create')"
-      mat-raised-button
+      (click)="updateDskFilters()"
+      [disabled]="dskFiltersLoading"
+      mat-button
       color="primary"
-      [disabled]="addAttribute"
     >
-      + <span i18n>Attribute</span>
+      <span i18n>Edit Filters</span>
     </button>
-
-    <button (click)="updateDskFilters()" [disabled]="addAttribute" mat-raised-button color="primary">
-      <span i18n>Edit Filters (beta)</span>
+    <button
+      (click)="deleteDskFilters()"
+      *ngIf="groupFilters"
+      [disabled]="dskFiltersLoading"
+      mat-button
+      color="warn"
+    >
+      <span i18n>Delete Filters</span>
     </button>
   </div>
 </mat-toolbar>
@@ -50,8 +50,9 @@
 >
   Add a new Group by clicking on the "+Security Group" button
 </div>
-<div *ngIf="!emptyState" style="float: left;">
+<div *ngIf="!emptyState" fxLayout="row">
   <dx-data-grid
+    fxFlex="30"
     class="security-group-grid"
     [customizeColumns]="config.customizeColumns"
     [selectionFilter]="[
@@ -124,5 +125,11 @@
       </div>
     </div>
   </dx-data-grid>
-  <field-attribute-view [groupSelected]="groupSelected"></field-attribute-view>
+  <mat-divider [vertical]="true"></mat-divider>
+  <field-attribute-view
+    fxFlex
+    style="padding: 10px"
+    [groupSelected]="groupSelected"
+    [dskFilterGroup]="groupFilters"
+  ></field-attribute-view>
 </div>

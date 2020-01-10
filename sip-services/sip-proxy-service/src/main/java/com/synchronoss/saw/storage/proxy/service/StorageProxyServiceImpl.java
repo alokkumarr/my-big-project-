@@ -525,7 +525,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (ticket != null) {
       DskDetails dskDetails =
           getDSKDetailsByUser(sipSecurityHost, ticket.getMasterLoginId(), restUtil);
-      sipDskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+      if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+        sipDskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+      }
     }
     SipQuery sipQueryFromSemantic =
         getSipQuery(sipQuery.getSemanticId(), metaDataServiceExport, restUtil);
