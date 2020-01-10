@@ -15,7 +15,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { ArtifactColumn, Filter, FilterModel } from '../../types';
-import { TYPE_MAP } from '../../../consts';
+import { TYPE_MAP, AGGREGATE_TYPES } from '../../../consts';
 
 @Component({
   selector: 'designer-filter-row',
@@ -125,6 +125,15 @@ export class DesignerFilterRowComponent implements OnInit {
 
   onOptionalCheckboxToggle(filter: Filter, checked: boolean) {
     filter.isOptional = checked;
+    this.filterModelChange.emit();
+  }
+
+  get supportedAggregates() {
+    return AGGREGATE_TYPES;
+  }
+
+  onAggregateSelected(aggregate: string) {
+    this.filter.aggregate = aggregate;
     this.filterModelChange.emit();
   }
 

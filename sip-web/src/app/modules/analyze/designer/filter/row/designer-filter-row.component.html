@@ -28,12 +28,34 @@
         "
       >
         <mat-option
-          *ngFor="let artifactColumn of (filteredColumns | async)"
+          *ngFor="let artifactColumn of filteredColumns | async"
           [value]="artifactColumn"
         >
           {{ artifactColumn.displayName }}
         </mat-option>
       </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field
+      *ngIf="filter.isAggregatedFilter"
+      class="select-form-field"
+      style="max-width: 145px; margin-left: 10px"
+      appearance="outline"
+    >
+      <mat-label>Aggregate</mat-label>
+      <mat-select
+        e2e="filter-aggregate-select"
+        (selectionChange)="onAggregateSelected($event.value)"
+        [value]="filter.aggregate"
+      >
+        <mat-option
+          *ngFor="let aggregate of supportedAggregates"
+          [value]="aggregate.value"
+          [attr.e2e]="'filter-aggregate-option-' + aggregate.label"
+        >
+          {{ aggregate.label }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
     <div
