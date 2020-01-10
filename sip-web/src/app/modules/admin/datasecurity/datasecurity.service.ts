@@ -55,6 +55,10 @@ export class DataSecurityService {
     }
   }
 
+  clearDSKEligibleFields() {
+    this.dskEligibleFields = null;
+  }
+
   getEligibleDSKFieldsFor(
     customerId,
     productId
