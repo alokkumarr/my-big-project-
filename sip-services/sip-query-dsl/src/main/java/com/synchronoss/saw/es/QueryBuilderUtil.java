@@ -474,22 +474,18 @@ public class QueryBuilderUtil {
         } else if (!StringUtils.isEmpty(dskAttribute.getColumnName())) {
           String[] col = dskAttribute.getColumnName().split("\\.");
           String dskColName = col.length == 1 ? col[0] : col[1];
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX),
+                  dskAttribute.getModel().getValues());
           List<?> modelValues = QueryBuilderUtil
               .buildStringTermsfilter(dskAttribute.getModel().getValues());
-          TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX),modelValues);
           TermsQueryBuilder termsQueryBuilder1 =
               new TermsQueryBuilder(
                   QueryBuilderUtil.buildFilterColumn(dskColName), modelValues);
           BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
-          boolean boolVal = Boolean.valueOf(bool.equals(BooleanCriteria.AND));
-          if (boolVal) {
-            dataSecurityBuilder.must(termsQueryBuilder);
-            dataSecurityBuilder.must(termsQueryBuilder1);
-          } else {
+          // Use "should" between termBuilders of same field to ignore casing.
             dataSecurityBuilder.should(termsQueryBuilder);
             dataSecurityBuilder.should(termsQueryBuilder1);
-          }
           childBuilder.add(dataSecurityBuilder);
         }
       }

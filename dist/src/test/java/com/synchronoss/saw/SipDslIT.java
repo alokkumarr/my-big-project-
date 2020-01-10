@@ -510,25 +510,24 @@ public class SipDslIT extends BaseIT {
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
-    String dskAttValues = "{ \n"
-        + "   \"booleanCriteria\":\"AND\",\n"
-        + "   \"booleanQuery\":[ \n"
-        + "      { \n"
-        + "         \"columnName\":\"string\",\n"
-        + "         \"model\":{ \n"
-        + "            \"operator\":\"ISIN\",\n"
-        + "            \"values\":[ \n"
-        + "               \"string 1\"\n"
-        + "            ]\n"
-        + "         }\n"
-        + "      }\n"
-        + "   ]\n"
-        + "}";
-    ObjectNode dskAttributeValues = (ObjectNode) mapper.readTree(dskAttValues);
+
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(dskAttributeValues)
+        .body(dskAttValues)
         .when()
         .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
@@ -800,25 +799,23 @@ public class SipDslIT extends BaseIT {
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
     Long groupSysId = secGroups.get("groupId").asLong();
 
-    String dskAttValues = "{ \n"
-        + "   \"booleanCriteria\":\"AND\",\n"
-        + "   \"booleanQuery\":[ \n"
-        + "      { \n"
-        + "         \"columnName\":\"string\",\n"
-        + "         \"model\":{ \n"
-        + "            \"operator\":\"ISIN\",\n"
-        + "            \"values\":[ \n"
-        + "               \"string 1\"\n"
-        + "            ]\n"
-        + "         }\n"
-        + "      }\n"
-        + "   ]\n"
-        + "}";
-    ObjectNode dskAttributeValues = (ObjectNode) mapper.readTree(dskAttValues);
+    ObjectNode dskAttValues = mapper.createObjectNode();
+    dskAttValues.put("booleanCriteria","AND");
+    ObjectNode dskValues = mapper.createObjectNode();
+    dskValues.put("columnName","string");
+    ArrayNode values = mapper.createArrayNode();
+    values.add("string 1");
+    ObjectNode model = mapper.createObjectNode();
+    model.put("operator","ISIN");
+    model.put("values",values);
+    dskValues.put("model",model);
+    ArrayNode booleanQuery = mapper.createArrayNode();
+    booleanQuery.add(dskValues);
+    dskAttValues.put("booleanQuery",booleanQuery);
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
-        .body(dskAttributeValues)
+        .body(dskAttValues)
         .when()
         .put("/security/auth/admin/dsk-security-groups/" + groupSysId)
         .then()
