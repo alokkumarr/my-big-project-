@@ -509,7 +509,6 @@ public class SipDslIT extends BaseIT {
             .extract()
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
-    Long groupSysId = secGroups.get("groupId").asLong();
 
     ObjectNode dskAttValues = mapper.createObjectNode();
     dskAttValues.put("booleanCriteria","AND");
@@ -524,6 +523,7 @@ public class SipDslIT extends BaseIT {
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
     dskAttValues.put("booleanQuery",booleanQuery);
+    Long groupSysId = secGroups.get("groupId").asLong();
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
@@ -797,7 +797,6 @@ public class SipDslIT extends BaseIT {
             .extract()
             .response();
     JsonNode secGroups = secGroupRes.as(JsonNode.class);
-    Long groupSysId = secGroups.get("groupId").asLong();
 
     ObjectNode dskAttValues = mapper.createObjectNode();
     dskAttValues.put("booleanCriteria","AND");
@@ -812,6 +811,7 @@ public class SipDslIT extends BaseIT {
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
     dskAttValues.put("booleanQuery",booleanQuery);
+    Long groupSysId = secGroups.get("groupId").asLong();
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
