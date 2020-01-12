@@ -31,7 +31,7 @@ public interface StorageProxyService {
 
     ExecuteAnalysisResponse executeAnalysis(Analysis analysis, Integer size, Integer page,
         Integer pageSize, ExecutionType executionType, String userId,
-        Ticket authTicket, String queryId) throws Exception;
+        Ticket authTicket, String queryId, boolean isScheduledExecution) throws Exception;
 
   ExecutionResponse fetchLastExecutionsData(
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,

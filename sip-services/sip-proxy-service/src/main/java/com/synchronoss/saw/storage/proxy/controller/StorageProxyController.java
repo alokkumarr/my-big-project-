@@ -315,7 +315,8 @@ public class StorageProxyController {
           "Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(analysis));
       executeResponse =
           proxyService.executeAnalysis(
-              analysis, size, page, pageSize,  executionType, userId, authTicket, queryId);
+              analysis, size, page, pageSize, executionType, userId, authTicket, queryId,
+              isScheduledExecution);
 
     } catch (IOException e) {
       logger.error("expected missing on the request body.", e);

@@ -573,7 +573,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       ExecutionType executionType,
       String masterLoginId,
       Ticket authTicket,
-      String queryId)
+      String queryId,
+      boolean isScheduledExecution)
       throws Exception {
     String analysisType = analysis.getType();
     Boolean designerEdit = analysis.getDesignerEdit() == null ? false : analysis.getDesignerEdit();
@@ -583,16 +584,21 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     if (size == null) {
       size = getExecutionSize(executionType);
     }
-    masterLoginId =
-        (masterLoginId != null && !StringUtils.isEmpty(masterLoginId))
-            ? masterLoginId
-            : authTicket.getMasterLoginId();
-    DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
     SipQuery sipQueryFromSemantic =
         getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, restUtil);
     SipDskAttribute dskAttribute = null;
-    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
-      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+    DskDetails dskDetails=null;
+    if (isScheduledExecution) {
+      masterLoginId =
+          (masterLoginId != null && !StringUtils.isEmpty(masterLoginId))
+              ? masterLoginId
+              : authTicket.getMasterLoginId();
+       dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
+      if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
+        dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
+      }
+    } else {
+      dskAttribute = authTicket.getSipDskAttribute();
     }
     if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
@@ -1135,12 +1141,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public Object fetchGlobalFilter(GlobalFilters globalFilters, Ticket authTicket)
       throws Exception {
     GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
-    String masterLoginId = authTicket.getMasterLoginId();
-    DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
-    SipDskAttribute dskAttribute = null;
-    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
-      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
-    }
+    DskDetails dskDetails = null;
+    SipDskAttribute dskAttribute = authTicket.getSipDskAttribute();
     dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
 
     List<GlobalFilterExecutionObject> executionList =
@@ -1172,14 +1174,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   @Override
   public Object processKpi(KPIBuilder kpiBuilder, Ticket authTicket) throws Exception {
-    String masterLoginId = authTicket.getMasterLoginId();
-    DskDetails dskDetails = getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
-    SipDskAttribute dskAttribute = null;
+    DskDetails dskDetails = null;
     SipQuery sipQueryFromSemantic =
         getSipQuery(kpiBuilder.getKpi().getSemanticId(), metaDataServiceExport, restUtil);
-    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
-      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
-    }
+    SipDskAttribute dskAttribute = authTicket.getSipDskAttribute();
     Analysis analysis = new Analysis();
     analysis.setSipQuery(sipQueryFromSemantic);
     analysis.setSemanticId(kpiBuilder.getKpi().getSemanticId());
