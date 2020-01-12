@@ -83,6 +83,7 @@ public class DLSparkQueryBuilder {
   public List<String> buildSelect(List<Artifact> artifactList) {
     AtomicInteger aggCount = new AtomicInteger();
     List<String> selectColumns = new ArrayList<>();
+    List<String>  columnList=getSamecolumnsAcrossArtifacts(artifactList);
     artifactList.forEach(
         artifact -> {
           artifact
@@ -96,12 +97,12 @@ public class DLSparkQueryBuilder {
                     if (aggregate != null && !aggregate.value().isEmpty()) {
                       aggCount.getAndIncrement();
                       if (aggregate == Aggregate.DISTINCTCOUNT) {
-                        column = buildDistinctCount(artifactName, field);
+                        column = buildDistinctCount(artifactName, field,columnList);
                       } else if (aggregate == Aggregate.PERCENTAGE) {
                         column = buildForPercentage(artifactName, field);
                         groupByColumns.add(artifactName + "." + columnName);
                       } else {
-                        if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+                        if (columnList.contains(columnName.toUpperCase())) {
                           column =
                               aggregate.value()
                                   + "("
@@ -128,7 +129,7 @@ public class DLSparkQueryBuilder {
                     } else {
                       column = artifactName + "." + columnName.replace(".keyword", "");
                       groupByColumns.add(column);
-                      column = alias4CustomerCodeField(column, columnName, artifactName);
+                      column = alias4CustomerCodeField(column, columnName, artifactName,columnList);
                     }
                     selectColumns.add(column);
                   });
@@ -137,6 +138,29 @@ public class DLSparkQueryBuilder {
       groupByColumns.clear(); // If aggregartion is not present Group By should not be set.
     }
     return selectColumns;
+  }
+
+  private List<String> getSamecolumnsAcrossArtifacts(List<Artifact> artifactList) {
+      List<String> sameColumnList = new ArrayList<>();
+    if (artifactList.size() > 1) {
+      List<String> fieldList = new ArrayList<>();
+      artifactList.stream()
+          .forEach(
+              (artifact) -> {
+                artifact
+                    .getFields()
+                    .forEach(
+                        (field -> {
+                          String columnName = field.getColumnName().toUpperCase();
+                          if (fieldList.contains(columnName)) {
+                            sameColumnList.add(columnName);
+                          } else {
+                            fieldList.add(columnName);
+                          }
+                        }));
+              });
+    }
+    return sameColumnList;
   }
 
   /**
@@ -558,10 +582,11 @@ public class DLSparkQueryBuilder {
     return (String.join(", ", sortsList));
   }
 
-  private String buildDistinctCount(String artifactName, Field field) {
+  private String buildDistinctCount(String artifactName, Field field,
+      List<String> columnList) {
     String columnName = field.getColumnName().replace(".keyword", "");
     String column = null;
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+    if (columnList.contains(columnName.toUpperCase())) {
       column =
           "count(distinct "
               + artifactName
@@ -664,10 +689,12 @@ public class DLSparkQueryBuilder {
    * @param column
    * @param columnName
    * @param artifactName
+   * @param columnList
    * @return
    */
-  public String alias4CustomerCodeField(String column, String columnName, String artifactName) {
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE)) {
+  public String alias4CustomerCodeField(String column, String columnName, String artifactName,
+      List<String> columnList) {
+    if (columnList.contains(columnName.toUpperCase())) {
       column = column.concat(" as " + artifactName + "_" + columnName + " ");
       return column;
     }
@@ -694,14 +721,17 @@ public class DLSparkQueryBuilder {
             query = query + " ";
             String artName = "FROM " + artifactName;
             logger.trace("dskFilter str = " + dskFilter);
-            query =
+            /*added below line for SIP-9839 ,for  $ character in string the replacement(replaceAll method) replacing $ as well
+            ,so to handle that  replacing $ with escapecharacter and $ */
+            String dskFilterString = dskFilter.toString().replaceAll("\\$", "\\\\\\$");
+              query =
                 query
                     .trim()
                     .replaceAll("\\s{2,}", " ")
-                    .replaceAll("(?i)" + artName.toUpperCase(), "FROM " + dskFilter.toString());
+                    .replaceAll("(?i)" + artName.toUpperCase(), "FROM " + dskFilterString);
             String artName1 = "JOIN " + artifactName;
             query =
-                query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilter.toString());
+                query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilterString);
             logger.info("Logged query : " + query);
           }
         }

@@ -9,7 +9,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 const DataSecurityServiceStub: Partial<DataSecurityService> = {
-  getFiltersFor: group => of(null)
+  getFiltersFor: group => of(null),
+  clearDSKEligibleFields: () => {}
 };
 
 describe('DskFilterDialogComponent', () => {
