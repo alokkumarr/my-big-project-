@@ -1,5 +1,6 @@
 package com.synchronoss.saw;
 
+import static io.restassured.RestAssured.enableLoggingOfRequestAndResponseIfValidationFails;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +34,8 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 public class SipDslIT extends BaseIT {
@@ -47,6 +50,7 @@ public class SipDslIT extends BaseIT {
   private static final String TENANT_B = "TenantB";
   private static final String TENANT_C = "TenantC";
   private static final String CUSTOMER_CODE = "customerCode";
+  private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   @Before
   public void setUpData() throws JsonProcessingException {
@@ -508,6 +512,9 @@ public class SipDslIT extends BaseIT {
             .statusCode(200)
             .extract()
             .response();
+    JsonNode secGroups = secGroupRes.as(JsonNode.class);
+    Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
     ObjectNode dskAttValues = mapper.createObjectNode();
     dskAttValues.put("booleanCriteria","AND");
@@ -522,8 +529,7 @@ public class SipDslIT extends BaseIT {
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
     dskAttValues.put("booleanQuery",booleanQuery);
-    JsonNode secGroups = secGroupRes.as(JsonNode.class);
-    Long groupSysId = secGroups.get("groupId").asLong();
+
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
@@ -796,6 +802,9 @@ public class SipDslIT extends BaseIT {
             .statusCode(200)
             .extract()
             .response();
+    JsonNode secGroups = secGroupRes.as(JsonNode.class);
+    Long groupSysId = secGroups.get("groupId").asLong();
+    logger.debug("security groupId : {}",groupSysId);
 
     ObjectNode dskAttValues = mapper.createObjectNode();
     dskAttValues.put("booleanCriteria","AND");
@@ -810,8 +819,6 @@ public class SipDslIT extends BaseIT {
     ArrayNode booleanQuery = mapper.createArrayNode();
     booleanQuery.add(dskValues);
     dskAttValues.put("booleanQuery",booleanQuery);
-    JsonNode secGroups = secGroupRes.as(JsonNode.class);
-    Long groupSysId = secGroups.get("groupId").asLong();
     given(spec)
         .header("Authorization", "Bearer " + customToken)
         .contentType(ContentType.JSON)
