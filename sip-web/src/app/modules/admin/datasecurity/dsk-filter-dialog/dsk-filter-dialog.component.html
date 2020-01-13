@@ -1,6 +1,6 @@
 <header class="base-dialog__header">
   <strong>
-    Update Attributes - {{ data?.groupSelected?.securityGroupName }}
+    {{ operation }} Attributes - {{ data?.groupSelected?.securityGroupName }}
   </strong>
 </header>
 <div class="base-dialog__content">
@@ -27,7 +27,7 @@
       </mat-expansion-panel>
     </mat-accordion>
     <dsk-filter-group
-      [filterGroup]="dskFilters$ | async"
+      [filterGroup]="dskFilterObject"
       (onChange)="updateFilter($event)"
     ></dsk-filter-group>
   </div>

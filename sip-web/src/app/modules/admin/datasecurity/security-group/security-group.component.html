@@ -28,7 +28,7 @@
       mat-button
       color="primary"
     >
-      <span i18n>Edit Filters</span>
+      <span i18n>{{ groupFilters ? 'Edit' : 'Add' }} Filters</span>
     </button>
     <button
       (click)="deleteDskFilters()"
