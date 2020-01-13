@@ -293,27 +293,4 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
       });
     }
   }
-
-  /**
-   * This will fetch the artifactNames from metadata and provide.
-   *
-   * @param sipQuery
-   * @return List of String
-   */
-  public List<String> getArtifactNames(SipQuery sipQuery) {
-    RestTemplate restTemplate = restUtil.restTemplate();
-
-    String url = metaDataServiceExport + "/internal/semantic/workbench/" + sipQuery.getSemanticId();
-    logger.debug("SIP query url for analysis fetch : " + url);
-    SemanticNode semanticNode = restTemplate.getForObject(url, SemanticNode.class);
-    List<String> artifactNames = new ArrayList<>();
-    List<Object> artifactList = semanticNode.getArtifacts();
-    for (Object artifact : artifactList) {
-      Gson gson = new Gson();
-      logger.debug("Gson String " + gson.toJson(artifact));
-      JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
-      artifactNames.add(artifactObj.get("artifactName").getAsString().toUpperCase());
-    }
-    return artifactNames;
-  }
 }

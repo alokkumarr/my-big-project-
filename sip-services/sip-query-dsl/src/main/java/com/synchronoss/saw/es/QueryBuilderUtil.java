@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -393,7 +394,7 @@ public class QueryBuilderUtil {
         (val) -> {
           // Add the lowercase value as terms to lookup based on custom analyser.
           if (val instanceof String) {
-            stringValues.add(((String) val).toLowerCase());
+            stringValues.add(((String) val).toLowerCase().trim());
           }
         });
     return stringValues;
@@ -475,13 +476,13 @@ public class QueryBuilderUtil {
           String[] col = dskAttribute.getColumnName().split("\\.");
           String dskColName = col.length == 1 ? col[0] : col[1];
           TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(dskColName.concat(BuilderUtil.SUFFIX),
+              new TermsQueryBuilder(dskColName.trim().concat(BuilderUtil.SUFFIX),
                   dskAttribute.getModel().getValues());
           List<?> modelValues = QueryBuilderUtil
               .buildStringTermsfilter(dskAttribute.getModel().getValues());
           TermsQueryBuilder termsQueryBuilder1 =
               new TermsQueryBuilder(
-                  QueryBuilderUtil.buildFilterColumn(dskColName), modelValues);
+                  QueryBuilderUtil.buildFilterColumn(dskColName.trim()), modelValues);
           BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
           // Use "should" between termBuilders of same field to ignore casing.
             dataSecurityBuilder.should(termsQueryBuilder);
