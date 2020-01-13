@@ -570,6 +570,25 @@ public class SftpServiceImpl extends SipPluginContract {
     LsEntry[] files = template.list(location + File.separator + pattern);
     final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
     long lastModifiedDate = 0L;
+
+    String destination = this.constructDestinationPath(payload.getDestinationLocation());
+    String path = processor.getFilePath(defaultDestinationLocation,
+          destination, File.separator + getBatchId());
+
+    File localDirectory  = new File(path);
+    logger.trace(
+          "directory where the file will be downloaded  :" + localDirectory.getAbsolutePath());
+    try {
+      if (!this.processor.isDestinationExists(localDirectory.getPath())) {
+        logger.trace(
+            "directory where the file will be downloaded "
+                + "does not exist so it will be created :"
+                + localDirectory.getAbsolutePath());
+        this.processor.createDestination(localDirectory.getPath(), new StringBuffer());
+      }
+    } catch (Exception e) {
+      logger.error("Exception while checking destination location" + e.getMessage());
+    }
     for (LsEntry entry : files) {
       logger.trace("entry :" + entry.getFilename());
       long modifiedDate = new Date(entry.getAttrs().getMTime() * 1000L).getTime();
@@ -593,21 +612,6 @@ public class SftpServiceImpl extends SipPluginContract {
       } else {
         if (list.size() <= batchSize && entry.getAttrs().getSize() != 0) {
 
-          String destination = this.constructDestinationPath(payload.getDestinationLocation());
-          String path = processor.getFilePath(defaultDestinationLocation,
-                   destination, File.separator + getBatchId());
-          File localDirectory  = new File(path);
-          logger.trace(
-              "directory where the file will be downnloaded  :" + localDirectory.getAbsolutePath());
-          try {
-            if (!this.processor.isDestinationExists(localDirectory.getPath())) {
-              logger.trace("directory where the file will be downnloaded "
-                  + "does not exist so it will be created :" + localDirectory.getAbsolutePath());
-              this.processor.createDestination(localDirectory.getPath(), new StringBuffer());
-            }
-          } catch (Exception e) {
-            logger.error("Exception while checking destination location" + e.getMessage());
-          }
           File localFile = createTargetFile(localDirectory, entry.getFilename());
           logger.trace("Actual file name after downloaded in the  :"
               + localDirectory.getAbsolutePath() + " file name " + localFile.getName());
@@ -842,13 +846,17 @@ public class SftpServiceImpl extends SipPluginContract {
     logger.info("Inside from channel :: " 
         + jobId);
     /* First transfer the files from the directory */
-    ZonedDateTime fileTransStartTime = ZonedDateTime.now();
     logger.trace("Transfer data started time: " + new Date());
     // Adding to a list has been removed as a part of optimization
     // SIP-6386
+
+    String batchId = getBatchId();
+    logger.trace("Batch ID = " + batchId);
+
+    ZonedDateTime fileTransStartTime = ZonedDateTime.now();
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
         destinationLocation, channelId, routeId, exclusions, 
-        getBatchId(), isDisableDuplicate, source, jobId, isHostNotReachable);
+        batchId, isDisableDuplicate, source, jobId, isHostNotReachable);
     
     ZonedDateTime fileTransEndTime = ZonedDateTime.now();
     long durationInMillis = Duration.between(fileTransStartTime,
@@ -927,8 +935,8 @@ public class SftpServiceImpl extends SipPluginContract {
     List<BisDataMetaInfo> list = new ArrayList<>();
     LsEntry[] files = null;
     try {
-      files = template.list(sourcelocation + File.separator + pattern);
       logger.trace("checking recursive in transferDataFromChannelDirectory");
+      files = template.list(sourcelocation + File.separator + pattern);
       if (files != null && files.length > 0) {
         logger.trace("Total files matching pattern " + pattern + " at source location "
             + sourcelocation + " are :: " + files.length);
@@ -949,6 +957,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
 
           int sizeOfFileInPath = filteredFiles.length;
+          logger.trace("Filtered files size: " + sizeOfFileInPath);
           batchSize = getBatchSize() > 0 ? getBatchSize() : batchSize;
           int iterationOfBatches = ((batchSize > sizeOfFileInPath) ? (batchSize / sizeOfFileInPath)
               : (sizeOfFileInPath / batchSize));
@@ -979,7 +988,7 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace("number of files on this pull :" + filesArray.size());
           logger.trace("size of partitions :" + result.size());
           logger
-              .trace("file from the source is downnloaded in the location :" + destinationLocation);
+              .trace("file from the source is downloaded in the location :" + destinationLocation);
           //File localDirectory = null;
           final BisDataMetaInfo bisDataMetaInfo = new BisDataMetaInfo();
           bisDataMetaInfo.setSource(source);
@@ -1039,7 +1048,7 @@ public class SftpServiceImpl extends SipPluginContract {
                           + entry.getFilename() + " batchSize " + batchSize);
                       logger.trace("Before Inprogress log jobId :: " 
                           + jobId);
-                      prepareLogInfo(bisDataMetaInfo, pattern, "",
+                      prepareLogInfo(bisDataMetaInfo, pattern, path,
                           getActualRecDate(entry), entry.getAttrs().getSize(),
                           sourcelocation + File.separator + entry.getFilename(), channelId, routeId,
                           "", jobId);
@@ -1241,7 +1250,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Override
   public void executeFileTransfer(String logId, Long jobId, Long channelId,
-      Long routeId, String fileName) {
+      Long routeId, String fileName, String destinationDirPath) {
 
     sipLogService.upsertInProgressStatus(logId);
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
@@ -1289,17 +1298,24 @@ public class SftpServiceImpl extends SipPluginContract {
           logger.trace(
               "executeFileTransfer :: created sftp template with session factory");
 
-          String destination = constructDestinationPath(destinationLocation);
-          String path = processor.getFilePath(defaultDestinationLocation,
-              destination, getBatchId());
+          String path = null;
+
+          if (StringUtils.isBlank(destinationDirPath)) {
+            // If destination dir path is not specified, it will be generated
+            String destination = constructDestinationPath(destinationLocation);
+            path = processor.getFilePath(defaultDestinationLocation, destination, getBatchId());
+          } else {
+            path = destinationDirPath;
+          }
+
           File localDirectory = new File(path);
           if (localDirectory != null && !this.processor
               .isDestinationExists(localDirectory.getPath())) {
 
             logger.info("directory where the file will be"
-                + " downnloaded does not exist so it will be created :"
+                + " downloaded does not exist so it will be created :"
                 + localDirectory.getAbsolutePath());
-            logger.info("directory where the file will be downnloaded  :"
+            logger.info("directory where the file will be downloaded  :"
                 + localDirectory.getAbsolutePath());
             this.processor.createDestination(localDirectory.getPath(),
                 new StringBuffer());

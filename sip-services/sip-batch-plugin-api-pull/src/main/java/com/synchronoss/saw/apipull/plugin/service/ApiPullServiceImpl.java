@@ -653,7 +653,7 @@ public class ApiPullServiceImpl extends SipPluginContract {
   /** This method executes actual file transfer used by worker threads. */
   @Override
   public void executeFileTransfer(
-      String logId, Long jobId, Long channelId, Long routeId, String fileName) {
+      String logId, Long jobId, Long channelId, Long routeId, String fileName, String destinationDirPath) {
     logger.info("Inside executeFileTransfer");
     sipLogService.upsertInProgressStatus(logId);
     BisJobEntity bisJobEntity = sipLogService.retriveJobById(jobId);
