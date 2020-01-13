@@ -63,18 +63,10 @@ public class GlobalFilterDataQueryBuilder {
           List<Filter> filters = globalFilter.getFilters();
           final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
           AggregationBuilder aggregationBuilder = null;
-          List<QueryBuilder> dskBuilder = new ArrayList<>();
-          BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
+          BoolQueryBuilder boolQueryBuilderDsk;
           if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
               .isEmpty(dskAttribute.getBooleanQuery())) {
-            dskBuilder = QueryBuilderUtil
-                .queryDSKBuilder(dskBuilder, dskAttribute,
-                    dskAttribute.getBooleanCriteria());
-            buildBooleanQuery(
-                BooleanCriteria.AND.toString()
-                    .equalsIgnoreCase(dskAttribute.getBooleanCriteria().toString())
-                    ? BooleanCriteria.AND
-                    : BooleanCriteria.OR, dskBuilder, boolQueryBuilderDsk);
+            boolQueryBuilderDsk = QueryBuilderUtil.queryDSKBuilder(dskAttribute);
             boolQueryBuilder.must(boolQueryBuilderDsk);
           }
 

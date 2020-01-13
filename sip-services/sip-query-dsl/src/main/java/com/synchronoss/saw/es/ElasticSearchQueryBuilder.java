@@ -1,5 +1,7 @@
 package com.synchronoss.saw.es;
 
+import static com.synchronoss.saw.es.QueryBuilderUtil.queryDSKBuilder;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,18 +69,11 @@ public class ElasticSearchQueryBuilder {
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
       List<QueryBuilder> dskBuilder = new ArrayList<>();
-    BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
+    BoolQueryBuilder boolQueryBuilderDsk;
     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
         .isEmpty(dskAttribute.getBooleanQuery())) {
-      dskBuilder = QueryBuilderUtil
-          .queryDSKBuilder(dskBuilder, dskAttribute,
-              dskAttribute.getBooleanCriteria());
-      logger.debug("Print Boolean value : {}", dskAttribute.getBooleanCriteria().toString());
-      buildBooleanQuery(
-          BooleanCriteria.AND.toString()
-              .equalsIgnoreCase(dskAttribute.getBooleanCriteria().toString()) ? BooleanCriteria.AND
-              : BooleanCriteria.OR, dskBuilder, boolQueryBuilderDsk);
+      boolQueryBuilderDsk = queryDSKBuilder(dskAttribute);
       boolQueryBuilder.must(boolQueryBuilderDsk);
     }
     // The below code to build filters
@@ -556,17 +551,9 @@ public class ElasticSearchQueryBuilder {
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
         .isEmpty(dskAttribute.getBooleanQuery())) {
-      List<QueryBuilder> dskBuilder = new ArrayList<>();
-      dskBuilder = QueryBuilderUtil
-          .queryDSKBuilder(dskBuilder, dskAttribute,
-              dskAttribute.getBooleanCriteria());
       // The below code to build filters
-      BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
-      buildBooleanQuery(
-          BooleanCriteria.AND.toString()
-              .equalsIgnoreCase(dskAttribute.getBooleanCriteria().toString()) ? BooleanCriteria.AND
-              : BooleanCriteria.OR, dskBuilder, boolQueryBuilderDsk);
-        boolQueryBuilder.must(boolQueryBuilderDsk);
+      BoolQueryBuilder boolQueryBuilderDsk = queryDSKBuilder(dskAttribute);
+      boolQueryBuilder.must(boolQueryBuilderDsk);
       }
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();

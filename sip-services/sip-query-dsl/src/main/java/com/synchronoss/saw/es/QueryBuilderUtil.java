@@ -394,7 +394,7 @@ public class QueryBuilderUtil {
         (val) -> {
           // Add the lowercase value as terms to lookup based on custom analyser.
           if (val instanceof String) {
-            stringValues.add(((String) val).toLowerCase().trim());
+            stringValues.add(((String) val).trim().toLowerCase().trim());
           }
         });
     return stringValues;
@@ -439,72 +439,66 @@ public class QueryBuilderUtil {
   /**
    * query builder for DSK node. TODO: Original DSK was supporting only string format, So query
    * builder is in place only for String.
-   * @param builder
-   * @param sipDskAttribute
-   * @param bool
+   *
+   * @param attribute
    * @return
    */
-  public static List<QueryBuilder> queryDSKBuilder(
-      List<QueryBuilder> builder,
-      SipDskAttribute sipDskAttribute, BooleanCriteria bool) {
-    List<QueryBuilder> childBuilder =  new ArrayList<>();
-    BoolQueryBuilder dskBuilder = new BoolQueryBuilder();
-    if (sipDskAttribute != null && sipDskAttribute.getBooleanQuery() != null && !CollectionUtils
-        .isEmpty(sipDskAttribute.getBooleanQuery())) {
-      for (SipDskAttribute dskAttribute : sipDskAttribute.getBooleanQuery()) {
-        if (dskAttribute.getBooleanQuery() != null && !CollectionUtils
-            .isEmpty(dskAttribute.getBooleanQuery())) {
-          boolean conj =
-              dskAttribute.getBooleanCriteria() == null ? Boolean
-                  .valueOf(bool.equals(BooleanCriteria.AND))
-                  : Boolean.valueOf(dskAttribute.getBooleanCriteria().equals(BooleanCriteria.AND));
-          if (!CollectionUtils.isEmpty(childBuilder)) {
-            if (bool.equals(BooleanCriteria.AND)) {
-              childBuilder.forEach(item -> {
-                dskBuilder.must(item);
-              });
-            } else {
-              childBuilder.forEach(item -> {
-                dskBuilder.should(item);
-              });
-            }
-            builder.add(dskBuilder);
+  public static BoolQueryBuilder queryDSKBuilder(SipDskAttribute attribute) {
+    BoolQueryBuilder boolQuery = new BoolQueryBuilder();
+    BooleanCriteria booleanCriteria = null;
+    if (attribute == null) {
+      return boolQuery;
+    }
+    if (attribute.getBooleanCriteria() == null && attribute.getBooleanQuery() == null) {
+      return boolQuery;
+    }
+    if (attribute.getBooleanCriteria() != null) {
+      booleanCriteria = attribute.getBooleanCriteria();
+    }
+    for (SipDskAttribute dskAttribute : attribute.getBooleanQuery()) {
+      if (dskAttribute.getBooleanQuery() != null) {
+        BoolQueryBuilder childQuery = queryDSKBuilder(dskAttribute);
+        if (childQuery != null) {
+          switch (booleanCriteria) {
+            case AND:
+              boolQuery.must(childQuery);
+              break;
+            case OR:
+              boolQuery.should(childQuery);
+              break;
           }
-          return queryDSKBuilder(builder,
-              dskAttribute, conj ? BooleanCriteria.AND : BooleanCriteria.OR);
-        } else if (!StringUtils.isEmpty(dskAttribute.getColumnName())) {
-          String[] col = dskAttribute.getColumnName().split("\\.");
-          String dskColName = col.length == 1 ? col[0] : col[1];
-          TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(dskColName.trim().concat(BuilderUtil.SUFFIX),
-                  dskAttribute.getModel().getValues());
-          List<?> modelValues = QueryBuilderUtil
-              .buildStringTermsfilter(dskAttribute.getModel().getValues());
-          TermsQueryBuilder termsQueryBuilder1 =
-              new TermsQueryBuilder(
-                  QueryBuilderUtil.buildFilterColumn(dskColName.trim()), modelValues);
-          BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
-          // Use "should" between termBuilders of same field to ignore casing.
-            dataSecurityBuilder.should(termsQueryBuilder);
-            dataSecurityBuilder.should(termsQueryBuilder1);
-          childBuilder.add(dataSecurityBuilder);
+        }
+      } else {
+        BoolQueryBuilder dataSecurityBuilder = buildFilterObject(dskAttribute);
+        switch (booleanCriteria) {
+          case AND:
+            boolQuery.must(dataSecurityBuilder);
+            break;
+          case OR:
+            boolQuery.should(dataSecurityBuilder);
+            break;
         }
       }
     }
+    return boolQuery;
+  }
 
-    if (!CollectionUtils.isEmpty(childBuilder)) {
-      if (bool.equals(BooleanCriteria.AND)) {
-        childBuilder.forEach(item -> {
-          dskBuilder.must(item);
-        });
-      } else {
-        childBuilder.forEach(item -> {
-          dskBuilder.should(item);
-        });
-      }
-      builder.add(dskBuilder);
-    }
-    return builder;
+  private static BoolQueryBuilder buildFilterObject(SipDskAttribute dskAttribute) {
+    String[] col = dskAttribute.getColumnName().trim().split("\\.");
+    String dskColName = col.length == 1 ? col[0] : col[1];
+    List<String> values = dskAttribute.getModel().getValues().stream().map(String::trim)
+        .collect(Collectors.toList());
+    TermsQueryBuilder termsQueryBuilder =
+        new TermsQueryBuilder(
+            dskColName.trim().concat(BuilderUtil.SUFFIX),values);
+    List<?> modelValues =
+        QueryBuilderUtil.buildStringTermsfilter(dskAttribute.getModel().getValues());
+    TermsQueryBuilder termsQueryBuilder1 =
+        new TermsQueryBuilder(QueryBuilderUtil.buildFilterColumn(dskColName.trim()), modelValues);
+    BoolQueryBuilder dataSecurityBuilder = new BoolQueryBuilder();
+    dataSecurityBuilder.should(termsQueryBuilder);
+    dataSecurityBuilder.should(termsQueryBuilder1);
+    return dataSecurityBuilder;
   }
 
   /**
