@@ -1,22 +1,21 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
 import { DSKFilterGroup } from '../dsk-filter.model';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { defaultFilters } from '../dsk-filter-group/dsk-filter-group.component';
 
 @Component({
   selector: 'add-attribute-dialog',
   templateUrl: './dsk-filter-dialog.component.html',
   styleUrls: ['./dsk-filter-dialog.component.scss']
 })
-export class DskFilterDialogComponent {
+export class DskFilterDialogComponent implements OnInit {
   public attribute = {};
-  dskFilters$: Observable<DSKFilterGroup>;
   dskFilterObject: DSKFilterGroup;
   errorState = true;
+  operation: 'Update' | 'Add' = 'Add';
   previewString = '';
   errorMessage;
   debouncedValidator = debounce(this.validateFilterGroup.bind(this), 200);
@@ -26,17 +25,15 @@ export class DskFilterDialogComponent {
     @Inject(MAT_DIALOG_DATA)
     public data: {
       groupSelected;
+      filterGroup: DSKFilterGroup;
     }
   ) {
     this.datasecurityService.clearDSKEligibleFields();
-    this.dskFilters$ = this.datasecurityService
-      .getFiltersFor(data.groupSelected.secGroupSysId)
-      .pipe(
-        tap(filters => {
-          this.dskFilterObject = filters;
-        })
-      );
+    this.operation = this.data.filterGroup ? 'Update' : 'Add';
+    this.dskFilterObject = this.data.filterGroup || defaultFilters;
   }
+
+  ngOnInit() {}
 
   validateFilterGroup() {
     this.errorState = !this.datasecurityService.isDSKFilterValid(

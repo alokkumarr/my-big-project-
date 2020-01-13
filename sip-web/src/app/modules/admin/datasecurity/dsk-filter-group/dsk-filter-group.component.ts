@@ -15,7 +15,7 @@ import { DataSecurityService, DskEligibleField } from '../datasecurity.service';
 import * as toString from 'lodash/toString';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-const defaultFilters: DSKFilterGroup = {
+export const defaultFilters: DSKFilterGroup = {
   booleanCriteria: DSKFilterBooleanCriteria.AND,
   booleanQuery: []
 };

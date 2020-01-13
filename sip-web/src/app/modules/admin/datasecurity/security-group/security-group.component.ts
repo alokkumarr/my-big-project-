@@ -8,6 +8,7 @@ import { DxDataGridService } from '../../../../common/services/dxDataGrid.servic
 import { DataSecurityService } from './../datasecurity.service';
 import { DeleteDialogComponent } from './../delete-dialog/delete-dialog.component';
 import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { DskFilterDialogComponent } from '../dsk-filter-dialog/dsk-filter-dialog.component';
 import { DSKFilterGroup } from '../dsk-filter.model';
 import { ConfirmDialogComponent } from 'src/app/common/components/confirm-dialog';
@@ -120,7 +121,8 @@ export class SecurityGroupComponent implements OnInit {
 
   updateDskFilters() {
     const data = {
-      groupSelected: this.groupSelected
+      groupSelected: this.groupSelected,
+      filterGroup: cloneDeep(this.groupFilters)
     };
     return this._dialog
       .open(DskFilterDialogComponent, {
