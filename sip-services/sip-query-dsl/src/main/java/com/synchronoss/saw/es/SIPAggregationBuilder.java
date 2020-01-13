@@ -9,11 +9,13 @@ import com.synchronoss.saw.model.Field;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Field.GroupInterval;
 import com.synchronoss.saw.model.Operand;
+import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.model.Sort.Order;
 import com.synchronoss.saw.model.Filter;
 import com.synchronoss.saw.util.BuilderUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -40,6 +43,8 @@ public class SIPAggregationBuilder {
   private Integer querySize;
   public static final String DATE_FORMAT = "yyyy-MM-dd";
   private static final String GROUP_BY_FIELD = "group_by_field";
+  private static final String SCRIPT_AND = "&&";
+  private static final String SCRIPT_OR = "||";
 
   int groupFieldCount = 0;
 
@@ -96,7 +101,8 @@ public class SIPAggregationBuilder {
       int aggregatedFieldCount,
       AggregationBuilder aggregationBuilder,
       List<Sort> sorts,
-      String[] groupByFields) {
+      String[] groupByFields,
+      BooleanCriteria booleanCriteria) {
 
     /** For Report find the list of Aggregate fields. */
     if ((fieldCount + aggregateFields.size()) < dataFields.size()) {
@@ -111,7 +117,8 @@ public class SIPAggregationBuilder {
             aggregatedFieldCount,
             aggregationBuilder,
             sorts,
-            groupByFields);
+            groupByFields,
+            booleanCriteria);
       }
       if (aggregationBuilder == null) {
         // initialize the terms aggregation builder.
@@ -198,14 +205,8 @@ public class SIPAggregationBuilder {
                     .size(size));
           }
         }
-        for (Filter filter : aggregationFilter) {
-          Map<String, String> bucketsPathsMap = new HashMap<>();
-          bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
-          Script script = QueryBuilderUtil.prepareAggregationFilter(filter);
-          BucketSelectorPipelineAggregationBuilder bs =
-              PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
-          aggregationBuilder.subAggregation(bs);
-        }
+        aggregationBuilder =
+            buildAggregationFilter(aggregationFilter, aggregationBuilder, booleanCriteria);
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
@@ -214,7 +215,8 @@ public class SIPAggregationBuilder {
             aggregatedFieldCount,
             aggregationBuilder,
             sorts,
-            groupByFields);
+            groupByFields,
+            booleanCriteria);
 
       } else {
         boolean order = checkSortOrder(sorts, dataField.getColumnName()) ? false : true;
@@ -271,10 +273,59 @@ public class SIPAggregationBuilder {
             aggregatedFieldCount,
             aggregationBuilderMain,
             sorts,
-            groupByFields);
+            groupByFields,
+            booleanCriteria);
       }
     } else {
       return aggregationBuilder;
+    }
+  }
+
+  private AggregationBuilder buildAggregationFilter(
+      List<Filter> aggregationFilter,
+      AggregationBuilder aggregationBuilder,
+      BooleanCriteria booleanCriteria) {
+
+    Map<String, String> bucketsPathsMap = new HashMap<>();
+    List<String> aggregateScript = new ArrayList<>();
+    for (Filter filter : aggregationFilter) {
+      String scriptSourceName;
+      if (filter.getAggregate() != null) {
+        Field aggregateField = new Field();
+        aggregateField.setColumnName(filter.getColumnName());
+        aggregateField.setAggregate(filter.getAggregate());
+        String fieldName =
+            filter.getAggregate() + "_" + filter.getColumnName() + random.nextInt(10000);
+        aggregateField.setDataField(fieldName);
+        aggregationBuilder.subAggregation(
+            QueryBuilderUtil.aggregationBuilderDataField(aggregateField));
+        bucketsPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
+        scriptSourceName = fieldName;
+      } else {
+        bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
+        scriptSourceName = filter.getColumnName();
+      }
+      aggregateScript.add(QueryBuilderUtil.prepareAggregationFilter(filter, scriptSourceName));
+    }
+    Script script =
+        new Script(StringUtils.join(aggregateScript, getScriptBooleanOperator(booleanCriteria)));
+
+    // Script script = QueryBuilderUtil.prepareAggregationFilter2(filter,scriptSourceName);
+    BucketSelectorPipelineAggregationBuilder bs =
+        PipelineAggregatorBuilders.bucketSelector("Bucket_filter", bucketsPathsMap, script);
+    aggregationBuilder.subAggregation(bs);
+
+    return aggregationBuilder;
+  }
+
+  private String getScriptBooleanOperator(BooleanCriteria booleanCriteria) {
+    switch (booleanCriteria) {
+      case AND:
+        return SCRIPT_AND;
+      case OR:
+        return SCRIPT_OR;
+      default:
+        return SCRIPT_AND;
     }
   }
 

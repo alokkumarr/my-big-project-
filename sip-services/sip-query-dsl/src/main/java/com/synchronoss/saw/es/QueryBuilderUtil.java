@@ -255,45 +255,64 @@ public class QueryBuilderUtil {
    * @param item
    * @return
    */
-  public static Script prepareAggregationFilter(Filter item) {
-    Script script = null;
-
+  public static String prepareAggregationFilter(Filter item, String aggregatedColumnName) {
     Operator operator = item.getModel().getOperator();
-
+    String scriptQuery = null;
     switch (operator) {
-        case BTW: script =
-            new Script(
-                "params."
-                    + item.getColumnName()
-                    + " " + Operation.LTE + " "
-                    + item.getModel().getValue()
-                    + "&& "
-                    + "params."
-                    + item.getColumnName()
-                    + " " + Operation.GTE + " "
-                    + item.getModel().getOtherValue());
+      case BTW:
+        scriptQuery =
+            String.format(
+                " (params.%s %s %s && params.%s %s %s) ",
+                aggregatedColumnName,
+                Operation.LTE,
+                item.getModel().getValue(),
+                aggregatedColumnName,
+                Operation.GTE,
+                item.getModel().getOtherValue());
         break;
       case GT:
-        script = new Script("params." + item.getColumnName() + " " + Operation.GT.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.GT, item.getModel().getValue());
+
         break;
       case GTE:
-        script = new Script("params." + item.getColumnName() + " " + Operation.GTE.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.GTE, item.getModel().getValue());
         break;
       case LT:
-        script = new Script("params." + item.getColumnName() + " " + Operation.LT.value() +  " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.LT, item.getModel().getValue());
+
         break;
       case LTE:
-        script = new Script("params." + item.getColumnName() + " " + Operation.LTE.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.LTE, item.getModel().getValue());
+
         break;
       case EQ:
-        script = new Script("params." + item.getColumnName() + " " + Operation.EQ.value() + " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.EQ, item.getModel().getValue());
+
         break;
       case NEQ:
-        script = new Script("params." + item.getColumnName() + " " + Operation.NEQ.value() +  " " + item.getModel().getValue());
+        scriptQuery =
+            String.format(
+                " params.%s %s %s ",
+                aggregatedColumnName, Operation.NEQ, item.getModel().getValue());
+
         break;
     }
-
-    return script;
+    return scriptQuery;
   }
 
   /**

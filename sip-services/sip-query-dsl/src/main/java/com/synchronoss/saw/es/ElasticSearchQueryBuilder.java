@@ -103,7 +103,8 @@ public class ElasticSearchQueryBuilder {
             aggregationFilter,
             searchSourceBuilder,
             size,
-            sipQuery.getSorts());
+            sipQuery.getSorts(),
+            sipQuery.getBooleanCriteria());
 
     return searchSourceBuilder.toString();
   }
@@ -254,6 +255,7 @@ public class ElasticSearchQueryBuilder {
    * @param aggregationFields
    * @param searchSourceBuilder
    * @param size
+   * @param booleanCriteria
    * @return
    */
   public SearchSourceBuilder buildAggregations(
@@ -262,7 +264,8 @@ public class ElasticSearchQueryBuilder {
       List<Filter> aggregationFilter,
       SearchSourceBuilder searchSourceBuilder,
       Integer size,
-      List<Sort> sorts) {
+      List<Sort> sorts,
+      BooleanCriteria booleanCriteria) {
     SIPAggregationBuilder reportAggregationBuilder = new SIPAggregationBuilder(size);
     AggregationBuilder finalAggregationBuilder = null;
     if (aggregationFields.size() == 0) {
@@ -278,7 +281,15 @@ public class ElasticSearchQueryBuilder {
         groupByFields = new String[dataFields.size() - aggregationFields.size()];;
         finalAggregationBuilder =
             reportAggregationBuilder.reportAggregationBuilder(
-                dataFields, aggregationFields, aggregationFilter, 0, 0, aggregationBuilder, sorts, groupByFields);
+                dataFields,
+                aggregationFields,
+                aggregationFilter,
+                0,
+                0,
+                aggregationBuilder,
+                sorts,
+                groupByFields,
+                booleanCriteria);
         searchSourceBuilder.aggregation(finalAggregationBuilder);
       }
       // set the size zero for aggregation query .
