@@ -851,7 +851,7 @@ public class SipDslIT extends BaseIT {
     ArrayNode data = attUserRes.withArray("data");
     Assert.assertTrue(data.size() == 1);
     String validateCustCode = TENANT_A;
-    Assert.assertEquals(data.get(0).get("SALES_" + CUSTOMER_CODE).asText(), validateCustCode);
+    Assert.assertEquals(data.get(0).get(CUSTOMER_CODE).asText(), validateCustCode);
     Assert.assertEquals(data.get(0).get("string").asText(), "string 1");
 
     given(authSpec)
