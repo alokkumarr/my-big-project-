@@ -738,6 +738,7 @@ public class DLSparkQueryBuilder {
             dskquery.append(boolenaCriteria);
           }
           dskquery.append(childQuery);
+          flag = false;
         }
       } else {
         String columnName = dskAttribute.getColumnName();
