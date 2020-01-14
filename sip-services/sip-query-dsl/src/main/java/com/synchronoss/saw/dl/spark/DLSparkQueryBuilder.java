@@ -761,7 +761,7 @@ public class DLSparkQueryBuilder {
 
   private static StringBuilder prepareQueryWithCondition(
       String columnName, com.synchronoss.bda.sip.dsk.Model model, StringBuilder dskquery) {
-    dskquery.append(UPPER).append("(" + columnName + ")");
+    dskquery.append(UPPER).append("(" + columnName.trim() + ")");
     com.synchronoss.bda.sip.dsk.Operator operator = model.getOperator();
     List<String> values = model.getValues();
     switch (operator) {
@@ -776,7 +776,7 @@ public class DLSparkQueryBuilder {
           int initFlag = 0;
           for (String value : values) {
             dskquery = initFlag != 0 ? dskquery.append(", ") : dskquery;
-            dskquery = dskquery.append(UPPER).append("('" + value + "')");
+            dskquery = dskquery.append(UPPER).append("('" + value.trim() + "')");
             initFlag++;
           }
           dskquery.append(" )");
