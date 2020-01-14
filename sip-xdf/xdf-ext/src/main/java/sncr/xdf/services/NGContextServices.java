@@ -60,7 +60,8 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         this.ngctx.serviceStatus.put(ComponentServices.OutputDSMetadata, false);
         this.ngctx.serviceStatus.put(ComponentServices.Project, false);
         this.ngctx.serviceStatus.put(ComponentServices.TransformationMetadata, false);
-        this.ngctx.serviceStatus.put(ComponentServices.Sample, true);
+        //SIP-9791 Disable Sampling for XDF Pipeline runs as it required for only Workbench
+        this.ngctx.serviceStatus.put(ComponentServices.Sample, false);
         this.ngctx.serviceStatus.put(ComponentServices.Spark, false);
 
     }
