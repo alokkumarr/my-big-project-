@@ -1,0 +1,16 @@
+.color-choser {
+  z-index: 9999; // Bringing forth color picker component.
+  margin-right: 60%;
+}
+
+.color-picker-label {
+  font-size: 13px;
+}
+
+.color-picker-top {
+  top: 0px !important;
+}
+
+.remove-arrow {
+  display: none !important;
+}

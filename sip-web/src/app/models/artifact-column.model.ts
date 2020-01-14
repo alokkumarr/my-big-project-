@@ -28,6 +28,7 @@ export interface ArtifactColumn {
     | 'percentagebyrow';
   name?: string;
   geoType?: string;
+  seriesColor?: string;
 }
 
 export interface ArtifactColumnChart extends ArtifactColumn {

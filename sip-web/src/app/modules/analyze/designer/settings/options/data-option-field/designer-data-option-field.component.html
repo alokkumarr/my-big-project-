@@ -165,5 +165,13 @@
       </div>
       <pre>{{ artifactColumn.formula }}</pre>
     </div>
+
+    <div *ngIf="artifactColumn.displayType">
+      <custom-color-picker
+        [config]="colorPickerConfig"
+        (change)="selectedColor($event)"
+      >
+      </custom-color-picker>
+    </div>
   </div>
 </mat-expansion-panel>

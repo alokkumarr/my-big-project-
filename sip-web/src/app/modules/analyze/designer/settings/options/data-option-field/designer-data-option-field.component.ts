@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as set from 'lodash/set';
 import * as debounce from 'lodash/debounce';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -17,6 +19,7 @@ import {
 import { QueryDSL } from 'src/app/models';
 import { getArtifactColumnTypeIcon } from '../../../utils';
 import { AggregateChooserComponent } from 'src/app/common/components/aggregate-chooser';
+import { DEFAULT_COLOR_PICKER_OPTION } from '../../../../../../common/components/custom-color-picker/default-color-picker-options';
 
 const ALIAS_CHANGE_DELAY = 500;
 
@@ -45,6 +48,7 @@ export class DesignerDataOptionFieldComponent implements OnInit {
   public comboTypes = COMBO_TYPES;
   public hasDateInterval = false;
   public isDataField = false;
+  public colorPickerConfig = {};
 
   constructor(private _store: Store) {
     this.onAliasChange = debounce(this.onAliasChange, ALIAS_CHANGE_DELAY);
@@ -61,6 +65,12 @@ export class DesignerDataOptionFieldComponent implements OnInit {
       this.artifactColumn,
       this.analysisType,
       this.analysisSubtype
+    );
+    this.colorPickerConfig = cloneDeep(DEFAULT_COLOR_PICKER_OPTION);
+    set(
+      this.colorPickerConfig,
+      'bgColor',
+      this.artifactColumn.seriesColor || '#ffffff'
     );
   }
 
@@ -122,5 +132,15 @@ export class DesignerDataOptionFieldComponent implements OnInit {
 
   checkChartType() {
     return AggregateChooserComponent.supportsPercentByRow(this.analysisSubtype);
+  }
+
+  selectedColor(event) {
+    if (event.data) {
+      set(this.artifactColumn, 'seriesColor', event.data.color);
+      this.change.emit({
+        subject: 'seriesColorChange',
+        data: { artifact: this.artifactColumn }
+      });
+    }
   }
 }

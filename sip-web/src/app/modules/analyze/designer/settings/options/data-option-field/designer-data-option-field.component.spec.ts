@@ -6,6 +6,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DesignerDataOptionFieldComponent } from './designer-data-option-field.component';
 import { IsAnalysisTypePipe } from 'src/app/common/pipes/is-analysis-type.pipe';
 
+const seriesColorChange = {
+  subject: 'seriesColorChange',
+  data: { artifact: [] }
+};
 describe('Designer Data Options', () => {
   let fixture: ComponentFixture<DesignerDataOptionFieldComponent>;
   let component: DesignerDataOptionFieldComponent;
@@ -45,5 +49,11 @@ describe('Designer Data Options', () => {
     const spy = spyOn(store, 'dispatch').and.returnValue(null);
     component.onAggregateChange('sum');
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should generate series color event', () => {
+    component.change.subscribe(result => {
+      expect(result).toEqual(seriesColorChange);
+    });
   });
 });
