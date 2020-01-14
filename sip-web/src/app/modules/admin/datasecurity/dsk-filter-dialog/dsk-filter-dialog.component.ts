@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DataSecurityService } from './../datasecurity.service';
 import * as get from 'lodash/get';
 import * as debounce from 'lodash/debounce';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { DSKFilterGroup } from '../dsk-filter.model';
 import { defaultFilters } from '../dsk-filter-group/dsk-filter-group.component';
 
@@ -30,7 +31,7 @@ export class DskFilterDialogComponent implements OnInit {
   ) {
     this.datasecurityService.clearDSKEligibleFields();
     this.operation = this.data.filterGroup ? 'Update' : 'Add';
-    this.dskFilterObject = this.data.filterGroup || defaultFilters;
+    this.dskFilterObject = this.data.filterGroup || cloneDeep(defaultFilters);
   }
 
   ngOnInit() {}
