@@ -588,6 +588,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         getSipQuery(analysis.getSipQuery().getSemanticId(), metaDataServiceExport, restUtil);
     SipDskAttribute dskAttribute = null;
     DskDetails dskDetails=null;
+    boolean filterDSKByCustomerCode;
+    String customerCode;
     if (isScheduledExecution) {
       masterLoginId =
           (masterLoginId != null && !StringUtils.isEmpty(masterLoginId))
@@ -597,8 +599,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
         dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
       }
+      filterDSKByCustomerCode = dskDetails != null
+          && dskDetails.getIsJvCustomer() != 1;
+      customerCode = filterDSKByCustomerCode ? dskDetails.getCustomerCode() : null;
     } else {
       dskAttribute = authTicket.getSipDskAttribute();
+      filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+          && authTicket.getFilterByCustomerCode() == 1;
+      customerCode = authTicket.getCustCode();
     }
     if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
@@ -606,7 +614,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           "DSK column mandatory!!"
               + " DSK column is missing in the semantic!!");
     }
-    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
 
     Long startTime = new Date().getTime();
     if (analysisType != null && analysisType.equalsIgnoreCase("report")) {
@@ -654,25 +662,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
 
   private SipDskAttribute updateDskAttribute(
       SipDskAttribute dskAttribute,
-      Ticket authTicket,
-      DskDetails dskDetails) {
+      String custCode,
+      boolean filterDSKByCustomerCode) {
     // Customer Code filtering SIP-8381, we can make use of existing DSK to filter based on customer
     // code.
-    boolean filterDSKByCustomerCode =
-        authTicket != null
-            && authTicket.getIsJvCustomer() != 1
-            && authTicket.getFilterByCustomerCode() == 1;
-    boolean scheduledDSKbyCustomerCode =
-        authTicket == null
-            && dskDetails != null
-            && dskDetails.getIsJvCustomer() != 1;
-
-    logger.info("sched:{}", scheduledDSKbyCustomerCode);
-    logger.info("sched1:{}", dskDetails);
-    if (filterDSKByCustomerCode || scheduledDSKbyCustomerCode) {
+    if (filterDSKByCustomerCode) {
       try {
-        String customerCode =
-            authTicket == null ? dskDetails.getCustomerCode() : authTicket.getCustCode();
         SipDskAttribute sipDskCustomerFilterAttribute = new SipDskAttribute();
         sipDskCustomerFilterAttribute.setBooleanCriteria(BooleanCriteria.AND);
         List<SipDskAttribute> attributeList = new ArrayList<>();
@@ -680,7 +675,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         attribute.setColumnName(CUSTOMER_CODE);
         Model model = new Model();
         model.setOperator(Operator.ISIN);
-        model.setValues(Collections.singletonList(customerCode));
+        model.setValues(Collections.singletonList(custCode));
         attribute.setModel(model);
         attributeList.add(attribute);
         if (dskAttribute != null) {
@@ -714,6 +709,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           executionType.equals(ExecutionType.onetime)
               || executionType.equals(ExecutionType.preview)
               || executionType.equals(ExecutionType.regularExecution);
+      String executedBy = authTicket != null ? authTicket.getMasterLoginId() : "scheduled";
 
       if (validExecutionType) {
         ExecutionResult executionResult =
@@ -722,7 +718,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                 analysis,
                 queryId,
                 startTime,
-                authTicket,
+                executedBy,
                 executionType,
                 dskAttribute,
                 (List<Object>) executeResponse.getData());
@@ -742,6 +738,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                 : analysis.getModifiedBy());
         updateAnalysis(analysis);
       }
+
       if (!analysis.getType().equalsIgnoreCase("report")) {
         logger.info("analysis ." + "not a DL report");
         if (tempExecutionType) {
@@ -751,7 +748,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                   analysis,
                   queryId,
                   startTime,
-                  authTicket,
+                  executedBy,
                   executionType,
                   dskAttribute,
                   (List<Object>) executeResponse.getData());
@@ -768,7 +765,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
    * @param analysis
    * @param queryId
    * @param startTime
-   * @param authTicket
+   * @param executedBy
    * @param executionType
    * @param data
    * @return execution
@@ -778,7 +775,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Analysis analysis,
       String queryId,
       Long startTime,
-      Ticket authTicket,
+      String executedBy,
       ExecutionType executionType,
       SipDskAttribute sipDskAttribute,
       List<Object> data) {
@@ -792,7 +789,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     executionResult.setExecutionType(executionType);
     executionResult.setData(!type.equalsIgnoreCase("report") ? data : null);
     executionResult.setStatus("success");
-    executionResult.setExecutedBy(authTicket != null ? authTicket.getMasterLoginId() : "scheduled");
+    executionResult.setExecutedBy(executedBy);
     executionResult.setSipDskAttribute(sipDskAttribute);
     executionResult.setRecordCount(data.size());
     return executionResult;
@@ -891,7 +888,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Override
   public List<?> fetchDslExecutionsList(String dslQueryId, Ticket authTicket, boolean isScheduled) {
     try {
-      if (!isScheduled && isDskApplicableUser(authTicket)) {
+      SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+      if (!isScheduled && dskAttribute != null && !CollectionUtils
+          .isEmpty(dskAttribute.getBooleanQuery())) {
         return new ArrayList<>();
       }
       // Create executionResult table if doesn't exists.
@@ -934,7 +933,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
     ExecutionResult executionResult = null;
-    if (!isScheduled && isDskApplicableUser(authTicket) && executionType != null && !executionType
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery()) && executionType != null && !executionType
         .equals(ExecutionType.onetime)) {
       return executionResponse;
     }
@@ -1070,7 +1071,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String dslQueryId, ExecutionType executionType, Integer page, Integer pageSize,
       Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (!isScheduled && isDskApplicableUser(authTicket)) {
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
       return executionResponse;
     }
       ExecutionResult executionResult = null;
@@ -1141,9 +1144,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   public Object fetchGlobalFilter(GlobalFilters globalFilters, Ticket authTicket)
       throws Exception {
     GlobalFilterDataQueryBuilder globalFilterDataQueryBuilder = new GlobalFilterDataQueryBuilder();
-    DskDetails dskDetails = null;
+    boolean filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+        && authTicket.getFilterByCustomerCode() == 1;
     SipDskAttribute dskAttribute = authTicket.getSipDskAttribute();
-    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
+    String customerCode = authTicket.getCustCode();
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
 
     List<GlobalFilterExecutionObject> executionList =
         globalFilterDataQueryBuilder.buildQuery(globalFilters,dskAttribute);
@@ -1181,13 +1186,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     Analysis analysis = new Analysis();
     analysis.setSipQuery(sipQueryFromSemantic);
     analysis.setSemanticId(kpiBuilder.getKpi().getSemanticId());
+    boolean filterDSKByCustomerCode = authTicket.getIsJvCustomer() != 1
+        && authTicket.getFilterByCustomerCode() == 1;
+    String customerCode = authTicket.getCustCode();
     if (isDskColumnNotPresent(sipQueryFromSemantic, dskAttribute,analysis)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "DSK column mandatory!!"
               + " DSK column is missing in the semantic!!");
     }
-    dskAttribute = updateDskAttribute(dskAttribute, authTicket, dskDetails);
+    dskAttribute = updateDskAttribute(dskAttribute, customerCode, filterDSKByCustomerCode);
     KPIExecutionObject kpiExecutionObject =
         new KPIDataQueryBuilder(dskAttribute).buildQuery(kpiBuilder);
     Store store = new Store();
@@ -1278,7 +1286,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String executionId, Integer pageNo, Integer pageSize, ExecutionType executionType,
       Ticket authTicket, boolean isScheduled) {
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (!isScheduled && isDskApplicableUser(authTicket) && executionType != null && !executionType
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery()) && executionType != null && !executionType
         .equals(ExecutionType.onetime)) {
       return executionResponse;
     }
@@ -1311,7 +1321,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       String analysisId, Integer pageNo, Integer pageSize, Ticket authTicket, boolean isScheduled) {
     logger.info("Fetching last execution data for DL report");
     ExecutionResponse executionResponse = new ExecutionResponse();
-    if (!isScheduled && isDskApplicableUser(authTicket)) {
+    SipDskAttribute dskAttribute = authTicket == null ? null : authTicket.getSipDskAttribute();
+    if (!isScheduled && dskAttribute != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
       return executionResponse;
     }
 
@@ -1327,19 +1339,5 @@ public class StorageProxyServiceImpl implements StorageProxyService {
     }
 
     return executionResponse;
-  }
-
-  public boolean isDskApplicableUser(Ticket authTicket) {
-    String masterLoginId = authTicket == null ? null : authTicket.getMasterLoginId();
-    DskDetails dskDetails =
-        authTicket == null ? null : getDSKDetailsByUser(sipSecurityHost, masterLoginId, restUtil);
-
-    SipDskAttribute dskAttribute = null;
-    if (dskDetails != null && dskDetails.getDskGroupPayload() != null) {
-      dskAttribute = dskDetails.getDskGroupPayload().getDskAttributes();
-      if (dskAttribute != null && !CollectionUtils.isEmpty(dskAttribute.getBooleanQuery()))
-        return true;
-    }
-    return false;
   }
 }
