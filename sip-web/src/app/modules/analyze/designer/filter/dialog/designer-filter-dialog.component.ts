@@ -108,9 +108,10 @@ export class DesignerFilterDialogComponent implements OnInit {
   }
 
   onFiltersChange() {
-    this.filters = fpPipe(fpToPairs, fpFlatMap(([_, filters]) => filters))(
-      this.groupedFilters
-    );
+    this.filters = fpPipe(
+      fpToPairs,
+      fpFlatMap(([_, filters]) => filters)
+    )(this.groupedFilters);
     this.areFiltersValid = this.validateFilters(this.filters);
   }
 
