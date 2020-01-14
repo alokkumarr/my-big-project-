@@ -75,6 +75,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             Map<String, Object> parameters = cli.parse(args);
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+            
             if (configAsStr == null || configAsStr.isEmpty()) {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
             }
@@ -134,6 +135,8 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
 
         try {
             esLoaderConfig = ngctx.componentConfiguration.getEsLoader();
+            logger.debug("#####After loading ES configuration additonal params ######");
+            esLoaderConfig.getAdditonalESConfigParams().forEach((paramKey,paramVal) ->  logger.debug(paramKey+ "-->"+ paramVal));
 
             if (ngctx.inputDataSets != null && !ngctx.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = ngctx.inputDataSets.keySet().iterator().next();
@@ -150,8 +153,6 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             logger.debug("Input dataset map = " + dataSetMap);
 
             Dataset<Row> inputDataset = dataSetMap.get(this.dataSetName);
-
-            inputDataset.show(4);
 
             ElasticSearchLoader loader = new ElasticSearchLoader(this.ctx.sparkSession, esLoaderConfig);
 

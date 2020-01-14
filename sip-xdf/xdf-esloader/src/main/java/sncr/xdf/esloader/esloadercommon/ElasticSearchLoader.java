@@ -58,6 +58,7 @@ public class ElasticSearchLoader {
         String esPass = esLoader.getEsPass();
         String esIndex = esLoader.getDestinationIndexName();
         String esClusterName = esLoader.getEsClusterName();
+        Map<String,String> additionalEsParams = esLoader.getAdditonalESConfigParams();
 
         ESConfig config = new ESConfig(esHost, esUser, esPass, esPort, esIndex);
         config.setEsClusterName(esClusterName);
@@ -67,6 +68,15 @@ public class ElasticSearchLoader {
             config.setEsSslEnabled(true);
             config.setKeyStorePath(esLoader.getKeyStorePath());
             config.setStorePassword(esLoader.getStorePassword());
+        }
+        
+        if(esLoader.getAdditonalESConfigParams() == null) {
+        	logger.debug("###### Setting up default additonal ES params #########");
+        	setDefaultAdditionalParams(config);
+        	
+        } else {
+        	logger.debug("###### Setting up configured additonal ES params #########");
+        	config.setAdditionalParams(esLoader.getAdditonalESConfigParams());
         }
 
         this.esConfig = generateESParamMap(config);
@@ -87,7 +97,17 @@ public class ElasticSearchLoader {
         this.sparkSession.udf().register("_XdfDateToString", new XDFTimestampconverter(), DataTypes.StringType);
     }
 
-    public ESHttpClient getHttpClient() {
+    private void setDefaultAdditionalParams(ESConfig config) {
+		Map<String, String> defaultAdditionalparams = new HashMap<String,String>();
+		defaultAdditionalparams.put("es.batch.size.bytes", "1mb");
+		defaultAdditionalparams.put("es.batch.size.entries", "1000");
+		
+		config.setAdditionalParams(defaultAdditionalparams);
+		
+		
+	}
+
+	public ESHttpClient getHttpClient() {
         return this.esClient;
     }
 
@@ -115,9 +135,14 @@ public class ElasticSearchLoader {
         if (config.isEsSslEnabled()){
         configMap.put("es.net.ssl","true");
         configMap.put("es.net.ssl.truststore.location",config.getKeyStorePath());
-        configMap.put("es.net.ssl.truststore.pass",config.getStorePassword());
         configMap.put("es.net.ssl.cert.allow.self.signed","true");
         }
+        config.getAdditionalParams().forEach((paramKey,paramVal) ->  
+        		configMap.put(paramKey,paramVal));
+        
+        logger.debug("############ ES Config Params :: ###############");
+        configMap.forEach((paramKey,paramVal) ->  logger.debug(paramKey+ "-->"+ paramVal));
+        logger.debug("############ End of ES Config Params :: ###############");
         return configMap;
     }
 
