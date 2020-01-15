@@ -5,9 +5,9 @@ import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReturnCodes {
-    protected static final Logger logger = Logger.getLogger(ReturnCodes.class);
-    private static Map<Integer, ReturnCode> map = null;
+public class XDFReturnCodes {
+    protected static final Logger logger = Logger.getLogger(XDFReturnCodes.class);
+    private static Map<Integer, XDFReturnCode> map = null;
 
     static{
         populateReturnCodesMap();
@@ -16,14 +16,14 @@ public class ReturnCodes {
     private static void populateReturnCodesMap(){
         logger.debug("ReturnCode Map initiation started");
         map = new HashMap<>();
-        for(ReturnCode rc : ReturnCode.values()){
+        for(XDFReturnCode rc : XDFReturnCode.values()){
             logger.debug("RC code :"+rc.getCode()+", RC :"+ rc);
             map.put(rc.getCode(), rc);
         }
         logger.debug("ReturnCode Map size :"+ map.size());
     }
 
-    public static Map<Integer, ReturnCode> getMap(){
+    public static Map<Integer, XDFReturnCode> getMap(){
         if(map == null){
             logger.debug("ReturnCode Map is null and re-initiating");
             populateReturnCodesMap();

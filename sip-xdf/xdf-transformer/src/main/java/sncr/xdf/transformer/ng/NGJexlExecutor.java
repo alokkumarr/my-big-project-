@@ -24,7 +24,7 @@ import java.util.Map;
 
 import static sncr.xdf.transformer.TransformerComponent.*;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 
 /**
@@ -66,7 +66,7 @@ public class NGJexlExecutor extends NGExecutor {
 
         Dataset ds = dsMap.get(inDataSetName);
         if(ds == null) {
-            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
         }else {
             logger.debug("Initialize structAccumulator: ");
             schema = ds.schema();

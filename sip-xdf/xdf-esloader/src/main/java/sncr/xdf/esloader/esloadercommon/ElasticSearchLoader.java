@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by skbm0001 on 30/1/2018.
@@ -139,7 +139,7 @@ public class ElasticSearchLoader {
         //long totalRecordCount = 0;
 
         if(!essm.elasticSearchLoaderConfigured()){
-            throw new XDFException(ReturnCode.CONFIG_ERROR);
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR);
         }
 
         // In case of partitioned data, each partition will be loaded separately

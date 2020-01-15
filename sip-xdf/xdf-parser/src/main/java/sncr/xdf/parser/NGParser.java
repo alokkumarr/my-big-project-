@@ -46,7 +46,7 @@ import java.util.UUID;
 import java.util.Arrays;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
@@ -181,7 +181,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }
                 if(files == null || files.length == 0){
                     logger.debug("No files exist. files = " + files);
-                    throw new XDFException(ReturnCode.FILE_NOT_FOUND, "parser input file - " +  sourcePath);
+                    throw new XDFException(XDFReturnCode.FILE_NOT_FOUND, "parser input file - " +  sourcePath);
                 }
             } catch (Exception e) {
                 if (e instanceof XDFException) {
@@ -189,7 +189,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 }else {
                     String error = "Error while deletion of outputDataSetLocation " + outputDataSetLocation;
                     logger.error(error);
-                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e, error);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e, error);
                 }
             }
 		}
@@ -342,7 +342,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 if (e instanceof XDFException) {
                     throw ((XDFException)e);
                 }else {
-                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
             logger.debug("Count for parser in dataset :: "+ ngctx.dataSetName + ngctx.datafileDFmap.get(ngctx.dataSetName).count());
@@ -418,11 +418,11 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
         sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
-            throw new XDFException( ReturnCode.INVALID_CONF_FILE);
+            throw new XDFException( XDFReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
-            throw new XDFException(ReturnCode.INVALID_CONF_FILE);
+            throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
         }
 
         return compConf;
@@ -955,22 +955,22 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {

@@ -13,7 +13,7 @@ import sncr.bda.services.TransformationService;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.context.RequiredNamedParameters;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.exceptions.XDFException;
 
 
@@ -249,13 +249,13 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
             ComponentConfiguration compConf = new Gson().fromJson(configAsStr, ComponentConfiguration.class);
             Transformer transformerCfg = compConf.getTransformer();
             if (transformerCfg == null)
-                throw new XDFException(ReturnCode.NO_COMPONENT_DESCRIPTOR, "transformer");
+                throw new XDFException(XDFReturnCode.NO_COMPONENT_DESCRIPTOR, "transformer");
 
             if (transformerCfg.getScript() == null || transformerCfg.getScript().isEmpty()) {
-                throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script name.");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script name.");
             }
             if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
-                throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script location.");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Transformer descriptor does not have script location.");
             }
 
             boolean valid = false;
@@ -265,7 +265,7 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                 }
             }
 
-            if (!valid) throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
+            if (!valid) throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
 
             valid = false;
             boolean rvalid = false;
@@ -274,7 +274,7 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
                     valid = true;
                 }
             }
-            if (!valid ) throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: dataset parameter with name 'output' does not exist .");
+            if (!valid ) throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: dataset parameter with name 'output' does not exist .");
             return compConf;
 
     }
@@ -298,15 +298,15 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
         Parser parserProps = compConf.getParser();
         if (parserProps == null) {
-            throw new XDFException( ReturnCode.INVALID_CONF_FILE);
+            throw new XDFException( XDFReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
-            throw new XDFException(ReturnCode.INVALID_CONF_FILE);
+            throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
         }
 
         if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
-            throw new XDFException(ReturnCode.INVALID_CONF_FILE);
+            throw new XDFException(XDFReturnCode.INVALID_CONF_FILE);
         }
         return compConf;
     }
@@ -317,13 +317,13 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
         Sql SQLProps = compConf.getSql();
         if (SQLProps == null) {
-            throw new XDFException(ReturnCode.NO_COMPONENT_DESCRIPTOR, "sql");
+            throw new XDFException(XDFReturnCode.NO_COMPONENT_DESCRIPTOR, "sql");
         }
         if (SQLProps.getScript() == null || SQLProps.getScript().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL does not have SQL script name.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL does not have SQL script name.");
         }
         if (SQLProps.getScriptLocation() == null || SQLProps.getScriptLocation().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
         }
         return compConf;
     }
@@ -334,19 +334,19 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
 
         ESLoader esLoaderConfig = compConf.getEsLoader();
         if (esLoaderConfig == null)
-            throw new XDFException(ReturnCode.NO_COMPONENT_DESCRIPTOR, "es-loader");
+            throw new XDFException(XDFReturnCode.NO_COMPONENT_DESCRIPTOR, "es-loader");
 
         if (esLoaderConfig.getEsNodes() == null || esLoaderConfig.getEsNodes().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
         }
         if (esLoaderConfig.getEsPort() == 0) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Port configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Port configuration missing.");
         }
         if (esLoaderConfig.getDestinationIndexName() == null || esLoaderConfig.getDestinationIndexName().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
         }
         if (esLoaderConfig.getEsClusterName() == null || esLoaderConfig.getEsClusterName().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch clustername configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch clustername configuration missing.");
         }
         return compConf;
     }

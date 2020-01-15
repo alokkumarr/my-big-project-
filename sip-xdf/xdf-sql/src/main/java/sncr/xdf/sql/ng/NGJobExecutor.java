@@ -15,7 +15,7 @@ import sncr.xdf.sql.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by srya0001 on 5/8/2016.
@@ -61,7 +61,7 @@ public class NGJobExecutor {
             try {
                 script = HFileOperations.readFile(pathToSQLScript);
             } catch (FileNotFoundException e) {
-                throw new XDFException(ReturnCode.CONFIG_ERROR, e, "Part to SQL script is not correct: " + pathToSQLScript);
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, e, "Part to SQL script is not correct: " + pathToSQLScript);
             }
         }
         logger.trace("Script to execute:\n" +  script);
@@ -120,7 +120,7 @@ public class NGJobExecutor {
                         if (e instanceof XDFException) {
                             throw ((XDFException)e);
                         }else {
-                            throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                            throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                         }
                     }
                 }
@@ -181,9 +181,9 @@ public class NGJobExecutor {
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else if (e instanceof IOException) {
-                throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "File System/IO");
+                throw new XDFException(XDFReturnCode.EMBEDDED_EXCEPTION, e, "File System/IO");
             }else {
-                throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "Internal exception");
+                throw new XDFException(XDFReturnCode.EMBEDDED_EXCEPTION, e, "Internal exception");
             }
         }
         return rc;

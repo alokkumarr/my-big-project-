@@ -23,7 +23,7 @@ import sncr.xdf.context.RequiredNamedParameters;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -82,7 +82,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                 try {
                     script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
-                    throw new XDFException(ReturnCode.CONFIG_ERROR, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
                 }
             }
             logger.trace("Script to execute:\n" +  script);
@@ -177,7 +177,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
             }
         }
         return 0;
@@ -268,22 +268,22 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices[] scs =

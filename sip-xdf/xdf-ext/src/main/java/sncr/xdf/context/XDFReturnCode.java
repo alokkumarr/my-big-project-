@@ -1,6 +1,6 @@
 package sncr.xdf.context;
 
-public enum ReturnCode {
+public enum XDFReturnCode {
     SUCCESS(0,"Success. %s"),
     PARTIAL_SUCCESS(1,"Partial Success. %s"),
     FAILURE(2,"Failure. %s"),
@@ -59,7 +59,7 @@ public enum ReturnCode {
     private final String description;
     protected final String prefix = "XDF-";
 
-    ReturnCode(int code, String description) {
+    XDFReturnCode(int code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -72,7 +72,7 @@ public enum ReturnCode {
         return this.description;
     }
 
-    public boolean equals(ReturnCode rc){
+    public boolean equals(XDFReturnCode rc){
         return this.code == rc.code && this.description.equals(rc.description);
     }
 

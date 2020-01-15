@@ -24,7 +24,7 @@ import sncr.xdf.services.NGContextServices;
 import sncr.xdf.sql.ng.NGSQLComponent;
 import sncr.xdf.transformer.ng.NGTransformerComponent;
 import sncr.xdf.ngcomponent.AbstractComponent;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 public class RTPSPipelineProcessor {
 
@@ -118,7 +118,7 @@ public class RTPSPipelineProcessor {
             if (e instanceof XDFException) {
                 rc = ((XDFException)e).getReturnCode().getCode();
             } else {
-                rc = ReturnCode.INTERNAL_ERROR.getCode();
+                rc = XDFReturnCode.INTERNAL_ERROR.getCode();
             }
         }
         return rc;
@@ -139,22 +139,22 @@ public class RTPSPipelineProcessor {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices pcs[] = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
@@ -216,22 +216,22 @@ public class RTPSPipelineProcessor {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] scs = { ComponentServices.OutputDSMetadata, ComponentServices.Project,
@@ -291,22 +291,22 @@ public class RTPSPipelineProcessor {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] sqlcs = {
@@ -367,22 +367,22 @@ public class RTPSPipelineProcessor {
 			String configAsStr = ConfigLoader.loadConfiguration(configPath);
 
 			if (configAsStr == null || configAsStr.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
 			}
 
 			String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
 			if (appId == null || appId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
 			}
 
 			String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
 			if (batchId == null || batchId.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
 			}
 
 			String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
 			if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-				throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+				throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
 			}
 
 			ComponentServices[] escs = { ComponentServices.Project, ComponentServices.TransformationMetadata,

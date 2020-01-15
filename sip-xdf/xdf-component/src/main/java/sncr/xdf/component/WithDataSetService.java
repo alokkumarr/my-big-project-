@@ -19,7 +19,7 @@ import sncr.xdf.context.Context;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public interface WithDataSetService {
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
             if (in.getDataSet() == null)
-                throw new XDFException(ReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
             retval.put(in.getDataSet(), discoverDataSetWithInput(aux, in));
         }
 
@@ -97,7 +97,7 @@ public interface WithDataSetService {
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
             if (in.getDataSet() == null)
-                throw new XDFException(ReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "DataSet parameter cannot be null");
 
             retval.put(in.getDataSet(), discoverDataSetWithMetaData(aux, project, in.getDataSet()));
         }
@@ -135,7 +135,7 @@ public interface WithDataSetService {
 
         if (!HFileOperations.exists(sb.toString())) {
             //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
-            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, in.getDataSet());
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, in.getDataSet());
         } else {
             DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
@@ -214,10 +214,10 @@ public interface WithDataSetService {
                 return res;
             }
             else {
-                throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
             }
         } else {
-            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
         }
     }
 
@@ -241,7 +241,7 @@ public interface WithDataSetService {
         //Check partitioning structure and match it with metadata/input
         if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                 trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-            throw new XDFException(ReturnCode.UNSUPPORTED_PARTITIONING, trgDSPartitioning._4().toString(), dataset);
+            throw new XDFException(XDFReturnCode.UNSUPPORTED_PARTITIONING, trgDSPartitioning._4().toString(), dataset);
         }
 
         List<String> partitionKeys =
@@ -253,7 +253,7 @@ public interface WithDataSetService {
                     && trgDSPartitioning._2() != null) {
                     for (int i = 0; i < partitionKeys.size(); i++)
                         if (!partitionKeys.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
-                            throw new XDFException(ReturnCode.CONFIG_ERROR,
+                            throw new XDFException(XDFReturnCode.CONFIG_ERROR,
                                 "Order and/or set of partitioning keys in Metadata" +
                                     " and in dataset does not match");
                         }
@@ -440,7 +440,7 @@ public interface WithDataSetService {
 
         private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system) throws Exception {
             if (!HFileOperations.exists(location)) {
-                throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, dataset);
             } else {
                 Map<String, Object> res = new HashMap();
 
@@ -457,7 +457,7 @@ public interface WithDataSetService {
                     //Check partitioning structure and match it with metadata/input
                     if (srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                             srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-                        throw new XDFException(ReturnCode.UNSUPPORTED_PARTITIONING, srcPartitioning._4().toString(), dataset);
+                        throw new XDFException(XDFReturnCode.UNSUPPORTED_PARTITIONING, srcPartitioning._4().toString(), dataset);
                     }
 
                     if (system != null && system.get(DataSetProperties.PartitionKeys.toString()) != null) {
@@ -466,7 +466,7 @@ public interface WithDataSetService {
                         if (srcPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && srcPartitioning._2() != null) {
                             for (int i = 0; i < mdKeyListJa.size(); i++)
                                 if (!mdKeyListJa.get(i).getAsString().equalsIgnoreCase(srcPartitioning._2().get(i))) {
-                                    throw new XDFException(ReturnCode.CONFIG_ERROR, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
+                                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                                 }
                             res.put(DataSetProperties.PartitionKeys.name(), srcPartitioning._2());
                         }

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by srya0001 on 5/8/2016.
@@ -161,11 +161,11 @@ public class JobExecutor {
             }
 
         } catch (IOException e) {
-            throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "File System/IO");
+            throw new XDFException(XDFReturnCode.EMBEDDED_EXCEPTION, e, "File System/IO");
 
         } catch (Exception e) {
             logger.error("Workaround exception logging: ", e);
-            throw new XDFException(ReturnCode.EMBEDDED_EXCEPTION, e, "Internal exception");
+            throw new XDFException(XDFReturnCode.EMBEDDED_EXCEPTION, e, "Internal exception");
         }
         return rc;
     }

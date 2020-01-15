@@ -33,7 +33,7 @@ import sncr.xdf.ngcomponent.AbstractComponent;
     import java.util.HashMap;
     import java.util.List;
     import java.util.Map;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
     import static java.util.stream.Collectors.toList;
 
@@ -79,22 +79,22 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
             if (configAsStr == null || configAsStr.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "configuration file name");
             }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
             if (appId == null || appId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "Project/application name");
             }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
             if (batchId == null || batchId.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "batch id/session id");
             }
 
             String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
             if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-                throw new XDFException(ReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
+                throw new XDFException(XDFReturnCode.INCORRECT_OR_ABSENT_PARAMETER, "XDF Data root");
             }
 
             ComponentServices pcs[] = {
@@ -189,7 +189,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
             }
         }
         return retVal;
@@ -516,7 +516,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                             ds = ctx.sparkSession.read().parquet(loc); break;
                         default:
                             logger.error("Unsupported data format: " + format);
-                            throw new XDFException(ReturnCode.UNSUPPORTED_DATA_FORMAT, -1);
+                            throw new XDFException(XDFReturnCode.UNSUPPORTED_DATA_FORMAT, -1);
                     }
                 }
             
@@ -524,7 +524,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
             
             logger.debug("Dataset = " + ds);
             if(ds==null){
-                throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, datasetName);
+                throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, datasetName);
             }
             /*switch (format.toLowerCase()) {
                 case "json":
@@ -534,7 +534,7 @@ public class NGESLoaderComponent extends AbstractComponent implements WithSpark,
                 default:
                     error = "Unsupported data format: " + format;
                     logger.error(error);
-                    throw new FatalXDFException(ReturnCode.UnsupportedDataFormat, -1);
+                    throw new FatalXDFException(XDFReturnCode.UnsupportedDataFormat, -1);
             }*/
             dataSetmap.put(entry.getKey(), ds);
         }

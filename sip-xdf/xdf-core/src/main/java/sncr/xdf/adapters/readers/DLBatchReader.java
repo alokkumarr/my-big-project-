@@ -6,7 +6,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 public class DLBatchReader {
     private static final Logger logger = Logger.getLogger(DLBatchReader.class);
@@ -36,7 +36,7 @@ public class DLBatchReader {
                 }
                 break;
             default:
-                throw new XDFException( ReturnCode.UNSUPPORTED_DATA_FORMAT);
+                throw new XDFException( XDFReturnCode.UNSUPPORTED_DATA_FORMAT);
         }
         inctx.registerDataset(name, ds.cache());
         return ds;
