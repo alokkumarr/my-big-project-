@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * This service class to perform CRUD operation for branding logo.
+ * This service class to perform CRUD operation for customer branding details.
  *
  * @author alok.kumarr
  * @since 3.5.0
