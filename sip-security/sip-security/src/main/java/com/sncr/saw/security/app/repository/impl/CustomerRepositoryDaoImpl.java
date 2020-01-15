@@ -13,6 +13,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
@@ -51,6 +52,19 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
       logger.error(e.getMessage());
     }
     return false;
+  }
+
+  @Override
+  public int haveCustomerInfo() {
+    String sql = "select 1";
+    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
+    int rowCount = 0;
+    System.out.println("Customer information:");
+    while(srs.next()) {
+      System.out.println(srs.getRow());
+      rowCount++;
+    }
+    return rowCount;
   }
 
   @Override
