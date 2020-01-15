@@ -31,7 +31,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by skbm0001 on 29/1/2018.
@@ -434,19 +434,19 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         ComponentConfiguration compConf = Component.analyzeAndValidate(cfgAsStr);
         ESLoader esLoaderConfig = compConf.getEsLoader();
         if (esLoaderConfig == null)
-            throw new XDFException(ReturnCode.NO_COMPONENT_DESCRIPTOR, "es-loader");
+            throw new XDFException(XDFReturnCode.NO_COMPONENT_DESCRIPTOR, "es-loader");
 
         if (esLoaderConfig.getEsNodes() == null || esLoaderConfig.getEsNodes().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Nodes configuration missing.");
         }
         if (esLoaderConfig.getEsPort() == 0) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Port configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Port configuration missing.");
         }
         if (esLoaderConfig.getDestinationIndexName() == null || esLoaderConfig.getDestinationIndexName().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch Destination Index Name missing.");
         }
         if (esLoaderConfig.getEsClusterName() == null || esLoaderConfig.getEsClusterName().isEmpty()) {
-            throw new XDFException(ReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch clustername configuration missing.");
+            throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Incorrect configuration: ElasticSearch clustername configuration missing.");
         }
 
         return compConf;
@@ -469,7 +469,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
                 default:
                     error = "Unsupported data format: " + format;
                     logger.error(error);
-                    throw new FatalXDFException(ReturnCode.UNSUPPORTED_DATA_FORMAT, -1);
+                    throw new FatalXDFException(XDFReturnCode.UNSUPPORTED_DATA_FORMAT, -1);
             }
             dataSetmap.put(entry.getKey(), ds);
         }

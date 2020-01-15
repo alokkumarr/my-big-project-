@@ -34,8 +34,8 @@ import sncr.xdf.services.WithProjectScope;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.CliHandler;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
-import sncr.xdf.context.ReturnCodes;
+import sncr.xdf.context.XDFReturnCode;
+import sncr.xdf.context.XDFReturnCodes;
 import java.util.Optional;
 
 /**
@@ -148,10 +148,10 @@ public abstract class AbstractComponent implements WithContext{
         int ret = 0;
         try {
             if (!verifyComponentServices()){
-                throw new XDFException(ReturnCode.VERIFY_COMPONENT_SERVICES_ERROR, componentName);
+                throw new XDFException(XDFReturnCode.VERIFY_COMPONENT_SERVICES_ERROR, componentName);
             }
             if (updateStatus() != 0) {
-                throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR);
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR);
             }
             if(ret == 0){
                 ret = execute();
@@ -167,7 +167,7 @@ public abstract class AbstractComponent implements WithContext{
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
             }
         }
         return ret;
@@ -182,7 +182,7 @@ public abstract class AbstractComponent implements WithContext{
             if (ret == 0) {
                 archive(ret);
             }else{
-                throw new XDFException(ReturnCode.MOVE_ERROR);
+                throw new XDFException(XDFReturnCode.MOVE_ERROR);
             }
         }
     }
@@ -196,7 +196,7 @@ public abstract class AbstractComponent implements WithContext{
             if (ret == 0) {
                 archive(ret);
             }else{
-                throw new XDFException(ReturnCode.MOVE_ERROR);
+                throw new XDFException(XDFReturnCode.MOVE_ERROR);
             }
 		}
 	}
@@ -211,7 +211,7 @@ public abstract class AbstractComponent implements WithContext{
             finalize(ret);
         }else {
             logger.error("Could not complete archive phase!");
-            throw new XDFException(ReturnCode.ARCHIVAL_ERROR);
+            throw new XDFException(XDFReturnCode.ARCHIVAL_ERROR);
         }
     }
     /**
@@ -246,7 +246,7 @@ public abstract class AbstractComponent implements WithContext{
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR, e);
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
             }
         }
         return 0;
@@ -353,7 +353,7 @@ public abstract class AbstractComponent implements WithContext{
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
             }
         }
         return rc;
@@ -519,7 +519,7 @@ public abstract class AbstractComponent implements WithContext{
                 if (e instanceof XDFException) {
                     throw ((XDFException)e);
                 }else {
-                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
         }
@@ -602,7 +602,7 @@ public abstract class AbstractComponent implements WithContext{
                 if (e instanceof XDFException) {
                     throw ((XDFException)e);
                 }else {
-                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
         }
@@ -678,7 +678,7 @@ public abstract class AbstractComponent implements WithContext{
                 if (e instanceof XDFException) {
                     throw ((XDFException)e);
                 }else {
-                    throw new XDFException(ReturnCode.INTERNAL_ERROR, e);
+                    throw new XDFException(XDFReturnCode.INTERNAL_ERROR, e);
                 }
             }
         }
@@ -792,7 +792,7 @@ public abstract class AbstractComponent implements WithContext{
                         if (e instanceof XDFException) {
                             throw ((XDFException)e);
                         }else {
-                            throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR, e);
+                            throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
                         }
                     }
                 });
@@ -807,7 +807,7 @@ public abstract class AbstractComponent implements WithContext{
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR, e);
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
             }
         }
     }
@@ -863,7 +863,7 @@ public abstract class AbstractComponent implements WithContext{
                         if (e instanceof XDFException) {
                             throw ((XDFException)e);
                         }else {
-                            throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR, e);
+                            throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
                         }
                     }
                 });
@@ -875,7 +875,7 @@ public abstract class AbstractComponent implements WithContext{
             if (e instanceof XDFException) {
                 throw ((XDFException)e);
             }else {
-                throw new XDFException(ReturnCode.UPDATE_STATUS_ERROR, e);
+                throw new XDFException(XDFReturnCode.UPDATE_STATUS_ERROR, e);
             }
         }
     }
@@ -883,10 +883,10 @@ public abstract class AbstractComponent implements WithContext{
     public static int handleErrorIfAny(AbstractComponent component, int rc, Exception e) {
         try {
             if (e == null && rc != 0) {
-                if (ReturnCodes.getMap().containsKey(rc)) {
-                    e = new XDFException(ReturnCodes.getMap().get(rc));
+                if (XDFReturnCodes.getMap().containsKey(rc)) {
+                    e = new XDFException(XDFReturnCodes.getMap().get(rc));
                 } else {
-                    e = new XDFException(ReturnCode.INTERNAL_ERROR);
+                    e = new XDFException(XDFReturnCode.INTERNAL_ERROR);
                 }
             }
             if (e != null) {
@@ -896,7 +896,7 @@ public abstract class AbstractComponent implements WithContext{
                 if (e instanceof XDFException) {
                     rc = ((XDFException)e).getReturnCode().getCode();
                 } else {
-                    rc = ReturnCode.INTERNAL_ERROR.getCode();
+                    rc = XDFReturnCode.INTERNAL_ERROR.getCode();
                 }
                 if (component != null) {
                     try {
@@ -905,13 +905,13 @@ public abstract class AbstractComponent implements WithContext{
                         if (ex instanceof XDFException) {
                             rc = ((XDFException)ex).getReturnCode().getCode();
                         } else {
-                            rc = ReturnCode.INTERNAL_ERROR.getCode();
+                            rc = XDFReturnCode.INTERNAL_ERROR.getCode();
                         }
                     }
                 }
             }
         }catch (Exception ex) {
-            rc = ReturnCode.INTERNAL_ERROR.getCode();
+            rc = XDFReturnCode.INTERNAL_ERROR.getCode();
         }
         logger.info("Component Return Code :" + rc);
         return rc;

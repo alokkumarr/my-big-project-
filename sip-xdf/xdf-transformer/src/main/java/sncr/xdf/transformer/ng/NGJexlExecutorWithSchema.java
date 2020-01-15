@@ -15,7 +15,7 @@ import sncr.xdf.ngcomponent.AbstractComponent;
 import java.util.List;
 import java.util.Map;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 
 /**
@@ -47,7 +47,7 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
     public void execute(Map<String, Dataset> dsMap) throws Exception {
         Dataset ds = dsMap.get(inDataSetName);
         if(ds == null) {
-            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
         }else{
             //This will throw an error if Dataset is Empty
             ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, ReturnCode.INPUT_DATA_EMPTY_ERROR);
@@ -66,7 +66,7 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
         String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
         Dataset ds = dsMap.get(transInKey);
         if(ds == null) {
-            throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
         }else{
             //This will throw an error if Dataset is Empty
             ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, ReturnCode.INPUT_DATA_EMPTY_ERROR);

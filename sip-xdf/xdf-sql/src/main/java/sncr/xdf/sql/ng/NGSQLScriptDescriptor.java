@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 /**
  * Created by srya0001 on 5/11/2017.
@@ -115,7 +115,7 @@ public class NGSQLScriptDescriptor {
             while (m.find(position)  ) {
 
                 if(parameterValues == null || parameterValues.isEmpty())
-                    throw new XDFException(ReturnCode.SQL_SCRIPT_PRE_PROC_FAILED, "The file has variable entries, but actual parameters are missing.");
+                    throw new XDFException(XDFReturnCode.SQL_SCRIPT_PRE_PROC_FAILED, "The file has variable entries, but actual parameters are missing.");
 
                 logger.trace( String.format("Found the text \"%s\" starting at index %d and ending at index %d.%n",m.group(),m.start(),m.end()));
                 String varExpression = m.group().trim();
@@ -179,7 +179,7 @@ public class NGSQLScriptDescriptor {
                         scriptWideTableMap.put(td.tableName, td);
                     } else {
                         if (existingTd.isTargetTable && td.isTargetTable && !existingTd.isInDropStatement && !td.isInDropStatement)
-                            throw new XDFException(ReturnCode.INVALID_DATA_SOURCES, td.tableName);
+                            throw new XDFException(XDFReturnCode.INVALID_DATA_SOURCES, td.tableName);
                         existingTd.asReference.add(i);
                     }
 
@@ -192,12 +192,12 @@ public class NGSQLScriptDescriptor {
 
                     case SELECT:
                         logger.error("SELECT statement is not supported anymore, please use CREATE [TEMPORARY] TABLE AS statement");
-                        throw new XDFException(ReturnCode.SQL_SCRIPT_NOT_PARSABLE);
+                        throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE);
 
                     case CREATE:
 
                         if (targetTable == null) {
-                            throw new XDFException(ReturnCode.INCORRECT_SQL, " Target table was not found in table register.");
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, " Target table was not found in table register.");
                         }
                         else {
                             sqlDesc.statementType = StatementType.CREATE;
@@ -216,7 +216,7 @@ public class NGSQLScriptDescriptor {
                                 pos = s.indexOf("select");
                             }
                             if (pos < 0)
-                                throw new XDFException(ReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
+                                throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not find SELECT clause for statement: " + stmt.toString());
                             sqlDesc.SQL = stmt.toString().substring(pos);
                             logger.debug(" \n" + "SQL is :  "  + sqlDesc.SQL  + " \n");
                             sqlDesc.tableDescriptor = targetTable;
@@ -225,7 +225,7 @@ public class NGSQLScriptDescriptor {
 
                     case DROP_TABLE:
                         if (targetTable == null)
-                            throw new XDFException(ReturnCode.INCORRECT_SQL, "Could not determine target table for drop statement");
+                            throw new XDFException(XDFReturnCode.INCORRECT_SQL, "Could not determine target table for drop statement");
                         sqlDesc.statementType = StatementType.DROP_TABLE;
                         sqlDesc.tableDescriptor = targetTable;
                         sqlDesc.targetTableName = targetTable.tableName;
@@ -233,7 +233,7 @@ public class NGSQLScriptDescriptor {
 
                     break;
                     default:
-                        throw new XDFException(ReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
+                        throw new XDFException(XDFReturnCode.UNSUPPORTED_SQL_STATEMENT_TYPE);
                 }
                 sqlDesc.index = i;
                 sqlDesc.targetTableName = targetTable.tableName;
@@ -249,7 +249,7 @@ public class NGSQLScriptDescriptor {
             }
             logger.debug("Table list: \n" + scriptWideTableMap );
         } catch(JSQLParserException e){
-            throw new XDFException(ReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
+            throw new XDFException(XDFReturnCode.SQL_SCRIPT_NOT_PARSABLE, e);
         }
         return;
     }
@@ -305,7 +305,7 @@ public class NGSQLScriptDescriptor {
                     td.mode = (String) doProps.get(DataSetProperties.Mode.name());
                     logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
                 } else {
-                    throw new XDFException(ReturnCode.CONFIG_ERROR, "Could not resolveDataParameters source data object: " + tn);
+                    throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters source data object: " + tn);
                 }
             }
         }
@@ -346,7 +346,7 @@ public class NGSQLScriptDescriptor {
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
                     tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));
             } else {
-                throw new XDFException(ReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
+                throw new XDFException(XDFReturnCode.CONFIG_ERROR, "Could not resolveDataParameters target data object: " + tn);
             }
         }
     }

@@ -21,7 +21,7 @@ import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 
 
 public class NGSQLExecutor implements Serializable {
@@ -108,7 +108,7 @@ public class NGSQLExecutor implements Serializable {
                                 return -1;
                             }else{
                                 if(!HFileOperations.exists(location)){
-                                    throw new XDFException(ReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, tn);
+                                    throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, tn);
                                 }
                             }
                                 logger.debug("Load data from: " + location + ", registered table name: " + tn);
@@ -123,7 +123,7 @@ public class NGSQLExecutor implements Serializable {
 
                                 if (loc_desc == null)
                                 	return -1;
-                                   // throw new XDFException(ReturnCode.PartitionCalcError, tn);
+                                   // throw new XDFException(XDFReturnCode.PartitionCalcError, tn);
 
                                 logger.debug("Final location to be loaded: " + loc_desc._1() + " for table: " + tn);
                                 
