@@ -49,6 +49,9 @@ public class NSSOProperties {
   @Value("${user.maxUnsuccessfulLoginAttemptAllowed}")
   private int maxInvalidPwdLimit;
 
+  @Value("${upload.file.path}")
+  private String storageFileLocation;
+
   public String getRefreshTokenValidityMins() {
     return refreshTokenValidityMins;
   }
@@ -87,22 +90,30 @@ public class NSSOProperties {
     this.mailPort = mailPort;
   }
 
-  /** @return the mailFrom */
+  /**
+   * @return the mailFrom
+   */
   public String getMailFrom() {
     return mailFrom;
   }
 
-  /** @param mailFrom the mailFrom to set */
+  /**
+   * @param mailFrom the mailFrom to set
+   */
   public void setMailFrom(String mailFrom) {
     this.mailFrom = mailFrom;
   }
 
-  /** @return the mailSubject */
+  /**
+   * @return the mailSubject
+   */
   public String getMailSubject() {
     return mailSubject;
   }
 
-  /** @param mailSubject the mailSubject to set */
+  /**
+   * @param mailSubject the mailSubject to set
+   */
   public void setMailSubject(String mailSubject) {
     this.mailSubject = mailSubject;
   }
@@ -132,7 +143,9 @@ public class NSSOProperties {
     return ssoSecretKey;
   }
 
-  /** Sets ssoSecretKey */
+  /**
+   * Sets ssoSecretKey
+   */
   public void setSsoSecretKey(String ssoSecretKey) {
     this.ssoSecretKey = ssoSecretKey;
   }
@@ -169,5 +182,19 @@ public class NSSOProperties {
   /** Sets Max number of attempts the user can retry */
   public void setMaxInvalidPwdLimit(int maxInvalidPwdLimit) {
     this.maxInvalidPwdLimit = maxInvalidPwdLimit;
+  }
+
+  /**
+   * Gets storageFileLocation
+   */
+  public String getStorageFileLocation() {
+    return storageFileLocation;
+  }
+
+  /**
+   * Sets storageFileLocation
+   */
+  public void setStorageFileLocation(String storageFileLocation) {
+    this.storageFileLocation = storageFileLocation;
   }
 }

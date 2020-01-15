@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.sncr.saw.security.app.model.response.CustomerBrandResponse;
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.repository.DataSecurityKeyRepository;
 import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.service.CustomerBrandService;
 import com.sncr.saw.security.app.service.SecurityService;
 import com.sncr.saw.security.app.service.TicketHelper;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
@@ -24,8 +27,8 @@ import com.sncr.saw.security.common.bean.ResetPwdDtls;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.UserPreferences;
-import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.BrandDetails;
 import com.sncr.saw.security.common.bean.repo.UserCustomerMetaData;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
@@ -38,8 +41,6 @@ import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
-import com.sncr.saw.security.common.bean.repo.admin.UserDetailsResponse;
-import com.sncr.saw.security.common.bean.repo.admin.UsersDetailsList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -54,7 +55,6 @@ import com.sncr.saw.security.common.bean.repo.dsk.SecurityGroups;
 import com.sncr.saw.security.common.bean.repo.dsk.UserAssignment;
 import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.PasswordValidation;
-import com.synchronoss.bda.sip.dsk.BooleanCriteria;
 import com.synchronoss.bda.sip.dsk.DskGroupPayload;
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
@@ -68,6 +68,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -77,7 +79,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.UUID;
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -86,11 +87,14 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,8 +103,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author gsan0003
@@ -112,27 +116,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
-	@Autowired
+  @Autowired
+  private TicketHelper tHelper;
+  @Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private NSSOProperties nSSOProperties;
-
-    @Autowired
-    private TicketHelper tHelper;
-
+  @Autowired
+  private SecurityService securityService;
+  @Autowired
+  private CustomerBrandService brandService;
 	@Autowired
-	SSORequestHandler ssoRequestHandler;
-
+	private SSORequestHandler ssoRequestHandler;
 	@Autowired
-    PreferenceRepository preferenceRepository;
-
+	private CustomerRepository customerRepository;
 	@Autowired
-    DataSecurityKeyRepository dataSecurityKeyRepository;
+  private PreferenceRepository preferenceRepository;
+	@Autowired
+  private DataSecurityKeyRepository dataSecurityKeyRepository;
 
-    @Autowired SecurityService securityService;
 
 	private final ObjectMapper mapper = new ObjectMapper();
-
   private final String AdminRole = "ADMIN";
   private final String ALERTS = "ALERTS";
   private final String UNAUTHORIZED_USER = "You are not authorized user to perform this operation.";
@@ -2223,4 +2227,104 @@ public class SecurityController {
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
         return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
     }
+
+	@ApiOperation(value = "Create customer brand",
+			nickname = "createCustomerBrand",
+			notes = "",
+			response = CustomerBrandResponse.class)
+	@ApiResponses(
+			value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+					@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+					@ApiResponse(code = 400, message = "Bad request"),
+					@ApiResponse(code = 401, message = "Unauthorized")})
+	@RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse createCustomerBrand(@RequestParam("brandColor") String brandColor,
+                                                   @RequestParam(value = "brandLogo", required = false) MultipartFile file,
+                                                   HttpServletRequest request,
+                                                   HttpServletResponse response) {
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    if (file == null || brandColor == null) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
+      return brandResponse;
+    }
+
+    brandResponse = brandService.storeFile(file);
+    Valid valid = customerRepository.upsertCustomerBrand(customerId, brandColor, brandResponse.getBrandLogoName());
+
+    brandResponse.setBrandColor(brandColor);
+    // build final response for the user
+    if (valid.getValid()) {
+      brandResponse.setMessage("Brand details are upserted.");
+    } else {
+      brandResponse.setMessage("Operation failed for brand upsert.");
+    }
+    return brandResponse;
+  }
+
+
+	@ApiOperation(value = "Fetch customer branding details.",
+			nickname = "fetchBrandDetails",
+			notes = "",
+			response = CustomerBrandResponse.class)
+	@ApiResponses(
+			value = {@ApiResponse(code = 200, message = "Request has been succeeded without any error"),
+					@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+					@ApiResponse(code = 500, message = "Server is down. Contact System administrator"),
+					@ApiResponse(code = 400, message = "Bad request"),
+					@ApiResponse(code = 401, message = "Unauthorized")})
+  @RequestMapping(value = "/auth/admin/cust/brand",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomerBrandResponse fetchBrandDetails(HttpServletRequest request, HttpServletResponse response) {
+    Ticket ticket = SipCommonUtils.getTicket(request);
+    CustomerBrandResponse brandResponse = new CustomerBrandResponse();
+    if (ticket == null) {
+      response.setStatus(org.apache.http.HttpStatus.SC_UNAUTHORIZED);
+      brandResponse.setMessage("Unauthorized customer to perform the operation.");
+      return brandResponse;
+    }
+
+    Long customerId = ticket.getCustID() != null ? Long.valueOf(ticket.getCustID()) : 0L;
+    if (customerId == 0) {
+      response.setStatus(HttpStatus.BAD_REQUEST.value());
+      brandResponse.setMessage("No Customer exit for branding.");
+      return brandResponse;
+    }
+
+    BrandDetails brandDetails = customerRepository.fetchCustomerBrand(customerId);
+    if (brandDetails != null) {
+      brandResponse.setBrandColor(brandDetails.getBrandColor());
+      brandResponse.setBrandLogoName(brandDetails.getBrandName());
+    }
+
+    // Try to determine file's logo location
+    try {
+      // Load file as Resource
+      Resource resource = brandService.loadFileAsResource(brandDetails.getBrandName());
+      brandResponse.setBrandLogoUrl(resource.getFile().getAbsolutePath());
+      brandResponse.setMessage("Brand details fetched successfully.");
+    } catch (IOException ex) {
+      String error = "Could not determine logo location.";
+      logger.error(error);
+      brandResponse.setMessage(error);
+    }
+    return brandResponse;
+  }
 }
