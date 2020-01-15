@@ -69,7 +69,7 @@ public class NGJexlExecutor extends NGExecutor {
             throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
         }else {
             //This will throw an error if Dataset is Empty
-            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
             logger.debug("Initialize structAccumulator: ");
             schema = ds.schema();
             String[] fNames = ds.schema().fieldNames();

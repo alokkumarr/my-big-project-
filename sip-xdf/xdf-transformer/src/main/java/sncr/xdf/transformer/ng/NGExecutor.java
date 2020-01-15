@@ -17,7 +17,7 @@ import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.context.ReturnCode;
+import sncr.xdf.context.XDFReturnCode;
 import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.*;
@@ -137,7 +137,7 @@ public abstract class NGExecutor {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
         //This will throw an error if Dataset is Empty //parent.getNgctx().outputs.get(outDataSetName).get(DataSetProperties.Name.name())
-        ((AbstractComponent)parent).validateRecordsCount(outputResult.count(), parent.getNgctx().componentConfiguration.getOutputs().get(0).getDataSet().toString(), ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+        ((AbstractComponent)parent).validateRecordsCount(outputResult.count(), parent.getNgctx().componentConfiguration.getOutputs().get(0).getDataSet().toString(), XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 
@@ -169,7 +169,7 @@ public abstract class NGExecutor {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
         //This will throw an error if Dataset is Empty
-        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, transOutKey, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, transOutKey, XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 }

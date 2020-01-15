@@ -360,7 +360,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             long inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
-            validateRecordsCount(inputDSCount, sourcePath, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+            validateRecordsCount(inputDSCount, sourcePath, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
 
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
@@ -381,7 +381,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             long inputDSCount = inputDataset.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
-            validateRecordsCount(inputDSCount, sourcePath, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+            validateRecordsCount(inputDSCount, sourcePath, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
 
             commitDataSetFromDSMap(ngctx, inputDataset, outputDataSetName, tempDir, "append");
 
@@ -395,7 +395,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             long inputDSCount = inputDataFrame.count();
             this.recCounter.setValue(inputDSCount);
             //This will throw an error if Dataset is Empty
-            validateRecordsCount(inputDSCount, null, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+            validateRecordsCount(inputDSCount, null, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
 
             commitDataSetFromDSMap(ngctx, inputDataFrame, outputDataSetName, tempDir, Output.Mode.APPEND.name());
 
@@ -407,7 +407,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.debug("Count for parser in dataset :: " + outputDataSetName + " - " + outputDSCount);
         logger.debug("NGParser ==>  dataSetName  & size " + outputDataSetName + "," + ngctx.datafileDFmap.size()+ "\n");
         //This will throw an error if Dataset is Empty
-        validateRecordsCount(outputDSCount, outputDataSetName, ReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+        validateRecordsCount(outputDSCount, outputDataSetName, XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
         return retval;
     }
 	
@@ -491,7 +491,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             .textFile(sourcePath, outputNOF);
         logger.debug("Source Rdd partition : "+ rdd.getNumPartitions());
         //This will throw an error if Dataset is Empty
-        validateRecordsCount(rdd.count(), sourcePath, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+        validateRecordsCount(rdd.count(), sourcePath, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
@@ -577,7 +577,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             }
         }
         //This will throw an error if Dataset is Empty
-        validateRecordsCount(recordCount, sourcePath, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+        validateRecordsCount(recordCount, sourcePath, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
         return 0;
     }
 
@@ -687,7 +687,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             rddWithoutHeader = rdd;
 		}
         //This will throw an error if Dataset is Empty
-        validateRecordsCount(rddWithoutHeader.count(), null, ReturnCode.INPUT_DATA_EMPTY_ERROR);
+        validateRecordsCount(rddWithoutHeader.count(), null, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
         JavaRDD<Row>  parseRdd = rddWithoutHeader.map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
             '\'', recCounter, errCounter));
 	    // Create output dataset
