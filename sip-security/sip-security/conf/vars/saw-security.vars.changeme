@@ -35,3 +35,10 @@ jwt.secret.key=CHANGEME # Secret key for jwt Token.
 #user properties
 user.maxUnsuccessfulLoginAttemptAllowed=CHANGEME
 user.lockingTime.mins=CHANGEME
+
+## MULTIPART (MultipartProperties)
+# Max file size.
+spring.servlet.multipart.max-file-size=CHANGEME
+
+# storage directory of uploaded file
+upload.file.path=CHANGEME
