@@ -1,8 +1,11 @@
 package com.synchronoss.saw.es;
 
+import static com.synchronoss.saw.es.QueryBuilderUtil.queryDSKBuilder;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.DataSecurityKey;
 import com.synchronoss.saw.model.Field;
@@ -35,6 +38,7 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 public class ElasticSearchQueryBuilder {
 
@@ -49,16 +53,14 @@ public class ElasticSearchQueryBuilder {
   private static String appenderForGTLTE = "||/M";
   public static String[] groupByFields;
 
-  public String buildDataQuery(SipQuery sipQuery, Integer size, DataSecurityKey dataSecurityKey)
-      throws IOException, ProcessingException {
+  public String buildDataQuery(SipQuery sipQuery, Integer size, SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(0);
-    DataSecurityKey dataSecurityKeyNode = dataSecurityKey;
     /*
     ToDo: when size is -1 need to remove the hard coded size as 1lakh and we need to send the total
       data  when the size is -1.
      */
-    if (size == -1) size = 100000;
+    if (size == null || size == -1) size = 100000;
     searchSourceBuilder.size(size);
     if (sipQuery.getSorts() == null && sipQuery.getFilters() == null) {
       throw new NullPointerException(
@@ -67,12 +69,15 @@ public class ElasticSearchQueryBuilder {
     // The below call is to build sort
     searchSourceBuilder = buildSortQuery(sipQuery, searchSourceBuilder);
       List<QueryBuilder> dskBuilder = new ArrayList<>();
-      dskBuilder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKeyNode, dskBuilder);
-    // The below code to build filters
-    BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
-      BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    buildBooleanQuery(BooleanCriteria.AND, dskBuilder,boolQueryBuilderDsk);
+    BoolQueryBuilder boolQueryBuilderDsk;
+    BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
+      boolQueryBuilderDsk = queryDSKBuilder(dskAttribute);
       boolQueryBuilder.must(boolQueryBuilderDsk);
+    }
+    // The below code to build filters
+
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();
       List<QueryBuilder> builder = new ArrayList<>();
@@ -551,17 +556,15 @@ public class ElasticSearchQueryBuilder {
    * @param sipQuery SIP Query.
    * @return Elasticsearch SearchSourceBuilder
    */
-  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery , DataSecurityKey dataSecurityKey) {
+  public SearchSourceBuilder percentagePriorQuery(SipQuery sipQuery,SipDskAttribute dskAttribute) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(0);
       BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    if (dataSecurityKey != null && dataSecurityKey.getDataSecuritykey().size() > 0) {
-      List<QueryBuilder> dskBuilder = new ArrayList<>();
-      dskBuilder = QueryBuilderUtil.queryDSKBuilder(dataSecurityKey, dskBuilder);
+    if (dskAttribute != null && dskAttribute.getBooleanCriteria() != null && !CollectionUtils
+        .isEmpty(dskAttribute.getBooleanQuery())) {
       // The below code to build filters
-      BoolQueryBuilder boolQueryBuilderDsk = new BoolQueryBuilder();
-      buildBooleanQuery(BooleanCriteria.AND, dskBuilder, boolQueryBuilderDsk);
-        boolQueryBuilder.must(boolQueryBuilderDsk);
+      BoolQueryBuilder boolQueryBuilderDsk = queryDSKBuilder(dskAttribute);
+      boolQueryBuilder.must(boolQueryBuilderDsk);
       }
     if (sipQuery.getBooleanCriteria() != null) {
       List<Filter> filters = sipQuery.getFilters();

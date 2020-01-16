@@ -55,7 +55,7 @@ connector : http
 metadata:
   service:
     host: ${connector}://localhost:9501
-    execution-migration-flag: true
+    execution-migration-flag: false
     transporthost: ${connector}://localhost:9200/analysis
 
 sip:

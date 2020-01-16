@@ -189,7 +189,7 @@ public class TicketHelperImpl implements TicketHelper {
       ticket.setRoleType(user.getTicketDetails().getRoleType());
       ticket.setUserFullName(user.getTicketDetails().getUserFullName());
       ticket.setProducts(user.getTicketDetails().getProducts());
-      ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
+      ticket.setSipDskAttribute(user.getTicketDetails().getDskAttribute());
       ticket.setCustID(user.getTicketDetails().getCustID());
       ticket.setCustCode(user.getTicketDetails().getCustCode());
       ticket.setUserId(user.getTicketDetails().getUserId());

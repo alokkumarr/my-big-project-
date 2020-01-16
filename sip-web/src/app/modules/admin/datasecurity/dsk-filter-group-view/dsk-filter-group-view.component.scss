@@ -1,0 +1,45 @@
+@import 'src/themes/base/colors';
+
+:host {
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  display: block;
+  padding: 5px;
+  width: 100%;
+}
+
+.filter-field {
+  margin-bottom: 10px;
+
+  &__name {
+    font-size: 14px;
+  }
+
+  &__operator {
+    color: $secondary-orange;
+    font-size: 14px;
+  }
+}
+
+.boolean-criteria-header {
+  padding: 10px 0 10px 10px;
+}
+
+.dsk-query-child {
+  margin-left: 20px;
+
+  &__group {
+    margin-bottom: 16px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  mat-chip {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 12px;
+    min-height: 26px;
+  }
+}
