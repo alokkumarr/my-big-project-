@@ -143,6 +143,8 @@ export class DesignerFilterRowComponent implements OnInit {
   get supportedAggregates() {
     const aggregatesForAnalysis = filterAggregatesByAnalysisType(
       this.analysisType
+    ).filter(
+      aggregate => !['percentage', 'percentagebyrow'].includes(aggregate.value)
     );
     return this.filter.type
       ? filterAggregatesByDataType(this.filter.type, aggregatesForAnalysis)
