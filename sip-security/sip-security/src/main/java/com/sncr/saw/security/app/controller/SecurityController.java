@@ -1,5 +1,7 @@
 package com.sncr.saw.security.app.controller;
 
+import static com.synchronoss.sip.utils.SipCommonUtils.validatePrivilege;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,6 +63,7 @@ import com.synchronoss.bda.sip.dsk.SipDskAttributeModel;
 import com.synchronoss.bda.sip.jwt.TokenParser;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
+import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -2192,15 +2195,16 @@ public class SecurityController {
 				userPreferences.setCustomerID(ticket.getCustID());
 				Preference preference = preferenceList.stream().
 						filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
-				Long customerId = preference != null && preference.getPreferenceValue() != null ?
+				Long categoryId = preference != null && preference.getPreferenceValue() != null ?
 						Long.valueOf(preference.getPreferenceValue()) : 0L;
 
-				if (securityService.haveValidCustomerId(ticket, customerId)) {
+				if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.CREATE)) {
 					userPreferences.setPreferences(preferenceList);
-					return preferenceRepository.upsertPreferences(userPreferences);
+					userPreferences = preferenceRepository.upsertPreferences(userPreferences);
 				} else {
-					userPreferences.setMessage("Customer Id not matched, please correct customer id.");
-					return userPreferences;
+					userPreferences.setMessage(UNAUTHORIZED_USER);
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.sendError(HttpStatus.UNAUTHORIZED.value(),UNAUTHORIZED_USER);
 				}
 			}catch (Exception ex) {
 				String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
@@ -2225,10 +2229,10 @@ public class SecurityController {
 					userPreferences.setCustomerID(ticket.getCustID());
 					Preference preference = preferenceList.stream().
 							filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
-					Long customerId = preference != null && preference.getPreferenceValue() != null ?
+					Long categoryId = preference != null && preference.getPreferenceValue() != null ?
 							Long.valueOf(preference.getPreferenceValue()) : 0L;
 
-					if (securityService.haveValidCustomerId(ticket, customerId)) {
+					if (validatePrivilege(ticket.getProducts(), categoryId, Privileges.PrivilegeNames.DELETE)) {
 						userPreferences.setPreferences(preferenceList);
 						if (inactivateAll!=null && inactivateAll) {
 							return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
@@ -2237,8 +2241,9 @@ public class SecurityController {
 							return preferenceRepository.deletePreferences(userPreferences,false);
 						}
 					} else {
-						userPreferences.setMessage("Customer Id not matched, please correct customer id.");
-						return userPreferences;
+						userPreferences.setMessage(UNAUTHORIZED_USER);
+						response.setStatus(HttpStatus.UNAUTHORIZED.value());
+						response.sendError(HttpStatus.UNAUTHORIZED.value(),	UNAUTHORIZED_USER);
 					}
 				}catch (Exception ex) {
 					String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
