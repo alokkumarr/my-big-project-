@@ -40,8 +40,8 @@
       </button>
     </div>
   </div>
-  <h3>Aggregated Filters</h3>
-  <div class="filter-container">
+  <h3 *ngIf="data.supportsAggregationFilters">Aggregated Filters</h3>
+  <div *ngIf="data.supportsAggregationFilters" class="filter-container">
     <div *ngFor="let artifact of data.artifacts; trackBy: artifactTrackByFn">
       <div class="filter__table-name">
         {{ artifact.artifactName }}

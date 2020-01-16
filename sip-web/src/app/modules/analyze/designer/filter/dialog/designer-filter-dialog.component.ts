@@ -24,6 +24,7 @@ export interface DesignerFilterDialogData {
   artifacts;
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
+  supportsAggregationFilters?: boolean;
   showFilterOptions: boolean;
 }
 export interface DesignerFilterDialogResult {
@@ -69,14 +70,14 @@ export class DesignerFilterDialogComponent implements OnInit {
   aggregatedFiltersFor(artifactName: string): Filter[] {
     const allFilters = this.groupedFilters[artifactName];
     return allFilters
-      ? allFilters.filter((f: Filter) => f.isAggregatedFilter)
+      ? allFilters.filter((f: Filter) => f.isAggregationFilter)
       : [];
   }
 
   nonAggregatedFiltersFor(artifactName: string): Filter[] {
     const allFilters = this.groupedFilters[artifactName];
     return allFilters
-      ? allFilters.filter((f: Filter) => !f.isAggregatedFilter)
+      ? allFilters.filter((f: Filter) => !f.isAggregationFilter)
       : [];
   }
 
@@ -91,14 +92,14 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
-  addFilter(tableName, initialAdd = false, isAggregatedFilter = false) {
+  addFilter(tableName, initialAdd = false, isAggregationFilter = false) {
     const newFilter: Filter = {
       type: null,
       tableName,
       isOptional: false,
       columnName: null,
       isRuntimeFilter: false,
-      isAggregatedFilter,
+      isAggregationFilter,
       isGlobalFilter: false,
       model: null
     };

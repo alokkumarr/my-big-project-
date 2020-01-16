@@ -90,13 +90,15 @@ export class AnalyzeDialogService {
     filters: Filter[],
     artifacts: Artifact[],
     booleanCriteria,
-    supportsGlobalFilters = false
+    supportsGlobalFilters = false,
+    supportsAggregationFilters = false
   ) {
     const data: DesignerFilterDialogData = {
       filters,
       artifacts,
       booleanCriteria,
       supportsGlobalFilters,
+      supportsAggregationFilters,
       isInRuntimeMode: false,
       showFilterOptions: true
     };

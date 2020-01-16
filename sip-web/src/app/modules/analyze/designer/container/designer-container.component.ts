@@ -772,15 +772,12 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
+    const analysis = this._store.selectSnapshot(DesignerState.analysis);
     switch (action) {
       case 'sort':
         // TODO update sorts for multiple artifacts
         this._analyzeDialogService
-          .openSortDialog(
-            this._store.selectSnapshot(DesignerState.analysis).sipQuery.sorts,
-            this._store.selectSnapshot(DesignerState.analysis).sipQuery
-              .artifacts
-          )
+          .openSortDialog(analysis.sipQuery.sorts, analysis.sipQuery.artifacts)
           .afterClosed()
           .subscribe((result: IToolbarActionResult) => {
             if (result) {
@@ -791,6 +788,14 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           });
         break;
       case 'filter':
+        const supportsAggregationFilters = ['report', 'esReport'].includes(
+          analysis.type
+        )
+          ? flatMap(
+              analysis.sipQuery.artifacts,
+              artifact => artifact.fields
+            ).some(field => Boolean(field.aggregate))
+          : true;
         const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes(
           (this.analysis || this.analysisStarter).type
         );
@@ -799,7 +804,8 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             this.filters,
             this.artifacts,
             this.booleanCriteria,
-            supportsGlobalFilters
+            supportsGlobalFilters,
+            supportsAggregationFilters
           )
           .afterClosed()
           .subscribe((result: IToolbarActionResult) => {
