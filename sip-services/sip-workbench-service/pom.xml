@@ -1,105 +1,95 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath></relativePath>
+	</parent>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.0.2.RELEASE</version>
-    <relativePath/>
-  </parent>
+	<groupId>com.synchronoss.saw</groupId>
+	<artifactId>sip-workbench-service</artifactId>
+	<version>${revision}</version>
+	<name>sip-workbench-service</name>
 
-  <groupId>com.synchronoss.saw</groupId>
-  <artifactId>sip-workbench-service</artifactId>
-  <version>${revision}</version>
-  <packaging>jar</packaging>
-  <description></description>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <json.validate>2.2.6</json.validate>
-    <start-class>com.synchronoss.saw.workbench.SAWWorkBenchServiceApplication</start-class>
-    <java.version>1.8</java.version>
-    <jackson-coreutils>1.8</jackson-coreutils>
-    <json-core>1.2.5</json-core>
-    <jjwt.version>0.7.0</jjwt.version>
-    <metadata.api>${revision}</metadata.api>
-    <mapr.db.version>6.1.0-mapr</mapr.db.version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<start-class>com.synchronoss.saw.workbench.SAWWorkBenchServiceApplication</start-class>
+		<json.validate>2.2.6</json.validate>
+		<java.version>1.8</java.version>
+		<jackson-coreutils>1.8</jackson-coreutils>
+		<json-core>1.2.5</json-core>
+		<wire.mock>2.7.1</wire.mock>
+		<jjwt.version>0.7.0</jjwt.version>
+		<spring.swagger>2.8.0</spring.swagger>
+		<guava>19.0</guava>
+		<flyway.db>5.2.0</flyway.db>
+		<mariadb>2.3.0</mariadb>
+		<snotify>1.1</snotify>
+		<common.io>2.6</common.io>
+		  <spark-version>2.3.2</spark-version>
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
-    <jjwt.version>0.7.0</jjwt.version>
-    <spark-version>2.3.2</spark-version>
-    <scala.version.exclude>20_2.11</scala.version.exclude>
-    <!-- TODO: Check livy version 0.5.0 (not getting resolved) -->
-    <livy.version>0.5.0-incubating</livy.version>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.jettison</groupId>
-      <artifactId>jettison</artifactId>
-      <version>1.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-hateoas</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
+	</properties>
+	<repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+		<repository>
+			<id>synchronoss-snapshots</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
     <dependency>
 	    <groupId>io.micrometer</groupId>
 	    <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.jolokia</groupId>
-      <artifactId>jolokia-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.github.fge</groupId>
-      <artifactId>json-schema-validator</artifactId>
-      <version>${json.validate}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.fge</groupId>
-      <artifactId>jackson-coreutils</artifactId>
-      <version>${jackson-coreutils}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.fge</groupId>
-      <artifactId>json-schema-core</artifactId>
-      <version>${json-core}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
+		<dependency>
+			<groupId>org.jolokia</groupId>
+			<artifactId>jolokia-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.fge</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>${json.validate}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.fge</groupId>
+			<artifactId>jackson-coreutils</artifactId>
+			<version>${jackson-coreutils}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.fge</groupId>
+			<artifactId>json-schema-core</artifactId>
+			<version>${json-core}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
     </dependency>
@@ -108,87 +98,56 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
     </dependency>
-    <dependency>
-      <groupId>info.faljse</groupId>
-      <artifactId>SDNotify</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock</artifactId>
-      <version>2.7.1</version>
-      <scope>test</scope>
-    </dependency>
+		
+		<!-- Spring integration related service -->
+	
 
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <dependency>
-      <!-- springfox.documentation.* -->
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger2</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>19.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.jayway.jsonpath</groupId>
-      <artifactId>json-path</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.jayway.jsonpath</groupId>
-      <artifactId>json-path-assert</artifactId>
-    </dependency>
-
-    <!-- APACHE COMMONS LANG -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-
-
-    <!-- APACHE COMMONS IO -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.6</version>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>meta-api</artifactId>
-      <version>${metadata.api}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.saw</groupId>
-      <artifactId>sip-date-extract-api</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.univocity</groupId>
-      <artifactId>univocity-parsers</artifactId>
-      <version>2.5.9</version>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.saw</groupId>
-      <artifactId>sip-inspect-data-api</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.mapr.db</groupId>
-      <artifactId>maprdb</artifactId>
-      <version>${mapr.db.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
+		<!-- Spring integration related service -->
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>${snotify}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>${wire.mock}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${spring.swagger}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${spring.swagger}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path-assert</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${common.io}</version>
+		</dependency>
+		
+		<dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf</artifactId>
       <version>${revision}</version>
@@ -246,29 +205,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-transformer</artifactId>
-      <version>${revision}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.11</artifactId>
-      <version>${spark-version}</version>
-      <scope>provided</scope>
-    </dependency>
      <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>2.11.8</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_2.11</artifactId>
       <version>${spark-version}</version>
@@ -279,109 +216,74 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.apache.livy</groupId>
-      <artifactId>livy-client-http</artifactId>
-      <version>${livy.version}</version>
-    </dependency>
-
-    <dependency>
+      <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-client</artifactId>
-      <version>${mapr.hadoop.client.version}</version>
-      <scope>provided</scope>
-    </dependency>
 
+		<!-- This is the SIP Batch plug-ins -->
+		
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>sip-inspect-data-api</artifactId>
+      <version>${revision}</version>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-    </dependency>
-    <dependency>
+<dependency>
       <groupId>com.synchronoss.bda.sip</groupId>
       <artifactId>sip-common-components</artifactId>
       <version>${revision}</version>
     </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <compilerArgument>-Xlint:all</compilerArgument>
-          <compilerArgument>-Xlint:-processing</compilerArgument>
-          <testCompilerArgument>-Xlint:all</testCompilerArgument>
-          <testCompilerArgument>-Xlint:-processing</testCompilerArgument>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/*RemoteIT.java</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues
-                        with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
-                        so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
-          <classifier>exec</classifier>
-          <!-- The Spring Boot Maven plug-in includes also dependencies with "provided" scope by default.  Exclude
-                        Spark and Scala to reduce artifact size. -->
-          <!--
-              The spring-boot-start-test dependency adds JUnit in the
-              compile scope so exclude JUnit explicitly from packaging
-          -->
-          <excludeGroupIds>ch.qos.logback,com.mapr.db,com.mapr.hadoop,javax.servlet,org.apache.hadoop,org.apache.zookeeper,junit,org.ojai</excludeGroupIds>
-          <layout>ZIP</layout>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-bundle</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
+		
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
+					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<classifier>exec</classifier>
+					<!--
+					    The spring-boot-start-test dependency adds JUnit in the
+					    compile scope so exclude JUnit explicitly from packaging
+					-->
+					<excludeGroupIds>junit</excludeGroupIds>
+				</configuration>
+			</plugin>
+			<!--  plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin-->
+			<plugin>
         <groupId>de.dentrassi.maven</groupId>
         <artifactId>rpm</artifactId>
         <version>0.10.0</version>
@@ -407,10 +309,10 @@
                   <name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
                   <file>target/sip-workbench-service-${revision}-exec.jar</file>
                 </entry>
-                <entry>
+                <!-- entry>
                   <name>/opt/bda/saw-workbench-service/saw-workbench-spark.jar</name>
                   <file>target/sip-workbench-service-${revision}-jar-with-dependencies.jar</file>
-                </entry>
+                </entry-->
                 <entry>
                   <name>/usr/lib/systemd/system/sip-workbench.service</name>
                   <file>src/main/system/sip-workbench.service</file>
@@ -437,19 +339,9 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
-  </build>
-  <repositories>
-    <repository>
-      <id>synchronoss</id>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
-    </repository>
-    <repository>
-      <id>synchronoss-snapshots</id>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
-    </repository>
-
-  </repositories>
+			
+		</plugins>
+	</build>
   <distributionManagement>
     <repository>
       <id>client-releases</id>

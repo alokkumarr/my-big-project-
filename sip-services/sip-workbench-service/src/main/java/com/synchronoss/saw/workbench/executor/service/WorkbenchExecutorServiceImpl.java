@@ -1,5 +1,7 @@
 package com.synchronoss.saw.workbench.executor.service;
 
+import java.util.UUID;
+
 import javax.validation.constraints.NotNull;
 
 import org.apache.hadoop.fs.Path;
@@ -96,7 +98,7 @@ public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 
 		workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
 		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
-		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.EXECUTE_JOB.toString(), 
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.EXECUTE_JOB.toString(), 
 				project, name,component,cfg);
 	    queueManager.sendWorkbenchMessageToStream(recordContent);
 		ObjectNode root = mapper.createObjectNode();
@@ -132,15 +134,7 @@ public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 	@NotNull
 	private String metastoreBase;
 
-	@Override
-	public ObjectNode preview(String project, String name, String component, String cfg) throws Exception {
-		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
-
-		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.CREATE_PREVIEW.toString(), project, name,
-				component, cfg);
-	    queueManager.sendWorkbenchMessageToStream(recordContent);
-		return null;
-	}
+	
 
 
 	@Override
@@ -150,6 +144,21 @@ public class WorkbenchExecutorServiceImpl implements WorkbenchExecutorService {
 		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.SHOW_PREVIEW.toString(), project, name,
 				component, cfg);
 	    queueManager.sendWorkbenchMessageToStream(recordContent);
+		return null;
+	}
+
+
+	@Override
+	public ObjectNode createPreview(String id, String location, int previewLimit, String previewsTablePath, String project,
+			String name) throws Exception {
+		WorkbenchExecutorQueuManager queueManager = new WorkbenchExecutorQueuManager(streamBasePath);
+		//String id = UUID.randomUUID().toString();
+		//String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+
+		String recordContent = String.format("%s˜˜%s˜˜%s˜˜%s˜˜%s˜˜%s", WorkbenchExecutionType.CREATE_PREVIEW.toString(), id, location, previewLimit, previewsTablePath, 
+				project, name);
+	    queueManager.sendWorkbenchMessageToStream(recordContent);
+		
 		return null;
 	}
 	

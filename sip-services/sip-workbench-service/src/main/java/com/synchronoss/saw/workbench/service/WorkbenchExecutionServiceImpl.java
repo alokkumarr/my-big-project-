@@ -1,10 +1,10 @@
 package com.synchronoss.saw.workbench.service;
 
 import java.util.UUID;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
-import com.google.gson.Gson;
 import org.apache.hadoop.fs.Path;
 import org.joda.time.DateTime;
 import org.ojai.Document;
@@ -12,23 +12,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorService;
+import com.synchronoss.saw.workbench.executor.service.WorkbenchExecutorServiceImpl;
+
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.services.NGContextServices;
-import sncr.xdf.context.ComponentServices;
-import static sncr.xdf.context.ComponentServices.*;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -55,12 +59,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private String previewsTablePath;
 
-  /**
-   * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
-   */
-  private WorkbenchClient cachedClient;
+ 
 
-  //@PostConstruct
+  @PostConstruct
   private void init() throws Exception {
       /* Workaround: If the "/apps/spark" directory does not exist in
        * the data lake, Apache Livy will fail with a file not found
@@ -84,7 +85,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
      * Cache a Workbench Livy client to reduce startup time for first operation
      */
     try {
-      cacheWorkbenchClient();
+//      cacheWorkbenchClient();
     } catch (Exception e) {
       /* If Apache Livy is not installed in the environment, fail
        * gracefully by letting the Workbench Service still start up.
@@ -94,45 +95,33 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     }
   }
 
-  /**
-   * Get Workbench Livy client to be used for Livy jobs.
-   */
-  private WorkbenchClient getWorkbenchClient() throws Exception {
-    /*
-     * Synchronize access to the cached client to ensure that the current client is handed out only
-     * to a single caller and that a new client is put into place before the next caller
-     */
-    synchronized (cachedClient) {
-      try {
-        if (cachedClient == null) {
-          log.debug("Create Workbench Livy client on demand");
-          cacheWorkbenchClient();
-        }
-        return cachedClient;
-      } finally {
-        /*
-         * Create a new Workbench Livy client for the next operation
-         */
-        cacheWorkbenchClient();
-      }
-    }
-  }
+  
 
-  private void cacheWorkbenchClient() throws Exception {
-    log.debug("Caching Workbench Livy client");
-    cachedClient = new WorkbenchClient(livyUri);
-  }
-
+  
   /**
    * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
   public ObjectNode execute(
     String project, String name, String component, String cfg) throws Exception {
-    log.info("Executing dataset transformation starts here ");
-    log.info("XDF Configuration = " + cfg);
-    WorkbenchClient client = getWorkbenchClient();
+	  
+	  
+	System.out.print("Checking logger level...");
+	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
+	logger4j.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
+	System.out.print("Logger level set to debug");
+	
+	//org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+	//logger.setLevel(org.apache.log4j.Level.toLevel("DEBUG"));
+	
+	
+    log.debug("Executing dataset transformation starts here ");
+    log.debug("XDF Configuration = " + cfg);
+    
+    
     createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    
+    
     log.info("execute name = " + name);
     log.info("execute root = " + root);
     log.info("execute component = " + component);
@@ -151,7 +140,11 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     NGContext workBenchcontext = contextServices.getNgctx();
 
     workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
-    client.submit(new WorkbenchExecuteJob(workBenchcontext));
+    WorkbenchExecutorService service = new WorkbenchExecutorServiceImpl();
+    service.executeJob(project, name, component, cfg);
+    
+    //String project, String name, String component, String cfg
+    //client.submit(new WorkbenchExecuteJob(workBenchcontext));
     ObjectNode root = mapper.createObjectNode();
     ArrayNode ids = root.putArray("outputDatasetIds");
     for (String id: workBenchcontext.registeredOutputDSIds) {
@@ -204,10 +197,14 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     }
     String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     /* Submit job to Livy for reading out preview data */
-    WorkbenchClient client = getWorkbenchClient();
+//    WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
-    client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
-        () -> handlePreviewFailure(id));
+    WorkbenchExecutorService service = new WorkbenchExecutorServiceImpl();
+    
+    service.createPreview(id, location, previewLimit, id, project, name);
+    //service.preview(id, location, previewLimit, id, project, name);
+    //client.submit(new WorkbenchPreviewJob(id, location, previewLimit, previewsTablePath),
+     //   () -> handlePreviewFailure(id));
     PreviewBuilder preview = new PreviewBuilder(previewsTablePath, id, "queued");
     preview.insert();
     /*

@@ -12,7 +12,7 @@ public interface WorkbenchExecutorService {
 	/**
 	   * Start creating preview of given dataset asynchronously.
 	   */
-	  ObjectNode preview(String project, String name,String component, String config) throws Exception;
+	  ObjectNode createPreview(String id, String location, int previewLimit, String previewsTablePath, String project, String name) throws Exception;
 
 	  /**
 	   * Get dataset preview data by preview ID.

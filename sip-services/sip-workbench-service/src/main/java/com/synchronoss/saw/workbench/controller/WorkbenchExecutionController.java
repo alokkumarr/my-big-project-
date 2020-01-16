@@ -74,16 +74,16 @@ public class WorkbenchExecutionController {
     log.debug("Create dataset: project = {}", project);
     log.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
-      authToken = authToken.substring("Bearer ".length());
+       authToken = authToken.substring("Bearer ".length());
     }
     /* Extract input parameters */
     final String name = body.path("name").asText();
     final String description = body.path("description").asText();
     String input = body.path("input").asText();
 
-     Ticket ticket = TokenParser.retrieveTicket(authToken);
+//     Ticket ticket = TokenParser.retrieveTicket(authToken);
 
-    log.info(ticket.getUserFullName());
+  //  log.info(ticket.getUserFullName());
 
     String component = body.path("component").asText();
     JsonNode configNode = body.path("configuration");
@@ -124,7 +124,7 @@ public class WorkbenchExecutionController {
     xdfOutput.put("desc", description);
 
     ObjectNode userData = mapper.createObjectNode();
-    userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
+   // userData.put(DataSetProperties.createdBy.toString(), ticket.getUserFullName());
 
 
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);

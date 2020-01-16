@@ -17,7 +17,7 @@ import sncr.xdf.alert.AlertQueueManager;
 
 public class WorkbenchExecutorQueuManager {
 
-	  private static final Logger logger = Logger.getLogger(AlertQueueManager.class);
+	  private static final Logger logger = Logger.getLogger(WorkbenchExecutorQueuManager.class);
 	  private String streamBasePath;
 
 	  private String project;
@@ -28,12 +28,8 @@ public class WorkbenchExecutorQueuManager {
 	  private String workbenchExecutorStream;
 
 	  public WorkbenchExecutorQueuManager(String basePath) {
-	      String sipBasePath = null;
-	      // Mapr stream having issue with path prefixed in HDFS /MAPRFS removing the maprfs
-	      // from the basepath.
-	      if (basePath.contains(":///")){
-	       sipBasePath = basePath.substring(basePath.indexOf(":")+3);
-	      }
+	      String sipBasePath = "";
+	     
 	      this.streamBasePath = sipBasePath + File.separator + "services/workbench/executor";
 	      this.workbenchExecutorStream = this.streamBasePath
           + File.separator
@@ -71,7 +67,9 @@ public class WorkbenchExecutorQueuManager {
 	    if (!streamAdmin.streamExists(workbenchExecutorStream)) {
 	      StreamDescriptor streamDescriptor = Streams.newStreamDescriptor();
 	      try {
+	    	logger.debug("####Stream not exists. Creating stream ####");
 	        streamAdmin.createStream(workbenchExecutorStream, streamDescriptor);
+	        logger.debug("####Stream created Successfully!! ####");
 	      } catch (Exception e) {
 
 	        if (retries == 0) {
@@ -93,6 +91,8 @@ public class WorkbenchExecutorQueuManager {
 	        "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 	    properties.setProperty(
 	        "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+	    properties.setProperty(
+		        "bootstrap.servers", "localhost:9092");
 
 	    KafkaProducer<String, String> producer = new KafkaProducer(properties);
 

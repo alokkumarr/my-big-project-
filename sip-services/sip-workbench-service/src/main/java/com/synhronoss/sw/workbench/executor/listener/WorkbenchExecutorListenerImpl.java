@@ -120,10 +120,10 @@ public class WorkbenchExecutorListenerImpl implements  WorkbenchExecutorListener
 					        		  if(content.length == 5) {
 					        			  	String batchID = new DateTime().toString("yyyyMMdd_HHmmssSSS");
 					        		  
-							        		  String project= content[0];
-							    			  String name = content[1];
-							    			  String component = content[2];
-							    			  String cfg = content[3];
+							        		  String project= content[1];
+							    			  String name = content[2];
+							    			  String component = content[3];
+							    			  String cfg = content[4];
 							    			  WorkbenchService service = new WorkbenchServiceImpl();
 							    			  service.executeJob(root, cfg, project, component, batchID);
 							    			  
