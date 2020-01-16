@@ -84,6 +84,8 @@ import org.springframework.util.CollectionUtils;
  *
  * @author girija.sankar
  *
+ * This class contains more than 3K LOC,
+ * the refactoring should be done as part of SIP-9923 in the near future.
  */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
