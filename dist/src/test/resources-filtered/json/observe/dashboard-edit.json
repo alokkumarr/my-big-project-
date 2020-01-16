@@ -1,0 +1,23 @@
+{"contents": {"observe": [{
+  "entityId": "8c1cc56e-af47-4846-b811-d89660e02e60::PortalDataSet::1578398477800",
+  "categoryId": "7",
+  "autoRefreshEnabled": false,
+  "name": "Test Board",
+  "description": "",
+  "createdBy": "1",
+  "createdByName": "system sncr admin",
+  "createdAt": "2020-01-07 12:01:17",
+  "updatedBy": "1",
+  "updatedByName": "system sncr admin",
+  "updatedAt": "",
+  "tiles": [{
+    "type": "analysis",
+    "id": "2b6fcbf0-575d-459d-aa80-f98d58f77786",
+    "x": 0,
+    "y": 0,
+    "cols": 16,
+    "rows": 16
+  }],
+  "filters": [],
+  "options": [{"minCols": 64}]
+}]}}
