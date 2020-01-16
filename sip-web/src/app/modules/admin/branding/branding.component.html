@@ -1,0 +1,11 @@
+<span>Choose Primary Color: </span>
+<br/>
+<span [(colorPicker)]="primaryColor"
+      [cpDialogDisplay]="'inline'"
+      [style.background]="primaryColor"
+      [cpToggle]="true"
+      [cpWidth]="'600%'"
+      [cpHeight]="'auto'">
+</span>
+
+<button mat-raised-button color="primary" (click)="savePrimaryColor()">Save Primary Color</button>

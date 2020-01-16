@@ -11,6 +11,7 @@ import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CommonModuleTs, CommonModuleGlobal } from './common';
+
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
