@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.dl.spark.DLSparkQueryBuilder;
-import com.synchronoss.saw.model.DataSecurityKey;
-import com.synchronoss.saw.model.DataSecurityKeyDef;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -64,37 +63,39 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
    *
    * @param sipQuery SipQuery.
    * @param size limit for execution data.
-   * @param dataSecurityKey DataSecurityKey.
+   * @param dskAttribute SipDskAttribute.
    * @param executionType ExecutionType.
    * @param designerEdit designer edit.
    * @param executionId executionId.
+   * @param sipQueryFromSemantic
    * @return ExecuteAnalysisResponse
    */
   public ExecuteAnalysisResponse executeDataLakeReport(
       SipQuery sipQuery,
       Integer size,
-      DataSecurityKey dataSecurityKey,
+      SipDskAttribute dskAttribute,
       ExecutionType executionType,
       Boolean designerEdit,
       String executionId,
       Integer page,
-      Integer pageSize)
+      Integer pageSize,
+      SipQuery sipQueryFromSemantic)
       throws Exception {
-    List<Object> result = null;
-
+    DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
     String query = null;
-    String queryShownTOUser=null;
+    String queryShownTOUser = null;
 
     if (designerEdit) {
       query = sipQuery.getQuery().concat(" ");
       queryShownTOUser = query;
-      query = dskForManualQuery(sipQuery,query,dataSecurityKey);
+      query = dlQueryBuilder.dskForManualQuery(sipQueryFromSemantic, query, dskAttribute);
     } else {
-      DLSparkQueryBuilder dlQueryBuilder = new DLSparkQueryBuilder();
-      query = dlQueryBuilder.buildDskDataQuery(sipQuery, dataSecurityKey);
       queryShownTOUser = dlQueryBuilder.buildDataQuery(sipQuery);
+      query = dlQueryBuilder.buildDskQuery(sipQuery, dskAttribute);
     }
-    sipQuery.setQuery(queryShownTOUser);
+    logger.trace("Query with dsk:{}",query);
+    logger.trace("Query shown to user:{}",query);
+      sipQuery.setQuery(queryShownTOUser);
     // Required parameters
     String semanticId = sipQuery.getSemanticId();
 
@@ -116,7 +117,7 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
     queueManager.sendMessageToStream(semanticId, executionId, limit, query);
 
     waitForResult(executionId, dlReportWaitTime);
-    return getDataLakeExecutionData(executionId, page, pageSize, executionType,queryShownTOUser);
+    return getDataLakeExecutionData(executionId, page, pageSize, executionType, queryShownTOUser);
   }
 
   private void waitForResult(String resultId, Integer retries) {
@@ -291,85 +292,5 @@ public class DataLakeExecutionServiceImpl implements DataLakeExecutionService {
         }
       });
     }
-  }
-
-  public String dskForManualQuery(
-      SipQuery sipQuery, String query, DataSecurityKey dataSecurityKey) {
-    String dskFilter = " (Select * from ";
-    String tempStr = dskFilter;
-    boolean flag = false;
-
-    if (dataSecurityKey.getDataSecuritykey() != null
-        && dataSecurityKey.getDataSecuritykey().size() != 0) {
-      logger.info("DSK :" + dataSecurityKey.getDataSecuritykey().get(0).getName());
-
-      List<String> semanticArtifactNames = getArtifactNames(sipQuery);
-      logger.debug("ArtifactNames = " + semanticArtifactNames);
-      for (String artifactName : semanticArtifactNames) {
-        flag = false;
-        dskFilter = " (Select * from ";
-        if (query.toUpperCase().contains(artifactName)) {
-          for (DataSecurityKeyDef dsk : dataSecurityKey.getDataSecuritykey()) {
-            String[] col = dsk.getName().split("\\.");
-
-            if (artifactName.equalsIgnoreCase(col[0])) {
-              flag = true;
-              if (dskFilter.equalsIgnoreCase(tempStr)) dskFilter = dskFilter.concat(col[0]);
-              if (!dskFilter.contains("WHERE")) {
-                dskFilter = dskFilter.concat(" WHERE upper(" + dsk.getName() + ") in (");
-              } else {
-                dskFilter = dskFilter.concat(" AND upper(" + dsk.getName() + ") in (");
-              }
-              List<String> values = dsk.getValues();
-              int initFlag = 0;
-              for (String value : values) {
-                dskFilter = initFlag != 0 ? dskFilter.concat(", ") : dskFilter;
-                dskFilter = dskFilter.concat("upper('" + value + "')");
-                initFlag++;
-              }
-              dskFilter = dskFilter.concat(")");
-            }
-          }
-
-          if (flag) {
-            dskFilter = dskFilter.concat(" ) as " + artifactName + " ");
-            query = query + " ";
-            String artName = "FROM " + artifactName;
-            logger.trace("dskFilter str = " + dskFilter);
-            query = query.trim().replaceAll("\\s{2,}", " ")
-                .replaceAll("(?i)"+artName.toUpperCase(), "FROM "+dskFilter);
-              String artName1 = "JOIN " + artifactName;
-              query = query.replaceAll("(?i)"+artName1.toUpperCase(),"JOIN "+dskFilter);
-            logger.info("Logged query : " + query);
-          }
-        }
-      }
-    }
-
-    logger.info("DSK applied Query : " + query);
-    return query;
-  }
-
-  /**
-   * This will fetch the artifactNames from metadata and provide.
-   *
-   * @param sipQuery
-   * @return List of String
-   */
-  public List<String> getArtifactNames(SipQuery sipQuery) {
-    RestTemplate restTemplate = restUtil.restTemplate();
-
-    String url = metaDataServiceExport + "/internal/semantic/workbench/" + sipQuery.getSemanticId();
-    logger.debug("SIP query url for analysis fetch : " + url);
-    SemanticNode semanticNode = restTemplate.getForObject(url, SemanticNode.class);
-    List<String> artifactNames = new ArrayList<>();
-    List<Object> artifactList = semanticNode.getArtifacts();
-    for (Object artifact : artifactList) {
-      Gson gson = new Gson();
-      logger.debug("Gson String " + gson.toJson(artifact));
-      JsonObject artifactObj = gson.toJsonTree(artifact).getAsJsonObject();
-      artifactNames.add(artifactObj.get("artifactName").getAsString().toUpperCase());
-    }
-    return artifactNames;
   }
 }
