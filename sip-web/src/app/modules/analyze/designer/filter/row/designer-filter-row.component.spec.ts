@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
 import { MaterialModule } from 'src/app/material.module';
 
 import { DesignerFilterRowComponent } from './designer-filter-row.component';
@@ -37,7 +37,9 @@ describe('DesignerFilterRowComponent', () => {
   });
 
   it('should exist', () => {
-    expect(typeof fixture.componentInstance.onGlobalCheckboxToggle).toEqual('function');
+    expect(typeof fixture.componentInstance.onGlobalCheckboxToggle).toEqual(
+      'function'
+    );
   });
 
   it('should exist', () => {
@@ -45,7 +47,9 @@ describe('DesignerFilterRowComponent', () => {
   });
 
   it('should fetch display name', () => {
-    const filter = fixture.componentInstance.displayWith({displayName: 'sample'});
+    const filter = fixture.componentInstance.displayWith({
+      displayName: 'sample'
+    });
     expect(filter).not.toBeNull();
   });
 
@@ -53,5 +57,12 @@ describe('DesignerFilterRowComponent', () => {
     const filterModel = fixture.componentInstance.nameFilter('sample');
     expect(filterModel).not.toBeNull();
   });
-});
 
+  it('should communicate changes on aggregate change', () => {
+    component.filterModelChange = new EventEmitter();
+    const spy = spyOn(component.filterModelChange, 'emit').and.returnValue({});
+    component.onAggregateSelected('abc');
+    expect(component.filter.aggregate).toEqual('abc');
+    expect(spy).toHaveBeenCalled();
+  });
+});

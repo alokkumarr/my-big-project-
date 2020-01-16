@@ -9,6 +9,7 @@ import { JwtService } from '../../../../common/services';
 import { Store } from '@ngxs/store';
 import { MatDialog } from '@angular/material';
 import { of } from 'rxjs';
+import { AnalysisDSL } from '../types';
 
 @Component({
   // tslint:disable-next-line
@@ -29,6 +30,11 @@ const analysisStub = {
   type: 'pivot'
 };
 
+const storeStub = {
+  dispatch: () => {},
+  selectSnapshot: () => {}
+};
+
 describe('Designer Component', () => {
   let component: DesignerContainerComponent;
   let fixture: ComponentFixture<DesignerContainerComponent>;
@@ -41,7 +47,7 @@ describe('Designer Component', () => {
         { provide: ChartService, useValue: {} },
         { provide: AnalyzeService, useValue: {} },
         { provide: JwtService, useValue: {} },
-        { provide: Store, useValue: { dispatch: () => {} } },
+        { provide: Store, useValue: storeStub },
         { provide: MatDialog, useValue: dialogStub }
       ],
       declarations: [DesignerContainerComponent, DesignerStubComponent],
@@ -171,5 +177,15 @@ describe('Designer Component', () => {
   it('should check filterSelectedFilter function ', () => {
     const filtersColumns = fixture.componentInstance.checkNodeForSorts();
     expect(filtersColumns).not.toBeNull();
+  });
+
+  it('should check if aggregation filters can be applied before opening filter dialog', () => {
+    const analysis = {
+      type: 'report',
+      sipQuery: { artifacts: [{ fields: [{ columnName: 'abc' }] }] }
+    };
+    expect(
+      component.supportsAggregatedFilters(analysis as AnalysisDSL)
+    ).toBeFalsy();
   });
 });
