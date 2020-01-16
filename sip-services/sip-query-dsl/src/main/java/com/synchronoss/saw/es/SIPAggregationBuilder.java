@@ -205,8 +205,10 @@ public class SIPAggregationBuilder {
                     .size(size));
           }
         }
-        aggregationBuilder =
-            buildAggregationFilter(aggregationFilter, aggregationBuilder, booleanCriteria);
+        if (aggregationFilter.size() > 0) {
+          aggregationBuilder =
+              buildAggregationFilter(aggregationFilter, aggregationBuilder, booleanCriteria);
+        }
         return reportAggregationBuilder(
             dataFields,
             aggregateFields,
@@ -312,7 +314,7 @@ public class SIPAggregationBuilder {
 
     // Script script = QueryBuilderUtil.prepareAggregationFilter2(filter,scriptSourceName);
     BucketSelectorPipelineAggregationBuilder bs =
-        PipelineAggregatorBuilders.bucketSelector("Bucket_filter", bucketsPathsMap, script);
+        PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
     aggregationBuilder.subAggregation(bs);
 
     return aggregationBuilder;
