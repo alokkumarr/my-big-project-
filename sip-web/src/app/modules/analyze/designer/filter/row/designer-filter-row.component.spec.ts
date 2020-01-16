@@ -4,6 +4,7 @@ import { MaterialModule } from 'src/app/material.module';
 
 import { DesignerFilterRowComponent } from './designer-filter-row.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { AGGREGATE_TYPES } from 'src/app/common/consts';
 
 describe('DesignerFilterRowComponent', () => {
   let component: DesignerFilterRowComponent;
@@ -28,7 +29,14 @@ describe('DesignerFilterRowComponent', () => {
       isRuntimeFilter: false,
       type: 'double'
     };
-    component.artifactColumns = [];
+    component.artifactColumns = [
+      {
+        columnName: 'date',
+        displayName: 'Date',
+        type: 'date'
+      }
+    ] as any;
+    component.analysisType = 'chart';
     fixture.detectChanges();
   });
 
@@ -64,5 +72,13 @@ describe('DesignerFilterRowComponent', () => {
     component.onAggregateSelected('abc');
     expect(component.filter.aggregate).toEqual('abc');
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should add correct aggregate automatically', () => {
+    const correctAggregate = AGGREGATE_TYPES.find(agg =>
+      agg.validDataType.includes('date')
+    ).value;
+    component.onArtifactColumnSelected('date');
+    expect(component.filter.aggregate).toEqual(correctAggregate);
   });
 });
