@@ -90,12 +90,14 @@ export class AnalyzeDialogService {
     filters: Filter[],
     artifacts: Artifact[],
     booleanCriteria,
+    analysisType,
     supportsGlobalFilters = false,
     supportsAggregationFilters = false
   ) {
     const data: DesignerFilterDialogData = {
       filters,
       artifacts,
+      analysisType,
       booleanCriteria,
       supportsGlobalFilters,
       supportsAggregationFilters,
@@ -118,6 +120,7 @@ export class AnalyzeDialogService {
             state => state.common.metrics[analysis.semanticId]
           ).artifacts
         : analysis.artifacts,
+      analysisType: analysis.type,
       isInRuntimeMode: true,
       showFilterOptions: true
     };

@@ -15,7 +15,11 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { ArtifactColumn, Filter, FilterModel } from '../../types';
-import { TYPE_MAP, AGGREGATE_TYPES } from '../../../consts';
+import { TYPE_MAP } from '../../../consts';
+import {
+  filterAggregatesByAnalysisType,
+  filterAggregatesByDataType
+} from 'src/app/common/consts';
 
 @Component({
   selector: 'designer-filter-row',
@@ -26,6 +30,7 @@ export class DesignerFilterRowComponent implements OnInit {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
+  @Input() analysisType: string;
   @Input() public filter: Filter;
   @Input() public isInRuntimeMode: boolean;
   @Input() public supportsGlobalFilters: boolean;
@@ -98,6 +103,13 @@ export class DesignerFilterRowComponent implements OnInit {
     } else {
       this.filter.model = null;
     }
+    const supportedAggregates = this.supportedAggregates.map(agg => agg.value);
+    if (
+      !this.filter.aggregate ||
+      !supportedAggregates.includes(this.filter.aggregate)
+    ) {
+      this.filter.aggregate = supportedAggregates[0];
+    }
     this.filterChange.emit();
   }
 
@@ -129,7 +141,12 @@ export class DesignerFilterRowComponent implements OnInit {
   }
 
   get supportedAggregates() {
-    return AGGREGATE_TYPES;
+    const aggregatesForAnalysis = filterAggregatesByAnalysisType(
+      this.analysisType
+    );
+    return this.filter.type
+      ? filterAggregatesByDataType(this.filter.type, aggregatesForAnalysis)
+      : aggregatesForAnalysis;
   }
 
   onAggregateSelected(aggregate: string) {

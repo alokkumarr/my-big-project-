@@ -20,6 +20,7 @@ import { ArtifactDSL } from '../../../../../models';
 
 export interface DesignerFilterDialogData {
   filters: Filter[];
+  analysisType: string;
   booleanCriteria?: string;
   artifacts;
   isInRuntimeMode: boolean;
@@ -156,6 +157,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       ({
         type,
         model,
+        isAggregationFilter,
         isRuntimeFilter,
         isGlobalFilter,
         isOptional
@@ -168,10 +170,10 @@ export class DesignerFilterDialogComponent implements OnInit {
               ? isOptional && isRuntimeFilter
               : isRuntimeFilter
           );
+        } else if (NUMBER_TYPES.includes(type) || isAggregationFilter) {
+          areValid = this.isNumberFilterValid(model);
         } else if (type === 'string') {
           areValid = this.isStringFilterValid(model);
-        } else if (NUMBER_TYPES.includes(type)) {
-          areValid = this.isNumberFilterValid(model);
         } else if (DATE_TYPES.includes(type)) {
           areValid = this.isDateFilterValid(model);
         }

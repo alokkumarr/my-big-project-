@@ -805,6 +805,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             this.filters,
             this.artifacts,
             this.booleanCriteria,
+            analysis.type,
             supportsGlobalFilters,
             this.supportsAggregatedFilters(analysis)
           )
