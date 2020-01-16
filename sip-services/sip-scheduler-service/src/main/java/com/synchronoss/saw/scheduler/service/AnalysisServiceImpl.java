@@ -2,6 +2,8 @@ package com.synchronoss.saw.scheduler.service;
 
 import com.synchronoss.saw.analysis.modal.Analysis;
 import com.synchronoss.saw.analysis.response.AnalysisResponse;
+import com.synchronoss.saw.model.Filter;
+import com.synchronoss.saw.scheduler.exception.SchedulerEntityException;
 import com.synchronoss.saw.scheduler.modal.DSLExecutionBean;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.service.ImmutableDispatchBean.Builder;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -182,12 +185,24 @@ public class AnalysisServiceImpl implements AnalysisService {
   }
 
   @Override
-  public void executeDslAnalysis(String analysisId, String userId) {
+  public void executeDslAnalysis(String analysisId, String userId, List<Filter> filters) {
     String dslUrl = metadataAnalysisUrl + "/" + analysisId +"?internalCall=true";
     logger.trace("URL for request body : ", dslUrl);
     AnalysisResponse analysisResponse = restTemplate.getForObject(dslUrl, AnalysisResponse.class);
 
     Analysis analysis = analysisResponse.getAnalysis();
+    List<Filter> analysisFilterList = analysis.getSipQuery().getFilters();
+//    if (CollectionUtils.isEmpty(analysisFilterList) && !CollectionUtils.isEmpty(filters)) {
+//      throw new SchedulerEntityException("Run time Filter is must!!");
+//    }
+    if (!CollectionUtils.isEmpty(filters)) {
+      List<Filter> filterList = analysisFilterList;
+      for (Filter filter : analysisFilterList) {
+        if (filter.getIsRuntimeFilter()) filterList.remove(filter);
+      }
+      filterList.addAll(filters);
+      analysis.getSipQuery().setFilters(filterList);
+    }
     logger.trace("Analysis request body : ", analysisResponse.getAnalysis());
 
     String url = proxyAnalysisUrl

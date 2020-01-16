@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.modal;
 
+import com.synchronoss.saw.model.Filter;
 import java.io.IOException;
 import java.io.OptionalDataException;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 
 /**
  * * Important Note : @Since SAW2.5.0. Section readObject and writeObject has added in this class
@@ -72,6 +74,8 @@ public class SchedulerJobDetail implements Serializable {
   private String auth;
 
   private String userId;
+
+  private List<Filter> filters;
 
   /**
    * Gets analysisID
@@ -355,6 +359,14 @@ public class SchedulerJobDetail implements Serializable {
     this.userId = userId;
   }
 
+  public List<Filter> getFilters() {
+    return filters;
+  }
+
+  public void setFilters(List<Filter> filters) {
+    this.filters = filters;
+  }
+
   /**
    * @param out
    * @throws IOException
@@ -382,6 +394,7 @@ public class SchedulerJobDetail implements Serializable {
     out.writeObject(zip);
     out.writeObject(auth);
     out.writeObject(userId);
+    if (!CollectionUtils.isEmpty(filters)) out.writeObject(filters);
   }
 
   /**
@@ -474,6 +487,15 @@ public class SchedulerJobDetail implements Serializable {
     } catch (OptionalDataException e) {
       logger.error("Unable to read user Id Object :{}", e.getMessage());
     }
+
+    try {
+      Object filtersObk = in.readObject();
+      if (filtersObk instanceof  List) {
+        filters = (List<Filter>) filtersObk;
+      }
+    } catch (OptionalDataException e) {
+      logger.error("Unable to read filter list Object :{}", e.getMessage());
+    }
   }
 
   @Override
@@ -533,6 +555,9 @@ public class SchedulerJobDetail implements Serializable {
         + s3
         + ", zip="
         + zip
+        + '\''
+        + ", filters="
+        + filters
         + '}';
   }
 }
