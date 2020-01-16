@@ -18,6 +18,7 @@ import com.sncr.saw.security.common.bean.RefreshToken;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.User;
+import com.sncr.saw.security.common.bean.UserDetails;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
@@ -28,6 +29,7 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import com.synchronoss.bda.sip.dsk.DskDetails;
 import com.synchronoss.bda.sip.jwt.token.DataSecurityKeys;
 import com.synchronoss.bda.sip.jwt.token.RoleType;
 import com.synchronoss.bda.sip.jwt.token.Ticket;
@@ -93,7 +95,8 @@ public class UserRepositoryImplTest {
 	private static Category category11;
 	private static Category category12;
 	private static List<Category> categoryList = new ArrayList<Category>();
-  private static String createdBy="sawadmin@synchronoss.com";
+	private static String createdBy="sawadmin@synchronoss.com";
+  private static DskDetails userDskDetails;
 
 	@BeforeClass
 	public static void setUp() {
@@ -295,7 +298,12 @@ public class UserRepositoryImplTest {
 
 		securityKeys = new DataSecurityKeys();
 		securityKeys.setDataSecurityKeys(dskDetails);
-		securityKeys.setMessage("success");
+    securityKeys.setMessage("success");
+
+    userDskDetails = new DskDetails();
+    userDskDetails.setCustomerCode("SYNCHRONOSS");
+    userDskDetails.setCustomerId(1l);
+    userDskDetails.setIsJvCustomer(1);
 	}
 
 	@Test
@@ -823,11 +831,13 @@ public class UserRepositoryImplTest {
 		assertEquals(1, allCategories.size());
 	}
 
-	@Test
-	public void testDSKDetailsByUserId() {
-		String userId = "alok.kumarr";
-		when(userRepositoryDAO.fetchDSKDetailByUserId(userId)).thenReturn(securityKeys);
-		DataSecurityKeys dataSecurityKeys = userRepositoryDAO.fetchDSKDetailByUserId(userId);
-		assertEquals(1, dataSecurityKeys.getDataSecurityKeys().size());
-	}
+  @Test
+  public void testDSKDetailsByUserId() {
+    String userId = "sawadmin@synchronoss.com";
+    when(userRepositoryDAO.getUserById(userId)).thenReturn(userDskDetails);
+    DskDetails details = userRepositoryDAO.getUserById(userId);
+    assertEquals(1l, (long) details.getCustomerId()); // OK - assertEquals(long, long)
+    assertEquals(1, (int) details.getIsJvCustomer());
+    assertEquals("SYNCHRONOSS", details.getCustomerCode());
+  }
 }

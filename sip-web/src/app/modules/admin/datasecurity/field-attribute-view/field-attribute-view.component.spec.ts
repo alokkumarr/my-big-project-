@@ -3,19 +3,14 @@ import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import 'hammerjs';
 import { MaterialModule } from '../../../../material.module';
 import { FieldAttributeViewComponent } from './field-attribute-view.component';
-import { UserAssignmentService } from '../userassignment.service';
+import { DataSecurityService } from '../datasecurity.service';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
-import {
-  DxDataGridModule
-} from 'devextreme-angular/ui/data-grid';
+import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxTemplateModule } from 'devextreme-angular/core/template';
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  NO_ERRORS_SCHEMA
-} from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 
 /* Stubs */
-const UserAssignmentServiceStub = {
+const DataSecurityServiceStub = {
   getSecurityAttributes: () => {
     return new Promise(res => res({ data: {} }));
   }
@@ -33,8 +28,10 @@ describe('field attribute component', () => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, DxDataGridModule, DxTemplateModule],
       declarations: [FieldAttributeViewComponent, FieldAttributeStubComponent],
-      providers: [ DxDataGridService,
-                  { provide: UserAssignmentService, useValue: UserAssignmentServiceStub }],
+      providers: [
+        DxDataGridService,
+        { provide: DataSecurityService, useValue: DataSecurityServiceStub }
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
     })
       .compileComponents()

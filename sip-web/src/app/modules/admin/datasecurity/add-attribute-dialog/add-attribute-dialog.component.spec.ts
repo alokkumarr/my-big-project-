@@ -4,7 +4,7 @@ import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import 'hammerjs';
 import { MaterialModule } from '../../../../material.module';
 import { AddAttributeDialogComponent } from './add-attribute-dialog.component';
-import { UserAssignmentService } from './../userassignment.service';
+import { DataSecurityService } from '../datasecurity.service';
 import {
   MatDialog,
   MatDialogConfig,
@@ -14,7 +14,7 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { JwtService } from 'src/app/common/services';
 
-const UserAssignmentServiceStub = {
+const DataSecurityServiceStub = {
   attributetoGroup: () => {
     return new Promise(res => res({ data: {} }));
   },
@@ -49,7 +49,7 @@ describe('Create AddAttributeDialogStubComponent', () => {
         AddAttributeDialogStubComponent
       ],
       providers: [
-        { provide: UserAssignmentService, useValue: UserAssignmentServiceStub },
+        { provide: DataSecurityService, useValue: DataSecurityServiceStub },
         { provide: JwtService, useValue: JwtServiceStub },
         { provide: MatDialog, useValue: mockService },
         { provide: MatDialogRef, useValue: mockService },

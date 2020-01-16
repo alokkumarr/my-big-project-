@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 @JsonInclude(Include.NON_NULL)
@@ -71,5 +72,16 @@ public class SipDskAttribute {
 
   public void setBooleanQuery(List<SipDskAttribute> booleanQuery) {
     this.booleanQuery = booleanQuery;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("attributeId", attributeId)
+        .append("columnName", columnName)
+        .append("model", model)
+        .append("booleanCriteria", booleanCriteria)
+        .append("booleanQuery", booleanQuery)
+        .toString();
   }
 }
