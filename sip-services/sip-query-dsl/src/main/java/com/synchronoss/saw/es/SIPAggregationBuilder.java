@@ -3,6 +3,7 @@ package com.synchronoss.saw.es;
 import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
 import com.google.gson.Gson;
+import com.synchronoss.saw.constants.CommonQueryConstants;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Expression;
 import com.synchronoss.saw.model.Field;
@@ -24,6 +25,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -314,7 +316,7 @@ public class SIPAggregationBuilder {
 
     // Script script = QueryBuilderUtil.prepareAggregationFilter2(filter,scriptSourceName);
     BucketSelectorPipelineAggregationBuilder bs =
-        PipelineAggregatorBuilders.bucketSelector("bucket_filter", bucketsPathsMap, script);
+        PipelineAggregatorBuilders.bucketSelector(CommonQueryConstants.BUCKET_FILTER, bucketsPathsMap, script);
     aggregationBuilder.subAggregation(bs);
 
     return aggregationBuilder;
@@ -348,18 +350,44 @@ public class SIPAggregationBuilder {
    * @param dataFields
    * @param aggregateFields
    * @param searchSourceBuilder
+   * @param aggregationFilter
+   * @param booleanCriteria
    */
   public void aggregationBuilder(
       List<Field> dataFields,
       List<Field> aggregateFields,
-      SearchSourceBuilder searchSourceBuilder) {
+      SearchSourceBuilder searchSourceBuilder,
+      List<Filter> aggregationFilter,
+      BooleanCriteria booleanCriteria) {
     // if only aggregation fields are there.
-
     if (aggregateFields.size() == dataFields.size()) {
-      for (Field field : aggregateFields) {
-        searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataField(field));
+      List<AggregationBuilder> aggregationBuilderList = getAggregationBuilderList(aggregateFields);
+      if (aggregationFilter != null && aggregationFilter.size() > 0) {
+        AggregationBuilder filterAggregationBuilder =
+            AggregationBuilders.filters(
+                CommonQueryConstants.ALL_MATCHING_DOCS, QueryBuilders.matchAllQuery());
+        for (AggregationBuilder fieldAggregationBuilder : aggregationBuilderList) {
+          filterAggregationBuilder.subAggregation(fieldAggregationBuilder);
+        }
+        if (aggregationFilter.size() > 0) {
+          filterAggregationBuilder =
+              buildAggregationFilter(aggregationFilter, filterAggregationBuilder, booleanCriteria);
+        }
+        searchSourceBuilder.aggregation(filterAggregationBuilder);
+      } else {
+        aggregationBuilderList.stream()
+            .forEach(aggregationBuilder1 -> searchSourceBuilder.aggregation(aggregationBuilder1));
       }
     }
+  }
+
+  private List<AggregationBuilder> getAggregationBuilderList(List<Field> aggregateFields) {
+    List<AggregationBuilder> aggregationBuilderList = new ArrayList<>();
+    aggregateFields.stream()
+        .forEach(
+            field ->
+                aggregationBuilderList.add(QueryBuilderUtil.aggregationBuilderDataField(field)));
+    return aggregationBuilderList;
   }
 
   /**

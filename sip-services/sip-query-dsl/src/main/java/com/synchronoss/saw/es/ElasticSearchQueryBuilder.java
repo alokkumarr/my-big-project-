@@ -276,7 +276,7 @@ public class ElasticSearchQueryBuilder {
       AggregationBuilder aggregationBuilder = null;
       if (dataFields.size() == aggregationFields.size()) {
         reportAggregationBuilder.aggregationBuilder(
-            dataFields, aggregationFields, searchSourceBuilder);
+            dataFields, aggregationFields, searchSourceBuilder, aggregationFilter,booleanCriteria);
       } else {
         groupByFields = new String[dataFields.size() - aggregationFields.size()];;
         finalAggregationBuilder =
