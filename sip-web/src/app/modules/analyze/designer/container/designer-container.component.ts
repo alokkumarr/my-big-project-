@@ -771,6 +771,15 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
     }
   }
 
+  supportsAggregatedFilters(analysis: AnalysisDSL): boolean {
+    return ['report', 'esReport'].includes(analysis.type)
+      ? flatMap(
+          analysis.sipQuery.artifacts,
+          artifact => artifact.fields
+        ).some(field => Boolean(field.aggregate))
+      : true;
+  }
+
   onToolbarAction(action: DesignerToolbarAciton) {
     const analysis = this._store.selectSnapshot(DesignerState.analysis);
     switch (action) {
@@ -788,14 +797,6 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
           });
         break;
       case 'filter':
-        const supportsAggregationFilters = ['report', 'esReport'].includes(
-          analysis.type
-        )
-          ? flatMap(
-              analysis.sipQuery.artifacts,
-              artifact => artifact.fields
-            ).some(field => Boolean(field.aggregate))
-          : true;
         const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes(
           (this.analysis || this.analysisStarter).type
         );
@@ -805,7 +806,7 @@ export class DesignerContainerComponent implements OnInit, OnDestroy {
             this.artifacts,
             this.booleanCriteria,
             supportsGlobalFilters,
-            supportsAggregationFilters
+            this.supportsAggregatedFilters(analysis)
           )
           .afterClosed()
           .subscribe((result: IToolbarActionResult) => {

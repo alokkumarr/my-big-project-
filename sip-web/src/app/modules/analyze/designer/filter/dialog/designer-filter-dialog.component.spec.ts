@@ -27,7 +27,6 @@ describe('DesignerFilterRowComponent', () => {
           provide: MAT_DIALOG_DATA,
           useValue: {}
         }
-
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -42,5 +41,11 @@ describe('DesignerFilterRowComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-});
 
+  it('should return aggregated filters', () => {
+    component.groupedFilters = {
+      table: [{ isAggregationFilter: true }, { isAggregationFilter: false }]
+    };
+    expect(component.aggregatedFiltersFor('table').length).toEqual(1);
+  });
+});

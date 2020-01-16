@@ -129,7 +129,6 @@ export class DesignerFilterDialogComponent implements OnInit {
       fpFlatMap(([_, filters]) => filters)
     )(this.groupedFilters);
     this.areFiltersValid = this.validateFilters(this.filters);
-    console.log(this.filters);
   }
 
   artifactTrackByFn(_, artifact: Artifact | ArtifactDSL) {
