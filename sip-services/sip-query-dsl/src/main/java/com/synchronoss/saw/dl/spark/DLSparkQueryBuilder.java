@@ -1,6 +1,7 @@
 package com.synchronoss.saw.dl.spark;
 
 import com.synchronoss.bda.sip.dsk.SipDskAttribute;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.exceptions.SipDslProcessingException;
 import com.synchronoss.saw.model.Aggregate;
 import com.synchronoss.saw.model.Artifact;
@@ -19,6 +20,7 @@ import com.synchronoss.saw.model.SipQuery.BooleanCriteria;
 import com.synchronoss.saw.model.Sort;
 import com.synchronoss.saw.util.BuilderUtil;
 import com.synchronoss.saw.util.DynamicConvertor;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +54,6 @@ public class DLSparkQueryBuilder {
   public static final String JOIN = "JOIN";
   public static final String SPACE = " ";
   public static final String ORDER_BY = "ORDER BY";
-
 
   List<String> groupByColumns = new ArrayList<>();
 
@@ -128,7 +129,11 @@ public class DLSparkQueryBuilder {
                     } else {
                       column = artifactName + "." + columnName.replace(".keyword", "");
                       groupByColumns.add(column);
-                      column = alias4CustomerCodeField(column, columnName, artifactName);
+
+                      String alias = field.getAlias();
+                      if (!StringUtils.isBlank(alias)) {
+                        column = column + " AS " + alias;
+                      }
                     }
                     selectColumns.add(column);
                   });
@@ -658,22 +663,6 @@ public class DLSparkQueryBuilder {
     return strList.stream().map(addQuotes).collect(Collectors.joining(", "));
   }
 
-  /**
-   * Handling customerCode field present in table joins.
-   *
-   * @param column
-   * @param columnName
-   * @param artifactName
-   * @return
-   */
-  public String alias4CustomerCodeField(String column, String columnName, String artifactName) {
-    if (columnName.equalsIgnoreCase(CUSTOMER_CODE))  {
-      column = column.concat(" as " + artifactName + "_" + columnName + " ");
-      return column;
-    }
-    return column;
-  }
-
   public static String dskForManualQuery(
       SipQuery sipQuery, String query, SipDskAttribute attribute) {
     StringBuffer dskFilter13 = new StringBuffer();
@@ -685,7 +674,7 @@ public class DLSparkQueryBuilder {
       for (Artifact artifact : artifacts) {
         String artifactName = artifact.getArtifactsName();
         StringBuffer dskFilter = new StringBuffer();
-        dskFilter.append(String.format(" (SELECT * FROM %s WHERE ",artifactName));
+        dskFilter.append(String.format(" (SELECT * FROM %s WHERE ", artifactName));
         if (query.toUpperCase().contains(artifactName)) {
           String dskFormedQuery = dskQueryForArtifact(attribute, artifactName);
           logger.info("dskformed query = " + dskFormedQuery);
@@ -697,14 +686,13 @@ public class DLSparkQueryBuilder {
             /*added below line for SIP-9839 ,for  $ character in string the replacement(replaceAll method) replacing $ as well
             ,so to handle that  replacing $ with escapecharacter and $ */
             String dskFilterString = dskFilter.toString().replaceAll("\\$", "\\\\\\$");
-              query =
+            query =
                 query
                     .trim()
                     .replaceAll("\\s{2,}", " ")
                     .replaceAll("(?i)" + artName.toUpperCase(), "FROM " + dskFilterString);
             String artName1 = "JOIN " + artifactName;
-            query =
-                query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilterString);
+            query = query.replaceAll("(?i)" + artName1.toUpperCase(), "JOIN " + dskFilterString);
             logger.info("Logged query : " + query);
           }
         }
@@ -715,8 +703,7 @@ public class DLSparkQueryBuilder {
     return query;
   }
 
-  public static String dskQueryForArtifact(
-      SipDskAttribute attribute, String arifactName) {
+  public static String dskQueryForArtifact(SipDskAttribute attribute, String arifactName) {
     boolean flag = true;
     String boolenaCriteria = null;
     StringBuilder dskquery = new StringBuilder();
@@ -793,8 +780,7 @@ public class DLSparkQueryBuilder {
    * @param sipDskAttribute DataSecurityKey Object
    * @return sipQuery semantic sipQuery
    */
-  public String buildDskQuery(
-      SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
+  public String buildDskQuery(SipQuery sipQuery, SipDskAttribute sipDskAttribute) {
     booleanCriteria = sipQuery.getBooleanCriteria();
     StringBuilder select = new StringBuilder(SELECT).append(SPACE);
     List<String> selectList = buildSelect(sipQuery.getArtifacts());
@@ -816,9 +802,7 @@ public class DLSparkQueryBuilder {
           .append(")")
           .append(SPACE);
     }
-    select
-        .append(queryDskBuilder(sipDskAttribute, sipQuery))
-        .append(buildGroupBy());
+    select.append(queryDskBuilder(sipDskAttribute, sipQuery)).append(buildGroupBy());
 
     String sort = buildSort(sipQuery.getSorts());
     if (sort != null && !StringUtils.isEmpty(sort)) {
@@ -833,8 +817,7 @@ public class DLSparkQueryBuilder {
    * @param sipQuery
    * @return
    */
-  public static String queryDskBuilder(
-      SipDskAttribute sipDskAttribute, SipQuery sipQuery) {
+  public static String queryDskBuilder(SipDskAttribute sipDskAttribute, SipQuery sipQuery) {
     StringBuilder dskFilter = new StringBuilder();
     if (sipDskAttribute != null
         && (sipDskAttribute.getBooleanCriteria() != null
@@ -859,4 +842,98 @@ public class DLSparkQueryBuilder {
     }
     return dskFilter.toString();
   }
+  //  public static void main(String[] args) throws IOException {
+  //
+  //      String sipQueryStr =
+  //        "{"
+  //            + " \"artifacts\": [{"
+  //            + "   \"artifactsName\": \"sales\","
+  //            + "   \"fields\": [{"
+  //            + "     \"alias\": \"salesCustomer\","
+  //            + "     \"columnName\": \"customerCode\","
+  //            + "     \"displayName\": \"CustomerCode\","
+  //            + "     \"type\": \"string\","
+  //            + "     \"visibleIndex\": 0,"
+  //            + "     \"name\": \"customerCode\","
+  //            + "     \"table\": \"sales\""
+  //            + "    },"
+  //            + "    {"
+  //            + "     \"alias\": \"\","
+  //            + "     \"columnName\": \"double\","
+  //            + "     \"displayName\": \"Double\","
+  //            + "     \"type\": \"double\","
+  //            + "     \"visibleIndex\": 1,"
+  //            + "     \"format\": {"
+  //            + "      \"precision\": 2"
+  //            + "     },"
+  //            + "     \"name\": \"double\","
+  //            + "     \"table\": \"sales\""
+  //            + "    },"
+  //            + "    {"
+  //            + "     \"alias\": \"\","
+  //            + "     \"columnName\": \"string\","
+  //            + "     \"displayName\": \"String\","
+  //            + "     \"type\": \"string\","
+  //            + "     \"visibleIndex\": 2,"
+  //            + "     \"name\": \"string\","
+  //            + "     \"table\": \"sales\""
+  //            + "    }"
+  //            + "   ]"
+  //            + "  },"
+  //            + "  {"
+  //            + "   \"artifactsName\": \"product\","
+  //            + "   \"fields\": [{"
+  //            + "     \"columnName\": \"string_2\","
+  //            + "     \"alias\": \"Secondstring\","
+  //            + "     \"displayName\": \"String_2\","
+  //            + "     \"groupInterval\": null,"
+  //            + "     \"name\": \"string_2\","
+  //            + "     \"type\": \"string\","
+  //            + "     \"table\": \"product\","
+  //            + "     \"visibleIndex\": 3"
+  //            + "    },"
+  //            + "    {"
+  //            + "     \"columnName\": \"customerCode\","
+  //            + "     \"displayName\": \"CustomerCode\","
+  //            + "     \"groupInterval\": null,"
+  //            + "     \"name\": \"customerCode\","
+  //            + "     \"type\": \"string\","
+  //            + "     \"table\": \"product\","
+  //            + "     \"visibleIndex\": 4"
+  //            + "    }"
+  //            + "   ]"
+  //            + "  }"
+  //            + " ],"
+  //            + " \"booleanCriteria\": \"AND\","
+  //            + " \"filters\": [],"
+  //            + " \"sorts\": [],"
+  //            + " \"joins\": [{"
+  //            + "  \"join\": \"inner\","
+  //            + "  \"criteria\": [{"
+  //            + "   \"joinCondition\": {"
+  //            + "    \"operator\": \"EQ\","
+  //            + "    \"left\": {"
+  //            + "     \"artifactsName\": \"PRODUCT\","
+  //            + "     \"columnName\": \"string_2\""
+  //            + "    },"
+  //            + "    \"right\": {"
+  //            + "     \"artifactsName\": \"SALES\","
+  //            + "     \"columnName\": \"string\""
+  //            + "    }"
+  //            + "   }"
+  //            + "  }]"
+  //            + " }],"
+  //            + " \"store\": {},"
+  //            + " \"query\": \"SELECT sales.customerCode as sales_customerCode , sales.double,
+  // sales.string, product.string_2, product.customerCode as product_customerCode  FROM PRODUCT
+  // INNER JOIN SALES ON PRODUCT.string_2 = SALES.string\","
+  //            + " \"semanticId\": \"workbench::sample-spark\""
+  //            + "}";
+  //      ObjectMapper mapper = new ObjectMapper();
+  //      SipQuery sipQuery = mapper.readValue(sipQueryStr, SipQuery.class);
+  //
+  //      String query = new DLSparkQueryBuilder().buildDataQuery(sipQuery);
+  //
+  //      System.out.println(query);
+  //  }
 }
