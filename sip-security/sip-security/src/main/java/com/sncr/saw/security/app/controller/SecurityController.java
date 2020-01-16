@@ -2183,14 +2183,31 @@ public class SecurityController {
      * @return
      */
 	@RequestMapping(value= "/auth/user/preferences/upsert", method = RequestMethod.POST)
-    public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
+    public UserPreferences addUserPreferences(HttpServletRequest request, HttpServletResponse response,
+																							@RequestBody List<Preference> preferenceList) {
 	    UserPreferences userPreferences = new UserPreferences();
-	    String jwtToken = JWTUtils.getToken(request);
-	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        return preferenceRepository.upsertPreferences(userPreferences);
+			try {
+				Ticket ticket = SipCommonUtils.getTicket(request);
+				userPreferences.setUserID(ticket.getMasterLoginId());
+				userPreferences.setCustomerID(ticket.getCustID());
+				Preference preference = preferenceList.stream().
+						filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
+				Long customerId = preference != null && preference.getPreferenceValue() != null ?
+						Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+				if (securityService.haveValidCustomerId(ticket, customerId)) {
+					userPreferences.setPreferences(preferenceList);
+					return preferenceRepository.upsertPreferences(userPreferences);
+				} else {
+					userPreferences.setMessage("Customer Id not matched, please correct customer id.");
+					return userPreferences;
+				}
+			}catch (Exception ex) {
+				String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
+				userPreferences.setMessage(message + " Please contact server Administrator");
+				logger.error(message);
+			}
+			return userPreferences;
     }
 
     /**
@@ -2198,19 +2215,37 @@ public class SecurityController {
      * @return
      */
     @RequestMapping(value= "/auth/user/preferences/delete", method = RequestMethod.POST)
-    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
+    public UserPreferences deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
         UserPreferences userPreferences = new UserPreferences();
-        String jwtToken = JWTUtils.getToken(request);
-        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken,nSSOProperties.getJwtSecretKey());
-        userPreferences.setUserID(extractValuesFromToken[0]);
-        userPreferences.setCustomerID(extractValuesFromToken[1]);
-        userPreferences.setPreferences(preferenceList);
-        if (inactivateAll!=null && inactivateAll)
-            return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
-        else
-            return preferenceRepository.deletePreferences(userPreferences,false);
+				try {
+					Ticket ticket = SipCommonUtils.getTicket(request);
+					userPreferences.setUserID(ticket.getMasterLoginId());
+					userPreferences.setCustomerID(ticket.getCustID());
+					Preference preference = preferenceList.stream().
+							filter(p -> p.getPreferenceName().equalsIgnoreCase("defaultDashboardCategory")).findFirst().get();
+					Long customerId = preference != null && preference.getPreferenceValue() != null ?
+							Long.valueOf(preference.getPreferenceValue()) : 0L;
+
+					if (securityService.haveValidCustomerId(ticket, customerId)) {
+						userPreferences.setPreferences(preferenceList);
+						if (inactivateAll!=null && inactivateAll) {
+							return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
+						}
+						else {
+							return preferenceRepository.deletePreferences(userPreferences,false);
+						}
+					} else {
+						userPreferences.setMessage("Customer Id not matched, please correct customer id.");
+						return userPreferences;
+					}
+				}catch (Exception ex) {
+					String message = (ex instanceof DataAccessException) ? "Database error." : "Error.";
+					userPreferences.setMessage(message + " Please contact server Administrator");
+					logger.error(message);
+				}
+			return userPreferences;
     }
 
     /**
