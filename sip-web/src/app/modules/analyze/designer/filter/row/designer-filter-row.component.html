@@ -61,10 +61,9 @@
     <ng-container *ngIf="!filter.isAggregationFilter; else aggregationFields">
       <div
         *ngIf="
-          filter.isAggregationFilter &&
-          (isInRuntimeMode
+          isInRuntimeMode
             ? filter.isRuntimeFilter
-            : !filter.isRuntimeFilter && !filter.isGlobalFilter)
+            : !filter.isRuntimeFilter && !filter.isGlobalFilter
         "
         style="margin-left: 10px;"
         [ngSwitch]="TYPE_MAP[filter.type]"
