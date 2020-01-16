@@ -515,7 +515,7 @@ public class SipAlertController {
       // validate the alerts access privileges
       if (!utils.validAlertPrivileges(ticket.getProducts())) {
         logger.error(String.format(UNAUTHORIZED, "Access"));
-        setUnAuthResponse(response);
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         response.sendError(HttpStatus.SC_UNAUTHORIZED,
             String.format(UNAUTHORIZED, "Access"));
         return alertCountResponse;
