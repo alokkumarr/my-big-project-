@@ -52,7 +52,7 @@ public class OnBoardCustomerRepositoryDaoImpl implements OnBoardCustomerReposito
      * @return
      */
     @Override
-    public int testSql() {
+    public int haveCustomerInfo() {
         String sql = "select 1";
         SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
         int rowCount = 0;

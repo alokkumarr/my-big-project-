@@ -33,7 +33,7 @@ class SawSecurityShell {
     try {
       CustomerRepositoryDaoImpl custDao = onboard.getCustomerDao();
       // check if connection is working fine only then proceed
-      if (custDao.testSql() == 1) {
+      if (custDao.haveCustomerInfo() == 1) {
 
         // display all the products
         display(onboard.getProductsDao().getProductList());
