@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
@@ -86,15 +87,18 @@ public class AlertUtils {
     boolean[] haveValid = {false};
     if (productList != null && !productList.isEmpty()) {
       productList.stream().forEach(products -> {
-        ProductModules productModule = products.getProductModules().stream()
-            .filter(productModules -> "ALERTS".equalsIgnoreCase(productModules.getProductModName()))
-            .collect(Collectors.toList()).get(0);
+        List<ProductModules> productModules = products.getProductModules().stream()
+            .filter(pm -> "ALERTS".equalsIgnoreCase(pm.getProductModName()))
+            .collect(Collectors.toList());
 
-        ArrayList<ProductModuleFeature> prodModFeature = productModule.getProdModFeature();
-        if (prodModFeature != null && !prodModFeature.isEmpty()) {
-          haveValid[0] = prodModFeature.stream()
-              .anyMatch(productModuleFeature ->
-                  "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()));
+        if (productModules != null && !productModules.isEmpty()) {
+          ProductModules modules = productModules.get(0);
+          ArrayList<ProductModuleFeature> prodModFeature = modules.getProdModFeature();
+          if (prodModFeature != null && !prodModFeature.isEmpty()) {
+            haveValid[0] = prodModFeature.stream()
+                .anyMatch(productModuleFeature ->
+                    "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()));
+          }
         }
       });
     }
