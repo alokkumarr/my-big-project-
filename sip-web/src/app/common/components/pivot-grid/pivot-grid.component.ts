@@ -354,6 +354,8 @@ export class PivotGridComponent implements OnDestroy {
             ? 'number'
             : 'string';
           this.setDisplayNameAndAggregate(cloned);
+
+          cloned.format = { formatter: getFormatter(artifactColumn.format) };
         } else {
           cloned.dataType = cloned.type;
         }
