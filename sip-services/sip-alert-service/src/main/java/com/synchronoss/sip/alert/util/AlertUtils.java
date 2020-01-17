@@ -83,7 +83,8 @@ public class AlertUtils {
    * @param productList
    * @return true if valid else false
    */
-  public boolean validAlertPrivileges(ArrayList<Products> productList) {
+  public boolean validAlertPrivileges(ArrayList<Products> productList
+      , String subcategory) {
     boolean[] haveValid = {false};
     if (productList != null && !productList.isEmpty()) {
       productList.stream().forEach(products -> {
@@ -95,9 +96,15 @@ public class AlertUtils {
           ProductModules modules = productModules.get(0);
           ArrayList<ProductModuleFeature> prodModFeature = modules.getProdModFeature();
           if (prodModFeature != null && !prodModFeature.isEmpty()) {
-            haveValid[0] = prodModFeature.stream()
-                .anyMatch(productModuleFeature ->
-                    "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()));
+            ProductModuleFeature feature = prodModFeature.stream()
+                .filter(productModuleFeature ->
+                    "Alerts".equalsIgnoreCase(productModuleFeature.getProdModFeatureName()))
+                .findAny().get();
+
+            haveValid[0] = feature.getProductModuleSubFeatures() != null
+                ? feature.getProductModuleSubFeatures().stream()
+                .anyMatch(pmf -> subcategory.equalsIgnoreCase(pmf.getProdModFeatureName()))
+                : false;
           }
         }
       });
@@ -245,7 +252,7 @@ public class AlertUtils {
       // validate the alerts access privileges
       logger.error(errorMessage);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      response.sendError(HttpStatus.SC_UNAUTHORIZED,errorMessage);
+      response.sendError(HttpStatus.SC_UNAUTHORIZED, errorMessage);
       return errorMessage;
     } catch (IOException ex) {
       return errorMessage;
