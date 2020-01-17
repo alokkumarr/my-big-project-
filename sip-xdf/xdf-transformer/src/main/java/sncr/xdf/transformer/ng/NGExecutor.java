@@ -128,15 +128,14 @@ public abstract class NGExecutor {
             .drop(trRC);
         if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
-
         logger.debug("Final DS: " + successTransformationsCount.value());
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
-        ((AbstractComponent)parent).getNgctx().datafileDFmap.put(outDataSetName,outputResult);
         writeResults(outputResult, outDataSetName, tempLoc);
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
+        ((AbstractComponent)parent).validateOutputDSCounts(((NGTransformerComponent)parent).inputDSCount,outputResult.count());
     }
 
 
@@ -167,6 +166,7 @@ public abstract class NGExecutor {
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
+        ((AbstractComponent)parent).validateOutputDSCounts(((NGTransformerComponent)parent).inputDSCount,outputResult.count());
     }
 
 }

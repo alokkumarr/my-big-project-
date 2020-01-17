@@ -62,6 +62,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         logger.trace(String.format("Get script %s in location: ", sqlScript));
         return sqlScript;
     }
+    protected long inputDSCount = 0;
 
     @Override
     protected int execute(){
@@ -89,7 +90,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
 
 //2. Read input datasets
-            long inputDSCount = 0;
             Map<String, Dataset> dsMap = new HashMap();
             if (ngctx.runningPipeLine) {
                 String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
@@ -189,15 +189,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     logger.error(error);
                     return -1;
                 }
-            }
-            Dataset outputDS = ngctx.datafileDFmap.get(ngctx.componentConfiguration.getOutputs().get(0).getDataSet().toString());
-            long outputDSCount = outputDS.count();
-            if(outputDSCount == 0){
-                throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
-            }else if(inputDSCount > outputDSCount){
-                isFinalStatusupdated=true;
-                XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
-                updateOutputDSMetadata(retCd.getCode(), "SUCCESS", Optional.of(retCd.getDescription(inputDSCount-outputDSCount)));
             }
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);

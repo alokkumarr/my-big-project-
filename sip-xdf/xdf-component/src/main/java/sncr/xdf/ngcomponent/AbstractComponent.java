@@ -898,5 +898,17 @@ public abstract class AbstractComponent implements WithContext{
         logger.info("Component Return Code :" + rc);
         return rc;
     }
+
+    public void validateOutputDSCounts(long inputDSCount, long outputDSCount){
+        logger.info("outputDSCount : " + outputDSCount);
+        logger.info("inputDSCount : " + inputDSCount);
+        if(outputDSCount == 0){
+            throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+        }else if(inputDSCount > outputDSCount){
+            isFinalStatusupdated=true;
+            XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
+            updateOutputDSMetadata(retCd.getCode(), "SUCCESS", Optional.of(retCd.getDescription(inputDSCount-outputDSCount)));
+        }
+    }
 }
 
