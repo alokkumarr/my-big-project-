@@ -47,7 +47,7 @@ public class S3ServiceImpl extends SipPluginContract {
 
   @Override
   public void executeFileTransfer(String logId, Long jobId, Long channelId,
-      Long routeId, String fileName, String destinationDirPath) {
+      Long routeId, String fileName, Optional<String> destinationDirPath) {
     // TODO Auto-generated method stub
     
   }

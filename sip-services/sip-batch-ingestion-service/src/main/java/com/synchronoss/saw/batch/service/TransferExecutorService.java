@@ -5,6 +5,7 @@ import com.synchronoss.saw.batch.plugin.SipIngestionPluginFactory;
 import com.synchronoss.saw.logs.entities.BisFileLog;
 import com.synchronoss.saw.logs.service.SipLogging;
 
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +48,10 @@ public class TransferExecutorService {
           .getInstance(bisFileLog.getBisChannelType());
       
 
+      Optional<String> destinationPath = Optional.of(bisFileLog.getRecdFileName());
       sipTransferService.executeFileTransfer(bisFileLog.getPid(),
           bisFileLog.getJob().getJobId(), bisFileLog.getBisChannelSysId(),
-          bisFileLog.getRouteSysId(), bisFileLog.getFileName(), bisFileLog.getRecdFileName());
+          bisFileLog.getRouteSysId(), bisFileLog.getFileName(), destinationPath);
     }
     
 

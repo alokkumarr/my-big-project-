@@ -777,8 +777,11 @@ public class SftpServiceImpl extends SipPluginContract {
               logger.trace("Job id before callling transfer channel :: " 
                   + jobEntity.getJobId());
               SftpRemoteFileTemplate template = new SftpRemoteFileTemplate(sesionFactory);
+
+              String batchId = getBatchId();
+              logger.trace("Batch ID = " + batchId);
               transferDataFromChannel(template, sourceLocation, filePattern,
-                         destinationLocation, channelId, routeId, 
+                         destinationLocation, batchId, channelId, routeId,
                          fileExclusions, isDisable, source,lastModifiedHoursLmt,
                          jobEntity.getJobId(), false);
              
@@ -837,8 +840,8 @@ public class SftpServiceImpl extends SipPluginContract {
    * @param isHostNotReachable TODO
    */
   public List<BisDataMetaInfo> transferDataFromChannel(SftpRemoteFileTemplate template,
-      String sourcelocation, String pattern, String destinationLocation, Long channelId,
-      Long routeId, String exclusions, boolean isDisableDuplicate, 
+      String sourcelocation, String pattern, String destinationLocation, String batchId,
+      Long channelId, Long routeId, String exclusions, boolean isDisableDuplicate,
       String source, int filesModifiedInLast, Long jobId, boolean isHostNotReachable)
       throws IOException, ParseException {
     logger.trace("TransferDataFromChannel starts here with the channelId " + channelId
@@ -850,8 +853,6 @@ public class SftpServiceImpl extends SipPluginContract {
     // Adding to a list has been removed as a part of optimization
     // SIP-6386
 
-    String batchId = getBatchId();
-    logger.trace("Batch ID = " + batchId);
 
     ZonedDateTime fileTransStartTime = ZonedDateTime.now();
     transferDataFromChannelDirectory(template, sourcelocation, pattern,
@@ -910,7 +911,7 @@ public class SftpServiceImpl extends SipPluginContract {
       // Adding to a list has been removed as a part of optimization
       // SIP-6386
       transferDataFromChannel(template, sourcelocationDirectory, pattern,
-          destinationLocation, channelId, routeId, exclusions, 
+          destinationLocation, batchId, channelId, routeId, exclusions,
           isDisableDuplicate, source, filesModifiedInLast, jobId, isHostNotReachable);
     }
     logger.trace("TransferDataFromChannel ends here with the channelId " + channelId
@@ -1250,7 +1251,7 @@ public class SftpServiceImpl extends SipPluginContract {
 
   @Override
   public void executeFileTransfer(String logId, Long jobId, Long channelId,
-      Long routeId, String fileName, String destinationDirPath) {
+      Long routeId, String fileName, Optional<String> destinationDirPath) {
 
     sipLogService.upsertInProgressStatus(logId);
     SessionFactory<LsEntry> sesionFactory = delegatingSessionFactory
@@ -1300,12 +1301,12 @@ public class SftpServiceImpl extends SipPluginContract {
 
           String path = null;
 
-          if (StringUtils.isBlank(destinationDirPath)) {
+          if (!destinationDirPath.isPresent()) {
             // If destination dir path is not specified, it will be generated
             String destination = constructDestinationPath(destinationLocation);
             path = processor.getFilePath(defaultDestinationLocation, destination, getBatchId());
           } else {
-            path = destinationDirPath;
+            path = destinationDirPath.get();
           }
 
           File localDirectory = new File(path);
