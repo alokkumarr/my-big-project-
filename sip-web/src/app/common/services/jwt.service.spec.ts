@@ -37,4 +37,40 @@ describe('JWT Service', () => {
   it('should return customer id', () => {
     expect(jwtService.customerId).toEqual('');
   });
+
+  describe('parseJWT', () => {
+    it('should handle no input', () => {
+      expect(jwtService.parseJWT(null)).toBeFalsy();
+    });
+
+    it('should parse json object correctly', () => {
+      const a = { test: 'value' };
+      const parsedJson = jwtService.parseJWT(`abc.${btoa(JSON.stringify(a))}`);
+      expect(parsedJson.test).toEqual(a.test);
+    });
+  });
+
+  describe('getTokenObj', () => {
+    it('should return null if not object set', () => {
+      const spy = spyOn(jwtService, 'get').and.returnValue(null);
+      expect(jwtService.getTokenObj()).toBeFalsy();
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  it('should return token productID', () => {
+    const spy = spyOn(jwtService, 'getTokenObj').and.returnValue({
+      ticket: { defaultProdID: 'abc' }
+    });
+    expect(jwtService.productId).toEqual('abc');
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should return login id', () => {
+    const spy = spyOn(jwtService, 'getTokenObj').and.returnValue({
+      ticket: { masterLoginId: 'abc' }
+    });
+    expect(jwtService.getLoginId()).toEqual('abc');
+    expect(spy).toHaveBeenCalled();
+  });
 });
