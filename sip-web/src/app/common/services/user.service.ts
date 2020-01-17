@@ -200,12 +200,13 @@ export class UserService {
       });
   }
 
-  authenticateWithSessionID(sessionID) {
+  authenticateWithSessionID(
+    sessionID: string,
+    domainName: string,
+    clientId: string
+  ) {
     const route = '/authenticates';
-    const body = {
-      domainName: 'sawadmin@mmpdev.com',
-      client_id: 'MMP-portal'
-    };
+    const body = { domainName, clientId };
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
