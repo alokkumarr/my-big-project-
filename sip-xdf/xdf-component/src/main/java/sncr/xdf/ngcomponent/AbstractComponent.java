@@ -177,12 +177,14 @@ public abstract class AbstractComponent implements WithContext{
 
     public void moveAndArchive(int ret)
     {
+        logger.debug("moveAndArchive() called");
         if (ret == 0)
         {
             ret = move();
             if (ret == 0) {
                 archive(ret);
             }else{
+                logger.error("move() returned error code :  "+ ret);
                 throw new XDFException(XDFReturnCode.MOVE_ERROR);
             }
         }
@@ -190,19 +192,23 @@ public abstract class AbstractComponent implements WithContext{
     
     public void moveAndArchiveForPipeline(int ret)
 	{
+        logger.debug("moveAndArchiveForPipeline() called");
 		if (ret == 0) {
 			if (ngctx.persistMode) {
                ret = move();
+               if(ret != 0){
+                   logger.error("move() returned error code :  "+ ret);
+                   throw new XDFException(XDFReturnCode.MOVE_ERROR);
+               }
 			}
             if (ret == 0) {
                 archive(ret);
-            }else{
-                throw new XDFException(XDFReturnCode.MOVE_ERROR);
             }
 		}
 	}
 
 	public void archive(int ret){
+        logger.debug("archive() called");
         try {
             ret = archive();
             if (ret == 0) {
@@ -214,7 +220,7 @@ public abstract class AbstractComponent implements WithContext{
                     updateOutputDSMetadata(ret, "SUCCESS", Optional.empty());
                 }
             } else {
-                logger.error("Could not complete archive phase!");
+                logger.error("Could not complete archive phase! archive() returned error code : " + ret);
                 throw new XDFException(XDFReturnCode.ARCHIVAL_ERROR);
             }
         }catch(Exception e){
@@ -722,6 +728,7 @@ public abstract class AbstractComponent implements WithContext{
     protected abstract int execute();
 
     protected int move(){
+        logger.debug("move() called");
         try{
             int ret = 0;
             if(this instanceof WithDLBatchWriter){
