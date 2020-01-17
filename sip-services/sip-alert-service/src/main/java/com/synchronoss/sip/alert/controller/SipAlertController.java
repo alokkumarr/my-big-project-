@@ -467,7 +467,7 @@ public class SipAlertController {
     }
 
     // validate the alerts access privileges
-    if (!utils.validAlertPrivileges(ticket.getProducts(), CONFIGURE_ALERT)) {
+    if (!utils.validAlertPrivileges(ticket.getProducts(), VIEW_ALERT)) {
       return utils.validatePermissionResponse(response, alertStatesResponse, ACCESS);
     }
 
