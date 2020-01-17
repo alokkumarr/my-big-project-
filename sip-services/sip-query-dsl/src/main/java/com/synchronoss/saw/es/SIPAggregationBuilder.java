@@ -45,8 +45,6 @@ public class SIPAggregationBuilder {
   private Integer querySize;
   public static final String DATE_FORMAT = "yyyy-MM-dd";
   private static final String GROUP_BY_FIELD = "group_by_field";
-  private static final String SCRIPT_AND = "&&";
-  private static final String SCRIPT_OR = "||";
 
   int groupFieldCount = 0;
 
@@ -325,11 +323,11 @@ public class SIPAggregationBuilder {
   private String getScriptBooleanOperator(BooleanCriteria booleanCriteria) {
     switch (booleanCriteria) {
       case AND:
-        return SCRIPT_AND;
+        return CommonQueryConstants.SCRIPT_AND;
       case OR:
-        return SCRIPT_OR;
+        return CommonQueryConstants.SCRIPT_OR;
       default:
-        return SCRIPT_AND;
+        return CommonQueryConstants.SCRIPT_AND;
     }
   }
 
