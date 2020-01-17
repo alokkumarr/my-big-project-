@@ -1,6 +1,8 @@
 /** */
 package com.synchronoss.bda.sip.jwt.token;
 
+import com.synchronoss.bda.sip.dsk.DskDetails;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,6 @@ public class Ticket implements Serializable {
   private String roleCode;
   private RoleType roleType;
   private Long createdTime;
-  private List<TicketDSKDetails> dataSecurityKey;
 
   /** CustomConfig provides feature for additional configurable properties for the SAW. */
   private List<String> CustomConfig;
@@ -42,6 +43,8 @@ public class Ticket implements Serializable {
   private String validityReason;
 
   private Long validMins;
+
+  private SipDskAttribute sipDskAttribute;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -109,14 +112,6 @@ public class Ticket implements Serializable {
 
   public void setFilterByCustomerCode(Integer filterByCustomerCode) {
     this.filterByCustomerCode = filterByCustomerCode;
-  }
-
-  public List<TicketDSKDetails> getDataSecurityKey() {
-    return dataSecurityKey;
-  }
-
-  public void setDataSecurityKey(List<TicketDSKDetails> dataSecurityKey) {
-    this.dataSecurityKey = dataSecurityKey;
   }
 
   /**
@@ -257,5 +252,13 @@ public class Ticket implements Serializable {
   /** @param windowId the windowId to set */
   public void setWindowId(String windowId) {
     this.windowId = windowId;
+  }
+
+  public SipDskAttribute getSipDskAttribute() {
+    return sipDskAttribute;
+  }
+
+  public void setSipDskAttribute(SipDskAttribute sipDskAttribute) {
+    this.sipDskAttribute = sipDskAttribute;
   }
 }

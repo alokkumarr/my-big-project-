@@ -1,6 +1,6 @@
 package com.synchronoss.saw.storage.proxy.service;
 
-import com.synchronoss.saw.model.DataSecurityKey;
+import com.synchronoss.bda.sip.dsk.SipDskAttribute;
 import com.synchronoss.saw.model.SipQuery;
 import com.synchronoss.saw.storage.proxy.model.ExecuteAnalysisResponse;
 import com.synchronoss.saw.storage.proxy.model.ExecutionType;
@@ -10,12 +10,13 @@ public interface DataLakeExecutionService {
   ExecuteAnalysisResponse executeDataLakeReport(
       SipQuery sipQuery,
       Integer size,
-      DataSecurityKey dataSecurityKey,
+      SipDskAttribute dskAttribute,
       ExecutionType executionType,
       Boolean designerEdit,
       String executionId,
       Integer page,
-      Integer pageSize)
+      Integer pageSize,
+      SipQuery sipQueryFromSemantic)
       throws Exception;
 
   ExecuteAnalysisResponse getDataLakeExecutionData(

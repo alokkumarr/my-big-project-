@@ -191,12 +191,12 @@ public class AnalysisServiceImpl implements AnalysisService {
     logger.trace("Analysis request body : ", analysisResponse.getAnalysis());
 
     String url = proxyAnalysisUrl
-          + "/execute?id="
-          + analysisId
-          + "&size="
-          + dispatchRowLimit
-          + "&executionType=scheduled"
-          + "&userId="+ userId;
+        + "/execute?id="
+        + analysisId
+        + "&size="
+        + dispatchRowLimit
+        + "&executionType=scheduled"
+        + "&userId="+ userId;
 
     logger.info("Execute URL for dispatch :" + url);
     HttpEntity<?> requestEntity = new HttpEntity<>(analysis);
