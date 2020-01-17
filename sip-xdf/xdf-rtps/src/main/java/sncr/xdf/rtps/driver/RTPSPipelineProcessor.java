@@ -204,7 +204,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        return AbstractComponent.handleErrorIfAny(component, rc, exception);
+        return AbstractComponent.endOfProcess(component, rc, exception);
 	}
 
 
@@ -279,7 +279,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        return AbstractComponent.handleErrorIfAny(component, rc, exception);
+        return AbstractComponent.endOfProcess(component, rc, exception);
 	}
 
 	public int processSQL(Map<String, Object> parameters, String configPath, boolean persistFlag) {
@@ -356,7 +356,7 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        return AbstractComponent.handleErrorIfAny(component, rc, exception);
+        return AbstractComponent.endOfProcess(component, rc, exception);
 	}
 
 	public int processESLoader(Map<String, Object> parameters, String configPath, boolean persistFlag) {
@@ -420,6 +420,6 @@ public class RTPSPipelineProcessor {
             logger.error("RTPSPipelineProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        return AbstractComponent.handleErrorIfAny(component, rc, exception);
+        return AbstractComponent.endOfProcess(component, rc, exception);
 	}
 }

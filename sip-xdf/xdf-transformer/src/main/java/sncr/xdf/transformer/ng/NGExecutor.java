@@ -131,13 +131,12 @@ public abstract class NGExecutor {
 
         logger.debug("Final DS: " + successTransformationsCount.value());
         logger.debug("Rejected DS: " + failedTransformationsCount.value());
+        ((AbstractComponent)parent).getNgctx().datafileDFmap.put(outDataSetName,outputResult);
         writeResults(outputResult, outDataSetName, tempLoc);
         logger.debug("createFinalDS :: Rejected record exists? "+ rejectedDataSetName );
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        //This will throw an error if Dataset is Empty //parent.getNgctx().outputs.get(outDataSetName).get(DataSetProperties.Name.name())
-        ((AbstractComponent)parent).validateRecordsCount(outputResult.count(), parent.getNgctx().componentConfiguration.getOutputs().get(0).getDataSet().toString(), XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 
@@ -168,8 +167,6 @@ public abstract class NGExecutor {
         if(rejectedDataSetName != null && !rejectedDataSetName.isEmpty()) {
             writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
         }
-        //This will throw an error if Dataset is Empty
-        ((AbstractComponent)parent).validateRecordsCount(outputDSCount, transOutKey, XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
     }
 
 }

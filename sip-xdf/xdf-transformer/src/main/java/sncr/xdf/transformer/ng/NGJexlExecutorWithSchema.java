@@ -46,38 +46,26 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
     }
     public void execute(Map<String, Dataset> dsMap) throws Exception {
         Dataset ds = dsMap.get(inDataSetName);
-        if(ds == null) {
-            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, inDataSetName);
-        }else{
-            //This will throw an error if Dataset is Empty
-            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
-            prepareRefData(dsMap);
-            JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-            Long c = transformationResult.count();
-            // Using structAccumulator do second pass to align schema
-            Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-            //df.schema().prettyJson();
-            logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
-            createFinalDS(df.cache());
-        }
+        prepareRefData(dsMap);
+        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+        Long c = transformationResult.count();
+        // Using structAccumulator do second pass to align schema
+        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+        //df.schema().prettyJson();
+        logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
+        createFinalDS(df.cache());
     }
     public void executeSingleProcessor(NGContext ngctx) throws Exception {
         Map<String, Dataset> dsMap = ngctx.datafileDFmap;
         String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
         Dataset ds = dsMap.get(transInKey);
-        if(ds == null) {
-            throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
-        }else{
-            //This will throw an error if Dataset is Empty
-            ((AbstractComponent)parent).validateRecordsCount(ds.count(), inDataSetName, XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
-            prepareRefData(dsMap);
-            JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-            Long c = transformationResult.count();
-            // Using structAccumulator do second pass to align schema
-            Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-            //df.schema().prettyJson();
-            logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
-            createFinalDS(df.cache(), ngctx);
-        }
+        prepareRefData(dsMap);
+        JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
+        Long c = transformationResult.count();
+        // Using structAccumulator do second pass to align schema
+        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+        //df.schema().prettyJson();
+        logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
+        createFinalDS(df.cache(), ngctx);
     }
 }

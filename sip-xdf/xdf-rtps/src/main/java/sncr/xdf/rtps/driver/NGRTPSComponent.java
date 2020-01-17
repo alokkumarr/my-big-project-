@@ -167,7 +167,7 @@ public class NGRTPSComponent extends AbstractComponent
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        System.exit(endOfProcess(component, rc, exception));
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {

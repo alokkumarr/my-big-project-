@@ -89,18 +89,34 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
 
 
 //2. Read input datasets
-
+            long inputDSCount = 0;
             Map<String, Dataset> dsMap = new HashMap();
-            if (!(ngctx.runningPipeLine)) {
+            if (ngctx.runningPipeLine) {
+                String transInKey =  ngctx.componentConfiguration.getInputs().get(0).getDataSet().toString();
+                Dataset ds = ngctx.datafileDFmap.get(transInKey);
+                if(ds == null) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                }
+                inputDSCount = ds.count();
+                if(inputDSCount == 0) {
+                    throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
+                }
+            }else{
                 for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
                     Map<String, Object> desc = entry.getValue();
                     String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                     String format = (String) desc.get(DataSetProperties.Format.name());
+                    String transInKey =  (String) desc.get(DataSetProperties.Name.name());
+                    if(!HFileOperations.getFileSystem().exists(new Path(loc))){
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_OBJECT_NOT_FOUND, transInKey);
+                    }
                     if(HFileOperations.getFileSystem().getContentSummary(new Path(loc)).getLength() == 0){
-                        validateRecordsCount(0, (String) desc.get(DataSetProperties.Name.name()), XDFReturnCode.INPUT_DATA_EMPTY_ERROR);
+                        inputDSCount = 0;
+                        throw new XDFException(XDFReturnCode.INPUT_DATA_EMPTY_ERROR, transInKey);
                     }
                     Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                     logger.trace("Added to DS map: " + entry.getKey());
+                    inputDSCount = ds.count();
                     dsMap.put(entry.getKey(), ds);
                 }
             }
@@ -174,7 +190,13 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
                     return -1;
                 }
             }
-
+            Dataset outputDS = ngctx.datafileDFmap.get(ngctx.componentConfiguration.getOutputs().get(0).getDataSet().toString());
+            long outputDSCount = outputDS.count();
+            if(outputDSCount == 0){
+                throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
+            }else if(inputDSCount > outputDSCount){
+                return XDFReturnCode.SOME_RECORDS_REJECTED_ERROR.getCode();
+            }
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);
             if (e instanceof XDFException) {
@@ -319,6 +341,6 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         }catch (Exception ex) {
             exception = ex;
         }
-        System.exit(handleErrorIfAny(component, rc, exception));
+        System.exit(endOfProcess(component, rc, exception));
     }
 }

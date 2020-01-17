@@ -246,7 +246,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processRTPS() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        return endOfProcess(component, rc, exception);
 	}
 
 	public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
@@ -350,7 +350,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processParser() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        return endOfProcess(component, rc, exception);
     }
 
     public int processTransformer(Map<String, Object> parameters, String configPath,boolean persistFlag)
@@ -425,7 +425,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processTransformer() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        return endOfProcess(component, rc, exception);
     }
 
 
@@ -507,7 +507,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processSQL() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        return endOfProcess(component, rc, exception);
     }
 
     public int processESLoader(Map<String, Object> parameters, String configPath,boolean persistFlag)
@@ -574,7 +574,7 @@ public class XDFDataProcessor  extends AbstractComponent {
             logger.error("XDFDataProcessor:processESLoader() Exception is : ",ex);
             exception = ex;
         }
-        return handleErrorIfAny(component, rc, exception);
+        return endOfProcess(component, rc, exception);
     }
 
 
