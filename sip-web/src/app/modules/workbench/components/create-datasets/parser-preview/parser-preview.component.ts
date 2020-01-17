@@ -52,7 +52,8 @@ export class ParserPreviewComponent
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.previewgridConfig = this.getPreviewGridConfig();
@@ -175,7 +176,7 @@ export class ParserPreviewComponent
     }
     if (has(this.fieldInfo[index], 'format')) {
       if (this.fieldInfo[index].format.length > 1) {
-        formatArr = this.fieldInfo[index].format;
+        formatArr = [this.fieldInfo[index].format];
       } else {
         dateformat = get(this.fieldInfo[index], 'format[0]');
       }
@@ -214,6 +215,7 @@ export class ParserPreviewComponent
       } else if (format !== '') {
         set(this.fieldInfo[id], 'format', [format]);
       }
+      console.log('Format lenght  :', this.fieldInfo[id].format.length);
     });
   }
 
