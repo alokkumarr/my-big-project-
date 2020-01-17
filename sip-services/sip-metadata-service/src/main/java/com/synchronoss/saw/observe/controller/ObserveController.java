@@ -42,8 +42,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/observe/dashboards")
 public class ObserveController {
 
-  private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ObserveController.class);
 
+  private static String ERROR_MESSAGE = "Expected missing on the request body.";
   private static String UNAUTHORIZED =
       "UNAUTHORIZED ACCESS : User don't have the %s privileges for dashboard!!";
 
@@ -60,7 +61,7 @@ public class ObserveController {
   @ResponseStatus(HttpStatus.CREATED)
   public ObserveResponse addDashboard(HttpServletRequest request, HttpServletResponse response,
                                       @RequestBody ObserveRequestBody requestBody) {
-    logger.trace("Request Body:{}", requestBody);
+    LOGGER.trace("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
@@ -71,7 +72,7 @@ public class ObserveController {
       objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       Observe observe =
           ObserveUtils.getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
-      logger.trace("Observe request object : {} ", objectMapper.writeValueAsString(observe));
+      LOGGER.trace("Observe request object : {} ", objectMapper.writeValueAsString(observe));
 
       Ticket ticket = SipCommonUtils.getTicket(request);
       ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
@@ -82,11 +83,13 @@ public class ObserveController {
       }
 
       observe.setEntityId(observeService.generateId());
-      logger.trace("Invoking service with entity id : {} ", observe.getEntityId());
+      LOGGER.trace("Invoking service with entity id : {} ", observe.getEntityId());
       observeResponse = observeService.addDashboard(observe);
     } catch (IOException e) {
-      throw new SipJsonProcessingException("expected missing on the request body");
+      LOGGER.error(ERROR_MESSAGE, e);
+      throw new SipJsonProcessingException(ERROR_MESSAGE);
     } catch (SipCreateEntityException ex) {
+      LOGGER.error("Problem on the storage while creating an entity {}", ex);
       throw new SipCreateEntityException("Problem on the storage while creating an entity");
     }
     return observeResponse;
@@ -106,7 +109,7 @@ public class ObserveController {
       @PathVariable(name = "Id", required = true) String entityId,
       HttpServletRequest request,
       HttpServletResponse response) {
-    logger.debug("dashboardId {}", entityId);
+    LOGGER.debug("dashboardId {}", entityId);
 
     Observe observe = new Observe();
     observe.setEntityId(entityId);
@@ -143,8 +146,8 @@ public class ObserveController {
       @PathVariable(name = "userId", required = true) String userId,
       HttpServletRequest request,
       HttpServletResponse response) {
-    logger.debug("categoryId {}", categoryId);
-    logger.debug("userId {}", userId);
+    LOGGER.debug("categoryId {}", categoryId);
+    LOGGER.debug("userId {}", userId);
     ObserveResponse observeResponse = new ObserveResponse();
 
     Ticket ticket = SipCommonUtils.getTicket(request);
@@ -160,7 +163,6 @@ public class ObserveController {
      * Ignore the the user Id for now list out all the dashboard for category. TO DO : User Id is
      * required to handle the My DashBoard (private)feature.
      */
-    // observe.setCreatedBy(userId);
     return observeService.getDashboardbyCategoryId(observe);
 
   }
@@ -181,8 +183,8 @@ public class ObserveController {
       HttpServletResponse response,
       @PathVariable(name = "Id", required = true) String entityId,
       @RequestBody ObserveRequestBody requestBody) {
-    logger.debug("dashboardId {}", entityId);
-    logger.debug("Request Body", requestBody);
+    LOGGER.debug("dashboardId {}", entityId);
+    LOGGER.debug("Request Body", requestBody);
     if (requestBody == null) {
       throw new SipJsonMissingException("json body is missing in request body");
     }
@@ -207,8 +209,10 @@ public class ObserveController {
       observe.setEntityId(entityId);
       observeResponse = observeService.updateDashboard(observe);
     } catch (IOException e) {
-      throw new SipJsonProcessingException("Expected missing on the request body.");
+      LOGGER.error(ERROR_MESSAGE, e);
+      throw new SipJsonProcessingException(ERROR_MESSAGE);
     } catch (SipUpdateEntityException ex) {
+      LOGGER.error("Entity does not exist {}", ex);
       throw new SipUpdateEntityException("Entity does not exist.");
     }
     return observeResponse;
@@ -228,7 +232,7 @@ public class ObserveController {
       HttpServletRequest request,
       HttpServletResponse response,
       @PathVariable(name = "Id", required = true) String entityId) {
-    logger.debug("dashboard Id {}", entityId);
+    LOGGER.debug("dashboard Id {}", entityId);
     ObserveResponse responseObjectFuture = new ObserveResponse();
     try {
       Observe observe = new Observe();
@@ -249,7 +253,8 @@ public class ObserveController {
       }
       responseObjectFuture = observeService.deleteDashboard(observe);
     } catch (Exception ex) {
-      throw new SipJsonProcessingException("Expected missing on the request body.");
+      LOGGER.error(ERROR_MESSAGE, ex);
+      throw new SipJsonProcessingException(ERROR_MESSAGE);
     }
     return responseObjectFuture;
   }
@@ -266,13 +271,14 @@ public class ObserveController {
                                                  HttpServletResponse response,
                                                  ObserveResponse observeResponse) {
     try {
-      logger.error(String.format(UNAUTHORIZED, privileges));
+      LOGGER.error(String.format(UNAUTHORIZED, privileges));
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.sendError(HttpStatus.UNAUTHORIZED.value(),
           String.format(UNAUTHORIZED, privileges));
       observeResponse.setMessage(String.format(UNAUTHORIZED, privileges));
       return observeResponse;
     } catch (IOException ex) {
+      LOGGER.error("Error while validating permission {}", ex);
       return observeResponse;
     }
   }
