@@ -267,9 +267,10 @@ export class DesignerState {
     const artifactColumnIndex = findIndex(
       artifacts[artifactIndex].fields,
       ({ columnName, dataField, area }) =>
-        dataField
+        artifactColumn.dataField
           ? dataField === artifactColumn.dataField
-          : columnName === artifactColumn.columnName
+          : columnName === artifactColumn.columnName &&
+            area === artifactColumn.area
     );
 
     artifacts[artifactIndex].fields.splice(artifactColumnIndex, 1);
