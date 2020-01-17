@@ -808,7 +808,7 @@ public abstract class AbstractComponent implements WithContext{
                         }
                     }
                 });
-                logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+                logger.debug("######## AbstractComponent() : updateOutputDSMetadata() ==> Status updating to:::######   "+ status);
                 
                 services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID, Optional.ofNullable(ret), description);
                // logger.info("Status updating to:::"+  services.transformationMD.ts.);
