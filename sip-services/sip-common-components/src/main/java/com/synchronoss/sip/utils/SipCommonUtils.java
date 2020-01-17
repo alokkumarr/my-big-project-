@@ -144,6 +144,51 @@ public class SipCommonUtils {
   }
 
   /**
+   * Validate privileges for the user.
+   *
+   * @param productList Products associated with the user
+   * @param category Analysis request body category
+   * @return validation response
+   */
+  public static Boolean validatePrivilege(
+      ArrayList<Products> productList, Long category, PrivilegeNames privName,
+      String moduleName) {
+    Privileges priv = new Privileges();
+    if (!CollectionUtils.isEmpty(productList)) {
+      for (Products product : productList) {
+        ArrayList<ProductModules> productModulesList =
+            product.getProductModules() != null ? product.getProductModules() : new ArrayList<>();
+        if (!CollectionUtils.isEmpty(productModulesList)) {
+          for (ProductModules productModule : productModulesList) {
+            ArrayList<ProductModuleFeature> prodModFeatureList =
+                productModule.getProdModFeature() != null
+                    && productModule.getProductModName().equals(moduleName)
+                    ? productModule.getProdModFeature()
+                    : new ArrayList<>();
+            if (!CollectionUtils.isEmpty(prodModFeatureList)) {
+              for (ProductModuleFeature productModuleFeature : prodModFeatureList) {
+                ArrayList<ProductModuleFeature> productModuleSubFeatureList =
+                    productModuleFeature.getProductModuleSubFeatures() != null
+                        ? productModuleFeature.getProductModuleSubFeatures()
+                        : new ArrayList<>();
+                if (!CollectionUtils.isEmpty(productModuleSubFeatureList)) {
+                  for (ProductModuleFeature prodModSubFeature : productModuleSubFeatureList) {
+                    if (category != null && prodModSubFeature.getProdModFeatureID() == category) {
+                      Long privCode = prodModSubFeature.getPrivilegeCode();
+                      return priv.isPriviegePresent(privName, privCode);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * Validate the auth token.
    *
    * @param authToken authorization token

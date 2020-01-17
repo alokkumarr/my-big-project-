@@ -18,6 +18,7 @@ import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveRequestBody;
 import com.synchronoss.saw.observe.model.ObserveResponse;
 import com.synchronoss.saw.observe.service.ObserveService;
+import com.synchronoss.sip.utils.Modules;
 import com.synchronoss.sip.utils.Privileges;
 import com.synchronoss.sip.utils.SipCommonUtils;
 
@@ -78,7 +79,8 @@ public class ObserveController {
       ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
 
       Long categoryId = Long.valueOf(observe.getCategoryId());
-      if (!validatePrivilege(productList, categoryId, Privileges.PrivilegeNames.CREATE)) {
+      if (!validatePrivilege(productList, categoryId,
+          Privileges.PrivilegeNames.CREATE, Modules.OBSERVE.name())) {
         return buildPrivilegesResponse("Create", response, observeResponse);
       }
 
@@ -122,7 +124,7 @@ public class ObserveController {
 
     ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
     if (!validatePrivilege(productList, Long.valueOf(categoryId),
-        Privileges.PrivilegeNames.ACCESS)) {
+        Privileges.PrivilegeNames.ACCESS, Modules.OBSERVE.name())) {
       observeResponse = new ObserveResponse();
       return buildPrivilegesResponse("Access", response, observeResponse);
     } else {
@@ -153,7 +155,7 @@ public class ObserveController {
     Ticket ticket = SipCommonUtils.getTicket(request);
     ArrayList<Products> productList = ticket != null ? ticket.getProducts() : null;
     if (!validatePrivilege(productList, Long.valueOf(categoryId),
-        Privileges.PrivilegeNames.ACCESS)) {
+        Privileges.PrivilegeNames.ACCESS, Modules.OBSERVE.name())) {
       return buildPrivilegesResponse("Access", response, observeResponse);
     }
 
@@ -202,7 +204,7 @@ public class ObserveController {
       Long categoryId = !StringUtils.isEmpty(observe.getCategoryId())
           ? Long.valueOf(observe.getCategoryId()) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
-          Privileges.PrivilegeNames.EDIT)) {
+          Privileges.PrivilegeNames.EDIT, Modules.OBSERVE.name())) {
         return buildPrivilegesResponse("Edit", response, observeResponse);
       }
 
@@ -248,7 +250,7 @@ public class ObserveController {
 
       Long categoryId = !StringUtils.isEmpty(category) ? Long.valueOf(category) : 0L;
       if (!validatePrivilege(productList, Long.valueOf(categoryId),
-          Privileges.PrivilegeNames.DELETE)) {
+          Privileges.PrivilegeNames.DELETE, Modules.OBSERVE.name())) {
         return buildPrivilegesResponse("Delete", response, responseObjectFuture);
       }
       responseObjectFuture = observeService.deleteDashboard(observe);
