@@ -195,7 +195,9 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
             if(outputDSCount == 0){
                 throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
             }else if(inputDSCount > outputDSCount){
-                return XDFReturnCode.SOME_RECORDS_REJECTED_ERROR.getCode();
+                isFinalStatusupdated=true;
+                XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
+                updateOutputDSMetadata(retCd.getCode(), "SUCCESS", Optional.of(retCd.getDescription(inputDSCount-outputDSCount)));
             }
         } catch (Exception e) {
             logger.error("Exception in main transformer module: ",e);

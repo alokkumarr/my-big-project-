@@ -53,7 +53,7 @@ public enum XDFReturnCode {
     UPDATE_STATUS_ERROR(47,"Could not update datasets / could not create Audit log entry. %s"),
     INPUT_DATA_EMPTY_ERROR(48,"Input File or Dataset is Empty. Input File/Dataset: %s"),
     OUTPUT_DATA_EMPTY_ERROR(49,"Output Dataset is empty. All records are rejected. %s"),
-    SOME_RECORDS_REJECTED_ERROR(50,"Some records are rejected. %s");
+    SOME_RECORDS_REJECTED_ERROR(50,"%s records are rejected.");
 
     private final int code;
     private final String description;
@@ -70,6 +70,10 @@ public enum XDFReturnCode {
 
     public String getDescription() {
         return this.description;
+    }
+
+    public String getDescription(Object... args) {
+        return String.format(getDescription(), args);
     }
 
     public boolean equals(XDFReturnCode rc){

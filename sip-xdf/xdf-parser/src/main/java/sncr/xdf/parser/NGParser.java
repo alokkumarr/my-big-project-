@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Arrays;
+import java.util.Optional;
 import sncr.xdf.context.RequiredNamedParameters;
 import sncr.bda.conf.ParserInputFileFormat;
 import sncr.xdf.context.XDFReturnCode;
@@ -412,7 +413,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         if(outputDSCount == 0){
             throw new XDFException(XDFReturnCode.OUTPUT_DATA_EMPTY_ERROR);
         }else if(inputDSCount > outputDSCount){
-            return XDFReturnCode.SOME_RECORDS_REJECTED_ERROR.getCode();
+            isFinalStatusupdated=true;
+            XDFReturnCode retCd = XDFReturnCode.SOME_RECORDS_REJECTED_ERROR;
+            updateOutputDSMetadata(retCd.getCode(), "SUCCESS", Optional.of(retCd.getDescription(inputDSCount-outputDSCount)));
         }
         return retval;
     }
