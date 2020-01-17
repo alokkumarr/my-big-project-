@@ -35,7 +35,7 @@
 
     <app.user>saw</app.user>
     <app.group>saw</app.group>
-    <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
+    <spring.boot.version>2.1.0.RELEASE</spring.boot.version>
   </properties>
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
