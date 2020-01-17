@@ -43,6 +43,7 @@ export class ParserPreviewComponent
   public rawFile: any;
   public inspectError = false;
   public errMsg = '';
+  private dateDialogRef;
 
   constructor(
     public dxDataGrid: DxDataGridService,
@@ -176,12 +177,17 @@ export class ParserPreviewComponent
     }
     if (has(this.fieldInfo[index], 'format')) {
       if (this.fieldInfo[index].format.length > 1) {
-        formatArr = [this.fieldInfo[index].format];
+        formatArr = [this.fieldInfo[index].format]; // Setting the formaArr as array. Added as part of SIP-9427.
       } else {
         dateformat = get(this.fieldInfo[index], 'format[0]');
       }
     }
-    const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
+
+    // Making sure multiple dialogs are not opened when edit icon is clicked.
+    if (this.dateDialogRef) {
+      return;
+    }
+    this.dateDialogRef = this.dialog.open(DateformatDialogComponent, {
       hasBackdrop: false,
       data: {
         placeholder: 'Enter date format',
@@ -189,8 +195,7 @@ export class ParserPreviewComponent
         formatArr: formatArr
       }
     });
-
-    dateDialogRef.afterClosed().subscribe(format => {
+    this.dateDialogRef.afterClosed().subscribe(format => {
       let id = -1;
       if (event.type === 'click') {
         id = replace(event.target.id, 'edit_', '');
@@ -215,7 +220,7 @@ export class ParserPreviewComponent
       } else if (format !== '') {
         set(this.fieldInfo[id], 'format', [format]);
       }
-      console.log('Format lenght  :', this.fieldInfo[id].format.length);
+      this.dateDialogRef = null;
     });
   }
 
