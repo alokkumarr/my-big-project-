@@ -791,7 +791,7 @@ public abstract class AbstractComponent implements WithContext{
                             // Set record count
                             long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
                             logger.trace("Extracted record count " + recordCount);
-
+                            logger.info("Updating DS - "+dsname+ " - status to "+status);
                             services.md.updateDS(id, ngctx, ds, schema, recordCount, size, Optional.ofNullable(ret), description);
                         }
                         else{
@@ -808,7 +808,7 @@ public abstract class AbstractComponent implements WithContext{
                         }
                     }
                 });
-                logger.debug("######## AbstractComponent() : updateOutputDSMetadata() ==> Status updating to:::######   "+ status);
+                logger.info("######## AbstractComponent() : updateOutputDSMetadata() ==> Status updating to:::######   "+ status);
                 
                 services.transformationMD.updateStatus(ngctx.transformationID, status, ngctx.startTs, ngctx.finishedTs, ale_id, ngctx.batchID, Optional.ofNullable(ret), description);
                // logger.info("Status updating to:::"+  services.transformationMD.ts.);
