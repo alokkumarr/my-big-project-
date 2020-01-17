@@ -751,7 +751,7 @@ public abstract class AbstractComponent implements WithContext{
      * @return
      */
     protected void updateOutputDSMetadata(int ret, String status, Optional<String> description)  {
-        logger.debug("######## AbstractComponent() : Finalize() ==> Status updating to:::######   "+ status);
+        logger.info("######## AbstractComponent() : updateOutputDSMetadata() ==> Status updating to:::######   "+ status);
         try {
             ngctx.setFinishTS();
             if (ngctx.serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
