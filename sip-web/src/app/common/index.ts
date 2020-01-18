@@ -109,7 +109,8 @@ import {
   DynamicModuleService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 } from './services';
 import { ShowPasswordDirective } from './directives/show-password.directive';
 
@@ -200,7 +201,8 @@ const SERVICES = [
   WindowService,
   CustomIconService,
   DndPubsubService,
-  CommonSemanticService
+  CommonSemanticService,
+  CookiesService
 ];
 
 const INTERCEPTORS = [
