@@ -803,6 +803,7 @@ public abstract class AbstractComponent implements WithContext{
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");
+                            logger.info("Updating DS - "+dsname+ " - status to "+status);
                             services.md.updateDS(id, ngctx, ds, schema, 0, 0, Optional.ofNullable(ret), description);
                         }
                     } catch (Exception e) {
