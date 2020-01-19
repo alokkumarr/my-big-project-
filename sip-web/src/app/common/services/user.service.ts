@@ -48,6 +48,7 @@ export class UserService {
         if (this._jwtService.isValid(jwt)) {
           this.loginChange$.next(true);
         }
+        return jwt;
       });
   }
 
@@ -205,7 +206,7 @@ export class UserService {
     domainName: string,
     clientId: string
   ) {
-    const route = '/authenticates';
+    const route = '/authenticate';
     const body = { domainName, clientId };
     const httpOptions = {
       headers: new HttpHeaders({
