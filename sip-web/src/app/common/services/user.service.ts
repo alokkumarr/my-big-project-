@@ -48,6 +48,7 @@ export class UserService {
         if (this._jwtService.isValid(jwt)) {
           this.loginChange$.next(true);
         }
+        return jwt;
       });
   }
 
