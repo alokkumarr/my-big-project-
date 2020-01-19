@@ -43,7 +43,7 @@ export class UserService {
     return this._http
       .post<TokenResponse>(loginUrl + route, LoginDetails)
       .toPromise()
-      .then(response => this.setJwtIfValid(response))
+      .then(response => this.saveJWTInLocalStorageIfValid(response))
       .then(jwt => {
         if (this._jwtService.isValid(jwt)) {
           this.loginChange$.next(true);
@@ -72,7 +72,7 @@ export class UserService {
           jwt: token
         }
       })
-      .pipe(map(response => this.setJwtIfValid(response)));
+      .pipe(map(response => this.saveJWTInLocalStorageIfValid(response)));
   }
 
   logout(path) {
@@ -192,7 +192,7 @@ export class UserService {
     return this._http
       .post<TokenResponse>(loginUrl + route, rtoken)
       .toPromise()
-      .then(response => this.setJwtIfValid(response))
+      .then(response => this.saveJWTInLocalStorageIfValid(response))
       .then(jwt => {
         // Store the user's info for easy lookup
         if (!this._jwtService.isValid(jwt)) {
@@ -217,10 +217,10 @@ export class UserService {
     return this._httpClientWithoutIntercepors
       .post<TokenResponse>(loginUrl + route, body, httpOptions)
       .toPromise()
-      .then(response => this.setJwtIfValid(response));
+      .then(response => this.saveJWTInLocalStorageIfValid(response));
   }
 
-  setJwtIfValid(response: TokenResponse) {
+  saveJWTInLocalStorageIfValid(response: TokenResponse) {
     const { aToken, rToken } = response;
     const jwt = this._jwtService.parseJWT(aToken);
     // Store the user's info for easy lookup
