@@ -1,5 +1,5 @@
 /*******************************************************************************
- Filename:  V27__DDL_CUSTOMER_BRAND_DETAILS.SQL
+ Filename:  V28__DDL_CUSTOMER_BRAND_DETAILS.SQL
  Purpose:   Alter customer details table to store customer logo and customer color for branding.
  Date:      14-01-2020
 ********************************************************************************/
