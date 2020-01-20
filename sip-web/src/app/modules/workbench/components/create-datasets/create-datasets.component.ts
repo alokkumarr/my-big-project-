@@ -14,6 +14,7 @@ import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { isUnique } from 'src/app/common/validators';
+import { DS_NAME_PATTERN, DS_NAME_PATTERN_HINT_ERROR } from '../../consts';
 
 @Component({
   selector: 'create-datasets',
@@ -33,8 +34,9 @@ export class CreateDatasetsComponent implements OnInit {
   public parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
   public selectedIndex = 0;
-  public folNamePattern = '[A-Za-z0-9_]+'; // User should be able to add underscore in DS name. Added as part of SIP-9001.
   public listOfDS: any[] = [];
+  public folNamePattern = cloneDeep(DS_NAME_PATTERN);
+  public dsNameHintAndError = cloneDeep(DS_NAME_PATTERN_HINT_ERROR);
 
   constructor(
     public router: Router,
