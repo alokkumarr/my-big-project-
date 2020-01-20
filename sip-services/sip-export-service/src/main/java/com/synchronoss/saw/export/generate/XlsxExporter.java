@@ -26,13 +26,14 @@ public class XlsxExporter implements IFileExporter {
   private static final Logger logger = LoggerFactory.getLogger(XlsxExporter.class);
   private static final String DATA_SPLITER = "|||";
   private static final String GENERAL = "General";
+  private static final Long  startingRowNumber = 1l;
 
   @Override
   public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) {
     Workbook workBook = new XSSFWorkbook();
     String sheetName = ExportUtils.prepareExcelSheetName(exportBean.getReportName());
     XSSFSheet sheet = (XSSFSheet) workBook.createSheet(sheetName);
-    addxlsxRows(exportBean, workBook, sheet, recordRowList);
+    addxlsxRows(exportBean, workBook, sheet, recordRowList, startingRowNumber);
     return workBook;
   }
 
@@ -43,16 +44,18 @@ public class XlsxExporter implements IFileExporter {
    * @param workBook
    * @param workSheet
    * @param recordRowList
+   * @param rowCount
    */
-  private void addxlsxRows(
-      ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList) {
+  public void addxlsxRows(
+      ExportBean exportBean, Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList,
+      Long rowCount) {
     logger.debug(this.getClass().getName() + " addxlsxRows starts");
 
     // Create instance here to optimize apache POI cell style
     CellStyle cellStyle = workBook.createCellStyle();
     String[] header = null;
     for (int rowNum = 0; rowNum < recordRowList.size(); rowNum++) {
-      XSSFRow excelRow = workSheet.createRow(rowNum + 1);
+      XSSFRow excelRow = workSheet.createRow(rowCount.intValue()+rowNum);
       Object data = recordRowList.get(rowNum);
       if (data instanceof LinkedHashMap) {
         if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
@@ -61,6 +64,7 @@ public class XlsxExporter implements IFileExporter {
           exportBean.setColumnHeader(header);
           addHeaderRow(exportBean, workBook, workSheet, null);
         }
+        header=exportBean.getColumnHeader();
         buildXlsxCells(exportBean, workBook, header, cellStyle, excelRow, (LinkedHashMap) data);
       }
     }
