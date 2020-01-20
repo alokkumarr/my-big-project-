@@ -49,6 +49,9 @@ public class NSSOProperties {
   @Value("${user.maxUnsuccessfulLoginAttemptAllowed}")
   private int maxInvalidPwdLimit;
 
+  @Value("${id3.base.url}")
+  private String id3BaseUrl;
+
   public String getRefreshTokenValidityMins() {
     return refreshTokenValidityMins;
   }
@@ -169,5 +172,19 @@ public class NSSOProperties {
   /** Sets Max number of attempts the user can retry */
   public void setMaxInvalidPwdLimit(int maxInvalidPwdLimit) {
     this.maxInvalidPwdLimit = maxInvalidPwdLimit;
+  }
+
+  /**
+   * Get the id3 base url.
+   * @return string */
+  public String getId3BaseUrl() {
+    return id3BaseUrl;
+  }
+
+  /**
+   * set the id3 base url.
+   *  @param id3BaseUrl */
+  public void setId3BaseUrl(String id3BaseUrl) {
+    this.id3BaseUrl = id3BaseUrl;
   }
 }
