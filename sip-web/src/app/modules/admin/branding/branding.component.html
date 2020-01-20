@@ -1,11 +1,11 @@
-<span>Choose Primary Color: </span>
-<br/>
-<span [(colorPicker)]="primaryColor"
-      [cpDialogDisplay]="'inline'"
-      [style.background]="primaryColor"
-      [cpToggle]="true"
-      [cpWidth]="'600%'"
-      [cpHeight]="'auto'">
-</span>
+<div>
+  <h1 e2e="branding-details">Set Brand Color and Logo</h1>
+  <input type="text" [(ngModel)]="primaryColor" /><br/>
+  <div class="choose_file">
+    <span>Select Image For Upload</span>
+    <input name="Select File" type="file" (change)="prepareBrandimgForUpload($event)" />
+  </div>
+  <button mat-raised-button color="primary" (click)="saveBrandingDetails()">Save Primary Color</button>
+</div>
 
-<button mat-raised-button color="primary" (click)="savePrimaryColor()">Save Primary Color</button>
+

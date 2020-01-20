@@ -13,6 +13,7 @@ import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
 import { DataSecurityService } from './datasecurity/datasecurity.service';
 import { AdminBrandingComponent } from './branding/branding.component';
+import { BrandingService } from './branding/branding.service';
 import { routes } from './routes';
 import { FormsModule } from '@angular/forms';
 import { AnalyzeService } from '../analyze/services/analyze.service';
@@ -109,6 +110,7 @@ const SERVICES = [
   ExportService,
   ImportService,
   DataSecurityService,
+  BrandingService,
   CategoryService,
   AnalyzeService
 ];
