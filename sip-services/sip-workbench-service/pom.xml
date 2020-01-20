@@ -31,6 +31,7 @@
 		<mariadb>2.3.0</mariadb>
 		<snotify>1.1</snotify>
 		<common.io>2.6</common.io>
+		<mapr.core.version>6.1.0</mapr.core.version>
 		  <spark-version>2.3.2</spark-version>
     <mapr.hadoop.client.version>2.7.0-mapr-1808</mapr.hadoop.client.version>
 	</properties>
@@ -45,6 +46,17 @@
 		</repository>
 	</repositories>
 	<dependencies>
+	<dependency>
+      <groupId>com.mapr.hadoop</groupId>
+      <artifactId>maprfs</artifactId>
+      <version>${mapr.core.version}-mapr</version>
+      <scope>provided</scope>
+    </dependency>
+     <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -92,6 +104,16 @@
 		<dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>com.mapr.streams</groupId>
+      <artifactId>mapr-streams</artifactId>
+      <version>${mapr.core.version}-mapr</version>
+    </dependency>
+     <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>1.0.1-mapr-1803</version>
     </dependency>
 
     <dependency>
