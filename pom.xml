@@ -9,6 +9,16 @@
   <name>sip</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jacoco.skip>true</jacoco.skip>
+    <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.skipPackageDesign>true</sonar.skipPackageDesign>
+    <sonar.exclusions>**/jquery*.js,**/bootstrap*.js,**/prototype.js</sonar.exclusions>
+    <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.jacoco.coverage>${project.build.directory}/coverage</sonar.jacoco.coverage>
+    <sonar.jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</sonar.jacoco.itReportPath>
+    <sonar.jacoco.itCoverage>${project.build.directory}/coverage-it</sonar.jacoco.itCoverage>
+    <sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -53,6 +63,59 @@
                parent project -->
           <skip>true</skip>
         </configuration>
+      </plugin>
+      <!--This JACOCO Configuration generates the test coverage results for Sonar-->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>pre-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <skip>${jacoco.skip}</skip>
+              <destFile>${sonar.jacoco.reportPath}</destFile>
+              <append>true</append>
+              <propertyName>surefireArgLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-unit-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <skip>${jacoco.skip}</skip>
+              <dataFile>${sonar.jacoco.reportPath}</dataFile>
+              <outputDirectory>${sonar.jacoco.coverage}</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pre-integration-test</id>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+            <configuration>
+              <destFile>${sonar.jacoco.itReportPath}</destFile>
+              <append>true</append>
+              <propertyName>failsafeArgLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${sonar.jacoco.itReportPath}</dataFile>
+              <outputDirectory>${sonar.jacoco.itCoverage}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -102,6 +165,16 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>3.0.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -191,5 +264,4 @@
       <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
     </site>
   </distributionManagement>
-
 </project>
