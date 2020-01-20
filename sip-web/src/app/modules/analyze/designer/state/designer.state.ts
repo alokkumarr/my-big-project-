@@ -824,7 +824,7 @@ export class DesignerState {
     const groupAdapters = getState().groupAdapters;
     const adapter = groupAdapters[adapterIndex];
     const column = adapter.artifactColumns[columnIndex];
-    adapter.reverseTransform(column);
+    // adapter.reverseTransform(column);
     groupAdapters[adapterIndex].artifactColumns.splice(columnIndex, 1);
     // const updatedGroupAdapters = produce(groupAdapters, draft => {
     //   draft[adapterIndex].artifactColumns.splice(columnIndex, 1);
