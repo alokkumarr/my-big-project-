@@ -15,7 +15,6 @@ import { ExecuteService } from '../../services/execute.service';
 import { AnalysisDSL } from '../types';
 import * as filter from 'lodash/fp/filter';
 import * as get from 'lodash/get';
-import * as find from 'lodash/find';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { DesignerLoadMetric } from '../actions/designer.actions';
 import { DesignerService } from '../designer.service';
@@ -198,40 +197,14 @@ export class DesignerPageComponent implements OnInit {
   }
 
   fixArtifactsForSIPQuery(analysis, artifacts) {
-    if (!isDSLAnalysis(analysis)) {
+    if (!isDSLAnalysis(analysis) || analysis.designerEdit) {
       return artifacts;
     }
 
-    if (analysis.designerEdit) {
-      return artifacts;
-    }
-
-    artifacts = this.designerService.addDerivedMetricsToArtifacts(
+    return this.designerService.addDerivedMetricsToArtifacts(
       artifacts,
       analysis.sipQuery
     );
-
-    analysis.sipQuery.artifacts[0].fields.forEach(field => {
-      const artifactColumn = find(
-        artifacts[0].columns,
-        col => col.columnName === field.columnName
-      );
-
-      if (!artifactColumn) {
-        return;
-      }
-
-      artifactColumn.checked = true;
-      artifactColumn.area = field.area;
-      if (field.aggregate) {
-        artifactColumn.aggregate = field.aggregate;
-      }
-      if (field.dateFormat) {
-        artifactColumn.dateFormat = field.dateFormat;
-      }
-    });
-
-    return artifacts;
   }
 
   /**
