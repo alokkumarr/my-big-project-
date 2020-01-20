@@ -45,6 +45,7 @@ public class SIPAggregationBuilder {
   private Integer querySize;
   public static final String DATE_FORMAT = "yyyy-MM-dd";
   private static final String GROUP_BY_FIELD = "group_by_field";
+  private static final Integer BOUND_VALUE = 10000;
 
   int groupFieldCount = 0;
 
@@ -205,7 +206,7 @@ public class SIPAggregationBuilder {
                     .size(size));
           }
         }
-        if (aggregationFilter.size() > 0) {
+        if (!aggregationFilter.isEmpty()) {
           aggregationBuilder =
               buildAggregationFilter(aggregationFilter, aggregationBuilder, booleanCriteria);
         }
@@ -287,34 +288,39 @@ public class SIPAggregationBuilder {
       List<Filter> aggregationFilter,
       AggregationBuilder aggregationBuilder,
       BooleanCriteria booleanCriteria) {
-
     Map<String, String> bucketsPathsMap = new HashMap<>();
     List<String> aggregateScript = new ArrayList<>();
-    for (Filter filter : aggregationFilter) {
-      String scriptSourceName;
-      if (filter.getAggregate() != null) {
-        Field aggregateField = new Field();
-        aggregateField.setColumnName(filter.getColumnName());
-        aggregateField.setAggregate(filter.getAggregate());
-        String fieldName =
-            filter.getAggregate() + "_" + filter.getColumnName() + random.nextInt(10000);
-        aggregateField.setDataField(fieldName);
-        aggregationBuilder.subAggregation(
-            QueryBuilderUtil.aggregationBuilderDataField(aggregateField));
-        bucketsPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
-        scriptSourceName = fieldName;
-      } else {
-        bucketsPathsMap.put(filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
-        scriptSourceName = filter.getColumnName();
-      }
-      aggregateScript.add(QueryBuilderUtil.prepareAggregationFilter(filter, scriptSourceName));
-    }
+    aggregationFilter.stream()
+        .forEach(
+            filter -> {
+              String scriptSourceName;
+              if (filter.getAggregate() != null) {
+                Field aggregateField = new Field();
+                aggregateField.setColumnName(filter.getColumnName());
+                aggregateField.setAggregate(filter.getAggregate());
+                String fieldName =
+                    filter.getAggregate()
+                        + "_"
+                        + filter.getColumnName()
+                        + random.nextInt(BOUND_VALUE);
+                aggregateField.setDataField(fieldName);
+                aggregationBuilder.subAggregation(
+                    QueryBuilderUtil.aggregationBuilderDataField(aggregateField));
+                bucketsPathsMap.put(fieldName, fieldName + BuilderUtil.VALUE);
+                scriptSourceName = fieldName;
+              } else {
+                bucketsPathsMap.put(
+                    filter.getColumnName(), filter.getColumnName() + BuilderUtil.VALUE);
+                scriptSourceName = filter.getColumnName();
+              }
+              aggregateScript.add(
+                  QueryBuilderUtil.prepareAggregationFilter(filter, scriptSourceName));
+            });
     Script script =
         new Script(StringUtils.join(aggregateScript, getScriptBooleanOperator(booleanCriteria)));
-
-    // Script script = QueryBuilderUtil.prepareAggregationFilter2(filter,scriptSourceName);
     BucketSelectorPipelineAggregationBuilder bs =
-        PipelineAggregatorBuilders.bucketSelector(CommonQueryConstants.BUCKET_FILTER, bucketsPathsMap, script);
+        PipelineAggregatorBuilders.bucketSelector(
+            CommonQueryConstants.BUCKET_FILTER, bucketsPathsMap, script);
     aggregationBuilder.subAggregation(bs);
 
     return aggregationBuilder;
